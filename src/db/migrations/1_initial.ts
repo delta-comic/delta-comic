@@ -1,7 +1,6 @@
 import type { Kysely } from 'kysely'
 
 async function up(db: Kysely<any>) {
-  console.log('update db to 1')
   //#region itemStore begin
   await db.schema
     .createTable('itemStore')
