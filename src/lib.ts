@@ -11,8 +11,7 @@ import * as Motion from 'motion-v'
 window.$$lib$$.Motion = Motion
 import * as Axios from 'axios'
 import axios from 'axios'
-import axiosTauriApiAdapter from 'axios-tauri-api-adapter'
-axios.defaults.adapter = axiosTauriApiAdapter
+axios.defaults.adapter = ['fetch']
 window.$$lib$$.Axios = { ...Axios, ...axios, axios }
 import * as EsKits from 'es-toolkit'
 window.$$lib$$.EsKits = EsKits
@@ -22,8 +21,8 @@ import * as Vr from 'vue-router'
 window.$$lib$$.VR = Vr
 import * as Pinia from 'pinia'
 window.$$lib$$.Pinia = Pinia
+//@ts-ignore
 import Crypto from 'crypto-js'
 window.$$lib$$.Crypto = Crypto
-
 window.$api.NImage = Naive.NImage
 window.$api.showImagePreview = Vant.showImagePreview

@@ -1,20 +1,22 @@
 import type { PluginArchiveDB } from "@/plugin/db"
-import { PluginInstaller } from "../utils"
-import { decodePluginMeta, Utils } from "delta-comic-core"
+import { PluginInstaller, type PluginFile, type PluginInstallerDescription } from "../utils"
+import { Utils } from "delta-comic-core"
 import axios from "axios"
-import * as fs from '@tauri-apps/plugin-fs'
-import { parse } from 'userscript-meta'
-import { getPluginFsPath } from "../utils"
 
-export class _PluginInstallByNormalUrl extends PluginInstaller {
-  public override name = 'normalUrl'
-  private async installer(input: string, { createLoading, createProgress }: Utils.message.DownloadMessageBind) {
+export class _PluginInstallByFallbackUrl extends PluginInstaller {
+  public override description: PluginInstallerDescription
+    = {
+      title: '通过任意URL安装插件',
+      description: '从任何你给定的url获取内容，无论内容是什么'
+    }
+  public override name = 'fallbackUrl'
+  private async installer(input: string, { createProgress }: Utils.message.DownloadMessageBind): Promise<PluginFile> {
     const code = await createProgress('下载插件中', async c => {
       c.retryable = true
       c.description = '下载中'
-      const res = await axios.request<string>({
+      const res = await axios.request<Blob>({
         url: input,
-        responseType: 'text',
+        responseType: 'blob',
         onDownloadProgress: progressEvent => {
           if (!progressEvent.lengthComputable) c.progress = 100
           else c.progress = progressEvent.loaded / progressEvent.total! * 100
@@ -22,34 +24,20 @@ export class _PluginInstallByNormalUrl extends PluginInstaller {
       })
       return res.data
     })
-    const meta = decodePluginMeta(parse(code))
-    await createLoading('写入文件系统', async c => {
-      c.retryable = true
-      c.description = '写入中'
-      const path = getPluginFsPath(meta.name.id)
-      fs.writeTextFile(`${path}/us.js`, code, { create: true })
-    })
-    return meta
-  }
-  public override async install(input: string): Promise<PluginArchiveDB.Meta> {
-    const meta = await Utils.message.createDownloadMessage('下载插件-回退URL', m => this.installer(input, m))
+    const fileName = input.split('/').at(-1)!
     return {
-      enable: true,
-      installerName: this.name,
-      installInput: input,
-      loaderName: 'userscript',
-      meta,
-      pluginName: meta.name.id,
-      displayName: meta.name.display
+      blob: code,
+      fileName
     }
   }
-  public override async update(pluginMeta: PluginArchiveDB.Meta): Promise<PluginArchiveDB.Meta> {
-    const meta = await Utils.message.createDownloadMessage('更新插件-回退URL', m => this.installer(pluginMeta.installInput, m))
-    return {
-      ...pluginMeta,
-      meta,
-      displayName: meta.name.display
-    }
+
+  public override async install(input: string): Promise<PluginFile> {
+    const file = await Utils.message.createDownloadMessage('下载插件-回退URL', m => this.installer(input, m))
+    return file
+  }
+  public override async update(pluginMeta: PluginArchiveDB.Meta): Promise<PluginFile> {
+    const file = await Utils.message.createDownloadMessage('更新插件-回退URL', m => this.installer(pluginMeta.installInput, m))
+    return file
   }
   public override isMatched(input: string): boolean {
     return URL.canParse(input)
@@ -57,4 +45,4 @@ export class _PluginInstallByNormalUrl extends PluginInstaller {
 
 }
 
-export default new _PluginInstallByNormalUrl
+export default new _PluginInstallByFallbackUrl

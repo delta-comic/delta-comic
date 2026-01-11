@@ -1,19 +1,21 @@
 import type { PluginArchiveDB } from "@/plugin/db"
-import { PluginInstaller } from "../utils"
-import { decodePluginMeta, Utils } from "delta-comic-core"
+import { PluginInstaller, type PluginFile, type PluginInstallerDescription } from "../utils"
+import { Utils } from "delta-comic-core"
 import axios from "axios"
-import * as fs from '@tauri-apps/plugin-fs'
-import { parse } from 'userscript-meta'
-import { getPluginFsPath } from "../utils"
 
 export class _PluginInstallByDev extends PluginInstaller {
+  public override description: PluginInstallerDescription
+    = {
+      title: '安装Develop Userscript插件',
+      description: '输入形如: "localhost"或者一个不含port的ip'
+    }
   public override name = 'devUrl'
-  private async installer(input: string, { createLoading, createProgress }: Utils.message.DownloadMessageBind) {
+  private async installer(input: string, { createProgress }: Utils.message.DownloadMessageBind): Promise<PluginFile> {
     const code = await createProgress('下载插件中', async c => {
       c.retryable = true
       c.description = '下载中'
       const res = await axios.request<string>({
-        url: input,
+        url: `http://${input}:6173/__vite-plugin-monkey.install.user.js?origin=http%3A%2F%2F${input}%3A6173`,
         responseType: 'text',
         onDownloadProgress: progressEvent => {
           if (!progressEvent.lengthComputable) c.progress = 100
@@ -22,37 +24,23 @@ export class _PluginInstallByDev extends PluginInstaller {
       })
       return res.data
     })
-    const meta = decodePluginMeta(parse(code))
-    await createLoading('写入文件系统', async c => {
-      c.retryable = true
-      c.description = '写入中'
-      const path = getPluginFsPath(meta.name.id)
-      fs.writeTextFile(`${path}/us.js`, code, { create: true })
-    })
-    return meta
-  }
-  public override async install(input: string): Promise<PluginArchiveDB.Meta> {
-    const meta = await Utils.message.createDownloadMessage('下载插件-回退URL', m => this.installer(input, m))
     return {
-      enable: true,
-      installerName: this.name,
-      installInput: input,
-      loaderName: 'userscript',
-      meta,
-      pluginName: meta.name.id,
-      displayName: meta.name.display
+      blob: new Blob([code
+        .replaceAll('localhost', input)
+        .replaceAll('127.0.0.1', input)]),
+      fileName: 'dev.js'
     }
   }
-  public override async update(pluginMeta: PluginArchiveDB.Meta): Promise<PluginArchiveDB.Meta> {
-    const meta = await Utils.message.createDownloadMessage('更新插件-回退URL', m => this.installer(pluginMeta.installInput, m))
-    return {
-      ...pluginMeta,
-      meta,
-      displayName: meta.name.display
-    }
+  public override async install(input: string): Promise<PluginFile> {
+    const file = await Utils.message.createDownloadMessage('下载插件-DevUs', m => this.installer(input, m))
+    return file
+  }
+  public override async update(pluginMeta: PluginArchiveDB.Meta): Promise<PluginFile> {
+    const file = await Utils.message.createDownloadMessage('更新插件-DevUs', m => this.installer(pluginMeta.installInput, m))
+    return file
   }
   public override isMatched(input: string): boolean {
-    return /(\d+\.?)+/.test(input)
+    return /((\d+\.?)+)|(localhost)/.test(input)
   }
 
 }

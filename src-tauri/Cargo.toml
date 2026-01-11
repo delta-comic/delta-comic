@@ -47,5 +47,5 @@ tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", fe
   "sqlite",
 ], branch = "v2" }
 tauri-plugin-pinia = "4.1.0"
-tauri-plugin-safe-area-insets = "0.1.0"
 tauri-plugin-m3 = "0.3.0"
+tauri-plugin-cors-fetch = "4.1.0"

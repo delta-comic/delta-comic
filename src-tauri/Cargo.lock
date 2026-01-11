@@ -775,13 +775,13 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tauri-plugin-clipboard-manager",
+ "tauri-plugin-cors-fetch",
  "tauri-plugin-fs",
  "tauri-plugin-http",
  "tauri-plugin-log",
  "tauri-plugin-m3",
  "tauri-plugin-persisted-scope",
  "tauri-plugin-pinia",
- "tauri-plugin-safe-area-insets",
  "tauri-plugin-sql",
  "tauri-plugin-upload",
 ]
@@ -1624,9 +1624,9 @@ dependencies = [
 
 [[package]]
 name = "h2"
-version = "0.4.12"
+version = "0.4.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3c0b69cfcb4e1b9f1bf2f53f95f766e4661169728ec61cd3fe5a0166f2d1386"
+checksum = "2f44da3a8150a6703ed5d34e164b875fd14c2cdab9af1252a9a1020bde2bdc54"
 dependencies = [
  "atomic-waker",
  "bytes",
@@ -4696,6 +4696,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "tauri-plugin-cors-fetch"
+version = "4.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1bbb818e0e97f72dc9d353d38fa5799ed1dd4cf7371ff3195bd1231072d6fc2d"
+dependencies = [
+ "http",
+ "once_cell",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.17",
+ "tokio",
+ "url",
+]
+
+[[package]]
 name = "tauri-plugin-fs"
 version = "2.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4801,18 +4819,6 @@ dependencies = [
  "tauri",
  "tauri-plugin",
  "tauri-store",
-]
-
-[[package]]
-name = "tauri-plugin-safe-area-insets"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "653b425316a0e9563995286eb5b0fa44490583486b7a0925859b33ec5be07f0e"
-dependencies = [
- "serde",
- "tauri",
- "tauri-plugin",
- "thiserror 2.0.17",
 ]
 
 [[package]]

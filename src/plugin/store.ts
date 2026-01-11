@@ -1,6 +1,6 @@
 import { type PluginConfig, type PluginConfigSearchMethod, _pluginExposes } from "delta-comic-core"
 import { defineStore } from "pinia"
-import { computed, reactive } from "vue"
+import { computed, reactive, type Raw } from "vue"
 import { shallowReactive } from "vue"
 import { db } from "@/db"
 import { computedAsync } from "@vueuse/core"
@@ -33,7 +33,7 @@ const pluginNames = computedAsync(async () => Object.fromEntries((await db.value
   .execute()).map(v => [v.pluginName, v.displayName] as const)), {})
 
 export const usePluginStore = defineStore('plugin', helper => {
-  const plugins = shallowReactive(new Map<string, PluginConfig>())
+  const plugins = shallowReactive(new Map<string, Raw<PluginConfig>>())
   const pluginSteps = reactive<Record<string, PluginLoadingMicroSteps>>({})
 
   const allSearchSource = computed(() => Array.from(plugins.values()).filter(v => v.search?.methods).map(v => [v.name, Object.entries(v.search?.methods ?? {})] as [plugin: string, sources: [name: string, method: PluginConfigSearchMethod][]]))

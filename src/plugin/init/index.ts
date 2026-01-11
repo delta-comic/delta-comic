@@ -2,7 +2,7 @@ import { Utils, type PluginConfig } from "delta-comic-core"
 import { sortBy } from "es-toolkit/compat"
 import { usePluginStore } from "../store"
 import { isString } from "es-toolkit"
-import { reactive } from "vue"
+import { markRaw, reactive } from "vue"
 import { until } from "@vueuse/core"
 import { PluginArchiveDB } from "../db"
 import { pluginName } from "@/symbol"
@@ -18,7 +18,7 @@ const booters = sortBy(Object.entries(rawBooters), ([fname]) => Number(fname.mat
 
 export const bootPlugin = async (cfg: PluginConfig) => {
   const { plugins, pluginSteps } = usePluginStore()
-  plugins.set(cfg.name, cfg as any)
+  plugins.set(cfg.name, markRaw(cfg))
   try {
     const env: Record<any, any> = {}
     for (const booter of booters) {
@@ -51,43 +51,66 @@ const rawInstallers = import.meta.glob<PluginInstaller>('./installer/*_*.ts', {
   eager: true,
   import: 'default'
 })
-const installers = sortBy(Object.entries(rawInstallers), ([fname]) => Number(fname.match(/[\d\.]+(?=_)/)?.[0])).map(v => v[1])
+const installers = sortBy(Object.entries(rawInstallers), ([fname]) => Number(fname.match(/[\d\.]+(?=_)/)?.[0])).map(v => v[1]).reverse()
 
+export const installPlugin = async (input: string, __installedPlugins?: Set<string>) => {
+  const installer = installers.filter(ins => ins.isMatched(input)).at(-1)
+  if (!installer) throw new Error('没有符合的下载器:' + input)
 
-export const installPlugin = async (input: string) => {
-  const matched = installers.filter(ins => ins.isMatched(input))
-  const bestMatched = matched.at(-1)
-  if (!bestMatched) throw new Error('没有符合的安装器')
+  const file = await installer.install(input)
 
-  const meta = await bestMatched.install(input)
+  const loader = loaders.filter(ins => ins.canInstall(file)).at(-1)
+  if (!loader) throw new Error('没有符合的安装器:' + input)
+
+  const meta = await loader.installDownload(file)
+
+  const plugins = __installedPlugins ?? new Set((await db.value
+    .selectFrom('plugin')
+    .select('pluginName')
+    .execute()).map(v => v.pluginName))
+  for (const { id, download } of meta.require) {
+    const isDownloaded = plugins.has(id)
+    if (isDownloaded || !download) continue
+    await installPlugin(download)
+  }
+
   await db.value
     .replaceInto('plugin')
     .values({
-      ...meta,
-      meta: JSON.stringify(meta.meta)
+      displayName: meta.name.display,
+      enable: true,
+      installerName: installer.name,
+      installInput: input,
+      loaderName: loader.name,
+      meta: JSON.stringify(meta),
+      pluginName: meta.name.id
     })
     .execute()
 }
 
 export const updatePlugin = async (pluginMeta: PluginArchiveDB.Meta) => {
-  const matched = installers.find(v => v.name == pluginMeta.installerName)
-  if (!matched) throw new Error('没有符合的安装器')
+  const installer = installers.find(v => v.name == pluginMeta.installerName)
+  if (!installer) throw new Error('没有符合的下载器')
 
-  const newMeta = await matched.update(pluginMeta)
+  const loader = loaders.find(v => v.name == pluginMeta.loaderName)
+  if (!loader) throw new Error('没有符合的安装器')
+
+  const file = await installer.update(pluginMeta)
+  const meta = await loader.installDownload(file)
   await db.value
     .replaceInto('plugin')
     .values({
-      ...newMeta,
-      meta: JSON.stringify(newMeta.meta)
+      ...pluginMeta,
+      meta: JSON.stringify(meta)
     })
     .execute()
 }
 
-const rawLoaders = import.meta.glob<PluginLoader>('./loader/_*.ts', {
+const rawLoaders = import.meta.glob<PluginLoader>('./loader/*_*.ts', {
   eager: true,
   import: 'default'
 })
-const loaders = Object.fromEntries(Object.entries(rawLoaders).map(([fname, loader]) => [fname.replace(/\.ts$/, '').replace(/^_/, ''), loader] as const))
+const loaders = sortBy(Object.entries(rawLoaders), ([fname]) => Number(fname.match(/[\d\.]+(?=_)/)?.[0])).map(v => v[1])
 
 const loadings = reactive<Record<string, boolean>>({})
 const { SharedFunction } = Utils.eventBus
@@ -104,7 +127,7 @@ export const loadPlugin = async (pluginMeta: PluginArchiveDB.Meta) => {
       description: '插件载入中'
     }]
   }
-  await loaders[pluginMeta.loaderName].load(pluginMeta)
+  await loaders.find(v => v.name == pluginMeta.loaderName)!.load(pluginMeta)
   await until(() => loadings[pluginMeta.loaderName]).toBeTruthy()
   console.log(`[plugin bootPlugin] booting name "${pluginMeta.loaderName}"`)
 }
@@ -113,3 +136,11 @@ SharedFunction.define(async cfg => {
   await bootPlugin(cfg)
   loadings[cfg.name] = true
 }, pluginName, 'addPlugin')
+
+
+export {
+  loaders as pluginLoaders,
+  installers as pluginInstallers
+}
+window.$api.loaders = loaders
+window.$api.installers = installers

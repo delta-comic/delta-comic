@@ -11,18 +11,12 @@
     "clipboard-manager:deny-write-text",
     "fs:default",
     "fs:allow-applocaldata-write-recursive",
-    {
-      "identifier": "http:default",
-      "allow": [
-        "*"
-      ]
-    },
     "sql:default",
     "sql:allow-execute",
     "upload:default",
     "pinia:default",
     "core:event:default",
     "m3:default",
-    "safe-area-insets:default"
+    "cors-fetch:default"
   ]
 }

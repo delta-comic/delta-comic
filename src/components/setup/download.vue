@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { installPlugin } from '@/plugin'
+import { installPlugin, pluginInstallers } from '@/plugin'
 import { toReactive, useFileDialog } from '@vueuse/core'
 import { Utils } from 'delta-comic-core'
 import { useMessage } from 'naive-ui'
@@ -73,7 +73,7 @@ const useUploadPlugin = () => {
 <template>
   <div class="w-full">
     <div class="pt-3 pl-5 text-2xl mb-2">插件安装</div>
-    <NInput v-model:value="inputUrl" class="w-[calc(100%-10px)]! m-1.25" clearable placeholder="输入插件的链接"
+    <NInput v-model:value="inputUrl" class="w-[calc(100%-10px)]! m-1.25" clearable placeholder="输入内容以安装插件"
       :disabled="isAdding" :loading="isAdding" />
     <div class="p-10 flex w-full items-center justify-center gap-4">
       <NButton type="primary" size="large" class="w-1/2!" :loading="isAdding" :disabled="isAdding"
@@ -83,21 +83,18 @@ const useUploadPlugin = () => {
         @click="useUploadPlugin">使用本地文件
       </NButton>
     </div>
-    <ul class="ml-10 w-fit *:my-1">
-      <li class="w-fit flex items-center gap-3">
+    <TransitionGroup name="list" tag="ul" class="ml-10 w-full *:my-1 h-1/2 overflow-auto">
+      <li name="list" tag="ul" class="w-5/6 flex items-center gap-3 rounded-lg px-2 mx-auto my-4!"
+        :class="[inputUrl && 'first:bg-green-300/60']" :key="desc.name"
+        v-for="desc of (inputUrl.length == 0) ? pluginInstallers : pluginInstallers.filter(v => v.isMatched(inputUrl))">
         <span class="size-2 rounded-full item-center bg-(--van-text-color) shrink-0" aria-hidden="true"></span>
         <div>
-          <div class="font-medium">输入完整链接</div>
-        </div>
-      </li>
-      <li class="w-fit flex items-center gap-3">
-        <span class="size-2 rounded-full item-center bg-(--van-text-color) shrink-0" aria-hidden="true"></span>
-        <div>
-          <div class="font-medium">输入github仓库
-            <br>(如: gh:wenxig/delta-comic-plugin-jmcomic )
+          <div class="van-hairline--bottom text-base font-semibold">
+            {{ desc.description.title }}
           </div>
+          <div>{{ desc.description.description }}</div>
         </div>
       </li>
-    </ul>
+    </TransitionGroup>
   </div>
 </template>

@@ -13,10 +13,10 @@ pub fn run() {
   ];
 
   tauri::Builder::default()
-    .plugin(tauri_plugin_safe_area_insets::init())
+   .plugin(tauri_plugin_http::init())
     .plugin(tauri_plugin_m3::init())
     .plugin(tauri_plugin_upload::init())
-    .plugin(tauri_plugin_http::init())
+    .plugin(tauri_plugin_cors_fetch::init())
     .plugin(tauri_plugin_fs::init())
     .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_persisted_scope::init())

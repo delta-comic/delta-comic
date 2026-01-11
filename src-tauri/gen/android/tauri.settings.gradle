@@ -9,5 +9,3 @@ include ':tauri-plugin-m3'
 project(':tauri-plugin-m3').projectDir = new File("/Users/xgw/.cargo/registry/src/github.com-25cdd57fae9f0462/tauri-plugin-m3-0.3.0/android")
 include ':tauri-plugin-pinia'
 project(':tauri-plugin-pinia').projectDir = new File("/Users/xgw/.cargo/registry/src/github.com-25cdd57fae9f0462/tauri-plugin-pinia-4.1.0/android")
-include ':tauri-plugin-safe-area-insets'
-project(':tauri-plugin-safe-area-insets').projectDir = new File("/Users/xgw/.cargo/registry/src/github.com-25cdd57fae9f0462/tauri-plugin-safe-area-insets-0.1.0/android")

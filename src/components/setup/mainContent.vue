@@ -86,7 +86,7 @@ const totalCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom('plug
         <NMenu v-model:value="pageSelect" mode="horizontal" :options="menuOptions" responsive />
         <VanTabs v-model:active="pageSelect" swipeable :show-header="false"
           class="size-full! *:size-full! *:*:size-full! *:*:*:size-full!">
-          <VanTab v-for="menu in menuOptions" :name="menu.key" class="size-full! *:size-full!">
+          <VanTab v-for="menu in menuOptions.filter(v => !v.disabled)" :name="menu.key" class="size-full! *:size-full!">
             <component :is="menu.comp" />
           </VanTab>
         </VanTabs>
