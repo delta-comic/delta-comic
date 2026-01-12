@@ -104,11 +104,6 @@
 
 ![Alt](https://repobeats.axiom.co/api/embed/d29bef6ede7cc9fcfabb0d1499a656e06f5462bf.svg "Repobeats analytics image")
 
-
-### main
-
-![Alt](https://repobeats.axiom.co/api/embed/d29bef6ede7cc9fcfabb0d1499a656e06f5462bf.svg "Repobeats analytics image")
-
 ### develop
 
 ![Alt](https://repobeats.axiom.co/api/embed/a878d5bd4b98d32935487a41f6087356c1e60a58.svg "Repobeats analytics image")
