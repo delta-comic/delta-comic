@@ -88,8 +88,8 @@
 ## 工程路线图
 
 - [x] bika -_何以忘却_
-- [x]  jmcomic -_何以哀怮_
-- [x]  cosav -_何以殁亡_
+- [x] jmcomic -_何以哀怮_
+- [x] cosav -_何以殁亡_
 - [ ] e-hentai -_何以战栗_
 - [ ] hanime1 _何以倾慕_
 - _待定_ -_无以迷惘_
@@ -100,4 +100,19 @@
 
 ## 状态
 
-![Alt](https://repobeats.axiom.co/api/embed/b2d1f0af6bed496b1f12c5dcb61bd95a0cd3369e.svg "Repobeats analytics image")
+### main
+
+![Alt](https://repobeats.axiom.co/api/embed/d29bef6ede7cc9fcfabb0d1499a656e06f5462bf.svg "Repobeats analytics image")
+
+
+### main
+
+![Alt](https://repobeats.axiom.co/api/embed/d29bef6ede7cc9fcfabb0d1499a656e06f5462bf.svg "Repobeats analytics image")
+
+### develop
+
+![Alt](https://repobeats.axiom.co/api/embed/a878d5bd4b98d32935487a41f6087356c1e60a58.svg "Repobeats analytics image")
+
+### develop-tauri
+
+![Alt](https://repobeats.axiom.co/api/embed/3281929c21afad2da85f03b7bd5e72f343eedc95.svg "Repobeats analytics image")
