@@ -53,40 +53,54 @@ const rawInstallers = import.meta.glob<PluginInstaller>('./installer/*_*.ts', {
 })
 const installers = sortBy(Object.entries(rawInstallers), ([fname]) => Number(fname.match(/[\d\.]+(?=_)/)?.[0])).map(v => v[1]).reverse()
 
-export const installPlugin = async (input: string, __installedPlugins?: Set<string>) => {
-  const installer = installers.filter(ins => ins.isMatched(input)).at(-1)
-  if (!installer) throw new Error('没有符合的下载器:' + input)
-
-  const file = await installer.install(input)
-
-  const loader = loaders.filter(ins => ins.canInstall(file)).at(-1)
-  if (!loader) throw new Error('没有符合的安装器:' + input)
-
-  const meta = await loader.installDownload(file)
-
-  const plugins = __installedPlugins ?? new Set((await db.value
-    .selectFrom('plugin')
-    .select('pluginName')
-    .execute()).map(v => v.pluginName))
-  for (const { id, download } of meta.require) {
-    const isDownloaded = plugins.has(id)
-    if (isDownloaded || !download) continue
-    await installPlugin(download)
-  }
-
-  await db.value
-    .replaceInto('plugin')
-    .values({
-      displayName: meta.name.display,
-      enable: true,
-      installerName: installer.name,
-      installInput: input,
-      loaderName: loader.name,
-      meta: JSON.stringify(meta),
-      pluginName: meta.name.id
+export const installPlugin = (input: string, __installedPlugins?: Set<string>) =>
+  Utils.message.createDownloadMessage('下载插件', async m => {
+    const [file, installer] = await m.createLoading('下载', async v => {
+      v.retryable = true
+      const installer = installers.filter(ins => ins.isMatched(input)).at(-1)
+      if (!installer) throw new Error('没有符合的下载器:' + input)
+      v.description = installer.name
+      return [
+        await installer.install(input),
+        installer
+      ] as const
     })
-    .execute()
-}
+
+    const meta = await m.createLoading('安装插件', async v => {
+      v.retryable = true
+      const loader = loaders.filter(ins => ins.canInstall(file)).at(-1)
+      if (!loader) throw new Error('没有符合的安装器:' + input)
+      v.description = loader.name
+
+      const meta = await loader.installDownload(file)
+
+      v.description = '写入数据库'
+      await db.value
+        .replaceInto('plugin')
+        .values({
+          displayName: meta.name.display,
+          enable: true,
+          installerName: installer.name,
+          installInput: input,
+          loaderName: loader.name,
+          meta: JSON.stringify(meta),
+          pluginName: meta.name.id
+        })
+        .execute()
+
+      return meta
+    })
+
+    const plugins = __installedPlugins ?? new Set((await db.value
+      .selectFrom('plugin')
+      .select('pluginName')
+      .execute()).map(v => v.pluginName))
+    for (const { id, download } of meta.require) {
+      const isDownloaded = plugins.has(id)
+      if (isDownloaded || !download) continue
+      await installPlugin(download)
+    }
+  })
 
 export const updatePlugin = async (pluginMeta: PluginArchiveDB.Meta) => {
   const installer = installers.find(v => v.name == pluginMeta.installerName)
