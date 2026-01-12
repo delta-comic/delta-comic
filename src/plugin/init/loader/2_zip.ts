@@ -3,22 +3,36 @@ import * as fs from '@tauri-apps/plugin-fs'
 import { getPluginFsPath } from "../utils"
 import type { PluginArchiveDB } from "@/plugin/db"
 import { type PluginMeta } from "delta-comic-core"
-import JSZip from "jszip"
+import { loadAsync, type JSZipObject } from "jszip"
 
 
 interface ProMeta {
   meta: PluginMeta
 }
 
-const jszip = new JSZip()
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'zip'
   public override async installDownload(file: PluginFile): Promise<PluginMeta> {
-    // const path = getPluginFsPath(meta.name.id)
-    // await fs.mkdir(path, { recursive: true })
-    // await fs.writeTextFile(`${path}/us.js`, code, { create: true })
-    const zip = await jszip.loadAsync(file.blob)
+    const zip = await loadAsync(file.blob)
     const { meta } = <ProMeta>JSON.parse((await zip.file('manifest.json')?.async('string')) ?? '{}')
+    const root = getPluginFsPath(meta.name.id)
+    await fs.mkdir(root, { recursive: true })
+    const files = new Array<{
+      path: string
+      file: JSZipObject
+    }>()
+    zip.forEach((zipFilePath, file) => {
+      files.push({
+        path: zipFilePath,
+        file
+      })
+    })
+    for (const { file, path } of files) {
+      if (file.dir)
+        await fs.mkdir(`${root}/${path}`, { recursive: true })
+      else
+        await fs.writeFile(`${root}/${path}`, await file.async('uint8array'), { create: true })
+    }
     return meta
   }
   public override canInstall(file: PluginFile): boolean {
@@ -26,10 +40,15 @@ class _PluginUserscriptLoader extends PluginLoader {
   }
 
   public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {
-    const code = await fs.readTextFile(getPluginFsPath(pluginMeta.pluginName) + '/us.js')
     const script = document.createElement('script')
-    script.innerHTML = code
+    script.type = 'module'
+    script.src = `app-files://${getPluginFsPath(pluginMeta.pluginName)}/index.js`
     document.body.appendChild(script)
+
+    const style = document.createElement('link')
+    style.rel = 'stylesheet'
+    style.href = `app-files://${getPluginFsPath(pluginMeta.pluginName)}/index.css`
+    document.head.appendChild(style)
   }
 }
 

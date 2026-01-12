@@ -13,7 +13,7 @@ pub fn run() {
   ];
 
   tauri::Builder::default()
-   .plugin(tauri_plugin_http::init())
+    .plugin(tauri_plugin_http::init())
     .plugin(tauri_plugin_m3::init())
     .plugin(tauri_plugin_upload::init())
     .plugin(tauri_plugin_cors_fetch::init())
@@ -26,6 +26,22 @@ pub fn run() {
         .build(),
     )
     .plugin(tauri_plugin_pinia::init())
+    .register_uri_scheme_protocol("app-files", |_ctx, request| {
+      // skip leading `/`
+      if let Ok(data) = std::fs::read(&request.uri().path()[1..]) {
+        tauri::http::Response::builder().body(data).unwrap()
+      } else {
+        tauri::http::Response::builder()
+          .status(tauri::http::StatusCode::BAD_REQUEST)
+          .header(
+            tauri::http::header::CONTENT_TYPE,
+            "text/plain",
+          )
+          .header("Access-Control-Allow-Origin", "*") // 允许跨域
+          .body("failed to read file".as_bytes().to_vec())
+          .unwrap()
+      }
+    })
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(
