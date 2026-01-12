@@ -84,8 +84,8 @@ await migrator.migrateToLatest()
 
 export namespace DBUtils {
   export async function countDb(sql: SelectQueryBuilder<DB, any, object>) {
-    const v = await sql.select(db => db.fn.countAll<number>().as('_count')).executeTakeFirstOrThrow()
-    return v._count
+    const v = await sql.select(db => db.fn.countAll<number>().as('count')).executeTakeFirstOrThrow()
+    return v.count
   }
 }
 
@@ -120,3 +120,4 @@ export const useNativeStore = <T>(namespace: string, key: MaybeRefOrGetter<strin
     },
   })
 }
+window.$api.useNativeStore = useNativeStore

@@ -85,8 +85,8 @@ const useUploadPlugin = () => {
     </div>
     <TransitionGroup name="list" tag="ul" class="ml-10 w-full *:my-1 h-1/2 overflow-auto">
       <li name="list" tag="ul" class="w-5/6 flex items-center gap-3 rounded-lg px-2 mx-auto my-4!"
-        :class="[inputUrl && 'first:bg-green-300/60']" :key="desc.name"
-        v-for="desc of (inputUrl.length == 0) ? pluginInstallers : pluginInstallers.filter(v => v.isMatched(inputUrl))">
+        :class="[(index == 0&& inputUrl) && 'bg-green-300/60']" :key="desc.name"
+        v-for="(desc, index) of (inputUrl.length == 0) ? pluginInstallers : pluginInstallers.filter(v => v.isMatched(inputUrl))">
         <span class="size-2 rounded-full item-center bg-(--van-text-color) shrink-0" aria-hidden="true"></span>
         <div>
           <div class="van-hairline--bottom text-base font-semibold">

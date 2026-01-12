@@ -12,19 +12,40 @@ import { Store } from "delta-comic-core"
 import 'vant/lib/index.css'
 import { createPlugin } from '@tauri-store/pinia'
 import '@/db'
-import '@saurl/tauri-plugin-safe-area-insets-css-api'
+import { M3, type InsetsScheme } from "tauri-plugin-m3"
 
 document.addEventListener('contextmenu', e => e.preventDefault())
+
+const handleSafeAreaChange = (v: InsetsScheme | false) => {
+  if (!v) return
+  const { rawInsetBottom, rawInsetLeft, rawInsetRight, rawInsetTop } = v
+  document.documentElement.style.setProperty(
+    `--safe-area-inset-bottom`,
+    `${rawInsetBottom}px`,
+  )
+  document.documentElement.style.setProperty(
+    `--safe-area-inset-left`,
+    `${rawInsetLeft}px`,
+  )
+  document.documentElement.style.setProperty(
+    `--safe-area-inset-right`,
+    `${rawInsetRight}px`,
+  )
+  document.documentElement.style.setProperty(
+    `--safe-area-inset-top`,
+    `${rawInsetTop}px`,
+  )
+}
+await M3.getInsets().then(handleSafeAreaChange)
 
 const app = createApp(
   defineComponent(() => {
     const themeColor = Color('#fb7299').hex()
-    const themeColorLight = Color(themeColor).lighten(0.2).hex()
     const themeColorDark = Color(themeColor).darken(0.2).hex()
     const themeOverrides = reactiveComputed<GlobalThemeOverrides>(() => ({
       common: {
         primaryColor: themeColor,
-        primaryColorHover: themeColorLight,
+        primaryColorHover: Color(themeColor).lighten(0.2).hex(),
         primaryColorPressed: themeColorDark,
         primaryColorSuppl: themeColorDark
       }

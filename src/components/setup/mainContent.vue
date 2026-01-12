@@ -76,7 +76,10 @@ const rebootApp = () => {
   location.reload()
 }
 
-const totalCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom('plugin')))
+const totalCount = computedAsync(() => DBUtils.countDb(db.value
+  .selectFrom('plugin')
+  .where('enable', '=', true)
+), 0)
 </script>
 
 <template>

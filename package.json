@@ -20,7 +20,6 @@
   "readme": "./README.md",
   "dependencies": {
     "@octokit/rest": "^22.0.1",
-    "@saurl/tauri-plugin-safe-area-insets-css-api": "^0.1.0",
     "@tauri-apps/api": "^2.9.1",
     "@tauri-apps/plugin-clipboard-manager": "~2.3.2",
     "@tauri-apps/plugin-fs": "~2.4.4",

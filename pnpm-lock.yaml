@@ -16,9 +16,6 @@ importers:
       '@octokit/rest':
         specifier: ^22.0.1
         version: 22.0.1
-      '@saurl/tauri-plugin-safe-area-insets-css-api':
-        specifier: ^0.1.0
-        version: 0.1.0
       '@tauri-apps/api':
         specifier: ^2.9.1
         version: 2.9.1
@@ -475,9 +472,6 @@ packages:
 
   '@rolldown/pluginutils@1.0.0-beta.59':
     resolution: {integrity: sha512-aoh6LAJRyhtazs98ydgpNOYstxUlsOV1KJXcpf/0c0vFcUA8uyd/hwKRhqE/AAPNqAho9RliGsvitCoOzREoVA==}
-
-  '@saurl/tauri-plugin-safe-area-insets-css-api@0.1.0':
-    resolution: {integrity: sha512-cZbOexV7OSBvgGECrqInA7daoCRLG5wGcUy/zrRIDaqXVKP6THdLWwsC5Ho6UD0lsxr8O4+zd1PPFJwrlHxTYg==}
 
   '@tailwindcss/node@4.1.18':
     resolution: {integrity: sha512-DoR7U1P7iYhw16qJ49fgXUlry1t4CpXeErJHnQ44JgTSKMaZUdf17cfn5mHchfJ4KRBZRFA/Coo+MUF5+gOaCQ==}
@@ -988,8 +982,8 @@ packages:
     engines: {node: '>=0.4.0'}
 
   delta-comic-core@file:../delta-comic-core/dist/pack.tgz:
-    resolution: {integrity: sha512-Jg9zfY2liVnM1ZoDYpkPkScCoBdJ3V0L7pWq8m6GA1dzIUhO0vvgx3wcIjdPj+OcG8h3fvJtu1ki8Czl8k0IXA==, tarball: file:../delta-comic-core/dist/pack.tgz}
-    version: 0.5.1
+    resolution: {integrity: sha512-LTYizeVAlGw+pFjl9/QUwVFlBUfap1Js6oNklLHw02cWDIqfsymiR09mUAtmbrIXnA6u3F2Z2rsswPre+fd6og==, tarball: file:../delta-comic-core/dist/pack.tgz}
+    version: 0.5.5
     peerDependencies:
       axios: ^1.12.2
       crypto-js: 4.2.0
@@ -2063,10 +2057,6 @@ snapshots:
   '@rolldown/pluginutils@1.0.0-beta.53': {}
 
   '@rolldown/pluginutils@1.0.0-beta.59': {}
-
-  '@saurl/tauri-plugin-safe-area-insets-css-api@0.1.0':
-    dependencies:
-      '@tauri-apps/api': 2.9.1
 
   '@tailwindcss/node@4.1.18':
     dependencies:

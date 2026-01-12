@@ -53,11 +53,13 @@ const rawInstallers = import.meta.glob<PluginInstaller>('./installer/*_*.ts', {
 })
 const installers = sortBy(Object.entries(rawInstallers), ([fname]) => Number(fname.match(/[\d\.]+(?=_)/)?.[0])).map(v => v[1]).reverse()
 
+
+
 export const installPlugin = (input: string, __installedPlugins?: Set<string>) =>
-  Utils.message.createDownloadMessage('下载插件', async m => {
+  Utils.message.createDownloadMessage(`下载插件-${input}`, async m => {
     const [file, installer] = await m.createLoading('下载', async v => {
       v.retryable = true
-      const installer = installers.filter(ins => ins.isMatched(input)).at(-1)
+      const installer = installers.filter(ins => ins.isMatched(input)).at(0)
       if (!installer) throw new Error('没有符合的下载器:' + input)
       v.description = installer.name
       return [
@@ -90,35 +92,71 @@ export const installPlugin = (input: string, __installedPlugins?: Set<string>) =
 
       return meta
     })
+    console.log(`安装插件成功: ${meta.name.id} ->`, meta)
 
-    const plugins = __installedPlugins ?? new Set((await db.value
-      .selectFrom('plugin')
-      .select('pluginName')
-      .execute()).map(v => v.pluginName))
-    for (const { id, download } of meta.require) {
-      const isDownloaded = plugins.has(id)
-      if (isDownloaded || !download) continue
-      await installPlugin(download)
-    }
+    await m.createLoading('依赖安装/检查', async v => {
+      v.retryable = true
+      let count = 0
+      const plugins = __installedPlugins ?? new Set((await db.value
+        .selectFrom('plugin')
+        .select('pluginName')
+        .execute()).map(v => v.pluginName))
+      for (const { id, download } of meta.require) {
+        const isDownloaded = plugins.has(id)
+        if (isDownloaded || !download) continue
+        console.log(`从 ${meta.name.id} 发现未安装依赖: ${id} ->`, download)
+        v.description = `安装: ${id}`
+        await installPlugin(download)
+        count++
+      }
+      v.description = `安装完成，共${count}个`
+    })
+
   })
 
-export const updatePlugin = async (pluginMeta: PluginArchiveDB.Meta) => {
-  const installer = installers.find(v => v.name == pluginMeta.installerName)
-  if (!installer) throw new Error('没有符合的下载器')
-
-  const loader = loaders.find(v => v.name == pluginMeta.loaderName)
-  if (!loader) throw new Error('没有符合的安装器')
-
-  const file = await installer.update(pluginMeta)
-  const meta = await loader.installDownload(file)
-  await db.value
-    .replaceInto('plugin')
-    .values({
-      ...pluginMeta,
-      meta: JSON.stringify(meta)
+export const updatePlugin = async (pluginMeta: PluginArchiveDB.Meta, __installedPlugins?: Set<string>) =>
+  Utils.message.createDownloadMessage(`更新插件-${pluginMeta.pluginName}`, async m => {
+    const file = await m.createLoading('更新', async v => {
+      v.retryable = true
+      const installer = installers.find(v => v.name == pluginMeta.installerName)
+      if (!installer) throw new Error('没有符合的下载器')
+      v.description = installer.name
+      return await installer.update(pluginMeta)
     })
-    .execute()
-}
+
+    const meta = await m.createLoading('安装插件', async v => {
+      v.retryable = true
+      const loader = loaders.find(v => v.name == pluginMeta.loaderName)
+      if (!loader) throw new Error('没有符合的安装器')
+      return await loader.installDownload(file)
+    })
+
+    await db.value
+      .replaceInto('plugin')
+      .values({
+        ...pluginMeta,
+        meta: JSON.stringify(meta)
+      })
+      .execute()
+
+    await m.createLoading('依赖安装/检查', async v => {
+      v.retryable = true
+      let count = 0
+      const plugins = __installedPlugins ?? new Set((await db.value
+        .selectFrom('plugin')
+        .select('pluginName')
+        .execute()).map(v => v.pluginName))
+      for (const { id, download } of meta.require) {
+        const isDownloaded = plugins.has(id)
+        if (isDownloaded || !download) continue
+        console.log(`从 ${meta.name.id} 发现未安装依赖: ${id} ->`, download)
+        v.description = `安装: ${id}`
+        await installPlugin(download)
+        count++
+      }
+      v.description = `安装完成，共${count}个`
+    })
+  })
 
 const rawLoaders = import.meta.glob<PluginLoader>('./loader/*_*.ts', {
   eager: true,

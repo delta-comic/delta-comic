@@ -10,7 +10,7 @@ import { usePluginStore } from "./store"
 import { OfflineShareRound } from "@vicons/material"
 import AuthorIcon from "@/components/user/authorIcon.vue"
 import { pluginName } from "@/symbol"
-import { db, DBUtils } from "@/db"
+import { db, DBUtils, useNativeStore } from "@/db"
 export const $initCore = () => definePlugin({
   name: pluginName,
   config: [
@@ -48,7 +48,8 @@ export const $initCore = () => definePlugin({
         CommentRow: CommentRow,
         AuthorIcon: AuthorIcon
       },
-      db
+      db,
+      useNativeStore
     }
   },
   share: {
