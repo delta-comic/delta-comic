@@ -8,7 +8,6 @@ import tailwindcss from '@tailwindcss/vite'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { browserslistToTargets } from 'lightningcss'
 import browserslist from 'browserslist'
-import basicSsl from '@vitejs/plugin-basic-ssl'
 
 const host = process.env.TAURI_DEV_HOST
 
@@ -57,7 +56,6 @@ export default defineConfig({
     minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
-    sourcemap: true
   },
   base: "/",
   server: {
