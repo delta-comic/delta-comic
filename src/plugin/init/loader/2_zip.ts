@@ -6,15 +6,12 @@ import { type PluginMeta } from "delta-comic-core"
 import { loadAsync, type JSZipObject } from "jszip"
 
 
-interface ProMeta {
-  meta: PluginMeta
-}
 
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'zip'
   public override async installDownload(file: PluginFile): Promise<PluginMeta> {
     const zip = await loadAsync(file.blob)
-    const { meta } = <ProMeta>JSON.parse((await zip.file('manifest.json')?.async('string')) ?? '{}')
+    const meta = <PluginMeta>JSON.parse((await zip.file('manifest.json')?.async('string')) ?? '{}')
     const root = getPluginFsPath(meta.name.id)
     await fs.mkdir(root, { recursive: true })
     const files = new Array<{
