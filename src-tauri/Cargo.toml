@@ -49,3 +49,8 @@ tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", fe
 tauri-plugin-pinia = "4.1.0"
 tauri-plugin-m3 = "0.3.0"
 tauri-plugin-cors-fetch = "4.1.0"
+tauri-plugin-aptabase = { git = "https://github.com/aptabase/tauri-plugin-aptabase" }
+tokio = "1.49.0"
+
+[features]
+default =  ["tauri/custom-protocol"]

@@ -2,7 +2,7 @@ import { appLocalDataDir } from '@tauri-apps/api/path'
 import type { PluginArchiveDB } from '../db'
 import type { PluginConfig, PluginMeta } from 'delta-comic-core'
 const appLocalDataDirPath = await appLocalDataDir()
-export const getPluginFsPath = (pluginName: string) => `${appLocalDataDirPath}/plugin/${pluginName}`
+export const getPluginFsPath = (pluginName: string) => `${appLocalDataDirPath}/plugin/${pluginName}`.replaceAll('\\','/')
 
 export interface PluginInstallerDescription {
   title: string

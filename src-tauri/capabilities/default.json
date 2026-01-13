@@ -10,13 +10,49 @@
     "clipboard-manager:allow-read-text",
     "clipboard-manager:deny-write-text",
     "fs:default",
-    "fs:allow-applocaldata-write-recursive",
+    "fs:allow-appdata-write-recursive",
     "sql:default",
     "sql:allow-execute",
     "upload:default",
     "pinia:default",
     "core:event:default",
     "m3:default",
+    "aptabase:allow-track-event",
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "https://**"
+        },
+        {
+          "url": "http://**"
+        },
+        {
+          "url": "http://localhost**"
+        },
+        {
+          "url": "https://*.localhost:*"
+        },
+        {
+          "url": "https://*:*"
+        },
+        {
+          "url": "http://*:*"
+        },
+        {
+          "url": "https://*.*:*"
+        },
+        {
+          "url": "http://*.*:*"
+        },
+        {
+          "url": "https://*.localhost:*/*"
+        },
+        {
+          "url": "http://*.localhost:*/*"
+        }
+      ]
+    },
     "cors-fetch:default"
   ]
 }

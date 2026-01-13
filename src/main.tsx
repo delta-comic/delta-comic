@@ -14,6 +14,7 @@ import { createPlugin } from '@tauri-store/pinia'
 import '@/db'
 import { M3, type InsetsScheme } from "tauri-plugin-m3"
 
+
 document.addEventListener('contextmenu', e => e.preventDefault())
 
 const handleSafeAreaChange = (v: InsetsScheme | false) => {

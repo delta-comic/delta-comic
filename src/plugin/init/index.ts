@@ -1,7 +1,7 @@
-import { Utils, type PluginConfig } from "delta-comic-core"
+import { PluginConfig, Utils } from "delta-comic-core"
 import { sortBy } from "es-toolkit/compat"
 import { usePluginStore } from "../store"
-import { isString } from "es-toolkit"
+import { isString, Mutex } from "es-toolkit"
 import { markRaw, reactive } from "vue"
 import { until } from "@vueuse/core"
 import { PluginArchiveDB } from "../db"
@@ -19,6 +19,13 @@ const booters = sortBy(Object.entries(rawBooters), ([fname]) => Number(fname.mat
 export const bootPlugin = async (cfg: PluginConfig) => {
   const { plugins, pluginSteps } = usePluginStore()
   plugins.set(cfg.name, markRaw(cfg))
+  pluginSteps[cfg.name] = {
+    steps: [],
+    now: {
+      stepsIndex: 0,
+      status: 'wait'
+    }
+  }
   try {
     const env: Record<any, any> = {}
     for (const booter of booters) {
@@ -164,12 +171,15 @@ const rawLoaders = import.meta.glob<PluginLoader>('./loader/*_*.ts', {
 })
 const loaders = sortBy(Object.entries(rawLoaders), ([fname]) => Number(fname.match(/[\d\.]+(?=_)/)?.[0])).map(v => v[1])
 
-const loadings = reactive<Record<string, boolean>>({})
+const loadLocks = <Record<string, Mutex>>{}
+const getLoadLock = (pluginName: string) => loadLocks[pluginName] ??= new Mutex
 const { SharedFunction } = Utils.eventBus
 
-export const loadPlugin = async (pluginMeta: PluginArchiveDB.Meta) => {
+export const loadPlugin = async (meta: PluginArchiveDB.Meta) => {
+  console.log(`[plugin bootPlugin] booting name "${meta.pluginName}"`)
+  const lock = getLoadLock(meta.pluginName)
   const store = usePluginStore()
-  store.pluginSteps[pluginMeta.pluginName] = {
+  store.pluginSteps[meta.pluginName] = {
     now: {
       status: 'wait',
       stepsIndex: 0
@@ -179,14 +189,17 @@ export const loadPlugin = async (pluginMeta: PluginArchiveDB.Meta) => {
       description: '插件载入中'
     }]
   }
-  await loaders.find(v => v.name == pluginMeta.loaderName)!.load(pluginMeta)
-  await until(() => loadings[pluginMeta.loaderName]).toBeTruthy()
-  console.log(`[plugin bootPlugin] booting name "${pluginMeta.loaderName}"`)
+  await lock.acquire()
+  await loaders.find(v => v.name == meta.loaderName)!.load(meta)
+  await lock.acquire()
+  console.log(`[plugin bootPlugin] boot name done "${meta.pluginName}"`)
 }
 SharedFunction.define(async cfg => {
-  console.log('[plugin addPlugin] new plugin defined', cfg)
+  console.log('[plugin addPlugin] new plugin defined', cfg.name, cfg)
+  const lock = getLoadLock(cfg.name)
   await bootPlugin(cfg)
-  loadings[cfg.name] = true
+  console.log('[plugin addPlugin] done', cfg.name)
+  lock.release()
 }, pluginName, 'addPlugin')
 
 

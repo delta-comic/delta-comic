@@ -39,12 +39,12 @@ class _PluginUserscriptLoader extends PluginLoader {
   public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {
     const script = document.createElement('script')
     script.type = 'module'
-    script.src = `app-files://${getPluginFsPath(pluginMeta.pluginName)}/index.js`
+    script.src = `http://local.localhost/${getPluginFsPath(pluginMeta.pluginName)}/index.js`
     document.body.appendChild(script)
 
     const style = document.createElement('link')
     style.rel = 'stylesheet'
-    style.href = `app-files://${getPluginFsPath(pluginMeta.pluginName)}/index.css`
+    style.href = `http://local.localhost/${getPluginFsPath(pluginMeta.pluginName)}/index.css`
     document.head.appendChild(style)
   }
 }
