@@ -20,42 +20,7 @@
       }
     ],
     "security": {
-      "csp": {
-        "default-src": [
-          "*",
-          "'unsafe-inline'",
-          "'unsafe-eval'",
-          "data:",
-          "blob:",
-          "local:"
-        ],
-        "script-src": [
-          "*",
-          "'unsafe-inline'",
-          "'unsafe-eval'",
-          "local:"
-        ],
-        "connect-src": [
-          "*",
-          "'unsafe-inline'",
-          "local:"
-        ],
-        "img-src": [
-          "*",
-          "data:",
-          "blob:",
-          "local:"
-        ],
-        "frame-src": [
-          "*",
-          "local:"
-        ],
-        "style-src": [
-          "*",
-          "'unsafe-inline'",
-          "local:"
-        ]
-      },
+      "csp": null,
       "assetProtocol": {
         "enable": false,
         "scope": []
