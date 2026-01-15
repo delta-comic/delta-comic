@@ -4,13 +4,14 @@ import { getPluginFsPath } from "../utils"
 import type { PluginArchiveDB } from "@/plugin/db"
 import { type PluginMeta } from "delta-comic-core"
 import { loadAsync, type JSZipObject } from "jszip"
+import { convertFileSrc } from "@tauri-apps/api/core"
 
 
 
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'zip'
   public override async installDownload(file: PluginFile): Promise<PluginMeta> {
-    console.log(file)
+    console.log('[loader zip] begin:', file)
     const zip = await loadAsync(file.blob)
     console.log(zip.files)
     const meta = <PluginMeta>JSON.parse((await zip.file('manifest.json')?.async('string')) ?? '{}')
@@ -40,7 +41,8 @@ class _PluginUserscriptLoader extends PluginLoader {
   }
 
   public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {
-    const baseDir = `http://local.localhost/${getPluginFsPath(pluginMeta.pluginName)}`
+    const ptl = convertFileSrc('', 'local')
+    const baseDir = `${ptl}/${getPluginFsPath(pluginMeta.pluginName)}`
 
     const script = document.createElement('script')
     script.type = 'module'

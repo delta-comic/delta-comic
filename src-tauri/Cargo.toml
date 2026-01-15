@@ -40,17 +40,14 @@ tauri = { version = "2.9.5", features = [] }
 tauri-plugin-clipboard-manager = "2"
 tauri-plugin-persisted-scope = "2.3.5"
 tauri-plugin-fs = "2.4.5"
-tauri-plugin-http = "2.5.5"
+tauri-plugin-http = "2.5.6"
 tauri-plugin-upload = "2.4.0"
 tauri-plugin-log = "2.8.0"
 tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", features = [
   "sqlite",
 ], branch = "v2" }
 tauri-plugin-pinia = "4.1.0"
-tauri-plugin-m3 = "0.3.0"
+tauri-plugin-m3 = "0.3.1"
 tauri-plugin-cors-fetch = "4.1.0"
-tauri-plugin-aptabase = { git = "https://github.com/aptabase/tauri-plugin-aptabase" }
+tauri-plugin-aptabase = { path = "../tauri-plugin-aptabase" }
 tokio = "1.49.0"
-
-[features]
-default =  ["tauri/custom-protocol"]

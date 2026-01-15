@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-track-event"
+description = "Enables the track_event command without any pre-configured scope."
+commands.allow = ["track_event"]
+
+[[permission]]
+identifier = "deny-track-event"
+description = "Denies the track_event command without any pre-configured scope."
+commands.deny = ["track_event"]

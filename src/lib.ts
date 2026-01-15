@@ -11,8 +11,9 @@ import * as Motion from 'motion-v'
 window.$$lib$$.Motion = Motion
 import * as Axios from 'axios'
 import axios from 'axios'
-import axiosTauriApiAdapter from 'axios-tauri-api-adapter';
-axios.defaults.adapter = [axiosTauriApiAdapter,'fetch']
+import axiosTauriApiAdapter from 'axios-tauri-api-adapter'
+axios.defaults.timeout = 7000
+axios.defaults.adapter = [axiosTauriApiAdapter, 'fetch']
 window.$$lib$$.Axios = { ...Axios, ...axios, axios }
 import * as EsKits from 'es-toolkit'
 window.$$lib$$.EsKits = EsKits
