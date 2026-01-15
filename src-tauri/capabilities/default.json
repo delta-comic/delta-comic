@@ -10,7 +10,10 @@
     "clipboard-manager:allow-read-text",
     "clipboard-manager:deny-write-text",
     "fs:default",
+    "fs:allow-localdata-write-recursive",
+    "fs:allow-data-write-recursive",
     "fs:allow-appdata-write-recursive",
+    "fs:read-all",
     "sql:default",
     "sql:allow-execute",
     "upload:default",
@@ -53,6 +56,7 @@
         }
       ]
     },
-    "cors-fetch:default"
+    "cors-fetch:default",
+    "sentry:default"
   ]
 }

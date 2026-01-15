@@ -13,6 +13,8 @@ import 'vant/lib/index.css'
 import { createPlugin } from '@tauri-store/pinia'
 import '@/db'
 import { M3, type InsetsScheme } from "tauri-plugin-m3"
+import * as Sentry from "@sentry/vue"
+import { defaultOptions } from "tauri-plugin-sentry-api"
 
 
 document.addEventListener('contextmenu', e => e.preventDefault())
@@ -85,6 +87,12 @@ const app = createApp(
     )
   })
 )
+
+if (!import.meta.env.DEV) Sentry.init({
+  ...defaultOptions,
+  app,
+  sendDefaultPii: true
+})
 
 const pinia = createPinia()
 pinia.use(createPlugin())

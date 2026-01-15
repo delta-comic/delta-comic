@@ -35,14 +35,12 @@ tauri-build = { version = "2.5.3", features = [] }
 [dependencies]
 serde_json = "1.0.149"
 serde = { version = "1.0", features = ["derive"] }
-log = "0.4"
 tauri = { version = "2.9.5", features = [] }
 tauri-plugin-clipboard-manager = "2"
 tauri-plugin-persisted-scope = "2.3.5"
 tauri-plugin-fs = "2.4.5"
 tauri-plugin-http = "2.5.6"
 tauri-plugin-upload = "2.4.0"
-tauri-plugin-log = "2.8.0"
 tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", features = [
   "sqlite",
 ], branch = "v2" }
@@ -51,3 +49,11 @@ tauri-plugin-m3 = "0.3.1"
 tauri-plugin-cors-fetch = "4.1.0"
 tauri-plugin-aptabase = { path = "../tauri-plugin-aptabase" }
 tokio = "1.49.0"
+tauri-plugin-sentry = "0.5.0"
+sentry = "0.42"
+
+
+[features]
+custom-protocol = [
+  "tauri/custom-protocol",
+] # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

@@ -44,6 +44,7 @@ export const bootPlugin = async (cfg: PluginConfig) => {
         }
       }, env)
     }
+    pluginSteps[cfg.name].now.stepsIndex++ // undefined to hide
   } catch (error) {
     pluginSteps[cfg.name].now.status = 'error'
     pluginSteps[cfg.name].now.error = error as Error

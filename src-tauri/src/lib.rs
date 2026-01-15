@@ -2,9 +2,25 @@ use tauri_plugin_sql::{Migration, MigrationKind};
 
 use tauri_plugin_aptabase::EventTracker;
 
+use tauri_plugin_sentry;
+
 #[tokio::main]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub async fn run() {
+  let client = sentry::init((
+    "https://fc7f04e50b58dbd4ee6d76008c3637eb@o4510714997899264.ingest.us.sentry.io/4510715019067392",
+    sentry::ClientOptions {
+      release: sentry::release_name!(),
+      auto_session_tracking: true,
+      ..Default::default()
+    },
+  ));
+
+  
+  // Caution! Everything before here runs in both app and crash reporter processes
+  #[cfg(not(target_os = "ios"))]
+  let _guard = tauri_plugin_sentry::minidump::init(&client);
+
   let migrations = vec![
     // Define your migrations here
     Migration {
@@ -14,8 +30,9 @@ pub async fn run() {
       kind: MigrationKind::Up,
     },
   ];
-
+  
   tauri::Builder::default()
+    .plugin(tauri_plugin_sentry::init_with_no_injection(&client))
     .plugin(tauri_plugin_http::init())
     .plugin(tauri_plugin_m3::init())
     .plugin(tauri_plugin_upload::init())
@@ -30,25 +47,12 @@ pub async fn run() {
         .build(),
     )
     .plugin(tauri_plugin_pinia::init())
-    .setup(|app| {
-      if cfg!(debug_assertions) {
-        app.handle().plugin(
-          tauri_plugin_log::Builder::default()
-            .level(log::LevelFilter::Info)
-            .build(),
-        )?;
-      }
-      Ok(())
-    })
     .register_uri_scheme_protocol("local", |_ctx, request| {
       // skip leading `/`
       print!("local called!!!!!");
       if let Ok(data) = std::fs::read(&request.uri().path()[1..]) {
         tauri::http::Response::builder()
-          .header(
-            tauri::http::header::CONTENT_TYPE,
-            "text/javascript",
-          )
+          .header(tauri::http::header::CONTENT_TYPE, "text/javascript")
           .header("Origin", "*")
           .header("Access-Control-Allow-Origin", "*")
           .body(data)
@@ -56,12 +60,13 @@ pub async fn run() {
       } else {
         tauri::http::Response::builder()
           .status(tauri::http::StatusCode::BAD_REQUEST)
-          .header(
-            tauri::http::header::CONTENT_TYPE,
-            "text/plain",
-          )
+          .header(tauri::http::header::CONTENT_TYPE, "text/plain")
           .header("Access-Control-Allow-Origin", "*") // 允许跨域
-          .body("[delta-comic::local] failed to read file".as_bytes().to_vec())
+          .body(
+            "[delta-comic::local] failed to read file"
+              .as_bytes()
+              .to_vec(),
+          )
           .unwrap()
       }
     })
@@ -73,7 +78,7 @@ pub async fn run() {
         handler.flush_events_blocking();
       }
       tauri::RunEvent::Ready { .. } => {
-       let _ =  handler.track_event("app_started", None);
+        let _ = handler.track_event("app_started", None);
       }
       _ => {}
     });

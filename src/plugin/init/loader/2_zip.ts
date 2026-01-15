@@ -5,17 +5,21 @@ import type { PluginArchiveDB } from "@/plugin/db"
 import { type PluginMeta } from "delta-comic-core"
 import { loadAsync, type JSZipObject } from "jszip"
 import { convertFileSrc } from "@tauri-apps/api/core"
-
+import { join } from "@tauri-apps/api/path"
 
 
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'zip'
   public override async installDownload(file: PluginFile): Promise<PluginMeta> {
     console.log('[loader zip] begin:', file)
+    const temp = await getPluginFsPath('__temp__')
+    await fs.mkdir(temp, { recursive: true })
+    await fs.writeFile(await join(temp, 'temp.zip'), new Uint8Array(await file.blob.arrayBuffer()))
+    console.log('[loader zip] temp:', temp)
     const zip = await loadAsync(file.blob)
     console.log(zip.files)
     const meta = <PluginMeta>JSON.parse((await zip.file('manifest.json')?.async('string')) ?? '{}')
-    const root = getPluginFsPath(meta.name.id)
+    const root = await getPluginFsPath(meta.name.id)
     await fs.remove(root, { recursive: true })
     await fs.mkdir(root, { recursive: true })
     const files = new Array<{
@@ -30,9 +34,9 @@ class _PluginUserscriptLoader extends PluginLoader {
     })
     for (const { file, path } of files) {
       if (file.dir)
-        await fs.mkdir(`${root}/${path}`, { recursive: true })
+        await fs.mkdir(await join(root, path), { recursive: true })
       else
-        await fs.writeFile(`${root}/${path}`, await file.async('uint8array'), { create: true })
+        await fs.writeFile(await join(root, path), await file.async('uint8array'), { create: true })
     }
     return meta
   }
@@ -42,17 +46,17 @@ class _PluginUserscriptLoader extends PluginLoader {
 
   public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {
     const ptl = convertFileSrc('', 'local')
-    const baseDir = `${ptl}/${getPluginFsPath(pluginMeta.pluginName)}`
+    const baseDir = await join(ptl, await getPluginFsPath(pluginMeta.pluginName))
 
     const script = document.createElement('script')
     script.type = 'module'
-    script.src = `${baseDir}/${pluginMeta.meta.entry!.jsPath}`
+    script.src = await join(baseDir, pluginMeta.meta.entry!.jsPath)
     document.body.appendChild(script)
 
     if (!pluginMeta.meta.entry?.cssPath) return
     const style = document.createElement('link')
     style.rel = 'stylesheet'
-    style.href = `${baseDir}/${pluginMeta.meta.entry.cssPath}`
+    style.href = await join(baseDir, pluginMeta.meta.entry.cssPath)
     document.head.appendChild(style)
   }
 }
