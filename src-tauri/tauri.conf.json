@@ -20,7 +20,7 @@
       }
     ],
     "security": {
-      "csp": null,
+      "csp": "default-src * local: 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * local: 'unsafe-inline' 'unsafe-eval'; connect-src * local: 'unsafe-inline'; img-src * local: data: blob:; frame-src * local:; style-src * local: 'unsafe-inline';",
       "assetProtocol": {
         "enable": false,
         "scope": []

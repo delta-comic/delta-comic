@@ -57,6 +57,7 @@
       ]
     },
     "cors-fetch:default",
-    "sentry:default"
+    "sentry:default",
+    "log:default"
   ]
 }

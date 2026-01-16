@@ -20,7 +20,9 @@ class _PluginUserscriptLoader extends PluginLoader {
     console.log(zip.files)
     const meta = <PluginMeta>JSON.parse((await zip.file('manifest.json')?.async('string')) ?? '{}')
     const root = await getPluginFsPath(meta.name.id)
-    await fs.remove(root, { recursive: true })
+    try {
+      await fs.remove(root, { recursive: true })
+    } catch { }
     await fs.mkdir(root, { recursive: true })
     const files = new Array<{
       path: string
@@ -45,9 +47,10 @@ class _PluginUserscriptLoader extends PluginLoader {
   }
 
   public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {
+    if (!pluginMeta.meta.entry)throw new Error('not found entry')
     const ptl = convertFileSrc('', 'local')
     const baseDir = await join(ptl, await getPluginFsPath(pluginMeta.pluginName))
-
+    console.log('[loader zip] baseDir:', baseDir, pluginMeta.meta.entry)
     const script = document.createElement('script')
     script.type = 'module'
     script.src = await join(baseDir, pluginMeta.meta.entry!.jsPath)

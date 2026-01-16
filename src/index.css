@@ -10,6 +10,9 @@
 
 * {
   user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
 }
 
 .van-floating-panel__header-bar {
@@ -55,7 +58,7 @@ input::-webkit-search-cancel-button {
   backdrop-filter: blur(12px);
 }
 
-* .n-progress-graph-line-indicator{
+* .n-progress-graph-line-indicator {
   display: none !important;
 }
 

@@ -13,8 +13,8 @@
   <meta name="description" content="Per Aspera, Ad Astra">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <!-- <meta http-equiv="Content-Security-Policy"
-    content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob:; frame-src *; style-src * 'unsafe-inline';"> -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src * local: 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * local: 'unsafe-inline' 'unsafe-eval'; connect-src * local: 'unsafe-inline'; img-src * local: data: blob:; frame-src * local:; style-src * local: 'unsafe-inline';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   <link rel="shortcut icon" href="/favicon.png" type="image/x-icon">
   <link rel="apple-touch-icon" href="/favicon.png" type="image/x-icon">
@@ -23,7 +23,7 @@
 </head>
 
 <body class="static size-full" ontouchstart="">
-  <div id="app" class="static bg-(--van-background) size-full overflow-auto"></div>
+  <div id="app" class="static bg-(--van-background) size-full overflow-auto **:select-none"></div>
   <div id="cover" class="fixed top-0 left-0 z-50 size-full pointer-events-none *:pointer-events-auto"></div>
   <div id="popups" class="relative z-100"></div>
   <div id="small-window" class="fixed top-0 left-0 pointer-events-none"></div>

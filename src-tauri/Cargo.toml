@@ -50,7 +50,21 @@ tauri-plugin-cors-fetch = "4.1.0"
 tauri-plugin-aptabase = { path = "../tauri-plugin-aptabase" }
 tokio = "1.49.0"
 tauri-plugin-sentry = "0.5.0"
-sentry = "0.42"
+sentry = { version = "0.42", default-features = false, features = [
+  "backtrace",
+  "contexts",
+  "debug-images",
+  "panic",
+  "release-health",
+
+  "reqwest",
+  "rustls",
+] }
+mime_guess = "2.0.5"
+percent-encoding = "2.3.2"
+tauri-plugin-log = "2"
+log = "0.4.29"
+zerocopy = "0.8.33"
 
 
 [features]
