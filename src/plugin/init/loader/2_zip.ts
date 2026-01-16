@@ -47,19 +47,18 @@ class _PluginUserscriptLoader extends PluginLoader {
   }
 
   public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {
-    if (!pluginMeta.meta.entry)throw new Error('not found entry')
-    const ptl = convertFileSrc('', 'local')
-    const baseDir = await join(ptl, await getPluginFsPath(pluginMeta.pluginName))
+    if (!pluginMeta.meta.entry) throw new Error('not found entry')
+    const baseDir = await getPluginFsPath(pluginMeta.pluginName)
     console.log('[loader zip] baseDir:', baseDir, pluginMeta.meta.entry)
     const script = document.createElement('script')
     script.type = 'module'
-    script.src = await join(baseDir, pluginMeta.meta.entry!.jsPath)
+    script.src = decodeURIComponent(convertFileSrc(await join(baseDir, pluginMeta.meta.entry.jsPath), 'local'))
     document.body.appendChild(script)
 
     if (!pluginMeta.meta.entry?.cssPath) return
     const style = document.createElement('link')
     style.rel = 'stylesheet'
-    style.href = await join(baseDir, pluginMeta.meta.entry.cssPath)
+    style.href = decodeURIComponent(convertFileSrc(await join(baseDir, pluginMeta.meta.entry.cssPath), 'local'))
     document.head.appendChild(style)
   }
 }

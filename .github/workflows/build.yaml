@@ -24,12 +24,18 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/android/.gradle/caches
-            ~/android/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+            ~/src-tauri/gen/android/.gradle
+            ~/src-tauri/target
+          key: ${{ runner.os }}-delta-comic
           restore-keys: |
-            ${{ runner.os }}-gradle-
-      
+            ${{ runner.os }}-delta-comic
+            
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          # 添加 Android 交叉编译目标
+          targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
+
       - name: JDK 23
         uses: actions/setup-java@v4
         with:
@@ -38,6 +44,9 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+      
+      - name: Install NDK
+        run: sdkmanager "ndk;26.1.10909125"
 
       - name: Install apksigner
         run: sudo apt-get update && sudo apt-get install -y apksigner
@@ -63,8 +72,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build
-        run: pnpm run build
+      - name: Build Android App
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --target aarch64 # 指定目标架构，或者不填构建全部
+          appName: Delta Comic
+          appVersion: v__VERSION__
+          
 
       - name: Get package version
         id: get_version

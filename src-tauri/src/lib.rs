@@ -8,8 +8,6 @@ use tauri_plugin_sentry;
 
 use percent_encoding::percent_decode_str;
 
-use zerocopy::IntoBytes;
-
 #[tokio::main]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub async fn run() {
@@ -87,7 +85,6 @@ pub async fn run() {
           Response::builder()
             .status(StatusCode::OK)
             .header(header::CONTENT_TYPE, mime)
-            // 解决 Origin http://localhost:5173 报错的关键
             .header(header::ACCESS_CONTROL_ALLOW_ORIGIN, "*")
             .body(data)
             .unwrap()

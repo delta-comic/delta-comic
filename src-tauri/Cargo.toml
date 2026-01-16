@@ -64,7 +64,6 @@ mime_guess = "2.0.5"
 percent-encoding = "2.3.2"
 tauri-plugin-log = "2"
 log = "0.4.29"
-zerocopy = "0.8.33"
 
 
 [features]
