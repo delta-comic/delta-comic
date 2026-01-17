@@ -2,6 +2,7 @@ import { type PluginConfig } from "delta-comic-core"
 import { isEmpty, sortBy } from "es-toolkit/compat"
 import { delay } from "motion-v"
 
+
 export const testApi = async (cfg: NonNullable<PluginConfig['api']>[string]) => {
   const forks = await cfg.forks()
   return await test(forks, cfg.test)
@@ -16,26 +17,30 @@ const test = async (forks: string[], test: (url: string, signal: AbortSignal) =>
   if (isEmpty(forks)) throw new Error('[plugin test] no fork found')
   const record: [url: string, result: false | number][] = []
   const abortController = new AbortController()
-  await Promise.all(forks.map(async fork => {
-    try {
-      const begin = Date.now()
-      const stopTimeout = delay(() => {
+  try {
+    await Promise.all(forks.map(async fork => {
+      try {
+        const begin = Date.now()
+        const stopTimeout = delay(() => {
+          abortController.abort()
+        }, 10000)
+        await test(fork, abortController.signal)
+        stopTimeout()
+        const end = Date.now()
+        const time = end - begin
+        record.push([fork, time])
+        console.log(`[plugin test] fetch url ${fork} connected time ${time}ms`)
         abortController.abort()
-      }, 10000)
-      await test(fork, abortController.signal)
-      stopTimeout()
-      const end = Date.now()
-      const time = end - begin
-      record.push([fork, time])
-      console.log(`[plugin test] resource url ${fork} connected time ${time}ms`)
-      abortController.abort()
-    } catch (error) {
-      record.push([fork, false])
-      console.log(`[plugin test] resource url ${fork} can not connected`)
-    }
-  }))
+      } catch (error) {
+        record.push([fork, false])
+        console.log(`[plugin test] fetch url ${fork} can not connected`)
+      }
+    }))
+  } catch (err) {
+    console.log('[plugin test] fetch test aborted', err)
+  }
   const result = sortBy(record.filter(v => v[1] != false), v => v[1])[0]
-  console.log(`[plugin test] resource test done`, result)
+  console.log(`[plugin test] fetch test done`, result)
   if (!result) {
     return ['', false] as [string, false]
   }

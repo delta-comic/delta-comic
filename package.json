@@ -55,6 +55,7 @@
     "tauri-plugin-sentry-api": "^0.5.0",
     "userscript-meta": "^1.0.1",
     "vant": "^4.9.22",
+    "vite-plugin-ms-clarity": "^1.0.0",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4"
   },
@@ -70,6 +71,7 @@
     "typescript": "^5.9.3",
     "unplugin-vue-components": "30.0.0",
     "vite": "npm:rolldown-vite@^7.3.1",
+    "vite-plugin-vue-devtools": "^8.0.5",
     "vue-component-type-helpers": "^3.2.2",
     "vue-tsc": "^3.2.2"
   },

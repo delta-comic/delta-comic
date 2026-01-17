@@ -12,6 +12,8 @@ window.$$lib$$.Motion = Motion
 import * as Axios from 'axios'
 import axios from 'axios'
 axios.defaults.timeout = 7000
+//@ts-ignore
+window.fetch = window.fetchNative
 axios.defaults.adapter = ['fetch']
 window.$$lib$$.Axios = { ...Axios, ...axios, axios }
 import * as EsKits from 'es-toolkit'

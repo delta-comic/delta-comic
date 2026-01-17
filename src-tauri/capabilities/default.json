@@ -24,36 +24,16 @@
     {
       "identifier": "http:default",
       "allow": [
-        {
-          "url": "https://**"
-        },
-        {
-          "url": "http://**"
-        },
-        {
-          "url": "http://localhost**"
-        },
-        {
-          "url": "https://*.localhost:*"
-        },
-        {
-          "url": "https://*:*"
-        },
-        {
-          "url": "http://*:*"
-        },
-        {
-          "url": "https://*.*:*"
-        },
-        {
-          "url": "http://*.*:*"
-        },
-        {
-          "url": "https://*.localhost:*/*"
-        },
-        {
-          "url": "http://*.localhost:*/*"
-        }
+        "https://**",
+        "http://**",
+        "http://localhost**",
+        "https://*.localhost:*",
+        "https://*:*",
+        "http://*:*",
+        "https://*.*:*",
+        "http://*.*:*",
+        "https://*.localhost:*/*",
+        "http://*.localhost:*/*"
       ]
     },
     "cors-fetch:default",

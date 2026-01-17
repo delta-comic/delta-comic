@@ -39,7 +39,7 @@ tauri = { version = "2.9.5", features = [] }
 tauri-plugin-clipboard-manager = "2"
 tauri-plugin-persisted-scope = "2.3.5"
 tauri-plugin-fs = "2.4.5"
-tauri-plugin-http = "2.5.6"
+tauri-plugin-http = { version = "2.5.6", features = ["unsafe-headers"] }
 tauri-plugin-upload = "2.4.0"
 tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", features = [
   "sqlite",

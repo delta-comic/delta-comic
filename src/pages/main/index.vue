@@ -11,7 +11,7 @@ const showForkSelect = shallowRef(false)
   <div class="w-full overflow-hidden h-[calc(100%-var(--van-tabbar-height))]">
     <RouterView />
   </div>
-  <VanTabbar class="fixed bottom-0 transition-[opacity] opacity-100 w-full items-center" :model-value="name">
+  <VanTabbar class="fixed bottom-0 transition-opacity opacity-100 w-full items-center" :model-value="name">
     <VanTabbarItem name="home" to="/main/home" icon="home-o">首页</VanTabbarItem>
     <VanTabbarItem name="subscribe" to="/main/subscribe">
       <template #icon>
@@ -28,7 +28,7 @@ const showForkSelect = shallowRef(false)
       </template>
       关注
     </VanTabbarItem>
-    <NButton class="!size-10 **:!text-2xl !rounded-2xl !mx-3" type="primary" @click="showForkSelect = true">
+    <NButton class="size-10! **:text-2xl! rounded-2xl! mx-3!" type="primary" @click="showForkSelect = true">
       <template #icon>
         <NIcon>
           <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"

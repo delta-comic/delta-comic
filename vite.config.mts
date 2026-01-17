@@ -8,11 +8,19 @@ import tailwindcss from '@tailwindcss/vite'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { browserslistToTargets } from 'lightningcss'
 import browserslist from 'browserslist'
+import MsClarity from "vite-plugin-ms-clarity"
+import vueDevTools from 'vite-plugin-vue-devtools'
 
 const host = process.env.TAURI_DEV_HOST
 
-export default defineConfig({
+export default defineConfig(({ }) => ({
   plugins: [
+    vueDevTools(),
+    MsClarity({
+      id: "v2xgbuugti",
+      enableInDevMode: false,
+      // ...
+    }),
     vue({
       template: {
         compilerOptions: {
@@ -82,4 +90,4 @@ export default defineConfig({
   },
   clearScreen: false,
   envPrefix: ['VITE_', 'TAURI_ENV_*'],
-})
+}))
