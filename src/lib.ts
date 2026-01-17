@@ -27,3 +27,7 @@ import Crypto from 'crypto-js'
 window.$$lib$$.Crypto = Crypto
 window.$api.NImage = Naive.NImage
 window.$api.showImagePreview = Vant.showImagePreview
+
+window.process = {
+  env: import.meta.env
+} as any // 强兼zip模式打包

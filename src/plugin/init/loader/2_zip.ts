@@ -56,9 +56,24 @@ class _PluginUserscriptLoader extends PluginLoader {
     document.body.appendChild(script)
 
     if (!pluginMeta.meta.entry?.cssPath) return
+    const cssPath = pluginMeta.meta.entry.cssPath
+
+    if (cssPath == 'auto') {
+      var filePath = ''
+      // take first
+      const files = await fs.readDir(baseDir)
+      for (const file of files) {
+        if (file.name.endsWith('.css')) {
+          var filePath = file.name
+          break
+        }
+      }
+    } else
+      var filePath = cssPath
+
     const style = document.createElement('link')
     style.rel = 'stylesheet'
-    style.href = decodeURIComponent(convertFileSrc(await join(baseDir, pluginMeta.meta.entry.cssPath), 'local'))
+    style.href = decodeURIComponent(convertFileSrc(await join(baseDir, filePath), 'local'))
     document.head.appendChild(style)
   }
 }
