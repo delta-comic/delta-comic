@@ -12,7 +12,9 @@ const $router = useRouter()
 const temp = Store.useTemp().$applyRaw('randomConfig', () => ({
   stream: Utils.data.Stream.create<uni.item.Item>(async function* (signal, that) {
     that.pages.value = Infinity
+    that.page.value = 0
     while (true) {
+      that.page.value++
       const result = await Utils.eventBus.SharedFunction.callRandom('getRandomProvide', signal).result
       yield result
     }

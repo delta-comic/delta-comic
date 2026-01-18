@@ -13,7 +13,7 @@ import * as Axios from 'axios'
 import axios from 'axios'
 axios.defaults.timeout = 7000
 //@ts-ignore
-// window.fetch = window.fetchNative
+window.fetch = window.__TAURI__.http.fetch
 axios.defaults.adapter = ['fetch']
 window.$$lib$$.Axios = { ...Axios, ...axios, axios }
 import * as EsKits from 'es-toolkit'
