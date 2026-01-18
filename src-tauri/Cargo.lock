@@ -997,7 +997,7 @@ dependencies = [
 
 [[package]]
 name = "delta-comic"
-version = "0.1.50"
+version = "0.2.1"
 dependencies = [
  "log",
  "mime_guess",
@@ -1019,6 +1019,7 @@ dependencies = [
  "tauri-plugin-sentry",
  "tauri-plugin-sql",
  "tauri-plugin-upload",
+ "tauri-runtime-wry",
  "tokio",
 ]
 
