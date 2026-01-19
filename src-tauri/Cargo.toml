@@ -69,6 +69,8 @@ tauri-plugin-log = "2"
 log = "0.4.29"
 tauri-runtime-wry = "2.9.3"
 
+[target.'cfg(any(target_os = "android"))'.dependencies]
+tauri-plugin-android-package-install = "2.0.1"
 
 [features]
 custom-protocol = [
