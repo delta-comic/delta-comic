@@ -7,8 +7,6 @@ import * as Vant from 'vant'
 window.$$lib$$.Vant = Vant
 import * as Naive from 'naive-ui'
 window.$$lib$$.Naive = Naive
-import * as Motion from 'motion-v'
-window.$$lib$$.Motion = Motion
 import * as Axios from 'axios'
 import axios from 'axios'
 axios.defaults.timeout = 7000
@@ -16,8 +14,6 @@ axios.defaults.timeout = 7000
 window.fetch = window.__TAURI__.http.fetch
 axios.defaults.adapter = ['fetch']
 window.$$lib$$.Axios = { ...Axios, ...axios, axios }
-import * as EsKits from 'es-toolkit'
-window.$$lib$$.EsKits = EsKits
 import * as Dcc from 'delta-comic-core'
 window.$$lib$$.Dcc = Dcc
 import * as Vr from 'vue-router'

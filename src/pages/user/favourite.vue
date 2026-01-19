@@ -1,18 +1,18 @@
 <script setup lang='ts'>
 import { CloudSyncOutlined } from '@vicons/antd'
-import Layout from '../layout.vue'
+import Layout from '@/components/user/userLayout.vue'
+import Searcher from '@/components/listSearcher.vue'
 import { CalendarViewDayRound, PlusRound, SearchFilled } from '@vicons/material'
 import { shallowRef, useTemplateRef } from 'vue'
 import { isNumber, uniqBy } from 'es-toolkit/compat'
-import FavouriteCard from './favouriteCard.vue'
-import Searcher from '../searcher.vue'
+import FavouriteCard from '@/components/user/favouriteCard.vue'
 import { Store, Utils, Comp, uni } from 'delta-comic-core'
 import { usePluginStore } from '@/plugin/store'
 import CreateFavouriteCard from '@/components/createFavouriteCard.vue'
 import { computedAsync } from '@vueuse/core'
 import { db, useNativeStore } from '@/db'
 import { FavouriteDB } from '@/db/favourite'
-import { pluginName } from '../../../symbol'
+import { pluginName } from '@/symbol'
 const isCardMode = shallowRef(true)
 
 const temp = Store.useTemp().$apply('favourite', () => ({

@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { Comp, coreModule, requireDepend, uni } from 'delta-comic-core'
-import LevelIcon from './icon.vue'
+import LevelIcon from '@/components/home/hotPageIcon.vue'
 import { isEmpty } from 'es-toolkit/compat'
 import { computed } from 'vue'
 import { ArrowForwardIosRound } from '@vicons/material'

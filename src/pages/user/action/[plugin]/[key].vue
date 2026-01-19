@@ -2,9 +2,9 @@
 import { usePluginStore } from '@/plugin/store'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-const $route = useRoute()
-const plugin = $route.params.plugin.toString()
-const key = $route.params.key.toString()
+const $route = useRoute<"/user/action/[plugin]/[key]">()
+const plugin = $route.params.plugin
+const key = $route.params.key
 const pluginStore = usePluginStore()
 const item = computed(() => pluginStore.plugins.get(plugin)?.user?.userActionPages?.map(v => v.items.find(item => item.key == key)!)[0])
 </script>

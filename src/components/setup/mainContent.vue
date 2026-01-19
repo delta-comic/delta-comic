@@ -8,11 +8,11 @@ import List from './list.vue'
 import Download from './download.vue'
 import { usePluginStore } from '@/plugin/store'
 import { loadAllPlugins } from '@/plugin'
-import { ReloadOutlined, SafetyOutlined } from '@vicons/antd'
+import { SafetyOutlined, SettingOutlined } from '@vicons/antd'
 import { motion } from 'motion-v'
-import { updateByApk } from '@/utils/appUpdate'
 import { computedAsync } from '@vueuse/core'
 import { db, DBUtils } from '@/db'
+import Config from './config.vue'
 
 const pluginStore = usePluginStore()
 const show = defineModel<boolean>('show', { required: true })
@@ -34,6 +34,12 @@ const menuOptions = [
     comp: Download
   },
   {
+    label: '配置',
+    key: 'config',
+    icon: renderIcon(SettingOutlined),
+    comp: Config
+  },
+  {
     label: `核心版本: ${version}`,
     key: 'version',
     disabled: true
@@ -51,18 +57,6 @@ const boot = async (safe = false) => {
 
 const $message = useMessage()
 
-const isUpdating = shallowRef(false)
-const updateApp = async (method: () => PromiseLike<void>) => {
-  if (isUpdating.value) return $message.warning('正在更新中')
-  isUpdating.value = true
-  try {
-    await Utils.message.createLoadingMessage('更新中').bind(method())
-    isUpdating.value = false
-  } catch (error) {
-    isUpdating.value = false
-    throw error
-  }
-}
 const isShowMenu = shallowRef(false)
 
 const closeMenuBefore = (v: any) => {
@@ -100,16 +94,6 @@ const totalCount = computedAsync(() => DBUtils.countDb(db.value
           <CheckRound />
         </NIcon>
         <template #menu>
-          <NPopover trigger="manual" :show="isShowMenu" placement="left-end" v-if="!isUpdating">
-            <template #trigger>
-              <NFloatButton class="z-100000!" @click="closeMenuBefore(updateApp(updateByApk))">
-                <NIcon :size="20">
-                  <ReloadOutlined />
-                </NIcon>
-              </NFloatButton>
-            </template>
-            Apk更新应用
-          </NPopover>
           <template v-if="totalCount">
             <NPopover trigger="manual" :show="isShowMenu" placement="left-end">
               <template #trigger>

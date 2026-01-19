@@ -6,12 +6,12 @@ import noneSearchTextIcon from '@/assets/images/none-search-text-icon.webp'
 import { CloudServerOutlined } from '@vicons/antd'
 import { Comp, PluginConfigSearchMethod, Store } from 'delta-comic-core'
 import { usePluginStore } from '@/plugin/store'
-import List from './list.vue'
+import List from '@/components/search/searchList.vue'
 import { SearchInstance } from 'vant'
 import { decodeURIDeep } from '@/utils/url'
-import SearchBar from './searchBar.vue'
-import { searchSourceKey } from './source'
-const $route = useRoute()
+import SearchBar from '@/components/search/searchBar.vue'
+import { searchSourceKey } from '@/components/search/source'
+const $route = useRoute<"/search/[input]">()
 const pluginStore = usePluginStore()
 const config = Store.useConfig().$load(Store.appConfig)
 const inputSort = $route.query.sort?.toString()

@@ -1,14 +1,13 @@
 <script setup lang='ts'>
-import ExtendableSearchBar from './searchBar.vue'
+import ExtendableSearchBar from '@/components/home/mainPageSearchBar.vue'
 import userIcon from '@/assets/images/userIcon.webp'
 import { isShowMainHomeNavBar } from '@/symbol'
 import { VideogameAssetFilled } from '@vicons/material'
 import { Comp, uni } from 'delta-comic-core'
 import { isEmpty, random } from 'es-toolkit/compat'
 import { shallowRef, provide, nextTick, useTemplateRef, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 const $router = useRouter()
-const $route = useRoute()
 const isShowNavBar = shallowRef(true)
 provide(isShowMainHomeNavBar, isShowNavBar)
 
@@ -67,11 +66,11 @@ const tabItem = computed(() => Array.from(uni.content.ContentPage.tabbar.entries
     <VanIcon size="25px" color="var(--van-text-color-2)"
       :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']"
       class="absolute! top-1/2 duration-200 aspect-square transition-transform right-10 -translate-y-1/2 bg-(--van-background-2) shadow rounded-full p-1"
-      @click="$router.force.push({ name: 'cate' })" name="more-o">
+      @click="$router.force.push({ name: '/cate' })" name="more-o">
     </VanIcon>
   </div>
   <div class="w-full duration-200 transition-all  overflow-hidden"
     :class="[isShowNavBar ? 'h-[calc(100%-var(--van-tabs-line-height)-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0' : 'h-[calc(100%-var(--safe-area-inset-top)-var(--van-tabs-line-height))]! -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]']">
-    <RouterView :key="$route.params.id.toString()" />
+    <RouterView />
   </div>
 </template>

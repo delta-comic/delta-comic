@@ -2,7 +2,7 @@
 import { SubscribeDB } from '@/db/subscribe'
 import { ArrowForwardIosRound } from '@vicons/material'
 import { computed, shallowRef } from 'vue'
-import AuthorList from './authorList.vue'
+import AuthorList from '@/components/subscribe/subAuthorList.vue'
 import AuthorIcon from '@/components/user/authorIcon.vue'
 import { Comp } from 'delta-comic-core'
 import { computedAsync } from '@vueuse/core'

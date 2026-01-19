@@ -45,10 +45,5 @@
   ],
   "exclude":[
     "./tauri-plugin-delta-comic/**/*"
-  ],
-  "vueCompilerOptions": {
-    "plugins": [
-      "unplugin-vue-router/volar/sfc-typed-router"
-    ]
-  }
+  ]
 }

@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { Comp, Store, uni, Utils } from 'delta-comic-core'
-import Card from './card.vue'
+import Card from './subCard.vue'
 import { SubscribeDB } from '@/db/subscribe'
 import { motion } from 'motion-v'
 import { usePluginStore } from '@/plugin/store'

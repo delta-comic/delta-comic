@@ -9,7 +9,7 @@ import { motion } from 'motion-v'
 import { computed, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { searchSourceKey } from './source'
-import { getBarcodeList, type ThinkList } from '../../utils/search'
+import { getBarcodeList, type ThinkList } from '@/utils/search'
 import { useNativeStore } from '@/db'
 const $props = defineProps<{
   source: string

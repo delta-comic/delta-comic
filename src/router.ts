@@ -1,13 +1,13 @@
-import { createMemoryHistory, createRouter, createWebHistory, isNavigationFailure, NavigationFailureType, type RouteLocationRaw } from "vue-router"
+import { createRouter, createWebHistory, isNavigationFailure, NavigationFailureType, type RouteLocationRaw } from "vue-router"
 import { Store, uni, Utils } from "delta-comic-core"
 import { useContentStore } from "@/stores/content"
 import { toRef } from "vue"
-import { searchSourceKey } from "@/pages/search/source"
+import { searchSourceKey } from "@/components/search/source"
 import { M3 } from "tauri-plugin-m3"
 import { pluginName } from "@/symbol"
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 export const router = window.$router = createRouter({
-  history: import.meta.env.DEV ? createWebHistory() : createMemoryHistory(),
+  history: createWebHistory(),
   routes
 })
 
@@ -15,7 +15,7 @@ Utils.eventBus.SharedFunction.define((contentType_, id, ep, preload) => {
   const contentStore = useContentStore()
   contentStore.$load(contentType_, id, ep, preload)
   return router.force.push({
-    name: 'content',
+    name: '/content/[contentType]/[id]/[ep]',
     params: {
       id: encodeURI(id),
       ep: encodeURI(ep),
@@ -25,7 +25,7 @@ Utils.eventBus.SharedFunction.define((contentType_, id, ep, preload) => {
 }, pluginName, 'routeToContent')
 Utils.eventBus.SharedFunction.define((input, source, sort) => {
   return router.force.push({
-    name: 'search',
+    name: '/search/[input]',
     params: {
       input: encodeURI(input)
     },

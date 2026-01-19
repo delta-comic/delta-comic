@@ -7,7 +7,7 @@ import { computed, markRaw, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const $router = useRouter()
-const $route = useRoute()
+const $route = useRoute<"/hot">()
 const plugin = computed(() => $route.query.plugin?.toString() ?? '')
 const sourceList = computed(() => uni.content.ContentPage.levelboard.get(plugin.value))
 

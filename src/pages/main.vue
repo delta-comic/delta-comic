@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import { computed, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
-const route = useRoute()
+const route = useRoute<"/main">()
 const name = computed(() => route.path.match(/(?<=\/main\/)\w+(?=\/)?/g)?.[0])
 
 const showForkSelect = shallowRef(false)

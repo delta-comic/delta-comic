@@ -15,7 +15,7 @@ const temp = Store.useTemp().$applyRaw('searchConfig', () => ({
 }))
 const list = useTemplateRef<ComponentExposed<typeof Comp.List>>('list')
 const $router = useRouter()
-const $route = useRoute()
+const $route = useRoute<"/search/[input]">()
 const $props = defineProps<{
   sort: string
   source: string
@@ -23,7 +23,7 @@ const $props = defineProps<{
 
 
 
-const input = decodeURIDeep($route.params.input.toString() ?? '')
+const input = decodeURIDeep($route.params.input)
 const pluginStore = usePluginStore()
 const method = computed(() => {
   const [plugin, name] = searchSourceKey.toJSON($props.source)

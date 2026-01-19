@@ -1,7 +1,6 @@
 <script setup lang='ts'>
 import { usePluginStore } from '@/plugin/store'
 import { PluginUserActionPage } from 'delta-comic-core'
-import { chunk } from 'es-toolkit'
 import { NGi, NGrid } from 'naive-ui'
 import { toRef } from 'vue'
 defineProps<{

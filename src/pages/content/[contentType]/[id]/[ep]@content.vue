@@ -6,7 +6,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { HistoryDB } from '@/db/history'
 import { useAppStore } from '@/stores/app'
 import { watch } from 'vue'
-const $route = useRoute()
+const $route = useRoute<"/content/[contentType]/[id]/[ep]">()
 const contentStore = useContentStore()
 const $router = useRouter()
 

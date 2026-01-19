@@ -1,20 +1,20 @@
 <script setup lang='ts'>
 import { useRoute, useRouter } from 'vue-router'
-import Layout from '../layout.vue'
+import Layout from '@/components/user/userLayout.vue'
+import Searcher from '@/components/listSearcher.vue'
+import Action from '@/components/listAction.vue'
 import { MoreHorizRound, SearchFilled } from '@vicons/material'
 import { shallowRef } from 'vue'
-import FavouriteItem from './favouriteItem.vue'
-import FavouriteSelect2 from './favouriteSelect.vue'
+import FavouriteItem from '@/components/user/favouriteItem.vue'
+import FavouriteSelect2 from '@/components/user/favouriteSelect.vue'
 import { useTemplateRef } from 'vue'
-import Searcher from '../searcher.vue'
-import Action from '../action.vue'
 import { Utils, Comp } from 'delta-comic-core'
 import { computedAsync } from '@vueuse/core'
 import { db, useNativeStore } from '@/db'
 import { FavouriteDB } from '@/db/favourite'
 import { pluginName } from '@/symbol'
-const $route = useRoute()
-const cardKey = Number($route.params.id.toString())
+const $route = useRoute<"/user/favourite/[id]">()
+const cardKey = Number($route.params.id)
 const card = computedAsync(() => db.value
   .selectFrom('favouriteCard')
   .where('createAt', '=', cardKey)

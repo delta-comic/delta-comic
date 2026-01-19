@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { Comp, Store } from 'delta-comic-core'
-import {  isEmpty } from 'es-toolkit/compat'
+import { isEmpty } from 'es-toolkit/compat'
 
 const config = Store.useConfig()
 </script>
