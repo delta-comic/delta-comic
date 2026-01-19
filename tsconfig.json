@@ -35,7 +35,9 @@
       "./components.d.ts",
       "./env.d.ts",
       "./src/global.d.ts",
-      "vue-component-type-helpers"
+      "vue-component-type-helpers",
+      "unplugin-vue-router/client",
+      "./typed-router.d.ts"
     ],
   },
   "include": [
@@ -43,5 +45,10 @@
   ],
   "exclude":[
     "./tauri-plugin-delta-comic/**/*"
-  ]
+  ],
+  "vueCompilerOptions": {
+    "plugins": [
+      "unplugin-vue-router/volar/sfc-typed-router"
+    ]
+  }
 }

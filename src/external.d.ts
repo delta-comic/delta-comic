@@ -6,7 +6,6 @@ export interface ExternalLibKey {
   axios: 'Axios',
   'es-toolkit': 'EsKit'
   'delta-comic-core': 'Dcc',
-  'crypto-js': 'Crypto',
   'vue-router': 'VR',
   'pinia': 'Pinia'
 }

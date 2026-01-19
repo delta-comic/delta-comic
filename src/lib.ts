@@ -24,9 +24,6 @@ import * as Vr from 'vue-router'
 window.$$lib$$.VR = Vr
 import * as Pinia from 'pinia'
 window.$$lib$$.Pinia = Pinia
-//@ts-ignore
-import Crypto from 'crypto-js'
-window.$$lib$$.Crypto = Crypto
 window.$api.NImage = Naive.NImage
 window.$api.showImagePreview = Vant.showImagePreview
 

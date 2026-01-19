@@ -1,11 +1,11 @@
 import { createMemoryHistory, createRouter, createWebHistory, isNavigationFailure, NavigationFailureType, type RouteLocationRaw } from "vue-router"
-import routes from "./routes"
 import { Store, uni, Utils } from "delta-comic-core"
 import { useContentStore } from "@/stores/content"
 import { toRef } from "vue"
 import { searchSourceKey } from "@/pages/search/source"
 import { M3 } from "tauri-plugin-m3"
 import { pluginName } from "@/symbol"
+import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 export const router = window.$router = createRouter({
   history: import.meta.env.DEV ? createWebHistory() : createMemoryHistory(),
   routes
@@ -58,3 +58,7 @@ router.beforeEach(async to => {
   }
   return true
 })
+
+if (import.meta.hot) {
+  handleHotUpdate(router)
+} 
