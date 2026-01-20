@@ -1,5 +1,6 @@
-<route lang="json">
-{
+<route lang="json">{
   "redirect": "/main/home"
-}
-</route>
+}</route>
+
+<template></template>
+<script></script>

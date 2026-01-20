@@ -23,7 +23,6 @@ pub async fn run() {
     .plugin(tauri_plugin_m3::init())
     .plugin(tauri_plugin_upload::init())
     .plugin(tauri_plugin_http::init())
-    .plugin(tauri_plugin_cors_fetch::init())
     .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_persisted_scope::init())
     .plugin(tauri_plugin_aptabase::Builder::new("A-US-9793062880").build())

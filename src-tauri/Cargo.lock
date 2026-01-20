@@ -1010,7 +1010,6 @@ dependencies = [
  "tauri-plugin-android-package-install",
  "tauri-plugin-aptabase",
  "tauri-plugin-clipboard-manager",
- "tauri-plugin-cors-fetch",
  "tauri-plugin-fs",
  "tauri-plugin-http",
  "tauri-plugin-log",
@@ -5503,24 +5502,6 @@ dependencies = [
  "tauri",
  "tauri-plugin",
  "thiserror 2.0.17",
-]
-
-[[package]]
-name = "tauri-plugin-cors-fetch"
-version = "4.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1bbb818e0e97f72dc9d353d38fa5799ed1dd4cf7371ff3195bd1231072d6fc2d"
-dependencies = [
- "http 1.4.0",
- "once_cell",
- "reqwest",
- "serde",
- "serde_json",
- "tauri",
- "tauri-plugin",
- "thiserror 2.0.17",
- "tokio",
- "url",
 ]
 
 [[package]]

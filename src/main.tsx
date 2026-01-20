@@ -1,3 +1,4 @@
+import "./override"
 import "./lib"
 import { createApp, defineComponent, watch, } from "vue"
 import { createPinia } from "pinia"

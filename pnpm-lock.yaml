@@ -31,6 +31,9 @@ importers:
       '@tauri-apps/plugin-fs':
         specifier: ~2.4.5
         version: 2.4.5
+      '@tauri-apps/plugin-http':
+        specifier: ^2.5.6
+        version: 2.5.6
       '@tauri-apps/plugin-log':
         specifier: ~2.8.0
         version: 2.8.0
@@ -55,6 +58,9 @@ importers:
       axios:
         specifier: ^1.13.2
         version: 1.13.2
+      axios-tauri-api-adapter:
+        specifier: ^2.0.6
+        version: 2.0.6
       color:
         specifier: ^5.0.3
         version: 5.0.3
@@ -66,7 +72,7 @@ importers:
         version: 1.11.19
       delta-comic-core:
         specifier: file:..\delta-comic-core\dist\pack.tgz
-        version: file:../delta-comic-core/dist/pack.tgz(@types/node@25.0.8)(axios@1.13.2)(crypto-js@4.2.0)(es-toolkit@1.43.0)(kysely@0.28.9)(motion-v@1.9.0(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)))(naive-ui@2.43.2(vue@3.5.26(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.26(typescript@5.9.3)))(postcss@8.5.6)(rolldown-vite@7.3.1(@types/node@25.0.8)(jiti@2.6.1)(yaml@2.8.2))(tailwindcss@4.1.18)(typescript@5.9.3)(vant@4.9.22(vue@3.5.26(typescript@5.9.3)))(vue-router@4.6.4(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3))
+        version: file:../delta-comic-core/dist/pack.tgz(@types/node@25.0.8)(axios@1.13.2)(kysely@0.28.9)(naive-ui@2.43.2(vue@3.5.26(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.26(typescript@5.9.3)))(postcss@8.5.6)(rolldown-vite@7.3.1(@types/node@25.0.8)(jiti@2.6.1)(yaml@2.8.2))(tailwindcss@4.1.18)(typescript@5.9.3)(vant@4.9.22(vue@3.5.26(typescript@5.9.3)))(vue-router@4.6.4(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3))
       dompurify:
         specifier: ^3.3.1
         version: 3.3.1
@@ -792,6 +798,9 @@ packages:
   '@tauri-apps/plugin-fs@2.4.5':
     resolution: {integrity: sha512-dVxWWGE6VrOxC7/jlhyE+ON/Cc2REJlM35R3PJX3UvFw2XwYhLGQVAIyrehenDdKjotipjYEVc4YjOl3qq90fA==}
 
+  '@tauri-apps/plugin-http@2.5.6':
+    resolution: {integrity: sha512-KhCK3TDNDF4vdz75/j+KNQipYKf+295Visa8r32QcXScg0+D3JwShcCM6D+FN8WuDF24X3KSiAB8QtRxW6jKRA==}
+
   '@tauri-apps/plugin-log@2.8.0':
     resolution: {integrity: sha512-a+7rOq3MJwpTOLLKbL8d0qGZ85hgHw5pNOWusA9o3cf7cEgtYHiGY/+O8fj8MvywQIGqFv0da2bYQDlrqLE7rw==}
 
@@ -1077,6 +1086,10 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
+  axios-tauri-api-adapter@2.0.6:
+    resolution: {integrity: sha512-VhoCtu+oZBZlFUAWIOEmIwZtp9/39oUzBo0fOutjB8wv0Y0P0HfLdZmGKsq0nvysAm661Cxy3hFZz/QTypxmCQ==}
+    engines: {node: '>=16', pnpm: '>=7'}
+
   axios@1.13.2:
     resolution: {integrity: sha512-VPk9ebNqPcy5lRGuSlKx752IlDatOjT9paPlm8A7yOuW2Fbvp4X3JznJtT4f0GzGLLiWE9W8onz51SqLYwzGaA==}
 
@@ -1239,14 +1252,11 @@ packages:
     engines: {node: '>=0.4.0'}
 
   delta-comic-core@file:../delta-comic-core/dist/pack.tgz:
-    resolution: {integrity: sha512-D7u1LKKvB1M3N1xrNuYmYEY90VYm87PnuZUzsPjZ5eaN3W50UnD9v9fZ7w5fyRmpy4IAugZ1YtbFqE437Z0n2g==, tarball: file:../delta-comic-core/dist/pack.tgz}
-    version: 0.5.10
+    resolution: {integrity: sha512-YOoAJ9FWDT8CAu83X+RPt+4PfMTFpPrXwZeDAxE5utb+w+PYBcFRNL4onRYX09HQjAScWS9PApoj8xSKmm5RIw==, tarball: file:../delta-comic-core/dist/pack.tgz}
+    version: 0.5.11
     peerDependencies:
       axios: ^1.12.2
-      crypto-js: 4.2.0
-      es-toolkit: ^1.40.0
       kysely: ^0.28.9
-      motion-v: 1.8.1
       naive-ui: 2.43.2
       pinia: ^3.0.4
       vant: 4.9.22
@@ -1368,6 +1378,20 @@ packages:
     resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
 
+  framer-motion@12.23.12:
+    resolution: {integrity: sha512-6e78rdVtnBvlEVgu6eFEAgG9v3wLnYEboM8I5O5EXvfKC8gxGQB8wXJdhkMy10iVcn05jl6CNw7/HTsTCfwcWg==}
+    peerDependencies:
+      '@emotion/is-prop-valid': '*'
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@emotion/is-prop-valid':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
   framer-motion@12.26.2:
     resolution: {integrity: sha512-lflOQEdjquUi9sCg5Y1LrsZDlsjrHw7m0T9Yedvnk7Bnhqfkc89/Uha10J3CFhkL+TCZVCRw9eUGyM/lyYhXQA==}
     peerDependencies:
@@ -1445,6 +1469,9 @@ packages:
 
   htmlparser2@10.0.0:
     resolution: {integrity: sha512-TwAZM+zE5Tq3lrEHvOlvwgj1XLWQCtaaibSN11Q+gGBAS7Y1uZSWwXXRe4iF6OXnaq1riyQAPFOBtYc77Mxq0g==}
+
+  http-status-codes@2.3.0:
+    resolution: {integrity: sha512-RJ8XvFvpPM/Dmc5SV+dC4y5PCeOhT3x1Hq0NU3rjGeg5a/CqlhZ7uudknPwZFz4aeAXDcbAyaeP7GAo9lvngtA==}
 
   immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
@@ -1688,11 +1715,21 @@ packages:
   mlly@1.8.0:
     resolution: {integrity: sha512-l8D9ODSRWLe2KHJSifWGwBqpTZXIXTeo8mlKjY+E2HAakaTeNpqAyBZ8GSqLzHgw4XmHmC8whvpjJNMbFZN7/g==}
 
+  motion-dom@12.23.12:
+    resolution: {integrity: sha512-RcR4fvMCTESQBD/uKQe49D5RUeDOokkGRmz4ceaJKDBgHYtZtntC/s2vLvY38gqGaytinij/yi3hMcWVcEF5Kw==}
+
   motion-dom@12.26.2:
     resolution: {integrity: sha512-KLMT1BroY8oKNeliA3JMNJ+nbCIsTKg6hJpDb4jtRAJ7nCKnnpg/LTq/NGqG90Limitz3kdAnAVXecdFVGlWTw==}
 
   motion-utils@12.24.10:
     resolution: {integrity: sha512-x5TFgkCIP4pPsRLpKoI86jv/q8t8FQOiM/0E8QKBzfMozWHfkKap2gA1hOki+B5g3IsBNpxbUnfOum1+dgvYww==}
+
+  motion-v@1.7.3:
+    resolution: {integrity: sha512-lwgrge7Y7FF9LxBxZ//MsSLPPjh4z1yYE9ie236Pa89mRCsBlONXbLcseln6G6LyAG8pt3PpzUxWt2grwMcBAA==}
+    deprecated: deprecate
+    peerDependencies:
+      '@vueuse/core': '>=10.0.0'
+      vue: '>=3.0.0'
 
   motion-v@1.9.0:
     resolution: {integrity: sha512-B5VeO69gO416yIqCyNL9EAD7v6n/h/9ktv7gGSRKzTCQhAhnC/N1VWLOTYvOiH90f/tZivbgN/V0MzSU5nsJLA==}
@@ -2822,6 +2859,10 @@ snapshots:
     dependencies:
       '@tauri-apps/api': 2.9.1
 
+  '@tauri-apps/plugin-http@2.5.6':
+    dependencies:
+      '@tauri-apps/api': 2.9.1
+
   '@tauri-apps/plugin-log@2.8.0':
     dependencies:
       '@tauri-apps/api': 2.9.1
@@ -3204,6 +3245,14 @@ snapshots:
 
   asynckit@0.4.0: {}
 
+  axios-tauri-api-adapter@2.0.6:
+    dependencies:
+      '@tauri-apps/plugin-http': 2.5.6
+      axios: 1.13.2
+      http-status-codes: 2.3.0
+    transitivePeerDependencies:
+      - debug
+
   axios@1.13.2:
     dependencies:
       follow-redirects: 1.15.11
@@ -3357,7 +3406,7 @@ snapshots:
 
   delayed-stream@1.0.0: {}
 
-  delta-comic-core@file:../delta-comic-core/dist/pack.tgz(@types/node@25.0.8)(axios@1.13.2)(crypto-js@4.2.0)(es-toolkit@1.43.0)(kysely@0.28.9)(motion-v@1.9.0(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)))(naive-ui@2.43.2(vue@3.5.26(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.26(typescript@5.9.3)))(postcss@8.5.6)(rolldown-vite@7.3.1(@types/node@25.0.8)(jiti@2.6.1)(yaml@2.8.2))(tailwindcss@4.1.18)(typescript@5.9.3)(vant@4.9.22(vue@3.5.26(typescript@5.9.3)))(vue-router@4.6.4(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)):
+  delta-comic-core@file:../delta-comic-core/dist/pack.tgz(@types/node@25.0.8)(axios@1.13.2)(kysely@0.28.9)(naive-ui@2.43.2(vue@3.5.26(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.26(typescript@5.9.3)))(postcss@8.5.6)(rolldown-vite@7.3.1(@types/node@25.0.8)(jiti@2.6.1)(yaml@2.8.2))(tailwindcss@4.1.18)(typescript@5.9.3)(vant@4.9.22(vue@3.5.26(typescript@5.9.3)))(vue-router@4.6.4(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)):
     dependencies:
       '@lhlyu/vue-virtual-waterfall': 1.0.8(vue@3.5.26(typescript@5.9.3))
       '@vant/use': 1.6.0(vue@3.5.26(typescript@5.9.3))
@@ -3370,7 +3419,7 @@ snapshots:
       es-toolkit: 1.43.0
       kysely: 0.28.9
       mitt: 3.0.1
-      motion-v: 1.9.0(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3))
+      motion-v: 1.7.3(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3))
       naive-ui: 2.43.2(vue@3.5.26(typescript@5.9.3))
       pinia: 3.0.4(typescript@5.9.3)(vue@3.5.26(typescript@5.9.3))
       tailwindcss-safe-area-capacitor: 0.5.1(tailwindcss@4.1.18)
@@ -3382,8 +3431,11 @@ snapshots:
       vue: 3.5.26(typescript@5.9.3)
       vue-router: 4.6.4(vue@3.5.26(typescript@5.9.3))
     transitivePeerDependencies:
+      - '@emotion/is-prop-valid'
       - '@types/node'
       - postcss
+      - react
+      - react-dom
       - rollup
       - supports-color
       - tailwindcss
@@ -3484,6 +3536,12 @@ snapshots:
       hasown: 2.0.2
       mime-types: 2.1.35
 
+  framer-motion@12.23.12:
+    dependencies:
+      motion-dom: 12.26.2
+      motion-utils: 12.24.10
+      tslib: 2.8.1
+
   framer-motion@12.26.2:
     dependencies:
       motion-dom: 12.26.2
@@ -3551,6 +3609,8 @@ snapshots:
       domhandler: 5.0.3
       domutils: 3.2.2
       entities: 6.0.1
+
+  http-status-codes@2.3.0: {}
 
   immediate@3.0.6: {}
 
@@ -3747,11 +3807,27 @@ snapshots:
       pkg-types: 1.3.1
       ufo: 1.6.2
 
+  motion-dom@12.23.12:
+    dependencies:
+      motion-utils: 12.24.10
+
   motion-dom@12.26.2:
     dependencies:
       motion-utils: 12.24.10
 
   motion-utils@12.24.10: {}
+
+  motion-v@1.7.3(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)):
+    dependencies:
+      '@vueuse/core': 14.1.0(vue@3.5.26(typescript@5.9.3))
+      framer-motion: 12.23.12
+      hey-listen: 1.0.8
+      motion-dom: 12.23.12
+      vue: 3.5.26(typescript@5.9.3)
+    transitivePeerDependencies:
+      - '@emotion/is-prop-valid'
+      - react
+      - react-dom
 
   motion-v@1.9.0(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)):
     dependencies:
