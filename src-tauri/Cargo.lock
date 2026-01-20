@@ -1007,6 +1007,7 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "tauri-plugin-android-package-install",
  "tauri-plugin-aptabase",
  "tauri-plugin-clipboard-manager",
  "tauri-plugin-cors-fetch",
@@ -5457,6 +5458,18 @@ dependencies = [
  "tauri-utils",
  "toml 0.9.10+spec-1.1.0",
  "walkdir",
+]
+
+[[package]]
+name = "tauri-plugin-android-package-install"
+version = "2.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "26adac3ec3483d877a70f9109c21ddbcdaa8f89ec376b25bc72818ed97aa09f6"
+dependencies = [
+ "serde",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.17",
 ]
 
 [[package]]

@@ -45,7 +45,7 @@ const tabItem = computed(() => Array.from(uni.content.ContentPage.tabbar.entries
     </div>
     <ExtendableSearchBar ref="extendableSearchBar" />
     <div class="flex justify-evenly font-mono w-[calc(50%-63px)]" v-if="!extendableSearchBar?.isSearching">
-      <NIcon color="rgb(156 163 175)" @click="$router.force.push('/game')" size="1.8rem">
+      <NIcon color="rgb(156 163 175)" @click="$router.force.push({ name: '/' })" size="1.8rem">
         <VideogameAssetFilled />
       </NIcon>
       <VanIcon name="bullhorn-o" color="rgb(156 163 175)" size="1.8rem" />
@@ -63,8 +63,7 @@ const tabItem = computed(() => Array.from(uni.content.ContentPage.tabbar.entries
     <VanIcon name="search" @click="toSearchInHideMode" size="25px" color="var(--van-text-color-2)"
       class="absolute! top-1/2 duration-200 transition-transform right-0 -translate-y-1/2 bg-(--van-background-2) shadow rounded-full p-1"
       :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']" />
-    <VanIcon size="25px" color="var(--van-text-color-2)"
-      :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']"
+    <VanIcon size="25px" color="var(--van-text-color-2)" :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']"
       class="absolute! top-1/2 duration-200 aspect-square transition-transform right-10 -translate-y-1/2 bg-(--van-background-2) shadow rounded-full p-1"
       @click="$router.force.push({ name: '/cate' })" name="more-o">
     </VanIcon>

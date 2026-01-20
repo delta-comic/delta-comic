@@ -24,7 +24,7 @@ export interface DB {
   recentView: RecentDB.Table
   subscribe: SubscribeDB.Table
   plugin: PluginArchiveDB.Table
-}
+} 
 const database = await Database.load(`sqlite:app.db`)
 await database.execute('PRAGMA foreign_keys = ON;')
 const emitter = mitt<{
@@ -32,8 +32,9 @@ const emitter = mitt<{
   noUse: bigint
 }>()
 
-const MUTATION_KEYWORDS = /\b(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b/i
+const MUTATION_KEYWORDS = /\b(INSERT|UPDATE|DELETE |REPLACE|CREATE|DROP|ALTER)\b/i
 const triggerUpdate = debounce(() => {
+  console.debug('[db sync] db changed')
   emitter.emit('onChange')
   triggerRef(db)
 }, 300)

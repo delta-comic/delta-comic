@@ -137,7 +137,7 @@ const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Arra
 
   <Comp.Popup v-model:show="isShowMore" position="bottom" round class="bg-(--van-background)! py-6!">
     <VanCellGroup inset>
-      <NPopconfirm @positive-click="$router.force.replace('/user/favourite').then(() => db
+      <NPopconfirm @positive-click="$router.force.replace({ name: '/user/favourite' }).then(() => db
         .deleteFrom('favouriteCard')
         .where('createAt', '=', cardKey)
         .execute())">

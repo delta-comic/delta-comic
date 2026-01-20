@@ -1,23 +1,13 @@
+mod db;
 mod fs_scheme;
 mod sentry;
 
 use tauri_plugin_aptabase::EventTracker;
-use tauri_plugin_sql::{Migration, MigrationKind};
 
 #[tokio::main]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub async fn run() {
   log::debug!("app started");
-
-  let migrations = vec![
-    // Define your migrations here
-    Migration {
-      version: 1,
-      description: "create_file",
-      sql: "",
-      kind: MigrationKind::Up,
-    },
-  ];
 
   let builder = fs_scheme::init(
     tauri::Builder::default()
@@ -27,7 +17,7 @@ pub async fn run() {
   let builder = builder
     .plugin(
       tauri_plugin_log::Builder::new()
-        .level(tauri_plugin_log::log::LevelFilter::Debug)
+        .level(tauri_plugin_log::log::LevelFilter::Info)
         .build(),
     )
     .plugin(tauri_plugin_m3::init())
@@ -37,11 +27,7 @@ pub async fn run() {
     .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_persisted_scope::init())
     .plugin(tauri_plugin_aptabase::Builder::new("A-US-9793062880").build())
-    .plugin(
-      tauri_plugin_sql::Builder::default()
-        .add_migrations("sqlite:app.db", migrations)
-        .build(),
-    )
+    .plugin(db::init())
     .plugin(tauri_plugin_pinia::init());
 
   match builder.build(tauri::generate_context!()) {

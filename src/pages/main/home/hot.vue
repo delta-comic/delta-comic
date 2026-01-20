@@ -22,7 +22,7 @@ const getItemCard = (contentType: uni.content.ContentType_) => uni.item.Item.ite
         icon: LevelIcon,
         onClick() {
           const first = uni.content.ContentPage.levelboard.keys().next().value!
-          return $router.force.push(`/hot?plugin=${first}`)
+          return $router.force.push({ name: '/hot', query: { plugin: first } })
         }
       }, ...Array.from(uni.content.ContentPage.topButton.values()).flat()].filter(v => !!v)">
         <button class="size-12  rounded-full flex items-center justify-center" :style="{ backgroundColor: btn.bgColor }"
@@ -31,7 +31,7 @@ const getItemCard = (contentType: uni.content.ContentType_) => uni.item.Item.ite
             <component :is="btn.icon" />
           </NIcon>
         </button>
-        <div class="!text-[13px]">{{ btn.name }}</div>
+        <div class="text-[13px]!">{{ btn.name }}</div>
       </div>
     </div>
     <div v-for="block of hotList.flat()">
@@ -39,7 +39,7 @@ const getItemCard = (contentType: uni.content.ContentType_) => uni.item.Item.ite
         <div class="w-[calc(100%-8px)] mx-auto relative flex items-center my-1 h-10 bg-(--van-background-2) rounded"
           @click="block.onClick">
           <span class="ml-3 text-(--nui-primary-color) text-xl font-bold">{{ block.name }}</span>
-          <NIcon class="!absolute right-3" color="var(--van-text-color-3)" size="20px">
+          <NIcon class="absolute! right-3" color="var(--van-text-color-3)" size="20px">
             <ArrowForwardIosRound />
           </NIcon>
         </div>

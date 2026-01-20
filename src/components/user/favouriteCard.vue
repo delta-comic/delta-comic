@@ -30,7 +30,7 @@ const handleClick = (rawItem: uni.item.RawItem) => {
 </script>
 
 <template>
-  <div v-if="isCardMode" @click="$router.force.push(`/user/favourite/${card.createAt}`)"
+  <div v-if="isCardMode" @click="$router.force.push({ name: '/user/favourite/[id]', params: { id: card.createAt } })"
     class="overflow-hidden w-full rounded-xl flex flex-col bg-center bg-(--van-background-2) text-(--van-text-color) border-none relative active:bg-gray p-3 items-center van-haptics-feedback">
     <div class="flex items-center h-6 w-full relative">
       <div class="text-lg font-semibold">{{ card.title }}</div>
@@ -62,7 +62,7 @@ const handleClick = (rawItem: uni.item.RawItem) => {
       </template>
     </div>
   </div>
-  <div v-else @click="$router.force.push(`/user/favourite/${card.createAt}`)"
+  <div v-else @click="$router.force.push({ name: '/user/favourite/[id]', params: { id: card.createAt } })"
     class="overflow-hidden min-h-25 w-full rounded-xl flex bg-center bg-(--van-background-2) text-(--van-text-color) border-none relative active:bg-gray p-3 items-center van-haptics-feedback">
     <Comp.Var :value="favouriteItems[0].item" v-slot="{ value: item }">
       <div class="w-[40%]">

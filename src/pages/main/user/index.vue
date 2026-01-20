@@ -35,7 +35,8 @@ const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom(
   </div>
   <template v-for="[plugin, user] of uni.user.User.userBase">
     <Comp.Var :value="pluginStore.plugins.get(plugin)?.user?.card" v-slot="{ value }">
-      <component :is="value" v-if="value" :user isSmall @click="$router.force.push(`/user/edit/${plugin}`)" />
+      <component :is="value" v-if="value" :user isSmall
+        @click="$router.force.push({ name: '/user/edit/[plugin]', params: { plugin } })" />
     </Comp.Var>
   </template>
   <div v-if="isEmpty(uni.user.User.userBase)"
@@ -96,7 +97,7 @@ const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom(
     <template v-for="[pluginName, plugin] of pluginStore.plugins.entries()">
       <ActionCard :pluginName v-for="card of plugin.user?.userActionPages ?? []" :card />
     </template>
-    <VanCell title="设置" is-link @click="$router.force.push('/setting')" />
+    <VanCell title="设置" is-link @click="$router.force.push({ name: '/setting' })" />
     <VanCell title="青少年模式" @click="$window.close()" is-link />
   </div>
 </template>

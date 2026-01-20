@@ -21,7 +21,7 @@ watch(() => temp.selectLevel, (selectLevel, oldSelectLevel) => {
   const [plugin, select] = selectLevelKey.toJSON(selectLevel)
   const [oldPlugin] = selectLevelKey.toJSON(oldSelectLevel)
   if (plugin != oldPlugin)
-    return $router.force.replace(`/hot?plugin=${plugin}&dfSel=${select}`)
+    return $router.force.replace({ name: '/hot', query: { plugin, dfSel: select } })
 })
 const source = computed(() => {
   if (!temp.list.has(temp.selectLevel)) {
