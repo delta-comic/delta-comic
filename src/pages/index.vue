@@ -1,6 +1,9 @@
-<route lang="json">{
-  "redirect": "/main/home"
-}</route>
+<script lang="ts" setup>
+definePage({
+  redirect: '/main/home/random'
+})
+</script>
 
-<template></template>
-<script></script>
+<template>
+
+</template>

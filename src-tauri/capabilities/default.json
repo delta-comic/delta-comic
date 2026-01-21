@@ -37,6 +37,7 @@
       ]
     },
     "sentry:default",
-    "log:default"
+    "log:default",
+    "cors-fetch:default"
   ]
 }

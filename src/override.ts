@@ -13,7 +13,6 @@
       // 2. 首先尝试使用原生的最高效解析
       return _originalJSONParse.call(JSON, text, reviver)
     } catch (e) {
-      console.warn(e, text)
       // 3. 只有在报错且是字符串时，才进入修复逻辑
       if (e instanceof SyntaxError) {
         let fixedText = text

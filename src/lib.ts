@@ -13,7 +13,7 @@ import * as Axios from 'axios'
 import axios from 'axios'
 axios.defaults.timeout = 7000
 import axiosTauriApiAdapter from 'axios-tauri-api-adapter'
-axios.defaults.adapter = [axiosTauriApiAdapter, 'fetch']
+axios.defaults.adapter = ['fetch']
 window.$$lib$$.Axios = { ...Axios, ...axios, axios }
 
 
