@@ -60,7 +60,10 @@ const rawInstallers = import.meta.glob<PluginInstaller>('./installer/*_*.ts', {
 })
 const installers = sortBy(Object.entries(rawInstallers), ([fname]) => Number(fname.match(/[\d\.]+(?=_)/)?.[0])).map(v => v[1]).reverse()
 
-
+export interface SourceOverrideConfig {
+  id: string
+  install: string
+}
 
 export const installPlugin = (input: string, __installedPlugins?: Set<string>) =>
   Utils.message.createDownloadMessage(`下载插件-${input}`, async m => {
