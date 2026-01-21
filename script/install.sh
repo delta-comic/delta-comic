@@ -1,19 +1,51 @@
-set -e
+#!/bin/bash
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PACKAGE_JSON="$SCRIPT_DIR/../package.json"
+# 定义目标文件
+PACKAGE_FILE="package.json"
 
-if [ ! -f "$PACKAGE_JSON" ]; then
-  echo "package.json not found at $PACKAGE_JSON" >&2
-  exit 1
+# 1. 检查文件是否存在
+if [ ! -f "$PACKAGE_FILE" ]; then
+    echo "❌ 错误: 当前目录下未找到 $PACKAGE_FILE"
+    exit 1
 fi
 
-if command -v jq >/dev/null 2>&1; then
-  TMP="$(mktemp)"
-  jq 'if (.dependencies != null and .dependencies["delta-comic-core"] != null) then .dependencies["delta-comic-core"]="latest"
-      elif (.devDependencies != null and .devDependencies["delta-comic-core"] != null) then .devDependencies["delta-comic-core"]="latest"
-      else .dependencies["delta-comic-core"]="latest" end' "$PACKAGE_JSON" > "$TMP"
-  mv "$TMP" "$PACKAGE_JSON"
+echo "🔍 正在读取 $PACKAGE_FILE ..."
+
+# 2. 使用 Node.js 处理 JSON (这是最安全的方法)
+# 我们将 Node代码作为字符串传递给 'node -e' 执行
+node -e "
+const fs = require('fs');
+const fileName = '$PACKAGE_FILE';
+
+try {
+    // 读取并解析 JSON
+    const data = fs.readFileSync(fileName, 'utf8');
+    const json = JSON.parse(data);
+
+    // 初始化 overrides 对象 (如果不存在)
+    if (!json.overrides) {
+        json.overrides = {};
+    }
+
+    // 添加或更新目标条目
+    json.overrides['delta-comic-core'] = 'latest';
+
+    // 写回文件，使用 2 个空格缩进格式化
+    fs.writeFileSync(fileName, JSON.stringify(json, null, 2) + '\n');
+    
+    console.log('✅ 成功: 已添加 delta-comic-core 到 overrides 字段。');
+
+    console.log(json);
+
+} catch (error) {
+    console.error('❌ 失败: 处理 JSON 时发生错误:', error.message);
+    process.exit(1);
+}
+"
+
+# 检查 Node.js 命令的执行状态
+if [ $? -eq 0 ]; then
+    echo "🎉 操作完成！"
 else
-  node -e 'const fs=require("fs");const p=process.argv[1];const pkg=JSON.parse(fs.readFileSync(p)); if(pkg.dependencies && Object.prototype.hasOwnProperty.call(pkg.dependencies,"delta-comic-core")) pkg.dependencies["delta-comic-core"]="latest"; else if(pkg.devDependencies && Object.prototype.hasOwnProperty.call(pkg.devDependencies,"delta-comic-core")) pkg.devDependencies["delta-comic-core"]="latest"; else { pkg.dependencies = pkg.dependencies || {}; pkg.dependencies["delta-comic-core"]="latest"; } fs.writeFileSync(p, JSON.stringify(pkg, null, 2) + "\n");' "$PACKAGE_JSON"
+    echo "⚠️ 脚本执行失败。"
 fi

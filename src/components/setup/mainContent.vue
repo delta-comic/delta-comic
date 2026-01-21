@@ -141,7 +141,7 @@ const totalCount = computedAsync(() => DBUtils.countDb(db.value
         <motion.div :initial="{ opacity: 0, scale: '50%', translateY: '85px' }"
           :exit="{ opacity: 0, scale: '50%', translateY: '85px' }" class="relative"
           :animate="{ opacity: 1, scale: '100%', translateY: '0px' }" v-if="allErrors.length">
-          <NButton type="primary" quaternary class="absolute! right-0!" @click="rebootApp">重新加载</NButton>
+          <NButton type="primary"  class="absolute! right-10!" @click="rebootApp">重新加载</NButton>
         </motion.div>
       </template>
     </NSpin>

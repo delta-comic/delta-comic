@@ -72,7 +72,7 @@ importers:
         version: 1.11.19
       delta-comic-core:
         specifier: file:..\delta-comic-core\dist\pack.tgz
-        version: file:../delta-comic-core/dist/pack.tgz(@types/node@25.0.8)(axios@1.13.2)(kysely@0.28.9)(naive-ui@2.43.2(vue@3.5.26(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.26(typescript@5.9.3)))(postcss@8.5.6)(rolldown-vite@7.3.1(@types/node@25.0.8)(jiti@2.6.1)(yaml@2.8.2))(tailwindcss@4.1.18)(typescript@5.9.3)(vant@4.9.22(vue@3.5.26(typescript@5.9.3)))(vue-router@4.6.4(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3))
+        version: file:../delta-comic-core/dist/pack.tgz(@types/node@25.0.8)(axios@1.13.2)(crypto-js@4.2.0)(es-toolkit@1.43.0)(kysely@0.28.9)(motion-v@1.9.0(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)))(naive-ui@2.43.2(vue@3.5.26(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.26(typescript@5.9.3)))(postcss@8.5.6)(rolldown-vite@7.3.1(@types/node@25.0.8)(jiti@2.6.1)(yaml@2.8.2))(tailwindcss@4.1.18)(typescript@5.9.3)(vant@4.9.22(vue@3.5.26(typescript@5.9.3)))(vue-router@4.6.4(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3))
       dompurify:
         specifier: ^3.3.1
         version: 3.3.1
@@ -1252,11 +1252,14 @@ packages:
     engines: {node: '>=0.4.0'}
 
   delta-comic-core@file:../delta-comic-core/dist/pack.tgz:
-    resolution: {integrity: sha512-YOoAJ9FWDT8CAu83X+RPt+4PfMTFpPrXwZeDAxE5utb+w+PYBcFRNL4onRYX09HQjAScWS9PApoj8xSKmm5RIw==, tarball: file:../delta-comic-core/dist/pack.tgz}
-    version: 0.5.11
+    resolution: {integrity: sha512-D7u1LKKvB1M3N1xrNuYmYEY90VYm87PnuZUzsPjZ5eaN3W50UnD9v9fZ7w5fyRmpy4IAugZ1YtbFqE437Z0n2g==, tarball: file:../delta-comic-core/dist/pack.tgz}
+    version: 0.5.10
     peerDependencies:
       axios: ^1.12.2
+      crypto-js: 4.2.0
+      es-toolkit: ^1.40.0
       kysely: ^0.28.9
+      motion-v: 1.8.1
       naive-ui: 2.43.2
       pinia: ^3.0.4
       vant: 4.9.22
@@ -1377,20 +1380,6 @@ packages:
   form-data@4.0.5:
     resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
-
-  framer-motion@12.23.12:
-    resolution: {integrity: sha512-6e78rdVtnBvlEVgu6eFEAgG9v3wLnYEboM8I5O5EXvfKC8gxGQB8wXJdhkMy10iVcn05jl6CNw7/HTsTCfwcWg==}
-    peerDependencies:
-      '@emotion/is-prop-valid': '*'
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-    peerDependenciesMeta:
-      '@emotion/is-prop-valid':
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
 
   framer-motion@12.26.2:
     resolution: {integrity: sha512-lflOQEdjquUi9sCg5Y1LrsZDlsjrHw7m0T9Yedvnk7Bnhqfkc89/Uha10J3CFhkL+TCZVCRw9eUGyM/lyYhXQA==}
@@ -1715,21 +1704,11 @@ packages:
   mlly@1.8.0:
     resolution: {integrity: sha512-l8D9ODSRWLe2KHJSifWGwBqpTZXIXTeo8mlKjY+E2HAakaTeNpqAyBZ8GSqLzHgw4XmHmC8whvpjJNMbFZN7/g==}
 
-  motion-dom@12.23.12:
-    resolution: {integrity: sha512-RcR4fvMCTESQBD/uKQe49D5RUeDOokkGRmz4ceaJKDBgHYtZtntC/s2vLvY38gqGaytinij/yi3hMcWVcEF5Kw==}
-
   motion-dom@12.26.2:
     resolution: {integrity: sha512-KLMT1BroY8oKNeliA3JMNJ+nbCIsTKg6hJpDb4jtRAJ7nCKnnpg/LTq/NGqG90Limitz3kdAnAVXecdFVGlWTw==}
 
   motion-utils@12.24.10:
     resolution: {integrity: sha512-x5TFgkCIP4pPsRLpKoI86jv/q8t8FQOiM/0E8QKBzfMozWHfkKap2gA1hOki+B5g3IsBNpxbUnfOum1+dgvYww==}
-
-  motion-v@1.7.3:
-    resolution: {integrity: sha512-lwgrge7Y7FF9LxBxZ//MsSLPPjh4z1yYE9ie236Pa89mRCsBlONXbLcseln6G6LyAG8pt3PpzUxWt2grwMcBAA==}
-    deprecated: deprecate
-    peerDependencies:
-      '@vueuse/core': '>=10.0.0'
-      vue: '>=3.0.0'
 
   motion-v@1.9.0:
     resolution: {integrity: sha512-B5VeO69gO416yIqCyNL9EAD7v6n/h/9ktv7gGSRKzTCQhAhnC/N1VWLOTYvOiH90f/tZivbgN/V0MzSU5nsJLA==}
@@ -3406,7 +3385,7 @@ snapshots:
 
   delayed-stream@1.0.0: {}
 
-  delta-comic-core@file:../delta-comic-core/dist/pack.tgz(@types/node@25.0.8)(axios@1.13.2)(kysely@0.28.9)(naive-ui@2.43.2(vue@3.5.26(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.26(typescript@5.9.3)))(postcss@8.5.6)(rolldown-vite@7.3.1(@types/node@25.0.8)(jiti@2.6.1)(yaml@2.8.2))(tailwindcss@4.1.18)(typescript@5.9.3)(vant@4.9.22(vue@3.5.26(typescript@5.9.3)))(vue-router@4.6.4(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)):
+  delta-comic-core@file:../delta-comic-core/dist/pack.tgz(@types/node@25.0.8)(axios@1.13.2)(crypto-js@4.2.0)(es-toolkit@1.43.0)(kysely@0.28.9)(motion-v@1.9.0(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)))(naive-ui@2.43.2(vue@3.5.26(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.26(typescript@5.9.3)))(postcss@8.5.6)(rolldown-vite@7.3.1(@types/node@25.0.8)(jiti@2.6.1)(yaml@2.8.2))(tailwindcss@4.1.18)(typescript@5.9.3)(vant@4.9.22(vue@3.5.26(typescript@5.9.3)))(vue-router@4.6.4(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)):
     dependencies:
       '@lhlyu/vue-virtual-waterfall': 1.0.8(vue@3.5.26(typescript@5.9.3))
       '@vant/use': 1.6.0(vue@3.5.26(typescript@5.9.3))
@@ -3419,7 +3398,7 @@ snapshots:
       es-toolkit: 1.43.0
       kysely: 0.28.9
       mitt: 3.0.1
-      motion-v: 1.7.3(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3))
+      motion-v: 1.9.0(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3))
       naive-ui: 2.43.2(vue@3.5.26(typescript@5.9.3))
       pinia: 3.0.4(typescript@5.9.3)(vue@3.5.26(typescript@5.9.3))
       tailwindcss-safe-area-capacitor: 0.5.1(tailwindcss@4.1.18)
@@ -3431,11 +3410,8 @@ snapshots:
       vue: 3.5.26(typescript@5.9.3)
       vue-router: 4.6.4(vue@3.5.26(typescript@5.9.3))
     transitivePeerDependencies:
-      - '@emotion/is-prop-valid'
       - '@types/node'
       - postcss
-      - react
-      - react-dom
       - rollup
       - supports-color
       - tailwindcss
@@ -3535,12 +3511,6 @@ snapshots:
       es-set-tostringtag: 2.1.0
       hasown: 2.0.2
       mime-types: 2.1.35
-
-  framer-motion@12.23.12:
-    dependencies:
-      motion-dom: 12.26.2
-      motion-utils: 12.24.10
-      tslib: 2.8.1
 
   framer-motion@12.26.2:
     dependencies:
@@ -3807,27 +3777,11 @@ snapshots:
       pkg-types: 1.3.1
       ufo: 1.6.2
 
-  motion-dom@12.23.12:
-    dependencies:
-      motion-utils: 12.24.10
-
   motion-dom@12.26.2:
     dependencies:
       motion-utils: 12.24.10
 
   motion-utils@12.24.10: {}
-
-  motion-v@1.7.3(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)):
-    dependencies:
-      '@vueuse/core': 14.1.0(vue@3.5.26(typescript@5.9.3))
-      framer-motion: 12.23.12
-      hey-listen: 1.0.8
-      motion-dom: 12.23.12
-      vue: 3.5.26(typescript@5.9.3)
-    transitivePeerDependencies:
-      - '@emotion/is-prop-valid'
-      - react
-      - react-dom
 
   motion-v@1.9.0(@vueuse/core@14.1.0(vue@3.5.26(typescript@5.9.3)))(vue@3.5.26(typescript@5.9.3)):
     dependencies:
