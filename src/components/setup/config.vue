@@ -7,16 +7,17 @@ const overrides = usePluginConfig()
 
 <template>
   <NScrollbar class="size-full">
-    <div>下载源覆写</div>
-    <TransitionGroup tag="ul" name="list">
-      <NDynamicInput v-model:value="overrides">
-        <template #default="{ value }">
-          <div class="flex items-center w-full">
-            <NInput v-model:value="value.id" class="w-1/3!" type="text" />
-            <NInput v-model:value="value.install" type="text" />
+    <div class="mb-2 ml-4 text-lg font-semibold">下载源覆写</div>
+    <NDynamicInput v-model:value="overrides" :on-create="() => ({ id: '', install: '', enabled: true })">
+      <template #default="{ value }">
+        <div class="flex items-center w-[calc(100%-var(--spacing)*25)]">
+          <NCheckbox v-model:checked="value.enabled" class="mx-4" />
+          <div class="items-center w-full ">
+            <NInput v-model:value="value.id" class="w-2/3!" type="text" placeholder="插件ID" />
+            <NInput v-model:value="value.install" type="text" class=" my-2" placeholder="下载语句" />
           </div>
-        </template>
-      </NDynamicInput>
-    </TransitionGroup>
+        </div>
+      </template>
+    </NDynamicInput>
   </NScrollbar>
 </template>

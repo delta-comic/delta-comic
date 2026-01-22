@@ -63,6 +63,7 @@ const installers = sortBy(Object.entries(rawInstallers), ([fname]) => Number(fna
 export interface SourceOverrideConfig {
   id: string
   install: string
+  enabled: boolean
 }
 
 export const usePluginConfig = () => useNativeStore(pluginName, 'pluginInstallSourceOverrides', new Array<SourceOverrideConfig>())
@@ -80,7 +81,7 @@ export const installDepends = (m: Utils.message.DownloadMessageBind, meta: Plugi
     if (isDownloaded || !download) continue
     console.log(`从 ${meta.name.id} 发现未安装依赖: ${id} ->`, download)
     v.description = `安装: ${id}`
-    let downloadCommend = overrides.value.find(c => c.id == id)?.install ?? download
+    let downloadCommend = overrides.value.find(c => c.id == id && c.enabled)?.install ?? download
     await installPlugin(downloadCommend)
     count++
   }
