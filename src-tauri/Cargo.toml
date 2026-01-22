@@ -67,7 +67,17 @@ percent-encoding = "2.3.2"
 tauri-plugin-log = "2"
 log = "0.4.29"
 tauri-runtime-wry = "2.9.3"
-tauri-plugin-cors-fetch = "5.0.0"
+tauri-plugin-cors-fetch = { version = "5.0.0", features = [
+  "system-proxy",
+  "json",
+  "form",
+  "cookies",
+  "charset",
+  "stream",
+  "rustls-no-provider",
+  "http2",
+  "query",
+] }
 
 [target.'cfg(any(target_os = "android"))'.dependencies]
 tauri-plugin-android-package-install = "2.0.1"

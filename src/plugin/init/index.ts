@@ -1,11 +1,11 @@
-import { PluginConfig, Utils } from "delta-comic-core"
+import { PluginConfig, Utils, type PluginMeta } from "delta-comic-core"
 import { sortBy } from "es-toolkit/compat"
 import { usePluginStore } from "../store"
 import { isString, Mutex } from "es-toolkit"
 import { markRaw } from "vue"
 import { PluginArchiveDB } from "../db"
 import { pluginName } from "@/symbol"
-import { db } from "@/db"
+import { db, useNativeStore } from "@/db"
 import type { PluginBooter, PluginInstaller, PluginLoader } from "./utils"
 
 
@@ -65,6 +65,28 @@ export interface SourceOverrideConfig {
   install: string
 }
 
+export const usePluginConfig = () => useNativeStore(pluginName, 'pluginInstallSourceOverrides', new Array<SourceOverrideConfig>())
+
+export const installDepends = (m: Utils.message.DownloadMessageBind, meta: PluginMeta, installedPlugins?: Set<string>) => m.createLoading('依赖安装/检查', async v => {
+  v.retryable = true
+  let count = 0
+  const plugins = installedPlugins ?? new Set((await db.value
+    .selectFrom('plugin')
+    .select('pluginName')
+    .execute()).map(v => v.pluginName))
+  const overrides = usePluginConfig()
+  for (const { id, download } of meta.require) {
+    const isDownloaded = plugins.has(id)
+    if (isDownloaded || !download) continue
+    console.log(`从 ${meta.name.id} 发现未安装依赖: ${id} ->`, download)
+    v.description = `安装: ${id}`
+    let downloadCommend = overrides.value.find(c => c.id == id)?.install ?? download
+    await installPlugin(downloadCommend)
+    count++
+  }
+  v.description = `安装完成，共${count}个`
+})
+
 export const installPlugin = (input: string, __installedPlugins?: Set<string>) =>
   Utils.message.createDownloadMessage(`下载插件-${input}`, async m => {
     const [file, installer] = await m.createLoading('下载', async v => {
@@ -104,23 +126,7 @@ export const installPlugin = (input: string, __installedPlugins?: Set<string>) =
     })
     console.log(`安装插件成功: ${meta.name.id} ->`, meta)
 
-    await m.createLoading('依赖安装/检查', async v => {
-      v.retryable = true
-      let count = 0
-      const plugins = __installedPlugins ?? new Set((await db.value
-        .selectFrom('plugin')
-        .select('pluginName')
-        .execute()).map(v => v.pluginName))
-      for (const { id, download } of meta.require) {
-        const isDownloaded = plugins.has(id)
-        if (isDownloaded || !download) continue
-        console.log(`从 ${meta.name.id} 发现未安装依赖: ${id} ->`, download)
-        v.description = `安装: ${id}`
-        await installPlugin(download)
-        count++
-      }
-      v.description = `安装完成，共${count}个`
-    })
+    await installDepends(m, meta, __installedPlugins)
 
   })
 
@@ -149,23 +155,7 @@ export const updatePlugin = async (pluginMeta: PluginArchiveDB.Meta, __installed
       })
       .execute()
 
-    await m.createLoading('依赖安装/检查', async v => {
-      v.retryable = true
-      let count = 0
-      const plugins = __installedPlugins ?? new Set((await db.value
-        .selectFrom('plugin')
-        .select('pluginName')
-        .execute()).map(v => v.pluginName))
-      for (const { id, download } of meta.require) {
-        const isDownloaded = plugins.has(id)
-        if (isDownloaded || !download) continue
-        console.log(`从 ${meta.name.id} 发现未安装依赖: ${id} ->`, download)
-        v.description = `安装: ${id}`
-        await installPlugin(download)
-        count++
-      }
-      v.description = `安装完成，共${count}个`
-    })
+    await installDepends(m, meta, __installedPlugins)
   })
 
 const rawLoaders = import.meta.glob<PluginLoader>('./loader/*_*.ts', {
