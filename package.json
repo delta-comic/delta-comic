@@ -14,6 +14,8 @@
     "typecheck": "vue-tsc --noEmit -p ./tsconfig.json --composite false",
     "dev": "tauri dev",
     "tauri": "tauri",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "build:plugin": "cd ./tauri-plugin-delta-comic && pnpm i && pnpm build && cd .."
   },
   "packageManager": "pnpm@10.27.0",
@@ -68,6 +70,7 @@
     "@vitejs/plugin-vue-jsx": "^5.1.3",
     "browserslist": "^4.28.1",
     "lightningcss": "^1.30.2",
+    "oxlint": "^1.41.0",
     "tailwindcss": "4.1.18",
     "typescript": "^5.9.3",
     "unplugin-vue-components": "31.0.0",
