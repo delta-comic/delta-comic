@@ -1,1 +1,0 @@
-{"main-capability":{"identifier":"main-capability","description":"Capability for the main window","context":"local","windows":["main"],"permissions":["aptabase:allow-track-event"],"platforms":["linux","macOS","windows","android","iOS"]}}

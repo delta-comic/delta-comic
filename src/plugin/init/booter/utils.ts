@@ -31,7 +31,7 @@ const test = async (forks: string[], test: (url: string, signal: AbortSignal) =>
         record.push([fork, time])
         console.log(`[plugin test] fetch url ${fork} connected time ${time}ms`)
         abortController.abort()
-      } catch (error) {
+      } catch {
         record.push([fork, false])
         console.log(`[plugin test] fetch url ${fork} can not connected`)
       }

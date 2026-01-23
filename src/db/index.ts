@@ -24,7 +24,7 @@ export interface DB {
   recentView: RecentDB.Table
   subscribe: SubscribeDB.Table
   plugin: PluginArchiveDB.Table
-} 
+}
 const database = await Database.load(`sqlite:app.db`)
 await database.execute('PRAGMA foreign_keys = ON;')
 const emitter = mitt<{
@@ -41,26 +41,18 @@ const triggerUpdate = debounce(() => {
 
 const originalExecute = database.execute.bind(database)
 database.execute = async (query: string, bindValues?: unknown[]) => {
-  try {
-    const result = await originalExecute(query, bindValues)
-    if (MUTATION_KEYWORDS.test(query))
-      triggerUpdate()
-    return result
-  } catch (error) {
-    throw error
-  }
+  const result = await originalExecute(query, bindValues)
+  if (MUTATION_KEYWORDS.test(query))
+    triggerUpdate()
+  return result
 }
 
 const originalSelect = database.select.bind(database)
 database.select = async <T>(query: string, bindValues?: unknown[]) => {
-  try {
-    const result = await originalSelect<T>(query, bindValues)
-    if (MUTATION_KEYWORDS.test(query))
-      triggerUpdate()
-    return result
-  } catch (error) {
-    throw error
-  }
+  const result = await originalSelect<T>(query, bindValues)
+  if (MUTATION_KEYWORDS.test(query))
+    triggerUpdate()
+  return result
 }
 
 export const db = shallowRef(new Kysely<DB>({

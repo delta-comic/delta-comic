@@ -1,0 +1,70 @@
+[package]
+name = "tauri-plugin-cors-fetch"
+version = "5.0.0"
+description = "Enabling Cross-Origin Resource Sharing (CORS) for Fetch Requests within Tauri applications."
+keywords = ["tauri-plugin", "CORS", "fetch", "unofficial"]
+authors = ["Del Wang <hello@xbox.work>"]
+repository = "https://github.com/idootop/tauri-plugin-cors-fetch"
+documentation = "https://docs.rs/crate/tauri-plugin-cors-fetch"
+license = "MIT"
+readme = "README.md"
+edition = "2021"
+rust-version = "1.77.2"
+links = "tauri-plugin-cors-fetch"
+
+[package.metadata.docs.rs]
+rustc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.platforms.support]
+windows = { level = "full", notes = "" }
+linux = { level = "full", notes = "" }
+macos = { level = "full", notes = "" }
+android = { level = "full", notes = "" }
+ios = { level = "full", notes = "" }
+
+[dependencies]
+tauri = { version = "2", default-features = false }
+serde = "1"
+serde_json = "1"
+thiserror = "2"
+url = "2"
+http = "1"
+reqwest = { version = "0.13", default-features = false }
+tokio = { version = "1", features = ["sync", "macros"] }
+data-url = "0.3"
+cookie_store = { version = "0.22", optional = true, features = ["serde"] }
+bytes = { version = "1", optional = true }
+tracing = { version = "0.1", optional = true }
+
+[build-dependencies]
+tauri-plugin = { version = "2", features = ["build"] }
+
+[features]
+default = ["reqwest/default", "cookies"]
+tracing = ["dep:tracing"]
+
+# Proxy for reqwest's core network features
+http2 = ["reqwest/http2"]
+rustls = ["reqwest/rustls"]
+rustls-no-provider = ["reqwest/rustls-no-provider"]
+native-tls = ["reqwest/native-tls"]
+native-tls-no-alpn = ["reqwest/native-tls-no-alpn"]
+native-tls-vendored = ["reqwest/native-tls-vendored"]
+native-tls-vendored-no-alpn = ["reqwest/native-tls-vendored-no-alpn"]
+blocking = ["reqwest/blocking"]
+charset = ["reqwest/charset"]
+cookies = ["reqwest/cookies", "dep:cookie_store", "dep:bytes"]
+gzip = ["reqwest/gzip"]
+brotli = ["reqwest/brotli"]
+zstd = ["reqwest/zstd"]
+deflate = ["reqwest/deflate"]
+query = ["reqwest/query"]
+form = ["reqwest/form"]
+json = ["reqwest/json"]
+multipart = ["reqwest/multipart"]
+hickory-dns = ["reqwest/hickory-dns"]
+stream = ["reqwest/stream"]
+socks = ["reqwest/socks"]
+system-proxy = ["reqwest/system-proxy"]
+http3 = ["reqwest/http3"]

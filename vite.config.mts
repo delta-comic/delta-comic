@@ -14,7 +14,7 @@ import VueRouter from 'unplugin-vue-router/vite'
 
 const host = process.env.TAURI_DEV_HOST
 
-export default defineConfig(({ }) => ({
+export default defineConfig(() => ({
   plugins: [
     VueRouter({
       

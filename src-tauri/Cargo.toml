@@ -67,7 +67,7 @@ percent-encoding = "2.3.2"
 tauri-plugin-log = "2"
 log = "0.4.29"
 tauri-runtime-wry = "2.9.3"
-tauri-plugin-cors-fetch = { version = "5.0.0", features = [
+tauri-plugin-cors-fetch = { path = "../tauri-plugin-cors-fetch", features = [
   "system-proxy",
   "json",
   "form",

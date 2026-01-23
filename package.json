@@ -8,6 +8,11 @@
     "type": "git",
     "url": "https://github.com/delta-comic/delta-comic.git"
   },
+  "author": {
+    "email": "wenxinguo12@gmail.com",
+    "name": "wenxig",
+    "url": "https://github.com/wenxig"
+  },
   "scripts": {
     "dev:web": "vite",
     "build:web": "vite build",
@@ -16,7 +21,7 @@
     "tauri": "tauri",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "build:plugin": "cd ./tauri-plugin-delta-comic && pnpm i && pnpm build && cd .."
+    "build:aptabase": "cd ./tauri-plugin-aptabase && pnpm i && pnpm build && cd .."
   },
   "packageManager": "pnpm@10.27.0",
   "readme": "./README.md",
@@ -36,7 +41,6 @@
     "@vicons/material": "^0.13.0",
     "@vueuse/core": "14.1.0",
     "axios": "^1.13.2",
-    "axios-tauri-api-adapter": "^2.0.6",
     "color": "^5.0.3",
     "core-js": "^3.47.0",
     "dayjs": "^1.11.19",

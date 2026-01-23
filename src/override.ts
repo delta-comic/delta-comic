@@ -34,13 +34,7 @@
         // 修复逻辑 C：去除首尾可能存在的普通空白符
         fixedText = fixedText.trim()
 
-        try {
-          // 4. 使用修复后的字符串再次尝试
-          return _originalJSONParse.call(JSON, fixedText, reviver)
-        } catch (retryError) {
-          // 如果修复后依然失败，抛出原有的或新的错误
-          throw retryError
-        }
+        return _originalJSONParse.call(JSON, fixedText, reviver)
       }
       throw e // 非 SyntaxError 原样抛出
     }
