@@ -22,9 +22,7 @@
     "noImplicitAny": true,
     "noImplicitOverride": true,
     "noImplicitThis": true,
-    "types": [
-      "@types/node"
-    ],
+    "types": ["@types/node"]
   },
   "include": [
     "vite.config.mts",
@@ -34,7 +32,5 @@
     "./dev/**/*",
     "./dev/*"
   ],
-  "exclude": [
-    "./src/**/*"
-  ]
+  "exclude": ["./src/**/*"]
 }

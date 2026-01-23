@@ -1,0 +1,36 @@
+name: oxlint 风格检查
+
+on:
+  pull_request:
+  push:
+    branches: [main,develop]
+    paths: '*.{js,jsx,ts,tsx,mjs,cjs,vue}'
+
+jobs:
+  oxlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.27.0
+
+      - name: Change depends
+        run: sh ./script/install.sh
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      # alternatively use npm install / yarn install here
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint

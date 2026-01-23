@@ -48,7 +48,7 @@ console.debug('[random] waterfall', waterfall,temp.stream)
 </script>
 
 <template>
-  <Comp.Waterfall class="!size-full" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
+  <Comp.Waterfall class="size-full!" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
     <component :is="uni.item.Item.itemCard.get(item.contentType) ?? comp.ItemCard" :item type="small" free-height
       :key="`${index}|${item.id}`">
       <NIcon color="var(--van-text-color-2)" size="14px">

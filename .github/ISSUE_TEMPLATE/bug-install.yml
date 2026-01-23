@@ -1,10 +1,7 @@
 name: 错误-安装错误
 description: 出现安装错误时使用此模版
-title: "[错误-安装错误] <简易描述>"
-labels: [
-  Bug,
-  Install-Bug
-]
+title: '[错误-安装错误] <简易描述>'
+labels: [Bug, Install-Bug]
 body:
   - type: markdown
     attributes:

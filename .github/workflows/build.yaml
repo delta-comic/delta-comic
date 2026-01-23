@@ -3,7 +3,7 @@ name: 构建和发布(dist.zip, app.apk)
 on:
   push:
     branches:
-      - "main"
+      - 'main'
 
 permissions:
   contents: write
@@ -16,10 +16,10 @@ jobs:
       ENV_STATE: github
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      
+
       - name: Store
         uses: actions/cache@v4
         with:
@@ -29,7 +29,7 @@ jobs:
           key: ${{ runner.os }}-delta-comic
           restore-keys: |
             ${{ runner.os }}-delta-comic
-            
+
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -44,7 +44,7 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-      
+
       - name: Install NDK
         run: sdkmanager "ndk;26.1.10909125"
 
@@ -57,14 +57,13 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 10.26.0    
-      
+          version: 10.27.0
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: 'pnpm'                     
-                  
+          cache: 'pnpm'
 
       - name: Change depends
         run: sh ./script/install.sh
@@ -80,7 +79,6 @@ jobs:
           args: --target aarch64 # 指定目标架构，或者不填构建全部
           appName: Delta Comic
           appVersion: v__VERSION__
-          
 
       - name: Get package version
         id: get_version
@@ -88,7 +86,6 @@ jobs:
           # 输出 package.json 中的 version 字段为 step 输出
           echo "version=`sh ./script/getVersion.sh`" >> "$GITHUB_OUTPUT"
 
-      
       - name: Prepare tag/name/body variables
         id: vars
         shell: bash
@@ -107,8 +104,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-           ./dist/dist.zip
-           ./dist/app.apk
+            ./dist/dist.zip
+            ./dist/app.apk
           tag_name: ${{ steps.vars.outputs.tag }}
           name: ${{ steps.get_version.outputs.version }}
           body: |
