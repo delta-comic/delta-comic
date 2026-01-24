@@ -10,6 +10,12 @@ const $route = useRoute<"/content/[contentType]/[id]/[ep]">()
 const contentStore = useContentStore()
 const $router = useRouter()
 
+definePage({
+  meta: {
+    statusBar: { style: 'dark' },
+    force: true
+  }
+})
 
 const ep = $route.params.ep.toString()
 const id = $route.params.id.toString()

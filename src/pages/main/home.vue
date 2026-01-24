@@ -30,6 +30,7 @@ const tabItem = computed(() => Array.from(uni.content.ContentPage.tabbar.entries
     }
   }))))
 </script>
+
 <template>
   <div class="w-full pt-safe bg-(--van-background-2)"></div>
   <header :class="[isShowNavBar ? 'translate-y-0' : '-translate-y-[calc(var(--safe-area-inset-top)+100%)]']"
@@ -70,6 +71,6 @@ const tabItem = computed(() => Array.from(uni.content.ContentPage.tabbar.entries
   </div>
   <div class="w-full duration-200 transition-all  overflow-hidden"
     :class="[isShowNavBar ? 'h-[calc(100%-var(--van-tabs-line-height)-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0' : 'h-[calc(100%-var(--safe-area-inset-top)-var(--van-tabs-line-height))]! -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]']">
-    <RouterView />
+    <RouterView :key="$route.fullPath" />
   </div>
 </template>

@@ -1321,7 +1321,7 @@ packages:
     engines: {node: '>=0.4.0'}
 
   delta-comic-core@file:../delta-comic-core/dist/pack.tgz:
-    resolution: {integrity: sha512-wIO04gtYwA/knoxOvn/lweWtL3wa67P1Ilc6uAzO3Ogr1V763LC4ws2azFJs9uMqcC1im3/38mi/QYi+1XJbNw==, tarball: file:../delta-comic-core/dist/pack.tgz}
+    resolution: {integrity: sha512-YOoAJ9FWDT8CAu83X+RPt+4PfMTFpPrXwZeDAxE5utb+w+PYBcFRNL4onRYX09HQjAScWS9PApoj8xSKmm5RIw==, tarball: file:../delta-comic-core/dist/pack.tgz}
     version: 0.5.11
     peerDependencies:
       axios: ^1.12.2
