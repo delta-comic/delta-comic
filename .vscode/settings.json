@@ -1,10 +1,13 @@
 {
-  "cSpell.words": ["androidx", "aptabase", "oxlint"],
+  "cSpell.words": [
+    "androidx",
+    "aptabase",
+    "Aspera",
+    "oxlint",
+    "rustls"
+  ],
   "oxc.path.oxlint": "node_modules/oxlint/bin/oxlint",
   "oxc.lint.run": "onSave",
   "oxc.requireConfig": true,
-  "oxc.enable": true,
-  "oxc.fmt.configPath": ".oxfmtrc.json",
-  "editor.defaultFormatter": "oxc.oxc-vscode",
-  "editor.formatOnSave": true
+  "oxc.enable": true
 }

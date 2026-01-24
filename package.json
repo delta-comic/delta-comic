@@ -13,6 +13,8 @@
     "type": "git",
     "url": "https://github.com/delta-comic/delta-comic.git"
   },
+  "packageManager": "pnpm@10.27.0",
+  "readme": "./README.md",
   "scripts": {
     "dev:web": "vite",
     "dev": "tauri dev",
@@ -24,7 +26,7 @@
     "lint:fix": "oxlint --fix"
   },
   "dependencies": {
-    "@aptabase/tauri": "github:aptabase/tauri-plugin-aptabase",
+    "@aptabase/tauri": "github:delta-comic/tauri-plugin-aptabase-rustls",
     "@octokit/rest": "^22.0.1",
     "@sentry/vue": "^10.34.0",
     "@tauri-apps/api": "^2.9.1",
@@ -87,7 +89,6 @@
   "overrides": {
     "vite": "7.3.1"
   },
-  "packageManager": "pnpm@10.27.0",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
@@ -100,6 +101,5 @@
     "patchedDependencies": {
       "tauri-plugin-m3": "patches/tauri-plugin-m3.patch"
     }
-  },
-  "readme": "./README.md"
+  }
 }

@@ -49,7 +49,7 @@ tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", fe
 ], branch = "v2" }
 tauri-plugin-pinia = "4.1.0"
 tauri-plugin-m3 = "0.3.1"
-tauri-plugin-aptabase = { path = "../tauri-plugin-aptabase" }
+tauri-plugin-aptabase = { git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls", branch = "main" }
 tokio = "1.49.0"
 tauri-plugin-sentry = "0.5.0"
 sentry = { version = "0.42", default-features = false, features = [
@@ -67,16 +67,10 @@ percent-encoding = "2.3.2"
 tauri-plugin-log = "2"
 log = "0.4.29"
 tauri-runtime-wry = "2.9.3"
-tauri-plugin-cors-fetch = { path = "../tauri-plugin-cors-fetch", features = [
-  "system-proxy",
-  "json",
-  "form",
-  "cookies",
-  "charset",
+tauri-plugin-cors-fetch = { git = "https://github.com/delta-comic/tauri-plugin-cors-fetch-no-aws", branch = "main", features = [
+  "rustls-tls",
   "stream",
-  "rustls-no-provider",
-  "http2",
-  "query",
+  "json"
 ] }
 
 [target.'cfg(any(target_os = "android"))'.dependencies]

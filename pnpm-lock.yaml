@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       '@aptabase/tauri':
-        specifier: github:aptabase/tauri-plugin-aptabase
-        version: https://codeload.github.com/aptabase/tauri-plugin-aptabase/tar.gz/7cc36ccce0052352bda7272a4acb25a214c4b804
+        specifier: github:delta-comic/tauri-plugin-aptabase-rustls
+        version: https://codeload.github.com/delta-comic/tauri-plugin-aptabase-rustls/tar.gz/8a2f40279a301dc70a09b266c43e07f04411ff85
       '@octokit/rest':
         specifier: ^22.0.1
         version: 22.0.1
@@ -188,9 +188,9 @@ importers:
 
 packages:
 
-  '@aptabase/tauri@https://codeload.github.com/aptabase/tauri-plugin-aptabase/tar.gz/7cc36ccce0052352bda7272a4acb25a214c4b804':
-    resolution: {tarball: https://codeload.github.com/aptabase/tauri-plugin-aptabase/tar.gz/7cc36ccce0052352bda7272a4acb25a214c4b804}
-    version: 0.4.2
+  '@aptabase/tauri@https://codeload.github.com/delta-comic/tauri-plugin-aptabase-rustls/tar.gz/8a2f40279a301dc70a09b266c43e07f04411ff85':
+    resolution: {tarball: https://codeload.github.com/delta-comic/tauri-plugin-aptabase-rustls/tar.gz/8a2f40279a301dc70a09b266c43e07f04411ff85}
+    version: 0.4.3
 
   '@babel/code-frame@7.28.6':
     resolution: {integrity: sha512-JYgintcMjRiCvS8mMECzaEn+m3PfoQiyqukOMCCVQtoJGYJw8j/8LBJEiqkHLkfwCcs74E3pbAUFNg7d9VNJ+Q==}
@@ -1321,7 +1321,7 @@ packages:
     engines: {node: '>=0.4.0'}
 
   delta-comic-core@file:../delta-comic-core/dist/pack.tgz:
-    resolution: {integrity: sha512-YOoAJ9FWDT8CAu83X+RPt+4PfMTFpPrXwZeDAxE5utb+w+PYBcFRNL4onRYX09HQjAScWS9PApoj8xSKmm5RIw==, tarball: file:../delta-comic-core/dist/pack.tgz}
+    resolution: {integrity: sha512-wIO04gtYwA/knoxOvn/lweWtL3wa67P1Ilc6uAzO3Ogr1V763LC4ws2azFJs9uMqcC1im3/38mi/QYi+1XJbNw==, tarball: file:../delta-comic-core/dist/pack.tgz}
     version: 0.5.11
     peerDependencies:
       axios: ^1.12.2
@@ -2406,7 +2406,7 @@ packages:
 
 snapshots:
 
-  '@aptabase/tauri@https://codeload.github.com/aptabase/tauri-plugin-aptabase/tar.gz/7cc36ccce0052352bda7272a4acb25a214c4b804':
+  '@aptabase/tauri@https://codeload.github.com/delta-comic/tauri-plugin-aptabase-rustls/tar.gz/8a2f40279a301dc70a09b266c43e07f04411ff85':
     dependencies:
       '@tauri-apps/api': 2.9.1
       tslib: 2.8.1

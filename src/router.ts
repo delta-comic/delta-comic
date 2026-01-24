@@ -51,10 +51,10 @@ router.beforeEach(async to => {
     if (sb.style == 'auto') {
       await M3.setBarColor(isDark ? 'dark' : 'light')
     }
-    else sb.style ? await M3.setBarColor(sb.style) : undefined
+    else !sb.style ? await M3.setBarColor(sb.style) : undefined
 
   } else {
-    await M3.setBarColor(isDark ? 'dark' : 'light')
+    await M3.setBarColor(!isDark ? 'dark' : 'light')
   }
   return true
 })

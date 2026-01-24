@@ -19,18 +19,17 @@ defineExpose({
 <template>
   <AnimatePresence>
     <div :class="[isSearching ? 'rounded-lg w-[calc(100%-8px)] right-1 ' : isEmpty(searchText)
-      ? 'rounded-full w-1/2 right-[41px] !opacity-0 pointer-events-none' : 'rounded-full w-1/2 ml-3 right-[41px]']"
-      class="transition-all duration-200 border-solid border bg-(--van-background-2) opacity-100 absolute !z-1000 border-gray-400 text-gray-400 h-[36px] px-1 flex items-center">
+      ? 'rounded-full w-1/2 right-10.25 opacity-0! pointer-events-none' : 'rounded-full w-1/2 ml-3 right-10.25']"
+      class="transition-all duration-200 border-solid border bg-(--van-background-2) opacity-100 absolute z-1000! border-gray-400 text-gray-400 h-9 px-1 flex items-center">
       <VanIcon name="search" color="rgb(156 163 175)" size="1.5rem" />
-      <SearchTag :text="searchText" />
       <form action="/" @submit.prevent class="h-full w-full">
-        <input type="search" class="h-full w-full border-none bg-transparent !font-normal text-(--van-text-color)"
+        <input type="search" class="h-full w-full border-none bg-transparent font-normal! text-(--van-text-color)"
           spellcheck="false" @focus="isSearching = true" v-model="searchText" ref="inputEl"
           @blur="isEmpty(searchText) || (filtersHistory = uniq([searchText, ...filtersHistory]))" />
         <Motion :initial="{ opacity: 0 }" :animate="{ opacity: !isEmpty(searchText) ? 1 : 0 }"
           :transition="{ type: 'tween', duration: 0.1 }">
           <VanIcon name="cross" @click="() => { searchText = ''; isSearching = false }"
-            class="z-10 !absolute h-full right-2 !flex items-center top-0 font-bold transition-[transform,_opacity]"
+            class="z-10 absolute! h-full right-2 flex! items-center top-0 font-bold transition-[transform,opacity]"
             color="#9ca3af" />
         </Motion>
       </form>

@@ -16,28 +16,28 @@ import '@/db'
 import { M3, type InsetsScheme } from "tauri-plugin-m3"
 import * as Sentry from "@sentry/vue"
 import { defaultOptions } from "tauri-plugin-sentry-api"
-
+window.$api.M3 = M3
 
 document.addEventListener('contextmenu', e => e.preventDefault())
 
 const handleSafeAreaChange = (v: InsetsScheme | false) => {
   if (!v) return
-  const { rawInsetBottom, rawInsetLeft, rawInsetRight, rawInsetTop } = v
+  const { adjustedInsetBottom, adjustedInsetLeft, adjustedInsetRight, adjustedInsetTop } = v
   document.documentElement.style.setProperty(
     `--safe-area-inset-bottom`,
-    `${rawInsetBottom}px`,
+    `${adjustedInsetBottom}px`,
   )
   document.documentElement.style.setProperty(
     `--safe-area-inset-left`,
-    `${rawInsetLeft}px`,
+    `${adjustedInsetLeft}px`,
   )
   document.documentElement.style.setProperty(
     `--safe-area-inset-right`,
-    `${rawInsetRight}px`,
+    `${adjustedInsetRight}px`,
   )
   document.documentElement.style.setProperty(
     `--safe-area-inset-top`,
-    `${rawInsetTop}px`,
+    `${adjustedInsetTop}px`,
   )
 }
 await M3.getInsets().then(handleSafeAreaChange)

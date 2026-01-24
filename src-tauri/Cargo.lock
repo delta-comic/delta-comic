@@ -1010,6 +1010,7 @@ dependencies = [
  "tauri-plugin-android-package-install",
  "tauri-plugin-aptabase",
  "tauri-plugin-clipboard-manager",
+ "tauri-plugin-cors-fetch",
  "tauri-plugin-fs",
  "tauri-plugin-http",
  "tauri-plugin-log",
@@ -5474,6 +5475,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-aptabase"
 version = "1.0.0"
+source = "git+https://github.com/delta-comic/tauri-plugin-aptabase-rustls?branch=main#8a2f40279a301dc70a09b266c43e07f04411ff85"
 dependencies = [
  "futures",
  "log",
@@ -5502,6 +5504,26 @@ dependencies = [
  "tauri",
  "tauri-plugin",
  "thiserror 2.0.17",
+]
+
+[[package]]
+name = "tauri-plugin-cors-fetch"
+version = "5.0.1"
+source = "git+https://github.com/delta-comic/tauri-plugin-cors-fetch-no-aws?branch=main#c8be50078c4183a7559b90d7d087fd9fb6cc1875"
+dependencies = [
+ "bytes",
+ "cookie_store 0.22.0",
+ "data-url",
+ "http 1.4.0",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.17",
+ "tokio",
+ "tracing",
+ "url",
 ]
 
 [[package]]
