@@ -75,6 +75,7 @@ class _PluginUserscriptLoader extends PluginLoader {
     const style = document.createElement('link')
     style.rel = 'stylesheet'
     style.href = decodeURIComponent(convertFileSrc(await join(baseDir, filePath), 'local'))
+    script.onerror = (err) => { throw err }
     document.head.appendChild(style)
   }
 }

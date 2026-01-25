@@ -26,6 +26,7 @@ class _PluginUserscriptLoader extends PluginLoader {
     const url = URL.createObjectURL(new Blob([code]))
     script.async = true
     script.src = url
+    script.onerror = (err) => { throw err }
     document.body.appendChild(script)
   }
 }
