@@ -38,6 +38,7 @@ export const $initCore = () => definePlugin({
       await db.value
         .deleteFrom('subscribe')
         .where('key', '=', SubscribeDB.key.toString([author.$$plugin, author.label]))
+        .execute()
       return
     }, pluginName, 'removeAuthorSubscribe')
     return {
