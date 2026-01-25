@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 definePage({
-  redirect: '/main/home/random'
+  redirect: {
+    name: '/main/home/random'
+  }
 })
 </script>
 

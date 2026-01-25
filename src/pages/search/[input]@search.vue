@@ -48,11 +48,11 @@ const goSearch = () => {
 
 <template>
   <div class="w-full pt-safe bg-(--van-background-2) fixed top-0 z-1"></div>
-  <header class="w-full h-[86px] text-(--van-text-color) duration-200 transition-transform mt-safe"
-    :class="[showSearch ? '!translate-y-0' : '!-translate-y-[54px]']">
+  <header class="w-full h-21.5 text-(--van-text-color) duration-200 transition-transform mt-safe"
+    :class="[showSearch ? 'translate-y-0!' : '-translate-y-13.5!']">
     <SearchBar v-model:search-text="searchText" :source="temp.source" />
     <div class="van-hairline--bottom h-8 w-full relative bg-(--van-background-2)">
-      <div class="w-full items-center flex *:!text-nowrap overflow-x-auto scroll gap-2 pr-2">
+      <div class="w-full items-center flex *:text-nowrap! overflow-x-auto scroll gap-2 pr-2">
         <NPopselect :options="pluginStore.allSearchSource.map(([plugin, sources]) => ({
           type: 'group',
           label: pluginStore.$getPluginDisplayName(plugin),
@@ -89,7 +89,7 @@ const goSearch = () => {
         </div>
       </div>
       <VanIcon @click="goSearch" :class="[showSearch ? 'translate-x-full' : '-translate-x-2']" size="25px"
-        class="!absolute top-1/2 duration-200 transition-transform right-0 -translate-y-1/2 bg-(--van-background-2) shadow rounded-full p-1"
+        class="absolute! top-1/2 duration-200 transition-transform right-0 -translate-y-1/2 bg-(--van-background-2) shadow rounded-full p-1"
         name="search" color="var(--van-text-color-2)" />
     </div>
   </header>
@@ -100,7 +100,7 @@ const goSearch = () => {
       <Comp.Image :src="noneSearchTextIcon" />
     </template>
   </NResult>
-  <div class="duration-200 *:!h-full transition-all will-change-[height,_transform]" v-else
+  <div class="duration-200 *:h-full! transition-all will-change-[height,transform]" v-else
     :class="[showSearch ? 'h-[calc(100vh-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0' : 'h-[calc(100vh-32px-var(--safe-area-inset-top))] -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]']">
     <List v-model:show-header="showSearch" :source="temp.source" :sort="temp.sort" :input="searchText" />
   </div>

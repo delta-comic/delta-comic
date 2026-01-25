@@ -1,10 +1,13 @@
 {
   "cSpell.words": [
     "androidx",
+    "antd",
     "aptabase",
     "Aspera",
     "oxlint",
-    "rustls"
+    "rustls",
+    "vant",
+    "Videogame"
   ],
   "oxc.path.oxlint": "node_modules/oxlint/bin/oxlint",
   "oxc.lint.run": "onSave",
