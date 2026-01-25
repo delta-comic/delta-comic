@@ -30,7 +30,8 @@ export type PluginLoadingMicroSteps = {
 const pluginNames = computedAsync(async () => Object.fromEntries((await db.value
   .selectFrom('plugin')
   .select(['pluginName', 'displayName'])
-  .execute()).map(v => [v.pluginName, v.displayName] as const)), {})
+  .execute())
+  .map(v => [v.pluginName, v.displayName] as const)), {})
 
 export const usePluginStore = defineStore('plugin', helper => {
   const plugins = shallowReactive(new Map<string, Raw<PluginConfig>>())

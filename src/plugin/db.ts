@@ -35,7 +35,11 @@ export namespace PluginArchiveDB {
   }
 
   export async function toggleEnable(pluginName: string) {
-    const isEnable = await db.value.selectFrom('plugin').where('pluginName', '=', pluginName).select('enable').executeTakeFirstOrThrow()
+    const isEnable = await db.value
+      .selectFrom('plugin')
+      .where('pluginName', '=', pluginName)
+      .select('enable')
+      .executeTakeFirstOrThrow()
     return db.value
       .updateTable('plugin')
       .where('pluginName', '=', pluginName)

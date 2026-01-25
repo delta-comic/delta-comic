@@ -28,6 +28,7 @@ const $message = useMessage()
 let promise = Promise.withResolvers<(FavouriteDB.Card['createAt'])[]>()
 
 const create = async () => {
+  console.log('create popup for favselect')
   promise = Promise.withResolvers<(FavouriteDB.Card['createAt'])[]>()
   if (isShow.value) {
     $message.warning('正在选择中')
@@ -35,11 +36,13 @@ const create = async () => {
     return promise.promise
   }
   selectList.clear()
+  console.log('favselect getting data')
   const items = await db.value
     .selectFrom('favouriteItem')
     .where('itemKey', '=', $props.item.id)
     .selectAll()
     .execute()
+  console.log('favselect done', selectList)
   for (const v of items) selectList.add(v.belongTo)
   isShow.value = true
   return await promise.promise

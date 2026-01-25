@@ -21,9 +21,11 @@ class _PluginUserscriptLoader extends PluginLoader {
   }
 
   public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {
-    const code = await fs.readTextFile(await join(await getPluginFsPath(pluginMeta.pluginName), 'us.js'))
+    const code = await fs.readFile(await join(await getPluginFsPath(pluginMeta.pluginName), 'us.js'))
     const script = document.createElement('script')
-    script.innerHTML = code
+    const url = URL.createObjectURL(new Blob([code]))
+    script.async = true
+    script.src = url
     document.body.appendChild(script)
   }
 }

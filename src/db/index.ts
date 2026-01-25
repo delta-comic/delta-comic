@@ -5,7 +5,7 @@ import type { ItemStoreDB } from './itemStore'
 import { reactive, shallowRef, toRef, triggerRef, type MaybeRefOrGetter } from "vue"
 import mitt from 'mitt'
 import type { FavouriteDB } from './favourite'
-import { debounce } from 'es-toolkit'
+import { debounce, withTimeout } from 'es-toolkit'
 import { SerializePlugin } from 'kysely-plugin-serialize'
 import type { HistoryDB } from './history'
 import { type RecentDB } from './recentView'
@@ -26,7 +26,8 @@ export interface DB {
   plugin: PluginArchiveDB.Table
 }
 const database = await Database.load(`sqlite:app.db`)
-await database.execute('PRAGMA foreign_keys = ON;')
+window.$api.database = database
+// await database.execute('PRAGMA foreign_keys = ON;')
 const emitter = mitt<{
   onChange: void
   noUse: bigint
@@ -41,19 +42,20 @@ const triggerUpdate = debounce(() => {
 
 const originalExecute = database.execute.bind(database)
 database.execute = async (query: string, bindValues?: unknown[]) => {
-  const result = await originalExecute(query, bindValues)
+  const result = await withTimeout(() => originalExecute(query, bindValues), Math.max(2000, query.length * 10))
   if (MUTATION_KEYWORDS.test(query))
     triggerUpdate()
   return result
 }
 
 const originalSelect = database.select.bind(database)
-database.select = async <T>(query: string, bindValues?: unknown[]) => {
-  const result = await originalSelect<T>(query, bindValues)
+database.select = (async <T>(query: string, bindValues?: unknown[]) => {
+  const result = await withTimeout(() => originalSelect<T>(query, bindValues), Math.max(2000, query.length * 10))
   if (MUTATION_KEYWORDS.test(query))
     triggerUpdate()
   return result
-}
+})
+
 
 export const db = shallowRef(new Kysely<DB>({
   dialect: new TauriSqliteDialect({
@@ -73,7 +75,7 @@ const migrator = new Migrator({
   },
 })
 await migrator.migrateToLatest()
-
+window.$api.db = db
 
 export namespace DBUtils {
   export async function countDb(sql: SelectQueryBuilder<DB, any, object>) {

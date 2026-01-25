@@ -74,7 +74,8 @@ export const installDepends = (m: Utils.message.DownloadMessageBind, meta: Plugi
   const plugins = installedPlugins ?? new Set((await db.value
     .selectFrom('plugin')
     .select('pluginName')
-    .execute()).map(v => v.pluginName))
+    .execute())
+    .map(v => v.pluginName))
   const overrides = usePluginConfig()
   for (const { id, download } of meta.require) {
     const isDownloaded = plugins.has(id)

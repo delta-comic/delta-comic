@@ -21,34 +21,35 @@ Utils.eventBus.SharedFunction.define(async token => {
 }, pluginName, 'pushShareToken')
 
 const handleShareTokenCheck = async () => {
-  const chipText = await Clipboard.readText()
-  if (scanned.has(chipText)) return
-  scanned.add(chipText)
-
-  const handlers = Array.from(uni.content.ContentPage.shareToken.values()).filter(v => v.patten(chipText))
-  console.log('new chipText discovery', chipText, handlers)
-  const lock = new Mutex
-  for (const handler of handlers) {
-    await lock.acquire()
-    const detail = await handler.show(chipText)
-    window.$dialog.info({
-      title: `口令探测：${detail.title}`,
-      content: detail.detail,
-      closeOnEsc: false,
-      maskClosable: false,
-      closable: false,
-      positiveText: '查看',
-      negativeText: '取消',
-      onPositiveClick() {
-        detail.onPositive()
-        lock.release()
-      },
-      onNegativeClick() {
-        detail.onNegative()
-        lock.release()
-      },
-    })
-  }
+  try {
+    const chipText = await Clipboard.readText()
+    if (scanned.has(chipText)) return
+    scanned.add(chipText)
+    const handlers = Array.from(uni.content.ContentPage.shareToken.values()).filter(v => v.patten(chipText))
+    console.log('new chipText discovery', chipText, handlers)
+    const lock = new Mutex
+    for (const handler of handlers) {
+      await lock.acquire()
+      const detail = await handler.show(chipText)
+      window.$dialog.info({
+        title: `口令探测：${detail.title}`,
+        content: detail.detail,
+        closeOnEsc: false,
+        maskClosable: false,
+        closable: false,
+        positiveText: '查看',
+        negativeText: '取消',
+        onPositiveClick() {
+          detail.onPositive()
+          lock.release()
+        },
+        onNegativeClick() {
+          detail.onNegative()
+          lock.release()
+        },
+      })
+    }
+  } catch { }
 }
 
 // App.addListener('resume', handleShareTokenCheck)

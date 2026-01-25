@@ -52,6 +52,7 @@ class _PluginUserscriptLoader extends PluginLoader {
     console.log('[loader zip] baseDir:', baseDir, pluginMeta.meta.entry)
     const script = document.createElement('script')
     script.type = 'module'
+    script.async = true
     script.src = decodeURIComponent(convertFileSrc(await join(baseDir, pluginMeta.meta.entry.jsPath), 'local'))
     document.body.appendChild(script)
 

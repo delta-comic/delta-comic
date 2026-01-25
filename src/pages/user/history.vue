@@ -28,6 +28,7 @@ const removeItems = async (item: HistoryDB.Item[]) => {
   await Promise.all(item.map(item => db.value
     .deleteFrom('history')
     .where('itemKey', '=', item.itemKey)
+    .execute()
   ))
   actionController.value?.selectList.clear()
 }

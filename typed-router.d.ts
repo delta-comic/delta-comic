@@ -188,7 +188,7 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
-    'src/pages/content/[contentType]/[id]/[ep]@content.vue': {
+    'src/pages/content/[contentType]/[id]/[ep].vue': {
       routes:
         | '/content/[contentType]/[id]/[ep]'
       views:
@@ -251,7 +251,7 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
-    'src/pages/search/[input]@search.vue': {
+    'src/pages/search/[input].vue': {
       routes:
         | '/search/[input]'
       views:
