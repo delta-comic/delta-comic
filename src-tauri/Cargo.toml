@@ -8,6 +8,14 @@ repository = "https://github.com/delta-comic/delta-comic/"
 edition = "2024"
 rust-version = "1.92.0"
 
+
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld.exe"
+
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
 [profile.dev]
 opt-level = 0          # 无优化
 debug = true           # 开启调试信息

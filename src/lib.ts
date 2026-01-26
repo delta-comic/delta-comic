@@ -11,7 +11,18 @@ import * as Axios from 'axios'
 
 
 import axios from 'axios'
-axios.defaults.timeout = 7000
+import { CORSFetch } from 'tauri-plugin-cors-fetch-no-aws'
+const cors = CORSFetch.init()
+cors.config({
+  request: {
+    connectTimeout: axios.defaults.timeout = 7000,
+    danger: {
+      acceptInvalidCerts: true,
+      acceptInvalidHostnames: true
+    }
+  }
+})
+
 axios.defaults.adapter = ['fetch']
 window.$$lib$$.Axios = { ...Axios, ...axios, axios }
 
