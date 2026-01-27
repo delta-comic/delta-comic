@@ -78,7 +78,10 @@ tauri-runtime-wry = "2.9.3"
 tauri-plugin-cors-fetch = { git = "https://github.com/delta-comic/tauri-plugin-cors-fetch-no-aws", branch = "main", features = [
   "rustls-tls",
   "stream",
-  "json"
+  "json",
+  "multipart",
+  "socks",
+  "blocking",
 ] }
 
 [target.'cfg(any(target_os = "android"))'.dependencies]

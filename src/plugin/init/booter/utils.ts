@@ -18,8 +18,7 @@ const test = async (forks: string[], test: (url: string, signal: AbortSignal) =>
   const record: [url: string, result: false | number][] = []
   const abortController = new AbortController()
   try {
-    const { promise, ...controller } = Promise.withResolvers<void>()
-    Promise.all(forks.map(async fork => {
+    await Promise.all(forks.map(async fork => {
       try {
         const begin = Date.now()
         const stopTimeout = delay(() => {
@@ -32,12 +31,10 @@ const test = async (forks: string[], test: (url: string, signal: AbortSignal) =>
         record.push([fork, time])
         console.log(`[plugin test] fetch url ${fork} connected time ${time}ms`)
         abortController.abort()
-        controller.resolve()
       } catch {
         record.push([fork, false])
         console.log(`[plugin test] fetch url ${fork} can not connected`)
       }
-      await promise
     }))
   } catch (err) {
     console.log('[plugin test] fetch test aborted', err)
