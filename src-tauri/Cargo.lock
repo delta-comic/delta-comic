@@ -5510,7 +5510,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-cors-fetch"
 version = "5.0.1"
-source = "git+https://github.com/delta-comic/tauri-plugin-cors-fetch-no-aws?branch=main#194fbc9c0993090d478ca8a56d61c4fab1f758a0"
+source = "git+https://github.com/delta-comic/tauri-plugin-cors-fetch-no-aws?branch=main#1ab41ec453ad4acd77aa6dcf453cc05365e77ef4"
 dependencies = [
  "bytes",
  "cookie_store 0.22.0",
