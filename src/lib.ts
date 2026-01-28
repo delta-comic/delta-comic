@@ -1,5 +1,8 @@
 import "core-js"
 
+import { attachConsole } from '@tauri-apps/plugin-log'
+await attachConsole();
+
 window.$isDev = import.meta.env.DEV
 import * as Vue from 'vue'
 window.$$lib$$.Vue = Vue

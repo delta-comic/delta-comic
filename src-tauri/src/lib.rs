@@ -1,6 +1,7 @@
 mod db;
 mod fs_scheme;
 mod sentry;
+mod logger;
 
 use tauri_plugin_aptabase::EventTracker;
 
@@ -15,13 +16,7 @@ pub async fn run() {
       .plugin(tauri_plugin_fs::init()),
   );
   let builder = builder
-    .plugin(
-      tauri_plugin_log::Builder::new()
-        .max_file_size(50_000)
-        .level(tauri_plugin_log::log::LevelFilter::Debug)
-        .rotation_strategy(tauri_plugin_log::RotationStrategy::KeepAll)
-        .build(),
-    )
+    .plugin(logger::init())
     .plugin(tauri_plugin_m3::init())
     .plugin(tauri_plugin_upload::init())
     .plugin(tauri_plugin_http::init())
@@ -40,7 +35,8 @@ _____   _________________ ____        __________________ _____   ______
 | |__| | |____ | |__| |  |  ___\ \  | |___| |_| || |  | |_| |_ | \_____
 |_____/|______||______|  |_|    \_\  \__________/|_|  \_______| \______/
 =========================================================================
-  "#;
+  Per Aspera, Ad Astra.                              Copyright © Wenxig
+"#;
 
       log::error!("{}", logo);
       Ok(())

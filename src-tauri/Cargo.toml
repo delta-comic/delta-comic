@@ -72,7 +72,9 @@ sentry = { version = "0.42", default-features = false, features = [
 ] }
 mime_guess = "2.0.5"
 percent-encoding = "2.3.2"
-tauri-plugin-log = "2"
+tauri-plugin-log = { version = "2", features = [
+  "colored",
+] }
 log = "0.4.29"
 tauri-runtime-wry = "2.9.3"
 tauri-plugin-cors-fetch = { git = "https://github.com/delta-comic/tauri-plugin-cors-fetch-no-aws", branch = "main", features = [
