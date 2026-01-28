@@ -111,7 +111,7 @@ importers:
         version: 0.5.1(tailwindcss@4.1.18)
       tauri-plugin-cors-fetch-no-aws:
         specifier: github:delta-comic/tauri-plugin-cors-fetch-no-aws
-        version: https://codeload.github.com/delta-comic/tauri-plugin-cors-fetch-no-aws/tar.gz/fea44af74f9b266457e79847d25523bd15376bd7(vue-tsc@3.2.4(typescript@5.9.3))
+        version: https://codeload.github.com/delta-comic/tauri-plugin-cors-fetch-no-aws/tar.gz/194fbc9c0993090d478ca8a56d61c4fab1f758a0(vue-tsc@3.2.4(typescript@5.9.3))
       tauri-plugin-m3:
         specifier: ^0.3.1
         version: 0.3.1(patch_hash=8c9ba340154ab43846ad8879e9cd6ba77d8ab97b1cd09726fd35883809f7dc34)
@@ -2579,8 +2579,8 @@ packages:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
 
-  tauri-plugin-cors-fetch-no-aws@https://codeload.github.com/delta-comic/tauri-plugin-cors-fetch-no-aws/tar.gz/fea44af74f9b266457e79847d25523bd15376bd7:
-    resolution: {tarball: https://codeload.github.com/delta-comic/tauri-plugin-cors-fetch-no-aws/tar.gz/fea44af74f9b266457e79847d25523bd15376bd7}
+  tauri-plugin-cors-fetch-no-aws@https://codeload.github.com/delta-comic/tauri-plugin-cors-fetch-no-aws/tar.gz/194fbc9c0993090d478ca8a56d61c4fab1f758a0:
+    resolution: {tarball: https://codeload.github.com/delta-comic/tauri-plugin-cors-fetch-no-aws/tar.gz/194fbc9c0993090d478ca8a56d61c4fab1f758a0}
     version: 5.0.2
 
   tauri-plugin-m3@0.3.1:
@@ -5216,7 +5216,7 @@ snapshots:
 
   tapable@2.3.0: {}
 
-  tauri-plugin-cors-fetch-no-aws@https://codeload.github.com/delta-comic/tauri-plugin-cors-fetch-no-aws/tar.gz/fea44af74f9b266457e79847d25523bd15376bd7(vue-tsc@3.2.4(typescript@5.9.3)):
+  tauri-plugin-cors-fetch-no-aws@https://codeload.github.com/delta-comic/tauri-plugin-cors-fetch-no-aws/tar.gz/194fbc9c0993090d478ca8a56d61c4fab1f758a0(vue-tsc@3.2.4(typescript@5.9.3)):
     dependencies:
       '@tauri-apps/api': 2.9.1
       es-toolkit: 1.44.0
