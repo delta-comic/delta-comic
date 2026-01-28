@@ -17,7 +17,9 @@ pub async fn run() {
   let builder = builder
     .plugin(
       tauri_plugin_log::Builder::new()
-        .level(tauri_plugin_log::log::LevelFilter::Info)
+        .max_file_size(50_000)
+        .level(tauri_plugin_log::log::LevelFilter::Debug)
+        .rotation_strategy(tauri_plugin_log::RotationStrategy::KeepAll)
         .build(),
     )
     .plugin(tauri_plugin_m3::init())
@@ -28,7 +30,21 @@ pub async fn run() {
     .plugin(tauri_plugin_persisted_scope::init())
     .plugin(tauri_plugin_aptabase::Builder::new("A-US-9793062880").build())
     .plugin(db::init())
-    .plugin(tauri_plugin_pinia::init());
+    .plugin(tauri_plugin_pinia::init())
+    .setup(|_app| {
+      let logo = r#"
+_____   _________________ ____        __________________ _____   ______
+|  __ \|  ____|| |__   __| __ \      / ______\   |  \/  |_   _| / _____\
+| |  | | |__   | |  | |  | | \ \    | |    _____ | \  / | | |  | /
+| |  | |  __|  | |  | |  | |__\ \   | |   /  _  \| |\/| | | |  | |
+| |__| | |____ | |__| |  |  ___\ \  | |___| |_| || |  | |_| |_ | \_____
+|_____/|______||______|  |_|    \_\  \__________/|_|  \_______| \______/
+=========================================================================
+  "#;
+
+      log::error!("{}", logo);
+      Ok(())
+    });
 
   match builder.build(tauri::generate_context!()) {
     Ok(builder) => builder.run(|handler, event| match event {
