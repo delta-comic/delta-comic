@@ -2,9 +2,18 @@
     <img alt="logo" src="assets/icon-only.png" width="120" height="120" style="margin-bottom: 10px;">
 </p>
 
-<h1 align="center">Delta Comic</h1>
-
-<p align="center">Per Aspera, Ad Astra</p>
+```python
+"""
+_____   _________________ ____        __________________ _____   ______
+|  __ \|  ____|| |__   __| __ \      / ______\   |  \/  |_   _| / _____\
+| |  | | |__   | |  | |  | | \ \    | |    _____ | \  / | | |  | /
+| |  | |  __|  | |  | |  | |__\ \   | |   /  _  \| |\/| | | |  | |
+| |__| | |____ | |__| |  |  ___\ \  | |___| |_| || |  | |_| |_ | \_____
+|_____/|______||______|  |_|    \_\  \__________/|_|  \_______| \______/
+=========================================================================
+  Per Aspera, Ad Astra.                              Copyright © Wenxig
+"""
+```
 
 <p align="center">
     <img src="https://img.shields.io/github/license/delta-comic/delta-comic" alt="Repo License" />
