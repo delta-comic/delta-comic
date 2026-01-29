@@ -51,7 +51,6 @@ const handleShareTokenCheck = async () => {
     }
   } catch { }
 }
-
 // App.addListener('resume', handleShareTokenCheck)
 onMounted(handleShareTokenCheck)
 useIntervalFn(handleShareTokenCheck, 2000)

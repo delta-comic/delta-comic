@@ -37,5 +37,5 @@
     "builtin": true
   },
   "globals": {},
-  "ignorePatterns": ["tauri-plugin-aptabase/**", "tauri-plugin-cors-fetch/**"]
+  "ignorePatterns": []
 }
