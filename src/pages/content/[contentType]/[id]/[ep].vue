@@ -12,7 +12,7 @@ const $router = useRouter()
 
 definePage({
   meta: {
-    statusBar: { style: 'dark' },
+    statusBar: 'dark',
     force: true
   }
 })
@@ -29,7 +29,6 @@ const layout = computed(() => uni.content.ContentPage.viewLayout.get(page.value.
 
 const appStore = useAppStore()
 
-console.log(page.value)
 
 // history
 const union = computed(() => page.value.union.value)

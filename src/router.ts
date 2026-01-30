@@ -48,10 +48,10 @@ router.beforeEach(async to => {
   const isDark = Store.useConfig().isDark
   if (to.meta.statusBar) {
     const sb = toRef(to.meta.statusBar).value
-    if (sb.style == 'auto') {
+    if (sb == 'auto') {
       await M3.setBarColor(isDark ? 'dark' : 'light')
     }
-    else !sb.style ? await M3.setBarColor(sb.style) : undefined
+    else !sb ? await M3.setBarColor(sb) : undefined
 
   } else {
     await M3.setBarColor(!isDark ? 'dark' : 'light')
