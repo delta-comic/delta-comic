@@ -23,7 +23,9 @@
     "tauri": "tauri",
     "typecheck": "vue-tsc --noEmit -p ./tsconfig.json --composite false",
     "lint": "oxlint",
-    "lint:fix": "oxlint --fix"
+    "lint:fix": "oxlint --fix",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@aptabase/tauri": "github:delta-comic/tauri-plugin-aptabase-rustls",
@@ -44,7 +46,7 @@
     "color": "^5.0.3",
     "core-js": "^3.48.0",
     "dayjs": "^1.11.19",
-    "delta-comic-core": "file:../delta-comic-core/dist/pack.tgz",
+    "delta-comic-core": "latest",
     "dompurify": "^3.3.1",
     "es-toolkit": "^1.44.0",
     "jszip": "^3.10.1",
@@ -68,6 +70,8 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
     "@tailwindcss/vite": "^4.1.18",
     "@tauri-apps/cli": "^2.9.6",
     "@types/semver": "^7.7.1",

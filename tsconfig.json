@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "jsx": "preserve",
-    "lib": ["ESNext", "DOM"],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
     "emitDecoratorMetadata": true,
     "strict": true,
     "target": "ESNext",
@@ -24,7 +27,9 @@
     "noImplicitThis": true,
     "jsxImportSource": "vue",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "types": [
       "./components.d.ts",
@@ -35,6 +40,10 @@
       "./typed-router.d.ts"
     ]
   },
-  "include": ["./src/**/*"],
-  "exclude": ["./tauri-plugin-delta-comic/**/*"]
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "./*.ts"
+  ]
 }

@@ -9,6 +9,9 @@ on:
 jobs:
   oxlint:
     runs-on: ubuntu-latest
+    env:
+      ENV_STATE: github
+      HUSKY: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v6
