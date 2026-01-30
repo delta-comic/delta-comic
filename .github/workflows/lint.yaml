@@ -1,4 +1,4 @@
-name: oxlint 风格检查
+name: 各种检查
 
 on:
   pull_request:
@@ -23,17 +23,17 @@ jobs:
         with:
           version: 10.27.0
 
+      - name: Node setup
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          cache: pnpm
+
       - name: Change depends
         run: sh ./script/install.sh
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
-          cache: pnpm
-
-      # alternatively use npm install / yarn install here
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run lint
+      - name: lint
+        run: pnpm run lint-staged
