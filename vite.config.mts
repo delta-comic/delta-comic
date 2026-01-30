@@ -13,13 +13,15 @@ import { browserslistToTargets } from 'lightningcss'
 import browserslist from 'browserslist'
 import MsClarity from 'vite-plugin-ms-clarity'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import VueRouter from 'unplugin-vue-router/vite'
+import VueRouter from 'vue-router/vite'
 
 const host = process.env.TAURI_DEV_HOST
 
 export default defineConfig({
   plugins: [
-    VueRouter({}),
+    VueRouter({
+      dts: 'typed-router.d.ts'
+    }),
     vueDevTools(),
     MsClarity({
       id: 'v2xgbuugti',
@@ -69,10 +71,10 @@ export default defineConfig({
     host: host || false,
     hmr: host
       ? {
-          protocol: 'ws',
-          host,
-          port: 1421,
-        }
+        protocol: 'ws',
+        host,
+        port: 1421,
+      }
       : undefined,
 
     watch: {
