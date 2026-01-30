@@ -26,6 +26,7 @@
     "isolatedModules": true,
     "noImplicitThis": true,
     "jsxImportSource": "vue",
+    "verbatimModuleSyntax": true,
     "paths": {
       "@/*": [
         "./src/*"

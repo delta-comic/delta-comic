@@ -203,9 +203,6 @@ importers:
       vue-component-type-helpers:
         specifier: ^3.2.4
         version: 3.2.4
-      vue-tsc:
-        specifier: ^3.2.4
-        version: 3.2.4(typescript@5.9.3)
 
 packages:
 
@@ -4493,14 +4490,17 @@ snapshots:
   '@volar/language-core@2.4.27':
     dependencies:
       '@volar/source-map': 2.4.27
+    optional: true
 
-  '@volar/source-map@2.4.27': {}
+  '@volar/source-map@2.4.27':
+    optional: true
 
   '@volar/typescript@2.4.27':
     dependencies:
       '@volar/language-core': 2.4.27
       path-browserify: 1.0.1
       vscode-uri: 3.1.0
+    optional: true
 
   '@vue-macros/common@3.1.2(vue@3.5.27(typescript@5.9.3))':
     dependencies:
@@ -4657,6 +4657,7 @@ snapshots:
       muggle-string: 0.4.1
       path-browserify: 1.0.1
       picomatch: 4.0.3
+    optional: true
 
   '@vue/reactivity@3.5.27':
     dependencies:
@@ -4708,7 +4709,8 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  alien-signals@3.1.2: {}
+  alien-signals@3.1.2:
+    optional: true
 
   ansi-escapes@7.2.0:
     dependencies:
@@ -5775,7 +5777,8 @@ snapshots:
       json-parse-even-better-errors: 2.3.1
       lines-and-columns: 1.2.4
 
-  path-browserify@1.0.1: {}
+  path-browserify@1.0.1:
+    optional: true
 
   path-key@3.1.1: {}
 
@@ -6318,6 +6321,7 @@ snapshots:
       '@volar/typescript': 2.4.27
       '@vue/language-core': 3.2.4
       typescript: 5.9.3
+    optional: true
 
   vue@3.5.27(typescript@5.9.3):
     dependencies:

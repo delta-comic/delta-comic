@@ -23,8 +23,8 @@
     "noImplicitOverride": true,
     "noImplicitThis": true,
     "types": [
-      "@types/node"
-    ]
+    ],
+    "lib": []
   },
   "include": [
     "vite.config.mts",
