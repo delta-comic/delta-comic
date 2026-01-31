@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { computed, StyleValue, useTemplateRef } from 'vue'
+import { computed, type StyleValue, useTemplateRef } from 'vue'
 import { MoreVertRound } from '@vicons/material'
 import { createReusableTemplate } from '@vueuse/core'
 import { Comp, Store, uni, Utils } from 'delta-comic-core'

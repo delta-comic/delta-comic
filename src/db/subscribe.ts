@@ -1,5 +1,5 @@
 import { Utils, type uni } from "delta-comic-core"
-import {
+import type {
   JSONColumnType,
   Selectable,
 } from 'kysely'

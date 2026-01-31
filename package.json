@@ -19,6 +19,7 @@
     "dev:web": "vite",
     "dev": "tauri dev",
     "build:web": "vite build",
+    "build": "tauri android build",
     "tauri": "tauri",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
@@ -88,14 +89,17 @@
     "tailwindcss": "4.1.18",
     "typescript": "^5.9.3",
     "unplugin-vue-components": "31.0.0",
-    "vite": "^7.3.1",
+    "vite": "^8.0.0-beta.11",
     "vite-plugin-vue-devtools": "^8.0.5",
     "vue-component-type-helpers": "^3.2.4"
   },
   "overrides": {
-    "vite": "7.3.1"
+    "vite": "^8.0.0-beta.11"
   },
   "pnpm": {
+    "overrides": {
+      "vite": "^8.0.0-beta.11"
+    },
     "onlyBuiltDependencies": [
       "@aptabase/tauri",
       "@parcel/watcher",

@@ -20,9 +20,8 @@ msvc
 mutsumi
 nvim
 oxlint
-picacomic
 pinia
-pixi
+webp
 Popconfirm
 Popselect
 reloadable

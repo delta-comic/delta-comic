@@ -1,4 +1,4 @@
-import { PluginConfig, Utils, type PluginMeta } from "delta-comic-core"
+import { type PluginConfig, Utils, type PluginMeta } from "delta-comic-core"
 import { sortBy } from "es-toolkit/compat"
 import { usePluginStore } from "../store"
 import { isString, Mutex } from "es-toolkit"

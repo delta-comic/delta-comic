@@ -2,7 +2,7 @@
 import { createReusableTemplate } from '@vueuse/core'
 import { Store } from 'delta-comic-core'
 import { motion } from 'motion-v'
-import { PopoverAction } from 'vant'
+import type { PopoverAction } from 'vant'
 import { shallowRef, shallowReactive } from 'vue'
 
 const $props = defineProps<{

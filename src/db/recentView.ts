@@ -1,4 +1,4 @@
-import {
+import type {
   Selectable,
 } from 'kysely'
 import { db } from '.'

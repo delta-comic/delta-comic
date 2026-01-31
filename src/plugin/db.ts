@@ -1,6 +1,6 @@
 import { db } from '@/db'
 import type { PluginMeta } from 'delta-comic-core'
-import {
+import type {
   JSONColumnType,
   Selectable,
 } from 'kysely'

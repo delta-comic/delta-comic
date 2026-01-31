@@ -14,6 +14,7 @@ import browserslist from 'browserslist'
 import MsClarity from 'vite-plugin-ms-clarity'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import VueRouter from 'vue-router/vite'
+import type { UserConfig } from 'vite'
 
 const host = process.env.TAURI_DEV_HOST
 
@@ -56,11 +57,12 @@ export default defineConfig({
   build: {
     // Tauri uses Chromium on Windows and WebKit on macOS and Linux
     target:
-      process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari13',
+      process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari15',
     // don't minify for debug builds
-    minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
+    minify: !process.env.TAURI_ENV_DEBUG ? 'oxc' : false,
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
+
   },
   base: '/',
   server: {
@@ -84,4 +86,4 @@ export default defineConfig({
   },
   clearScreen: false,
   envPrefix: ['VITE_', 'TAURI_ENV_*'],
-} as any)
+} as UserConfig)
