@@ -22,7 +22,7 @@ class _TestPluginResource extends PluginBooter {
       setMeta(`测试完成, 无法连接至服务器`)
       throw new Error('[plugin test] can not connect to server')
     }
-    setMeta(`测试完成, \n${displayResult.map(ent => `${ent[0]}->${ent[1]}ms`).join('\n')}`)
+    setMeta(`测试完成, \n${displayResult.map(ent => `${ent[0].type}->${ent[1]}ms`).join('\n')}`)
   }
 }
 export default new _TestPluginResource

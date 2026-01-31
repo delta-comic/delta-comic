@@ -109,7 +109,7 @@ export const $initCore = () => definePlugin({
           detail: `发现分享的内容: ${meta.item.name}，需要的插件: ${pluginStore.$getPluginDisplayName(meta.plugin)}`,
           onNegative() { },
           onPositive() {
-            Utils.eventBus.SharedFunction.call('routeToContent', meta.item.contentType, meta.id, meta.item.ep)
+            return Utils.eventBus.SharedFunction.call('routeToContent', meta.item.contentType, meta.id, meta.item.ep)
           },
         }
       },

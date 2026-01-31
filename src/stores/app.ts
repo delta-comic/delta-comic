@@ -5,12 +5,12 @@ import { shallowReactive } from "vue"
 export const useAppStore = defineStore('app', () => {
   const isFullScreen = shallowRef(false)
   const fc = useFullscreen()
-  watch(isFullScreen, isFullScreen => {
+  watch(isFullScreen, async isFullScreen => {
     if (isFullScreen) {
-      fc.enter()
+      await fc.enter()
       return
     }
-    fc.exit()
+    await fc.exit()
   }, { immediate: true })
 
   const renderRootNodes = shallowReactive<(VNode | Component)[]>([])

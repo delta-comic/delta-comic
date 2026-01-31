@@ -12,7 +12,7 @@ export const useContentStore = defineStore('content', helper => {
       history.set(itemId, newIns)
       console.log('[useContentStore.$load] page cache miss', newIns)
     } else var newIns = history.get(itemId)!
-    if (load) newIns.loadAll()
+    if (load) void newIns.loadAll()
   }, 'load')
   return {
     history,

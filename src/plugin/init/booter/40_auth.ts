@@ -49,7 +49,7 @@ class _PluginAuth extends PluginBooter {
           const store = useAppStore()
           store.renderRootNodes.push(markRaw(defineComponent(() => {
             const show = ref(true)
-            f.data.then(() => show.value = false)
+            void f.data.then(() => show.value = false)
             return () => h(Comp.Popup, {
               show: show.value,
               position: 'center',
@@ -76,7 +76,7 @@ class _PluginAuth extends PluginBooter {
       authPopupMutex.release()
       setMeta('鉴权成功')
 
-    } catch (error) {
+    } catch (error: any) {
       setMeta(`登录失败: ${error}`)
       throw error
     }

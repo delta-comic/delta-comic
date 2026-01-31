@@ -1,7 +1,6 @@
 (function () {
   // 1. 保存原始句柄
   const _originalJSONParse = JSON.parse
-  const _originalResponseJSON = Response.prototype.json
 
   JSON.parse = function (text, reviver) {
     // 如果不是字符串，直接交给原函数处理（原函数会处理 null/undefined/number 等）
@@ -53,5 +52,5 @@ window.process = {
 
 window.$api = {}
 window.$layout = {}
-window.$$safe$$ = false
-window.$$lib$$ = {}
+window.$$safe$$ = false;
+(window.$$lib$$ as any) = {}
