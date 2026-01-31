@@ -21,6 +21,7 @@
   "ignorePaths": [
     "node_modules",
     "/words.txt",
-    "./dist"
+    "./dist",
+    "./README.md"
   ],
 }
