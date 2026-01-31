@@ -1,112 +1,61 @@
-import { useLocalStorage } from "@vueuse/core"
-import { AppDB, type SaveItem, type SaveItem_ } from "./app"
-import type { Table } from "dexie"
-import { useLiveQueryRef } from "@/utils/db"
-import { uniq } from "es-toolkit"
-import { defaults, isEmpty, } from "es-toolkit/compat"
-import { Utils, type uni } from "delta-comic-core"
-export interface FavouriteItem {
-  itemKey: string
-  addtime: number
-  belongTo: (FavouriteCard['createAt'])[]
-  ep: uni.ep.RawEp
-}
+import type {
+  Selectable,
+} from 'kysely'
+import { db } from '.'
+import { ItemStoreDB } from './itemStore'
 
-export interface FavouriteCard {
-  title: string
-  private: boolean
-  description: string
-  createAt: number
-}
 
-export class FavouriteDB extends AppDB {
-  public favouriteItemBase!: Table<FavouriteItem, FavouriteItem['addtime'], FavouriteItem, {
-    itemBase: SaveItem
-  }>
-  public favouriteCardBase!: Table<FavouriteCard, FavouriteCard['createAt']>
-  constructor() {
-    super()
-    this.version(AppDB.createVersion()).stores({
-      favouriteItemBase: 'addtime, *belongTo, itemKey -> itemBase.key, ep',
-      favouriteCardBase: 'createAt, title, private, description'
-    })
-    this.defaultCard = useLiveQueryRef(() => this.favouriteCardBase.get(0), undefined)
+export namespace FavouriteDB {
+  export interface CardTable {
+    title: string
+    private: boolean
+    description: string
+    createAt: number
   }
 
-  public async $setCards(...cards: (Partial<Omit<FavouriteCard, 'title'>> & Pick<FavouriteCard, 'title'>)[]) {
-    await this.$init()
-    return Utils.data.PromiseContent.fromPromise(
-      favouriteDB.favouriteCardBase.bulkPut(cards.map(card => defaults(card, {
-        private: false,
-        description: '',
-        createAt: Date.now()
-      })))
-    )
-  }
-  public async $clearCards(...cardCreateAts: FavouriteCard['createAt'][]) {
-    await this.$init()
-    return Utils.data.PromiseContent.fromPromise(
-      favouriteDB.favouriteItemBase.where('belongTo').anyOf(cardCreateAts).delete()
-    )
+  export type Card = Selectable<CardTable>
+
+  export interface ItemTable {
+    itemKey: string
+    belongTo: CardTable['createAt']
+    addTime: number
   }
 
-  public async $removeCards(...cardCreateAts: FavouriteCard['createAt'][]) {
-    await this.$init()
-    return Utils.data.PromiseContent.fromPromise(
-      favouriteDB.transaction('readwrite', [favouriteDB.favouriteItemBase, favouriteDB.favouriteCardBase], async trans => {
-        await this.$clearCards(...cardCreateAts)
-        await trans.favouriteCardBase.bulkDelete(cardCreateAts)
+  export type Item = Selectable<ItemTable>
+
+  export function upsertItem(item: ItemStoreDB.StorableItem, ...belongTos: Item['belongTo'][]) {
+    return db.value.transaction()
+      .setIsolationLevel('serializable')
+      .execute(async trx => {
+        const itemKey = await ItemStoreDB.upsert(item)
+        for (const belongTo of belongTos)
+          await trx.replaceInto('favouriteItem')
+            .values({
+              addTime: Date.now(),
+              itemKey,
+              belongTo
+            })
+            .execute()
       })
-    )
   }
 
-  public async $setItems(...items: ({
-    fItem?: FavouriteItem,
-    item: SaveItem_,
-    aims: FavouriteItem['belongTo'],
-    ep: uni.ep.RawEp
-  })[]) {
-    await this.$init()
-    return Utils.data.PromiseContent.fromPromise(
-      favouriteDB.transaction('readwrite', [favouriteDB.itemBase, favouriteDB.favouriteItemBase], async tran => {
-        await tran.itemBase.bulkPut(items.map(v => AppDB.createSaveItem(v.item)))
-        await Promise.all(items.map(async ({ aims, item, fItem, ep }) => {
-          const belongTo = uniq(aims.concat(fItem?.belongTo ?? []))
-          if (isEmpty(belongTo)) fItem && await this.$removeItems(fItem.addtime)
-          else await tran.favouriteItemBase.put(JSON.parse(JSON.stringify({
-            addtime: fItem?.addtime ?? Date.now(),
-            belongTo,
-            itemKey: AppDB.createSaveItem(item).key,
-            ep
-          })))
-        }))
+  export function moveItem(item: ItemStoreDB.StorableItem, from: Item['belongTo'], ...tos: Item['belongTo'][]) {
+    return db.value.transaction()
+      .setIsolationLevel('serializable')
+      .execute(async trx => {
+        await trx
+          .deleteFrom('favouriteItem')
+          .where('itemKey', '=', item.id)
+          .where('belongTo', '=', from)
+          .execute()
+        for (const to of tos)
+          await trx.replaceInto('favouriteItem')
+            .values({
+              addTime: Date.now(),
+              itemKey: item.id,
+              belongTo: to
+            })
+            .execute()
       })
-    )
   }
-
-  public async $removeItems(...keys: FavouriteItem['addtime'][]) {
-    await this.$init()
-    return Utils.data.PromiseContent.fromPromise(
-      favouriteDB.favouriteItemBase.where('addtime').anyOf(keys).delete()
-    )
-  }
-
-
-  public mainFilters = useLocalStorage('app.filter.favourite.main', new Array<string>())
-  public infoFilters = useLocalStorage('app.filter.favourite.info', new Array<string>())
-  public async $init() {
-    if (await this.favouriteCardBase.get(0)) {
-      this.defaultCard = useLiveQueryRef(() => this.favouriteCardBase.get(0), undefined)
-      return
-    }
-    await this.$setCards({
-      title: '默认收藏夹',
-      createAt: 0,
-      description: "默认收藏内容",
-      private: true
-    })
-    this.defaultCard = useLiveQueryRef(() => this.favouriteCardBase.get(0), undefined)
-  }
-  public defaultCard
 }
-export const favouriteDB = new FavouriteDB()

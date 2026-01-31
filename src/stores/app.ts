@@ -1,16 +1,16 @@
+import { useFullscreen } from "@vueuse/core"
 import { defineStore } from "pinia"
 import { shallowRef, watch, type Component, type VNode } from "vue"
-import { StatusBar } from '@capacitor/status-bar'
-import { Capacitor } from "@capacitor/core"
 import { shallowReactive } from "vue"
 export const useAppStore = defineStore('app', () => {
   const isFullScreen = shallowRef(false)
-  if (Capacitor.isNativePlatform()) watch(isFullScreen, isFullScreen => {
+  const fc = useFullscreen()
+  watch(isFullScreen, isFullScreen => {
     if (isFullScreen) {
-      StatusBar.hide()
+      fc.enter()
       return
     }
-    StatusBar.show()
+    fc.exit()
   }, { immediate: true })
 
   const renderRootNodes = shallowReactive<(VNode | Component)[]>([])

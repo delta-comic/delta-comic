@@ -1,13 +1,13 @@
 <script setup lang='ts'>
-import { subscribeDb } from '@/db/subscribe'
-import { useLiveQueryRef } from '@/utils/db'
+import { SubscribeDB } from '@/db/subscribe'
 import { ArrowForwardIosRound } from '@vicons/material'
 import { computed, shallowRef } from 'vue'
-import AuthorList from './authorList.vue'
+import AuthorList from '@/components/subscribe/subAuthorList.vue'
 import AuthorIcon from '@/components/user/authorIcon.vue'
 import { Comp } from 'delta-comic-core'
+import { computedAsync } from '@vueuse/core'
 const isOnAllPage = shallowRef(true)
-const subscribe = useLiveQueryRef(() => subscribeDb.all.toArray(), [])
+const subscribe = computedAsync(() => SubscribeDB.getAll(), [])
 
 const select = shallowRef<string>()
 const selectItem = computed(() => subscribe.value.find(v => v.key == select.value))
@@ -17,7 +17,7 @@ const isShowAllList = shallowRef(false)
 </script>
 
 <template>
-  <div class="!size-full flex flex-col relative pt-safe">
+  <div class="size-full flex flex-col relative pt-safe">
     <div class="w-full h-fit transition-all will-change-transform"
       :class="[!!select ? '-translate-y-1/3 opacity-0' : 'translate-y-0 opacity-100']">
       <!-- nav -->
@@ -27,11 +27,11 @@ const isShowAllList = shallowRef(false)
       </div>
       <!-- tab -->
       <div class="w-full text-nowrap flex justify-around bg-(--van-background-2) h-fit py-1">
-        <NButton tertiary :type="isOnAllPage ? 'primary' : 'tertiary'" size="tiny" class="!w-[calc(50%-5px)]"
+        <NButton tertiary :type="isOnAllPage ? 'primary' : 'tertiary'" size="tiny" class="w-[calc(50%-5px)]!"
           @click="isOnAllPage = true">
           全部
         </NButton>
-        <NButton tertiary :type="isOnAllPage ? 'tertiary' : 'primary'" size="tiny" class="!w-[calc(50%-5px)]"
+        <NButton tertiary :type="isOnAllPage ? 'tertiary' : 'primary'" size="tiny" class="w-[calc(50%-5px)]!"
           @click="isOnAllPage = false">
           追更
         </NButton>
@@ -40,7 +40,7 @@ const isShowAllList = shallowRef(false)
       <div class="w-full text-nowrap flex items-center bg-(--van-background-2) pb-3 pt-3 relative"
         @click="isShowAllList = true">
         <div class="font-semibold ml-3 h-fit">最常访问</div>
-        <div class="flex items-center text-(--van-text-color-2) absolute right-3 !text-xs top-safe-offset-3">
+        <div class="flex items-center text-(--van-text-color-2) absolute right-3 text-xs top-safe-offset-3">
           更多
           <NIcon>
             <ArrowForwardIosRound />
@@ -54,7 +54,7 @@ const isShowAllList = shallowRef(false)
           @click="select = sub.key">
           <template v-if="sub.type == 'author'">
             <AuthorIcon :size-spacing="12" :author="sub.author" />
-            <div class="text-wrap w-18 !text-xs mt-1 text-center !text-(--van-text-color-2) van-multi-ellipsis--l2">
+            <div class="text-wrap w-18 text-xs mt-1 text-center text-(--van-text-color-2) van-multi-ellipsis--l2">
               {{ sub.author.label }}
             </div>
           </template>

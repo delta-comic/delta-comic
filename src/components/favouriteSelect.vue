@@ -3,41 +3,49 @@ import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { PlusFilled, StarOutlineRound } from '@vicons/material'
 import { useMessage } from 'naive-ui'
 import { Comp, uni, } from 'delta-comic-core'
-import { useLiveQueryRef } from '@/utils/db'
-import { FavouriteCard, favouriteDB } from '@/db/favourite'
-import { AppDB } from '@/db/app'
+import { FavouriteDB } from '@/db/favourite'
 import { StarFilled } from '@vicons/antd'
+import { db, DBUtils } from '@/db'
+import { computedAsync } from '@vueuse/core'
 
 
 const $props = defineProps<{
   item: uni.item.Item
   plain?: boolean
 }>()
-const thisKey = AppDB.createSaveItemKey($props.item)
-const thisFavouriteItemRef = useLiveQueryRef(() => favouriteDB.favouriteItemBase.where('itemKey').equals(thisKey).first(), undefined)
 
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
-const selectList = shallowReactive(new Set<(FavouriteCard['createAt'])>())
-const allFavouriteItems = useLiveQueryRef(() => favouriteDB.favouriteItemBase.with({ itemBase: 'itemKey' }), [])
-const allFavouriteCards = useLiveQueryRef(() => favouriteDB.favouriteCardBase.toArray(), [])
+const selectList = shallowReactive(new Set<(FavouriteDB.Card['createAt'])>())
+
+const allFavouriteCards = computedAsync(() => db.value.selectFrom('favouriteCard').selectAll().execute(), [])
+const getCardCount = (createAt: FavouriteDB.Card['createAt']) => DBUtils.countDb(db.value
+  .selectFrom('favouriteItem')
+  .where('belongTo', '=', createAt))
 
 const isShow = shallowRef(false)
 const $message = useMessage()
 
-let promise = Promise.withResolvers<(FavouriteCard['createAt'])[]>()
+let promise = Promise.withResolvers<(FavouriteDB.Card['createAt'])[]>()
 
-const create = () => {
-  promise = Promise.withResolvers<(FavouriteCard['createAt'])[]>()
+const create = async () => {
+  console.log('create popup for favselect')
+  promise = Promise.withResolvers<(FavouriteDB.Card['createAt'])[]>()
   if (isShow.value) {
     $message.warning('正在选择中')
     promise.reject()
     return promise.promise
   }
   selectList.clear()
-  const fItem = thisFavouriteItemRef.value
-  for (const v of fItem?.belongTo ?? []) selectList.add(v)
+  console.log('favselect getting data')
+  const items = await db.value
+    .selectFrom('favouriteItem')
+    .where('itemKey', '=', $props.item.id)
+    .selectAll()
+    .execute()
+  console.log('favselect done', selectList)
+  for (const v of items) selectList.add(v.belongTo)
   isShow.value = true
-  return promise.promise
+  return await promise.promise
 }
 const submit = () => {
   if (selectList.size === 0) {
@@ -48,24 +56,22 @@ const submit = () => {
   isShow.value = false
 }
 
-const favouriteThis = async (inCard: FavouriteCard['createAt'][]) => {
-  const fItem = thisFavouriteItemRef.value
-  await favouriteDB.$setItems({
-    aims: inCard,
-    item: $props.item,
-    fItem: fItem && {
-      ...fItem,
-      belongTo: []
-    },
-    ep: $props.item.thisEp
+const favouriteThis = async (inCard: FavouriteDB.Card['createAt'][]) =>
+  db.value.transaction().execute(async () => {
+    for (const card of inCard)
+      await FavouriteDB.upsertItem($props.item, card)
   })
-}
+
+const thisFavouriteCount = computedAsync(() => DBUtils.countDb(db.value
+  .selectFrom('favouriteItem')
+  .where('itemKey', '=', $props.item.id))
+  , 0)
+
 </script>
 
 <template>
   <Comp.ToggleIcon padding :size="plain ? '35px' : '27px'" @long-click="create().then(favouriteThis)"
-    @click="favouriteDB.defaultCard.value && favouriteThis([favouriteDB.defaultCard.value.createAt])"
-    :model-value="(thisFavouriteItemRef?.belongTo.length ?? 0) > 0" :icon="plain ? StarOutlineRound : StarFilled">
+    @click="favouriteThis([0])" :model-value="thisFavouriteCount > 0" :icon="plain ? StarOutlineRound : StarFilled">
     {{ plain ? '' : '收藏' }}
   </Comp.ToggleIcon>
   <Comp.Popup v-model:show="isShow" position="bottom" round class="bg-(--van-background)!" @closed="promise.reject()">
@@ -80,15 +86,15 @@ const favouriteThis = async (inCard: FavouriteCard['createAt'][]) => {
       </div>
     </div>
     <VanCellGroup inset class="mb-6!">
-      <Comp.Var v-for="card of allFavouriteCards"
-        :value="allFavouriteItems.filter(v => v.belongTo.includes(card.createAt))" v-slot="{ value }">
-        <VanCell center :title="card.title" :label="`${value.length}个内容`" clickable
+      <Comp.Await v-for="card of allFavouriteCards" v-slot="{ result: count }" auto-load
+        :promise="() => getCardCount(card.createAt)">
+        <VanCell center :title="card.title" :label="`${count ?? 0}个内容`" clickable
           @click="selectList.has(card.createAt) ? selectList.delete(card.createAt) : selectList.add(card.createAt)">
           <template #right-icon>
             <NCheckbox :checked="selectList.has(card.createAt)" />
           </template>
         </VanCell>
-      </Comp.Var>
+      </Comp.Await>
     </VanCellGroup>
     <NButton class="m-5! w-30!" @click="submit" strong secondary type="primary" size="large">
       确定

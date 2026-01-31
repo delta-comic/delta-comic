@@ -2,7 +2,7 @@
 import { isEmpty } from 'es-toolkit/compat'
 import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import symbol from '@/symbol'
+import { isShowMainHomeNavBar } from '@/symbol'
 import { until, useResizeObserver } from '@vueuse/core'
 import { Comp, coreModule, requireDepend, Store, uni, Utils } from 'delta-comic-core'
 import { LikeOutlined } from '@vicons/antd'
@@ -12,7 +12,9 @@ const $router = useRouter()
 const temp = Store.useTemp().$applyRaw('randomConfig', () => ({
   stream: Utils.data.Stream.create<uni.item.Item>(async function* (signal, that) {
     that.pages.value = Infinity
+    that.page.value = 0
     while (true) {
+      that.page.value++
       const result = await Utils.eventBus.SharedFunction.callRandom('getRandomProvide', signal).result
       yield result
     }
@@ -33,7 +35,7 @@ const stop = $router.beforeEach(() => {
   temp.scroll = waterfall.value?.scrollTop ?? 0
 })
 
-const showNavBar = inject(symbol.showMainHomeNavBar)!
+const showNavBar = inject(isShowMainHomeNavBar)!
 watch(() => waterfall.value?.scrollTop, async (scrollTop, old) => {
   if (!scrollTop || !old) return
   if (scrollTop - old > 0) showNavBar.value = false
@@ -41,10 +43,12 @@ watch(() => waterfall.value?.scrollTop, async (scrollTop, old) => {
 }, { immediate: true })
 
 const { comp } = requireDepend(coreModule)
+
+console.debug('[random] waterfall', waterfall,temp.stream)
 </script>
 
 <template>
-  <Comp.Waterfall class="w-full" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
+  <Comp.Waterfall class="size-full!" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
     <component :is="uni.item.Item.itemCard.get(item.contentType) ?? comp.ItemCard" :item type="small" free-height
       :key="`${index}|${item.id}`">
       <NIcon color="var(--van-text-color-2)" size="14px">

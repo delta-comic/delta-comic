@@ -1,17 +1,18 @@
 <script setup lang='ts'>
 import { AutoAwesomeMosaicFilled, CheckRound, FileDownloadRound } from '@vicons/material'
 import { Comp, Utils, version } from 'delta-comic-core'
-import { MenuOption, NIcon, useMessage } from 'naive-ui'
+import { type MenuOption, NIcon, useMessage } from 'naive-ui'
 import type { Component } from 'vue'
 import { computed, h, shallowRef } from 'vue'
 import List from './list.vue'
 import Download from './download.vue'
 import { usePluginStore } from '@/plugin/store'
-import { isEmpty } from 'es-toolkit/compat'
-import { bootPlugin } from '@/plugin'
-import { ReloadOutlined, SafetyOutlined } from '@vicons/antd'
+import { loadAllPlugins } from '@/plugin'
+import { SafetyOutlined, SettingOutlined } from '@vicons/antd'
 import { motion } from 'motion-v'
-import { updateByApk, updateByHot } from '@/utils/appUpdate'
+import { computedAsync } from '@vueuse/core'
+import { db, DBUtils } from '@/db'
+import Config from './config.vue'
 
 const pluginStore = usePluginStore()
 const show = defineModel<boolean>('show', { required: true })
@@ -33,6 +34,12 @@ const menuOptions = [
     comp: Download
   },
   {
+    label: '配置',
+    key: 'config',
+    icon: renderIcon(SettingOutlined),
+    comp: Config
+  },
+  {
     label: `核心版本: ${version}`,
     key: 'version',
     disabled: true
@@ -43,25 +50,13 @@ const boot = async (safe = false) => {
   if (isBooting.value || isBooted.value) return $message.warning('正在启动中')
   isBooting.value = true
   window.$$safe$$ = safe
-  await bootPlugin()
+  await loadAllPlugins()
   isBooted.value = true
   show.value = false
 }
 
 const $message = useMessage()
 
-const isUpdating = shallowRef(false)
-const updateApp = async (method: () => PromiseLike<void>) => {
-  if (isUpdating.value) return $message.warning('正在更新中')
-  isUpdating.value = true
-  try {
-    await Utils.message.createLoadingMessage('更新中').bind(method())
-    isUpdating.value = false
-  } catch (error) {
-    isUpdating.value = false
-    throw error
-  }
-}
 const isShowMenu = shallowRef(false)
 
 const closeMenuBefore = (v: any) => {
@@ -74,6 +69,11 @@ const rebootApp = () => {
   Utils.message.createLoadingMessage('重启中')
   location.reload()
 }
+
+const totalCount = computedAsync(() => DBUtils.countDb(db.value
+  .selectFrom('plugin')
+  .where('enable', '=', true)
+), 0)
 </script>
 
 <template>
@@ -83,7 +83,7 @@ const rebootApp = () => {
         <NMenu v-model:value="pageSelect" mode="horizontal" :options="menuOptions" responsive />
         <VanTabs v-model:active="pageSelect" swipeable :show-header="false"
           class="size-full! *:size-full! *:*:size-full! *:*:*:size-full!">
-          <VanTab v-for="menu in menuOptions" :name="menu.key" class="size-full! *:size-full!">
+          <VanTab v-for="menu in menuOptions.filter(v => !v.disabled)" :name="menu.key" class="size-full! *:size-full!">
             <component :is="menu.comp" />
           </VanTab>
         </VanTabs>
@@ -94,27 +94,7 @@ const rebootApp = () => {
           <CheckRound />
         </NIcon>
         <template #menu>
-          <NPopover trigger="manual" :show="isShowMenu" placement="left-end" v-if="!isUpdating">
-            <template #trigger>
-              <NFloatButton class="z-100000!" @click="closeMenuBefore(updateApp(updateByApk))">
-                <NIcon :size="20">
-                  <ReloadOutlined />
-                </NIcon>
-              </NFloatButton>
-            </template>
-            Apk更新应用
-          </NPopover>
-          <NPopover trigger="manual" :show="isShowMenu" placement="left-end" v-if="!isUpdating">
-            <template #trigger>
-              <NFloatButton class="z-100000!" @click="closeMenuBefore(updateApp(updateByHot))" type="primary">
-                <NIcon :size="20">
-                  <ReloadOutlined />
-                </NIcon>
-              </NFloatButton>
-            </template>
-            热更新应用
-          </NPopover>
-          <template v-if="!isEmpty(pluginStore.savedPluginCode)">
+          <template v-if="totalCount">
             <NPopover trigger="manual" :show="isShowMenu" placement="left-end">
               <template #trigger>
                 <NFloatButton class="z-100000!" @click="closeMenuBefore(boot(true))">
@@ -161,7 +141,7 @@ const rebootApp = () => {
         <motion.div :initial="{ opacity: 0, scale: '50%', translateY: '85px' }"
           :exit="{ opacity: 0, scale: '50%', translateY: '85px' }" class="relative"
           :animate="{ opacity: 1, scale: '100%', translateY: '0px' }" v-if="allErrors.length">
-          <NButton type="primary" quaternary class="absolute! right-0!" @click="rebootApp">重新加载</NButton>
+          <NButton type="primary" class="absolute! right-10!" @click="rebootApp">重新加载</NButton>
         </motion.div>
       </template>
     </NSpin>

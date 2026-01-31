@@ -2,63 +2,55 @@ import CommentRow from "@/components/comment/commentRow.vue"
 import Index from "@/components/comment/index.vue"
 import FavouriteSelect from "@/components/favouriteSelect.vue"
 import UnitCard from "@/components/unitCard.vue"
-import { imageViewConfig } from "@/config"
-import { subscribeKey, subscribeDb } from "@/db/subscribe"
-import Default from "@/pages/content/layout/default.vue"
-import Images from "@/pages/content/layout/view/images.vue"
-import Videos from "@/pages/content/layout/view/videos.v.vue"
+import { SubscribeDB } from "@/db/subscribe"
 import { TagOutlined } from "@vicons/antd"
 import { definePlugin, Store, uni, Utils, } from "delta-comic-core"
-import { Share } from '@capacitor/share'
-
-
-import { compress, decompress } from 'lz-string'
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
 import { usePluginStore } from "./store"
 import { OfflineShareRound } from "@vicons/material"
+import AuthorIcon from "@/components/user/authorIcon.vue"
+import { pluginName } from "@/symbol"
+import { db, DBUtils, useNativeStore } from "@/db"
 export const $initCore = () => definePlugin({
-  name: 'core',
+  name: pluginName,
   config: [
-    Store.appConfig,
-    imageViewConfig
+    Store.appConfig
   ],
   onBooted: () => {
-    Utils.eventBus.SharedFunction.define(async (author, plugin) => {
-      const count = await subscribeDb.all.where('key').equals(subscribeKey.toString([plugin, author.label])).count()
+    Utils.eventBus.SharedFunction.define(async author => {
+      const count = await DBUtils.countDb(db.value
+        .selectFrom('subscribe')
+        .where('key', '=', SubscribeDB.key.toString([author.$$plugin, author.label])))
+
       return count > 0
-    }, 'core', 'getIsAuthorSubscribe')
-    Utils.eventBus.SharedFunction.define(async (author, plugin) => {
-      await subscribeDb.$add({
-        key: subscribeKey.toString([plugin, author.label]),
+    }, pluginName, 'getIsAuthorSubscribe')
+    Utils.eventBus.SharedFunction.define(async author => {
+      await SubscribeDB.upsert({
+        key: SubscribeDB.key.toString([author.$$plugin, author.label]),
         author,
-        plugin,
-        type: 'author'
+        plugin: author.$$plugin,
+        type: 'author',
+        itemKey: null
       })
       return
-    }, 'core', 'addAuthorSubscribe')
-    Utils.eventBus.SharedFunction.define(async (author, plugin) => {
-      await subscribeDb.$remove({
-        key: subscribeKey.toString([plugin, author.label]),
-        author,
-        plugin,
-        type: 'author'
-      })
+    }, pluginName, 'addAuthorSubscribe')
+    Utils.eventBus.SharedFunction.define(async author => {
+      await db.value
+        .deleteFrom('subscribe')
+        .where('key', '=', SubscribeDB.key.toString([author.$$plugin, author.label]))
+        .execute()
       return
-    }, 'core', 'removeAuthorSubscribe')
+    }, pluginName, 'removeAuthorSubscribe')
     return {
-      layout: {
-        Default
-      },
-      view: {
-        Images,
-        Video: Videos,
-        Videos
-      },
       comp: {
         Comment: Index,
         ItemCard: UnitCard,
         FavouriteSelect: FavouriteSelect,
-        CommentRow: CommentRow
-      }
+        CommentRow: CommentRow,
+        AuthorIcon: AuthorIcon
+      },
+      db,
+      useNativeStore
     }
   },
   share: {
@@ -69,7 +61,7 @@ export const $initCore = () => definePlugin({
       name: '复制口令',
       async call(page) {
         const item = page.union.value!.toJSON()
-        const compressed = compress(JSON.stringify(<CorePluginTokenShareMeta>{
+        const compressed = compressToEncodedURIComponent(JSON.stringify(<CorePluginTokenShareMeta>{
           item: {
             contentType: uni.content.ContentPage.contentPage.toString(item.contentType),
             ep: item.thisEp.index,
@@ -86,10 +78,8 @@ export const $initCore = () => definePlugin({
       key: 'native',
       name: '原生分享',
       async call(page) {
-        const canShare = await Share.canShare()
-        if (!canShare.value) return window.$message.error('平台不可原生分享')
         const item = page.union.value!.toJSON()
-        const compressed = compress(JSON.stringify(<CorePluginTokenShareMeta>{
+        const compressed = compressToEncodedURIComponent(JSON.stringify(<CorePluginTokenShareMeta>{
           item: {
             contentType: uni.content.ContentPage.contentPage.toString(item.contentType),
             ep: item.thisEp.index,
@@ -99,9 +89,8 @@ export const $initCore = () => definePlugin({
           id: page.id
         }))
         const token = `[${page.union.value?.title}](复制这条口令，打开Delta Comic)${compressed}`
-        await Share.share({
+        await navigator.share({
           title: 'Delta Comic内容分享',
-          dialogTitle: '分享你的内容',
           text: token
         })
       }
@@ -114,7 +103,7 @@ export const $initCore = () => definePlugin({
       },
       show(chipboard) {
         const pluginStore = usePluginStore()
-        const meta: CorePluginTokenShareMeta = JSON.parse(decompress(chipboard.replace(/^\[.+\]/, '').replaceAll('(复制这条口令，打开Delta Comic)', '')))
+        const meta: CorePluginTokenShareMeta = JSON.parse(decompressFromEncodedURIComponent(chipboard.replace(/^\[.+\]/, '').replaceAll('(复制这条口令，打开Delta Comic)', '')))
         return {
           title: '口令',
           detail: `发现分享的内容: ${meta.item.name}，需要的插件: ${pluginStore.$getPluginDisplayName(meta.plugin)}`,
@@ -127,10 +116,10 @@ export const $initCore = () => definePlugin({
     }]
   },
   search: {
-    
+
   }
 })
-export interface CorePluginTokenShareMeta {
+interface CorePluginTokenShareMeta {
   item: {
     name: string
     contentType: string

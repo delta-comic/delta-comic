@@ -26,6 +26,7 @@
     "isolatedModules": true,
     "noImplicitThis": true,
     "jsxImportSource": "vue",
+    "verbatimModuleSyntax": true,
     "paths": {
       "@/*": [
         "./src/*"
@@ -34,12 +35,20 @@
     "types": [
       "./components.d.ts",
       "./env.d.ts",
-      "./src/global.d.ts",
       "vue-component-type-helpers",
-      "vidstack/vue"
+      "./typed-router.d.ts"
+    ]
+  },
+  "vueCompilerOptions": {
+    "plugins": [
+      "vue-router/volar/sfc-typed-router",
+      "vue-router/volar/sfc-route-blocks",
     ],
   },
   "include": [
     "./src/**/*"
+  ],
+  "exclude": [
+    "./*.ts"
   ]
 }

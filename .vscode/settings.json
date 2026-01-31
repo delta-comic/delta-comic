@@ -1,5 +1,6 @@
 {
-  "java.project.sourcePaths": [
-    "android"
-  ]
+  "oxc.path.oxlint": "node_modules/oxlint/bin/oxlint",
+  "oxc.lint.run": "onSave",
+  "oxc.requireConfig": true,
+  "oxc.enable": true
 }

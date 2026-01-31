@@ -1,20 +1,9 @@
-import { uni, type PluginConfig, type PluginConfigSearchMethod, _pluginExposes, type Utils, RawPluginMeta, decodePluginMeta, type PluginMeta } from "delta-comic-core"
+import { type PluginConfig, type PluginConfigSearchMethod, _pluginExposes } from "delta-comic-core"
 import { defineStore } from "pinia"
-import { parse } from 'userscript-meta'
-import { computed, reactive } from "vue"
+import { computed, reactive, type Raw } from "vue"
 import { shallowReactive } from "vue"
-import axios from "axios"
-import { auth, testApi, testResourceApi } from "./utils"
-import Dexie from "dexie"
-import type { Table } from "dexie"
-import { useLiveQueryRef } from "@/utils/db"
-import { Octokit } from "@octokit/rest"
-export interface SavedPluginCode extends PluginMeta {
-  key: string // SavePluginBlob.key
-  enable: boolean
-  updateUrl?: string
-}
-
+import { db } from "@/db"
+import { computedAsync } from "@vueuse/core"
 export interface SavePluginBlob {
   key: string
   blob: Blob
@@ -23,18 +12,6 @@ export interface SavePluginBlob {
 export interface PluginData {
   key: string
   value: any
-}
-
-export const scriptDB = new class ScriptDB extends Dexie {
-  public scripts!: Table<SavedPluginCode, SavedPluginCode['key'], SavedPluginCode, { content: SavePluginBlob }>
-  public codes!: Table<SavePluginBlob, SavePluginBlob['key']>
-  constructor() {
-    super('ScriptDB')
-    this.version(1).stores({
-      scripts: 'key',
-      codes: 'key'
-    })
-  }
 }
 
 
@@ -50,247 +27,23 @@ export type PluginLoadingMicroSteps = {
   }
 }
 
+const pluginNames = computedAsync(async () => Object.fromEntries((await db.value
+  .selectFrom('plugin')
+  .select(['pluginName', 'displayName'])
+  .execute())
+  .map(v => [v.pluginName, v.displayName] as const)), {})
+
 export const usePluginStore = defineStore('plugin', helper => {
-  const octokit = new Octokit()
-  const plugins = shallowReactive(new Map<string, PluginConfig>())
+  const plugins = shallowReactive(new Map<string, Raw<PluginConfig>>())
   const pluginSteps = reactive<Record<string, PluginLoadingMicroSteps>>({})
-  const $loadPlugin = helper.action(async (cfg: PluginConfig, onBootedDone?: Function) => {
-    plugins.set(cfg.name, cfg)
-    pluginSteps[cfg.name] = {
-      now: {
-        status: 'wait',
-        stepsIndex: 0
-      },
-      steps: []
-    }
-    if (cfg.api)
-      pluginSteps[cfg.name].steps.push({
-        name: '接口测试',
-        description: '' // 获取全部接口
-      })
-    if (cfg.resource)
-      pluginSteps[cfg.name].steps.push({
-        name: '资源链接测试',
-        description: '' // 获取全部接口
-      })
-    if (cfg.auth)
-      pluginSteps[cfg.name].steps.push({
-        name: '登录',
-        description: ''
-      })
-    if (cfg.otherProgress)
-      pluginSteps[cfg.name].steps.push(...cfg.otherProgress.map(v => ({
-        name: v.name,
-        description: ''
-      })))
-    const api: Record<string, string | false | undefined> = {}
-    try {
-      if (cfg.api) {
-        const msIndex = pluginSteps[cfg.name].steps.findIndex(v => v.name === '接口测试')!
-        const namespaces = Object.keys(cfg.api)
-        pluginSteps[cfg.name].now.stepsIndex = msIndex
-        pluginSteps[cfg.name].now.status = 'process'
-        pluginSteps[cfg.name].steps[msIndex].description = '开始并发测试'
-        const results = await Promise.all(
-          namespaces.map(namespace => testApi(cfg.api![namespace]))
-        )
-        const displayResult = new Array<[namespace: string, time: number | false]>()
-        namespaces.forEach((namespace, i) => {
-          api[namespace] = results[i][0]
-          displayResult.push([namespace, results[i][1]])
-        })
-        if (Object.values(api).some(v => v == false)) {
-          pluginSteps[cfg.name].steps[msIndex].description = `测试完成, 无法连接至服务器`
-          throw new Error('[plugin test] can not connect to server')
-        }
-        pluginSteps[cfg.name].steps[msIndex].description = `测试完成, ${displayResult.map(ent => `${ent[0]}->${ent[1]}ms`).join(', ')}`
-      }
-      if (cfg.resource?.types) {
-        const msIndex = pluginSteps[cfg.name].steps.findIndex(v => v.name === '资源链接测试')!
-        const types = cfg.resource.types.map(v => ({ type: v.type, val: v }))
-        pluginSteps[cfg.name].now.stepsIndex = msIndex
-        pluginSteps[cfg.name].now.status = 'process'
-        pluginSteps[cfg.name].steps[msIndex].description = '开始并发测试'
-        const results = await Promise.all(
-          types.map(type => testResourceApi(type.val))
-        )
-        const displayResult = new Array<[type: (typeof types)[number], time: number | false]>()
-        types.forEach((type, i) => {
-          if (results[i][1]) uni.resource.Resource.precedenceFork.set([cfg.name, type.type], results[i][0])
-          api[type.type] = results[i][0]
-          displayResult.push([type, results[i][1]])
-        })
-        if (results.some(v => v[1] == false)) {
-          pluginSteps[cfg.name].steps[msIndex].description = `测试完成, 无法连接至服务器`
-          throw new Error('[plugin test] can not connect to server')
-        }
-        pluginSteps[cfg.name].steps[msIndex].description = `测试完成, ${displayResult.map(ent => `${ent[0].type}->${ent[1]}ms`).join(', ')}`
-      }
-      const expose = await cfg.onBooted?.({
-        api
-      })
-      if (expose) _pluginExposes.set(Symbol.for(`expose:${cfg.name}`), expose)
-      onBootedDone?.()
-      try {
-        if (cfg.auth) {
-          const msIndex = pluginSteps[cfg.name].steps.findIndex(v => v.name === '登录')!
-          pluginSteps[cfg.name].now.stepsIndex = msIndex
-          await auth(cfg.auth, $getPluginDisplayName(cfg.name), pluginSteps[cfg.name].steps[msIndex])
-        }
-      } catch (error) {
-        pluginSteps[cfg.name].steps.find(v => v.name === '登录')!.description = '登录失败'
-        throw error
-      }
-      if (cfg.otherProgress) {
-        for (const process of cfg.otherProgress) {
-          const msIndex = pluginSteps[cfg.name].steps.findLastIndex(v => v.name === process.name)!
-          pluginSteps[cfg.name].now.stepsIndex = msIndex
-          await process.call(description => {
-            pluginSteps[cfg.name].steps[msIndex].description = description
-          })
-        }
-      }
-    } catch (error) {
-      pluginSteps[cfg.name].now.status = 'error'
-      pluginSteps[cfg.name].now.error = error as Error
-      throw error
-    }
-    console.log(`[plugin usePluginStore.$loadPlugin] plugin "${cfg.name}" load done`)
-  }, 'loadPlugin')
-
-  const $addPlugin = helper.action((fullCode: string, method: Utils.message.DownloadMessageBind, updateUrl?: string) =>
-    method.createLoading('数据库写入中', async c => {
-      c.retryable = true
-      c.description = '修正代码中'
-      const metadata = decodePluginMeta(parse(fullCode) as RawPluginMeta)
-      const code = `
-      (function(){
-      var _console = window.console;
-      var console = {
-        log(...args) {
-          _console.log("[plugin->${metadata.name.id}#${metadata.name.display}]",...args)
-        },
-        info(...args) {
-          _console.info("[plugin->${metadata.name.id}#${metadata.name.display}]",...args)
-        },
-        debug(...args) {
-          _console.debug("[plugin->${metadata.name.id}#${metadata.name.display}]",...args)
-        },
-        warn(...args) {
-          _console.warn("[plugin->${metadata.name.id}#${metadata.name.display}]",...args)
-        },
-        error(...args) {
-          _console.error("[plugin->${metadata.name.id}#${metadata.name.display}]",...args)
-        }
-      };
-      // --inject code done--
-      ${updateUrl
-          ? fullCode
-            .replaceAll('127.0.0.1', new URL(updateUrl).hostname)
-            .replaceAll('localhost', new URL(updateUrl).hostname)
-          : fullCode
-        }
-    })();
-    `
-      const blob = new Blob([code], { type: 'text/plain' })
-      c.description = '写入中'
-      await scriptDB.transaction('rw', [scriptDB.scripts, scriptDB.codes], trans => {
-        trans.scripts.put({
-          ...metadata,
-          key: metadata.name.id,
-          enable: true,
-          updateUrl,
-        })
-        trans.codes.put({
-          blob,
-          key: metadata.name.id
-        })
-      })
-    }), 'addPlugin')
-
-  const $changePluginEnable = helper.action(async (key: string) => {
-    const config = await scriptDB.scripts.get(key)
-    if (!config) throw new Error(`not found plugin key: "${key}"`)
-    await scriptDB.scripts.put({
-      ...config,
-      enable: !config.enable
-    })
-  }, 'changePluginEnable')
-
-  const $removePlugin = helper.action((key: string) => scriptDB.transaction('rw', [scriptDB.scripts, scriptDB.codes], () => {
-    scriptDB.scripts.delete(key)
-    scriptDB.codes.delete(key)
-  }), 'removePlugin')
-
-  const $addPluginFromNet = helper.action(async (url: string, method: Utils.message.DownloadMessageBind) => {
-    const content = await download(url, method)
-    return $addPlugin(content, method, url)
-  }, 'addPluginFromNet')
-
-  const download = (url: string, method: Utils.message.DownloadMessageBind) =>
-    method.createProgress('下载插件中', async c => {
-      c.retryable = true
-      c.description = '下载中'
-      const res = await axios.request<string>({
-        url,
-        responseType: 'text',
-        onDownloadProgress: progressEvent => {
-          if (!progressEvent.lengthComputable) c.progress = 100
-          else c.progress = progressEvent.loaded / progressEvent.total! * 100
-        }
-      })
-      return res.data
-    })
-
-
-  const $addPluginFromGithub = helper.action(async (owner: string, repo: string, method: Utils.message.DownloadMessageBind) => {
-    const url = await method.createLoading('获取仓库信息', async c => {
-      c.retryable = true
-      c.description = '请求中'
-      const { data: release } = await octokit.rest.repos.getLatestRelease({ owner, repo })
-      const assets = release.assets.find(v => v.name.endsWith('js')) ?? release.assets[0]
-      if (!assets) throw new Error('未找到资源')
-      return assets.browser_download_url
-    })
-
-    const content = await download(url, method)
-
-    return $addPlugin(content, method, `https://github.com/${owner}/${repo}/release`)
-  }, 'addPluginFromGithub')
 
   const allSearchSource = computed(() => Array.from(plugins.values()).filter(v => v.search?.methods).map(v => [v.name, Object.entries(v.search?.methods ?? {})] as [plugin: string, sources: [name: string, method: PluginConfigSearchMethod][]]))
 
-  const savedPluginCode = useLiveQueryRef(() => scriptDB.scripts.toArray(), [])
-
-  const pluginDisplayNameCache = new Map<string, string>()
-  const $getPluginDisplayName = helper.action((key: string) => {
-    if (pluginDisplayNameCache.has(key)) return pluginDisplayNameCache.get(key)!
-    const displayName = savedPluginCode.value.find(v => v.key == key)?.name.display ?? key
-    pluginDisplayNameCache.set(key, displayName)
-    return displayName
-  }, 'getPluginDisplayName')
 
 
-  const $updatePlugin = helper.action(async (key: string, method: Utils.message.DownloadMessageBind) => {
-    const { isGithub, url } = await method.createLoading('检测插件类型', async c => {
-      c.retryable = true
-      c.description = '检测中'
-      const plugin = await scriptDB.scripts.get(key)
-      if (!plugin) throw new Error(`Can not found plugin named "${key}".`)
-      if (!plugin.updateUrl) throw new Error(`Can not update plugin named "${key}" because haven't update url.`)
-      const url = new URL(plugin.updateUrl)
-      const isGithub = url.hostname.includes('github.com')
-      if (isGithub) c.description = 'Github'
-      else c.description = '其他源'
-      return { url, isGithub }
-    })
-    if (!isGithub) {
-      const content = await download(url.toString(), method)
-      return await $addPlugin(content, method, url.toString())
-    }
-    const [owner, repo] = url.pathname.split('/').filter(Boolean)
-    await $addPluginFromGithub(owner, repo, method)
-  }, 'updatePlugin')
+  const $getPluginDisplayName = helper.action((key: string) =>
+    pluginNames.value[key] || key
+    , 'getPluginDisplayName')
 
-  return { $loadPlugin, $updatePlugin, $removePlugin, $getPluginDisplayName, plugins, savedPluginCode, $changePluginEnable, $addPlugin, $addPluginFromNet, $addPluginFromGithub, allSearchSource, pluginSteps }
+  return { $getPluginDisplayName, plugins, allSearchSource, pluginSteps }
 })

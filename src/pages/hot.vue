@@ -7,7 +7,7 @@ import { computed, markRaw, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const $router = useRouter()
-const $route = useRoute()
+const $route = useRoute<"/hot">()
 const plugin = computed(() => $route.query.plugin?.toString() ?? '')
 const sourceList = computed(() => uni.content.ContentPage.levelboard.get(plugin.value))
 
@@ -21,7 +21,7 @@ watch(() => temp.selectLevel, (selectLevel, oldSelectLevel) => {
   const [plugin, select] = selectLevelKey.toJSON(selectLevel)
   const [oldPlugin] = selectLevelKey.toJSON(oldSelectLevel)
   if (plugin != oldPlugin)
-    return $router.force.replace(`/hot?plugin=${plugin}&dfSel=${select}`)
+    return $router.force.replace({ name: '/hot', query: { plugin, dfSel: select } })
 })
 const source = computed(() => {
   if (!temp.list.has(temp.selectLevel)) {

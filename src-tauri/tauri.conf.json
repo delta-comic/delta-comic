@@ -1,0 +1,53 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "delta-comic",
+  "version": "0.1.0",
+  "identifier": "org.wenxig.delta-comic",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "pnpm dev:web",
+    "beforeBuildCommand": "pnpm build:web"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Delta Comic",
+        "width": 800,
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src * local: ipc: 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * local: ipc: 'unsafe-inline' 'unsafe-eval'; connect-src * local: ipc: 'unsafe-inline'; img-src * local: ipc: data: blob:; frame-src * local: ipc:; style-src * local: ipc: 'unsafe-inline';",
+      "assetProtocol": {
+        "enable": false,
+        "scope": []
+      }
+    },
+    "withGlobalTauri": true
+  },
+  "plugins": {
+    "sql": {
+      "preload": [
+        "sqlite:app.db"
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "android": {
+      "autoIncrementVersionCode": false,
+      "minSdkVersion": 26
+    }
+  }
+}

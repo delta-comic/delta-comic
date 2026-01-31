@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { Comp, Store, uni, Utils } from 'delta-comic-core'
-import { FieldInstance } from 'vant'
+import type { FieldInstance } from 'vant'
 import { shallowRef } from 'vue'
 
 const config = Store.useConfig()
