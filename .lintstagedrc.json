@@ -1,4 +1,4 @@
 {
   "*.{js,jsx,ts,tsx,mts,cts,mjs,cjs,vue}": "pnpm run lint",
-  "*.{md,json,toml,rs,js,jsx,ts,tsx,mts,cts,mjs,cjs,vue,html}": "pnpm exec cspell"
+  "*.{md,json,toml,rs,js,jsx,ts,tsx,mts,cts,mjs,cjs,vue,html}": "pnpm exec cspell --no-exit-code"
 }

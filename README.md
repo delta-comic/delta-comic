@@ -30,7 +30,7 @@ _____   _________________ ____        __________________ _____   ______
 - 提供一个可扩展的平台，使得来源不同的资源可通过**插件**整合于单个应用
 - 独立开发不易，各位喜欢的点个star吧，你们的支持就是我开发的最大动力
 - 该项目仅供技术研究使用，请勿用于其他用途，下载后请与24小时内删除
-- 项目最近在向tauri技术栈迁移，请关注`develop-tauri`分支
+- 项目最近在向tauri技术栈迁移，请关注`develop`分支
 - 
 - 其他应用的设计一直以来只能用一个简单且粗暴的词来形容：失败。如今，我们将亲自定义成功。
 - ~~_主包最近在玩嘎啦给木，更新频率稍缓_~~ (嘎啦给木太好玩了 :sob::+1:)
@@ -121,7 +121,3 @@ _为什么大黑塔点击率这么高_
 ### develop
 
 ![Alt](https://repobeats.axiom.co/api/embed/a878d5bd4b98d32935487a41f6087356c1e60a58.svg "Repobeats analytics image")
-
-### develop-tauri
-
-![Alt](https://repobeats.axiom.co/api/embed/3281929c21afad2da85f03b7bd5e72f343eedc95.svg "Repobeats analytics image")
