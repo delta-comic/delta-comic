@@ -3,14 +3,14 @@ name: 构建和发布
 on:
   push:
     branches:
-      - 'main'
+      - 'develop'
 
 permissions:
   contents: write
 
 jobs:
   build:
-    if: ${{ github.event.head_commit && startsWith(github.event.head_commit.message, 'release-') }}
+    if: ${{ github.event.head_commit && contains(github.event.head_commit.message, '(build)') }}
     runs-on: ubuntu-latest
     env:
       HUSKY: 0
@@ -93,3 +93,9 @@ jobs:
           mobile: "android"
           args: ""
           retryAttempts: 1
+          prerelease: true
+          tagName: "DEV-__VERSION__:${{github.event.head_commit}}"
+          releaseName: dev build __VERSION__
+          releaseBody: |
+            dev构建，不确保任何功能可以使用
+            ${{github.event.head_commit}}
