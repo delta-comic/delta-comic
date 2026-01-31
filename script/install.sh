@@ -22,12 +22,8 @@ try {
   const data = fs.readFileSync(fileName, 'utf8');
   const json = JSON.parse(data);
 
-  // 初始化 overrides 对象 (如果不存在)
-  if (!json.overrides) {
-    json.overrides = {};
-  }
-
   // 添加或更新 overrides 中的条目
+  json.overrides ??= {}
   json.overrides['delta-comic-core'] = 'latest';
   json.pnpm ??= {};
   json.pnpm.overrides ??= {};

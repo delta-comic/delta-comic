@@ -1,4 +1,4 @@
-name: 构建和发布(dist.zip, app.apk)
+name: 构建和发布
 
 on:
   push:
@@ -13,55 +13,32 @@ jobs:
     if: ${{ github.event.head_commit && startsWith(github.event.head_commit.message, 'v') }}
     runs-on: ubuntu-latest
     env:
-      ENV_STATE: github
       HUSKY: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
-      - name: Store
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/src-tauri/gen/android/.gradle
-            ~/src-tauri/target
-          key: ${{ runner.os }}-delta-comic
-          restore-keys: |
-            ${{ runner.os }}-delta-comic
-
+        
+# rust
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          # 添加 Android 交叉编译目标
           targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
 
-      - name: JDK 23
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '23'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install NDK
-        run: sdkmanager "ndk;26.1.10909125"
-
-      - name: Install apksigner
-        run: sudo apt-get update && sudo apt-get install -y apksigner
-
+# js
       - name: Build script run pm
         run: chmod +x ./script/*
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4.2.0
         with:
           version: 10.27.0
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: 24
           cache: 'pnpm'
@@ -72,45 +49,47 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+
+# java
+      - name: JDK 23
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '23'
+          cache: "gradle"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3.2.2
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1.5.0
+        id: setup-ndk
+        with:
+          ndk-version: r29
+          link-to-sdk: true
+
+      - name: Init android project
+        run: |
+          pnpm dlx @tauri-apps/cli android init
+
+      - name: setup Android signing
+        if: matrix.mobile == 'android'
+        run: |
+          cd src-tauri/gen/android
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" > keystore.properties
+          echo "password=${{ secrets.ANDROID_KEY_PASSWORD }}" >> keystore.properties
+          base64 -d <<< "${{ secrets.ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
+          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
+
+
+# build
       - name: Build Android App
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         with:
-          args: --target aarch64 # 指定目标架构，或者不填构建全部
-          appName: Delta Comic
-          appVersion: v__VERSION__
-
-      - name: Get package version
-        id: get_version
-        run: |
-          # 输出 package.json 中的 version 字段为 step 输出
-          echo "version=`sh ./script/getVersion.sh`" >> "$GITHUB_OUTPUT"
-
-      - name: Prepare tag/name/body variables
-        id: vars
-        shell: bash
-        run: |
-          # Determine TAG:
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            TAG="${GITHUB_REF#refs/tags/}"
-          else
-            TAG="${GITHUB_RUN_NUMBER}-$(echo ${GITHUB_SHA} | cut -c1-7)"
-          fi
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: |
-            ./dist/dist.zip
-            ./dist/app.apk
-          tag_name: ${{ steps.vars.outputs.tag }}
-          name: ${{ steps.get_version.outputs.version }}
-          body: |
-            或许你可以猜猜更新内容
-          repository: ${{github.repository}}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          make_latest: true
+          mobile: "android"
+          args: ""
+          retryAttempts: 1
