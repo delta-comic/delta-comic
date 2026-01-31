@@ -60,6 +60,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3.2.2
+        with:
+          log-accepted-android-sdk-licenses: false
 
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1.5.0
@@ -67,6 +69,7 @@ jobs:
         with:
           ndk-version: r29
           link-to-sdk: true
+          local-cache: true
 
       - name: Init android project
         run: |
@@ -94,8 +97,8 @@ jobs:
           args: ""
           retryAttempts: 1
           prerelease: true
-          tagName: "DEV-__VERSION__:${{github.event.head_commit}}"
-          releaseName: dev build __VERSION__
+          tagName: "dev-v__VERSION__"
+          releaseName: "dev build __VERSION__"
           releaseBody: |
             dev构建，不确保任何功能可以使用
             ${{github.event.head_commit}}

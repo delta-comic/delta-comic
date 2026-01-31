@@ -60,6 +60,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3.2.2
+        with:
+          log-accepted-android-sdk-licenses: false
 
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1.5.0
@@ -67,6 +69,7 @@ jobs:
         with:
           ndk-version: r29
           link-to-sdk: true
+          local-cache: true
 
       - name: Init android project
         run: |
