@@ -36,4 +36,5 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: lint
-        run: pnpm run lint-staged
+        run: |
+          pnpm exec oxlint --type-aware
