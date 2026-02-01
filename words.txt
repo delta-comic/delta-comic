@@ -11,14 +11,11 @@ codegen
 Favourite
 favselect
 Gmailerrorred
-hitbox
-jassub
 kysely
 Levelboard
 lightningcss
 minidump
 msvc
-mutsumi
 nvim
 oxfmt
 oxlint
