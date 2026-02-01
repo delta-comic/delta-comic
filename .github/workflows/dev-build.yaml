@@ -83,7 +83,7 @@ jobs:
 
       - name: Init android project
         run: |
-          pnpm exec @tauri-apps/cli android init
+          pnpm dlx @tauri-apps/cli android init
 
       - name: setup Android signing
         if: matrix.mobile == 'android'
