@@ -2,5 +2,5 @@
 
 declare module 'userscript-meta' {
   function parse(userscript: string): any
-  function stringify(meta: Meta): string
+  function stringify(meta: any): string
 }

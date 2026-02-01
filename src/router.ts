@@ -66,6 +66,7 @@ router.beforeEach(async to => {
   return true
 })
 
+//@ts-ignore
 if (import.meta.hot) {
   handleHotUpdate(router)
 }

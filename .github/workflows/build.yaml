@@ -158,19 +158,7 @@ jobs:
           ls -la ./dist
 
       #publish
-      - name: Release
-        uses: softprops/action-gh-release@v2.5.0
+      - name: Run semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: |
-            ./dist/app.apk
-          tag_name: 'dev-v${{ steps.build.outputs.appVersion }}'
-          name: 'Dev build v${{ steps.build.outputs.appVersion }}'
-          body: |
-            dev构建，不确保任何功能可以使用
-            ${{ github.event.head_commit.message }}
-          repository: ${{github.repository}}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          make_latest: true
-          prerelease: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 用于在 GitHub 上创建 release 与 tag
+        run: pnpm exec semantic-release

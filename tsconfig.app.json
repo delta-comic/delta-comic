@@ -1,0 +1,25 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": [
+    "./src/**/*"
+  ],
+  "vueCompilerOptions": {
+    "plugins": [
+      "vue-router/volar/sfc-typed-router",
+      "vue-router/volar/sfc-route-blocks"
+    ]
+  },
+  "compilerOptions": {
+    "composite": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "types": [
+        "./components.d.ts",
+        "./env.d.ts",
+        "./typed-router.d.ts"
+      ]
+    }
+  }
+}

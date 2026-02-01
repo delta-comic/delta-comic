@@ -2,5 +2,6 @@
   "oxc.path.oxlint": "node_modules/oxlint/bin/oxlint",
   "oxc.lint.run": "onSave",
   "oxc.requireConfig": true,
-  "oxc.enable": true
+  "oxc.enable": true,
+  "editor.defaultFoldingRangeProvider": "oxc.oxc-vscode"
 }
