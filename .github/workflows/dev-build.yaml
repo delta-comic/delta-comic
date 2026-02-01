@@ -85,8 +85,7 @@ jobs:
         run: |
           pnpm dlx @tauri-apps/cli android init
 
-      - name: setup Android signing
-        if: matrix.mobile == 'android'
+      - name: Setup Android signing
         run: |
           cd src-tauri/gen/android
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" > keystore.properties
@@ -107,12 +106,6 @@ jobs:
           mobile: "android"
           args: ""
           retryAttempts: 1
-          prerelease: true
-          tagName: "dev-v__VERSION__"
-          releaseName: "dev build __VERSION__"
-          releaseBody: |
-            dev构建，不确保任何功能可以使用
-            ${{ github.event.head_commit.message }}
 
 
 #signature
