@@ -1,4 +1,4 @@
-name: 构建和发布
+name: 构建和发布(dev)
 
 on:
   push:
@@ -15,11 +15,24 @@ jobs:
     env:
       HUSKY: 0
     steps:
+#restore
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 1
+      
+      - name: Store
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/src-tauri/target
+            ~/src-tauri/gen/android/.gradle
+          key: ${{ runner.os }}-delta-comic-native
+          restore-keys: |
+            ${{ runner.os }}-delta-comic-native
 
+      - name: Build script run pm
+        run: chmod +x ./script/*
         
 # rust
       - name: Setup Rust
@@ -29,9 +42,6 @@ jobs:
 
 
 # js
-      - name: Build script run pm
-        run: chmod +x ./script/*
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
         with:
@@ -56,7 +66,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '23'
-          cache: "gradle"
+          cache: "maven"
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3.2.2
@@ -87,6 +97,7 @@ jobs:
 
 # build
       - name: Build Android App
+        id: build
         uses: tauri-apps/tauri-action@dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -101,4 +112,51 @@ jobs:
           releaseName: "dev build __VERSION__"
           releaseBody: |
             dev构建，不确保任何功能可以使用
-            ${{github.event.head_commit}}
+            ${{ github.event.head_commit.message }}
+
+
+#signature
+      - name: Install apksigner
+        run: sudo apt-get update && sudo apt-get install -y apksigner
+
+      - name: Signature App
+        run: |
+          APK_SRC="./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
+          if [ -f "$APK_SRC" ]; then
+            apksigner sign \
+              --ks $RUNNER_TEMP/keystore.jks \
+              --ks-key-alias ${{ secrets.ANDROID_KEY_ALIAS }} \
+              --ks-pass pass:${{ secrets.ANDROID_KEY_PASSWORD }} \
+              --key-pass pass:${{ secrets.ANDROID_KEY_PASSWORD }} \
+              --v1-signing-enabled true \
+              --v2-signing-enabled true \
+              --v3-signing-enabled true \
+              --out ./dist/app.apk \
+              "$APK_SRC"
+            echo '-----------'
+            ls .
+            echo '-----------'
+            ls ./dist
+          else
+            echo "APK not found at $APK_SRC" >&2
+            exit 1
+          fi
+                    
+
+#publish
+      - name: Release
+        uses: softprops/action-gh-release@v2.5.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+           ./dist/app.apk
+          tag_name: "dev-v${{ steps.build.outputs.appVersion }}"
+          name: "Dev build v${{ steps.build.outputs.appVersion }}"
+          body: |
+            dev构建，不确保任何功能可以使用
+            ${{ github.event.head_commit.message }}
+          repository: ${{github.repository}}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          make_latest: true
+          prerelease: true

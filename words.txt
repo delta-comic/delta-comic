@@ -1,5 +1,6 @@
 androidx
 antd
+apksigner
 aptabase
 Aspera
 bili
@@ -19,9 +20,9 @@ minidump
 msvc
 mutsumi
 nvim
+oxfmt
 oxlint
 pinia
-webp
 Popconfirm
 Popselect
 reloadable
@@ -46,6 +47,6 @@ vant
 vicons
 Videogame
 vueuse
+webp
 wenxig
 xgbuugti
-oxfmt
