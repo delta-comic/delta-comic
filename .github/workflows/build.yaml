@@ -19,17 +19,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
-      - name: Store
-        uses: actions/cache@v4
+      - name: Cache Java
+        uses: actions/cache@v5.0.3
         with:
           path: |
             ~/src-tauri/target
-            ~/src-tauri/gen/android/.gradle
-          key: ${{ runner.os }}-delta-comic-native
-          restore-keys: |
-            ${{ runner.os }}-delta-comic-native
+          key: ${{ runner.os }}-delta-comic-java
+          
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5  # v2.8.2
+        with:
+          key: ${{ runner.os }}-delta-comic-rust
+          workspaces: "./src-tauri/ -> target"
 
       - name: Build script run pm
         run: chmod +x ./script/*
