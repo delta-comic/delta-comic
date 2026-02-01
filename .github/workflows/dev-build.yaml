@@ -134,12 +134,42 @@ jobs:
 
       - name: Ensure apksigner available
         run: |
-          set -euo pipefail
+          # 找到 sdkmanager 的可执行路径（通常在 $ANDROID_SDK_ROOT/cmdline-tools/latest/bin 或 tools/bin）
+          SDKMANAGER_CMD="$(command -v sdkmanager || true)"
+          if [ -z "$SDKMANAGER_CMD" ]; then
+            # 尝试常见位置
+            if [ -x "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
+              SDKMANAGER_CMD="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+            elif [ -x "$ANDROID_SDK_ROOT/tools/bin/sdkmanager" ]; then
+              SDKMANAGER_CMD="$ANDROID_SDK_ROOT/tools/bin/sdkmanager"
+            else
+              echo "sdkmanager not found in PATH or in \$ANDROID_SDK_ROOT; please install Android cmdline-tools." >&2
+              exit 1
+            fi
+          fi
+
           if ! command -v apksigner >/dev/null 2>&1; then
-            yes | sdkmanager "build-tools;33.0.2"
+            echo "apksigner not found — installing build-tools via sdkmanager ($SDKMANAGER_CMD)"
+
+            # 1) 接受许可（可能会导致 yes 收到 SIGPIPE，允许其返回非零）
+            #    我们忽略其退出码，因为 SIGPIPE 导致的非零不是致命错误
+            yes | "$SDKMANAGER_CMD" --licenses >/dev/null 2>&1 || true
+
+            # 2) 安装 build-tools —— 不把 yes 直接 pipe 到安装命令（避免 broken pipe）
+            "$SDKMANAGER_CMD" "build-tools;33.0.2" || { echo "sdkmanager failed to install build-tools;33.0.2" >&2; exit 1; }
+
+            # 3) 将 apksigner 加入 PATH
             export PATH="$ANDROID_SDK_ROOT/build-tools/33.0.2:$PATH"
           fi
+
+          # 最后验证 apksigner 是否可用
+          if ! command -v apksigner >/dev/null 2>&1; then
+            echo "apksigner still not found after attempted install" >&2
+            exit 1
+          fi
+
           apksigner --version || true
+
 
       - name: Sign APK
         env:
