@@ -162,38 +162,36 @@ jobs:
           echo '-----------'
           ls -la ./dist
 
-            - name: Signature App
-              env:
-                KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
-                KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-              run: |
-                set -euo pipefail
-                APK_SRC="./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
-                if [ ! -f "$APK_SRC" ]; then
-                  echo "APK not found at $APK_SRC" >&2
-                  exit 1
-                fi
+      - name: Signature App
+        env:
+          KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          APK_SRC="./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
+          if [ ! -f "$APK_SRC" ]; then
+            echo "APK not found at $APK_SRC" >&2
+            exit 1
+          fi
 
-                DIST_DIR=./dist
-                mkdir -p "$DIST_DIR"
+          DIST_DIR=./dist
+          mkdir -p "$DIST_DIR"
+          # 使用 --ks-type 明确指定 keystore 类型（若你的是 JKS，请用 JKS；如果是 PKCS12，改为 PKCS12）
+          apksigner sign \
+            --ks "$RUNNER_TEMP/keystore.jks" \
+            --ks-type JKS \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$KEYSTORE_PASS" \
+            --key-pass "pass:$KEYSTORE_PASS" \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            --out "$DIST_DIR/app.apk" \
+            "$APK_SRC"
 
-              # 使用 --ks-type 明确指定 keystore 类型（若你的是 JKS，请用 JKS；如果是 PKCS12，改为 PKCS12）
-              apksigner sign \
-                --ks "$RUNNER_TEMP/keystore.jks" \
-                --ks-type JKS \
-                --ks-key-alias "$KEY_ALIAS" \
-                --ks-pass "pass:$KEYSTORE_PASS" \
-                --key-pass "pass:$KEYSTORE_PASS" \
-                --v1-signing-enabled true \
-                --v2-signing-enabled true \
-                --v3-signing-enabled true \
-                --out "$DIST_DIR/app.apk" \
-                "$APK_SRC"
-
-              echo '-----------'
-              ls -la .
-              echo '-----------'
-              ls -la "$DIST_DIR"
+          echo '-----------'
+          ls -la .
+          echo '-----------'
+          ls -la "$DIST_DIR"
                     
 
 #publish
