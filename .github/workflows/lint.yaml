@@ -4,7 +4,7 @@ run-name: code-check
 on:
   pull_request:
   push:
-    branches: [main,develop]
+    branches: [main, develop]
     paths: '*.{js,jsx,ts,tsx,mjs,cjs,vue}'
 
 jobs:

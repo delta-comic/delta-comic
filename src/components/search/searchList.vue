@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { onMounted, computed, watch, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ComponentExposed } from 'vue-component-type-helpers'
@@ -15,13 +15,8 @@ const temp = Store.useTemp().$applyRaw('searchConfig', () => ({
 }))
 const list = useTemplateRef<ComponentExposed<typeof Comp.List>>('list')
 const $router = useRouter()
-const $route = useRoute<"/search/[input]">()
-const $props = defineProps<{
-  sort: string
-  source: string
-}>()
-
-
+const $route = useRoute<'/search/[input]'>()
+const $props = defineProps<{ sort: string; source: string }>()
 
 const input = decodeURIDeep($route.params.input)
 const pluginStore = usePluginStore()
@@ -37,14 +32,19 @@ const comicStream = computed(() => {
   return stream
 })
 
-const dataProcessor = (data: uni.item.Item[]) => config.value.showAIProject ? data : data.filter(comic => !comic.$isAi)
+const dataProcessor = (data: uni.item.Item[]) =>
+  config.value.showAIProject ? data : data.filter(comic => !comic.$isAi)
 
 const showSearch = defineModel<boolean>('showHeader', { required: true })
-watch(() => list.value?.scrollTop, async (scrollTop, old) => {
-  if (!scrollTop || !old) return
-  if (scrollTop - old > 0) showSearch.value = false
-  else showSearch.value = true
-}, { immediate: true })
+watch(
+  () => list.value?.scrollTop,
+  async (scrollTop, old) => {
+    if (!scrollTop || !old) return
+    if (scrollTop - old > 0) showSearch.value = false
+    else showSearch.value = true
+  },
+  { immediate: true }
+)
 
 const setupScroll = () => {
   if (temp.scroll.has(input)) list.value?.listInstance?.scrollTo({ top: temp.scroll.get(input) })
@@ -65,15 +65,21 @@ const stop = $router.beforeEach(() => {
 })
 onMounted(setupScroll)
 
-
 const { comp } = requireDepend(coreModule)
-const getItemCard = (contentType: uni.content.ContentType_) => uni.item.Item.itemCard.get(contentType) ?? comp.ItemCard
+const getItemCard = (contentType: uni.content.ContentType_) =>
+  uni.item.Item.itemCard.get(contentType) ?? comp.ItemCard
 </script>
 
 <template>
-  <Comp.List :itemHeight="140" v-slot="{ data: { item } }" v-if="isActive ?? true"
-    class="duration-200 will-change-[transform,_height] transition-all h-full" ref="list" :source="comicStream!"
-    :data-processor>
+  <Comp.List
+    :itemHeight="140"
+    v-slot="{ data: { item } }"
+    v-if="isActive ?? true"
+    class="h-full transition-all duration-200 will-change-[transform,_height]"
+    ref="list"
+    :source="comicStream!"
+    :data-processor
+  >
     <component :is="getItemCard(item.contentType)" :item />
   </Comp.List>
 </template>

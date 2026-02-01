@@ -1,12 +1,12 @@
 @charset "UTF-8";
 
 @layer theme, base, components, utilities;
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/preflight.css" layer(base);
-@import "tailwindcss/utilities.css" layer(utilities);
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css' layer(utilities);
 
 @plugin "tailwindcss-safe-area-capacitor";
-@import "delta-comic-core/style.css";
+@import 'delta-comic-core/style.css';
 
 * {
   user-select: none;
@@ -40,7 +40,7 @@
 * {
   --van-tab-active-text-color: var(--van-tabs-bottom-bar-color) !important;
   --van-tabs-padding-bottom: 10px;
-  --bili-blue: #00AEEC;
+  --bili-blue: #00aeec;
   --p-color: var(--nui-primary-color);
   --van-tabs-line-height: 44px;
 }
@@ -67,7 +67,7 @@ input::-webkit-search-cancel-button {
 .list-enter-active,
 .list-leave-active {
   transition:
-    transform 420ms cubic-bezier(.22, 1.5, .5, 1),
+    transform 420ms cubic-bezier(0.22, 1.5, 0.5, 1),
     opacity 240ms ease-out;
   will-change: transform, opacity;
 }

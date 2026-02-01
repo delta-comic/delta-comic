@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { isEmpty } from 'es-toolkit/compat'
 import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -15,7 +15,8 @@ const temp = Store.useTemp().$applyRaw('randomConfig', () => ({
     that.page.value = 0
     while (true) {
       that.page.value++
-      const result = await Utils.eventBus.SharedFunction.callRandom('getRandomProvide', signal).result
+      const result = await Utils.eventBus.SharedFunction.callRandom('getRandomProvide', signal)
+        .result
       yield result
     }
   }),
@@ -23,7 +24,10 @@ const temp = Store.useTemp().$applyRaw('randomConfig', () => ({
 }))
 
 const containBound = ref<DOMRectReadOnly>()
-useResizeObserver(() => <HTMLDivElement | null>waterfall.value?.scrollParent?.firstElementChild, ([b]) => containBound.value = b.contentRect)
+useResizeObserver(
+  () => <HTMLDivElement | null>waterfall.value?.scrollParent?.firstElementChild,
+  ([b]) => (containBound.value = b.contentRect)
+)
 onMounted(async () => {
   if (!isEmpty(temp.stream._data)) {
     await until(() => (containBound.value?.height ?? 0) > 8).toBeTruthy()
@@ -36,25 +40,36 @@ const stop = $router.beforeEach(() => {
 })
 
 const showNavBar = inject(isShowMainHomeNavBar)!
-watch(() => waterfall.value?.scrollTop, async (scrollTop, old) => {
-  if (!scrollTop || !old) return
-  if (scrollTop - old > 0) showNavBar.value = false
-  else showNavBar.value = true
-}, { immediate: true })
+watch(
+  () => waterfall.value?.scrollTop,
+  async (scrollTop, old) => {
+    if (!scrollTop || !old) return
+    if (scrollTop - old > 0) showNavBar.value = false
+    else showNavBar.value = true
+  },
+  { immediate: true }
+)
 
 const { comp } = requireDepend(coreModule)
 
-console.debug('[random] waterfall', waterfall,temp.stream)
+console.debug('[random] waterfall', waterfall, temp.stream)
 </script>
 
 <template>
   <Comp.Waterfall class="size-full!" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
-    <component :is="uni.item.Item.itemCard.get(item.contentType) ?? comp.ItemCard" :item type="small" free-height
-      :key="`${index}|${item.id}`">
+    <component
+      :is="uni.item.Item.itemCard.get(item.contentType) ?? comp.ItemCard"
+      :item
+      type="small"
+      free-height
+      :key="`${index}|${item.id}`"
+    >
       <NIcon color="var(--van-text-color-2)" size="14px">
         <DrawOutlined />
       </NIcon>
-      <span class="ml-0.5 text-xs van-ellipsis max-w-2/3 text-(--van-text-color-2)">{{ item.author.join(',') }}</span>
+      <span class="van-ellipsis ml-0.5 max-w-2/3 text-xs text-(--van-text-color-2)">{{
+        item.author.join(',')
+      }}</span>
       <template #smallTopInfo>
         <span v-if="item.viewNumber">
           <VanIcon name="eye-o" class="mr-0.5" size="14px" />

@@ -1,12 +1,13 @@
-import { PluginLoader, type PluginFile } from "../utils"
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { join } from '@tauri-apps/api/path'
 import * as fs from '@tauri-apps/plugin-fs'
-import { getPluginFsPath } from "../utils"
-import type { PluginArchiveDB } from "@/plugin/db"
-import { type PluginMeta } from "delta-comic-core"
-import { loadAsync, type JSZipObject } from "jszip"
-import { convertFileSrc } from "@tauri-apps/api/core"
-import { join } from "@tauri-apps/api/path"
+import { type PluginMeta } from 'delta-comic-core'
+import { loadAsync, type JSZipObject } from 'jszip'
 
+import type { PluginArchiveDB } from '@/plugin/db'
+
+import { PluginLoader, type PluginFile } from '../utils'
+import { getPluginFsPath } from '../utils'
 
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'zip'
@@ -22,21 +23,14 @@ class _PluginUserscriptLoader extends PluginLoader {
     const root = await getPluginFsPath(meta.name.id)
     try {
       await fs.remove(root, { recursive: true })
-    } catch { }
+    } catch {}
     await fs.mkdir(root, { recursive: true })
-    const files = new Array<{
-      path: string
-      file: JSZipObject
-    }>()
+    const files = new Array<{ path: string; file: JSZipObject }>()
     zip.forEach((zipFilePath, file) => {
-      files.push({
-        path: zipFilePath,
-        file
-      })
+      files.push({ path: zipFilePath, file })
     })
     for (const { file, path } of files) {
-      if (file.dir)
-        await fs.mkdir(await join(root, path), { recursive: true })
+      if (file.dir) await fs.mkdir(await join(root, path), { recursive: true })
       else
         await fs.writeFile(await join(root, path), await file.async('uint8array'), { create: true })
     }
@@ -53,7 +47,9 @@ class _PluginUserscriptLoader extends PluginLoader {
     const script = document.createElement('script')
     script.type = 'module'
     script.async = true
-    script.src = decodeURIComponent(convertFileSrc(await join(baseDir, pluginMeta.meta.entry.jsPath), 'local'))
+    script.src = decodeURIComponent(
+      convertFileSrc(await join(baseDir, pluginMeta.meta.entry.jsPath), 'local')
+    )
     document.body.appendChild(script)
 
     if (!pluginMeta.meta.entry?.cssPath) return
@@ -69,15 +65,16 @@ class _PluginUserscriptLoader extends PluginLoader {
           break
         }
       }
-    } else
-      var filePath = cssPath
+    } else var filePath = cssPath
 
     const style = document.createElement('link')
     style.rel = 'stylesheet'
     style.href = decodeURIComponent(convertFileSrc(await join(baseDir, filePath), 'local'))
-    script.onerror = (err) => { throw err }
+    script.onerror = err => {
+      throw err
+    }
     document.head.appendChild(style)
   }
 }
 
-export default new _PluginUserscriptLoader
+export default new _PluginUserscriptLoader()

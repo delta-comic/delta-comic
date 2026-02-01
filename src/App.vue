@@ -14,20 +14,26 @@ Utils.eventBus.SharedFunction.define(item => RecentDB.upsert(item), pluginName, 
 await $router.push($route.fullPath)
 
 const scanned = new Set<string>()
-Utils.eventBus.SharedFunction.define(async token => {
-  await Clipboard.writeText(token)
-  scanned.add(token)
-  window.$message.success('复制成功')
-}, pluginName, 'pushShareToken')
+Utils.eventBus.SharedFunction.define(
+  async token => {
+    await Clipboard.writeText(token)
+    scanned.add(token)
+    window.$message.success('复制成功')
+  },
+  pluginName,
+  'pushShareToken'
+)
 
 const handleShareTokenCheck = async () => {
   try {
     const chipText = await Clipboard.readText()
     if (scanned.has(chipText)) return
     scanned.add(chipText)
-    const handlers = Array.from(uni.content.ContentPage.shareToken.values()).filter(v => v.patten(chipText))
+    const handlers = Array.from(uni.content.ContentPage.shareToken.values()).filter(v =>
+      v.patten(chipText)
+    )
     console.log('new chipText discovery', chipText, handlers)
-    const lock = new Mutex
+    const lock = new Mutex()
     for (const handler of handlers) {
       await lock.acquire()
       const detail = await handler.show(chipText)
@@ -46,10 +52,10 @@ const handleShareTokenCheck = async () => {
         onNegativeClick() {
           detail.onNegative()
           lock.release()
-        },
+        }
       })
     }
-  } catch { }
+  } catch {}
 }
 // App.addListener('resume', handleShareTokenCheck)
 onMounted(handleShareTokenCheck)

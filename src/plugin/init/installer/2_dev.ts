@@ -1,13 +1,14 @@
-import type { PluginArchiveDB } from "@/plugin/db"
-import { PluginInstaller, type PluginFile, type PluginInstallerDescription } from "../utils"
-import axios from "axios"
+import axios from 'axios'
+
+import type { PluginArchiveDB } from '@/plugin/db'
+
+import { PluginInstaller, type PluginFile, type PluginInstallerDescription } from '../utils'
 
 export class _PluginInstallByDev extends PluginInstaller {
-  public override description: PluginInstallerDescription
-    = {
-      title: '安装Develop Userscript插件',
-      description: '输入形如: "localhost"或者一个可以不含port的ip'
-    }
+  public override description: PluginInstallerDescription = {
+    title: '安装Develop Userscript插件',
+    description: '输入形如: "localhost"或者一个可以不含port的ip'
+  }
   public override name = 'devUrl'
   private async installer(input: string): Promise<PluginFile> {
     const res = await axios.request<string>({
@@ -16,9 +17,7 @@ export class _PluginInstallByDev extends PluginInstaller {
     })
     const noPort = input.replace(/:\d+$/, '')
     return {
-      blob: new Blob([res.data
-        .replaceAll('localhost', noPort)
-        .replaceAll('127.0.0.1', noPort)]),
+      blob: new Blob([res.data.replaceAll('localhost', noPort).replaceAll('127.0.0.1', noPort)]),
       fileName: 'dev.js'
     }
   }
@@ -33,7 +32,6 @@ export class _PluginInstallByDev extends PluginInstaller {
   public override isMatched(input: string): boolean {
     return /((\d+\.?)+)|(localhost)(:\d+)?/.test(input)
   }
-
 }
 
-export default new _PluginInstallByDev
+export default new _PluginInstallByDev()

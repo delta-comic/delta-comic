@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import ExtendableSearchBar from '@/components/home/mainPageSearchBar.vue'
 import userIcon from '@/assets/images/userIcon.webp'
 import { isShowMainHomeNavBar } from '@/symbol'
@@ -11,11 +11,7 @@ const $router = useRouter()
 const isShowNavBar = shallowRef(true)
 provide(isShowMainHomeNavBar, isShowNavBar)
 
-definePage({
-  redirect: {
-    name: '/main/home/random'
-  }
-})
+definePage({ redirect: { name: '/main/home/random' } })
 
 const extendableSearchBar = useTemplateRef('extendableSearchBar')
 
@@ -25,58 +21,92 @@ const toSearchInHideMode = async () => {
   extendableSearchBar.value?.inputEl?.focus()
 }
 
-const avatars = computed(() => Array.from(uni.user.User.userBase.values()).filter(v => !!v.avatar).map(v => v.avatar!))
+const avatars = computed(() =>
+  Array.from(uni.user.User.userBase.values())
+    .filter(v => !!v.avatar)
+    .map(v => v.avatar!)
+)
 
-const tabItem = computed(() => Array.from(uni.content.ContentPage.tabbar.entries()).flatMap(pair =>
-  pair[1].map(val => ({
-    title: val.title,
-    name: val.id,
-    queries: {
-      plugin: pair[0]
-    }
-  }))))
+const tabItem = computed(() =>
+  Array.from(uni.content.ContentPage.tabbar.entries()).flatMap(pair =>
+    pair[1].map(val => ({ title: val.title, name: val.id, queries: { plugin: pair[0] } }))
+  )
+)
 </script>
 
 <template>
-  <div class="w-full pt-safe bg-(--van-background-2)"></div>
-  <header :class="[isShowNavBar ? 'translate-y-0' : '-translate-y-[calc(var(--safe-area-inset-top)+100%)]']"
-    class="h-13.5 duration-200 transition-transform w-full bg-(--van-background-2) flex items-center relative overflow-hidden *:overflow-hidden">
-    <div class="size-10.25! ml-1">
-      <Comp.Var :value="isEmpty(avatars) ? userIcon : avatars[random(0, avatars.length - 1)]" v-slot="{ value: src }">
+  <div class="w-full bg-(--van-background-2) pt-safe"></div>
+  <header
+    :class="[
+      isShowNavBar ? 'translate-y-0' : '-translate-y-[calc(var(--safe-area-inset-top)+100%)]'
+    ]"
+    class="relative flex h-13.5 w-full items-center overflow-hidden bg-(--van-background-2) transition-transform duration-200 *:overflow-hidden"
+  >
+    <div class="ml-1 size-10.25!">
+      <Comp.Var
+        :value="isEmpty(avatars) ? userIcon : avatars[random(0, avatars.length - 1)]"
+        v-slot="{ value: src }"
+      >
         <Teleport to="#popups">
-          <Comp.Image :src round v-if="!extendableSearchBar?.isSearching"
+          <Comp.Image
+            :src
+            round
+            v-if="!extendableSearchBar?.isSearching"
             :class="[isShowNavBar ? 'translate-y-0' : '-translate-y-[200%]']"
-            class="fixed size-10.25! ml-1 top-safe-offset-2 duration-200 transition-transform" />
+            class="fixed top-safe-offset-2 ml-1 size-10.25! transition-transform duration-200"
+          />
         </Teleport>
       </Comp.Var>
     </div>
     <ExtendableSearchBar ref="extendableSearchBar" />
-    <div class="flex justify-evenly font-mono w-[calc(50%-63px)]" v-if="!extendableSearchBar?.isSearching">
+    <div
+      class="flex w-[calc(50%-63px)] justify-evenly font-mono"
+      v-if="!extendableSearchBar?.isSearching"
+    >
       <NIcon color="rgb(156 163 175)" @click="$router.force.push({ name: '/' })" size="1.8rem">
         <VideogameAssetFilled />
       </NIcon>
       <VanIcon name="bullhorn-o" color="rgb(156 163 175)" size="1.8rem" />
     </div>
   </header>
-  <div class="h-(--van-tabs-line-height) static duration-200 transition-transform"
-    :class="[isShowNavBar ? 'translate-y-0' : '-translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]']">
-    <Comp.RouterTab router-base="/main/home" :items="[{
-      title: '推荐',
-      name: 'random'
-    }, {
-      title: '热门',
-      name: 'hot'
-    }, ...tabItem]" />
-    <VanIcon name="search" @click="toSearchInHideMode" size="25px" color="var(--van-text-color-2)"
-      class="absolute! top-1/2 duration-200 transition-transform right-0 -translate-y-1/2 bg-(--van-background-2) shadow rounded-full p-1"
-      :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']" />
-    <VanIcon size="25px" color="var(--van-text-color-2)" :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']"
-      class="absolute! top-1/2 duration-200 aspect-square transition-transform right-10 -translate-y-1/2 bg-(--van-background-2) shadow rounded-full p-1"
-      @click="$router.force.push({ name: '/cate' })" name="more-o">
+  <div
+    class="static h-(--van-tabs-line-height) transition-transform duration-200"
+    :class="[
+      isShowNavBar
+        ? 'translate-y-0'
+        : '-translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]'
+    ]"
+  >
+    <Comp.RouterTab
+      router-base="/main/home"
+      :items="[{ title: '推荐', name: 'random' }, { title: '热门', name: 'hot' }, ...tabItem]"
+    />
+    <VanIcon
+      name="search"
+      @click="toSearchInHideMode"
+      size="25px"
+      color="var(--van-text-color-2)"
+      class="absolute! top-1/2 right-0 -translate-y-1/2 rounded-full bg-(--van-background-2) p-1 shadow transition-transform duration-200"
+      :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']"
+    />
+    <VanIcon
+      size="25px"
+      color="var(--van-text-color-2)"
+      :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']"
+      class="absolute! top-1/2 right-10 aspect-square -translate-y-1/2 rounded-full bg-(--van-background-2) p-1 shadow transition-transform duration-200"
+      @click="$router.force.push({ name: '/cate' })"
+      name="more-o"
+    >
     </VanIcon>
   </div>
-  <div class="w-full duration-200 transition-all  overflow-hidden"
-    :class="[isShowNavBar ? 'h-[calc(100%-var(--van-tabs-line-height)-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0' : 'h-[calc(100%-var(--safe-area-inset-top)-var(--van-tabs-line-height))]! -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]']">
+  <div
+    class="w-full overflow-hidden transition-all duration-200"
+    :class="[
+      isShowNavBar
+        ? 'h-[calc(100%-var(--van-tabs-line-height)-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0'
+        : 'h-[calc(100%-var(--safe-area-inset-top)-var(--van-tabs-line-height))]! -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]'
+    ]"
+  >
     <RouterView />
   </div>
 </template>

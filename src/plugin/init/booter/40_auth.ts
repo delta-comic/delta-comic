@@ -1,13 +1,20 @@
-import { _pluginExposes, Comp, Utils, type PluginConfig, type PluginConfigAuthMethod } from "delta-comic-core"
-import { PluginBooter, type PluginBooterSetMeta } from "../utils"
-import { Mutex } from "es-toolkit"
-import { createForm } from "@/utils/createForm"
-import { useAppStore } from "@/stores/app"
-import { defineComponent, h, markRaw, ref } from "vue"
-import { usePluginStore } from "@/plugin/store"
+import {
+  _pluginExposes,
+  Comp,
+  Utils,
+  type PluginConfig,
+  type PluginConfigAuthMethod
+} from 'delta-comic-core'
+import { Mutex } from 'es-toolkit'
+import { defineComponent, h, markRaw, ref } from 'vue'
 
+import { usePluginStore } from '@/plugin/store'
+import { useAppStore } from '@/stores/app'
+import { createForm } from '@/utils/createForm'
 
-const authPopupMutex = new Mutex
+import { PluginBooter, type PluginBooterSetMeta } from '../utils'
+
+const authPopupMutex = new Mutex()
 class _PluginAuth extends PluginBooter {
   public override name = '登录'
   public override async call(cfg: PluginConfig, setMeta: PluginBooterSetMeta): Promise<any> {
@@ -47,26 +54,32 @@ class _PluginAuth extends PluginBooter {
         async form(form) {
           const f = createForm(form)
           const store = useAppStore()
-          store.renderRootNodes.push(markRaw(defineComponent(() => {
-            const show = ref(true)
-            void f.data.then(() => show.value = false)
-            return () => h(Comp.Popup, {
-              show: show.value,
-              position: 'center',
-              round: true,
-              class: 'p-6 pt-3 !w-[95vw]',
-              transitionAppear: true
-            }, [
-              h('div', { class: 'pl-1 py-1 text-lg w-full' }, [pluginName]),
-              f.comp
-            ])
-          })))
+          store.renderRootNodes.push(
+            markRaw(
+              defineComponent(() => {
+                const show = ref(true)
+                void f.data.then(() => (show.value = false))
+                return () =>
+                  h(
+                    Comp.Popup,
+                    {
+                      show: show.value,
+                      position: 'center',
+                      round: true,
+                      class: 'p-6 pt-3 !w-[95vw]',
+                      transitionAppear: true
+                    },
+                    [h('div', { class: 'pl-1 py-1 text-lg w-full' }, [pluginName]), f.comp]
+                  )
+              })
+            )
+          )
           const data = await f.data
           return data
         },
         website(_url) {
           return window
-        },
+        }
       }
       if (method == 'logIn') {
         await cfg.auth.logIn(by)
@@ -75,12 +88,10 @@ class _PluginAuth extends PluginBooter {
       }
       authPopupMutex.release()
       setMeta('鉴权成功')
-
     } catch (error: any) {
       setMeta(`登录失败: ${error}`)
       throw error
     }
-
   }
 }
-export default new _PluginAuth
+export default new _PluginAuth()

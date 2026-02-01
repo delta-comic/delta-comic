@@ -1,15 +1,17 @@
-import { _pluginExposes, Utils } from "delta-comic-core"
-import { $initCore } from "./core"
-import { remove } from "es-toolkit"
-import { isEmpty } from "es-toolkit/compat"
-import { PluginArchiveDB } from "./db"
-import { loadPlugin } from "./init"
-import { pluginName } from "@/symbol"
+import { _pluginExposes, Utils } from 'delta-comic-core'
+import { remove } from 'es-toolkit'
+import { isEmpty } from 'es-toolkit/compat'
+
+import { pluginName } from '@/symbol'
+
+import { $initCore } from './core'
+import { PluginArchiveDB } from './db'
+import { loadPlugin } from './init'
 
 export const loadAllPlugins = Utils.data.PromiseContent.fromAsyncFunction(async () => {
   await $initCore()
 
-  /* 
+  /*
     查找循环引用原理
     正常的插件一定可以被格式化为一个多入口树，
     因此无法被放入树的插件一定存在循环引用
@@ -27,8 +29,7 @@ export const loadAllPlugins = Utils.data.PromiseContent.fromAsyncFunction(async 
   if (!isEmpty(plugins))
     throw new Error(`插件循环引用: ${plugins.map(v => v.pluginName).join(', ')}`)
 
-  for (const level of allLevels)
-    await Promise.all(level.map(p => loadPlugin(p)))
+  for (const level of allLevels) await Promise.all(level.map(p => loadPlugin(p)))
 
   console.log('[plugin bootPlugin] all load done')
 })

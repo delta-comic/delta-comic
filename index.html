@@ -1,27 +1,33 @@
 <!doctype html>
 <html lang="zh-cn" class="static size-full">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Delta Comic</title>
+    <meta name="description" content="Per Aspera, Ad Astra" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src * chrome-extension: blob: local: ipc: ws: wss: 'unsafe-inline' 'unsafe-eval' data: chrome-extension: blob:; script-src * chrome-extension: blob: local: ipc: ws: wss: 'unsafe-inline' 'unsafe-eval'; connect-src * chrome-extension: blob: local: ipc: ws: wss: 'unsafe-inline'; img-src * chrome-extension: blob: local: ipc: ws: wss: data: chrome-extension: blob:; frame-src * chrome-extension: blob: local: ipc: ws: wss:; style-src * chrome-extension: blob: local: ipc: ws: wss: 'unsafe-inline';"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="/favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="/setup.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Delta Comic</title>
-  <meta name="description" content="Per Aspera, Ad Astra" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src * chrome-extension: blob: local: ipc: ws: wss: 'unsafe-inline' 'unsafe-eval' data: chrome-extension: blob:; script-src * chrome-extension: blob: local: ipc: ws: wss: 'unsafe-inline' 'unsafe-eval'; connect-src * chrome-extension: blob: local: ipc: ws: wss: 'unsafe-inline'; img-src * chrome-extension: blob: local: ipc: ws: wss: data: chrome-extension: blob:; frame-src * chrome-extension: blob: local: ipc: ws: wss:; style-src * chrome-extension: blob: local: ipc: ws: wss: 'unsafe-inline';" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-  <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="/favicon.png" type="image/x-icon" />
-  <link rel="stylesheet" href="/setup.css" />
-</head>
-
-<body class="static size-full">
-  <div id="app" class="static size-full overflow-auto bg-(--van-background) **:select-none"></div>
-  <div id="cover" class="pointer-events-none fixed top-0 left-0 z-50 size-full *:pointer-events-auto"></div>
-  <div id="popups" class="relative z-100"></div>
-  <div id="small-window" class="pointer-events-none fixed top-0 left-0"></div>
-  <div id="messages" class="translate-y-(--safe-area-inset-top)"></div>
-  <script type="module" src="./src/main.tsx"></script>
-</body>
-
+  <body class="static size-full">
+    <div id="app" class="static size-full overflow-auto bg-(--van-background) **:select-none"></div>
+    <div
+      id="cover"
+      class="pointer-events-none fixed top-0 left-0 z-50 size-full *:pointer-events-auto"
+    ></div>
+    <div id="popups" class="relative z-100"></div>
+    <div id="small-window" class="pointer-events-none fixed top-0 left-0"></div>
+    <div id="messages" class="translate-y-(--safe-area-inset-top)"></div>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
 </html>

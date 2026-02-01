@@ -1,10 +1,7 @@
-import { db } from '@/db'
 import type { PluginMeta } from 'delta-comic-core'
-import type {
-  JSONColumnType,
-  Selectable,
-} from 'kysely'
+import type { JSONColumnType, Selectable } from 'kysely'
 
+import { db } from '@/db'
 
 export namespace PluginArchiveDB {
   export interface Table {
@@ -19,11 +16,7 @@ export namespace PluginArchiveDB {
   export type Meta = Selectable<Table>
 
   export function getByEnabled(isEnabled: boolean) {
-    return db.value
-      .selectFrom('plugin')
-      .where('enable', '=', isEnabled)
-      .selectAll()
-      .execute()
+    return db.value.selectFrom('plugin').where('enable', '=', isEnabled).selectAll().execute()
   }
 
   export function get(pluginName: string) {

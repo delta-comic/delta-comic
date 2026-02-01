@@ -1,47 +1,47 @@
-import { type PluginConfig, Utils, type PluginMeta } from "delta-comic-core"
-import { sortBy } from "es-toolkit/compat"
-import { usePluginStore } from "../store"
-import { isString, Mutex } from "es-toolkit"
-import { markRaw } from "vue"
-import { PluginArchiveDB } from "../db"
-import { pluginName } from "@/symbol"
-import { db, useNativeStore } from "@/db"
-import type { PluginBooter, PluginInstaller, PluginLoader } from "./utils"
+import { type PluginConfig, Utils, type PluginMeta } from 'delta-comic-core'
+import { isString, Mutex } from 'es-toolkit'
+import { sortBy } from 'es-toolkit/compat'
+import { markRaw } from 'vue'
 
+import { db, useNativeStore } from '@/db'
+import { pluginName } from '@/symbol'
+
+import type { PluginBooter, PluginInstaller, PluginLoader } from './utils'
+
+import { PluginArchiveDB } from '../db'
+import { usePluginStore } from '../store'
 
 const rawBooters = import.meta.glob<PluginBooter>('./booter/*_*.ts', {
   eager: true,
   import: 'default'
 })
-const booters = sortBy(Object.entries(rawBooters), ([fname]) => Number(fname.match(/[\d\.]+(?=_)/)?.[0])).map(v => v[1])
+const booters = sortBy(Object.entries(rawBooters), ([fname]) =>
+  Number(fname.match(/[\d\.]+(?=_)/)?.[0])
+).map(v => v[1])
 
 export const bootPlugin = async (cfg: PluginConfig) => {
   const { plugins, pluginSteps } = usePluginStore()
   plugins.set(cfg.name, markRaw(cfg))
-  pluginSteps[cfg.name] = {
-    steps: [],
-    now: {
-      stepsIndex: 0,
-      status: 'wait'
-    }
-  }
+  pluginSteps[cfg.name] = { steps: [], now: { stepsIndex: 0, status: 'wait' } }
   try {
     const env: Record<any, any> = {}
     for (const booter of booters) {
       const msIndex = pluginSteps[cfg.name].steps.length
-      pluginSteps[cfg.name].steps[msIndex] = {
-        name: booter.name,
-        description: ''
-      }
+      pluginSteps[cfg.name].steps[msIndex] = { name: booter.name, description: '' }
       pluginSteps[cfg.name].now.stepsIndex = msIndex
       pluginSteps[cfg.name].now.status = 'process'
-      await booter.call(cfg, meta => {
-        if (isString(meta)) pluginSteps[cfg.name].steps[msIndex].description = meta
-        else {
-          if (meta.description) pluginSteps[cfg.name].steps[msIndex].description = meta.description
-          if (meta.name) pluginSteps[cfg.name].steps[msIndex].name = meta.name
-        }
-      }, env)
+      await booter.call(
+        cfg,
+        meta => {
+          if (isString(meta)) pluginSteps[cfg.name].steps[msIndex].description = meta
+          else {
+            if (meta.description)
+              pluginSteps[cfg.name].steps[msIndex].description = meta.description
+            if (meta.name) pluginSteps[cfg.name].steps[msIndex].name = meta.name
+          }
+        },
+        env
+      )
     }
     pluginSteps[cfg.name].now.stepsIndex++ // undefined to hide
   } catch (error) {
@@ -52,13 +52,15 @@ export const bootPlugin = async (cfg: PluginConfig) => {
   console.log(`[plugin usePluginStore.$loadPlugin] plugin "${cfg.name}" load done`)
 }
 
-
-
 const rawInstallers = import.meta.glob<PluginInstaller>('./installer/*_*.ts', {
   eager: true,
   import: 'default'
 })
-const installers = sortBy(Object.entries(rawInstallers), ([fname]) => Number(fname.match(/[\d\.]+(?=_)/)?.[0])).map(v => v[1]).reverse()
+const installers = sortBy(Object.entries(rawInstallers), ([fname]) =>
+  Number(fname.match(/[\d\.]+(?=_)/)?.[0])
+)
+  .map(v => v[1])
+  .reverse()
 
 export interface SourceOverrideConfig {
   id: string
@@ -66,28 +68,34 @@ export interface SourceOverrideConfig {
   enabled: boolean
 }
 
-export const usePluginConfig = () => useNativeStore(pluginName, 'pluginInstallSourceOverrides', new Array<SourceOverrideConfig>())
+export const usePluginConfig = () =>
+  useNativeStore(pluginName, 'pluginInstallSourceOverrides', new Array<SourceOverrideConfig>())
 
-export const installDepends = (m: Utils.message.DownloadMessageBind, meta: PluginMeta, installedPlugins?: Set<string>) => m.createLoading('依赖安装/检查', async v => {
-  v.retryable = true
-  let count = 0
-  const plugins = installedPlugins ?? new Set((await db.value
-    .selectFrom('plugin')
-    .select('pluginName')
-    .execute())
-    .map(v => v.pluginName))
-  const overrides = usePluginConfig()
-  for (const { id, download } of meta.require) {
-    const isDownloaded = plugins.has(id)
-    if (isDownloaded || !download) continue
-    console.log(`从 ${meta.name.id} 发现未安装依赖: ${id} ->`, download)
-    v.description = `安装: ${id}`
-    let downloadCommend = overrides.value.find(c => c.id == id && c.enabled)?.install ?? download
-    await installPlugin(downloadCommend)
-    count++
-  }
-  v.description = `安装完成，共${count}个`
-})
+export const installDepends = (
+  m: Utils.message.DownloadMessageBind,
+  meta: PluginMeta,
+  installedPlugins?: Set<string>
+) =>
+  m.createLoading('依赖安装/检查', async v => {
+    v.retryable = true
+    let count = 0
+    const plugins =
+      installedPlugins ??
+      new Set(
+        (await db.value.selectFrom('plugin').select('pluginName').execute()).map(v => v.pluginName)
+      )
+    const overrides = usePluginConfig()
+    for (const { id, download } of meta.require) {
+      const isDownloaded = plugins.has(id)
+      if (isDownloaded || !download) continue
+      console.log(`从 ${meta.name.id} 发现未安装依赖: ${id} ->`, download)
+      v.description = `安装: ${id}`
+      let downloadCommend = overrides.value.find(c => c.id == id && c.enabled)?.install ?? download
+      await installPlugin(downloadCommend)
+      count++
+    }
+    v.description = `安装完成，共${count}个`
+  })
 
 export const installPlugin = (input: string, __installedPlugins?: Set<string>) =>
   Utils.message.createDownloadMessage(`下载插件-${input}`, async m => {
@@ -96,10 +104,7 @@ export const installPlugin = (input: string, __installedPlugins?: Set<string>) =
       const installer = installers.filter(ins => ins.isMatched(input)).at(0)
       if (!installer) throw new Error('没有符合的下载器:' + input)
       v.description = installer.name
-      return [
-        await installer.install(input),
-        installer
-      ] as const
+      return [await installer.install(input), installer] as const
     })
 
     const meta = await m.createLoading('安装插件', async v => {
@@ -129,10 +134,12 @@ export const installPlugin = (input: string, __installedPlugins?: Set<string>) =
     console.log(`安装插件成功: ${meta.name.id} ->`, meta)
 
     await installDepends(m, meta, __installedPlugins)
-
   })
 
-export const updatePlugin = async (pluginMeta: PluginArchiveDB.Meta, __installedPlugins?: Set<string>) =>
+export const updatePlugin = async (
+  pluginMeta: PluginArchiveDB.Meta,
+  __installedPlugins?: Set<string>
+) =>
   Utils.message.createDownloadMessage(`更新插件-${pluginMeta.pluginName}`, async m => {
     const file = await m.createLoading('更新', async v => {
       v.retryable = true
@@ -151,10 +158,7 @@ export const updatePlugin = async (pluginMeta: PluginArchiveDB.Meta, __installed
 
     await db.value
       .replaceInto('plugin')
-      .values({
-        ...pluginMeta,
-        meta: JSON.stringify(meta)
-      })
+      .values({ ...pluginMeta, meta: JSON.stringify(meta) })
       .execute()
 
     await installDepends(m, meta, __installedPlugins)
@@ -164,10 +168,12 @@ const rawLoaders = import.meta.glob<PluginLoader>('./loader/*_*.ts', {
   eager: true,
   import: 'default'
 })
-const loaders = sortBy(Object.entries(rawLoaders), ([fname]) => Number(fname.match(/[\d\.]+(?=_)/)?.[0])).map(v => v[1])
+const loaders = sortBy(Object.entries(rawLoaders), ([fname]) =>
+  Number(fname.match(/[\d\.]+(?=_)/)?.[0])
+).map(v => v[1])
 
 const loadLocks = <Record<string, Mutex>>{}
-const getLoadLock = (pluginName: string) => loadLocks[pluginName] ??= new Mutex
+const getLoadLock = (pluginName: string) => (loadLocks[pluginName] ??= new Mutex())
 const { SharedFunction } = Utils.eventBus
 
 export const loadPlugin = async (meta: PluginArchiveDB.Meta) => {
@@ -175,32 +181,26 @@ export const loadPlugin = async (meta: PluginArchiveDB.Meta) => {
   const lock = getLoadLock(meta.pluginName)
   const store = usePluginStore()
   store.pluginSteps[meta.pluginName] = {
-    now: {
-      status: 'wait',
-      stepsIndex: 0
-    },
-    steps: [{
-      name: '等待',
-      description: '插件载入中'
-    }]
+    now: { status: 'wait', stepsIndex: 0 },
+    steps: [{ name: '等待', description: '插件载入中' }]
   }
   await lock.acquire()
   await loaders.find(v => v.name == meta.loaderName)!.load(meta)
   await lock.acquire()
   console.log(`[plugin bootPlugin] boot name done "${meta.pluginName}"`)
 }
-SharedFunction.define(async cfg => {
-  console.log('[plugin addPlugin] new plugin defined', cfg.name, cfg)
-  const lock = getLoadLock(cfg.name)
-  await bootPlugin(cfg)
-  console.log('[plugin addPlugin] done', cfg.name)
-  lock.release()
-}, pluginName, 'addPlugin')
+SharedFunction.define(
+  async cfg => {
+    console.log('[plugin addPlugin] new plugin defined', cfg.name, cfg)
+    const lock = getLoadLock(cfg.name)
+    await bootPlugin(cfg)
+    console.log('[plugin addPlugin] done', cfg.name)
+    lock.release()
+  },
+  pluginName,
+  'addPlugin'
+)
 
-
-export {
-  loaders as pluginLoaders,
-  installers as pluginInstallers
-}
+export { loaders as pluginLoaders, installers as pluginInstallers }
 window.$api.loaders = loaders
 window.$api.installers = installers

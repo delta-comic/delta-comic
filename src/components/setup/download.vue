@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { installPlugin, pluginInstallers } from '@/plugin'
 import { toReactive, useFileDialog } from '@vueuse/core'
 import { Utils } from 'delta-comic-core'
@@ -24,7 +24,7 @@ const confirmAdd = async (url: string) => {
       },
       onNegativeClick: () => {
         isAdding.value = false
-      },
+      }
     })
     await installPlugin(url)
   } catch (error) {
@@ -32,10 +32,7 @@ const confirmAdd = async (url: string) => {
   }
   isAdding.value = false
 }
-const upload = toReactive(useFileDialog({
-  accept: '',
-  multiple: false
-}))
+const upload = toReactive(useFileDialog({ accept: '', multiple: false }))
 const useUploadPlugin = () => {
   if (isAdding.value) {
     $message.warning('正在添加插件')
@@ -44,13 +41,12 @@ const useUploadPlugin = () => {
   isAdding.value = true
   upload.reset()
   upload.open()
-  const { off: stop } = upload.onChange(async (files) => {
+  const { off: stop } = upload.onChange(async files => {
     stop()
     cel.off()
     try {
       const file = files?.item(0)
-      if (!file)
-        throw new Error('未上传文件')
+      if (!file) throw new Error('未上传文件')
 
       const blobUrl = URL.createObjectURL(file)
       await installPlugin(blobUrl)
@@ -67,27 +63,55 @@ const useUploadPlugin = () => {
     isAdding.value = false
   })
 }
-
 </script>
 
 <template>
   <div class="w-full">
-    <div class="pt-3 pl-5 text-2xl mb-2">插件安装</div>
-    <NInput v-model:value="inputUrl" class="w-[calc(100%-10px)]! m-1.25" clearable placeholder="输入内容以安装插件"
-      :disabled="isAdding" :loading="isAdding" />
-    <div class="p-10 flex w-full items-center justify-center gap-4">
-      <NButton type="primary" size="large" class="w-1/2!" :loading="isAdding" :disabled="isAdding"
-        @click="confirmAdd(inputUrl)">确认
+    <div class="mb-2 pt-3 pl-5 text-2xl">插件安装</div>
+    <NInput
+      v-model:value="inputUrl"
+      class="m-1.25 w-[calc(100%-10px)]!"
+      clearable
+      placeholder="输入内容以安装插件"
+      :disabled="isAdding"
+      :loading="isAdding"
+    />
+    <div class="flex w-full items-center justify-center gap-4 p-10">
+      <NButton
+        type="primary"
+        size="large"
+        class="w-1/2!"
+        :loading="isAdding"
+        :disabled="isAdding"
+        @click="confirmAdd(inputUrl)"
+        >确认
       </NButton>
-      <NButton type="primary" secondary size="large" class="" :loading="isAdding" :disabled="isAdding"
-        @click="useUploadPlugin">使用本地文件
+      <NButton
+        type="primary"
+        secondary
+        size="large"
+        class=""
+        :loading="isAdding"
+        :disabled="isAdding"
+        @click="useUploadPlugin"
+        >使用本地文件
       </NButton>
     </div>
-    <TransitionGroup name="list" tag="ul" class="ml-10 w-full *:my-1 h-1/2 overflow-auto">
-      <li name="list" tag="ul" class="w-5/6 flex items-center gap-3 rounded-lg px-2 mx-auto my-4!"
-        :class="[(index == 0&& inputUrl) && 'bg-green-300/60']" :key="desc.name"
-        v-for="(desc, index) of (inputUrl.length == 0) ? pluginInstallers : pluginInstallers.filter(v => v.isMatched(inputUrl))">
-        <span class="size-2 rounded-full item-center bg-(--van-text-color) shrink-0" aria-hidden="true"></span>
+    <TransitionGroup name="list" tag="ul" class="ml-10 h-1/2 w-full overflow-auto *:my-1">
+      <li
+        name="list"
+        tag="ul"
+        class="mx-auto my-4! flex w-5/6 items-center gap-3 rounded-lg px-2"
+        :class="[index == 0 && inputUrl && 'bg-green-300/60']"
+        :key="desc.name"
+        v-for="(desc, index) of inputUrl.length == 0
+          ? pluginInstallers
+          : pluginInstallers.filter(v => v.isMatched(inputUrl))"
+      >
+        <span
+          class="item-center size-2 shrink-0 rounded-full bg-(--van-text-color)"
+          aria-hidden="true"
+        ></span>
         <div>
           <div class="van-hairline--bottom text-base font-semibold">
             {{ desc.description.title }}

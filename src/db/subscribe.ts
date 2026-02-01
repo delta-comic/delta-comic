@@ -1,12 +1,10 @@
-import { Utils, type uni } from "delta-comic-core"
-import type {
-  JSONColumnType,
-  Selectable,
-} from 'kysely'
-import { db } from "."
+import type { JSONColumnType, Selectable } from 'kysely'
+
+import { Utils, type uni } from 'delta-comic-core'
+
+import { db } from '.'
 
 export namespace SubscribeDB {
-
   export const key = new Utils.data.SourcedValue<[plugin: string, label: string]>()
   export type Key_ = Utils.data.SourcedKeyType<typeof key>
   export type Key = Exclude<Key_, string>

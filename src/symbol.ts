@@ -1,4 +1,4 @@
-import type { InjectionKey, ShallowRef } from "vue"
+import type { InjectionKey, ShallowRef } from 'vue'
 
 export const isShowMainHomeNavBar = <InjectionKey<ShallowRef<boolean>>>Symbol('showNavBar')
 

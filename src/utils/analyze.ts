@@ -1,1 +1,1 @@
-export namespace Analyze { }
+export namespace Analyze {}

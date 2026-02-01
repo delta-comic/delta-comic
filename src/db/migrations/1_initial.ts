@@ -8,11 +8,7 @@ async function up(db: Kysely<any>) {
     .addColumn('item', 'text', col => col.notNull())
     .execute()
 
-  await db.schema
-    .createIndex('item_store_key')
-    .on('itemStore')
-    .column('key')
-    .execute()
+  await db.schema.createIndex('item_store_key').on('itemStore').column('key').execute()
   //#endregion
 
   //#region history begin
@@ -21,20 +17,12 @@ async function up(db: Kysely<any>) {
     .addColumn('ep', 'text', col => col.notNull())
     .addColumn('timestamp', 'datetime', col => col.notNull().primaryKey())
     .addColumn('itemKey', 'text', col => col.notNull().unique())
-    .addForeignKeyConstraint(
-      'itemKeyForeign',
-      ['itemKey'],
-      'itemStore',
-      ['key'],
-      cb => cb.onDelete('cascade')
+    .addForeignKeyConstraint('itemKeyForeign', ['itemKey'], 'itemStore', ['key'], cb =>
+      cb.onDelete('cascade')
     )
     .execute()
 
-  await db.schema
-    .createIndex('history_timestamp')
-    .on('history')
-    .column('timestamp desc')
-    .execute()
+  await db.schema.createIndex('history_timestamp').on('history').column('timestamp desc').execute()
   //#endregion
 
   //#region recentView begin
@@ -42,12 +30,8 @@ async function up(db: Kysely<any>) {
     .createTable('recentView')
     .addColumn('timestamp', 'datetime', col => col.notNull().primaryKey())
     .addColumn('itemKey', 'text', col => col.notNull().unique())
-    .addForeignKeyConstraint(
-      'itemKeyForeign',
-      ['itemKey'],
-      'itemStore',
-      ['key'],
-      cb => cb.onDelete('cascade')
+    .addForeignKeyConstraint('itemKeyForeign', ['itemKey'], 'itemStore', ['key'], cb =>
+      cb.onDelete('cascade')
     )
     .addColumn('isViewed', 'boolean', col => col.notNull())
     .execute()
@@ -67,12 +51,10 @@ async function up(db: Kysely<any>) {
     .addColumn('private', 'boolean', col => col.notNull())
     .addColumn('description', 'text', col => col.notNull())
     .execute()
-  await db.insertInto('favouriteCard').values({
-    createAt: 0,
-    title: '默认收藏夹',
-    private: false,
-    description: ''
-  }).execute()
+  await db
+    .insertInto('favouriteCard')
+    .values({ createAt: 0, title: '默认收藏夹', private: false, description: '' })
+    .execute()
 
   await db.schema
     .createIndex('favourite_card_title_createAt')
@@ -90,19 +72,11 @@ async function up(db: Kysely<any>) {
     .addColumn('itemKey', 'text', col => col.notNull())
     .addPrimaryKeyConstraint('primary_key', ['addTime', 'belongTo', 'itemKey'])
     .addUniqueConstraint('uniqueKey', ['belongTo', 'itemKey'])
-    .addForeignKeyConstraint(
-      'itemKeyForeign',
-      ['itemKey'],
-      'itemStore',
-      ['createAt'],
-      cb => cb.onDelete('cascade')
+    .addForeignKeyConstraint('itemKeyForeign', ['itemKey'], 'itemStore', ['createAt'], cb =>
+      cb.onDelete('cascade')
     )
-    .addForeignKeyConstraint(
-      'belongToForeign',
-      ['belongTo'],
-      'favouriteCard',
-      ['key'],
-      cb => cb.onDelete('cascade')
+    .addForeignKeyConstraint('belongToForeign', ['belongTo'], 'favouriteCard', ['key'], cb =>
+      cb.onDelete('cascade')
     )
     .execute()
 
@@ -118,12 +92,8 @@ async function up(db: Kysely<any>) {
   await db.schema
     .createTable('subscribe')
     .addColumn('itemKey', 'text')
-    .addForeignKeyConstraint(
-      'itemKeyForeign',
-      ['itemKey'],
-      'itemStore',
-      ['key'],
-      cb => cb.onDelete('cascade')
+    .addForeignKeyConstraint('itemKeyForeign', ['itemKey'], 'itemStore', ['key'], cb =>
+      cb.onDelete('cascade')
     )
     .addColumn('author', 'text')
     .addColumn('type', 'text', col => col.notNull())
@@ -151,17 +121,9 @@ async function up(db: Kysely<any>) {
     .addColumn('installInput', 'text', col => col.notNull())
     .execute()
 
-  await db.schema
-    .createIndex('plugin_enable')
-    .on('plugin')
-    .column('enable')
-    .execute()
+  await db.schema.createIndex('plugin_enable').on('plugin').column('enable').execute()
 
-  await db.schema
-    .createIndex('plugin_pluginName')
-    .on('plugin')
-    .column('pluginName')
-    .execute()
+  await db.schema.createIndex('plugin_pluginName').on('plugin').column('pluginName').execute()
   //#endregion
 }
 

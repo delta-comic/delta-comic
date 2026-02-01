@@ -1,9 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["unicorn", "typescript", "oxc", "vue"],
-  "categories": {
-    "correctness": "error"
-  },
+  "categories": { "correctness": "error" },
   "rules": {
     "no-unused-expressions": "allow",
     "no-useless-escape": "allow",
@@ -11,14 +9,8 @@
   },
 
   "settings": {
-    "jsx-a11y": {
-      "polymorphicPropName": null,
-      "components": {},
-      "attributes": {}
-    },
-    "next": {
-      "rootDir": []
-    },
+    "jsx-a11y": { "polymorphicPropName": null, "components": {}, "attributes": {} },
+    "next": { "rootDir": [] },
     "jsdoc": {
       "ignorePrivate": false,
       "ignoreInternal": false,
@@ -29,13 +21,9 @@
       "exemptDestructuredRootsFromChecks": false,
       "tagNamePreference": {}
     },
-    "vitest": {
-      "typecheck": false
-    }
+    "vitest": { "typecheck": false }
   },
-  "env": {
-    "builtin": true
-  },
+  "env": { "builtin": true },
   "globals": {},
   "ignorePatterns": []
 }

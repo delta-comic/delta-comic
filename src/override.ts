@@ -1,4 +1,4 @@
-(function () {
+;(function () {
   // 1. 保存原始句柄
   const _originalJSONParse = JSON.parse
 
@@ -18,7 +18,10 @@
 
         // 修复逻辑 A：去除不可见的 Unicode 控制字符和特殊空格
         // \u00A0 是你遇到的不间断空格，\uFEFF 是 BOM 头，等等
-        fixedText = fixedText.replace(/[\u00A0\u1680\u200b\u180e\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]/g, " ")
+        fixedText = fixedText.replace(
+          /[\u00A0\u1680\u200b\u180e\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]/g,
+          ' '
+        )
 
         // 修复逻辑 B：处理"Unexpected non-whitespace character after JSON"
         // 找到最后一个有效的 JSON 闭合符号 ( } 或 ] )，截断后面的垃圾字符
@@ -41,16 +44,13 @@
 
   // 修补 Response.prototype.json 方法
   Response.prototype.json = function () {
-    return this.text().then((text) => JSON.parse(text))
+    return this.text().then(text => JSON.parse(text))
   }
 })()
 
-
-window.process = {
-  env: import.meta.env
-} as any // 强兼zip模式打包
+window.process = { env: import.meta.env } as any // 强兼zip模式打包
 
 window.$api = {}
 window.$layout = {}
-window.$$safe$$ = false;
-(window.$$lib$$ as any) = {}
+window.$$safe$$ = false
+;(window.$$lib$$ as any) = {}

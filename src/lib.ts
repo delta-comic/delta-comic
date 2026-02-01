@@ -1,5 +1,4 @@
-import "core-js"
-
+import 'core-js'
 import { attachConsole } from '@tauri-apps/plugin-log'
 await attachConsole()
 
@@ -11,25 +10,15 @@ window.$$lib$$.Vant = Vant
 import * as Naive from 'naive-ui'
 window.$$lib$$.Naive = Naive
 import * as Axios from 'axios'
-
-
 import axios from 'axios'
 import { CORSFetch } from 'tauri-plugin-cors-fetch-no-aws'
 const cors = CORSFetch.init()
-cors.config({
-  request: {
-    danger: {
-      acceptInvalidCerts: true,
-      acceptInvalidHostnames: true
-    }
-  }
-})
+cors.config({ request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } } })
 
 axios.defaults.timeout = 7000
 axios.defaults.adapter = ['fetch']
 
 window.$$lib$$.Axios = { ...Axios, ...axios, axios }
-
 
 import * as Dcc from 'delta-comic-core'
 window.$$lib$$.Dcc = Dcc

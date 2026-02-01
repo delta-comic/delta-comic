@@ -1,11 +1,5 @@
 <script lang="ts" setup>
-definePage({
-  redirect: {
-    name: '/main/home/random'
-  }
-})
+definePage({ redirect: { name: '/main/home/random' } })
 </script>
 
-<template>
-
-</template>
+<template></template>

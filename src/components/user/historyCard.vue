@@ -1,31 +1,35 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { UserOutlined } from '@vicons/antd'
 import { PhoneAndroidOutlined } from '@vicons/material'
 import { Comp, coreModule, requireDepend, uni, Utils } from 'delta-comic-core'
 import dayjs from 'dayjs'
 import type { ItemStoreDB } from '@/db/itemStore'
 import type { HistoryDB } from '@/db/history'
-defineProps<{
-  item: ItemStoreDB.StoredItem & HistoryDB.Item
-}>()
+defineProps<{ item: ItemStoreDB.StoredItem & HistoryDB.Item }>()
 
-const { comp: { ItemCard } } = requireDepend(coreModule)
+const {
+  comp: { ItemCard }
+} = requireDepend(coreModule)
 </script>
 
 <template>
   <Comp.Var v-if="item" :value="item?.item" v-slot="{ value }">
     <ItemCard :item="uni.item.Item.create(value)">
-      <div class="flex flex-nowrap items-center *:text-nowrap van-ellipsis">
+      <div class="van-ellipsis flex flex-nowrap items-center *:text-nowrap">
         <NIcon color="var(--van-text-color-2)" size="14px">
           <UserOutlined />
         </NIcon>
-        <span v-for="author of value.author" class="mr-2 van-haptics-feedback">{{ author.label }}</span>
+        <span v-for="author of value.author" class="van-haptics-feedback mr-2">{{
+          author.label
+        }}</span>
       </div>
-      <div class="flex flex-nowrap items-center *:text-nowrap van-ellipsis">
+      <div class="van-ellipsis flex flex-nowrap items-center *:text-nowrap">
         <NIcon color="var(--van-text-color-2)" size="14px">
           <PhoneAndroidOutlined />
         </NIcon>
-        <span class="mr-2 van-haptics-feedback">{{ Utils.translate.createDateString(dayjs(item.timestamp)) }}</span>
+        <span class="van-haptics-feedback mr-2">{{
+          Utils.translate.createDateString(dayjs(item.timestamp))
+        }}</span>
       </div>
     </ItemCard>
   </Comp.Var>

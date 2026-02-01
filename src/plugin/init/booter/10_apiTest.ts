@@ -1,19 +1,22 @@
-import type { PluginConfig } from "delta-comic-core"
-import { PluginBooter, type PluginBooterSetMeta } from "../utils"
-import { testApi } from "./utils"
+import type { PluginConfig } from 'delta-comic-core'
+
+import { PluginBooter, type PluginBooterSetMeta } from '../utils'
+import { testApi } from './utils'
 
 export type _TestPluginApiResult = Record<string, string | false | undefined>
 
 class _TestPluginApi extends PluginBooter {
   public override name = '接口测试'
-  public override async call(cfg: PluginConfig, setMeta: PluginBooterSetMeta, env: Record<any, any>): Promise<any> {
+  public override async call(
+    cfg: PluginConfig,
+    setMeta: PluginBooterSetMeta,
+    env: Record<any, any>
+  ): Promise<any> {
     if (!cfg.api) return
     setMeta('开始并发测试')
 
     const namespaces = Object.keys(cfg.api)
-    const results = await Promise.all(
-      namespaces.map(namespace => testApi(cfg.api![namespace]))
-    )
+    const results = await Promise.all(namespaces.map(namespace => testApi(cfg.api![namespace])))
     const displayResult = new Array<[namespace: string, time: number | false]>()
     const api: _TestPluginApiResult = {}
     namespaces.forEach((namespace, i) => {
@@ -30,4 +33,4 @@ class _TestPluginApi extends PluginBooter {
     setMeta(`测试完成, \n${displayResult.map(ent => `${ent[0]}->${ent[1]}ms`).join('\n')}`)
   }
 }
-export default new _TestPluginApi
+export default new _TestPluginApi()

@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { fromPairs, isEmpty } from 'es-toolkit/compat'
 import { shallowRef, computed, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -11,7 +11,7 @@ import type { SearchInstance } from 'vant'
 import { decodeURIDeep } from '@/utils/url'
 import SearchBar from '@/components/search/searchBar.vue'
 import { searchSourceKey } from '@/components/search/source'
-const $route = useRoute<"/search/[input]">()
+const $route = useRoute<'/search/[input]'>()
 const pluginStore = usePluginStore()
 const config = Store.useConfig().$load(Store.appConfig)
 const inputSort = $route.query.sort?.toString()
@@ -25,45 +25,62 @@ const temp = Store.useTemp().$apply('searchBase', () => {
   }
 })
 if (inputSource) temp.source = inputSource
-watch(() => temp.source, source => {
-  const [plugin, name] = searchSourceKey.toJSON(source)
-  const s = fromPairs(fromPairs(pluginStore.allSearchSource)[plugin])[name]
-  console.log(pluginStore.allSearchSource, (fromPairs(pluginStore.allSearchSource)[plugin]))
-  temp.sort = s.defaultSort
-}, { immediate: true })
+watch(
+  () => temp.source,
+  source => {
+    const [plugin, name] = searchSourceKey.toJSON(source)
+    const s = fromPairs(fromPairs(pluginStore.allSearchSource)[plugin])[name]
+    console.log(pluginStore.allSearchSource, fromPairs(pluginStore.allSearchSource)[plugin])
+    temp.sort = s.defaultSort
+  },
+  { immediate: true }
+)
 const showSearch = shallowRef(true)
 const searchText = shallowRef(decodeURIDeep($route.params.input?.toString() ?? ''))
 
 const method = computed(() => {
   const [plugin, name] = searchSourceKey.toJSON(temp.source)
-  return [plugin, fromPairs(fromPairs(pluginStore.allSearchSource)[plugin])[name]] as [plugin: string, method: PluginConfigSearchMethod]
+  return [plugin, fromPairs(fromPairs(pluginStore.allSearchSource)[plugin])[name]] as [
+    plugin: string,
+    method: PluginConfigSearchMethod
+  ]
 })
 const search = useTemplateRef<SearchInstance>('search')
 const goSearch = () => {
   showSearch.value = true
   search.value?.focus()
 }
-
 </script>
 
 <template>
-  <div class="w-full pt-safe bg-(--van-background-2) fixed top-0 z-1"></div>
-  <header class="w-full h-21.5 text-(--van-text-color) duration-200 transition-transform mt-safe"
-    :class="[showSearch ? 'translate-y-0!' : '-translate-y-13.5!']">
+  <div class="fixed top-0 z-1 w-full bg-(--van-background-2) pt-safe"></div>
+  <header
+    class="mt-safe h-21.5 w-full text-(--van-text-color) transition-transform duration-200"
+    :class="[showSearch ? 'translate-y-0!' : '-translate-y-13.5!']"
+  >
     <SearchBar v-model:search-text="searchText" :source="temp.source" />
-    <div class="van-hairline--bottom h-8 w-full relative bg-(--van-background-2)">
-      <div class="w-full items-center flex *:text-nowrap! overflow-x-auto scroll gap-2 pr-2">
-        <NPopselect :options="pluginStore.allSearchSource.map(([plugin, sources]) => ({
-          type: 'group',
-          label: pluginStore.$getPluginDisplayName(plugin),
-          children: sources.map(([id, { name }]) => ({
-            label: name,
-            value: searchSourceKey.toString([plugin, id])
-          }))
-        }))" v-model:value="temp.source" placement="bottom" size="large">
+    <div class="van-hairline--bottom relative h-8 w-full bg-(--van-background-2)">
+      <div class="scroll flex w-full items-center gap-2 overflow-x-auto pr-2 *:text-nowrap!">
+        <NPopselect
+          :options="
+            pluginStore.allSearchSource.map(([plugin, sources]) => ({
+              type: 'group',
+              label: pluginStore.$getPluginDisplayName(plugin),
+              children: sources.map(([id, { name }]) => ({
+                label: name,
+                value: searchSourceKey.toString([plugin, id])
+              }))
+            }))
+          "
+          v-model:value="temp.source"
+          placement="bottom"
+          size="large"
+        >
           <NButton quaternary>
-            搜索源:<span class="text-(--nui-primary-color) text-xs">
-              {{ pluginStore.$getPluginDisplayName(searchSourceKey.toJSON(temp.source)[0]) }}:{{ method[1].name }}
+            搜索源:<span class="text-xs text-(--nui-primary-color)">
+              {{ pluginStore.$getPluginDisplayName(searchSourceKey.toJSON(temp.source)[0]) }}:{{
+                method[1].name
+              }}
             </span>
             <template #icon>
               <NIcon size="1.8rem">
@@ -72,40 +89,68 @@ const goSearch = () => {
             </template>
           </NButton>
         </NPopselect>
-        <VanPopover :actions="method[1].sorts" @select="q => temp.sort = q.value" placement="bottom-start">
+        <VanPopover
+          :actions="method[1].sorts"
+          @select="q => (temp.sort = q.value)"
+          placement="bottom-start"
+        >
           <template #reference>
-            <NButton quaternary class="text-sm h-full van-haptics-feedback flex justify-start items-center">
-              <template #icon>
-                <VanIcon name="sort" size="1.5rem" class="sort-icon" />
-              </template>排序
-              <span class="text-(--nui-primary-color) text-xs">
-                -{{method[1].sorts.find(v => v.value == temp.sort)?.text ?? 'not found'}}
+            <NButton
+              quaternary
+              class="van-haptics-feedback flex h-full items-center justify-start text-sm"
+            >
+              <template #icon> <VanIcon name="sort" size="1.5rem" class="sort-icon" /> </template
+              >排序
+              <span class="text-xs text-(--nui-primary-color)">
+                -{{ method[1].sorts.find(v => v.value == temp.sort)?.text ?? 'not found' }}
               </span>
             </NButton>
           </template>
         </VanPopover>
-        <div class="text-sm h-full van-haptics-feedback flex justify-start items-center">
+        <div class="van-haptics-feedback flex h-full items-center justify-start text-sm">
           <VanSwitch v-model="config.showAIProject" size="1rem" />展示AI作品
         </div>
       </div>
-      <VanIcon @click="goSearch" :class="[showSearch ? 'translate-x-full' : '-translate-x-2']" size="25px"
-        class="absolute! top-1/2 duration-200 transition-transform right-0 -translate-y-1/2 bg-(--van-background-2) shadow rounded-full p-1"
-        name="search" color="var(--van-text-color-2)" />
+      <VanIcon
+        @click="goSearch"
+        :class="[showSearch ? 'translate-x-full' : '-translate-x-2']"
+        size="25px"
+        class="absolute! top-1/2 right-0 -translate-y-1/2 rounded-full bg-(--van-background-2) p-1 shadow transition-transform duration-200"
+        name="search"
+        color="var(--van-text-color-2)"
+      />
     </div>
   </header>
 
-  <NResult status="info" title="无搜索" class="h-[80vh] flex items-center flex-col justify-center" description="请输入"
-    v-if="isEmpty($route.params.input)">
+  <NResult
+    status="info"
+    title="无搜索"
+    class="flex h-[80vh] flex-col items-center justify-center"
+    description="请输入"
+    v-if="isEmpty($route.params.input)"
+  >
     <template #icon>
       <Comp.Image :src="noneSearchTextIcon" />
     </template>
   </NResult>
-  <div class="duration-200 *:h-full! transition-all will-change-[height,transform]" v-else
-    :class="[showSearch ? 'h-[calc(100vh-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0' : 'h-[calc(100vh-32px-var(--safe-area-inset-top))] -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]']">
-    <List v-model:show-header="showSearch" :source="temp.source" :sort="temp.sort" :input="searchText" />
+  <div
+    class="transition-all duration-200 will-change-[height,transform] *:h-full!"
+    v-else
+    :class="[
+      showSearch
+        ? 'h-[calc(100vh-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0'
+        : 'h-[calc(100vh-32px-var(--safe-area-inset-top))] -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]'
+    ]"
+  >
+    <List
+      v-model:show-header="showSearch"
+      :source="temp.source"
+      :sort="temp.sort"
+      :input="searchText"
+    />
   </div>
 </template>
-<style scoped lang='css'>
+<style scoped lang="css">
 :deep(.van-swipe-item) {
   height: 100% !important;
 }

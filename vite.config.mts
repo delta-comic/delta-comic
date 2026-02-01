@@ -1,68 +1,46 @@
-import { fileURLToPath, URL } from 'node:url'
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import Components from 'unplugin-vue-components/vite'
-import MotionResolver from 'motion-v/resolver'
-import {
-  NaiveUiResolver,
-  VantResolver,
-} from 'unplugin-vue-components/resolvers'
+import type { UserConfig } from 'vite'
+
 import tailwindcss from '@tailwindcss/vite'
+import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import { browserslistToTargets } from 'lightningcss'
 import browserslist from 'browserslist'
+import { browserslistToTargets } from 'lightningcss'
+import MotionResolver from 'motion-v/resolver'
+import { fileURLToPath, URL } from 'node:url'
+import { NaiveUiResolver, VantResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
+import { defineConfig } from 'vite'
 import MsClarity from 'vite-plugin-ms-clarity'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import VueRouter from 'vue-router/vite'
-import type { UserConfig } from 'vite'
 
 const host = process.env.TAURI_DEV_HOST
 
 export default defineConfig({
   plugins: [
-    VueRouter({
-      dts: 'typed-router.d.ts'
-    }),
+    VueRouter({ dts: 'typed-router.d.ts' }),
     vueDevTools(),
-    MsClarity({
-      id: 'v2xgbuugti',
-      enableInDevMode: false,
-    }),
-    vue({
-      template: {
-        compilerOptions: {
-          isCustomElement: tag => tag.startsWith('media-'),
-        },
-      },
-    }),
+    MsClarity({ id: 'v2xgbuugti', enableInDevMode: false }),
+    vue({ template: { compilerOptions: { isCustomElement: tag => tag.startsWith('media-') } } }),
     vueJsx(),
-    Components({
-      dts: true,
-      resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver()],
-    }),
-    tailwindcss(),
+    Components({ dts: true, resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver()] }),
+    tailwindcss()
   ],
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-    extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts']
   },
   css: {
     transformer: 'lightningcss',
-    lightningcss: {
-      targets: browserslistToTargets(browserslist('> 5%')),
-    },
+    lightningcss: { targets: browserslistToTargets(browserslist('> 5%')) }
   },
   build: {
     // Tauri uses Chromium on Windows and WebKit on macOS and Linux
-    target:
-      process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari15',
+    target: process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari15',
     // don't minify for debug builds
     minify: !process.env.TAURI_ENV_DEBUG ? 'oxc' : false,
     // produce sourcemaps for debug builds
-    sourcemap: !!process.env.TAURI_ENV_DEBUG,
-
+    sourcemap: !!process.env.TAURI_ENV_DEBUG
   },
   base: '/',
   server: {
@@ -71,19 +49,13 @@ export default defineConfig({
     strictPort: true,
     // if the host Tauri is expecting is set, use it
     host: host || false,
-    hmr: host
-      ? {
-        protocol: 'ws',
-        host,
-        port: 1421,
-      }
-      : undefined,
+    hmr: host ? { protocol: 'ws', host, port: 1421 } : undefined,
 
     watch: {
       // tell vite to ignore watching `src-tauri`
-      ignored: ['**/src-tauri/**', '**/tauri-plugin-delta-comic/**'],
-    },
+      ignored: ['**/src-tauri/**', '**/tauri-plugin-delta-comic/**']
+    }
   },
   clearScreen: false,
-  envPrefix: ['VITE_', 'TAURI_ENV_*'],
+  envPrefix: ['VITE_', 'TAURI_ENV_*']
 } as UserConfig)

@@ -1,4 +1,0 @@
-{
-  "*.{js,jsx,ts,tsx,mts,cts,mjs,cjs,vue}": "pnpm exec oxlint --fix --type-aware",
-  "*.{md,json,toml,rs,js,jsx,ts,tsx,mts,cts,mjs,cjs,vue,html}": "pnpm exec cspell --no-exit-code"
-}

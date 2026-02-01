@@ -13,8 +13,6 @@
     "type": "git",
     "url": "https://github.com/delta-comic/delta-comic.git"
   },
-  "packageManager": "pnpm@10.27.0",
-  "readme": "./README.md",
   "scripts": {
     "dev:web": "vite",
     "dev": "tauri dev",
@@ -85,6 +83,7 @@
     "husky": "^9.1.7",
     "lightningcss": "^1.31.1",
     "lint-staged": "^16.2.7",
+    "oxfmt": "^0.27.0",
     "oxlint": "^1.42.0",
     "oxlint-tsgolint": "^0.11.4",
     "tailwindcss": "4.1.18",
@@ -97,6 +96,7 @@
   "overrides": {
     "vite": "^8.0.0-beta.11"
   },
+  "packageManager": "pnpm@10.27.0",
   "pnpm": {
     "overrides": {
       "vite": "^8.0.0-beta.11"
@@ -112,5 +112,6 @@
     "patchedDependencies": {
       "tauri-plugin-m3": "patches/tauri-plugin-m3.patch"
     }
-  }
+  },
+  "readme": "./README.md"
 }
