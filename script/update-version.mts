@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-const version = process.argv0
+const version = process.argv[2]
 
 const path = join(import.meta.dirname, '../src-tauri/tauri.conf.json')
 const tauri: typeof import('../src-tauri/tauri.conf.json') = JSON.parse(
