@@ -85,14 +85,6 @@ jobs:
         run: |
           pnpm dlx @tauri-apps/cli android init
 
-      - name: Setup Android signing
-        run: |
-          cd src-tauri/gen/android
-          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" > keystore.properties
-          echo "password=${{ secrets.ANDROID_KEY_PASSWORD }}" >> keystore.properties
-          base64 -d <<< "${{ secrets.ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
-          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> keystore.properties
-
 
 # build
       - name: Build Android App
@@ -106,34 +98,85 @@ jobs:
           mobile: "android"
           args: ""
           retryAttempts: 1
+          
 
 
 #signature
-      - name: Install apksigner
-        run: sudo apt-get update && sudo apt-get install -y apksigner
+      - name: Setup Android signing
+        run: |
+          set -euo pipefail
+          cd src-tauri/gen/android
+
+          # 写 keystore.properties（更稳健的写法）
+          printf 'keyAlias=%s\n' "${{ secrets.ANDROID_KEY_ALIAS }}" > keystore.properties
+          printf 'password=%s\n' "${{ secrets.ANDROID_KEY_PASSWORD }}" >> keystore.properties
+
+          # 更稳健地解码 base64 到二进制文件（避免 echo 的换行/转义问题）
+          printf '%s' "${{ secrets.ANDROID_KEY_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/keystore.jks"
+          printf 'storeFile=%s\n' "$RUNNER_TEMP/keystore.jks" >> keystore.properties
+
+          # 快速断言：文件存在且大小>0
+          ls -l "$RUNNER_TEMP/keystore.jks"
+          stat --format="size=%s" "$RUNNER_TEMP/keystore.jks" || true
+          head -c 64 "$RUNNER_TEMP/keystore.jks" | xxd -g 1 -l 64 || true
+
+          # 用 keytool 验证 keystore 能否被打开（会失败则退出）
+          KEYSTORE_PASS="${{ secrets.ANDROID_KEY_PASSWORD }}"
+          if ! keytool -list -keystore "$RUNNER_TEMP/keystore.jks" -storepass "$KEYSTORE_PASS" >/dev/null 2>&1; then
+            echo "ERROR: keystore cannot be read by keytool — likely empty, corrupted, wrong password or wrong format" >&2
+            exit 1
+          fi
+
+      - name: Ensure apksigner (from Android build-tools) is available
+        run: |
+          set -euo pipefail
+          # 优先使用 Android SDK 的 build-tools 下的 apksigner；如果没有则尝试通过 sdkmanager 安装
+          if command -v apksigner >/dev/null 2>&1; then
+            echo "apksigner already in PATH"
+            apksigner --version || true
+          else
+            echo "Attempting to install Android build-tools via sdkmanager"
+            yes | sdkmanager "build-tools;33.0.2"
+            export PATH="$ANDROID_SDK_ROOT/build-tools/33.0.2:$PATH"
+            if ! command -v apksigner >/dev/null 2>&1; then
+              echo "apksigner not found after installing build-tools — check Android SDK setup" >&2
+              exit 1
+            fi
+            apksigner --version || true
+          fi
 
       - name: Signature App
+        env:
+          KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
+          set -euo pipefail
           APK_SRC="./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
-          if [ -f "$APK_SRC" ]; then
-            apksigner sign \
-              --ks $RUNNER_TEMP/keystore.jks \
-              --ks-key-alias ${{ secrets.ANDROID_KEY_ALIAS }} \
-              --ks-pass pass:${{ secrets.ANDROID_KEY_PASSWORD }} \
-              --key-pass pass:${{ secrets.ANDROID_KEY_PASSWORD }} \
-              --v1-signing-enabled true \
-              --v2-signing-enabled true \
-              --v3-signing-enabled true \
-              --out ./dist/app.apk \
-              "$APK_SRC"
-            echo '-----------'
-            ls .
-            echo '-----------'
-            ls ./dist
-          else
+          if [ ! -f "$APK_SRC" ]; then
             echo "APK not found at $APK_SRC" >&2
             exit 1
           fi
+
+          DIST_DIR=./dist
+          mkdir -p "$DIST_DIR"
+
+          # 使用 --ks-type 明确指定 keystore 类型（若你的是 JKS，请用 JKS；如果是 PKCS12，改为 PKCS12）
+          apksigner sign \
+            --ks "$RUNNER_TEMP/keystore.jks" \
+            --ks-type JKS \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$KEYSTORE_PASS" \
+            --key-pass "pass:$KEYSTORE_PASS" \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            --out "$DIST_DIR/app.apk" \
+            "$APK_SRC"
+
+          echo '-----------'
+          ls -la .
+          echo '-----------'
+          ls -la "$DIST_DIR"
                     
 
 #publish
