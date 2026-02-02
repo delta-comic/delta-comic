@@ -36,36 +36,33 @@ window.$api.database = database
 // await database.execute('PRAGMA foreign_keys = ON;')
 const emitter = mitt<{ onChange: void; noUse: bigint }>()
 
-const MUTATION_KEYWORDS = /\b(INSERT|UPDATE|DELETE |REPLACE|CREATE|DROP|ALTER)\b/i
+const MUTATION_KEYWORDS = /\b(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b/i
 const triggerUpdate = debounce(() => {
   console.debug('[db sync] db changed')
   emitter.emit('onChange')
   triggerRef(db)
 }, 300)
 
-const originalExecute = database.execute.bind(database)
-database.execute = async (query: string, bindValues?: unknown[]) => {
-  const result = await withTimeout(
-    () => originalExecute(query, bindValues),
-    Math.max(2000, query.length * 10)
-  )
-  if (MUTATION_KEYWORDS.test(query)) triggerUpdate()
-  return result
-}
-
-const originalSelect = database.select.bind(database)
-database.select = async <T>(query: string, bindValues?: unknown[]) => {
-  const result = await withTimeout(
-    () => originalSelect<T>(query, bindValues),
-    Math.max(2000, query.length * 10)
-  )
-  if (MUTATION_KEYWORDS.test(query)) triggerUpdate()
-  return result
-}
-
 export const db = shallowRef(
   new Kysely<DB>({
-    dialect: new TauriSqliteDialect({ database }),
+    dialect: new TauriSqliteDialect({
+      database: {
+        close(db) {
+          return database.close(db)
+        },
+        path: database.path,
+        async select<T>(query: string, bindValues?: unknown[]) {
+          const result = await withTimeout(() => database.select<T>(query, bindValues), 3000)
+          if (MUTATION_KEYWORDS.test(query)) triggerUpdate()
+          return result
+        },
+        async execute(query: string, bindValues?: unknown[]) {
+          const result = await withTimeout(() => database.execute(query, bindValues), 3000)
+          if (MUTATION_KEYWORDS.test(query)) triggerUpdate()
+          return result
+        }
+      }
+    }),
     plugins: [new CamelCasePlugin(), new SerializePlugin()]
   })
 )

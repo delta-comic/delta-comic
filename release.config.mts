@@ -1,10 +1,10 @@
 import { GlobalConfig } from 'semantic-release'
 
-import _package from './package.json' with { type: 'json' }
+import pkg from './package.json' with { type: 'json' }
 
 export default {
   branches: ['main'],
-  repositoryUrl: _package.repository.url,
+  repositoryUrl: pkg.repository.url,
   plugins: [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',

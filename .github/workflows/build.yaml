@@ -90,7 +90,7 @@ jobs:
       - name: Change version
         id: set-version
         run: |
-          $OLD_VERSION = "$(node ~/script/set-version.mts)"
+          $OLD_VERSION = "$(node ~/script/update-version.mts)"
           echo "old_version=$OLD_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build Android App
@@ -107,7 +107,7 @@ jobs:
 
       - name: Restore version
         run: |
-          node ~/script/restore-version.mts ${{ steps.set-version.outputs.old_version }}
+          node ~/script/set-version.mts ${{ steps.set-version.outputs.old_version }}
 
       #signature
       - name: Restore keystore (decode + verify)

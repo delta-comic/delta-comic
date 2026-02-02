@@ -1,11 +1,19 @@
-import { readFile, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { Bumper } from 'conventional-recommended-bump'
+import semver from 'semver'
 
-const version = process.argv[2]
+import pkg from '../package.json' with { type: 'json' }
+//@ts-ignore .mts was exist
+import { setVersion } from './set-version.mts'
 
-const path = join(import.meta.dirname, '../src-tauri/tauri.conf.json')
-const tauri: typeof import('../src-tauri/tauri.conf.json') = JSON.parse(
-  await readFile(path, { encoding: 'utf-8' })
-)
-tauri.version = version
-await writeFile(path, JSON.stringify(tauri, null, 2), { encoding: 'utf-8' })
+const recommend = await new Bumper().loadPreset('angular').bump()
+
+if (!('releaseType' in recommend)) {
+  process.exit(0)
+}
+
+const next = semver.inc(pkg.version, recommend.releaseType)!
+
+await setVersion(next)
+
+console.log(pkg.version)
+process.exit(0)

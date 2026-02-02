@@ -1,12 +1,12 @@
 [package]
-name = "delta-comic"
+name = "Delta Comic"
 description = "Per Aspera, Ad Astra"
 authors = ["wenxig"]
 license = "AGPL-3.0-only"
-repository = "https://github.com/delta-comic/delta-comic/"
+repository = "https://github.com/delta-comic/delta-comic"
 edition = "2024"
 rust-version = "1.92.0"
-
+version = "0.2.1"
 
 [target.x86_64-pc-windows-msvc]
 linker = "rust-lld.exe"

@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "delta-comic",
+  "productName": "Delta Comic",
   "version": "0.2.1",
   "identifier": "org.wenxig.delta-comic",
   "build": {
