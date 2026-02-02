@@ -2,6 +2,7 @@ import { Bumper } from 'conventional-recommended-bump'
 import semver from 'semver'
 
 import pkg from '../package.json' with { type: 'json' }
+
 //@ts-ignore .mts was exist
 import { setVersion } from './set-version.mts'
 

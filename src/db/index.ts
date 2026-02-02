@@ -14,9 +14,8 @@ import type { PluginArchiveDB } from '@/plugin/db'
 import type { FavouriteDB } from './favourite'
 import type { HistoryDB } from './history'
 import type { ItemStoreDB } from './itemStore'
-import type { SubscribeDB } from './subscribe'
-
 import { type RecentDB } from './recentView'
+import type { SubscribeDB } from './subscribe'
 const migrations = import.meta.glob<Migration>('./migrations/*.ts', {
   eager: true,
   import: 'default'

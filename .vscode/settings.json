@@ -3,5 +3,10 @@
   "oxc.lint.run": "onSave",
   "oxc.requireConfig": true,
   "oxc.enable": true,
-  "editor.defaultFoldingRangeProvider": "oxc.oxc-vscode"
+  "oxc.fmt.configPath": ".oxfmtrc.json",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true,
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  }
 }

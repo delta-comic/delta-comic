@@ -6,10 +6,10 @@ import { markRaw } from 'vue'
 import { db, useNativeStore } from '@/db'
 import { pluginName } from '@/symbol'
 
-import type { PluginBooter, PluginInstaller, PluginLoader } from './utils'
-
 import { PluginArchiveDB } from '../db'
 import { usePluginStore } from '../store'
+
+import type { PluginBooter, PluginInstaller, PluginLoader } from './utils'
 
 const rawBooters = import.meta.glob<PluginBooter>('./booter/*_*.ts', {
   eager: true,

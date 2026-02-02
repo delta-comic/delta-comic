@@ -1,6 +1,7 @@
-import TOML from '@iarna/toml'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+
+import TOML from '@iarna/toml'
 
 export async function setVersion(version: string) {
   {

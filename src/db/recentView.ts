@@ -1,7 +1,8 @@
 import type { Selectable } from 'kysely'
 
-import { db } from '.'
 import { ItemStoreDB } from './itemStore'
+
+import { db } from '.'
 
 export namespace RecentDB {
   export interface Table {

@@ -1,6 +1,5 @@
-import type { PluginConfig, PluginMeta } from 'delta-comic-core'
-
 import { appLocalDataDir, join } from '@tauri-apps/api/path'
+import type { PluginConfig, PluginMeta } from 'delta-comic-core'
 
 import type { PluginArchiveDB } from '../db'
 const appLocalDataDirPath = await appLocalDataDir()

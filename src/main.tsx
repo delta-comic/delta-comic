@@ -1,10 +1,12 @@
 import './override'
 import './lib'
+import '@/index.css'
+import 'vant/lib/index.css'
+import '@/db'
+
 import * as Sentry from '@sentry/vue'
 import { createPlugin } from '@tauri-store/pinia'
 import { reactiveComputed, useCssVar, useDark } from '@vueuse/core'
-
-import '@/index.css'
 import Color from 'color'
 import { Store } from 'delta-comic-core'
 import {
@@ -20,10 +22,7 @@ import {
 import { createPinia } from 'pinia'
 import { M3, type InsetsScheme } from 'tauri-plugin-m3'
 import { defaultOptions } from 'tauri-plugin-sentry-api'
-import 'vant/lib/index.css'
 import { ConfigProvider as VanConfigProvider, type ConfigProviderThemeVars } from 'vant'
-
-import '@/db'
 import { createApp, defineComponent, watch } from 'vue'
 
 import AppSetup from './AppSetup.vue'

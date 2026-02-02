@@ -22,20 +22,9 @@
     "noImplicitThis": true,
     "types": []
   },
-  "include": [
-    "vite.config.mts",
-    "./script/**/*",
-    "./script/*",
-    "./*.ts",
-    "./*.mts"
-  ],
-  "exclude": [
-    "./src/**/*"
-  ],
+  "include": ["vite.config.mts", "./script/**/*", "./script/*", "./*.ts", "./*.mts"],
+  "exclude": ["./src/**/*"],
   "vueCompilerOptions": {
-    "plugins": [
-      "vue-router/volar/sfc-typed-router",
-      "vue-router/volar/sfc-route-blocks"
-    ]
+    "plugins": ["vue-router/volar/sfc-typed-router", "vue-router/volar/sfc-route-blocks"]
   }
 }

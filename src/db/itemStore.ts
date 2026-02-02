@@ -1,6 +1,5 @@
-import type { JSONColumnType, Selectable } from 'kysely'
-
 import { uni, Utils } from 'delta-comic-core'
+import type { JSONColumnType, Selectable } from 'kysely'
 
 import { db } from '.'
 

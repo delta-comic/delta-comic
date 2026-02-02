@@ -1,9 +1,9 @@
+import { uni, Utils } from 'delta-comic-core'
 import type { JSONColumnType, Selectable } from 'kysely'
 
-import { uni, Utils } from 'delta-comic-core'
+import { ItemStoreDB } from './itemStore'
 
 import { db } from '.'
-import { ItemStoreDB } from './itemStore'
 
 export namespace HistoryDB {
   export interface Table {

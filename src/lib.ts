@@ -1,4 +1,5 @@
 import 'core-js'
+
 import { attachConsole } from '@tauri-apps/plugin-log'
 await attachConsole()
 

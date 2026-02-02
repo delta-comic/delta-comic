@@ -18,7 +18,6 @@
     "preserveWhitespace": false,
     "stylesheet": "./src/index.css"
   },
-  "experimentalSortImports": {},
   "bracketSameLine": false,
   "bracketSpacing": true,
   "embeddedLanguageFormatting": "auto",
@@ -26,5 +25,16 @@
   "proseWrap": "preserve",
   "htmlWhitespaceSensitivity": "css",
   "objectWrap": "collapse",
-  "quoteProps": "consistent"
+  "quoteProps": "consistent",
+  "experimentalSortImports": {
+    "groups": [
+      ["side-effect"],
+      ["builtin"],
+      ["external", "type-external"],
+      ["internal", "type-internal"],
+      ["parent", "type-parent"],
+      ["sibling", "type-sibling"],
+      ["index", "type-index"]
+    ]
+  }
 }
