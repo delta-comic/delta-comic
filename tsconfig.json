@@ -1,11 +1,17 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.json",
-  "files": [],
   "compilerOptions": {
+    "jsx": "preserve",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
     "emitDecoratorMetadata": true,
     "strict": true,
+    "target": "ESNext",
     "useDefineForClassFields": true,
+    "module": "ESNext",
     "skipLibCheck": true,
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "noEmit": true,
@@ -19,12 +25,33 @@
     "noImplicitOverride": true,
     "isolatedModules": true,
     "noImplicitThis": true,
+    "jsxImportSource": "vue",
     "verbatimModuleSyntax": true,
-  },
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
     },
+    "types": [
+      "./components.d.ts",
+      "./env.d.ts",
+      "vue-component-type-helpers",
+      "./typed-router.d.ts"
+    ]
+  },
+  "vueCompilerOptions": {
+    "plugins": [
+      "vue-router/volar/sfc-typed-router",
+      "vue-router/volar/sfc-route-blocks"
+    ]
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "./*.ts"
+  ],
+  "references": [
     {
       "path": "./tsconfig.node.json"
     }
