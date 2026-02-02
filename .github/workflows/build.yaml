@@ -27,12 +27,12 @@ jobs:
           path: |
             ~/src-tauri/target
           key: ${{ runner.os }}-delta-comic-java
-          
+
       - name: Cache Rust
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5  # v2.8.2
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
         with:
           key: ${{ runner.os }}-delta-comic-rust
-          workspaces: "./src-tauri/ -> target"
+          workspaces: './src-tauri/ -> target'
 
       - name: Build script run pm
         run: chmod +x ./script/*
@@ -104,7 +104,7 @@ jobs:
           mobile: 'android'
           args: ''
           retryAttempts: 1
-          
+
       - name: Restore version
         run: |
           node ~/script/restore-version.mts ${{ steps.set-version.outputs.old_version }}

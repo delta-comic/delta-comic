@@ -5,7 +5,7 @@ on:
   pull_request:
   push:
     branches: [main, develop]
-    paths: '*.{js,jsx,ts,tsx,mjs,cjs,vue}'
+    paths: '*.{js,jsx,ts,tsx,mts,cts,mjs,cjs,vue}'
 
 jobs:
   lint:
@@ -38,3 +38,4 @@ jobs:
       - name: lint
         run: |
           pnpm exec oxlint --type-aware
+          pnpm exec oxfmt --check
