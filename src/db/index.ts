@@ -1,7 +1,7 @@
 import Database from '@tauri-apps/plugin-sql'
 import { useStorage } from '@vueuse/core'
 import { Utils } from 'delta-comic-core'
-import { debounce, withTimeout } from 'es-toolkit'
+import { debounce } from 'es-toolkit'
 import { CamelCasePlugin, Kysely, Migrator, type Migration, type SelectQueryBuilder } from 'kysely'
 import { TauriSqliteDialect } from 'kysely-dialect-tauri'
 import { SerializePlugin } from 'kysely-plugin-serialize'
@@ -42,38 +42,41 @@ const triggerUpdate = debounce(() => {
   triggerRef(db)
 }, 300)
 
-export const db = shallowRef(
-  new Kysely<DB>({
-    dialect: new TauriSqliteDialect({
-      database: {
-        close(db) {
-          return database.close(db)
-        },
-        path: database.path,
-        async select<T>(query: string, bindValues?: unknown[]) {
-          const result = await withTimeout(() => database.select<T>(query, bindValues), 3000)
-          if (MUTATION_KEYWORDS.test(query)) triggerUpdate()
-          return result
-        },
-        async execute(query: string, bindValues?: unknown[]) {
-          const result = await withTimeout(() => database.execute(query, bindValues), 3000)
-          if (MUTATION_KEYWORDS.test(query)) triggerUpdate()
-          return result
+export const db = await (async () => {
+  const db = shallowRef(
+    new Kysely<DB>({
+      dialect: new TauriSqliteDialect({
+        database: {
+          close(db) {
+            return database.close(db)
+          },
+          path: database.path,
+          async select<T>(query: string, bindValues?: unknown[]) {
+            const result = await database.select<T>(query, bindValues)
+            if (MUTATION_KEYWORDS.test(query)) triggerUpdate()
+            return result
+          },
+          async execute(query: string, bindValues?: unknown[]) {
+            const result = await database.execute(query, bindValues)
+            if (MUTATION_KEYWORDS.test(query)) triggerUpdate()
+            return result
+          }
         }
+      }),
+      plugins: [new CamelCasePlugin(), new SerializePlugin()]
+    })
+  )
+  const migrator = new Migrator({
+    db: db.value,
+    provider: {
+      async getMigrations() {
+        return migrations
       }
-    }),
-    plugins: [new CamelCasePlugin(), new SerializePlugin()]
-  })
-)
-const migrator = new Migrator({
-  db: db.value,
-  provider: {
-    async getMigrations() {
-      return migrations
     }
-  }
-})
-await migrator.migrateToLatest()
+  })
+  await migrator.migrateToLatest()
+  return db
+})()
 window.$api.db = db
 
 export namespace DBUtils {

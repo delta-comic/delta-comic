@@ -40,20 +40,18 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
 </script>
 
 <template>
-  <div class="ml-3 h-[36px] w-1/2">
+  <div class="ml-3 h-9 w-1/2">
     <div
       :class="[
-        isSearching
-          ? 'left-1 w-[calc(100%-18px)] rounded-lg'
-          : 'left-[41px] ml-3 w-1/2 rounded-full'
+        isSearching ? 'left-1 w-[calc(100%-18px)] rounded-lg' : 'left-10.25 ml-3 w-1/2 rounded-full'
       ]"
-      class="absolute !z-1000 flex h-[36px] items-center border border-solid border-gray-400 px-1 text-gray-400 transition-all duration-200"
+      class="absolute z-1000! flex h-9 items-center border border-solid border-gray-400 px-1 text-gray-400 transition-all duration-200"
     >
       <VanIcon name="search" color="rgb(156 163 175)" size="1.5rem" @click="handleSearch(text)" />
       <form action="/" @submit.prevent="handleSearch(text)" class="h-full w-full">
         <input
           type="search"
-          class="h-full w-full border-none bg-transparent !text-(--van-text-color)"
+          class="h-full w-full border-none bg-transparent text-(--van-text-color)!"
           spellcheck="false"
           @focus="isSearching = true"
           v-model="text"
@@ -73,7 +71,7 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
                 isSearching = false
               }
             "
-            class="!absolute top-0 right-2 z-10 !flex h-full items-center font-bold transition-[transform,_opacity]"
+            class="absolute! top-0 right-2 z-10 flex! h-full items-center font-bold transition-[transform,opacity]"
             color="#9ca3af"
           />
         </Motion>

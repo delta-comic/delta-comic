@@ -12,16 +12,11 @@ export namespace RecentDB {
   }
   export type Item = Selectable<Table>
 
-  export function upsert(item: ItemStoreDB.StorableItem) {
-    return db.value
-      .transaction()
-      .setIsolationLevel('serializable')
-      .execute(async db => {
-        const itemKey = await ItemStoreDB.upsert(item)
-        await db
-          .replaceInto('recentView')
-          .values({ isViewed: false, itemKey, timestamp: Date.now() })
-          .execute()
-      })
+  export async function upsert(item: ItemStoreDB.StorableItem) {
+    const itemKey = await ItemStoreDB.upsert(item)
+    await db.value
+      .replaceInto('recentView')
+      .values({ isViewed: false, itemKey, timestamp: Date.now() })
+      .execute()
   }
 }

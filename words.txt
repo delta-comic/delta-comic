@@ -34,6 +34,7 @@ rustls
 serde
 sider
 staticlib
+stylesheet
 swipeable
 tauri
 TAURI

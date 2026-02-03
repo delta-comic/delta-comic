@@ -14,15 +14,10 @@ export namespace HistoryDB {
 
   export type Item = Selectable<Table>
   export async function upsert(item: ItemStoreDB.StorableItem) {
-    return db.value
-      .transaction()
-      .setIsolationLevel('serializable')
-      .execute(async txr => {
-        const itemKey = await ItemStoreDB.upsert(item)
-        await txr
-          .replaceInto('history')
-          .values({ itemKey, timestamp: Date.now(), ep: Utils.data.Struct.toRaw(item) })
-          .execute()
-      })
+    const itemKey = await ItemStoreDB.upsert(item)
+    await db.value
+      .replaceInto('history')
+      .values({ itemKey, timestamp: Date.now(), ep: Utils.data.Struct.toRaw(item) })
+      .execute()
   }
 }

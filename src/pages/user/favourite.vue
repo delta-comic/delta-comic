@@ -49,39 +49,33 @@ const syncFromCloud = () =>
           async c => {
             c.retryable = true
             let diff: uni.item.RawItem[] = []
-            c.description = '等待中'
+            c.description = '写入中'
             await db.value
-              .transaction()
-              .setIsolationLevel('serializable')
-              .execute(async trx => {
-                c.description = '写入中'
-                await trx
-                  .replaceInto('favouriteCard')
-                  .values({
-                    title: `同步文件夹-${plugin}`,
-                    description: '',
-                    createAt: index,
-                    private: true
-                  })
-                  .execute()
-
-                for (const v of downloadItems) {
-                  FavouriteDB.upsertItem(v, index)
-                }
-
-                c.description = '对比差异中'
-                const all = await trx
-                  .selectFrom('favouriteItem')
-                  .innerJoin('itemStore', 'favouriteItem.itemKey', 'itemStore.key')
-                  .selectAll()
-                  .execute()
-
-                const thisPluginItems = all.filter(v => v.item.$$plugin == plugin).map(v => v.item)
-                diff = uniqBy(
-                  thisPluginItems.filter(v => !downloadItems.some(r => v.id == r.id)),
-                  v => v.id
-                )
+              .replaceInto('favouriteCard')
+              .values({
+                title: `同步文件夹-${plugin}`,
+                description: '',
+                createAt: index,
+                private: true
               })
+              .execute()
+
+            for (const v of downloadItems) {
+              FavouriteDB.upsertItem(v, index)
+            }
+
+            c.description = '对比差异中'
+            const all = await db.value
+              .selectFrom('favouriteItem')
+              .innerJoin('itemStore', 'favouriteItem.itemKey', 'itemStore.key')
+              .selectAll()
+              .execute()
+
+            const thisPluginItems = all.filter(v => v.item.$$plugin == plugin).map(v => v.item)
+            diff = uniqBy(
+              thisPluginItems.filter(v => !downloadItems.some(r => v.id == r.id)),
+              v => v.id
+            )
             return diff
           }
         )

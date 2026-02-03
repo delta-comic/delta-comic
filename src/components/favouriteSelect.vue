@@ -54,10 +54,8 @@ const submit = () => {
   isShow.value = false
 }
 
-const favouriteThis = async (inCard: FavouriteDB.Card['createAt'][]) =>
-  db.value.transaction().execute(async () => {
-    for (const card of inCard) await FavouriteDB.upsertItem($props.item, card)
-  })
+const favouriteThis = (inCard: FavouriteDB.Card['createAt'][]) =>
+  Promise.all(inCard.map(card => FavouriteDB.upsertItem($props.item, card)))
 
 const thisFavouriteCount = computedAsync(
   () => DBUtils.countDb(db.value.selectFrom('favouriteItem').where('itemKey', '=', $props.item.id)),

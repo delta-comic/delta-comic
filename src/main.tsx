@@ -32,12 +32,22 @@ window.$api.M3 = M3
 document.addEventListener('contextmenu', e => e.preventDefault())
 
 const handleSafeAreaChange = (v: InsetsScheme | false) => {
-  if (!v) return
+  if (!v)
+    v = { adjustedInsetBottom: 0, adjustedInsetLeft: 0, adjustedInsetRight: 0, adjustedInsetTop: 0 }
   const { adjustedInsetBottom, adjustedInsetLeft, adjustedInsetRight, adjustedInsetTop } = v
-  document.documentElement.style.setProperty(`--safe-area-inset-bottom`, `${adjustedInsetBottom}px`)
-  document.documentElement.style.setProperty(`--safe-area-inset-left`, `${adjustedInsetLeft}px`)
-  document.documentElement.style.setProperty(`--safe-area-inset-right`, `${adjustedInsetRight}px`)
-  document.documentElement.style.setProperty(`--safe-area-inset-top`, `${adjustedInsetTop}px`)
+  document.documentElement.style.setProperty(
+    `--safe-area-inset-bottom`,
+    `${adjustedInsetBottom ?? 0}px`
+  )
+  document.documentElement.style.setProperty(
+    `--safe-area-inset-left`,
+    `${adjustedInsetLeft ?? 0}px`
+  )
+  document.documentElement.style.setProperty(
+    `--safe-area-inset-right`,
+    `${adjustedInsetRight ?? 0}px`
+  )
+  document.documentElement.style.setProperty(`--safe-area-inset-top`, `${adjustedInsetTop ?? 0}px`)
 }
 await M3.getInsets().then(handleSafeAreaChange)
 

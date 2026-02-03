@@ -1,5 +1,5 @@
 [package]
-name = "Delta Comic"
+name = "delta-comic"
 description = "Per Aspera, Ad Astra"
 authors = ["wenxig"]
 license = "AGPL-3.0-only"
