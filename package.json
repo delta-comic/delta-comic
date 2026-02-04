@@ -78,7 +78,6 @@
     "@cspell/dict-npm": "^5.2.31",
     "@cspell/dict-rust": "^4.1.1",
     "@iarna/toml": "^2.2.5",
-    "@semantic-release/exec": "^7.1.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tauri-apps/cli": "^2.9.6",
     "@tsconfig/node24": "^24.0.4",

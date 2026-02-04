@@ -90,7 +90,7 @@ jobs:
       - name: Change version
         id: set-version
         run: |
-          $OLD_VERSION = "$(node ~/script/update-version.mts)"
+          OLD_VERSION="$(node ./script/update-version.mts)"
           echo "old_version=$OLD_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build Android App
@@ -107,7 +107,7 @@ jobs:
 
       - name: Restore version
         run: |
-          node ~/script/set-version.mts ${{ steps.set-version.outputs.old_version }}
+          node ./script/set-version.mts ${{ steps.set-version.outputs.old_version }}
 
       #signature
       - name: Restore keystore (decode + verify)
@@ -165,6 +165,11 @@ jobs:
           ls -la ./dist
 
       #publish
+      - name: Configure git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 用于在 GitHub 上创建 release 与 tag
