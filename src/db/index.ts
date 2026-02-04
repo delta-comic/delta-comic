@@ -52,11 +52,13 @@ export const db = await (async () => {
           },
           path: database.path,
           async select<T>(query: string, bindValues?: unknown[]) {
+            console.debug('sql!', query, bindValues)
             const result = await database.select<T>(query, bindValues)
             if (MUTATION_KEYWORDS.test(query)) triggerUpdate()
             return result
           },
           async execute(query: string, bindValues?: unknown[]) {
+            console.debug('sql!', query, bindValues)
             const result = await database.execute(query, bindValues)
             if (MUTATION_KEYWORDS.test(query)) triggerUpdate()
             return result
