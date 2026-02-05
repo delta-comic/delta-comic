@@ -2268,8 +2268,8 @@ packages:
     engines: {node: '>=0.4.0'}
 
   delta-comic-core@file:../delta-comic-core/dist/pack.tgz:
-    resolution: {integrity: sha512-ksHMyfNBvaZzdTUoU1aLpV3sQ2BsSfaw2gfwo40ZOpk1uZ7QzkO0TqSxthsgW1dnztBqOjqXAhe2DkfVf6QqLg==, tarball: file:../delta-comic-core/dist/pack.tgz}
-    version: 0.5.14
+    resolution: {integrity: sha512-N//QtxAXnlBY17vrLvISZSJy/6OPuVvLVRaWnzbGKNH70N37T+gWRo3R8E+oSylG5IVHZ5ebhZ2JTfgnZGG2rA==, tarball: file:../delta-comic-core/dist/pack.tgz}
+    version: 1.1.0
     peerDependencies:
       axios: ^1.13.4
       kysely: ^0.28.10
@@ -6389,6 +6389,7 @@ snapshots:
       motion-v: 1.7.3(@vueuse/core@14.1.0(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3))
       naive-ui: 2.43.2(vue@3.5.27(typescript@5.9.3))
       pinia: 3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3))
+      semver: 7.7.3
       tailwindcss-safe-area-capacitor: 0.5.1(tailwindcss@4.1.18)
       vant: 4.9.22(vue@3.5.27(typescript@5.9.3))
       vidstack: 1.12.13

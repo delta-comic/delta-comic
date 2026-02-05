@@ -10,11 +10,14 @@ import * as Vant from 'vant'
 window.$$lib$$.Vant = Vant
 import * as Naive from 'naive-ui'
 window.$$lib$$.Naive = Naive
-import * as Axios from 'axios'
-import axios from 'axios'
+
 import { CORSFetch } from 'tauri-plugin-cors-fetch-no-aws'
 const cors = CORSFetch.init()
 cors.config({ request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } } })
+
+import * as Axios from 'axios'
+import axios from 'axios'
+window.fetch = fetch
 
 axios.defaults.timeout = 7000
 axios.defaults.adapter = ['fetch']
