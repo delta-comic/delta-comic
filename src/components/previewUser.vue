@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { computed, shallowRef } from 'vue'
 import { Comp, uni } from 'delta-comic-core'
 import { usePluginStore } from '@/plugin/store'

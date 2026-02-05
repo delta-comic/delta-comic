@@ -1,0 +1,3 @@
+# rustfmt.toml（放在项目根）
+tab_spaces = 2
+hard_tabs = false

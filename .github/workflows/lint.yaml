@@ -1,0 +1,41 @@
+name: 各种检查
+run-name: code-check
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+    paths: '*.{js,jsx,ts,tsx,mts,cts,mjs,cjs,vue}'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.2.0
+        with:
+          version: 10.27.0
+
+      - name: Node setup
+        uses: actions/setup-node@v6.2.0
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Change depends
+        run: sh ./script/install.sh
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: lint
+        run: |
+          pnpm exec oxlint --type-aware
+          pnpm exec oxfmt --check

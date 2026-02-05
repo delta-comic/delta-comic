@@ -1,5 +1,5 @@
-<script setup lang='ts'>
-import { favouriteDB } from '@/db/favourite'
+<script setup lang="ts">
+import { db } from '@/db'
 import { Comp } from 'delta-comic-core'
 import { useMessage } from 'naive-ui'
 import { ref, shallowRef } from 'vue'
@@ -15,11 +15,7 @@ const create = (defaultValue = formDataRaw) => {
   show.value = true
 }
 
-const formDataRaw = {
-  title: '',
-  description: '',
-  isPrivate: true
-}
+const formDataRaw = { title: '', description: '', isPrivate: true }
 const formData = ref(formDataRaw)
 
 const cancel = () => {
@@ -27,26 +23,42 @@ const cancel = () => {
   show.value = false
 }
 
-const onSubmit = () => {
-  favouriteDB.$setCards({
-    ...formData.value,
-  })
+const onSubmit = async () => {
+  await db.value
+    .replaceInto('favouriteCard')
+    .values({ ...formData.value, private: false, createAt: Date.now() })
+    .execute()
   formData.value = formDataRaw
   show.value = false
 }
-defineExpose({
-  create
-})
+defineExpose({ create })
 </script>
 
 <template>
-  <Comp.Popup v-model:show="show" position="bottom" round @closed="cancel" class="bg-(--van-background)!">
-    <div class="w-full flex items-center pl-5 my-2 h-8 font-semibold">创建收藏夹</div>
+  <Comp.Popup
+    v-model:show="show"
+    position="bottom"
+    round
+    @closed="cancel"
+    class="bg-(--van-background)!"
+  >
+    <div class="my-2 flex h-8 w-full items-center pl-5 font-semibold">创建收藏夹</div>
     <VanForm @submit="onSubmit">
       <VanCellGroup inset>
-        <VanField v-model="formData.title" name="title" label="名称" placeholder="名称"
-          :rules="[{ required: true, message: '请填写名称' }]" />
-        <VanField v-model="formData.description" type="textarea" name="description" label="简介" placeholder="可选的" />
+        <VanField
+          v-model="formData.title"
+          name="title"
+          label="名称"
+          placeholder="名称"
+          :rules="[{ required: true, message: '请填写名称' }]"
+        />
+        <VanField
+          v-model="formData.description"
+          type="textarea"
+          name="description"
+          label="简介"
+          placeholder="可选的"
+        />
         <VanField name="switch" label="私密的">
           <template #input>
             <VanSwitch v-model="formData.isPrivate" />

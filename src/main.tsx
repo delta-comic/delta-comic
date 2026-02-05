@@ -1,42 +1,64 @@
-import "./lib"
-import { createApp, defineComponent, watch, } from "vue"
-import { createPinia } from "pinia"
-import { router } from "./router"
-import "@/index.css"
-import { ConfigProvider as VanConfigProvider, type ConfigProviderThemeVars } from 'vant'
-import { NConfigProvider, NMessageProvider, NDialogProvider, NLoadingBarProvider, zhCN, type GlobalThemeOverrides, darkTheme, NGlobalStyle } from 'naive-ui'
-import Color from "color"
-import { reactiveComputed, useCssVar, useDark } from "@vueuse/core"
-import { SafeArea, type SafeAreaInsets } from 'capacitor-plugin-safe-area'
-import AppSetup from "./AppSetup.vue"
-import { Store } from "delta-comic-core"
+import './override'
+import './lib'
+import '@/index.css'
 import 'vant/lib/index.css'
-import { Capacitor } from '@capacitor/core'
-import { ScreenOrientation } from '@capacitor/screen-orientation'
-document.addEventListener('contextmenu', e => e.preventDefault())
-const handleSafeAreaChange = ({ insets }: SafeAreaInsets) => {
-  for (const [key, value] of Object.entries(insets)) document.documentElement.style.setProperty(
-    `--safe-area-inset-${key}`,
-    `${value}px`,
-  )
-}
-await SafeArea.getSafeAreaInsets().then(handleSafeAreaChange)
-SafeArea.addListener('safeAreaChanged', handleSafeAreaChange)
+import '@/db'
 
-if(Capacitor.isNativePlatform())
-  await ScreenOrientation.lock({
-    orientation: "portrait-primary"
-  })
+import * as Sentry from '@sentry/vue'
+import { createPlugin } from '@tauri-store/pinia'
+import { reactiveComputed, useCssVar, useDark } from '@vueuse/core'
+import Color from 'color'
+import { Store } from 'delta-comic-core'
+import {
+  NConfigProvider,
+  NMessageProvider,
+  NDialogProvider,
+  NLoadingBarProvider,
+  zhCN,
+  type GlobalThemeOverrides,
+  darkTheme,
+  NGlobalStyle
+} from 'naive-ui'
+import { createPinia } from 'pinia'
+import { M3, type InsetsScheme } from 'tauri-plugin-m3'
+import { defaultOptions } from 'tauri-plugin-sentry-api'
+import { ConfigProvider as VanConfigProvider, type ConfigProviderThemeVars } from 'vant'
+import { createApp, defineComponent, watch } from 'vue'
+
+import AppSetup from './AppSetup.vue'
+import { router } from './router'
+window.$api.M3 = M3
+
+document.addEventListener('contextmenu', e => e.preventDefault())
+
+const handleSafeAreaChange = (v: InsetsScheme | false) => {
+  if (!v)
+    v = { adjustedInsetBottom: 0, adjustedInsetLeft: 0, adjustedInsetRight: 0, adjustedInsetTop: 0 }
+  const { adjustedInsetBottom, adjustedInsetLeft, adjustedInsetRight, adjustedInsetTop } = v
+  document.documentElement.style.setProperty(
+    `--safe-area-inset-bottom`,
+    `${adjustedInsetBottom ?? 0}px`
+  )
+  document.documentElement.style.setProperty(
+    `--safe-area-inset-left`,
+    `${adjustedInsetLeft ?? 0}px`
+  )
+  document.documentElement.style.setProperty(
+    `--safe-area-inset-right`,
+    `${adjustedInsetRight ?? 0}px`
+  )
+  document.documentElement.style.setProperty(`--safe-area-inset-top`, `${adjustedInsetTop ?? 0}px`)
+}
+await M3.getInsets().then(handleSafeAreaChange)
 
 const app = createApp(
   defineComponent(() => {
     const themeColor = Color('#fb7299').hex()
-    const themeColorLight = Color(themeColor).lighten(0.2).hex()
     const themeColorDark = Color(themeColor).darken(0.2).hex()
     const themeOverrides = reactiveComputed<GlobalThemeOverrides>(() => ({
       common: {
         primaryColor: themeColor,
-        primaryColorHover: themeColorLight,
+        primaryColorHover: Color(themeColor).lighten(0.2).hex(),
         primaryColorPressed: themeColorDark,
         primaryColorSuppl: themeColorDark
       }
@@ -44,28 +66,40 @@ const app = createApp(
     const config = Store.useConfig()
     const fontBold = useCssVar('--nui-font-weight')
 
-    const isUseDarkMode = useDark({
-      listenToStorageChanges: false
-    })
-    watch(() => config.isDark, isDark => isUseDarkMode.value = isDark)
+    const isUseDarkMode = useDark({ listenToStorageChanges: false })
+    watch(
+      () => config.isDark,
+      isDark => (isUseDarkMode.value = isDark)
+    )
     return () => (
-      <NConfigProvider locale={zhCN} abstract theme={config.isDark ? darkTheme : undefined} themeOverrides={themeOverrides}>
+      <NConfigProvider
+        locale={zhCN}
+        abstract
+        theme={config.isDark ? darkTheme : undefined}
+        themeOverrides={themeOverrides}
+      >
         <NGlobalStyle />
-        <NLoadingBarProvider container-class="z-200000">
-          <NDialogProvider to="#popups">
-            <VanConfigProvider themeVars={{
+        <NLoadingBarProvider container-class='z-200000'>
+          <NDialogProvider to='#popups'>
+            <VanConfigProvider
+              themeVars={
+                {
+                  blue: themeColor,
+                  green: themeOverrides.common?.successColor,
+                  red: themeOverrides.common?.errorColor,
+                  orange: themeOverrides.common?.warningColor,
 
-              blue: themeColor,
-              green: themeOverrides.common?.successColor,
-              red: themeOverrides.common?.errorColor,
-              orange: themeOverrides.common?.warningColor,
+                  baseFont: 'var(--nui-font-family)',
+                  priceFont: 'var(--font-family-mono)',
 
-              baseFont: 'var(--nui-font-family)',
-              priceFont: 'var(--font-family-mono)',
-
-              fontBold: fontBold.value
-            } as ConfigProviderThemeVars} class="h-full overflow-hidden" theme={config.isDark ? 'dark' : "light"} themeVarsScope="global" >
-              <NMessageProvider max={5} to="#messages">
+                  fontBold: fontBold.value
+                } as ConfigProviderThemeVars
+              }
+              class='h-full overflow-hidden'
+              theme={config.isDark ? 'dark' : 'light'}
+              themeVarsScope='global'
+            >
+              <NMessageProvider max={5} to='#messages'>
                 <AppSetup />
               </NMessageProvider>
             </VanConfigProvider>
@@ -76,12 +110,16 @@ const app = createApp(
   })
 )
 
+if (!import.meta.env.DEV) Sentry.init({ ...defaultOptions, app, sendDefaultPii: true })
+
 const pinia = createPinia()
+pinia.use(createPlugin())
 app.use(pinia)
+
 app.use(router)
 
 const meta = document.createElement('meta')
 meta.name = 'naive-ui-style'
 document.head.appendChild(meta)
 
-app.mount("#app")
+app.mount('#app')

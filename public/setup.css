@@ -12,20 +12,32 @@
   z-index: 1145141919810 !important;
 }
 
-#setup>img {
+#setup > img {
   all: unset !important;
   width: 95vw !important;
   object-fit: scale-down !important;
   margin-top: -30vw !important;
 }
 
-#setup>div {
+#setup > div {
   all: unset !important;
   position: absolute !important;
   bottom: 3rem !important;
   font-weight: 600 !important;
   font-size: 1.5rem !important;
   color: #fb7299 !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif !important;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'Helvetica Neue',
+    Helvetica,
+    Segoe UI,
+    Arial,
+    Roboto,
+    'PingFang SC',
+    'miui',
+    'Hiragino Sans GB',
+    'Microsoft Yahei',
+    sans-serif !important;
   line-height: 1rem !important;
 }

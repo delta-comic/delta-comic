@@ -1,0 +1,179 @@
+name: 构建和发布(dev)
+
+on:
+  push:
+    branches:
+      - 'develop'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: ${{ github.event.head_commit && contains(github.event.head_commit.message, '(build)') }}
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
+    steps:
+      #restore
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Cache Java
+        uses: actions/cache@v5.0.3
+        with:
+          path: |
+            ~/src-tauri/target
+          key: ${{ runner.os }}-delta-comic-java
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
+        with:
+          key: ${{ runner.os }}-delta-comic-rust
+          workspaces: './src-tauri/ -> target'
+
+      - name: Build script run pm
+        run: chmod +x ./script/*
+
+      # rust
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
+
+      # js
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.2.0
+        with:
+          version: 10.27.0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v6.2.0
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Change depends
+        run: sh ./script/install.sh
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      # java
+      - name: JDK 23
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '23'
+          cache: 'gradle'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3.2.2
+        with:
+          log-accepted-android-sdk-licenses: false
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1.5.0
+        id: setup-ndk
+        with:
+          ndk-version: r29
+          link-to-sdk: true
+          local-cache: true
+
+      - name: Init android project
+        run: |
+          pnpm dlx @tauri-apps/cli android init
+
+      # build
+      - name: Build Android App
+        id: build
+        uses: tauri-apps/tauri-action@dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        with:
+          mobile: 'android'
+          args: ''
+          retryAttempts: 1
+
+      #signature
+      - name: Restore keystore (decode + verify)
+        env:
+          KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP"
+
+          # 解码到 PKCS12 文件（注意这里恢复为 .p12/.jks 都可以，只要之后使用 --ks-type PKCS12）
+          printf '%s' "${{ secrets.ANDROID_KEY_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/keystore.p12"
+
+          # 基本检查
+          ls -l "$RUNNER_TEMP/keystore.p12"
+          FILESIZE=$(stat --format="%s" "$RUNNER_TEMP/keystore.p12" || echo 0)
+          echo "keystore size: $FILESIZE"
+          if [ "$FILESIZE" -lt 1000 ]; then
+            echo "ERROR: keystore seems too small ($FILESIZE bytes). Did you upload the correct base64 content?" >&2
+            exit 1
+          fi
+
+          # 验证 keystore（PKCS12）
+          keytool -list -keystore "$RUNNER_TEMP/keystore.p12" -storetype PKCS12 -storepass "$KEYSTORE_PASS"
+
+          # 写 keystore.properties（如果你的构建或脚本需要）
+          cd src-tauri/gen/android || true
+          printf 'storeFile=%s\n' "$RUNNER_TEMP/keystore.p12" > keystore.properties
+          printf 'storePassword=%s\n' "$KEYSTORE_PASS" >> keystore.properties
+          printf 'keyPassword=%s\n' "$KEYSTORE_PASS" >> keystore.properties
+          printf 'keyAlias=%s\n' "${{ secrets.ANDROID_KEY_ALIAS }}" >> keystore.properties
+
+      - name: Install apksigner
+        run: sudo apt-get update && sudo apt-get install -y apksigner
+
+      - name: Sign APK
+        env:
+          KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          APK_SRC="./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
+          if [ ! -f "$APK_SRC" ]; then
+            echo "APK not found at $APK_SRC" >&2
+            exit 1
+          fi
+          mkdir -p dist
+
+          apksigner sign \
+            --ks "$RUNNER_TEMP/keystore.p12" \
+            --ks-type PKCS12 \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$KEYSTORE_PASS" \
+            --key-pass "pass:$KEYSTORE_PASS" \
+            --v1-signing-enabled true \
+            --v2-signing-enabled true \
+            --v3-signing-enabled true \
+            --out ./dist/app.apk \
+            "$APK_SRC"
+
+          echo '-----------'
+          ls -la ./dist
+
+      #publish
+      - name: Release
+        uses: softprops/action-gh-release@v2.5.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            ./dist/app.apk
+          tag_name: 'dev-v${{ steps.build.outputs.appVersion }}'
+          name: 'Dev build v${{ steps.build.outputs.appVersion }}'
+          body: |
+            dev构建，不确保任何功能可以使用
+            ${{ github.event.head_commit.message }}
+          repository: ${{github.repository}}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          make_latest: true
+          prerelease: true

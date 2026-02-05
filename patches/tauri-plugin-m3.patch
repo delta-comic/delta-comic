@@ -1,0 +1,15 @@
+diff --git a/package.json b/package.json
+index d6cc5e6bad6c896f6a15f2275ca2546e2311eef9..5f01a0952d9cb36526f36db9cdc45cc49918cb27 100644
+--- a/package.json
++++ b/package.json
+@@ -11,8 +11,8 @@
+         "url": "https://github.com/0xk1f0/tauri-plugin-m3"
+     },
+     "exports": {
+-        "types": "./dist-js/index.d.ts",
+-        "import": "./dist-js/index.js",
++        "types": "./dist-js/index.d.mts",
++        "import": "./dist-js/index.mjs",
+         "require": "./dist-js/index.cjs"
+     },
+     "files": [

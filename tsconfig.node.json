@@ -3,14 +3,12 @@
     "composite": true,
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "module": "ESNext",
+    "module": "nodenext",
     "skipLibCheck": true,
     /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
@@ -22,19 +20,11 @@
     "noImplicitAny": true,
     "noImplicitOverride": true,
     "noImplicitThis": true,
-    "types": [
-      "@types/node"
-    ],
+    "types": []
   },
-  "include": [
-    "vite.config.mts",
-    "./scripts/**/*",
-    "./scripts/*",
-    "./*.ts",
-    "./dev/**/*",
-    "./dev/*"
-  ],
-  "exclude": [
-    "./src/**/*"
-  ]
+  "include": ["vite.config.mts", "./script/**/*", "./script/*", "./*.ts", "./*.mts"],
+  "exclude": ["./src/**/*"],
+  "vueCompilerOptions": {
+    "plugins": ["vue-router/volar/sfc-typed-router", "vue-router/volar/sfc-route-blocks"]
+  }
 }

@@ -1,0 +1,41 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "enables the default permissions",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "clipboard-manager:allow-read-text",
+    "clipboard-manager:deny-write-text",
+    "fs:default",
+    "fs:allow-localdata-write-recursive",
+    "fs:allow-data-write-recursive",
+    "fs:allow-appdata-write-recursive",
+    "fs:read-all",
+    "sql:default",
+    "sql:allow-execute",
+    "upload:default",
+    "pinia:default",
+    "core:event:default",
+    "m3:default",
+    "aptabase:allow-track-event",
+    {
+      "identifier": "http:default",
+      "allow": [
+        "https://**",
+        "http://**",
+        "http://localhost**",
+        "https://*.localhost:*",
+        "https://*:*",
+        "http://*:*",
+        "https://*.*:*",
+        "http://*.*:*",
+        "https://*.localhost:*/*",
+        "http://*.localhost:*/*"
+      ]
+    },
+    "sentry:default",
+    "log:default",
+    "cors-fetch:default"
+  ]
+}

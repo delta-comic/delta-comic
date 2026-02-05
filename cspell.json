@@ -1,0 +1,8 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "dictionaryDefinitions": [{ "name": "words", "path": "./words.txt", "addWords": true }],
+  "import": ["@cspell/dict-rust/cspell-ext.json", "@cspell/dict-npm/cspell-ext.json"],
+  "dictionaries": ["words", "npm", "rust", "rust-crates"],
+  "ignorePaths": ["node_modules", "/words.txt", "./dist", "./README.md"]
+}

@@ -1,10 +1,7 @@
 name: 错误-使用时错误
 description: 使用应用时出现的任何错误，或出现不符合预期的内容
-title: "[错误-使用时错误] <简易描述>"
-labels: [
-  Bug,
-  Runtime-Bug
-]
+title: '[错误-使用时错误] <简易描述>'
+labels: [Bug, Runtime-Bug]
 body:
   - type: markdown
     attributes:

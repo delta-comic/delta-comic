@@ -1,8 +1,8 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { isEmpty } from 'es-toolkit/compat'
 import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import symbol from '@/symbol'
+import { isShowMainHomeNavBar } from '@/symbol'
 import { until, useResizeObserver } from '@vueuse/core'
 import { Comp, coreModule, requireDepend, Store, uni, Utils } from 'delta-comic-core'
 import { LikeOutlined } from '@vicons/antd'
@@ -12,8 +12,11 @@ const $router = useRouter()
 const temp = Store.useTemp().$applyRaw('randomConfig', () => ({
   stream: Utils.data.Stream.create<uni.item.Item>(async function* (signal, that) {
     that.pages.value = Infinity
+    that.page.value = 0
     while (true) {
-      const result = await Utils.eventBus.SharedFunction.callRandom('getRandomProvide', signal).result
+      that.page.value++
+      const result = await Utils.eventBus.SharedFunction.callRandom('getRandomProvide', signal)
+        .result
       yield result
     }
   }),
@@ -21,7 +24,10 @@ const temp = Store.useTemp().$applyRaw('randomConfig', () => ({
 }))
 
 const containBound = ref<DOMRectReadOnly>()
-useResizeObserver(() => <HTMLDivElement | null>waterfall.value?.scrollParent?.firstElementChild, ([b]) => containBound.value = b.contentRect)
+useResizeObserver(
+  () => <HTMLDivElement | null>waterfall.value?.scrollParent?.firstElementChild,
+  ([b]) => (containBound.value = b.contentRect)
+)
 onMounted(async () => {
   if (!isEmpty(temp.stream._data)) {
     await until(() => (containBound.value?.height ?? 0) > 8).toBeTruthy()
@@ -33,24 +39,37 @@ const stop = $router.beforeEach(() => {
   temp.scroll = waterfall.value?.scrollTop ?? 0
 })
 
-const showNavBar = inject(symbol.showMainHomeNavBar)!
-watch(() => waterfall.value?.scrollTop, async (scrollTop, old) => {
-  if (!scrollTop || !old) return
-  if (scrollTop - old > 0) showNavBar.value = false
-  else showNavBar.value = true
-}, { immediate: true })
+const showNavBar = inject(isShowMainHomeNavBar)!
+watch(
+  () => waterfall.value?.scrollTop,
+  async (scrollTop, old) => {
+    if (!scrollTop || !old) return
+    if (scrollTop - old > 0) showNavBar.value = false
+    else showNavBar.value = true
+  },
+  { immediate: true }
+)
 
 const { comp } = requireDepend(coreModule)
+
+console.debug('[random] waterfall', waterfall, temp.stream)
 </script>
 
 <template>
-  <Comp.Waterfall class="w-full" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
-    <component :is="uni.item.Item.itemCard.get(item.contentType) ?? comp.ItemCard" :item type="small" free-height
-      :key="`${index}|${item.id}`">
+  <Comp.Waterfall class="size-full!" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
+    <component
+      :is="uni.item.Item.itemCard.get(item.contentType) ?? comp.ItemCard"
+      :item
+      type="small"
+      free-height
+      :key="`${index}|${item.id}`"
+    >
       <NIcon color="var(--van-text-color-2)" size="14px">
         <DrawOutlined />
       </NIcon>
-      <span class="ml-0.5 text-xs van-ellipsis max-w-2/3 text-(--van-text-color-2)">{{ item.author.join(',') }}</span>
+      <span class="van-ellipsis ml-0.5 max-w-2/3 text-xs text-(--van-text-color-2)">{{
+        item.author.join(',')
+      }}</span>
       <template #smallTopInfo>
         <span v-if="item.viewNumber">
           <VanIcon name="eye-o" class="mr-0.5" size="14px" />

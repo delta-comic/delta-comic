@@ -1,69 +1,47 @@
-import { usePluginStore } from "@/plugin/store"
-import { Utils, type uni, } from "delta-comic-core"
-import { type Table, Dexie } from "dexie"
-import { isString } from "es-toolkit"
+import { Utils, type uni } from 'delta-comic-core'
+import type { JSONColumnType, Selectable } from 'kysely'
 
-export const subscribeKey = new Utils.data.SourcedValue<[plugin: string, label: string]>()
-export type SubscribeKey_ = Utils.data.SourcedKeyType<typeof subscribeKey>
-export type SubscribeKey = Exclude<SubscribeKey_, string>
+import { db } from '.'
 
-export interface AuthorSubscribeItem {
-  author: uni.item.Author
-  type: 'author'
-  key: string
-  plugin: string
-}
-export interface EpSubscribeItem {
-  eps: uni.ep.Ep[]
-  type: 'ep'
-  key: string
-  plugin: string
-}
-export type SubscribeItem = AuthorSubscribeItem | EpSubscribeItem
+export namespace SubscribeDB {
+  export const key = new Utils.data.SourcedValue<[plugin: string, label: string]>()
+  export type Key_ = Utils.data.SourcedKeyType<typeof key>
+  export type Key = Exclude<Key_, string>
 
-export class SubscribeDb extends Dexie {
-  constructor() {
-    super('SubscribeDb')
-    this.version(1).stores({
-      all: 'key, type',
-    })
+  export interface AuthorTable {
+    author: JSONColumnType<uni.item.Author>
+    itemKey: null
+    type: 'author'
+    key: string
+    plugin: string
   }
-  public all!: Table<SubscribeItem, SubscribeItem['key']>
-  public async $add(...items: (SubscribeItem)[]) {
-    console.log(this.all)
-    await this.transaction('readwrite', [this.all], async () => {
-      console.log(`[SubscribeDb] add`, items)
-      await Promise.all(Object.entries(Object.groupBy(items, v => v.type)).map(async ([type, items]) => {
-        if (type == 'author')
-          await this.all.bulkPut(JSON.parse(JSON.stringify(items)))
-      }))
-    })
-    const pluginStore = usePluginStore()
-    Array.from(pluginStore.plugins.entries())
-      .filter(v => items.some(k => k.plugin == v[0]))
-      .flatMap(v => Object.entries(v[1].subscribe!)
-        .flatMap(sub =>
-          items.some(k => {
-            if (k.type != 'author') throw new Error
-            return k.author.subscribe! == sub[0]
-          }) ? () => items.filter(k => k.type == 'author').flatMap(k => sub[1].onAdd?.(k.author)) : undefined
-        )).map(v => v?.())
+  export type AuthorItem = Selectable<AuthorTable>
+
+  export interface EpTable {
+    author: null
+    itemKey: string // not f key
+    type: 'ep'
+    key: string
+    plugin: string
   }
-  public async $remove(...items: (SubscribeItem | SubscribeItem['key'])[]) {
-    const all = await Promise.all(items.map(async v => isString(v) ? (await this.all.get(v))! : v))
-    await Utils.data.PromiseContent.fromPromise(this.transaction('readwrite', [this.all], async () => {
-      await this.all.bulkDelete(items.map(v => isString(v) ? v : subscribeKey.toString(v.key)))
-    }))
-    const pluginStore = usePluginStore()
-    Array.from(pluginStore.plugins.entries())
-      .filter(v => all.some(k => k.plugin == v[0]))
-      .flatMap(v => Object.entries(v[1].subscribe!)
-        .flatMap(sub =>
-          all.some(k => {
-            if (k.type != 'author') throw new Error
-            return k.author.subscribe! == sub[0]
-          }) ? () => all.filter(k => k.type == 'author').flatMap(k => sub[1].onRemove?.(k.author)) : undefined
-        )).map(v => v?.())
+  export type EpItem = Selectable<EpTable>
+
+  export type Table = AuthorTable | EpTable
+  export type Item = AuthorItem | EpItem
+
+  export function getAll() {
+    return db.value.selectFrom('subscribe').selectAll().execute() as Promise<SubscribeDB.Item[]>
+  }
+  export async function upsert(item: Item) {
+    return db.value
+      .replaceInto('subscribe')
+      .values({
+        type: item.type,
+        itemKey: item.itemKey,
+        key: item.key,
+        plugin: item.plugin,
+        author: JSON.stringify(item.author)
+      })
+      .execute()
   }
 }
-export const subscribeDb = new SubscribeDb()
