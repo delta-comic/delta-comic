@@ -6,6 +6,7 @@ import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from
 import CommentRow from '@/components/comment/commentRow.vue'
 import Index from '@/components/comment/index.vue'
 import FavouriteSelect from '@/components/favouriteSelect.vue'
+import ImagedIcon from '@/components/ImagedIcon.vue'
 import UnitCard from '@/components/unitCard.vue'
 import AuthorIcon from '@/components/user/authorIcon.vue'
 import { db, DBUtils, useNativeStore } from '@/db'
@@ -62,7 +63,8 @@ export const $initCore = () =>
           ItemCard: UnitCard,
           FavouriteSelect: FavouriteSelect,
           CommentRow: CommentRow,
-          AuthorIcon: AuthorIcon
+          AuthorIcon: AuthorIcon,
+          ImagedIcon: ImagedIcon
         },
         db,
         useNativeStore
