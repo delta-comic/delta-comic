@@ -21,11 +21,20 @@
     ],
     "security": {
       "csp": "default-src * local: ipc: 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * local: ipc: 'unsafe-inline' 'unsafe-eval'; connect-src * local: ipc: 'unsafe-inline'; img-src * local: ipc: data: blob:; frame-src * local: ipc:; style-src * local: ipc: 'unsafe-inline';",
-      "assetProtocol": { "enable": false, "scope": [] }
+      "assetProtocol": {
+        "enable": false,
+        "scope": []
+      }
     },
     "withGlobalTauri": true
   },
-  "plugins": { "sql": { "preload": ["sqlite:app.db"] } },
+  "plugins": {
+    "sql": {
+      "preload": [
+        "sqlite:app.db"
+      ]
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",
@@ -36,6 +45,9 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "android": { "autoIncrementVersionCode": false, "minSdkVersion": 26 }
+    "android": {
+      "autoIncrementVersionCode": false,
+      "minSdkVersion": 26
+    }
   }
 }
