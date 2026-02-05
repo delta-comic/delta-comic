@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": [],
+  "ignorePatterns": [".vscode","package.json"],
   "endOfLine": "lf",
   "semi": false,
   "useTabs": false,
