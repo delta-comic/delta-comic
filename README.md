@@ -61,7 +61,7 @@ _为什么大黑塔点击率这么高_
 
 1. 尝试自行构建
 
-<details>
+<details> 
   <summary>
     <h2>现成的插件</h2>
   </summary>
