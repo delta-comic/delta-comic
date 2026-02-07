@@ -17,6 +17,7 @@ const recent = computedAsync(
       .selectFrom('recentView')
       .innerJoin('itemStore', 'recentView.itemKey', 'itemStore.key')
       .selectAll()
+      .orderBy('recentView.timestamp', 'desc')
       .execute(),
   []
 )
