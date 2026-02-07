@@ -1,7 +1,7 @@
 [package]
 name = "delta-comic"
 description = "Per Aspera, Ad Astra"
-authors = ["wenxig"]
+authors = [ "wenxig" ]
 license = "AGPL-3.0-only"
 repository = "https://github.com/delta-comic/delta-comic"
 edition = "2024"
@@ -13,30 +13,31 @@ linker = "rust-lld.exe"
 
 [target.x86_64-unknown-linux-gnu]
 linker = "clang"
-rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+rustflags = [ "-C", "link-arg=-fuse-ld=lld" ]
+
+[target."cfg(any(target_os = \"android\"))".dependencies]
+tauri-plugin-android-package-install = "2.0.1"
 
 [profile.dev]
-opt-level = 0 # 无优化
-debug = true # 开启调试信息
-overflow-checks = true # 整数溢出检查
-incremental = true # 启用增量编译
-
+opt-level = 0
+debug = true
+overflow-checks = true
+incremental = true
 
 [profile.dev.package."*"]
-opt-level = 0 # 无优化
-
+opt-level = 0
 
 [profile.release]
-codegen-units = 1 # 一个接一个地编译包，这样编译器就可以更好地优化
-lto = true # 启用链接到优化
-opt-level = 3 # 最大优化
-strip = true # 删除调试符号
-debug = false # 关闭调试信息
-incremental = true # 启用增量编译
+codegen-units = 1
+lto = true
+opt-level = 3
+strip = true
+debug = false
+incremental = true
 
 [lib]
 name = "delta_comic"
-crate-type = ["staticlib", "cdylib", "rlib"]
+crate-type = [ "staticlib", "cdylib", "rlib" ]
 
 
 [build-dependencies]
@@ -56,10 +57,38 @@ tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", fe
 ], branch = "v2" }
 tauri-plugin-pinia = "4.1.1"
 tauri-plugin-m3 = "0.3.1"
-tauri-plugin-aptabase = { git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls", branch = "main" }
 tokio = "1.49.0"
 tauri-plugin-sentry = "0.5.0"
-sentry = { version = "0.42", default-features = false, features = [
+mime_guess = "2.0.5"
+percent-encoding = "2.3.2"
+log = "0.4.29"
+tauri-runtime-wry = "2.9.3"
+
+  [dependencies.serde]
+  version = "1.0"
+  features = [ "derive" ]
+
+  [dependencies.tauri]
+  version = "2.9.5"
+  features = [ ]
+
+  [dependencies.tauri-plugin-http]
+  version = "2.5.6"
+  features = [ "unsafe-headers", "json" ]
+
+  [dependencies.tauri-plugin-sql]
+  git = "https://github.com/tauri-apps/plugins-workspace"
+  features = [ "sqlite" ]
+  branch = "v2"
+
+  [dependencies.tauri-plugin-aptabase]
+  git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls"
+  branch = "main"
+
+  [dependencies.sentry]
+  version = "0.42"
+  default-features = false
+  features = [
   "backtrace",
   "contexts",
   "debug-images",
@@ -80,6 +109,4 @@ tauri-plugin-better-cors-fetch = { git = "https://github.com/delta-comic/tauri-p
 ] }
 
 [features]
-custom-protocol = [
-  "tauri/custom-protocol"
-] # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
+custom-protocol = [ "tauri/custom-protocol" ]
