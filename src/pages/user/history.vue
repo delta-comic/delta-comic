@@ -17,6 +17,7 @@ const histories = computedAsync(
       .selectFrom('history')
       .innerJoin('itemStore', 'history.itemKey', 'itemStore.key')
       .selectAll()
+      .orderBy('history.timestamp', 'desc')
       .execute(),
   []
 )
