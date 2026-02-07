@@ -11,7 +11,7 @@ window.$$lib$$.Vant = Vant
 import * as Naive from 'naive-ui'
 window.$$lib$$.Naive = Naive
 
-import { CORSFetch } from 'tauri-plugin-cors-fetch-no-aws'
+import { CORSFetch } from 'tauri-plugin-better-cors-fetch'
 const cors = CORSFetch.init()
 cors.config({ request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } } })
 
