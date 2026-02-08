@@ -1,6 +1,14 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": [".vscode", "package.json"],
+  "ignorePatterns": [
+    ".vscode",
+    "package.json",
+    ".releaserc.mjs",
+    "*.md",
+    "components.d.ts",
+    "src-tauri/**/*",
+    "typed-router.d.ts"
+  ],
   "endOfLine": "lf",
   "semi": false,
   "useTabs": false,
@@ -28,13 +36,32 @@
   "quoteProps": "consistent",
   "experimentalSortImports": {
     "groups": [
-      ["side-effect"],
-      ["builtin"],
-      ["external", "type-external"],
-      ["internal", "type-internal"],
-      ["parent", "type-parent"],
-      ["sibling", "type-sibling"],
-      ["index", "type-index"]
+      [
+        "side-effect"
+      ],
+      [
+        "builtin"
+      ],
+      [
+        "external",
+        "type-external"
+      ],
+      [
+        "internal",
+        "type-internal"
+      ],
+      [
+        "parent",
+        "type-parent"
+      ],
+      [
+        "sibling",
+        "type-sibling"
+      ],
+      [
+        "index",
+        "type-index"
+      ]
     ]
   }
 }
