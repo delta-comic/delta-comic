@@ -71,8 +71,8 @@ importers:
         specifier: ^1.11.19
         version: 1.11.19
       delta-comic-core:
-        specifier: file:../delta-comic-core/dist/pack.tgz
-        version: file:../delta-comic-core/dist/pack.tgz(axios@1.13.4)(kysely@0.28.11)(naive-ui@2.43.2(vue@3.5.27(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(postcss@8.5.6)(tailwindcss@4.1.18)(vant@4.9.22(vue@3.5.27(typescript@5.9.3)))(vite@8.0.0-beta.13(@types/node@25.2.1)(esbuild@0.27.2)(jiti@2.6.1)(yaml@2.8.2))(vue-router@5.0.2(@vue/compiler-sfc@3.5.27)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3))
+        specifier: latest
+        version: 1.1.0(axios@1.13.4)(kysely@0.28.11)(naive-ui@2.43.2(vue@3.5.27(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(postcss@8.5.6)(tailwindcss@4.1.18)(vant@4.9.22(vue@3.5.27(typescript@5.9.3)))(vite@8.0.0-beta.13(@types/node@25.2.1)(esbuild@0.27.2)(jiti@2.6.1)(yaml@2.8.2))(vue-router@5.0.2(@vue/compiler-sfc@3.5.27)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3))
       dompurify:
         specifier: ^3.3.1
         version: 3.3.1
@@ -116,8 +116,8 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(tailwindcss@4.1.18)
       tauri-plugin-better-cors-fetch:
-        specifier: github:delta-comic/tauri-plugin-better-cors-fetch
-        version: git+https://git@github.com:delta-comic/tauri-plugin-better-cors-fetch.git#97153df1b070fa6874442a2279e38d68ffd70f6f(@commitlint/lint@20.4.1)(@types/node@25.2.1)(typescript@5.9.3)
+        specifier: https://github.com/delta-comic/tauri-plugin-better-cors-fetch
+        version: https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/399f76e5c9bf0a3797aa00dd256687ba48b68d62(@commitlint/lint@20.4.1)(@types/node@25.2.1)(typescript@5.9.3)
       tauri-plugin-m3:
         specifier: ^0.3.1
         version: 0.3.1(patch_hash=8c9ba340154ab43846ad8879e9cd6ba77d8ab97b1cd09726fd35883809f7dc34)
@@ -156,11 +156,14 @@ importers:
         specifier: ^4.1.2
         version: 4.1.2
       '@iarna/toml':
-        specifier: ^2.2.5
-        version: 2.2.5
+        specifier: ^3.0.0
+        version: 3.0.0
       '@semantic-release/changelog':
         specifier: ^6.0.3
         version: 6.0.3(semantic-release@25.0.3(typescript@5.9.3))
+      '@semantic-release/exec':
+        specifier: ^7.1.0
+        version: 7.1.0(semantic-release@25.0.3(typescript@5.9.3))
       '@semantic-release/git':
         specifier: ^10.0.1
         version: 10.0.1(semantic-release@25.0.3(typescript@5.9.3))
@@ -179,9 +182,6 @@ importers:
       '@tsconfig/node24':
         specifier: ^24.0.4
         version: 24.0.4
-      '@types/conventional-recommended-bump':
-        specifier: ^10.0.3
-        version: 10.0.3
       '@types/iarna__toml':
         specifier: ^2.0.5
         version: 2.0.5
@@ -928,8 +928,8 @@ packages:
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
 
-  '@iarna/toml@2.2.5':
-    resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
+  '@iarna/toml@3.0.0':
+    resolution: {integrity: sha512-td6ZUkz2oS3VeleBcN+m//Q6HlCFCPrnI0FZhrt/h4XqLEdOyYp2u21nd8MdsR+WJy5r9PTDaHTDDfhf4H4l6Q==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -1261,6 +1261,12 @@ packages:
     resolution: {integrity: sha512-mgdxrHTLOjOddRVYIYDo0fR3/v61GNN1YGkfbrjuIKg/uMgCd+Qzo3UAXJ+woLQQpos4pl5Esuw5A7AoNlzjUQ==}
     engines: {node: '>=18'}
 
+  '@semantic-release/exec@7.1.0':
+    resolution: {integrity: sha512-4ycZ2atgEUutspPZ2hxO6z8JoQt4+y/kkHvfZ1cZxgl9WKJId1xPj+UadwInj+gMn2Gsv+fLnbrZ4s+6tK2TFQ==}
+    engines: {node: '>=20.8.1'}
+    peerDependencies:
+      semantic-release: '>=24.1.0'
+
   '@semantic-release/git@10.0.1':
     resolution: {integrity: sha512-eWrx5KguUcU2wUPaO6sfvZI0wPafUKAMNC18aXY4EnNcrZL86dEmpNVnC9uMpGZkmZJ9EfCVJBQx4pV4EMGT1w==}
     engines: {node: '>=14.17'}
@@ -1538,10 +1544,6 @@ packages:
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
-
-  '@types/conventional-recommended-bump@10.0.3':
-    resolution: {integrity: sha512-bU0stOuSkWbhF/3hh3zHZaL5VqvfQwyHCOuxOMUc2O0kCVaoyKE/6GIb2RBz872vzmML61MMSg/Jec5/qRfOAA==}
-    deprecated: This is a stub types definition. conventional-recommended-bump provides its own type definitions, so you do not need this installed.
 
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
@@ -2204,9 +2206,8 @@ packages:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
 
-  delta-comic-core@file:../delta-comic-core/dist/pack.tgz:
-    resolution: {integrity: sha512-N//QtxAXnlBY17vrLvISZSJy/6OPuVvLVRaWnzbGKNH70N37T+gWRo3R8E+oSylG5IVHZ5ebhZ2JTfgnZGG2rA==, tarball: file:../delta-comic-core/dist/pack.tgz}
-    version: 1.1.0
+  delta-comic-core@1.1.0:
+    resolution: {integrity: sha512-ya5y0wVVA4qx8EzYeJT5WqTjBZxnlZMUyWY/JJGh8Z7NfzJ69O4nbQFVsljUFqEwbX02hHDwipmmDslBXLhwJQ==}
     peerDependencies:
       axios: ^1.13.4
       kysely: ^0.28.10
@@ -3798,8 +3799,8 @@ packages:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
 
-  tauri-plugin-better-cors-fetch@git+https://git@github.com:delta-comic/tauri-plugin-better-cors-fetch.git#97153df1b070fa6874442a2279e38d68ffd70f6f:
-    resolution: {commit: 97153df1b070fa6874442a2279e38d68ffd70f6f, repo: git@github.com:delta-comic/tauri-plugin-better-cors-fetch.git, type: git}
+  tauri-plugin-better-cors-fetch@https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/399f76e5c9bf0a3797aa00dd256687ba48b68d62:
+    resolution: {tarball: https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/399f76e5c9bf0a3797aa00dd256687ba48b68d62}
     version: 6.0.1
 
   tauri-plugin-m3@0.3.1:
@@ -4957,7 +4958,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-  '@iarna/toml@2.2.5': {}
+  '@iarna/toml@3.0.0': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -5228,6 +5229,18 @@ snapshots:
   '@semantic-release/error@3.0.0': {}
 
   '@semantic-release/error@4.0.0': {}
+
+  '@semantic-release/exec@7.1.0(semantic-release@25.0.3(typescript@5.9.3))':
+    dependencies:
+      '@semantic-release/error': 4.0.0
+      aggregate-error: 3.1.0
+      debug: 4.4.3
+      execa: 9.6.1
+      lodash-es: 4.17.23
+      parse-json: 8.3.0
+      semantic-release: 25.0.3(typescript@5.9.3)
+    transitivePeerDependencies:
+      - supports-color
 
   '@semantic-release/git@10.0.1(semantic-release@25.0.3(typescript@5.9.3))':
     dependencies:
@@ -5515,10 +5528,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
-
-  '@types/conventional-recommended-bump@10.0.3':
-    dependencies:
-      conventional-recommended-bump: 11.2.0
 
   '@types/debug@4.1.12':
     dependencies:
@@ -6308,7 +6317,7 @@ snapshots:
 
   delayed-stream@1.0.0: {}
 
-  delta-comic-core@file:../delta-comic-core/dist/pack.tgz(axios@1.13.4)(kysely@0.28.11)(naive-ui@2.43.2(vue@3.5.27(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(postcss@8.5.6)(tailwindcss@4.1.18)(vant@4.9.22(vue@3.5.27(typescript@5.9.3)))(vite@8.0.0-beta.13(@types/node@25.2.1)(esbuild@0.27.2)(jiti@2.6.1)(yaml@2.8.2))(vue-router@5.0.2(@vue/compiler-sfc@3.5.27)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)):
+  delta-comic-core@1.1.0(axios@1.13.4)(kysely@0.28.11)(naive-ui@2.43.2(vue@3.5.27(typescript@5.9.3)))(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(postcss@8.5.6)(tailwindcss@4.1.18)(vant@4.9.22(vue@3.5.27(typescript@5.9.3)))(vite@8.0.0-beta.13(@types/node@25.2.1)(esbuild@0.27.2)(jiti@2.6.1)(yaml@2.8.2))(vue-router@5.0.2(@vue/compiler-sfc@3.5.27)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)):
     dependencies:
       '@lhlyu/vue-virtual-waterfall': 1.0.9(vue@3.5.27(typescript@5.9.3))
       '@vant/use': 1.6.0(vue@3.5.27(typescript@5.9.3))
@@ -7769,7 +7778,7 @@ snapshots:
 
   tapable@2.3.0: {}
 
-  tauri-plugin-better-cors-fetch@git+https://git@github.com:delta-comic/tauri-plugin-better-cors-fetch.git#97153df1b070fa6874442a2279e38d68ffd70f6f(@commitlint/lint@20.4.1)(@types/node@25.2.1)(typescript@5.9.3):
+  tauri-plugin-better-cors-fetch@https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/399f76e5c9bf0a3797aa00dd256687ba48b68d62(@commitlint/lint@20.4.1)(@types/node@25.2.1)(typescript@5.9.3):
     dependencies:
       '@commitlint/cli': 20.4.1(@types/node@25.2.1)(typescript@5.9.3)
       '@commitlint/config-conventional': 20.4.1

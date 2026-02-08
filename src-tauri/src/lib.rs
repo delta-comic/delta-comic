@@ -19,7 +19,6 @@ pub async fn run() {
     .plugin(logger::init())
     .plugin(tauri_plugin_m3::init())
     .plugin(tauri_plugin_upload::init())
-    .plugin(tauri_plugin_http::init())
     .plugin(tauri_plugin_better_cors_fetch::init())
     .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_persisted_scope::init())

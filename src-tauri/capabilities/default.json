@@ -19,21 +19,6 @@
     "core:event:default",
     "m3:default",
     "aptabase:allow-track-event",
-    {
-      "identifier": "http:default",
-      "allow": [
-        "https://**",
-        "http://**",
-        "http://localhost**",
-        "https://*.localhost:*",
-        "https://*:*",
-        "http://*:*",
-        "https://*.*:*",
-        "http://*.*:*",
-        "https://*.localhost:*/*",
-        "http://*.localhost:*/*"
-      ]
-    },
     "sentry:default",
     "log:default",
     "cors-fetch:default"

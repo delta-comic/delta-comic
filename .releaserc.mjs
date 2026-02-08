@@ -9,6 +9,12 @@ export default {
     '@semantic-release/release-notes-generator',
     ['@semantic-release/changelog', { changelogFile: 'CHANGELOG.md' }],
     [
+      "@semantic-release/exec",
+      {
+        "publishCmd": "node ./script/set-version.mts ${nextRelease.version}"
+      }
+    ],
+    [
       '@semantic-release/git',
       {
         assets: [
