@@ -84,6 +84,7 @@ jobs:
 
       - name: Init android project
         run: |
+          echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
           pnpm dlx @tauri-apps/cli android init
 
       # build
