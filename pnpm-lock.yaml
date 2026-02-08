@@ -6,6 +6,7 @@ settings:
 
 overrides:
   vite: ^8.0.0-beta.13
+  delta-comic-core: latest
 
 patchedDependencies:
   tauri-plugin-m3:
@@ -116,8 +117,8 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(tailwindcss@4.1.18)
       tauri-plugin-better-cors-fetch:
-        specifier: https://github.com/delta-comic/tauri-plugin-better-cors-fetch
-        version: https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/399f76e5c9bf0a3797aa00dd256687ba48b68d62(@commitlint/lint@20.4.1)(@types/node@25.2.1)(typescript@5.9.3)
+        specifier: github:delta-comic/tauri-plugin-better-cors-fetch
+        version: https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/b2d32aa689f0611db35db6b40881e2103de97772(@commitlint/lint@20.4.1)(@types/node@25.2.1)(typescript@5.9.3)
       tauri-plugin-m3:
         specifier: ^0.3.1
         version: 0.3.1(patch_hash=8c9ba340154ab43846ad8879e9cd6ba77d8ab97b1cd09726fd35883809f7dc34)
@@ -3799,9 +3800,9 @@ packages:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
 
-  tauri-plugin-better-cors-fetch@https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/399f76e5c9bf0a3797aa00dd256687ba48b68d62:
-    resolution: {tarball: https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/399f76e5c9bf0a3797aa00dd256687ba48b68d62}
-    version: 6.0.1
+  tauri-plugin-better-cors-fetch@https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/b2d32aa689f0611db35db6b40881e2103de97772:
+    resolution: {tarball: https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/b2d32aa689f0611db35db6b40881e2103de97772}
+    version: 6.1.0
 
   tauri-plugin-m3@0.3.1:
     resolution: {integrity: sha512-+ortXl/R601iw2JWgEndvFaN5COVgELVIZ6W0RjS6ewBzOBVYakK7x6rL8xhB5J/lXd5rz2o9bZls7wX1Nit4w==}
@@ -7778,17 +7779,13 @@ snapshots:
 
   tapable@2.3.0: {}
 
-  tauri-plugin-better-cors-fetch@https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/399f76e5c9bf0a3797aa00dd256687ba48b68d62(@commitlint/lint@20.4.1)(@types/node@25.2.1)(typescript@5.9.3):
+  tauri-plugin-better-cors-fetch@https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/b2d32aa689f0611db35db6b40881e2103de97772(@commitlint/lint@20.4.1)(@types/node@25.2.1)(typescript@5.9.3):
     dependencies:
       '@commitlint/cli': 20.4.1(@types/node@25.2.1)(typescript@5.9.3)
       '@commitlint/config-conventional': 20.4.1
       '@commitlint/types': 20.4.0
       '@cspell/dict-npm': 5.2.32
       '@cspell/dict-rust': 4.1.2
-      '@semantic-release/changelog': 6.0.3(semantic-release@25.0.3(typescript@5.9.3))
-      '@semantic-release/git': 10.0.1(semantic-release@25.0.3(typescript@5.9.3))
-      '@semantic-release/github': 12.0.5(semantic-release@25.0.3(typescript@5.9.3))
-      '@semantic-release/release-notes-generator': 14.1.0(semantic-release@25.0.3(typescript@5.9.3))
       '@tauri-apps/api': 2.10.1
       commitlint-plugin-cspell: 0.4.0(@commitlint/lint@20.4.1)
       conventional-recommended-bump: 11.2.0
@@ -7799,11 +7796,9 @@ snapshots:
       oxfmt: 0.28.0
       oxlint: 1.43.0(oxlint-tsgolint@0.11.4)
       oxlint-tsgolint: 0.11.4
-      semantic-release: 25.0.3(typescript@5.9.3)
     transitivePeerDependencies:
       - '@commitlint/lint'
       - '@types/node'
-      - supports-color
       - typescript
 
   tauri-plugin-m3@0.3.1(patch_hash=8c9ba340154ab43846ad8879e9cd6ba77d8ab97b1cd09726fd35883809f7dc34):

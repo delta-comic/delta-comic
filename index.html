@@ -28,6 +28,14 @@
     <div id="popups" class="relative z-100"></div>
     <div id="small-window" class="pointer-events-none fixed top-0 left-0"></div>
     <div id="messages" class="translate-y-(--safe-area-inset-top)"></div>
+    <script>
+      window.process = { env: import.meta.env }
+
+      window.$api = {}
+      window.$layout = {}
+      window.$$safe$$ = false
+      window.$$lib$$ ={}
+    </script>
     <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>

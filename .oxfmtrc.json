@@ -8,7 +8,7 @@
     "components.d.ts",
     "src-tauri/**/*",
     "typed-router.d.ts",
-    ".oxfmtrc.json"
+    "*.json"
   ],
   "endOfLine": "lf",
   "semi": false,

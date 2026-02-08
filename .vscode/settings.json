@@ -9,4 +9,7 @@
   "[toml]": {
     "editor.defaultFormatter": "tamasfe.even-better-toml"
   },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
 }
