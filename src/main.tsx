@@ -109,8 +109,7 @@ const app = createApp(
     )
   })
 )
-
-if (!import.meta.env.DEV) Sentry.init({ ...defaultOptions, app, sendDefaultPii: true })
+Sentry.init({ ...defaultOptions, app, sendDefaultPii: true })
 
 const pinia = createPinia()
 pinia.use(createPlugin())
