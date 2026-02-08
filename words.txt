@@ -22,6 +22,7 @@ oxlint
 pinia
 Popconfirm
 Popselect
+releaserc
 reloadable
 Reloadable
 reqwest
