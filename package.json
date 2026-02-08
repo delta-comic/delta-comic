@@ -104,12 +104,14 @@
     "vue-component-type-helpers": "^3.2.4"
   },
   "overrides": {
-    "vite": "^8.0.0-beta.13"
+    "vite": "^8.0.0-beta.13",
+    "delta-comic-core": "latest"
   },
   "packageManager": "pnpm@10.27.0",
   "pnpm": {
     "overrides": {
-      "vite": "^8.0.0-beta.13"
+      "vite": "^8.0.0-beta.13",
+      "delta-comic-core": "latest"
     },
     "onlyBuiltDependencies": [
       "@aptabase/tauri",

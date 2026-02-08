@@ -1,3 +1,17 @@
+# [1.1.0](https://github.com/delta-comic/delta-comic/compare/v1.0.0...v1.1.0) (2026-02-08)
+
+
+### Bug Fixes
+
+* **build:** ci ([#23](https://github.com/delta-comic/delta-comic/issues/23)) ([d257532](https://github.com/delta-comic/delta-comic/commit/d257532cf21f55434a66ed13addd9a4d8d4e687a)), closes [#17](https://github.com/delta-comic/delta-comic/issues/17)
+* **build:** config ([#22](https://github.com/delta-comic/delta-comic/issues/22)) ([7436a89](https://github.com/delta-comic/delta-comic/commit/7436a894f1dba936bf619d93815bb7294503fe37)), closes [#17](https://github.com/delta-comic/delta-comic/issues/17)
+* **build:** readme fmt ([1203f66](https://github.com/delta-comic/delta-comic/commit/1203f6670ac2ce7e9ca0fc062f9d284b85d3471d))
+
+
+### Features
+
+* Better Net ([#21](https://github.com/delta-comic/delta-comic/issues/21)) ([088b0d9](https://github.com/delta-comic/delta-comic/commit/088b0d9aba0941ad460a1a8ea7a233dea779c7e0)), closes [#17](https://github.com/delta-comic/delta-comic/issues/17)
+
 # 1.0.0 (2026-02-05)
 
 
