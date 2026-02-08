@@ -25,5 +25,5 @@
   },
   "env": { "builtin": true },
   "globals": {},
-  "ignorePatterns": []
+  "ignorePatterns": [".vscode", "./package.json"]
 }

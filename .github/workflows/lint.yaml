@@ -39,3 +39,4 @@ jobs:
         run: |
           pnpm exec oxlint --type-aware
           pnpm exec oxfmt --check
+          pnpm exec cspell --no-exit-code
