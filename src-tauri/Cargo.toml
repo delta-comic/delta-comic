@@ -1,7 +1,7 @@
 [package]
 name = "delta-comic"
 description = "Per Aspera, Ad Astra"
-authors = ["wenxig"]
+authors = [ "wenxig" ]
 license = "AGPL-3.0-only"
 repository = "https://github.com/delta-comic/delta-comic"
 edition = "2024"
@@ -13,7 +13,7 @@ linker = "rust-lld.exe"
 
 [target.x86_64-unknown-linux-gnu]
 linker = "clang"
-rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+rustflags = [ "-C", "link-arg=-fuse-ld=lld" ]
 
 [profile.dev]
 opt-level = 0
@@ -34,11 +34,11 @@ incremental = true
 
 [lib]
 name = "delta_comic"
-crate-type = ["staticlib", "cdylib", "rlib"]
+crate-type = [ "staticlib", "cdylib", "rlib" ]
 
 [build-dependencies.tauri-build]
 version = "2.5.5"
-features = []
+features = [ ]
 
 [dependencies]
 serde_json = "1.0.149"
@@ -55,53 +55,49 @@ percent-encoding = "2.3.2"
 log = "0.4.29"
 tauri-runtime-wry = "2.10.0"
 
-[dependencies.tauri-plugin-http]
-version = "2.5.7"
-features = ["unsafe-headers", "json"]
+  [dependencies.tauri-plugin-http]
+  version = "2.5.7"
+  features = [ "unsafe-headers", "json" ]
 
-[dependencies.tauri-plugin-log]
-version = "2.8.0"
-features = ["colored"]
+  [dependencies.tauri-plugin-log]
+  version = "2.8.0"
+  features = [ "colored" ]
 
-[dependencies.tauri-plugin-better-cors-fetch]
-git = "https://github.com/delta-comic/tauri-plugin-better-cors-fetch"
-branch = "main"
-features = ["multipart", "blocking", "native-tls-vendored"]
+  [dependencies.tauri-plugin-better-cors-fetch]
+  git = "https://github.com/delta-comic/tauri-plugin-better-cors-fetch"
+  branch = "main"
+  features = [ "multipart", "blocking", "native-tls-vendored" ]
 
-[dependencies.serde]
-version = "1.0"
-features = ["derive"]
+  [dependencies.serde]
+  version = "1.0"
+  features = [ "derive" ]
 
-[dependencies.tauri]
-version = "2.9.5"
-features = ["devtools", "custom-protocol"]
+  [dependencies.tauri]
+  version = "2.9.5"
+  features = [ "devtools", "custom-protocol" ]
 
-[dependencies.sentry]
-version = "0.42"
-default-features = false
-features = [
+  [dependencies.sentry]
+  version = "0.42"
+  default-features = false
+  features = [
   "backtrace",
   "contexts",
   "debug-images",
   "panic",
   "release-health",
   "reqwest",
-  "rustls",
+  "rustls"
 ]
 
-[dependencies.tauri-plugin-sql]
-git = "https://github.com/tauri-apps/plugins-workspace"
-features = ["sqlite"]
-branch = "v2"
+  [dependencies.tauri-plugin-sql]
+  git = "https://github.com/tauri-apps/plugins-workspace"
+  features = [ "sqlite" ]
+  branch = "v2"
 
-[dependencies.tauri-plugin-aptabase]
-git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls"
-branch = "main"
+  [dependencies.tauri-plugin-aptabase]
+  git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls"
+  branch = "main"
 
 [features]
-# by default Tauri runs in production mode
-# when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
-default = ["custom-protocol"]
-# this feature is used for production builds where `devPath` points to the filesystem
-# DO NOT remove this
-custom-protocol = ["tauri/custom-protocol"]
+default = [ "custom-protocol" ]
+custom-protocol = [ "tauri/custom-protocol" ]
