@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/delta-comic/delta-comic/compare/v1.1.0...v1.1.1) (2026-02-09)
+
+
+### Bug Fixes
+
+* **build:** build frontend error ([#24](https://github.com/delta-comic/delta-comic/issues/24)) ([3a1bf4d](https://github.com/delta-comic/delta-comic/commit/3a1bf4de75dd2b3a14c680eae7c66243484f045d)), closes [#17](https://github.com/delta-comic/delta-comic/issues/17)
+
 # [1.1.0](https://github.com/delta-comic/delta-comic/compare/v1.0.0...v1.1.0) (2026-02-08)
 
 
