@@ -53,7 +53,7 @@ export default defineConfig({
 
     watch: {
       // tell vite to ignore watching `src-tauri`
-      ignored: ['**/src-tauri/**', '**/tauri-plugin-delta-comic/**']
+      ignored: ['**/src-tauri/**']
     }
   },
   clearScreen: false,

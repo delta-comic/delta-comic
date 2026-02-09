@@ -755,6 +755,24 @@ dependencies = [
 
 [[package]]
 name = "cookie_store"
+version = "0.21.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2eac901828f88a5241ee0600950ab981148a18f2f756900ffba1b125ca6a3ef9"
+dependencies = [
+ "cookie",
+ "document-features",
+ "idna",
+ "log",
+ "publicsuffix",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "time",
+ "url",
+]
+
+[[package]]
+name = "cookie_store"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3fc4bff745c9b4c7fb1e97b25d13153da2bc7796260141df62378998d070207f"
@@ -1036,6 +1054,7 @@ dependencies = [
  "tauri-plugin-better-cors-fetch",
  "tauri-plugin-clipboard-manager",
  "tauri-plugin-fs",
+ "tauri-plugin-http",
  "tauri-plugin-log",
  "tauri-plugin-m3",
  "tauri-plugin-persisted-scope",
@@ -4266,9 +4285,13 @@ checksum = "eddd3ca559203180a307f12d114c268abf583f59b03cb906fd0b3ff8646c1147"
 dependencies = [
  "base64 0.22.1",
  "bytes",
+ "cookie",
+ "cookie_store 0.22.0",
+ "encoding_rs",
  "futures-channel",
  "futures-core",
  "futures-util",
+ "h2",
  "http 1.4.0",
  "http-body",
  "http-body-util",
@@ -4277,6 +4300,7 @@ dependencies = [
  "hyper-util",
  "js-sys",
  "log",
+ "mime",
  "percent-encoding",
  "pin-project-lite",
  "quinn",
@@ -4309,7 +4333,7 @@ dependencies = [
  "base64 0.22.1",
  "bytes",
  "cookie",
- "cookie_store",
+ "cookie_store 0.22.0",
  "encoding_rs",
  "futures-channel",
  "futures-core",
@@ -5761,11 +5785,11 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-better-cors-fetch"
-version = "6.0.0"
-source = "git+https://github.com/delta-comic/tauri-plugin-better-cors-fetch?branch=main#399f76e5c9bf0a3797aa00dd256687ba48b68d62"
+version = "6.1.0"
+source = "git+https://github.com/delta-comic/tauri-plugin-better-cors-fetch?branch=main#b2d32aa689f0611db35db6b40881e2103de97772"
 dependencies = [
  "bytes",
- "cookie_store",
+ "cookie_store 0.22.0",
  "dashmap",
  "data-url",
  "http 1.4.0",
@@ -5816,6 +5840,30 @@ dependencies = [
  "thiserror 2.0.17",
  "toml 0.9.10+spec-1.1.0",
  "url",
+]
+
+[[package]]
+name = "tauri-plugin-http"
+version = "2.5.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d8f069451c4e87e7e2636b7f065a4c52866c4ce5e60e2d53fa1038edb6d184dc"
+dependencies = [
+ "bytes",
+ "cookie_store 0.21.1",
+ "data-url",
+ "http 1.4.0",
+ "regex",
+ "reqwest 0.12.28",
+ "schemars 0.8.22",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "tauri-plugin-fs",
+ "thiserror 2.0.17",
+ "tokio",
+ "url",
+ "urlpattern",
 ]
 
 [[package]]

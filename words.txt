@@ -18,6 +18,7 @@ minidump
 msvc
 nvim
 oxfmt
+oxfmtrc
 oxlint
 pinia
 Popconfirm
