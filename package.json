@@ -120,7 +120,8 @@
       "core-js",
       "esbuild",
       "sharp",
-      "tauri-plugin-better-cors-fetch"
+      "tauri-plugin-better-cors-fetch",
+      "delta-comic-plugin-layout"
     ],
     "patchedDependencies": {
       "tauri-plugin-m3": "patches/tauri-plugin-m3.patch"
