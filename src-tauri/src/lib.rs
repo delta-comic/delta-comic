@@ -24,7 +24,7 @@ pub async fn run() {
     .plugin(tauri_plugin_persisted_scope::init())
     .plugin(tauri_plugin_aptabase::Builder::new("A-US-9793062880").build())
     .plugin(db::init())
-    .plugin(tauri_plugin_pinia::init())
+    .plugin(tauri_store::init())
     .setup(|_app| {
       let logo = r#"
 _____   _________________ ____        __________________ _____   ______

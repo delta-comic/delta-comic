@@ -12,4 +12,5 @@
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
+  "typescript.experimental.useTsgo": true
 }

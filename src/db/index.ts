@@ -6,8 +6,7 @@ import { CamelCasePlugin, Kysely, Migrator, type Migration, type SelectQueryBuil
 import { TauriSqliteDialect } from 'kysely-dialect-tauri'
 import { SerializePlugin } from 'kysely-plugin-serialize'
 import mitt from 'mitt'
-import { defineStore } from 'pinia'
-import { reactive, shallowRef, toRef, triggerRef, type MaybeRefOrGetter } from 'vue'
+import { shallowRef, toRef, triggerRef, type MaybeRefOrGetter } from 'vue'
 
 import type { PluginArchiveDB } from '@/plugin/db'
 
@@ -88,15 +87,11 @@ export namespace DBUtils {
   }
 }
 
-const useKvStore = defineStore(
-  'staticKvs',
-  () => {
-    const store = reactive<Record<string, Record<string, any>>>({})
+import { Store } from 'tauri-store'
 
-    return { store }
-  },
-  { tauri: { autoStart: id => id == 'staticKvs', deep: true } }
-)
+const store = new Store('counter', {} as Record<string, any>)
+
+await store.start()
 
 const saveKey = new Utils.data.SourcedValue()
 export const useNativeStore = <T>(
@@ -104,20 +99,25 @@ export const useNativeStore = <T>(
   key: MaybeRefOrGetter<string>,
   defaultValue: MaybeRefOrGetter<T>
 ) => {
-  const kvs = useKvStore()
-  kvs.store[namespace] ??= {}
+  store.update(namespace, s => s ?? {})
   return useStorage<T>(saveKey.toString([namespace, toRef(key).value]), defaultValue, {
     removeItem(key) {
       const [namespace, k] = saveKey.toJSON(key)
-      delete kvs.store[namespace][k]
+      store.update(namespace, s => {
+        delete s[k]
+        return s
+      })
     },
     getItem(key) {
       const [namespace, k] = saveKey.toJSON(key)
-      return kvs.store[namespace][k]
+      return store.get(namespace)[k]
     },
     setItem(key, value) {
       const [namespace, k] = saveKey.toJSON(key)
-      kvs.store[namespace][k] = value
+      store.update(namespace, s => {
+        s[k] = value
+        return s
+      })
     }
   })
 }

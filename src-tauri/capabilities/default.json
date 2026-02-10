@@ -15,7 +15,7 @@
     "sql:default",
     "sql:allow-execute",
     "upload:default",
-    "pinia:default",
+    "tauri-store:default",
     "core:event:default",
     "m3:default",
     "aptabase:allow-track-event",

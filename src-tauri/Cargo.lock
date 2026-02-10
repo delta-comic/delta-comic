@@ -1040,7 +1040,7 @@ dependencies = [
 
 [[package]]
 name = "delta-comic"
-version = "0.2.1"
+version = "0.0.0"
 dependencies = [
  "log",
  "mime_guess",
@@ -1063,6 +1063,7 @@ dependencies = [
  "tauri-plugin-sql",
  "tauri-plugin-upload",
  "tauri-runtime-wry",
+ "tauri-store",
  "tokio",
 ]
 
@@ -6035,9 +6036,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-store"
-version = "1.1.0"
+version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aee4e469de686b5ca47838ca6dd99c1b98cbf574848fb4f987eecd11d7c965f1"
+checksum = "2c0cf1b1a3a5e7d100f57c3eccbf8d67e53cffc1598b787c628d809405d6de56"
 dependencies = [
  "dashmap",
  "futures",
@@ -6046,6 +6047,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tauri",
+ "tauri-plugin",
  "tauri-store-macros",
  "tauri-store-utils",
  "thiserror 2.0.17",
