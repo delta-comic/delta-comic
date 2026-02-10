@@ -5,6 +5,7 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
+    "core:event:default",
     "clipboard-manager:allow-read-text",
     "clipboard-manager:deny-write-text",
     "fs:default",
@@ -14,9 +15,7 @@
     "fs:read-all",
     "sql:default",
     "sql:allow-execute",
-    "upload:default",
     "tauri-store:default",
-    "core:event:default",
     "m3:default",
     "aptabase:allow-track-event",
     "sentry:default",

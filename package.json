@@ -75,7 +75,6 @@
     "@cspell/dict-rust": "^4.1.2",
     "@iarna/toml": "^3.0.0",
     "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^12.0.5",
     "@semantic-release/release-notes-generator": "^14.1.0",
