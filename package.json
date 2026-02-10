@@ -18,6 +18,8 @@
     "dev": "tauri dev",
     "build:web": "vite build",
     "build": "tauri android build",
+    "build:debug": "tauri android build --debug",
+    "build:local": "tauri build --debug",
     "tauri": "tauri",
     "lint": "oxlint --type-aware",
     "lint:fix": "oxlint --fix --type-aware",

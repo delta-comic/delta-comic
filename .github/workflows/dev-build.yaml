@@ -5,7 +5,7 @@ on:
     branches:
       - 'develop'
       - 'main'
-      
+
 permissions:
   contents: write
 
@@ -98,7 +98,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         with:
           mobile: 'android'
-          args: ''
+          args: '--debug'
           retryAttempts: 1
 
       #signature
