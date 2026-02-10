@@ -75,8 +75,24 @@ jobs:
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
           pnpm dlx @tauri-apps/cli android init
 
+      - name: Free up disk space
+        run: |
+          sudo apt-get clean || true
+          sudo rm -rf /var/lib/apt/lists/* || true
+          # 如果你不需要 Android emulator / system images，可以清掉这些（通常占很多空间）
+          sudo rm -rf /usr/local/lib/android/sdk/emulator || true
+          sudo rm -rf /usr/local/lib/android/sdk/system-images || true
+          sudo rm -rf /usr/local/lib/android/sdk/ndk/*/sources || true
+          # 清理 cargo 缓存（谨慎：会导致重新下载，但能释放空间）
+          rm -rf $HOME/.cargo/registry/cache || true
+          rm -rf $HOME/.cargo/registry/index || true
+          rm -rf $HOME/.gradle/caches/* || true
+          df -h
+
       # build
       - name: Build Android App
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/cargo-target
         run: |
           pnpm build:debug
 
