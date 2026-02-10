@@ -22,19 +22,6 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Cache Java
-        uses: actions/cache@v5.0.3
-        with:
-          path: |
-            ~/src-tauri/target
-          key: ${{ runner.os }}-delta-comic-java
-
-      - name: Cache Rust
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
-        with:
-          key: ${{ runner.os }}-delta-comic-rust
-          workspaces: './src-tauri/ -> target'
-
       - name: Build script run pm
         run: chmod +x ./script/*
 
@@ -90,16 +77,8 @@ jobs:
 
       # build
       - name: Build Android App
-        id: build
-        uses: tauri-apps/tauri-action@dev
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        with:
-          mobile: 'android'
-          args: '--debug'
-          retryAttempts: 1
+        run: |
+          pnpm build:debug
 
       #signature
       - name: Restore keystore (decode + verify)
