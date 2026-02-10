@@ -37,7 +37,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "arm64-v8a",
+    "targets": "all",
     "homepage": "https://github.com/delta-comic",
     "license": "AGPL-3.0-only",
     "longDescription": "Delta Comic",

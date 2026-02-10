@@ -94,7 +94,7 @@ jobs:
         env:
           CARGO_TARGET_DIR: ${{ runner.temp }}/cargo-target
         run: |
-          pnpm build:debug
+          pnpm build:debug --target=armv7
 
       #signature
       - name: Restore keystore (decode + verify)
@@ -165,8 +165,8 @@ jobs:
         with:
           files: |
             ./dist/app.apk
-          tag_name: 'dev-v${{ steps.build.outputs.appVersion }}'
-          name: 'Dev build v${{ steps.build.outputs.appVersion }}'
+          tag_name: 'dev-v${{ github.event.head_commit.id }}'
+          name: 'Dev build ${{ github.event.head_commit.id }}'
           body: |
             dev构建，不确保任何功能可以使用
             ${{ github.event.head_commit.message }}
