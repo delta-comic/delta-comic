@@ -13,7 +13,7 @@ export class _PluginInstallByLocal extends PluginInstaller {
   public override name = 'local'
   private async installer(input: string): Promise<File> {
     const path = decodeURIComponent(convertFileSrc(input.replace(/^local:/, ''), 'local'))
-    const name = path.split(/\\|\//).at(-1) ?? 'index.js'
+    const name = path.split(/\\|\//).at(-1) ?? 'us.js'
     const buffer = await readFile(path)
     return new File([buffer], name)
   }

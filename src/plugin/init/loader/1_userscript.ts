@@ -27,12 +27,12 @@ class _PluginUserscriptLoader extends PluginLoader {
       await join(await getPluginFsPath(pluginMeta.pluginName), 'us.js')
     )
     const script = document.createElement('script')
+    script.addEventListener('error', err => {
+      throw err
+    })
     const url = URL.createObjectURL(new Blob([code]))
     script.async = true
     script.src = url
-    script.onerror = err => {
-      throw err
-    }
     document.body.appendChild(script)
   }
 }

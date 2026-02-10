@@ -45,6 +45,9 @@ class _PluginUserscriptLoader extends PluginLoader {
     const baseDir = await getPluginFsPath(pluginMeta.pluginName)
     console.log('[loader zip] baseDir:', baseDir, pluginMeta.meta.entry)
     const script = document.createElement('script')
+    script.addEventListener('error', err => {
+      throw err
+    })
     script.type = 'module'
     script.async = true
     script.src = decodeURIComponent(
@@ -68,11 +71,11 @@ class _PluginUserscriptLoader extends PluginLoader {
     } else var filePath = cssPath
 
     const style = document.createElement('link')
+    style.addEventListener('error', err => {
+      throw err
+    })
     style.rel = 'stylesheet'
     style.href = decodeURIComponent(convertFileSrc(await join(baseDir, filePath), 'local'))
-    script.onerror = err => {
-      throw err
-    }
     document.head.appendChild(style)
   }
 }

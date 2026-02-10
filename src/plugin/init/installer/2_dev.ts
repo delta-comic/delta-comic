@@ -18,7 +18,7 @@ export class _PluginInstallByDev extends PluginInstaller {
     const noPort = input.replace(/:\d+$/, '')
 
     const processed = res.data.replaceAll('localhost', noPort).replaceAll('127.0.0.1', noPort)
-    return new File([processed], 'dev.js')
+    return new File([processed], 'us.js')
   }
   public override async install(input: string): Promise<File> {
     const file = await this.installer(input)
