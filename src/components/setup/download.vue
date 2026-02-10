@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { installPlugin, pluginInstallers } from '@/plugin'
+import { installFilePlugin, installPlugin, pluginInstallers } from '@/plugin'
 import { toReactive, useFileDialog } from '@vueuse/core'
 import { Utils } from 'delta-comic-core'
 import { useMessage } from 'naive-ui'
@@ -32,6 +32,7 @@ const confirmAdd = async (url: string) => {
   }
   isAdding.value = false
 }
+
 const upload = toReactive(useFileDialog({ accept: '', multiple: false }))
 const useUploadPlugin = () => {
   if (isAdding.value) {
@@ -48,9 +49,7 @@ const useUploadPlugin = () => {
       const file = files?.item(0)
       if (!file) throw new Error('未上传文件')
 
-      const blobUrl = URL.createObjectURL(file)
-      await installPlugin(blobUrl)
-      URL.revokeObjectURL(blobUrl)
+      await installFilePlugin(file)
     } finally {
       upload.reset()
       isAdding.value = false

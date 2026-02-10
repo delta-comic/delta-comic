@@ -5,21 +5,21 @@ import { parse } from 'userscript-meta'
 
 import type { PluginArchiveDB } from '@/plugin/db'
 
-import { PluginLoader, type PluginFile } from '../utils'
+import { PluginLoader } from '../utils'
 import { getPluginFsPath } from '../utils'
 
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'userscript'
-  public override async installDownload(file: PluginFile): Promise<PluginMeta> {
-    const code = await file.blob.text()
+  public override async installDownload(file: File): Promise<PluginMeta> {
+    const code = await file.text()
     const meta = decodePluginMeta(parse(code))
     const path = await getPluginFsPath(meta.name.id)
     await fs.mkdir(path, { recursive: true })
     await fs.writeTextFile(await join(path, 'us.js'), code, { create: true })
     return meta
   }
-  public override canInstall(file: PluginFile): boolean {
-    return file.fileName.endsWith('.js')
+  public override canInstall(file: File): boolean {
+    return file.name.endsWith('.js')
   }
 
   public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {

@@ -136,6 +136,37 @@ export const installPlugin = (input: string, __installedPlugins?: Set<string>) =
     await installDepends(m, meta, __installedPlugins)
   })
 
+export const installFilePlugin = (file: File, __installedPlugins?: Set<string>) =>
+  Utils.message.createDownloadMessage(`安装插件-${file.name}`, async m => {
+    const meta = await m.createLoading('安装插件', async v => {
+      v.retryable = true
+      const loader = loaders.filter(ins => ins.canInstall(file)).at(-1)
+      if (!loader) throw new Error('没有符合的安装器')
+      v.description = loader.name
+
+      const meta = await loader.installDownload(file)
+
+      v.description = '写入数据库'
+      await db.value
+        .replaceInto('plugin')
+        .values({
+          displayName: meta.name.display,
+          enable: true,
+          installerName: '',
+          installInput: '',
+          loaderName: loader.name,
+          meta: JSON.stringify(meta),
+          pluginName: meta.name.id
+        })
+        .execute()
+
+      return meta
+    })
+    console.log(`安装插件成功: ${meta.name.id} ->`, meta)
+
+    await installDepends(m, meta, __installedPlugins)
+  })
+
 export const updatePlugin = async (
   pluginMeta: PluginArchiveDB.Meta,
   __installedPlugins?: Set<string>

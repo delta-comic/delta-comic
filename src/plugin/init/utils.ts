@@ -10,23 +10,18 @@ export interface PluginInstallerDescription {
   description: string
 }
 export abstract class PluginInstaller {
-  public abstract install(input: string): Promise<PluginFile>
-  public abstract update(pluginMeta: PluginArchiveDB.Meta): Promise<PluginFile>
+  public abstract install(input: string): Promise<File>
+  public abstract update(pluginMeta: PluginArchiveDB.Meta): Promise<File>
   public abstract isMatched(input: string): boolean
   public abstract name: string
   public abstract description: PluginInstallerDescription
 }
 
-export interface PluginFile {
-  blob: Blob
-  fileName: string
-}
-
 export abstract class PluginLoader {
   public abstract name: string
   public abstract load(pluginMeta: PluginArchiveDB.Meta): Promise<any>
-  public abstract installDownload(file: PluginFile): Promise<PluginMeta>
-  public abstract canInstall(file: PluginFile): boolean
+  public abstract installDownload(file: File): Promise<PluginMeta>
+  public abstract canInstall(file: File): boolean
 }
 
 export type PluginBooterSetMeta = (

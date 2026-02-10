@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import type { PluginArchiveDB } from '@/plugin/db'
 
-import { PluginInstaller, type PluginFile, type PluginInstallerDescription } from '../utils'
+import { PluginInstaller, type PluginInstallerDescription } from '../utils'
 
 export class _PluginInstallByNormalUrl extends PluginInstaller {
   public override description: PluginInstallerDescription = {
@@ -11,22 +11,25 @@ export class _PluginInstallByNormalUrl extends PluginInstaller {
     description: '输入形如: "gh:owner/repo"的内容'
   }
   public override name = 'github'
-  private async installer(input: string): Promise<PluginFile> {
+  private async installer(input: string): Promise<File> {
     const octokit = new Octokit()
     const [owner, repo] = input.replace(/^gh:/, '').split('/')
     const { data: release } = await octokit.rest.repos.getLatestRelease({ owner, repo })
     const asset = release.assets[0]
     if (!asset) throw new Error('未找到资源')
 
-    const res = await axios.request<Blob>({ url: asset.browser_download_url, responseType: 'blob' })
+    const { data } = await axios.request<Blob>({
+      url: asset.browser_download_url,
+      responseType: 'blob'
+    })
 
-    return { fileName: asset.name, blob: res.data }
+    return new File([data], asset.name)
   }
-  public override async install(input: string): Promise<PluginFile> {
+  public override async install(input: string): Promise<File> {
     const file = await this.installer(input)
     return file
   }
-  public override async update(pluginMeta: PluginArchiveDB.Meta): Promise<PluginFile> {
+  public override async update(pluginMeta: PluginArchiveDB.Meta): Promise<File> {
     const file = await this.installer(pluginMeta.installInput)
     return file
   }
