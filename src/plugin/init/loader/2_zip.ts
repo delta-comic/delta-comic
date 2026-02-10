@@ -15,7 +15,7 @@ class _PluginUserscriptLoader extends PluginLoader {
     console.log('[loader zip] begin:', file)
     const temp = await getPluginFsPath('__temp__')
     await fs.mkdir(temp, { recursive: true })
-    await fs.writeFile(await join(temp, 'temp.zip'), await file.bytes())
+    await fs.writeFile(await join(temp, 'temp.zip'), new Uint8Array(await file.arrayBuffer()))
     console.log('[loader zip] temp:', temp)
     const zip = await loadAsync(file)
     console.log(zip.files)

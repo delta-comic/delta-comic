@@ -71,13 +71,7 @@ const totalCount = computedAsync(
   >
     <NSpin :show="isBooting" class="relative size-full *:first:size-full">
       <div class="flex size-full flex-col">
-        <NMenu
-          v-model:value="pageSelect"
-          mode="horizontal"
-          :options="menuOptions"
-          responsive
-          class="**:z-100! **:h-20!"
-        />
+        <NMenu v-model:value="pageSelect" mode="horizontal" :options="menuOptions" responsive />
         <VanTabs
           v-model:active="pageSelect"
           swipeable

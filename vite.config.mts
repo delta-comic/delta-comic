@@ -40,7 +40,7 @@ export default defineConfig({
     // don't minify for debug builds
     minify: !process.env.TAURI_ENV_DEBUG ? 'oxc' : false,
     // produce sourcemaps for debug builds
-    sourcemap: !!process.env.TAURI_ENV_DEBUG
+    sourcemap: true
   },
   base: '/',
   server: {

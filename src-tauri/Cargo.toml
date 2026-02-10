@@ -74,6 +74,7 @@ features = ["derive"]
 
 [dependencies.tauri]
 version = "2.9.5"
+features = ["devtools"]
 
 [dependencies.sentry]
 version = "0.42"
