@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    if: ${{ github.event.head_commit && contains(github.event.head_commit.message, '[preview]') }}
+    if: ${{ github.event.head_commit && contains(github.event.head_commit.message, '[pub]') }}
     runs-on: ubuntu-latest
     env:
       HUSKY: 0
