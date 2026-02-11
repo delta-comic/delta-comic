@@ -45,14 +45,14 @@ const $message = useMessage()
     :before-close="() => !isBooting"
   >
     <NSpin :show="isBooting" class="relative size-full *:first:size-full">
-      <div class="flex size-full flex-col">
+      <div class="size-full overflow-hidden">
         <NMenu v-model:value="pageSelect" mode="horizontal" :options="menuOptions" responsive />
         <!-- content pages -->
         <VanTabs
           v-model:active="pageSelect"
           swipeable
           :show-header="false"
-          class="size-full! *:*:*:size-full! *:*:size-full! *:size-full!"
+          class="h-[calc(100%-42px)]! w-full! **:[.van-swipe-item]:h-full! **:[.van-tabs__content]:h-full!"
         >
           <VanTab
             v-for="menu in menuOptions.filter(v => !v.disabled)"

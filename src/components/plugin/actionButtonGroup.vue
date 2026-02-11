@@ -4,6 +4,7 @@ import { db, DBUtils } from '@/db'
 import { NIcon } from 'naive-ui'
 import type { Component } from 'vue'
 import { shallowRef } from 'vue'
+import { CheckRound } from '@vicons/material'
 
 defineProps<{ actions: { title: string; icon: Component; onClick: () => any }[] }>()
 
@@ -41,7 +42,7 @@ const totalCount = computedAsync(
           v-for="action of actions"
         >
           <template #trigger>
-            <NFloatButton class="z-100000!" @click="closeMenuBefore(action.onClick)">
+            <NFloatButton class="z-100000!" @click="closeMenuBefore(action.onClick())">
               <NIcon :size="20">
                 <component :is="action.icon" />
               </NIcon>

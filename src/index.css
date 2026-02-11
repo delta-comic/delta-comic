@@ -63,7 +63,6 @@ input::-webkit-search-cancel-button {
 }
 
 .list-move,
-/* 对移动中的元素应用的过渡 */
 .list-enter-active,
 .list-leave-active {
   transition:
@@ -77,9 +76,12 @@ input::-webkit-search-cancel-button {
   opacity: 0;
   transform: translateY(30px);
 }
-
-/* 确保将离开的元素从布局流中删除
-  以便能够正确地计算移动的动画。 */
 .list-leave-active {
   position: absolute;
+}
+
+.van-tabs {
+  .van-tabs__content {
+    height: 100% !important;
+  }
 }

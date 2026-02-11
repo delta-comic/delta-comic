@@ -65,7 +65,7 @@ const useUploadPlugin = () => {
 </script>
 
 <template>
-  <div class="w-full">
+  <NScrollbar class="size-full">
     <div class="mb-2 pt-3 pl-5 text-2xl">插件安装</div>
     <NInput
       v-model:value="inputUrl"
@@ -119,5 +119,5 @@ const useUploadPlugin = () => {
         </div>
       </li>
     </TransitionGroup>
-  </div>
+  </NScrollbar>
 </template>
