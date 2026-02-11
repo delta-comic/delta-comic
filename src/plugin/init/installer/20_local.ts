@@ -26,7 +26,7 @@ export class _PluginInstallByLocal extends PluginInstaller {
     return file
   }
   public override isMatched(input: string): boolean {
-    return /^(((\d+\.?)+)|(localhost))(:\d+)?$/.test(input)
+    return input.startsWith('local:')
   }
 }
 
