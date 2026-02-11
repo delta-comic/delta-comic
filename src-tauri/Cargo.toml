@@ -47,34 +47,34 @@ log = "0.4.29"
 tauri-runtime-wry = "2.10.0"
 tauri-store = "1.1.1"
 
-[dependencies.tauri-plugin-log]
-version = "2.8.0"
-features = [ "colored" ]
+  [dependencies.tauri-plugin-log]
+  version = "2.8.0"
+  features = [ "colored" ]
 
-[dependencies.tauri-plugin-better-cors-fetch]
-git = "https://github.com/delta-comic/tauri-plugin-better-cors-fetch"
-branch = "main"
-features = [ "multipart", "blocking", "native-tls-vendored" ]
+  [dependencies.tauri-plugin-better-cors-fetch]
+  git = "https://github.com/delta-comic/tauri-plugin-better-cors-fetch"
+  branch = "main"
+  features = [ "multipart", "blocking", "native-tls-vendored" ]
 
-[dependencies.serde]
-version = "1.0"
-features = [ "derive" ]
+  [dependencies.serde]
+  version = "1.0"
+  features = [ "derive" ]
 
-[dependencies.tauri]
-version = "2.9.5"
-features = [ "devtools" ]
+  [dependencies.tauri]
+  version = "2.9.5"
+  features = [ "devtools" ]
 
-[dependencies.sentry]
-version = "0.42"
-default-features = false
-features = [
-"backtrace",
-"contexts",
-"debug-images",
-"panic",
-"release-health",
-"reqwest",
-"rustls"
+  [dependencies.sentry]
+  version = "0.42"
+  default-features = false
+  features = [
+  "backtrace",
+  "contexts",
+  "debug-images",
+  "panic",
+  "release-health",
+  "reqwest",
+  "rustls"
 ]
 
   [dependencies.tauri-plugin-sql]

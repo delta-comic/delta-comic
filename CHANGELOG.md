@@ -1,3 +1,11 @@
+## [1.1.2](https://github.com/delta-comic/delta-comic/compare/v1.1.1...v1.1.2) (2026-02-11)
+
+
+### Bug Fixes
+
+* [pub] fix ([#25](https://github.com/delta-comic/delta-comic/issues/25)) by ([#26](https://github.com/delta-comic/delta-comic/issues/26)) ([9e07b02](https://github.com/delta-comic/delta-comic/commit/9e07b02599db19f551ace374c93a8fd8e8c1b44e))
+* [pub] wf ([#27](https://github.com/delta-comic/delta-comic/issues/27)) ([6a726d3](https://github.com/delta-comic/delta-comic/commit/6a726d3e810d59de76189a1d69d2180fc0801351))
+
 ## [1.1.1](https://github.com/delta-comic/delta-comic/compare/v1.1.0...v1.1.1) (2026-02-09)
 
 
