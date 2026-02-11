@@ -85,3 +85,8 @@ input::-webkit-search-cancel-button {
     height: 100% !important;
   }
 }
+
+.van-tabs__content > .van-swipe,
+.van-tabs__content > .van-swipe > .van-swipe__track {
+  width: 100% !important;
+}

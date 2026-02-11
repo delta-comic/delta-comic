@@ -1,7 +1,7 @@
 mod db;
 mod fs_scheme;
-mod sentry;
 mod logger;
+mod sentry;
 
 use tauri_plugin_aptabase::EventTracker;
 
@@ -12,18 +12,18 @@ pub async fn run() {
 
   let builder = fs_scheme::init(
     tauri::Builder::default()
+      .plugin(logger::init())
       .plugin(sentry::init())
       .plugin(tauri_plugin_fs::init()),
   );
   let builder = builder
-    .plugin(logger::init())
+    .plugin(tauri_plugin_store::Builder::new().build())
     .plugin(tauri_plugin_m3::init())
     .plugin(tauri_plugin_better_cors_fetch::init())
     .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_persisted_scope::init())
     .plugin(tauri_plugin_aptabase::Builder::new("A-US-9793062880").build())
     .plugin(db::init())
-    .plugin(tauri_store::init())
     .setup(|_app| {
       let logo = r#"
 _____   _________________ ____        __________________ _____   ______

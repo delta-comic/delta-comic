@@ -6,7 +6,6 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
     .target(tauri_plugin_log::Target::new(
       tauri_plugin_log::TargetKind::LogDir {
         file_name: Some("logs".to_string()),
-        
       },
     ))
     .max_file_size(50_000)
