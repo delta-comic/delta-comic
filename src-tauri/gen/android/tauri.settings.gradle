@@ -7,5 +7,3 @@ include ':tauri-plugin-fs'
 project(':tauri-plugin-fs').projectDir = new File("/Users/xgw/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-plugin-fs-2.4.5/android")
 include ':tauri-plugin-m3'
 project(':tauri-plugin-m3').projectDir = new File("/Users/xgw/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-plugin-m3-0.3.1/android")
-include ':tauri-plugin-pinia'
-project(':tauri-plugin-pinia').projectDir = new File("/Users/xgw/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tauri-plugin-pinia-4.1.1/android")

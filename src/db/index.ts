@@ -1,7 +1,7 @@
 import Database from '@tauri-apps/plugin-sql'
-import { useStorage } from '@vueuse/core'
+import { useStorageAsync } from '@vueuse/core'
 import { Utils } from 'delta-comic-core'
-import { debounce } from 'es-toolkit'
+import { debounce, isString, isUndefined } from 'es-toolkit'
 import { CamelCasePlugin, Kysely, Migrator, type Migration, type SelectQueryBuilder } from 'kysely'
 import { TauriSqliteDialect } from 'kysely-dialect-tauri'
 import { SerializePlugin } from 'kysely-plugin-serialize'
@@ -87,37 +87,43 @@ export namespace DBUtils {
   }
 }
 
-import { Store } from 'tauri-store'
+import { Store } from '@tauri-apps/plugin-store'
 
-const store = new Store('counter', {} as Record<string, any>)
-
-await store.start()
-
-const saveKey = new Utils.data.SourcedValue()
-export const useNativeStore = <T>(
+const saveKey = new Utils.data.SourcedValue<[namespace: string, key: string]>()
+export const useNativeStore = <T extends object>(
   namespace: string,
   key: MaybeRefOrGetter<string>,
   defaultValue: MaybeRefOrGetter<T>
 ) => {
-  store.update(namespace, s => s ?? {})
-  return useStorage<T>(saveKey.toString([namespace, toRef(key).value]), defaultValue, {
-    removeItem(key) {
-      const [namespace, k] = saveKey.toJSON(key)
-      store.update(namespace, s => {
-        delete s[k]
-        return s
-      })
+  const _store = Store.load(namespace, { defaults: {} })
+  const useStore = async () => {
+    const store = await _store
+    await store.reload()
+    return Object.assign(store, {
+      async [Symbol.asyncDispose]() {
+        await store.save()
+      }
+    })
+  }
+  return useStorageAsync<T>(saveKey.toString([namespace, toRef(key).value]), defaultValue, {
+    async removeItem(key) {
+      const [, k] = saveKey.toJSON(key)
+      const store = await useStore()
+      await store.delete(k)
+      await store[Symbol.asyncDispose]()
     },
-    getItem(key) {
-      const [namespace, k] = saveKey.toJSON(key)
-      return store.get(namespace)[k]
+    async getItem(key) {
+      const [, k] = saveKey.toJSON(key)
+      const store = await useStore()
+      return store
+        .get<T>(k)
+        .then(v => (isString(v) ? v : isUndefined(v) ? null : JSON.stringify(v)))
     },
-    setItem(key, value) {
-      const [namespace, k] = saveKey.toJSON(key)
-      store.update(namespace, s => {
-        s[k] = value
-        return s
-      })
+    async setItem(key, value) {
+      const [, k] = saveKey.toJSON(key)
+      const store = await useStore()
+      await store.set(k, value)
+      await store[Symbol.asyncDispose]()
     }
   })
 }

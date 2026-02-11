@@ -2,7 +2,9 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "enables the default permissions",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "core:event:default",
@@ -15,11 +17,11 @@
     "fs:read-all",
     "sql:default",
     "sql:allow-execute",
-    "tauri-store:default",
     "m3:default",
     "aptabase:allow-track-event",
     "sentry:default",
     "log:default",
-    "cors-fetch:default"
+    "cors-fetch:default",
+    "store:default"
   ]
 }

@@ -1,8 +1,8 @@
-use tauri::{Builder, EventLoopMessage};
 use percent_encoding::percent_decode_str;
-use tauri_runtime_wry::Wry;
 use std::path::Path;
 use tauri::http::{Response, StatusCode, header};
+use tauri::{Builder, EventLoopMessage};
+use tauri_runtime_wry::Wry;
 
 pub fn init(builder: Builder<Wry<EventLoopMessage>>) -> Builder<Wry<EventLoopMessage>> {
   builder.register_uri_scheme_protocol("local", |_ctx, request| {

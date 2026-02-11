@@ -52,7 +52,7 @@ const $message = useMessage()
           v-model:active="pageSelect"
           swipeable
           :show-header="false"
-          class="h-[calc(100%-42px)]! w-full! **:[.van-swipe-item]:h-full! **:[.van-tabs__content]:h-full!"
+          class="h-[calc(100%-42px)]! w-full! **:[.van-swipe-item]:h-full! **:[.van-tabs__content]:size-full!"
         >
           <VanTab
             v-for="menu in menuOptions.filter(v => !v.disabled)"

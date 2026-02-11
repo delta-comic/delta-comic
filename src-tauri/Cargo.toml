@@ -1,12 +1,12 @@
 [package]
 name = "delta-comic"
 description = "Per Aspera, Ad Astra"
-authors = [ "wenxig" ]
+authors = ["wenxig"]
 license = "AGPL-3.0-only"
 repository = "https://github.com/delta-comic/delta-comic"
 edition = "2024"
 rust-version = "1.92.0"
-version = "0.0.0"
+version = "0.0.1"
 
 [profile.dev]
 opt-level = 0
@@ -27,11 +27,7 @@ incremental = true
 
 [lib]
 name = "delta_comic"
-crate-type = [ "staticlib", "cdylib", "rlib" ]
-
-[build-dependencies.tauri-build]
-version = "2.5.5"
-features = [ ]
+crate-type = ["staticlib", "cdylib", "rlib"]
 
 [dependencies]
 serde_json = "1.0.149"
@@ -45,46 +41,50 @@ mime_guess = "2.0.5"
 percent-encoding = "2.3.2"
 log = "0.4.29"
 tauri-runtime-wry = "2.10.0"
-tauri-store = "1.1.1"
+tauri-plugin-store = "2"
+[dependencies.tauri-plugin-log]
+version = "2.8.0"
+features = ["colored"]
 
-  [dependencies.tauri-plugin-log]
-  version = "2.8.0"
-  features = [ "colored" ]
+[dependencies.tauri-plugin-better-cors-fetch]
+git = "https://github.com/delta-comic/tauri-plugin-better-cors-fetch"
+branch = "main"
+features = ["multipart", "blocking", "native-tls-vendored"]
 
-  [dependencies.tauri-plugin-better-cors-fetch]
-  git = "https://github.com/delta-comic/tauri-plugin-better-cors-fetch"
-  branch = "main"
-  features = [ "multipart", "blocking", "native-tls-vendored" ]
+[dependencies.serde]
+version = "1.0.228"
+features = ["derive"]
 
-  [dependencies.serde]
-  version = "1.0"
-  features = [ "derive" ]
+[dependencies.tauri]
+version = "2.10.2"
+features = []
 
-  [dependencies.tauri]
-  version = "2.9.5"
-  features = [ "devtools" ]
-
-  [dependencies.sentry]
-  version = "0.42"
-  default-features = false
-  features = [
+[dependencies.sentry]
+version = "0.42"
+default-features = false
+features = [
   "backtrace",
   "contexts",
   "debug-images",
   "panic",
   "release-health",
   "reqwest",
-  "rustls"
+  "rustls",
 ]
 
-  [dependencies.tauri-plugin-sql]
-  git = "https://github.com/tauri-apps/plugins-workspace"
-  features = [ "sqlite" ]
-  branch = "v2"
+[dependencies.tauri-plugin-sql]
+git = "https://github.com/tauri-apps/plugins-workspace"
+features = ["sqlite"]
+branch = "v2"
 
-  [dependencies.tauri-plugin-aptabase]
-  git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls"
-  branch = "main"
+[dependencies.tauri-plugin-aptabase]
+git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls"
+branch = "main"
+
+[build-dependencies.tauri-build]
+version = "2.5.5"
+features = []
 
 [features]
-custom-protocol = [ "tauri/custom-protocol" ]
+default = []
+custom-protocol = ["tauri/custom-protocol"]

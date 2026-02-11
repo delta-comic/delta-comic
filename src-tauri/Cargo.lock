@@ -1022,7 +1022,7 @@ dependencies = [
 
 [[package]]
 name = "delta-comic"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "log",
  "mime_guess",
@@ -1041,8 +1041,8 @@ dependencies = [
  "tauri-plugin-persisted-scope",
  "tauri-plugin-sentry",
  "tauri-plugin-sql",
+ "tauri-plugin-store",
  "tauri-runtime-wry",
- "tauri-store",
  "tokio",
 ]
 
@@ -2452,15 +2452,6 @@ checksum = "c91338f0783edbd6195decb37bae672fd3b165faffb89bf7b9e6942f8b1a731a"
 dependencies = [
  "memchr",
  "serde",
-]
-
-[[package]]
-name = "itertools"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
-dependencies = [
- "either",
 ]
 
 [[package]]
@@ -5889,6 +5880,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "tauri-plugin-store"
+version = "2.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ca1a8ff83c269b115e98726ffc13f9e548a10161544a92ad121d6d0a96e16ea"
+dependencies = [
+ "dunce",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.17",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "tauri-runtime"
 version = "2.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5938,38 +5945,6 @@ dependencies = [
  "webview2-com",
  "windows",
  "wry",
-]
-
-[[package]]
-name = "tauri-store"
-version = "1.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c0cf1b1a3a5e7d100f57c3eccbf8d67e53cffc1598b787c628d809405d6de56"
-dependencies = [
- "dashmap",
- "futures",
- "itertools",
- "semver",
- "serde",
- "serde_json",
- "tauri",
- "tauri-plugin",
- "tauri-store-utils",
- "thiserror 2.0.17",
- "tokio",
-]
-
-[[package]]
-name = "tauri-store-utils"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "855375aae57c8c81bb89c847716e4ec1130fab7e0628310cfd173136f4382080"
-dependencies = [
- "parking_lot",
- "semver",
- "tauri",
- "thiserror 2.0.17",
- "tokio",
 ]
 
 [[package]]
