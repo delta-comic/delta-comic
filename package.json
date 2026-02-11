@@ -85,7 +85,6 @@
     "@vitejs/plugin-vue-jsx": "^5.1.4",
     "browserslist": "^4.28.1",
     "commitlint-plugin-cspell": "^0.4.0",
-    "conventional-recommended-bump": "^11.2.0",
     "cspell": "^9.6.4",
     "husky": "^9.1.7",
     "lightningcss": "^1.31.1",

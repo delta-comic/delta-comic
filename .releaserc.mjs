@@ -1,26 +1,28 @@
 import pkg from './package.json' with { type: 'json' }
 
+const isDryRun = !!process.env.IS_DUR_RUN
+
+const shared = { branches: ['main'], repositoryUrl: pkg.repository.url, tagFormat: '${version}' }
+
 /** @type {import("semantic-release").GlobalConfig} */
-export default {
-  branches: ['main'],
-  repositoryUrl: pkg.repository.url,
+const production = {
+  ...shared,
   plugins: [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
     ['@semantic-release/changelog', { changelogFile: 'CHANGELOG.md' }],
+    ['@semantic-release/github', { assets: ['dist/app.apk'] }],
     [
       '@semantic-release/git',
       {
-        assets: [
-          'package.json',
-          'CHANGELOG.md',
-          './src-tauri/tauri.conf.json',
-          './src-tauri/Cargo.toml'
-        ],
+        assets: ['package.json', 'CHANGELOG.md'],
         message: 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
       }
-    ],
-    ['@semantic-release/github', { assets: ['dist/*.apk'] }]
-  ],
-  tagFormat: 'v${version}'
+    ]
+  ]
 }
+
+/** @type {import("semantic-release").GlobalConfig} */
+const dev = { ...shared, plugins: ['@semantic-release/commit-analyzer'], dryRun: true }
+
+export default isDryRun ? dev : production

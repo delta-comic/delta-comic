@@ -186,9 +186,6 @@ importers:
       commitlint-plugin-cspell:
         specifier: ^0.4.0
         version: 0.4.0(@commitlint/lint@20.4.1)
-      conventional-recommended-bump:
-        specifier: ^11.2.0
-        version: 11.2.0
       cspell:
         specifier: ^9.6.4
         version: 9.6.4
