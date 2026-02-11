@@ -34,7 +34,6 @@ import 'vant/lib/index.css'
 import '@/db'
 
 import * as Sentry from '@sentry/vue'
-import { createPlugin } from '@tauri-store/pinia'
 import { reactiveComputed, useCssVar, useDark } from '@vueuse/core'
 import Color from 'color'
 import { Store } from 'delta-comic-core'
@@ -141,7 +140,6 @@ const app = createApp(
 Sentry.init({ ...defaultOptions, app, sendDefaultPii: true })
 
 const pinia = createPinia()
-pinia.use(createPlugin())
 app.use(pinia)
 
 app.use(router)

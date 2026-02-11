@@ -18,13 +18,12 @@ pub async fn run() {
   let builder = builder
     .plugin(logger::init())
     .plugin(tauri_plugin_m3::init())
-    .plugin(tauri_plugin_upload::init())
     .plugin(tauri_plugin_better_cors_fetch::init())
     .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_persisted_scope::init())
     .plugin(tauri_plugin_aptabase::Builder::new("A-US-9793062880").build())
     .plugin(db::init())
-    .plugin(tauri_plugin_pinia::init())
+    .plugin(tauri_store::init())
     .setup(|_app| {
       let logo = r#"
 _____   _________________ ____        __________________ _____   ______

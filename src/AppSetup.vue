@@ -2,11 +2,13 @@
 import { shallowRef, computed } from 'vue'
 import { useDialog, useLoadingBar, useMessage, useThemeVars } from 'naive-ui'
 import { useStyleTag } from '@vueuse/core'
-import { AnimatePresence, motion } from 'motion-v'
-import App from './App.vue'
-import MainContent from './components/setup/mainContent.vue'
 import { Comp } from 'delta-comic-core'
 import { useAppStore } from './stores/app'
+
+import { AnimatePresence, motion } from 'motion-v'
+import App from './App.vue'
+import Plugin from './components/plugin/index.vue'
+
 window.$message = useMessage()
 window.$loading = useLoadingBar()
 window.$dialog = useDialog()
@@ -75,6 +77,6 @@ const showContent = shallowRef(false)
   <Suspense v-if="isBooted">
     <App />
   </Suspense>
-  <MainContent v-model:show="showContent" v-model:is-booted="isBooted" />
+  <Plugin v-model:show="showContent" v-model:is-booted="isBooted" />
   <component v-for="c of appStore.renderRootNodes" :is="c" />
 </template>

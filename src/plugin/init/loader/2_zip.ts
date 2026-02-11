@@ -6,18 +6,18 @@ import { loadAsync, type JSZipObject } from 'jszip'
 
 import type { PluginArchiveDB } from '@/plugin/db'
 
-import { PluginLoader, type PluginFile } from '../utils'
+import { PluginLoader } from '../utils'
 import { getPluginFsPath } from '../utils'
 
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'zip'
-  public override async installDownload(file: PluginFile): Promise<PluginMeta> {
+  public override async installDownload(file: File): Promise<PluginMeta> {
     console.log('[loader zip] begin:', file)
     const temp = await getPluginFsPath('__temp__')
     await fs.mkdir(temp, { recursive: true })
-    await fs.writeFile(await join(temp, 'temp.zip'), new Uint8Array(await file.blob.arrayBuffer()))
+    await fs.writeFile(await join(temp, 'temp.zip'), new Uint8Array(await file.arrayBuffer()))
     console.log('[loader zip] temp:', temp)
-    const zip = await loadAsync(file.blob)
+    const zip = await loadAsync(file)
     console.log(zip.files)
     const meta = <PluginMeta>JSON.parse((await zip.file('manifest.json')?.async('string')) ?? '{}')
     const root = await getPluginFsPath(meta.name.id)
@@ -36,8 +36,8 @@ class _PluginUserscriptLoader extends PluginLoader {
     }
     return meta
   }
-  public override canInstall(file: PluginFile): boolean {
-    return file.fileName.endsWith('.zip')
+  public override canInstall(file: File): boolean {
+    return file.name.endsWith('.zip')
   }
 
   public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {
@@ -45,6 +45,9 @@ class _PluginUserscriptLoader extends PluginLoader {
     const baseDir = await getPluginFsPath(pluginMeta.pluginName)
     console.log('[loader zip] baseDir:', baseDir, pluginMeta.meta.entry)
     const script = document.createElement('script')
+    script.addEventListener('error', err => {
+      throw err
+    })
     script.type = 'module'
     script.async = true
     script.src = decodeURIComponent(
@@ -68,11 +71,11 @@ class _PluginUserscriptLoader extends PluginLoader {
     } else var filePath = cssPath
 
     const style = document.createElement('link')
+    style.addEventListener('error', err => {
+      throw err
+    })
     style.rel = 'stylesheet'
     style.href = decodeURIComponent(convertFileSrc(await join(baseDir, filePath), 'local'))
-    script.onerror = err => {
-      throw err
-    }
     document.head.appendChild(style)
   }
 }

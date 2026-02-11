@@ -6,14 +6,7 @@ license = "AGPL-3.0-only"
 repository = "https://github.com/delta-comic/delta-comic"
 edition = "2024"
 rust-version = "1.92.0"
-version = "0.2.1"
-
-[target.x86_64-pc-windows-msvc]
-linker = "rust-lld.exe"
-
-[target.x86_64-unknown-linux-gnu]
-linker = "clang"
-rustflags = [ "-C", "link-arg=-fuse-ld=lld" ]
+version = "0.0.0"
 
 [profile.dev]
 opt-level = 0
@@ -45,8 +38,6 @@ serde_json = "1.0.149"
 tauri-plugin-clipboard-manager = "2.3.2"
 tauri-plugin-persisted-scope = "2.3.5"
 tauri-plugin-fs = "2.4.5"
-tauri-plugin-upload = "2.4.0"
-tauri-plugin-pinia = "4.1.1"
 tauri-plugin-m3 = "0.3.1"
 tokio = "1.49.0"
 tauri-plugin-sentry = "0.5.0"
@@ -54,39 +45,36 @@ mime_guess = "2.0.5"
 percent-encoding = "2.3.2"
 log = "0.4.29"
 tauri-runtime-wry = "2.10.0"
+tauri-store = "1.1.1"
 
-  [dependencies.tauri-plugin-http]
-  version = "2.5.7"
-  features = [ "unsafe-headers", "json" ]
+[dependencies.tauri-plugin-log]
+version = "2.8.0"
+features = [ "colored" ]
 
-  [dependencies.tauri-plugin-log]
-  version = "2.8.0"
-  features = [ "colored" ]
+[dependencies.tauri-plugin-better-cors-fetch]
+git = "https://github.com/delta-comic/tauri-plugin-better-cors-fetch"
+branch = "main"
+features = [ "multipart", "blocking", "native-tls-vendored" ]
 
-  [dependencies.tauri-plugin-better-cors-fetch]
-  git = "https://github.com/delta-comic/tauri-plugin-better-cors-fetch"
-  branch = "main"
-  features = [ "multipart", "blocking", "native-tls-vendored" ]
+[dependencies.serde]
+version = "1.0"
+features = [ "derive" ]
 
-  [dependencies.serde]
-  version = "1.0"
-  features = [ "derive" ]
+[dependencies.tauri]
+version = "2.9.5"
+features = [ "devtools" ]
 
-  [dependencies.tauri]
-  version = "2.9.5"
-  features = [ "devtools", "custom-protocol" ]
-
-  [dependencies.sentry]
-  version = "0.42"
-  default-features = false
-  features = [
-  "backtrace",
-  "contexts",
-  "debug-images",
-  "panic",
-  "release-health",
-  "reqwest",
-  "rustls"
+[dependencies.sentry]
+version = "0.42"
+default-features = false
+features = [
+"backtrace",
+"contexts",
+"debug-images",
+"panic",
+"release-health",
+"reqwest",
+"rustls"
 ]
 
   [dependencies.tauri-plugin-sql]
@@ -99,5 +87,4 @@ tauri-runtime-wry = "2.10.0"
   branch = "main"
 
 [features]
-default = [ "custom-protocol" ]
 custom-protocol = [ "tauri/custom-protocol" ]

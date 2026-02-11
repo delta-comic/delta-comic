@@ -31,7 +31,7 @@ class _PluginAuth extends PluginBooter {
       if (!isPass) {
         setMeta('选择鉴权方式')
         try {
-          await Utils.message.createDialog({
+          void Utils.message.createDialog({
             type: 'default',
             positiveText: '登录',
             negativeText: '注册',
