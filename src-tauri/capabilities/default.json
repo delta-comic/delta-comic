@@ -8,6 +8,7 @@
   "permissions": [
     "core:default",
     "core:event:default",
+    "core:window:allow-set-fullscreen",
     "clipboard-manager:allow-read-text",
     "clipboard-manager:deny-write-text",
     "fs:default",
