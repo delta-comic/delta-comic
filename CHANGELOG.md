@@ -1,3 +1,13 @@
+## [1.1.4](https://github.com/delta-comic/delta-comic/compare/v1.1.3...1.1.4) (2026-02-12)
+
+
+### Bug Fixes
+
+* **ci:** [pub] env not configured ([5575ba8](https://github.com/delta-comic/delta-comic/commit/5575ba81cd81f47790b3ef8e4863fd595f25244f))
+* **ci:** [pub] fullscreen fixed ([aaa4309](https://github.com/delta-comic/delta-comic/commit/aaa4309f81d8f3989dba3733a611bb747a97260f))
+* fullscreen ([99e91f5](https://github.com/delta-comic/delta-comic/commit/99e91f5f2dcd5e7432f953dcc6eef3071428db9a))
+* plugin download sort ([2394f5a](https://github.com/delta-comic/delta-comic/commit/2394f5ae3a8095f58dcdb08e6a5c0bc40191aa54))
+
 ## [1.1.3](https://github.com/delta-comic/delta-comic/compare/v1.1.2...v1.1.3) (2026-02-11)
 
 
