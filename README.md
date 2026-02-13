@@ -48,11 +48,7 @@ _____   _________________ ____        __________________ _____   ______
 
 1. 安装应用
 2. 在下文所提及的插件中选择一些安装
-3. 启动
-
-### Ios
-
-1. 尝试自行构建
+3. 启动！
 
 <details> 
   <summary>
@@ -107,10 +103,4 @@ _____   _________________ ____        __________________ _____   ______
 
 ## 状态
 
-### main
-
 ![Alt](https://repobeats.axiom.co/api/embed/d29bef6ede7cc9fcfabb0d1499a656e06f5462bf.svg 'Repobeats analytics image')
-
-### develop
-
-![Alt](https://repobeats.axiom.co/api/embed/a878d5bd4b98d32935487a41f6087356c1e60a58.svg 'Repobeats analytics image')
