@@ -1,4 +1,3 @@
-import { Store, uni, Utils } from 'delta-comic-core'
 import { M3 } from 'tauri-plugin-m3'
 import { toRef } from 'vue'
 import {
@@ -13,9 +12,12 @@ import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 import { searchSourceKey } from '@/components/search/source'
 import { useContentStore } from '@/stores/content'
 import { pluginName } from '@/symbol'
+import { SharedFunction } from '@delta-comic/core'
+import { uni } from '@delta-comic/model'
+import { useConfig } from '@delta-comic/plugin'
 export const router = (window.$router = createRouter({ history: createWebHistory(), routes }))
 
-Utils.eventBus.SharedFunction.define(
+SharedFunction.define(
   (contentType_, id, ep, preload) => {
     const contentStore = useContentStore()
     contentStore.$load(contentType_, id, ep, preload)
@@ -31,7 +33,7 @@ Utils.eventBus.SharedFunction.define(
   pluginName,
   'routeToContent'
 )
-Utils.eventBus.SharedFunction.define(
+SharedFunction.define(
   (input, source, sort) => {
     return router.force.push({
       name: '/search/[input]',
@@ -54,7 +56,7 @@ router.force = {
 }
 
 router.beforeEach(async to => {
-  const isDark = Store.useConfig().isDark
+  const isDark = useConfig().isDark
   if (to.meta.statusBar) {
     const sb = toRef(to.meta.statusBar).value
     if (sb == 'auto') {

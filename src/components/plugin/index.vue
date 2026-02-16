@@ -8,9 +8,11 @@ import LoadList from './loadList.vue'
 import Config from './config.vue'
 
 import { type MenuOption, NIcon, useMessage } from 'naive-ui'
-import { Comp, version } from 'delta-comic-core'
 import { type Component, h, shallowRef } from 'vue'
-import { loadAllPlugins } from '@/plugin'
+import { loadAllPlugins } from '@delta-comic/plugin'
+import { DcPopup } from '@delta-comic/ui'
+
+import pkg from '../../../package.json'
 
 const show = defineModel<boolean>('show', { required: true })
 const isBooted = defineModel<boolean>('isBooted', { required: true })
@@ -21,7 +23,7 @@ const menuOptions = [
   { label: '管理', key: 'list', icon: renderIcon(AutoAwesomeMosaicFilled), comp: List },
   { label: '安装', key: 'download', icon: renderIcon(FileDownloadRound), comp: Download },
   { label: '配置', key: 'config', icon: renderIcon(SettingOutlined), comp: Config },
-  { label: `核心版本: ${version}`, key: 'version', disabled: true }
+  { label: `版本: ${pkg.version}`, key: 'version', disabled: true }
 ] satisfies MenuOption[]
 const isBooting = shallowRef(false)
 const boot = async (safe = false) => {
@@ -37,44 +39,28 @@ const $message = useMessage()
 </script>
 
 <template>
-  <Comp.Popup
-    v-model:show="show"
-    position="bottom"
-    round
-    class="h-[80vh]"
-    :before-close="() => !isBooting"
-  >
+  <DcPopup v-model:show="show" position="bottom" round class="h-[80vh]" :before-close="() => !isBooting">
     <NSpin :show="isBooting" class="relative size-full *:first:size-full">
       <div class="size-full overflow-hidden">
         <NMenu v-model:value="pageSelect" mode="horizontal" :options="menuOptions" responsive />
         <!-- content pages -->
-        <VanTabs
-          v-model:active="pageSelect"
-          swipeable
-          :show-header="false"
-          class="h-[calc(100%-42px)]! w-full! **:[.van-swipe-item]:h-full! **:[.van-tabs__content]:size-full!"
-        >
-          <VanTab
-            v-for="menu in menuOptions.filter(v => !v.disabled)"
-            :name="menu.key"
-            class="size-full! *:size-full!"
-          >
+        <VanTabs v-model:active="pageSelect" swipeable :show-header="false"
+          class="h-[calc(100%-42px)]! w-full! **:[.van-swipe-item]:h-full! **:[.van-tabs__content]:size-full!">
+          <VanTab v-for="menu in menuOptions.filter(v => !v.disabled)" :name="menu.key" class="size-full! *:size-full!">
             <component :is="menu.comp" />
           </VanTab>
         </VanTabs>
       </div>
       <!-- boot button group -->
-      <ActionButtonGroup
-        :actions="[
-          { title: '安全启动', icon: SafetyOutlined, onClick: () => boot(true) },
-          { title: '启动', icon: CheckRound, onClick: () => boot(false) }
-        ]"
-      />
+      <ActionButtonGroup :actions="[
+        { title: '安全启动', icon: SafetyOutlined, onClick: () => boot(true) },
+        { title: '启动', icon: CheckRound, onClick: () => boot(false) }
+      ]" />
       <template #description>
         <AnimatePresence>
           <LoadList :isBooting />
         </AnimatePresence>
       </template>
     </NSpin>
-  </Comp.Popup>
+  </DcPopup>
 </template>

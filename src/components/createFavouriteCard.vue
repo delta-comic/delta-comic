@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { db } from '@/db'
-import { Comp } from 'delta-comic-core'
+import { db } from '@delta-comic/db'
+import { DcPopup } from '@delta-comic/ui'
 import { useMessage } from 'naive-ui'
 import { ref, shallowRef } from 'vue'
 
@@ -35,7 +35,7 @@ defineExpose({ create })
 </script>
 
 <template>
-  <Comp.Popup
+  <DcPopup
     v-model:show="show"
     position="bottom"
     round
@@ -69,5 +69,5 @@ defineExpose({ create })
         提交
       </NButton>
     </VanForm>
-  </Comp.Popup>
+  </DcPopup>
 </template>

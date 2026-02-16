@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { usePluginStore } from '@/plugin/store'
-import { uni, Utils } from 'delta-comic-core'
+import { SharedFunction } from '@delta-comic/core'
+import { Global, usePluginStore } from '@delta-comic/plugin'
+
 
 const pluginStore = usePluginStore()
 </script>
@@ -9,7 +10,7 @@ const pluginStore = usePluginStore()
   <div class="size-full bg-(--van-background)">
     <VanNavBar title="全部分类" left-arrow @click-left="$router.back()" class="pt-safe" />
     <NScrollbar class="h-[calc(100%-var(--van-nav-bar-height)-var(--safe-area-inset-top))]!">
-      <div v-for="[plugin, categories] in uni.content.ContentPage.categories.entries()">
+      <div v-for="[plugin, categories] in Global.categories.entries()">
         <NH1 prefix="bar" align-text type="success" class="mb-0! ml-2!">
           <NText type="primary">
             {{ pluginStore.$getPluginDisplayName(plugin) }}
@@ -27,7 +28,7 @@ const pluginStore = usePluginStore()
               ghost
               v-for="cate in category"
               @click="
-                Utils.eventBus.SharedFunction.call(
+                SharedFunction.call(
                   'routeToSearch',
                   cate.search.input,
                   [plugin, cate.search.methodId],

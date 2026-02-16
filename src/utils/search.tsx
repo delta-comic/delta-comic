@@ -1,13 +1,12 @@
-import { uni, Utils, type PluginConfigSearchMethod } from 'delta-comic-core'
+import { SharedFunction } from '@delta-comic/core'
+import { Global, type Search, usePluginStore } from '@delta-comic/plugin'
 import { Cell } from 'vant'
 
-import { usePluginStore } from '@/plugin/store'
-
-export type ThinkList = Awaited<ReturnType<PluginConfigSearchMethod['getAutoComplete']>>
+export type ThinkList = Awaited<ReturnType<Search.SearchMethod['getAutoComplete']>>
 
 export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise<ThinkList> => {
   const store = usePluginStore()
-  const flattedAll = Array.from(uni.content.ContentPage.barcode.entries())
+  const flattedAll = Array.from(Global.barcode.entries())
   const matched = flattedAll.map(v => [v[0], v[1].filter(b => b.match(searchText))] as const)
   return Promise.all(
     matched.flatMap(r =>
@@ -15,10 +14,7 @@ export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise
         <Cell
           title={`转至${i.name}`}
           onClick={async () =>
-            Utils.eventBus.SharedFunction.call(
-              'routeToContent',
-              ...(await i.getContent(searchText, signal))
-            )
+            SharedFunction.call('routeToContent', ...(await i.getContent(searchText, signal)))
           }
           label={`来源:${store.$getPluginDisplayName(r[0])}`}
           value={searchText}

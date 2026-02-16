@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useContentStore } from '@/stores/content'
-import { uni, Utils } from 'delta-comic-core'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { HistoryDB } from '@/db/history'
 import { watch } from 'vue'
 import { toReactive, useFullscreen } from '@vueuse/core'
+import { uni } from '@delta-comic/model'
+import { createLoadingMessage } from '@delta-comic/ui'
+import { HistoryDB } from '@delta-comic/db'
 const $route = useRoute<'/content/[contentType]/[id]/[ep]'>()
 const contentStore = useContentStore()
 const $router = useRouter()
@@ -28,7 +29,7 @@ const fullscreen = toReactive(useFullscreen())
 
 // history
 const union = computed(() => page.value.union.value)
-if (!union.value) var loading = Utils.message.createLoadingMessage()
+if (!union.value) var loading = createLoadingMessage()
 watch(
   union,
   union => {

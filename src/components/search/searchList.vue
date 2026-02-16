@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { onMounted, computed, watch, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ComponentExposed } from 'vue-component-type-helpers'
+import type { ComponentExposed } from 'vue-component-type-helpers'
 import { useTabStatus } from 'vant'
-import { Comp, coreModule, requireDepend, Store, uni, Utils } from 'delta-comic-core'
-import { usePluginStore } from '@/plugin/store'
 import { fromPairs } from 'es-toolkit/compat'
 import { decodeURIDeep, decodeURIComponentDeep } from '@/utils/url'
 import { searchSourceKey } from './source'
-const config = Store.useConfig().$load(Store.appConfig)
-const temp = Store.useTemp().$applyRaw('searchConfig', () => ({
-  result: new Map<string, Utils.data.RStream<uni.item.Item>>(),
+import { uni, type RStream } from '@delta-comic/model'
+import { appConfig, useConfig, usePluginStore } from '@delta-comic/plugin'
+import { useTemp } from '@delta-comic/core'
+import type { DcList } from '@delta-comic/ui'
+const config = useConfig().$load(appConfig)
+const temp = useTemp().$applyRaw('searchConfig', () => ({
+  result: new Map<string, RStream<uni.item.Item>>(),
   scroll: new Map<string, number>()
 }))
-const list = useTemplateRef<ComponentExposed<typeof Comp.List>>('list')
+const list = useTemplateRef<ComponentExposed<typeof DcList>>('list')
 const $router = useRouter()
 const $route = useRoute<'/search/[input]'>()
 const $props = defineProps<{ sort: string; source: string }>()
@@ -65,21 +67,14 @@ const stop = $router.beforeEach(() => {
 })
 onMounted(setupScroll)
 
-const { comp } = requireDepend(coreModule)
 const getItemCard = (contentType: uni.content.ContentType_) =>
-  uni.item.Item.itemCard.get(contentType) ?? comp.ItemCard
+  uni.item.Item.itemCard.get(contentType)
 </script>
 
 <template>
-  <Comp.List
-    :itemHeight="140"
-    v-slot="{ data: { item } }"
-    v-if="isActive ?? true"
-    class="h-full transition-all duration-200 will-change-[transform,_height]"
-    ref="list"
-    :source="comicStream!"
-    :data-processor
-  >
+  <DcList :itemHeight="140" v-slot="{ data: { item } }" v-if="isActive ?? true"
+    class="h-full transition-all duration-200 will-change-[transform,height]" ref="list" :source="comicStream!"
+    :data-processor>
     <component :is="getItemCard(item.contentType)" :item />
-  </Comp.List>
+  </DcList>
 </template>

@@ -1,20 +1,20 @@
 <script setup lang="ts">
+import { createDateString } from '@/utils/date'
+import type { HistoryDB, ItemStoreDB } from '@delta-comic/db'
+import { uni } from '@delta-comic/model'
+import { DcVar } from '@delta-comic/ui'
 import { UserOutlined } from '@vicons/antd'
 import { PhoneAndroidOutlined } from '@vicons/material'
-import { Comp, coreModule, requireDepend, uni, Utils } from 'delta-comic-core'
 import dayjs from 'dayjs'
-import type { ItemStoreDB } from '@/db/itemStore'
-import type { HistoryDB } from '@/db/history'
-defineProps<{ item: ItemStoreDB.StoredItem & HistoryDB.Item }>()
+import { computed } from 'vue'
+const $props = defineProps<{ item: ItemStoreDB.StoredItem & HistoryDB.Item }>()
 
-const {
-  comp: { ItemCard }
-} = requireDepend(coreModule)
+const instance = computed(() => uni.item.Item.create($props.item.item))
 </script>
 
 <template>
-  <Comp.Var v-if="item" :value="item?.item" v-slot="{ value }">
-    <ItemCard :item="uni.item.Item.create(value)">
+  <DcVar v-if="item" :value="item?.item" v-slot="{ value }">
+    <component :item="instance" :is="uni.item.Item.itemCard.get(instance.contentType)">
       <div class="van-ellipsis flex flex-nowrap items-center *:text-nowrap">
         <NIcon color="var(--van-text-color-2)" size="14px">
           <UserOutlined />
@@ -28,9 +28,9 @@ const {
           <PhoneAndroidOutlined />
         </NIcon>
         <span class="van-haptics-feedback mr-2">{{
-          Utils.translate.createDateString(dayjs(item.timestamp))
+          createDateString(dayjs(item.timestamp))
         }}</span>
       </div>
-    </ItemCard>
-  </Comp.Var>
+    </component>
+  </DcVar>
 </template>

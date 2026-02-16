@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import UnitCard from '@/components/unitCard.vue'
-import { usePluginStore } from '@/plugin/store'
-import { Comp, Store, uni, Utils } from 'delta-comic-core'
+import { useTemp } from '@delta-comic/core'
+import { PromiseContent, SourcedValue, Stream, uni, type RPromiseContent, type RStream } from '@delta-comic/model'
+import { Global, usePluginStore } from '@delta-comic/plugin'
+import { DcVar } from '@delta-comic/ui'
 import { isArray } from 'es-toolkit/compat'
 import { computed, markRaw, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -9,11 +11,11 @@ import { useRoute, useRouter } from 'vue-router'
 const $router = useRouter()
 const $route = useRoute<'/hot'>()
 const plugin = computed(() => $route.query.plugin?.toString() ?? '')
-const sourceList = computed(() => uni.content.ContentPage.levelboard.get(plugin.value))
+const sourceList = computed(() => Global.levelboard.get(plugin.value))
 
-const selectLevelKey = new Utils.data.SourcedValue<[plugin: string, name: string]>()
+const selectLevelKey = new SourcedValue<[plugin: string, name: string]>()
 
-const temp = Store.useTemp().$apply('level', () => ({
+const temp = useTemp().$apply('level', () => ({
   selectLevel: selectLevelKey.toString([
     plugin.value,
     (isArray($route.query.dfSel) ? $route.query.dfSel[0] : $route.query.dfSel) ??
@@ -23,7 +25,7 @@ const temp = Store.useTemp().$apply('level', () => ({
   list: markRaw(
     new Map<
       string,
-      Utils.data.RStream<uni.item.Item> | Utils.data.RPromiseContent<any, uni.item.Item[]>
+      RStream<uni.item.Item> | RPromiseContent<any, uni.item.Item[]>
     >()
   )
 }))
@@ -42,7 +44,7 @@ const source = computed(() => {
     const s = sourceList.value?.find(v => v.name == name)?.content()
     if (!s)
       return {
-        data: Utils.data.PromiseContent.fromPromise(
+        data: PromiseContent.fromPromise(
           Promise.reject(`Can not found named: "${name}" in ${plugin}`)
         ),
         isEnd: true
@@ -50,7 +52,7 @@ const source = computed(() => {
     temp.list.set(temp.selectLevel, s)
   }
   const s = temp.list.get(temp.selectLevel)!
-  return Utils.data.Stream.isStream(s) ? s : { data: s, isEnd: true }
+  return Stream.isStream(s) ? s : { data: s, isEnd: true }
 })
 
 const getItemCard = (item: uni.item.Item) =>
@@ -80,7 +82,7 @@ const pluginStore = usePluginStore()
       <template #right>
         <NPopselect
           :options="
-            Array.from(uni.content.ContentPage.levelboard.entries()).map(([plugin, sources]) => ({
+            Array.from(Global.levelboard.entries()).map(([plugin, sources]) => ({
               type: 'group',
               label: plugin,
               children: sources.map(s => ({
@@ -95,19 +97,19 @@ const pluginStore = usePluginStore()
         >
           <NButton text>
             <span class="text-xs text-(--nui-primary-color)">
-              <Comp.Var
+              <DcVar
                 :value="selectLevelKey.toJSON(temp.selectLevel)"
                 v-slot="{ value: [plugin, name] }"
               >
                 {{ pluginStore.$getPluginDisplayName(plugin) }}:{{ name }}
-              </Comp.Var>
+              </DcVar>
             </span>
           </NButton>
         </NPopselect>
       </template>
     </VanNavBar>
     <div class="h-[calc(100%-46px)] w-full">
-      <Comp.List
+      <DcList
         v-if="source"
         :source
         :item-height="140"
@@ -123,7 +125,7 @@ const pluginStore = usePluginStore()
             #{{ index + 1 }}
           </div>
         </div>
-      </Comp.List>
+      </DcList>
     </div>
   </div>
 </template>

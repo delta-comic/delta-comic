@@ -1,4 +1,4 @@
-import { uni } from 'delta-comic-core'
+import { uni } from '@delta-comic/model'
 import { defineStore } from 'pinia'
 import { markRaw, shallowReactive, type Raw } from 'vue'
 

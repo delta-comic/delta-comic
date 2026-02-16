@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Comp, Store } from 'delta-comic-core'
+import { useConfig } from '@delta-comic/plugin'
+import { DcPopup, DcVar } from '@delta-comic/ui'
 import { isEmpty } from 'es-toolkit/compat'
 
-const config = Store.useConfig()
+const config = useConfig()
 </script>
 
 <template>
@@ -28,7 +29,7 @@ const config = Store.useConfig()
               :allowInput="v => (config.patten ? config.patten.test(v) || isEmpty(v) : true)"
               :placeholder="config.placeholder"
               v-model:value="store.value[name]"
-              class="!w-[80vw]"
+              class="w-[80vw]!"
             />
           </template>
         </NPopselect>
@@ -44,7 +45,7 @@ const config = Store.useConfig()
               :max="config.range?.[1]"
               :placeholder="config.placeholder"
               v-model:value="store.value[name]"
-              class="!w-[80vw]"
+              class="w-[80vw]!"
             />
           </template>
         </NPopselect>
@@ -73,10 +74,10 @@ const config = Store.useConfig()
             {{ store.value[name] }}
           </VanCell>
         </NPopselect>
-        <Comp.Var v-else-if="config.type == 'date'" :value="{ show: false }" v-slot="{ value }">
+        <DcVar v-else-if="config.type == 'date'" :value="{ show: false }" v-slot="{ value }">
           <VanCell center :title="config.info" clickable @click="value.show = true">
             {{ store.value[name] }}
-            <Comp.Popup
+            <DcPopup
               v-model:show="value.show"
               overlay
               round
@@ -85,9 +86,9 @@ const config = Store.useConfig()
               class="flex justify-center"
             >
               <NDatePicker input-readonly v-model:value="store.value[name]" />
-            </Comp.Popup>
+            </DcPopup>
           </VanCell>
-        </Comp.Var>
+        </DcVar>
       </template>
     </VanCellGroup>
   </NScrollbar>

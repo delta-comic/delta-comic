@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { usePluginStore } from '@/plugin/store'
-import type { PluginUserActionPage } from 'delta-comic-core'
+import { usePluginStore, type User } from '@delta-comic/plugin'
 import { NGi, NGrid } from 'naive-ui'
 import { toRef } from 'vue'
-defineProps<{ card: PluginUserActionPage; pluginName: string; color?: string }>()
+defineProps<{ card: User.UserActionPage; pluginName: string; color?: string }>()
 const pluginStore = usePluginStore()
 </script>
 

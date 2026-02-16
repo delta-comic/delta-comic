@@ -1,13 +1,8 @@
 import 'core-js'
 
+import type {} from '@delta-comic/utils'
 import { attachConsole } from '@tauri-apps/plugin-log'
 await attachConsole()
-import * as Vue from 'vue'
-window.$$lib$$.Vue = Vue
-import * as Vant from 'vant'
-window.$$lib$$.Vant = Vant
-import * as Naive from 'naive-ui'
-window.$$lib$$.Naive = Naive
 
 import { CORSFetch } from 'tauri-plugin-better-cors-fetch'
 CORSFetch.init({ request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } } })
@@ -20,23 +15,54 @@ axios.defaults.adapter = ['fetch']
 
 window.$$lib$$.Axios = { ...Axios, ...axios, axios }
 
-import * as Dcc from 'delta-comic-core'
-window.$$lib$$.Dcc = Dcc
-import * as Vr from 'vue-router'
-window.$$lib$$.VR = Vr
+import * as Vue from 'vue'
+window.$$lib$$.Vue = Vue
+
+import * as Vant from 'vant'
+window.$$lib$$.Vant = Vant
+
+import * as Naive from 'naive-ui'
+window.$$lib$$.Naive = Naive
+
+import * as VR from 'vue-router'
+window.$$lib$$.VR = VR
+
 import * as Pinia from 'pinia'
 window.$$lib$$.Pinia = Pinia
+
+import * as DcUi from '@delta-comic/ui'
+window.$$lib$$.DcUi = DcUi
+
+import * as DcModel from '@delta-comic/model'
+window.$$lib$$.DcModel = DcModel
+
+import * as DcCore from '@delta-comic/core'
+window.$$lib$$.DcCore = DcCore
+
+import * as DcPlugin from '@delta-comic/plugin'
+window.$$lib$$.DcPlugin = DcPlugin
+
+import * as DcUtils from '@delta-comic/utils'
+window.$$lib$$.DcUtils = DcUtils
+
+import * as DcRequire from '@delta-comic/request'
+window.$$lib$$.DcRequire = DcRequire
+
+import * as DcDb from '@delta-comic/db'
+window.$$lib$$.DcDb = DcDb
+
+import * as Vr from 'vue-router'
+window.$$lib$$.VR = Vr
+
 window.$api.NImage = Naive.NImage
 window.$api.showImagePreview = Vant.showImagePreview
 
 import '@/index.css'
 import 'vant/lib/index.css'
-import '@/db'
 
 import * as Sentry from '@sentry/vue'
 import { reactiveComputed, useCssVar, useDark } from '@vueuse/core'
 import Color from 'color'
-import { Store } from 'delta-comic-core'
 import {
   NConfigProvider,
   NMessageProvider,
@@ -91,7 +117,7 @@ const app = createApp(
         primaryColorSuppl: themeColorDark
       }
     }))
-    const config = Store.useConfig()
+    const config = DcPlugin.useConfig()
     const fontBold = useCssVar('--nui-font-weight')
 
     const isUseDarkMode = useDark({ listenToStorageChanges: false })

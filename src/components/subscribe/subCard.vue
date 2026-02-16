@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import AuthorIcon from '@/components/user/authorIcon.vue'
+import { createDateString } from '@/utils/date'
+import { SharedFunction } from '@delta-comic/core'
+import type { uni } from '@delta-comic/model'
+import { DcImage } from '@delta-comic/ui'
 import { MoreVertRound } from '@vicons/material'
-import { Comp, uni, Utils } from 'delta-comic-core'
 
 defineProps<{ item: uni.item.Item }>()
-defineEmits<{ unsubscribe: [] }>()
+defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
 </script>
 
 <template>
-  <div
-    class="van-hairline--bottom w-full bg-(--van-background-2)"
-    @click="
-      Utils.eventBus.SharedFunction.call(
-        'routeToContent',
-        item.contentType,
-        item.id,
-        item.thisEp.index,
-        item
-      )
-    "
-  >
+  <div class="van-hairline--bottom w-full bg-(--van-background-2)" @click="
+    SharedFunction.call(
+      'routeToContent',
+      item.contentType,
+      item.id,
+      item.thisEp.index,
+      item
+    )
+    ">
     <!-- user -->
     <div class="relative flex w-full py-2">
       <div class="van-ellipsis flex w-fit items-center pl-2 text-[16px] text-(--p-color)">
@@ -29,24 +28,20 @@ defineEmits<{ unsubscribe: [] }>()
             {{ item.author[0].label }}
           </div>
           <div class="-mt-0.5 flex items-center text-[11px] text-(--van-text-color-2)">
-            {{ Utils.translate.createDateString(item.$updateTime) }}·投稿了内容
+            {{ createDateString(item.$updateTime) }}·投稿了内容
           </div>
         </div>
       </div>
-      <NButton class="!absolute top-1/2 right-3 -translate-y-1/2" type="tertiary" text>
+      <NButton class="absolute! top-1/2 right-3 -translate-y-1/2" type="tertiary" text>
         <template #icon>
-          <VanPopover
-            placement="bottom-end"
-            :actions="[
-              {
-                text: '取消关注',
-                onClick() {
-                  $emit('unsubscribe')
-                }
+          <VanPopover placement="bottom-end" :actions="[
+            {
+              text: '取消关注',
+              onClick() {
+                $emit('unsubscribe', item)
               }
-            ]"
-            @select="q => q.onClick()"
-          >
+            }
+          ]" @select="q => q.onClick()">
             <template #reference>
               <NIcon size="20px">
                 <MoreVertRound />
@@ -58,11 +53,7 @@ defineEmits<{ unsubscribe: [] }>()
     </div>
     <!-- cover -->
     <div class="w-full px-2">
-      <Comp.Image
-        :src="item.$cover"
-        class="aspect-video w-full rounded-lg bg-black"
-        fit="contain"
-      />
+      <DcImage :src="item.$cover" class="aspect-video w-full rounded-lg bg-black" fit="contain" />
     </div>
     <!-- title -->
     <div class="van-multi-ellipsis--l2 w-full px-2 text-base font-semibold">

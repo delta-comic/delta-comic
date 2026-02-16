@@ -2,10 +2,9 @@
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { PlusFilled } from '@vicons/material'
 import { useMessage } from 'naive-ui'
-import { Comp } from 'delta-comic-core'
-import { db } from '@/db'
-import { FavouriteDB } from '@/db/favourite'
 import { computedAsync } from '@vueuse/core'
+import { db, type FavouriteDB } from '@delta-comic/db'
+import { DcAwait, DcPopup } from '@delta-comic/ui'
 
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())
@@ -50,7 +49,7 @@ defineExpose({ create })
 </script>
 
 <template>
-  <Comp.Popup
+  <DcPopup
     v-model:show="isShow"
     position="bottom"
     round
@@ -70,7 +69,7 @@ defineExpose({ create })
       </div>
     </div>
     <VanCellGroup inset class="mb-6!">
-      <Comp.Await
+      <DcAwait
         v-for="card of allFavouriteCards"
         v-slot="{ result: count }"
         :promise="() => getCardItemCount(card.createAt)"
@@ -90,11 +89,11 @@ defineExpose({ create })
             <NCheckbox :checked="selectList.has(card.createAt)" />
           </template>
         </VanCell>
-      </Comp.Await>
+      </DcAwait>
     </VanCellGroup>
     <NButton class="m-5! w-30!" @click="submit" strong secondary type="primary" size="large">
       确定
     </NButton>
-  </Comp.Popup>
+  </DcPopup>
   <CreateFavouriteCard ref="createFavouriteCard" />
 </template>

@@ -1,27 +1,26 @@
 <script setup lang="ts">
-import { Comp, Store, uni, Utils } from 'delta-comic-core'
 import Card from './subCard.vue'
-import { SubscribeDB } from '@/db/subscribe'
 import { motion } from 'motion-v'
-import { usePluginStore } from '@/plugin/store'
 import { CloseRound } from '@vicons/material'
 import { onBeforeRouteLeave } from 'vue-router'
-import AuthorIcon from '@/components/user/authorIcon.vue'
-import { db } from '@/db'
 import { computedAsync } from '@vueuse/core'
+import { db, SubscribeDB } from '@delta-comic/db'
+import { usePluginStore } from '@delta-comic/plugin'
+import { useTemp } from '@delta-comic/core'
+import type { RStream, uni } from '@delta-comic/model'
+import { DcWaterfall } from '@delta-comic/ui'
 
 defineProps<{ selectItem: SubscribeDB.AuthorItem }>()
 const select = defineModel<string | undefined>('select', { required: true })
 
-const pluginStore = usePluginStore()
-const subscribe = computedAsync(() => SubscribeDB.getAll(), [])
+  const pluginStore = usePluginStore()
+  const subscribe = computedAsync(() => SubscribeDB.getAll(), [])
 
-const temp = Store.useTemp().$applyRaw(
+const temp = useTemp().$applyRaw(
   'subscribeList',
-  () => new Map<string, Utils.data.RStream<uni.item.Item>>()
+  () => new Map<string, RStream<uni.item.Item>>()
 )
 const getSource = (si: SubscribeDB.Item) => {
-  // select.value ? (temp[select.value.key] ??=   []) : undefined
   if (temp.has(si.key)) return temp.get(si.key)!
   const [plugin] = SubscribeDB.key.toJSON(si.key)
   if (si.type == 'author') {
@@ -58,7 +57,7 @@ onBeforeRouteLeave(() => {
           :animate="{ scale: '100%', translateX: '0%', opacity: 1 }"
           class="van-ellipsis absolute top-1 left-1 flex h-[calc(60px-(var(--spacing)*2))] w-fit max-w-[calc(100%-8px)] items-center gap-2 rounded-2xl bg-(--van-background-2) px-3 text-nowrap"
         >
-          <AuthorIcon :size-spacing="10" :author="selectItem.author" />
+          <DcAuthorIcon :size-spacing="10" :author="selectItem.author" />
           <div class="text-lg font-semibold text-(--p-color)">{{ selectItem.author.label }}</div>
         </motion.div>
       </template>
@@ -99,7 +98,7 @@ onBeforeRouteLeave(() => {
             </NIcon>
           </div>
           <div @pointerdown.stop class="h-[calc(100%-40px)] w-full overflow-hidden">
-            <Comp.Waterfall
+            <DcWaterfall
               :source="getSource(author)"
               :padding="0"
               :col="1"
@@ -107,7 +106,7 @@ onBeforeRouteLeave(() => {
               v-slot="{ item }"
             >
               <Card :item @unsubscribe="unsubscribe(author)" />
-            </Comp.Waterfall>
+            </DcWaterfall>
           </div>
         </VanTab>
       </VanTabs>

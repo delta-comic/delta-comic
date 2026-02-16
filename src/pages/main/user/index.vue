@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { DBUtils, db } from '@/db'
-import { usePluginStore } from '@/plugin/store'
+import { db, DBUtils } from '@delta-comic/db'
+import { uni } from '@delta-comic/model'
+import { useConfig, usePluginStore } from '@delta-comic/plugin'
+import { DcVar } from '@delta-comic/ui'
 import { FolderOutlined } from '@vicons/antd'
 import { computedAsync } from '@vueuse/core'
-import { Comp, uni, Store } from 'delta-comic-core'
 import { isEmpty } from 'es-toolkit/compat'
 import { useRouter } from 'vue-router'
 const $router = useRouter()
-const config = Store.useConfig()
+const config = useConfig()
 const $window = window
 const pluginStore = usePluginStore()
 
@@ -58,7 +59,7 @@ const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom(
     </VanIcon>
   </div>
   <template v-for="[plugin, user] of uni.user.User.userBase">
-    <Comp.Var :value="pluginStore.plugins.get(plugin)?.user?.card" v-slot="{ value }">
+    <DcVar :value="pluginStore.plugins.get(plugin)?.user?.card" v-slot="{ value }">
       <component
         :is="value"
         v-if="value"
@@ -66,7 +67,7 @@ const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom(
         isSmall
         @click="$router.force.push({ name: '/user/edit/[plugin]', params: { plugin } })"
       />
-    </Comp.Var>
+    </DcVar>
   </template>
   <div
     v-if="isEmpty(uni.user.User.userBase)"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Utils } from 'delta-comic-core'
+import { useZIndex } from '@delta-comic/ui'
 import { isEmpty, uniq } from 'es-toolkit/compat'
 import { motion } from 'motion-v'
 import { shallowRef } from 'vue'
@@ -8,7 +8,7 @@ const filtersHistory = defineModel<string[]>('filtersHistory', { required: true 
 
 const isSearching = shallowRef(false)
 const searchText = shallowRef('')
-const [zIndex] = Utils.layout.useZIndex(isSearching)
+const [zIndex] = useZIndex(isSearching)
 
 defineExpose({ isSearching, searchText })
 </script>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Comp, uni } from 'delta-comic-core'
+import { uni } from '@delta-comic/model'
+import { DcPopup } from '@delta-comic/ui'
 import { NSelect } from 'naive-ui'
 
 const show = defineModel<boolean>('show', { required: true })
@@ -7,7 +8,7 @@ const $emit = defineEmits<{ change: [] }>()
 </script>
 
 <template>
-  <Comp.Popup v-model:show="show" position="bottom" overlay round>
+  <DcPopup v-model:show="show" position="bottom" overlay round>
     <div class="min-h-60 w-full px-2">
       <div class="mb-2 pt-3 pl-5 text-2xl">数据源更改</div>
       <div
@@ -43,5 +44,5 @@ const $emit = defineEmits<{ change: [] }>()
         </div>
       </div>
     </div>
-  </Comp.Popup>
+  </DcPopup>
 </template>

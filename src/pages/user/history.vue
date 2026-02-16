@@ -5,11 +5,12 @@ import HistoryCard from '@/components/user/historyCard.vue'
 import Layout from '@/components/user/userLayout.vue'
 import Searcher from '@/components/listSearcher.vue'
 import Action from '@/components/listAction.vue'
-import { Comp, Store, Utils } from 'delta-comic-core'
 import { computedAsync } from '@vueuse/core'
-import { db, useNativeStore } from '@/db'
-import type { HistoryDB } from '@/db/history'
 import { pluginName } from '@/symbol'
+import { db, useNativeStore, type HistoryDB } from '@delta-comic/db'
+import { appConfig, useConfig } from '@delta-comic/plugin'
+import { createDialog, DcPopup, DcWaterfall } from '@delta-comic/ui'
+import { PromiseContent } from '@delta-comic/model'
 
 const histories = computedAsync(
   () =>
@@ -21,7 +22,7 @@ const histories = computedAsync(
       .execute(),
   []
 )
-const config = Store.useConfig().$load(Store.appConfig)
+const config = useConfig().$load(appConfig)
 const searcher = useTemplateRef('searcher')
 
 const showConfig = shallowRef(false)
@@ -46,7 +47,7 @@ const filters = useNativeStore(pluginName, 'history.filter', new Array<string>()
         text: '删除',
         color: 'var(--van-danger-color)',
         onTrigger(sel) {
-          Utils.message.createDialog({
+          createDialog({
             type: 'warning',
             title: '警告',
             content: `你确认删除${sel.length}项?`,
@@ -107,10 +108,10 @@ const filters = useNativeStore(pluginName, 'history.filter', new Array<string>()
           </NIcon>
         </div>
       </template>
-      <Comp.Waterfall
+      <DcWaterfall
         class="h-full!"
         un-reloadable
-        :source="{ data: Utils.data.PromiseContent.resolve(histories), isEnd: true }"
+        :source="{ data: PromiseContent.resolve(histories), isEnd: true }"
         v-slot="{ item }"
         :col="1"
         :gap="0"
@@ -131,10 +132,10 @@ const filters = useNativeStore(pluginName, 'history.filter', new Array<string>()
             />
           </template>
         </VanSwipeCell>
-      </Comp.Waterfall>
+      </DcWaterfall>
     </Layout>
   </Action>
-  <Comp.Popup v-model:show="showConfig" position="bottom" round class="bg-(--van-background)!">
+  <DcPopup v-model:show="showConfig" position="bottom" round class="bg-(--van-background)!">
     <div class="m-(--van-cell-group-inset-padding) mt-4 mb-2! w-full font-semibold">
       历史记录设置
     </div>
@@ -150,5 +151,5 @@ const filters = useNativeStore(pluginName, 'history.filter', new Array<string>()
         </template>
       </VanCell>
     </VanCellGroup>
-  </Comp.Popup>
+  </DcPopup>
 </template>

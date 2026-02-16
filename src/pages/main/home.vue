@@ -3,10 +3,12 @@ import ExtendableSearchBar from '@/components/home/mainPageSearchBar.vue'
 import userIcon from '@/assets/images/userIcon.webp'
 import { isShowMainHomeNavBar } from '@/symbol'
 import { VideogameAssetFilled } from '@vicons/material'
-import { Comp, uni } from 'delta-comic-core'
 import { isEmpty, random } from 'es-toolkit/compat'
 import { shallowRef, provide, nextTick, useTemplateRef, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { uni } from '@delta-comic/model'
+import { Global } from '@delta-comic/plugin'
+import { DcImage, DcRouterTab, DcVar } from '@delta-comic/ui'
 const $router = useRouter()
 const isShowNavBar = shallowRef(true)
 provide(isShowMainHomeNavBar, isShowNavBar)
@@ -28,7 +30,7 @@ const avatars = computed(() =>
 )
 
 const tabItem = computed(() =>
-  Array.from(uni.content.ContentPage.tabbar.entries()).flatMap(pair =>
+  Array.from(Global.tabbar.entries()).flatMap(pair =>
     pair[1].map(val => ({ title: val.title, name: val.id, queries: { plugin: pair[0] } }))
   )
 )
@@ -43,12 +45,12 @@ const tabItem = computed(() =>
     class="relative flex h-13.5 w-full items-center overflow-hidden bg-(--van-background-2) transition-transform duration-200 *:overflow-hidden"
   >
     <div class="ml-1 size-10.25!">
-      <Comp.Var
+      <DcVar
         :value="isEmpty(avatars) ? userIcon : avatars[random(0, avatars.length - 1)]"
         v-slot="{ value: src }"
       >
         <Teleport to="#popups">
-          <Comp.Image
+          <DcImage
             :src
             round
             v-if="!extendableSearchBar?.isSearching"
@@ -56,7 +58,7 @@ const tabItem = computed(() =>
             class="fixed top-safe-offset-2 ml-1 size-10.25! transition-transform duration-200"
           />
         </Teleport>
-      </Comp.Var>
+      </DcVar>
     </div>
     <ExtendableSearchBar ref="extendableSearchBar" />
     <div
@@ -77,7 +79,7 @@ const tabItem = computed(() =>
         : '-translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]'
     ]"
   >
-    <Comp.RouterTab
+    <DcRouterTab
       router-base="/main/home"
       :items="[{ title: '推荐', name: 'random' }, { title: '热门', name: 'hot' }, ...tabItem]"
     />

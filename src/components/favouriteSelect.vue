@@ -2,11 +2,11 @@
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { PlusFilled, StarOutlineRound } from '@vicons/material'
 import { useMessage } from 'naive-ui'
-import { Comp, uni } from 'delta-comic-core'
-import { FavouriteDB } from '@/db/favourite'
 import { StarFilled } from '@vicons/antd'
-import { db, DBUtils } from '@/db'
 import { computedAsync } from '@vueuse/core'
+import { db, DBUtils, FavouriteDB } from '@delta-comic/db'
+import type { uni } from '@delta-comic/model'
+import { DcAwait, DcPopup, DcToggleIcon } from '@delta-comic/ui'
 
 const $props = defineProps<{ item: uni.item.Item; plain?: boolean }>()
 
@@ -64,29 +64,15 @@ const thisFavouriteCount = computedAsync(
 </script>
 
 <template>
-  <Comp.ToggleIcon
-    padding
-    :size="plain ? '35px' : '27px'"
-    @long-click="create().then(favouriteThis)"
-    @click="favouriteThis([0])"
-    :model-value="thisFavouriteCount > 0"
-    :icon="plain ? StarOutlineRound : StarFilled"
-  >
+  <DcToggleIcon padding :size="plain ? '35px' : '27px'" @long-click="create().then(favouriteThis)"
+    @click="favouriteThis([0])" :model-value="thisFavouriteCount > 0" :icon="plain ? StarOutlineRound : StarFilled">
     {{ plain ? '' : '收藏' }}
-  </Comp.ToggleIcon>
-  <Comp.Popup
-    v-model:show="isShow"
-    position="bottom"
-    round
-    class="bg-(--van-background)!"
-    @closed="promise.reject()"
-  >
+  </DcToggleIcon>
+  <DcPopup v-model:show="isShow" position="bottom" round class="bg-(--van-background)!" @closed="promise.reject()">
     <div class="relative m-(--van-cell-group-inset-padding) mt-2 mb-2! w-full font-semibold">
       选择收藏夹
-      <div
-        @click="createFavouriteCard?.create()"
-        class="absolute top-1/2 right-8 flex -translate-y-1/2 items-center text-xs! font-normal text-(--van-text-color-2)"
-      >
+      <div @click="createFavouriteCard?.create()"
+        class="absolute top-1/2 right-8 flex -translate-y-1/2 items-center text-xs! font-normal text-(--van-text-color-2)">
         <NIcon>
           <PlusFilled />
         </NIcon>
@@ -94,32 +80,22 @@ const thisFavouriteCount = computedAsync(
       </div>
     </div>
     <VanCellGroup inset class="mb-6!">
-      <Comp.Await
-        v-for="card of allFavouriteCards"
-        v-slot="{ result: count }"
-        auto-load
-        :promise="() => getCardCount(card.createAt)"
-      >
-        <VanCell
-          center
-          :title="card.title"
-          :label="`${count ?? 0}个内容`"
-          clickable
-          @click="
-            selectList.has(card.createAt)
-              ? selectList.delete(card.createAt)
-              : selectList.add(card.createAt)
-          "
-        >
+      <DcAwait v-for="card of allFavouriteCards" v-slot="{ result: count }" auto-load
+        :promise="() => getCardCount(card.createAt)">
+        <VanCell center :title="card.title" :label="`${count ?? 0}个内容`" clickable @click="
+          selectList.has(card.createAt)
+            ? selectList.delete(card.createAt)
+            : selectList.add(card.createAt)
+          ">
           <template #right-icon>
             <NCheckbox :checked="selectList.has(card.createAt)" />
           </template>
         </VanCell>
-      </Comp.Await>
+      </DcAwait>
     </VanCellGroup>
     <NButton class="m-5! w-30!" @click="submit" strong secondary type="primary" size="large">
       确定
     </NButton>
-  </Comp.Popup>
+  </DcPopup>
   <CreateFavouriteCard ref="createFavouriteCard" />
 </template>

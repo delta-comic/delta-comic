@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { usePluginStore } from '@delta-comic/plugin'
+import { createLoadingMessage } from '@delta-comic/ui'
 import { motion } from 'motion-v'
-import { usePluginStore } from '@/plugin/store'
 import { computed } from 'vue'
-import { Utils } from 'delta-comic-core'
 
 defineProps<{ isBooting: boolean }>()
 
@@ -15,7 +15,7 @@ const allErrors = computed(() =>
 )
 
 const rebootApp = () => {
-  Utils.message.createLoadingMessage('重启中')
+  createLoadingMessage('重启中')
   location.reload()
 }
 </script>

@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="T">
+import { useConfig } from '@delta-comic/plugin'
 import { createReusableTemplate } from '@vueuse/core'
-import { Store } from 'delta-comic-core'
 import { motion } from 'motion-v'
 import type { PopoverAction } from 'vant'
 import { shallowRef, shallowReactive } from 'vue'
@@ -29,7 +29,7 @@ defineSlots<{
 }>()
 defineExpose({ showSelect, selectList })
 
-const config = Store.useConfig()
+const config = useConfig()
 </script>
 
 <template>
@@ -53,7 +53,7 @@ const config = Store.useConfig()
               :initial="{ opacity: 0 }"
               :animate="{ opacity: 1 }"
               :exit="{ opacity: 0 }"
-              class="absolute top-0 right-0 h-full w-15 bg-[linear-gradient(to_left,_var(--p-color),_transparent)]"
+              class="absolute top-0 right-0 h-full w-15 bg-[linear-gradient(to_left,var(--p-color),transparent)]"
             >
             </motion.div>
             <Motion
@@ -84,14 +84,14 @@ const config = Store.useConfig()
         <div class="ml-2 flex w-full items-center">
           <span
             class="rounded bg-(--van-gray-1) px-1.5 text-[16px]"
-            :class="[config.isDark && '!bg-white/10']"
+            :class="[config.isDark && 'bg-white/10!']"
           >
             已选<span class="px-0.5 text-(--p-color)">{{ selectList.size }}</span
             >项
           </span>
         </div>
         <div class="flex items-center text-nowrap">
-          <NButton class="!h-11" quaternary @click="selectAll()">全选</NButton>
+          <NButton class="h-11!" quaternary @click="selectAll()">全选</NButton>
           <VanButton square type="warning" @click="cancel()">取消</VanButton>
           <VanPopover
             :actions="action"

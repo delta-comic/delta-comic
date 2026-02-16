@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { MenuRound, WarningRound } from '@vicons/material'
-import { Comp, Utils, version } from 'delta-comic-core'
 import { shallowReactive } from 'vue'
 import semver from 'semver'
 import { memoize } from 'es-toolkit'
-import { PluginArchiveDB } from '@/plugin/db'
-import { updatePlugin } from '@/plugin'
 import { computedAsync } from '@vueuse/core'
-import { db } from '@/db'
+import pkg from '../../../package.json'
+import { db, PluginArchiveDB } from '@delta-comic/db'
+import { updatePlugin } from '@delta-comic/plugin'
+import { PromiseContent } from '@delta-comic/model'
 
 const updating = shallowReactive(new Set<string>())
 const _updatePlugin = async (plugin: PluginArchiveDB.Meta) => {
@@ -20,7 +20,7 @@ const _updatePlugin = async (plugin: PluginArchiveDB.Meta) => {
   }
 }
 
-const checkIsSupport = memoize((supportCore: string) => semver.satisfies(version, supportCore))
+const checkIsSupport = memoize((supportCore: string) => semver.satisfies(pkg.version, supportCore))
 
 const getCardClass = (plugin: PluginArchiveDB.Meta) => {
   if (!plugin.enable)
@@ -34,7 +34,7 @@ const codeArchives = computedAsync(() => db.value.selectFrom('plugin').selectAll
 </script>
 
 <template>
-  <Comp.Content :source="Utils.data.PromiseContent.resolve(codeArchives)" class="size-full">
+  <DcContent :source="PromiseContent.resolve(codeArchives)" class="size-full">
     <NScrollbar class="size-full">
       <TransitionGroup tag="ul" name="list">
         <NCard
@@ -107,5 +107,5 @@ const codeArchives = computedAsync(() => db.value.selectFrom('plugin').selectAll
         </NCard>
       </TransitionGroup>
     </NScrollbar>
-  </Comp.Content>
+  </DcContent>
 </template>

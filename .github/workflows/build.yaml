@@ -34,9 +34,6 @@ jobs:
           key: ${{ runner.os }}-delta-comic-rust
           workspaces: './src-tauri/ -> target'
 
-      - name: Build script run pm
-        run: chmod +x ./script/*
-
       # rust
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -55,11 +52,8 @@ jobs:
           node-version: 24
           cache: 'pnpm'
 
-      - name: Change depends
-        run: sh ./script/install.sh
-
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # java
       - name: JDK 23

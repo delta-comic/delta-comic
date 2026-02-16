@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { db } from '@/db'
-import { FavouriteDB } from '@/db/favourite'
 import { useContentStore } from '@/stores/content'
+import { db, type FavouriteDB } from '@delta-comic/db'
+import { uni } from '@delta-comic/model'
+import { DcImage, DcVar } from '@delta-comic/ui'
 import { LockOutlined } from '@vicons/antd'
 import { ArrowForwardIosRound } from '@vicons/material'
 import { computedAsync } from '@vueuse/core'
-import { Comp, uni } from 'delta-comic-core'
 import { isEmpty } from 'es-toolkit/compat'
 import { useRouter } from 'vue-router'
 const $props = defineProps<{ isCardMode?: boolean; card: FavouriteDB.Card }>()
@@ -60,14 +60,14 @@ const handleClick = (rawItem: uni.item.RawItem) => {
           class="flex w-[30%] flex-col gap-2"
           @click="handleClick(item)"
         >
-          <Comp.Var :value="item" v-slot="{ value: item }">
-            <Comp.Image
+          <DcVar :value="item" v-slot="{ value: item }">
+            <DcImage
               :src="uni.image.Image.create(item.cover)"
               class="z-2 rounded-lg!"
               fit="cover"
             />
             <div class="van-multi-ellipsis--l2">{{ item.title }}</div>
-          </Comp.Var>
+          </DcVar>
         </div>
       </template>
     </div>
@@ -77,9 +77,9 @@ const handleClick = (rawItem: uni.item.RawItem) => {
     @click="$router.force.push({ name: '/user/favourite/[id]', params: { id: card.createAt } })"
     class="active:bg-gray van-haptics-feedback relative flex min-h-25 w-full items-center overflow-hidden rounded-xl border-none bg-(--van-background-2) bg-center p-3 text-(--van-text-color)"
   >
-    <Comp.Var :value="favouriteItems[0].item" v-slot="{ value: item }">
+    <DcVar :value="favouriteItems[0].item" v-slot="{ value: item }">
       <div class="w-[40%]">
-        <Comp.Image
+        <DcImage
           :src="uni.image.Image.create(item.cover)"
           class="z-2 ml-[1%] h-full rounded-lg!"
           fit="contain"
@@ -99,6 +99,6 @@ const handleClick = (rawItem: uni.item.RawItem) => {
           {{ favouriteItems.length }}个内容
         </div>
       </div>
-    </Comp.Var>
+    </DcVar>
   </div>
 </template>

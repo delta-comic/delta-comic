@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { usePluginStore } from '@/plugin/store'
+import { usePluginStore } from '@delta-comic/plugin'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 const $route = useRoute<'/user/action/[plugin]/[key]'>()

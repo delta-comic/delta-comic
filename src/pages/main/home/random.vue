@@ -4,18 +4,20 @@ import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { isShowMainHomeNavBar } from '@/symbol'
 import { until, useResizeObserver } from '@vueuse/core'
-import { Comp, coreModule, requireDepend, Store, uni, Utils } from 'delta-comic-core'
 import { LikeOutlined } from '@vicons/antd'
 import { DrawOutlined } from '@vicons/material'
+import { SharedFunction, useTemp } from '@delta-comic/core'
+import { Stream, uni } from '@delta-comic/model'
+import { DcWaterfall } from '@delta-comic/ui'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()
-const temp = Store.useTemp().$applyRaw('randomConfig', () => ({
-  stream: Utils.data.Stream.create<uni.item.Item>(async function* (signal, that) {
+const temp = useTemp().$applyRaw('randomConfig', () => ({
+  stream: Stream.create<uni.item.Item>(async function* (signal, that) {
     that.pages.value = Infinity
     that.page.value = 0
     while (true) {
       that.page.value++
-      const result = await Utils.eventBus.SharedFunction.callRandom('getRandomProvide', signal)
+      const result = await SharedFunction.callRandom('getRandomProvide', signal)
         .result
       yield result
     }
@@ -50,26 +52,20 @@ watch(
   { immediate: true }
 )
 
-const { comp } = requireDepend(coreModule)
 
 console.debug('[random] waterfall', waterfall, temp.stream)
 </script>
 
 <template>
-  <Comp.Waterfall class="size-full!" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
-    <component
-      :is="uni.item.Item.itemCard.get(item.contentType) ?? comp.ItemCard"
-      :item
-      type="small"
-      free-height
-      :key="`${index}|${item.id}`"
-    >
+  <DcWaterfall class="size-full!" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
+    <component :is="uni.item.Item.itemCard.get(item.contentType)" :item type="small" free-height
+      :key="`${index}|${item.id}`">
       <NIcon color="var(--van-text-color-2)" size="14px">
         <DrawOutlined />
       </NIcon>
       <span class="van-ellipsis ml-0.5 max-w-2/3 text-xs text-(--van-text-color-2)">{{
         item.author.join(',')
-      }}</span>
+        }}</span>
       <template #smallTopInfo>
         <span v-if="item.viewNumber">
           <VanIcon name="eye-o" class="mr-0.5" size="14px" />
@@ -90,5 +86,5 @@ console.debug('[random] waterfall', waterfall, temp.stream)
         <span class="absolute right-1">{{ item.length }}</span>
       </template>
     </component>
-  </Comp.Waterfall>
+  </DcWaterfall>
 </template>
