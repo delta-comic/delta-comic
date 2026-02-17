@@ -59,7 +59,7 @@
     "kysely-plugin-serialize": "^0.8.2",
     "lz-string": "^1.5.0",
     "mitt": "^3.0.1",
-    "motion-v": "2.0.0-beta.3",
+    "motion-v": "2.0.0-beta.4",
     "naive-ui": "^2.43.2",
     "pinia": "^3.0.4",
     "semver": "^7.7.4",
@@ -96,9 +96,9 @@
     "husky": "^9.1.7",
     "lightningcss": "^1.31.1",
     "lint-staged": "^16.2.7",
-    "oxfmt": "^0.32.0",
-    "oxlint": "^1.47.0",
-    "oxlint-tsgolint": "^0.13.0",
+    "oxfmt": "^0.33.0",
+    "oxlint": "^1.48.0",
+    "oxlint-tsgolint": "^0.14.0",
     "prettier": "^3.8.1",
     "semantic-release": "^25.0.3",
     "tailwindcss": "4.1.18",
@@ -122,6 +122,9 @@
     ],
     "patchedDependencies": {
       "tauri-plugin-m3": "patches/tauri-plugin-m3.patch"
+    },
+    "overrides": {
+      "vite": "8.0.0-beta.14"
     }
   },
   "readme": "./README.md"
