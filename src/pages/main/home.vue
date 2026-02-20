@@ -3,12 +3,11 @@ import ExtendableSearchBar from '@/components/home/mainPageSearchBar.vue'
 import userIcon from '@/assets/images/userIcon.webp'
 import { isShowMainHomeNavBar } from '@/symbol'
 import { VideogameAssetFilled } from '@vicons/material'
-import { isEmpty, random } from 'es-toolkit/compat'
 import { shallowRef, provide, nextTick, useTemplateRef, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { uni } from '@delta-comic/model'
 import { Global } from '@delta-comic/plugin'
-import { DcImage, DcRouterTab, DcVar } from '@delta-comic/ui'
+import { DcImage, DcRouterTab } from '@delta-comic/ui'
+import { useAppStore } from '@/stores/app'
 const $router = useRouter()
 const isShowNavBar = shallowRef(true)
 provide(isShowMainHomeNavBar, isShowNavBar)
@@ -23,11 +22,7 @@ const toSearchInHideMode = async () => {
   extendableSearchBar.value?.inputEl?.focus()
 }
 
-const avatars = computed(() =>
-  Array.from(uni.user.User.userBase.values())
-    .filter(v => !!v.avatar)
-    .map(v => v.avatar!)
-)
+const app = useAppStore()
 
 const tabItem = computed(() =>
   Array.from(Global.tabbar.entries()).flatMap(pair =>
@@ -45,20 +40,16 @@ const tabItem = computed(() =>
     class="relative flex h-13.5 w-full items-center overflow-hidden bg-(--van-background-2) transition-transform duration-200 *:overflow-hidden"
   >
     <div class="ml-1 size-10.25!">
-      <DcVar
-        :value="isEmpty(avatars) ? userIcon : avatars[random(0, avatars.length - 1)]"
-        v-slot="{ value: src }"
-      >
-        <Teleport to="#popups">
-          <DcImage
-            :src
-            round
-            v-if="!extendableSearchBar?.isSearching"
-            :class="[isShowNavBar ? 'translate-y-0' : '-translate-y-[200%]']"
-            class="fixed top-safe-offset-2 ml-1 size-10.25! transition-transform duration-200"
-          />
-        </Teleport>
-      </DcVar>
+      <Teleport to="#popups">
+        <DcImage
+          :src="app.activatedUser?.avatar ?? userIcon"
+          :fallback="userIcon"
+          round
+          v-if="!extendableSearchBar?.isSearching"
+          :class="[isShowNavBar ? 'translate-y-0' : '-translate-y-[200%]']"
+          class="fixed top-safe-offset-2 ml-1 size-10.25! transition-transform duration-200"
+        />
+      </Teleport>
     </div>
     <ExtendableSearchBar ref="extendableSearchBar" />
     <div

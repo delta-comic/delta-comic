@@ -1,12 +1,14 @@
 @charset "UTF-8";
 
 @layer theme, base, components, utilities;
-@import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/preflight.css' layer(base);
-@import 'tailwindcss/utilities.css' layer(utilities);
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
 
 @plugin "tailwindcss-safe-area-capacitor";
-@import '@delta-comic/ui/style.css';
+
+@import "@delta-comic/ui/style.css";
+@import "@delta-comic/plugin/style.css";
 
 * {
   user-select: none;

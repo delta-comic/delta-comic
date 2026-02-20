@@ -1,26 +1,80 @@
 <script setup lang="ts">
-import { db, DBUtils } from "@delta-comic/db";
-import { uni } from "@delta-comic/model";
-import { useConfig, usePluginStore } from "@delta-comic/plugin";
-import { DcVar } from "@delta-comic/ui";
-import { FolderOutlined } from "@vicons/antd";
-import { computedAsync } from "@vueuse/core";
-import { isEmpty } from "es-toolkit/compat";
-import { useRouter } from "vue-router";
-const $router = useRouter();
-const config = useConfig();
-const $window = window;
-const pluginStore = usePluginStore();
+import { useAppStore } from '@/stores/app'
+import { db, DBUtils } from '@delta-comic/db'
+import { uni } from '@delta-comic/model'
+import { useConfig, usePluginStore } from '@delta-comic/plugin'
+import { DcVar } from '@delta-comic/ui'
+import { FolderOutlined } from '@vicons/antd'
+import {
+  KeyboardArrowDownRound,
+  KeyboardArrowUpRound,
+  VerticalAlignTopRound
+} from '@vicons/material'
+import { computedAsync, createReusableTemplate } from '@vueuse/core'
+import { isEmpty } from 'es-toolkit/compat'
+import { motion } from 'motion-v'
+import { NCollapseTransition } from 'naive-ui'
+import { computed, shallowRef, watch } from 'vue'
+import { useRouter } from 'vue-router'
+const $router = useRouter()
+const config = useConfig()
+const $window = window
+const pluginStore = usePluginStore()
 
 const favouriteCount = computedAsync(
-  () => DBUtils.countDb(db.value.selectFrom("favouriteItem")),
-  -1,
-);
-const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom("subscribe")), -1);
-const recentCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom("recentView")), -1);
+  () => DBUtils.countDb(db.value.selectFrom('favouriteItem')),
+  -1
+)
+const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom('subscribe')), -1)
+const recentCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom('recentView')), -1)
+
+const app = useAppStore()
+watch(
+  () => uni.user.User.userBase,
+  user => {
+    if (!app.activatedUser) app.activatedUser = Array.from(user.values()).at(0)
+  },
+  { immediate: true }
+)
+const userNoTopUserList = computed(() =>
+  Array.from(uni.user.User.userBase.entries()).filter(v => v[1] != app.activatedUser)
+)
+
+const showActivatedUserSelect = shallowRef(false)
+
+const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin: string }>()
 </script>
 
 <template>
+  <DefineUser v-slot="{ user, plugin }">
+    <DcVar :value="pluginStore.plugins.get(plugin)?.user?.card" v-slot="{ value }">
+      <div class="relative w-full">
+        <component
+          :is="value"
+          v-if="value"
+          :user
+          isSmall
+          @click="$router.force.push({ name: '/user/edit/[plugin]', params: { plugin } })"
+        />
+        <motion.div
+          v-if="showActivatedUserSelect && app.activatedUser != user"
+          class="absolute right-2 bottom-2 size-fit"
+          :initial="{ opacity: 0 }"
+          :animate="{ opacity: 1 }"
+          :exit="{ opacity: 0 }"
+        >
+          <NButton circle @click="app.activatedUser = user">
+            <template #icon>
+              <NIcon>
+                <VerticalAlignTopRound />
+              </NIcon>
+            </template>
+          </NButton>
+        </motion.div>
+      </div>
+    </DcVar>
+  </DefineUser>
+
   <div class="w-full bg-(--van-background-2) pt-safe"></div>
   <div class="flex h-10 w-full items-center justify-end bg-(--van-background-2)">
     <VanIcon color="var(--van-text-color-2)" class="mx-2">
@@ -62,17 +116,30 @@ const recentCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom("rec
       </svg>
     </VanIcon>
   </div>
-  <template v-for="[plugin, user] of uni.user.User.userBase">
-    <DcVar :value="pluginStore.plugins.get(plugin)?.user?.card" v-slot="{ value }">
-      <component
-        :is="value"
-        v-if="value"
-        :user
-        isSmall
-        @click="$router.force.push({ name: '/user/edit/[plugin]', params: { plugin } })"
-      />
-    </DcVar>
-  </template>
+  <AnimatePresence>
+    <User
+      :user="app.activatedUser"
+      :plugin="app.activatedUser?.$$plugin"
+      v-if="app.activatedUser"
+    />
+    <NCollapseTransition :show="showActivatedUserSelect" appear>
+      <User :user :plugin v-for="[plugin, user] of userNoTopUserList" />
+    </NCollapseTransition>
+    <Motion
+      :initial="{ opacity: 0 }"
+      :animate="{ opacity: 1 }"
+      :exit="{ opacity: 0 }"
+      v-if="uni.user.User.userBase.size > 1"
+    >
+      <NDivider class="my-0! bg-(--van-background-2)">
+        <NIcon @click="showActivatedUserSelect = !showActivatedUserSelect" size="20px">
+          <KeyboardArrowUpRound v-if="showActivatedUserSelect" />
+          <KeyboardArrowDownRound v-else />
+        </NIcon>
+      </NDivider>
+    </Motion>
+  </AnimatePresence>
+
   <div
     v-if="isEmpty(uni.user.User.userBase)"
     class="flex h-20 w-full items-center justify-center bg-(--van-background-2)"
