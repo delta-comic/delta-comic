@@ -13,11 +13,13 @@ import { defineConfig } from 'vite'
 import MsClarity from 'vite-plugin-ms-clarity'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import VueRouter from 'vue-router/vite'
+import wasm from 'vite-plugin-wasm'
 
 const host = process.env.TAURI_DEV_HOST
 
 export default defineConfig({
   plugins: [
+    wasm(),
     VueRouter({ dts: 'typed-router.d.ts' }),
     vueDevTools(),
     MsClarity({ id: 'v2xgbuugti', enableInDevMode: false }),
