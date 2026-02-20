@@ -38,9 +38,6 @@
   "experimentalSortImports": {
     "groups": [
       [
-        "side-effect"
-      ],
-      [
         "builtin"
       ],
       [
