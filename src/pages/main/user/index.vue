@@ -1,19 +1,23 @@
 <script setup lang="ts">
-import { db, DBUtils } from '@delta-comic/db'
-import { uni } from '@delta-comic/model'
-import { useConfig, usePluginStore } from '@delta-comic/plugin'
-import { DcVar } from '@delta-comic/ui'
-import { FolderOutlined } from '@vicons/antd'
-import { computedAsync } from '@vueuse/core'
-import { isEmpty } from 'es-toolkit/compat'
-import { useRouter } from 'vue-router'
-const $router = useRouter()
-const config = useConfig()
-const $window = window
-const pluginStore = usePluginStore()
+import { db, DBUtils } from "@delta-comic/db";
+import { uni } from "@delta-comic/model";
+import { useConfig, usePluginStore } from "@delta-comic/plugin";
+import { DcVar } from "@delta-comic/ui";
+import { FolderOutlined } from "@vicons/antd";
+import { computedAsync } from "@vueuse/core";
+import { isEmpty } from "es-toolkit/compat";
+import { useRouter } from "vue-router";
+const $router = useRouter();
+const config = useConfig();
+const $window = window;
+const pluginStore = usePluginStore();
 
-const favouriteCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom('favouriteItem')), 0)
-const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom('subscribe')), 0)
+const favouriteCount = computedAsync(
+  () => DBUtils.countDb(db.value.selectFrom("favouriteItem")),
+  -1,
+);
+const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom("subscribe")), -1);
+const recentCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom("recentView")), -1);
 </script>
 
 <template>
@@ -92,8 +96,8 @@ const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom(
     </VanCol>
     <VanCol span="8">
       <div class="van-hairline--left">
-        <span>123</span>
-        <span>获赞</span>
+        <span>{{ recentCount }}</span>
+        <span>待看</span>
       </div>
     </VanCol>
   </VanRow>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useConfig } from '@delta-comic/plugin'
-import { DcPopup, DcVar } from '@delta-comic/ui'
-import { isEmpty } from 'es-toolkit/compat'
+import { useConfig } from "@delta-comic/plugin";
+import { DcPopup, DcVar } from "@delta-comic/ui";
+import { isEmpty } from "es-toolkit/compat";
 
-const config = useConfig()
+const config = useConfig();
 </script>
 
 <template>
@@ -11,7 +11,7 @@ const config = useConfig()
   <NScrollbar class="h-[calc(100%-46px)] w-full">
     <VanCellGroup
       v-for="[plugin, { form, value: store }] of config.form.entries()"
-      :title="plugin.description"
+      :title="plugin.description?.split('|')[1] ?? plugin.description"
     >
       <template v-for="[name, config] of Object.entries(form)">
         <VanCell center v-if="config.type == 'switch'" :title="config.info">
@@ -26,7 +26,7 @@ const config = useConfig()
           <template #empty>
             <NInput
               clearable
-              :allowInput="v => (config.patten ? config.patten.test(v) || isEmpty(v) : true)"
+              :allowInput="(v) => (config.patten ? config.patten.test(v) || isEmpty(v) : true)"
               :placeholder="config.placeholder"
               v-model:value="store.value[name]"
               class="w-[80vw]!"
@@ -58,7 +58,7 @@ const config = useConfig()
           v-model:value="store.value[name]"
         >
           <VanCell center :title="config.info" clickable>
-            {{ config.selects.find(v => v.value == store.value[name])?.label }}
+            {{ config.selects.find((v) => v.value == store.value[name])?.label }}
           </VanCell>
         </NPopselect>
         <NPopselect

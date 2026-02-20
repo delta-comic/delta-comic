@@ -1,79 +1,79 @@
 <script setup lang="ts">
-import UnitCard from '@/components/unitCard.vue'
-import { useTemp } from '@delta-comic/core'
-import { PromiseContent, SourcedValue, Stream, uni, type RPromiseContent, type RStream } from '@delta-comic/model'
-import { Global, usePluginStore } from '@delta-comic/plugin'
-import { DcVar } from '@delta-comic/ui'
-import { isArray } from 'es-toolkit/compat'
-import { computed, markRaw, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useTemp } from "@delta-comic/core";
+import {
+  PromiseContent,
+  SourcedValue,
+  Stream,
+  uni,
+  type RPromiseContent,
+  type RStream,
+} from "@delta-comic/model";
+import { Global, usePluginStore } from "@delta-comic/plugin";
+import { DcList, DcVar } from "@delta-comic/ui";
+import { isArray } from "es-toolkit/compat";
+import { computed, markRaw, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-const $router = useRouter()
-const $route = useRoute<'/hot'>()
-const plugin = computed(() => $route.query.plugin?.toString() ?? '')
-const sourceList = computed(() => Global.levelboard.get(plugin.value))
+const $router = useRouter();
+const $route = useRoute<"/hot">();
+const plugin = computed(() => $route.query.plugin?.toString() ?? "");
+const sourceList = computed(() => Global.levelboard.get(plugin.value));
 
-const selectLevelKey = new SourcedValue<[plugin: string, name: string]>()
+const selectLevelKey = new SourcedValue<[plugin: string, name: string]>();
 
-const temp = useTemp().$apply('level', () => ({
+const temp = useTemp().$apply("level", () => ({
   selectLevel: selectLevelKey.toString([
     plugin.value,
     (isArray($route.query.dfSel) ? $route.query.dfSel[0] : $route.query.dfSel) ??
       sourceList.value?.[0].name ??
-      ''
+      "",
   ]),
-  list: markRaw(
-    new Map<
-      string,
-      RStream<uni.item.Item> | RPromiseContent<any, uni.item.Item[]>
-    >()
-  )
-}))
+  list: markRaw(new Map<string, RStream<uni.item.Item> | RPromiseContent<any, uni.item.Item[]>>()),
+}));
 watch(
   () => temp.selectLevel,
   (selectLevel, oldSelectLevel) => {
-    const [plugin, select] = selectLevelKey.toJSON(selectLevel)
-    const [oldPlugin] = selectLevelKey.toJSON(oldSelectLevel)
+    const [plugin, select] = selectLevelKey.toJSON(selectLevel);
+    const [oldPlugin] = selectLevelKey.toJSON(oldSelectLevel);
     if (plugin != oldPlugin)
-      return $router.force.replace({ name: '/hot', query: { plugin, dfSel: select } })
-  }
-)
+      return $router.force.replace({ name: "/hot", query: { plugin, dfSel: select } });
+  },
+);
 const source = computed(() => {
   if (!temp.list.has(temp.selectLevel)) {
-    const [plugin, name] = selectLevelKey.toJSON(temp.selectLevel)
-    const s = sourceList.value?.find(v => v.name == name)?.content()
+    const [plugin, name] = selectLevelKey.toJSON(temp.selectLevel);
+    const s = sourceList.value?.find((v) => v.name == name)?.content();
     if (!s)
       return {
         data: PromiseContent.fromPromise(
-          Promise.reject(`Can not found named: "${name}" in ${plugin}`)
+          Promise.reject(`Can not found named: "${name}" in ${plugin}`),
         ),
-        isEnd: true
-      }
-    temp.list.set(temp.selectLevel, s)
+        isEnd: true,
+      };
+    temp.list.set(temp.selectLevel, s);
   }
-  const s = temp.list.get(temp.selectLevel)!
-  return Stream.isStream(s) ? s : { data: s, isEnd: true }
-})
+  const s = temp.list.get(temp.selectLevel)!;
+  return Stream.isStream(s) ? s : { data: s, isEnd: true };
+});
 
-const getItemCard = (item: uni.item.Item) =>
-  uni.item.Item.itemCard.get(item.contentType) ?? UnitCard
+const getItemCard = (item: uni.item.Item) => uni.item.Item.itemCard.get(item.contentType);
 
 const getColor = (index: number) => {
   if (index == 0) {
-    return 'rgb(255,215,0)'
+    return "rgb(255,215,0)";
   }
   if (index == 1) {
-    return 'rgb(192,192,192)' // silver
+    return "rgb(192,192,192)"; // silver
   }
   if (index == 2) {
-    return 'rgb(205,127,50)' // bronze
+    return "rgb(205,127,50)"; // bronze
   }
   if (index < 9) {
-    return 'var(--p-color)'
+    return "var(--p-color)";
   }
-  return 'transparent'
-}
-const pluginStore = usePluginStore()
+  return "transparent";
+};
+const pluginStore = usePluginStore();
 </script>
 
 <template>
@@ -85,10 +85,10 @@ const pluginStore = usePluginStore()
             Array.from(Global.levelboard.entries()).map(([plugin, sources]) => ({
               type: 'group',
               label: plugin,
-              children: sources.map(s => ({
+              children: sources.map((s) => ({
                 label: s.name,
-                value: selectLevelKey.toString([plugin, s.name])
-              }))
+                value: selectLevelKey.toString([plugin, s.name]),
+              })),
             }))
           "
           v-model:value="temp.selectLevel"
