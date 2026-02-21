@@ -1,5 +1,4 @@
 '*.{js,jsx,ts,tsx,mts,cts,mjs,cjs,vue}': |
-  bun oxfmt
   bun oxlint
 
 '*.{md,json,toml,rs,js,jsx,ts,tsx,mts,cts,mjs,cjs,vue,html}': |

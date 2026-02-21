@@ -107,15 +107,17 @@ const app = createApp(
   defineComponent(() => {
     const themeColor = Color('#fb7299').hex()
     const themeColorDark = Color(themeColor).darken(0.2).hex()
+    const config = DcPlugin.useConfig()
+
     const themeOverrides = reactiveComputed<GlobalThemeOverrides>(() => ({
       common: {
         primaryColor: themeColor,
         primaryColorHover: Color(themeColor).lighten(0.2).hex(),
         primaryColorPressed: themeColorDark,
-        primaryColorSuppl: themeColorDark
+        primaryColorSuppl: themeColorDark,
+        cardColor: config.isDark ? '#17181a' : undefined
       }
     }))
-    const config = DcPlugin.useConfig()
     const fontBold = useCssVar('--nui-font-weight')
 
     const isUseDarkMode = useDark({ listenToStorageChanges: false })
@@ -143,6 +145,8 @@ const app = createApp(
 
                   baseFont: 'var(--nui-font-family)',
                   priceFont: 'var(--font-family-mono)',
+
+                  background: config.isDark ? themeOverrides.common?.cardColor : undefined,
 
                   fontBold: fontBold.value
                 } as ConfigProviderThemeVars

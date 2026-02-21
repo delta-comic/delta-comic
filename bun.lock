@@ -9,7 +9,7 @@
         "@delta-comic/core": "^0.3.0",
         "@delta-comic/db": "^0.0.2",
         "@delta-comic/model": "^0.0.2",
-        "@delta-comic/plugin": "^0.3.1",
+        "@delta-comic/plugin": "^0.3.2",
         "@delta-comic/request": "^0.0.2",
         "@delta-comic/ui": "^0.0.5",
         "@delta-comic/utils": "^0.0.3",
@@ -356,7 +356,7 @@
 
     "@delta-comic/model": ["@delta-comic/model@0.0.2", "", { "dependencies": { "@vueuse/core": "^14.2.1", "dayjs": "^1.11.19", "mitt": "^3.0.1" }, "peerDependencies": { "@delta-comic/request": "0.0.2", "@delta-comic/utils": "0.0.3", "vue": "^3.5" } }, "sha512-+BJESp9EoRYja/uQ0geeEToqmliZEUPjcSPWAjCQh3xfrb9RP9hhXvD1X4REaIzUSUFB6HCsHtXUG7Fxcfh1Sw=="],
 
-    "@delta-comic/plugin": ["@delta-comic/plugin@0.3.1", "", { "dependencies": { "@delta-comic/core": "0.3.0", "@delta-comic/db": "0.0.2", "@delta-comic/model": "0.0.2", "@delta-comic/ui": "0.0.5", "@delta-comic/utils": "0.0.3", "@octokit/rest": "^22.0.1", "@tauri-apps/api": "^2.10.1", "@tauri-apps/plugin-fs": "^2.4.5", "@vueuse/core": "^14.2.1", "jszip": "^3.10.1", "lz-string": "^1.5.0", "mitt": "^3.0.1", "userscript-meta": "^1.0.1", "vue-component-type-helpers": "^3.2.4" }, "peerDependencies": { "axios": "^1.13", "kysely": "^0.28", "pinia": "^3.0", "vue": "^3.5", "vue-router": "^5.0" } }, "sha512-dWgROO2yEDHMHuiUsS8NFezm9kU2BfyXtdvxoS+m3eVV+4kYjBcWOkfhPF5wd5fXBoSDW8y4mDKJxy0EsNZcNQ=="],
+    "@delta-comic/plugin": ["@delta-comic/plugin@0.3.2", "", { "dependencies": { "@delta-comic/core": "0.3.0", "@delta-comic/db": "0.0.2", "@delta-comic/model": "0.0.2", "@delta-comic/ui": "0.0.5", "@delta-comic/utils": "0.0.3", "@octokit/rest": "^22.0.1", "@tauri-apps/api": "^2.10.1", "@tauri-apps/plugin-fs": "^2.4.5", "@vueuse/core": "^14.2.1", "jszip": "^3.10.1", "lz-string": "^1.5.0", "mitt": "^3.0.1", "userscript-meta": "^1.0.1", "vue-component-type-helpers": "^3.2.4" }, "peerDependencies": { "axios": "^1.13", "kysely": "^0.28", "pinia": "^3.0", "vue": "^3.5", "vue-router": "^5.0" } }, "sha512-I1dHH2h2YuZ9Kd1uMqTuuqFVVm5nXQbatQAebgPo1LMXnx8DSbCGA7BP328DW8ZvhQirPbDWXFUD/jzVWIjX0g=="],
 
     "@delta-comic/request": ["@delta-comic/request@0.0.2", "", { "dependencies": { "@vueuse/core": "^14.2.1", "mitt": "^3.0.1" }, "peerDependencies": { "@delta-comic/utils": "0.0.3", "axios": "^1.13" } }, "sha512-+7NsYhLSoFb5bTs9x/U+8PhmTNlEACAJ5XnvZhT3GYiE+AWp4ivq67IaURfk9LPrc1wdqMp2JZyWjVsptvAq3A=="],
 
