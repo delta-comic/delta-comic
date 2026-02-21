@@ -1,3 +1,6 @@
+import { SharedFunction } from '@delta-comic/core'
+import { uni } from '@delta-comic/model'
+import { useConfig } from '@delta-comic/plugin'
 import { M3 } from 'tauri-plugin-m3'
 import { toRef } from 'vue'
 import {
@@ -12,9 +15,6 @@ import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 import { searchSourceKey } from '@/components/search/source'
 import { useContentStore } from '@/stores/content'
 import { pluginName } from '@/symbol'
-import { SharedFunction } from '@delta-comic/core'
-import { uni } from '@delta-comic/model'
-import { useConfig } from '@delta-comic/plugin'
 export const router = (window.$router = createRouter({ history: createWebHistory(), routes }))
 
 SharedFunction.define(

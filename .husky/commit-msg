@@ -1,1 +1,1 @@
-bun --bun exec commitlint --edit "$1"
+bun --bun commitlint --edit "$1"

@@ -26,6 +26,6 @@ jobs:
 
       - name: lint
         run: |
-          bun --bun exec oxlint --type-aware
-          bun --bun exec oxfmt --check
-          bun --bun exec cspell --no-exit-code
+          bun --bun oxlint --type-aware
+          bun --bun oxfmt --check
+          bun --bun cspell --no-exit-code

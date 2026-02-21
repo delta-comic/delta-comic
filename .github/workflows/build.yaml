@@ -58,7 +58,7 @@ jobs:
       - name: Init android project
         run: |
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
-          bun exec @tauri-apps/cli android init
+          bun --bun tauri android init
 
       # build
       - name: Change version
@@ -150,4 +150,4 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 用于在 GitHub 上创建 release 与 tag
-        run: bun --bun exec semantic-release
+        run: bun --bun semantic-release

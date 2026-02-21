@@ -1,6 +1,6 @@
 '*.{js,jsx,ts,tsx,mts,cts,mjs,cjs,vue}': |
-  bun --bun exec oxfmt
-  bun --bun exec oxlint
+  bun oxfmt
+  bun oxlint
 
 '*.{md,json,toml,rs,js,jsx,ts,tsx,mts,cts,mjs,cjs,vue,html}': |
-  bun --bun exec cspell --no-exit-code
+  bun cspell --no-exit-code

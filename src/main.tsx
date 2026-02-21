@@ -1,5 +1,4 @@
 import 'core-js'
-
 import type {} from '@delta-comic/utils'
 import { attachConsole } from '@tauri-apps/plugin-log'
 await attachConsole()
@@ -59,7 +58,6 @@ window.$api.showImagePreview = Vant.showImagePreview
 
 import '@/index.css'
 import 'vant/lib/index.css'
-
 import * as Sentry from '@sentry/vue'
 import { reactiveComputed, useCssVar, useDark } from '@vueuse/core'
 import Color from 'color'
