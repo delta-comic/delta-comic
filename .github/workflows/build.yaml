@@ -67,7 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IS_DUR_RUN: true
         run: |
-          OLD_VERSION="$(node ./script/update-version.mts)"
+          OLD_VERSION="$(bun ./script/update-version.mts)"
           echo "old_version=$OLD_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build Android App
@@ -84,7 +84,7 @@ jobs:
 
       - name: Restore version
         run: |
-          node ./script/set-version.mts ${{ steps.set-version.outputs.old_version }}
+          bun ./script/set-version.mts ${{ steps.set-version.outputs.old_version }}
 
       #signature
       - name: Restore keystore (decode + verify)
