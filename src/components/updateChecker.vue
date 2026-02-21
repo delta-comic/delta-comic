@@ -5,6 +5,7 @@ import { computedAsync } from '@vueuse/core'
 import { watch, shallowRef } from 'vue'
 import VueMarkdown from 'vue-markdown-render'
 import { open } from '@tauri-apps/plugin-shell'
+
 const oct = new Octokit()
 const markdown = computedAsync(async () => {
   try {
@@ -36,7 +37,10 @@ watch(markdown, markdown => (isShow.value = Boolean(markdown.length)), { immedia
   >
     <div class="text-xl font-bold text-[--p-color]">发现新版本</div>
     <NScrollbar>
-      <VueMarkdown :source="markdown.map(v => v[1]).join('------\n\n')" class="markdown max-h-[70vh]!" />
+      <VueMarkdown
+        :source="markdown.map(v => v[1]).join('------\n\n')"
+        class="markdown max-h-[70vh]!"
+      />
     </NScrollbar>
     <VanButton
       type="primary"
