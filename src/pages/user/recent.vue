@@ -8,7 +8,7 @@ import RecentCard from '@/components/user/recentCard.vue'
 import { computedAsync } from '@vueuse/core'
 import { pluginName } from '@/symbol'
 import { db, useNativeStore, type RecentDB } from '@delta-comic/db'
-import { createDialog, DcWaterfall } from '@delta-comic/ui'
+import { createDialog } from '@delta-comic/ui'
 import { PromiseContent } from '@delta-comic/model'
 
 const recent = computedAsync(

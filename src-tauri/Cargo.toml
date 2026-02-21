@@ -42,6 +42,7 @@ percent-encoding = "2.3.2"
 log = "0.4.29"
 tauri-runtime-wry = "2.10.0"
 tauri-plugin-store = "2"
+tauri-plugin-shell = "2"
 
   [dependencies.tauri-plugin-log]
   version = "2.8.0"

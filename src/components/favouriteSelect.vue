@@ -6,7 +6,6 @@ import { StarFilled } from '@vicons/antd'
 import { computedAsync } from '@vueuse/core'
 import { db, DBUtils, FavouriteDB } from '@delta-comic/db'
 import type { uni } from '@delta-comic/model'
-import { DcAwait, DcPopup, DcToggleIcon } from '@delta-comic/ui'
 
 const $props = defineProps<{ item: uni.item.Item; plain?: boolean }>()
 

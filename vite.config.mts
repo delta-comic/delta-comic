@@ -1,5 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
 
+import { DeltaComicUiResolver } from '@delta-comic/ui/vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -25,7 +26,10 @@ export default defineConfig({
     MsClarity({ id: 'v2xgbuugti', enableInDevMode: false }),
     vue({ template: { compilerOptions: { isCustomElement: tag => tag.startsWith('media-') } } }),
     vueJsx(),
-    Components({ dts: true, resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver()] }),
+    Components({
+      dts: true,
+      resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver(), DeltaComicUiResolver()]
+    }),
     tailwindcss()
   ],
   resolve: {

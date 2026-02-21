@@ -3,7 +3,6 @@ import { useAppStore } from '@/stores/app'
 import { db, DBUtils } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
 import { useConfig, usePluginStore } from '@delta-comic/plugin'
-import { DcVar } from '@delta-comic/ui'
 import { FolderOutlined } from '@vicons/antd'
 import {
   KeyboardArrowDownRound,

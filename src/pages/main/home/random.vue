@@ -8,7 +8,6 @@ import { LikeOutlined } from '@vicons/antd'
 import { DrawOutlined } from '@vicons/material'
 import { SharedFunction, useTemp } from '@delta-comic/core'
 import { Stream, uni } from '@delta-comic/model'
-import { DcWaterfall } from '@delta-comic/ui'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()
 const temp = useTemp().$applyRaw('randomConfig', () => ({

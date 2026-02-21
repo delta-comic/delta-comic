@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useConfig } from "@delta-comic/plugin";
-import { DcPopup, DcVar } from "@delta-comic/ui";
 import { isEmpty } from "es-toolkit/compat";
 
 const config = useConfig();

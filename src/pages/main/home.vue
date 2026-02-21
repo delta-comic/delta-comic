@@ -6,7 +6,6 @@ import { VideogameAssetFilled } from '@vicons/material'
 import { shallowRef, provide, nextTick, useTemplateRef, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Global } from '@delta-comic/plugin'
-import { DcImage, DcRouterTab } from '@delta-comic/ui'
 import { useAppStore } from '@/stores/app'
 const $router = useRouter()
 const isShowNavBar = shallowRef(true)

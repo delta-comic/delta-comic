@@ -11,7 +11,6 @@ import SearchBar from '@/components/search/searchBar.vue'
 import { searchSourceKey } from '@/components/search/source'
 import { appConfig, useConfig, usePluginStore, type Search } from '@delta-comic/plugin'
 import { useTemp } from '@delta-comic/core'
-import { DcImage } from '@delta-comic/ui'
 const $route = useRoute<'/search/[input]'>()
 const pluginStore = usePluginStore()
 const config = useConfig().$load(appConfig)

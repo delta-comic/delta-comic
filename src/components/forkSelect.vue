@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { uni } from '@delta-comic/model'
-import { DcPopup } from '@delta-comic/ui'
 import { NSelect } from 'naive-ui'
 
 const show = defineModel<boolean>('show', { required: true })

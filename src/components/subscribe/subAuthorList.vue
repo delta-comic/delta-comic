@@ -8,7 +8,6 @@ import { db, SubscribeDB } from '@delta-comic/db'
 import { usePluginStore } from '@delta-comic/plugin'
 import { useTemp } from '@delta-comic/core'
 import type { RStream, uni } from '@delta-comic/model'
-import { DcWaterfall } from '@delta-comic/ui'
 
 defineProps<{ selectItem: SubscribeDB.AuthorItem }>()
 const select = defineModel<string | undefined>('select', { required: true })

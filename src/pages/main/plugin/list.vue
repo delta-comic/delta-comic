@@ -4,11 +4,10 @@ import { shallowReactive } from 'vue'
 import semver from 'semver'
 import { memoize } from 'es-toolkit'
 import { computedAsync } from '@vueuse/core'
-import pkg from '../../../package.json'
+import pkg from '../../../../package.json'
 import { db, PluginArchiveDB } from '@delta-comic/db'
 import { updatePlugin } from '@delta-comic/plugin'
 import { PromiseContent } from '@delta-comic/model'
-import { DcContent } from '@delta-comic/ui'
 
 const updating = shallowReactive(new Set<string>())
 const _updatePlugin = async (plugin: PluginArchiveDB.Meta) => {

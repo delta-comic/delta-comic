@@ -2,7 +2,6 @@
 import { useContentStore } from '@/stores/content'
 import { db, type FavouriteDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
-import { DcImage, DcVar } from '@delta-comic/ui'
 import { LockOutlined } from '@vicons/antd'
 import { ArrowForwardIosRound } from '@vicons/material'
 import { computedAsync } from '@vueuse/core'

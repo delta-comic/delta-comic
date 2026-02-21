@@ -2,7 +2,6 @@
 import { createDateString } from '@/utils/date'
 import type { ItemStoreDB, RecentDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
-import { DcVar } from '@delta-comic/ui'
 import { UserOutlined } from '@vicons/antd'
 import { TimerRound } from '@vicons/material'
 import dayjs from 'dayjs'

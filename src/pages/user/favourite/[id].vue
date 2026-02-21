@@ -11,7 +11,7 @@ import { useTemplateRef } from 'vue'
 import { computedAsync } from '@vueuse/core'
 import { pluginName } from '@/symbol'
 import { db, FavouriteDB, useNativeStore } from '@delta-comic/db'
-import { createDialog, createLoadingMessage, DcPopup, DcWaterfall } from '@delta-comic/ui'
+import { createDialog, createLoadingMessage } from '@delta-comic/ui'
 import { PromiseContent } from '@delta-comic/model'
 const $route = useRoute<'/user/favourite/[id]'>()
 const cardKey = Number($route.params.id)

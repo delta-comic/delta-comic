@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { db } from '@delta-comic/db'
-import { DcPopup } from '@delta-comic/ui'
 import { useMessage } from 'naive-ui'
 import { ref, shallowRef } from 'vue'
 

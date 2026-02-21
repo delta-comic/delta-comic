@@ -2,7 +2,6 @@
 import { createDateString } from '@/utils/date'
 import { SharedFunction } from '@delta-comic/core'
 import type { uni } from '@delta-comic/model'
-import { DcImage } from '@delta-comic/ui'
 import { MoreVertRound } from '@vicons/material'
 
 defineProps<{ item: uni.item.Item }>()

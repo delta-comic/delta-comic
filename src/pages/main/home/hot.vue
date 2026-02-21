@@ -6,7 +6,6 @@ import { ArrowForwardIosRound } from '@vicons/material'
 import { chunk } from 'es-toolkit'
 import { Global } from '@delta-comic/plugin'
 import { uni } from '@delta-comic/model'
-import { DcContent, DcVar } from '@delta-comic/ui'
 
 const hotList = computed(() => Array.from(Global.mainLists.values()))
 

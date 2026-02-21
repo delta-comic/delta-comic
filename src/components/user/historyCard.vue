@@ -2,7 +2,6 @@
 import { createDateString } from '@/utils/date'
 import type { HistoryDB, ItemStoreDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
-import { DcVar } from '@delta-comic/ui'
 import { UserOutlined } from '@vicons/antd'
 import { PhoneAndroidOutlined } from '@vicons/material'
 import dayjs from 'dayjs'

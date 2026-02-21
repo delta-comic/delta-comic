@@ -63,8 +63,13 @@ declare module 'vue-router/auto-routes' {
       | '/main/home/[id]'
       | '/main/home/hot'
       | '/main/home/random'
-      | '/main/subscribe/'
-      | '/main/user/'
+      | '/main/plugin'
+      | '/main/plugin/config'
+      | '/main/plugin/download'
+      | '/main/plugin/list'
+      | '/main/plugin/shop'
+      | '/main/subscribe'
+      | '/main/user'
     >,
     '/main/home': RouteRecordInfo<
       '/main/home',
@@ -96,15 +101,53 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/main/subscribe/': RouteRecordInfo<
-      '/main/subscribe/',
+    '/main/plugin': RouteRecordInfo<
+      '/main/plugin',
+      '/main/plugin',
+      Record<never, never>,
+      Record<never, never>,
+      | '/main/plugin/config'
+      | '/main/plugin/download'
+      | '/main/plugin/list'
+      | '/main/plugin/shop'
+    >,
+    '/main/plugin/config': RouteRecordInfo<
+      '/main/plugin/config',
+      '/main/plugin/config',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/main/plugin/download': RouteRecordInfo<
+      '/main/plugin/download',
+      '/main/plugin/download',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/main/plugin/list': RouteRecordInfo<
+      '/main/plugin/list',
+      '/main/plugin/list',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/main/plugin/shop': RouteRecordInfo<
+      '/main/plugin/shop',
+      '/main/plugin/shop',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/main/subscribe': RouteRecordInfo<
+      '/main/subscribe',
       '/main/subscribe',
       Record<never, never>,
       Record<never, never>,
       | never
     >,
-    '/main/user/': RouteRecordInfo<
-      '/main/user/',
+    '/main/user': RouteRecordInfo<
+      '/main/user',
       '/main/user',
       Record<never, never>,
       Record<never, never>,
@@ -210,8 +253,13 @@ declare module 'vue-router/auto-routes' {
         | '/main/home/[id]'
         | '/main/home/hot'
         | '/main/home/random'
-        | '/main/subscribe/'
-        | '/main/user/'
+        | '/main/plugin'
+        | '/main/plugin/config'
+        | '/main/plugin/download'
+        | '/main/plugin/list'
+        | '/main/plugin/shop'
+        | '/main/subscribe'
+        | '/main/user'
       views:
         | 'default'
     }
@@ -242,15 +290,49 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
-    'src/pages/main/subscribe/index.vue': {
+    'src/pages/main/plugin.vue': {
       routes:
-        | '/main/subscribe/'
+        | '/main/plugin'
+        | '/main/plugin/config'
+        | '/main/plugin/download'
+        | '/main/plugin/list'
+        | '/main/plugin/shop'
+      views:
+        | 'default'
+    }
+    'src/pages/main/plugin/config.vue': {
+      routes:
+        | '/main/plugin/config'
       views:
         | never
     }
-    'src/pages/main/user/index.vue': {
+    'src/pages/main/plugin/download.vue': {
       routes:
-        | '/main/user/'
+        | '/main/plugin/download'
+      views:
+        | never
+    }
+    'src/pages/main/plugin/list.vue': {
+      routes:
+        | '/main/plugin/list'
+      views:
+        | never
+    }
+    'src/pages/main/plugin/shop.vue': {
+      routes:
+        | '/main/plugin/shop'
+      views:
+        | never
+    }
+    'src/pages/main/subscribe.vue': {
+      routes:
+        | '/main/subscribe'
+      views:
+        | never
+    }
+    'src/pages/main/user.vue': {
+      routes:
+        | '/main/user'
       views:
         | never
     }

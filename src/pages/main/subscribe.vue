@@ -4,7 +4,6 @@ import { computed, shallowRef } from 'vue'
 import AuthorList from '@/components/subscribe/subAuthorList.vue'
 import { computedAsync } from '@vueuse/core'
 import { SubscribeDB } from '@delta-comic/db'
-import { DcAuthorIcon, DcPopup, DcVar } from '@delta-comic/ui'
 const isOnAllPage = shallowRef(true)
 const subscribe = computedAsync(() => SubscribeDB.getAll(), [])
 

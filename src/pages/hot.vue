@@ -9,7 +9,6 @@ import {
   type RStream,
 } from "@delta-comic/model";
 import { Global, usePluginStore } from "@delta-comic/plugin";
-import { DcList, DcVar } from "@delta-comic/ui";
 import { isArray } from "es-toolkit/compat";
 import { computed, markRaw, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";

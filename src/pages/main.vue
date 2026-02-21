@@ -71,7 +71,7 @@ const showForkSelect = shallowRef(false)
         </NIcon>
       </template>
     </NButton>
-    <VanTabbarItem name="buy" to="/main/home" icon="home-o">会员购</VanTabbarItem>
+    <VanTabbarItem name="plugin" to="/main/plugin" icon="bag-o">插件</VanTabbarItem>
     <VanTabbarItem name="user" to="/main/user" icon="user-o">我的</VanTabbarItem>
   </VanTabbar>
   <ForkSelect v-model:show="showForkSelect" />

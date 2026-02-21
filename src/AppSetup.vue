@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'motion-v'
 import App from './App.vue'
 import Plugin from './components/plugin/index.vue'
 import { Global } from '@delta-comic/plugin'
-import { DcImage } from '@delta-comic/ui'
+import UpdateChecker from './components/updateChecker.vue'
 
 window.$message = useMessage()
 window.$loading = useLoadingBar()
@@ -77,4 +77,5 @@ const showContent = shallowRef(false)
   </Suspense>
   <Plugin v-model:show="showContent" v-model:is-booted="isBooted" />
   <component v-for="c of Global.globalNodes" :is="c" />
+  <UpdateChecker />
 </template>

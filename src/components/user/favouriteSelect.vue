@@ -4,7 +4,6 @@ import { PlusFilled } from '@vicons/material'
 import { useMessage } from 'naive-ui'
 import { computedAsync } from '@vueuse/core'
 import { db, type FavouriteDB } from '@delta-comic/db'
-import { DcAwait, DcPopup } from '@delta-comic/ui'
 
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())
