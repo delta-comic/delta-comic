@@ -50,34 +50,9 @@ _____   _________________ ____        __________________ _____   ______
 2. 在下文所提及的插件中选择一些安装
 3. 启动！
 
-<details> 
-  <summary>
-    <h2>现成的插件</h2>
-  </summary>
-    
-### PicaAcg/bika/哔卡漫画
+### 插件集合
 
-[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=delta-comic-plugin-bika&user&theme=transparent)](https://github.com/wenxig/delta-comic-plugin-bika)
-
-### Jmcomic/禁漫天堂
-
-[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=delta-comic-plugin-jmcomic&user&theme=transparent)](https://github.com/wenxig/delta-comic-plugin-jmcomic)
-
-### Cosav/cos天堂
-
-[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=delta-comic-plugin-cosav&user&theme=transparent)](https://github.com/wenxig/delta-comic-plugin-cosav)
-
-### E-hentai/ExHentai/EHentai(_开发中_)
-
-[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=delta-comic-plugin-ehentai&user&theme=transparent)](https://github.com/wenxig/delta-comic-plugin-ehentai)
-
-### Hanime1(_开发中_)
-
-[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=delta-comic-plugin-hanime1&user&theme=transparent)](https://github.com/wenxig/delta-comic-plugin-hanime1)
-
-</details>
-
----
+[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=awesome-plugins&user&theme=transparent)](https://github.com/wenxig/awesome-plugins)
 
 ## 想要编写插件?
 
