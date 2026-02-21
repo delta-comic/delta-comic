@@ -14,24 +14,22 @@
     "url": "https://github.com/delta-comic/delta-comic.git"
   },
   "scripts": {
-    "dev:web": "vite",
-    "dev": "tauri dev",
-    "build:web": "vite build",
-    "build": "tauri android build",
-    "build:debug": "tauri android build --debug",
-    "build:local": "tauri build --debug",
-    "tauri": "tauri",
-    "lint": "oxlint --type-aware",
-    "lint:fix": "oxlint --fix --type-aware",
-    "prepare": "husky",
-    "lint-staged": "lint-staged"
+    "dev:web": "bun --bun vite",
+    "dev": "bun --bun tauri dev",
+    "build:web": "bun --bun vite build",
+    "build": "bun --bun run tauri android build",
+    "build:debug": "bun --bun run tauri android build --debug",
+    "build:local": "bun --bun run tauri build --debug",
+    "lint": "bun --bun oxlint --type-aware",
+    "lint:fix": "bun --bun oxlint --fix --type-aware",
+    "prepare": "husky"
   },
   "dependencies": {
     "@aptabase/tauri": "github:delta-comic/tauri-plugin-aptabase-rustls",
     "@delta-comic/core": "^0.3.0",
     "@delta-comic/db": "^0.0.2",
     "@delta-comic/model": "^0.0.2",
-    "@delta-comic/plugin": "^0.2.4",
+    "@delta-comic/plugin": "^0.3.1",
     "@delta-comic/request": "^0.0.2",
     "@delta-comic/ui": "^0.0.5",
     "@delta-comic/utils": "^0.0.3",
@@ -104,29 +102,15 @@
     "tailwindcss": "4.2.0",
     "tailwindcss-safe-area-capacitor": "^0.5.1",
     "unplugin-vue-components": "31.0.0",
-    "vite": "8.0.0-beta.14",
+    "vite": "8.0.0-beta.15",
     "vite-plugin-ms-clarity": "^1.0.0",
     "vite-plugin-vue-devtools": "^8.0.6",
     "vite-plugin-wasm": "^3.5.0",
     "vue-component-type-helpers": "^3.2.4"
   },
-  "packageManager": "pnpm@10.27.0",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@aptabase/tauri",
-      "@parcel/watcher",
-      "@tailwindcss/oxide",
-      "core-js",
-      "esbuild",
-      "sharp",
-      "tauri-plugin-better-cors-fetch"
-    ],
-    "patchedDependencies": {
-      "tauri-plugin-m3": "patches/tauri-plugin-m3.patch"
-    },
-    "overrides": {
-      "vite": "8.0.0-beta.14"
-    }
+  "overrides": {
+    "vite": "8.0.0-beta.15"
   },
+  "packageManager": "bun@1.3.9",
   "readme": "./README.md"
 }

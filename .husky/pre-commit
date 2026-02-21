@@ -1,1 +1,1 @@
-pnpm run lint-staged
+bun --bun exec lint-staged

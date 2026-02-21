@@ -21,19 +21,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache Java
-        uses: actions/cache@v5.0.3
-        with:
-          path: |
-            ~/src-tauri/target
-          key: ${{ runner.os }}-delta-comic-java
-
-      - name: Cache Rust
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
-        with:
-          key: ${{ runner.os }}-delta-comic-rust
-          workspaces: './src-tauri/ -> target'
-
       # rust
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -41,19 +28,11 @@ jobs:
           targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
 
       # js
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.2.0
-        with:
-          version: 10.27.0
-
-      - name: Use Node.js
-        uses: actions/setup-node@v6.2.0
-        with:
-          node-version: 24
-          cache: 'pnpm'
+      - name: Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun i --frozen-lockfile
 
       # java
       - name: JDK 23
@@ -79,7 +58,7 @@ jobs:
       - name: Init android project
         run: |
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
-          pnpm dlx @tauri-apps/cli android init
+          bun exec @tauri-apps/cli android init
 
       # build
       - name: Change version
@@ -171,4 +150,4 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 用于在 GitHub 上创建 release 与 tag
-        run: pnpm exec semantic-release
+        run: bun --bun exec semantic-release
