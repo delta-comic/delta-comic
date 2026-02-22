@@ -1,3 +1,24 @@
+# [1.2.0](https://github.com/delta-comic/delta-comic/compare/1.1.4...1.2.0) (2026-02-22)
+
+
+### Bug Fixes
+
+* ci node [pub] ([330d86a](https://github.com/delta-comic/delta-comic/commit/330d86aaaf606d8ea037b1364b00dcae21f14005))
+* **ci:** node 25 ([8ad2240](https://github.com/delta-comic/delta-comic/commit/8ad2240a276bb9d6b4162a04ebb10e5e3f094ffa))
+* exec in bun ([43a523c](https://github.com/delta-comic/delta-comic/commit/43a523cddce8fc3c90f13f1399ed83699d2282e5))
+* fmt config ([8b39543](https://github.com/delta-comic/delta-comic/commit/8b395439affacd4fb11e0fb0f272e528460791b8))
+* git name [pub] ([1347806](https://github.com/delta-comic/delta-comic/commit/1347806553d0658e4c8eee4e9c1b4368a37f6122))
+* semantic-release node ([0d54189](https://github.com/delta-comic/delta-comic/commit/0d54189c7b7077332edef123d9980e2c9a833b8d))
+* un-imported component ([c9a1f22](https://github.com/delta-comic/delta-comic/commit/c9a1f229ededc4603b9dd285d6191c9fc6b76b19))
+* wasm run ([d386ac7](https://github.com/delta-comic/delta-comic/commit/d386ac746bac72862aad76c531f8be6317bc7997))
+
+
+### Features
+
+* activated user ([f5437c7](https://github.com/delta-comic/delta-comic/commit/f5437c783292dbffd000017cfc9de19df35a0991))
+* bun instead of pnpm ([389c46e](https://github.com/delta-comic/delta-comic/commit/389c46ec3256bb0d1ec7e8a38d22875f2324e9e8))
+* wasm support ([ce75ed6](https://github.com/delta-comic/delta-comic/commit/ce75ed6983d15b360bc4547c01a8c8149b97d659))
+
 ## [1.1.4](https://github.com/delta-comic/delta-comic/compare/v1.1.3...1.1.4) (2026-02-12)
 
 
