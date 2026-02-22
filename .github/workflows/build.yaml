@@ -155,4 +155,4 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 用于在 GitHub 上创建 release 与 tag
-        run: bun --bun semantic-release
+        run: npm exec semantic-release
