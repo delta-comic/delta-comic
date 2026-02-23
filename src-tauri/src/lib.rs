@@ -12,13 +12,12 @@ pub async fn run() {
 
   let builder = fs_scheme::init(
     tauri::Builder::default()
-      .plugin(tauri_plugin_shell::init())
-      .plugin(logger::init())
-      .plugin(sentry::init())
       .plugin(tauri_plugin_fs::init()),
+      .plugin(sentry::init())
+      .plugin(logger::init())
   );
   let builder = builder
-    .plugin(tauri_plugin_store::Builder::new().build())
+      .plugin(tauri_plugin_shell::init())
     .plugin(tauri_plugin_m3::init())
     .plugin(tauri_plugin_better_cors_fetch::init())
     .plugin(tauri_plugin_clipboard_manager::init())

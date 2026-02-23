@@ -21,7 +21,6 @@
         "@tauri-apps/plugin-fs": "~2.4.5",
         "@tauri-apps/plugin-shell": "~2",
         "@tauri-apps/plugin-sql": "^2.3.2",
-        "@tauri-apps/plugin-store": "~2.4.2",
         "@vicons/antd": "^0.13.0",
         "@vicons/material": "^0.13.0",
         "@vueuse/core": "14.2.1",

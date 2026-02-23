@@ -23,7 +23,6 @@
     "sentry:default",
     "log:default",
     "cors-fetch:default",
-    "store:default",
     "shell:default"
   ]
 }
