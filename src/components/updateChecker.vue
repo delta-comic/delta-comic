@@ -8,6 +8,7 @@ import { open } from '@tauri-apps/plugin-shell'
 
 const oct = new Octokit()
 const markdown = computedAsync(async () => {
+  if (import.meta.env.DEV) return []
   try {
     const releases = await oct.rest.repos.listReleases({
       owner: 'delta-comic',
