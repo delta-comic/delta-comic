@@ -54,7 +54,7 @@ _____   _________________ ____        __________________ _____   ______
 
 ### 插件集合
 
-[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=awesome-plugins&user&theme=transparent)](https://github.com/wenxig/awesome-plugins)
+[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=awesome-plugins&user&theme=transparent)](https://github.com/delta-comic/awesome-plugins)
 
 ## 想要编写插件?
 
