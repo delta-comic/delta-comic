@@ -34,6 +34,8 @@ _____   _________________ ____        __________________ _____   ______
 
 > 项目底层再次重构中...
 
+[**评论区**](https://github.com/orgs/delta-comic/discussions/32)
+
 ## 实机演示
 
 | ![content](docs/content-1.webp) | ![content](docs/content-3.webp) | ![content](docs/content-2.webp) |
