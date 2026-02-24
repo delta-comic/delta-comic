@@ -12,7 +12,7 @@ pub async fn run() {
 
   let builder = fs_scheme::init(
     tauri::Builder::default()
-      .plugin(tauri_plugin_fs::init()),
+      .plugin(tauri_plugin_fs::init())
       .plugin(sentry::init())
       .plugin(logger::init())
   );
