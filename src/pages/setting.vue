@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { useConfig } from "@delta-comic/plugin";
-import { isEmpty } from "es-toolkit/compat";
+import { useConfig } from '@delta-comic/plugin'
 
-const config = useConfig();
+const config = useConfig()
 </script>
 
 <template>
@@ -15,7 +14,7 @@ const config = useConfig();
       <template v-for="[name, config] of Object.entries(form)">
         <VanCell center v-if="config.type == 'switch'" :title="config.info">
           <template #right-icon>
-            <VanSwitch v-model="store.value[name]" />
+            <DcFormSwitch :config v-model="store.value[name]" />
           </template>
         </VanCell>
         <NPopselect :options="[]" trigger="click" size="huge" v-else-if="config.type == 'string'">
@@ -23,13 +22,7 @@ const config = useConfig();
             {{ store.value[name] }}
           </VanCell>
           <template #empty>
-            <NInput
-              clearable
-              :allowInput="(v) => (config.patten ? config.patten.test(v) || isEmpty(v) : true)"
-              :placeholder="config.placeholder"
-              v-model:value="store.value[name]"
-              class="w-[80vw]!"
-            />
+            <DcFormString :config v-model="store.value[name]" class="max-w-[80vw]!" />
           </template>
         </NPopselect>
         <NPopselect :options="[]" trigger="click" size="huge" v-else-if="config.type == 'number'">
@@ -37,15 +30,7 @@ const config = useConfig();
             {{ store.value[name] }}
           </VanCell>
           <template #empty>
-            <NInputNumber
-              :precision="config.float ? undefined : 0"
-              clearable
-              :min="config.range?.[0]"
-              :max="config.range?.[1]"
-              :placeholder="config.placeholder"
-              v-model:value="store.value[name]"
-              class="w-[80vw]!"
-            />
+            <DcFormNumber :config v-model="store.value[name]" class="max-w-[80vw]!" />
           </template>
         </NPopselect>
         <NPopselect
@@ -57,7 +42,7 @@ const config = useConfig();
           v-model:value="store.value[name]"
         >
           <VanCell center :title="config.info" clickable>
-            {{ config.selects.find((v) => v.value == store.value[name])?.label }}
+            {{ config.selects.find(v => v.value == store.value[name])?.label }}
           </VanCell>
         </NPopselect>
         <NPopselect
@@ -84,7 +69,37 @@ const config = useConfig();
               position="center"
               class="flex justify-center"
             >
-              <NDatePicker input-readonly v-model:value="store.value[name]" />
+              <DcFormDate :config v-model="store.value[name]" class="max-w-[80vw]!" />
+            </DcPopup>
+          </VanCell>
+        </DcVar>
+        <DcVar v-else-if="config.type == 'dateRange'" :value="{ show: false }" v-slot="{ value }">
+          <VanCell center :title="config.info" clickable @click="value.show = true">
+            {{ store.value[name] }}
+            <DcPopup
+              v-model:show="value.show"
+              overlay
+              round
+              closeable
+              position="center"
+              class="flex justify-center"
+            >
+              <DcFormDateRange :config v-model="store.value[name]" class="max-w-[80vw]!" />
+            </DcPopup>
+          </VanCell>
+        </DcVar>
+        <DcVar v-else-if="config.type == 'pairs'" :value="{ show: false }" v-slot="{ value }">
+          <VanCell center :title="config.info" clickable @click="value.show = true">
+            {{ store.value[name] }}
+            <DcPopup
+              v-model:show="value.show"
+              overlay
+              round
+              closeable
+              position="center"
+              class="flex justify-center"
+            >
+              <DcFormPairs :config v-model="store.value[name]" class="max-w-[80vw]!" />
             </DcPopup>
           </VanCell>
         </DcVar>
