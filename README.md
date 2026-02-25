@@ -3,7 +3,6 @@
 </p>
 
 ```python
-"""
 _____   _________________ ____        __________________ _____   ______
 |  __ \|  ____|| |__   __| __ \      / ______\   |  \/  |_   _| / _____\
 | |  | | |__   | |  | |  | | \ \    | |    _____ | \  / | | |  | /
@@ -12,13 +11,21 @@ _____   _________________ ____        __________________ _____   ______
 |_____/|______||______|  |_|    \_\  \__________/|_|  \_______| \______/
 =========================================================================
   Per Aspera, Ad Astra.                              Copyright © Wenxig
-"""
 ```
 
 <p align="center">
-    <img src="https://img.shields.io/github/license/delta-comic/delta-comic" alt="Repo License" />
-    <img src="https://img.shields.io/github/downloads/delta-comic/delta-comic/total" alt="GitHub Downloads (all assets, all releases)" />
-    <a href="https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440"><img src="https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg" alt="wakatime"></a>
+    <a href="https://github.com/semantic-release/semantic-release">
+      <img src="https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release" alt="semantic-release: angular" />
+    </a>
+    <a href="https://github.com/delta-comic/delta-comic/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/delta-comic/delta-comic" alt="Repo License" />
+    </a>
+    <a href="https://github.com/delta-comic/delta-comic/releases/latest">
+      <img src="https://img.shields.io/github/downloads/delta-comic/delta-comic/total" alt="GitHub Downloads (all assets, all releases)" />
+    </a>
+    <a href="https://wakatime.com/projects/delta-comic">
+      <img src="https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg" alt="wakatime" />
+    </a>
 </p>
 
 ---
@@ -34,14 +41,14 @@ _____   _________________ ____        __________________ _____   ______
 
 > 项目底层再次重构中...
 
-[**评论区**](https://github.com/orgs/delta-comic/discussions/32)
+[**评论区戳我**](https://github.com/orgs/delta-comic/discussions/32)
 
 ## 实机演示
 
-| ![content](docs/content-1.webp) | ![content](docs/content-3.webp) | ![content](docs/content-2.webp) |
+| [![content](docs/content-1.webp)](https://github.com/delta-comic/delta-comic/releases/latest) | [![content](docs/content-3.webp)](https://github.com/delta-comic/delta-comic/releases/latest) | [![content](docs/content-2.webp)](https://github.com/delta-comic/delta-comic/releases/latest) |
 | :-: | :-: | :-: |
 
-| ![main](docs/main-1.webp) | ![hot](docs/hot-1.webp) | ![user](docs/user-1.webp) |
+| [![main](docs/main-1.webp)](https://github.com/delta-comic/delta-comic/releases/latest) | [![hot](docs/hot-1.webp)](https://github.com/delta-comic/delta-comic/releases/latest) | [![user](docs/user-1.webp)](https://github.com/delta-comic/delta-comic/releases/latest) |
 | :-: | :-: | :-: |
 
 ## 如何使用
@@ -54,7 +61,21 @@ _____   _________________ ____        __________________ _____   ______
 
 ### 插件集合
 
-[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=awesome-plugins&user&theme=transparent)](https://github.com/delta-comic/awesome-plugins)
+[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=awesome-plugins&user&theme=transparent)](https://github.com/delta-comic/awesome-plugins) 
+
+## 工程路线图
+
+> 代码块内是下载命令
+- [x] 哔咔漫画 `ap:bika` -_何以忘却_
+- [x] 禁漫天堂 `ap:jmcomic` -_何以哀怮_
+- [x] CosAv `ap:cosav` -_何以殁亡_
+- [ ] E-Hentai -_何以战栗_
+- [ ] Hanime1 _何以倾慕_
+- _待定_ -_无以迷惘_
+- _待定_ -_无以踟蹰_
+- _待定_ -_无以迁怒_
+- _待定_ -_无以夸矜_
+- _待定_ -_无以降神_
 
 ## 想要编写插件?
 
@@ -64,19 +85,6 @@ _____   _________________ ____        __________________ _____   ______
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=delta-comic/delta-comic&type=Date)](https://www.star-history.com/#delta-comic/delta-comic&Date)
-
-## 工程路线图
-
-- [x] bika -_何以忘却_
-- [x] jmcomic -_何以哀怮_
-- [x] cosav -_何以殁亡_
-- [ ] e-hentai -_何以战栗_
-- [ ] hanime1 _何以倾慕_
-- _待定_ -_无以迷惘_
-- _待定_ -_无以踟蹰_
-- _待定_ -_无以迁怒_
-- _待定_ -_无以夸矜_
-- _待定_ -_无以降神_
 
 ## 状态
 
