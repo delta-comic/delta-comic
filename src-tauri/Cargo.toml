@@ -71,7 +71,9 @@ features = [
   "contexts",
   "debug-images",
   "panic",
-  "release-health"
+  "release-health",
+  "reqwest",
+  "rustls",
 ]
 
 [dependencies.tauri-plugin-sql]

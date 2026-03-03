@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import pkg from '../../package.json'
 import { Octokit } from '@octokit/rest'
+import { open } from '@tauri-apps/plugin-shell'
 import { computedAsync } from '@vueuse/core'
 import { watch, shallowRef } from 'vue'
-import VueMarkdown from 'vue-markdown-render'
-import { open } from '@tauri-apps/plugin-shell'
+
+import pkg from '../../package.json'
+
+import DcMarkdown from './md/DcMarkdown.vue'
 
 const oct = new Octokit()
 const markdown = computedAsync(async () => {
-  if (import.meta.env.DEV) return []
+  // if (import.meta.env.DEV) return []
   try {
     const releases = await oct.rest.repos.listReleases({
       owner: 'delta-comic',
@@ -34,18 +36,16 @@ watch(markdown, markdown => (isShow.value = Boolean(markdown.length)), { immedia
     v-model:show="isShow"
     round
     position="center"
-    class="max-h-[90vh] min-h-[80vw] w-[70%] p-3"
+    class="max-h-[90vh] min-w-[80vw] p-3"
   >
     <div class="text-xl font-bold text-[--p-color]">发现新版本</div>
-    <NScrollbar>
-      <VueMarkdown
-        :source="markdown.map(v => v[1]).join('------\n\n')"
-        class="markdown max-h-[70vh]!"
-      />
-    </NScrollbar>
+    <DcMarkdown
+      :markdown="markdown.map(v => v[1]).join('------\n\n')"
+      class="pt-3 h-[60vh]! w-full"
+    />
     <VanButton
       type="primary"
-      class="absolute bottom-3 left-1/2 w-[calc(100%-24px)] -translate-x-1/2"
+      class="absolute bottom-2 left-1/2 w-[calc(100%-24px)] -translate-x-1/2"
       size="small"
       block
       @click="open('https://github.com/delta-comic/delta-comic/releases/latest')"
