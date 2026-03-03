@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import ExtendableSearchBar from '@/components/home/mainPageSearchBar.vue'
-import userIcon from '@/assets/images/userIcon.webp'
-import { isShowMainHomeNavBar } from '@/symbol'
+import { Global } from '@delta-comic/plugin'
 import { VideogameAssetFilled } from '@vicons/material'
 import { shallowRef, provide, nextTick, useTemplateRef, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Global } from '@delta-comic/plugin'
+
+import userIcon from '@/assets/images/userIcon.webp'
+import ExtendableSearchBar from '@/components/home/mainPageSearchBar.vue'
 import { useAppStore } from '@/stores/app'
+import { isShowMainHomeNavBar } from '@/symbol'
 const $router = useRouter()
 const isShowNavBar = shallowRef(true)
 provide(isShowMainHomeNavBar, isShowNavBar)
@@ -92,7 +93,7 @@ const tabItem = computed(() =>
     </VanIcon>
   </div>
   <div
-    class="w-full overflow-hidden transition-all duration-200"
+    class="min-h-screen w-full overflow-hidden transition-all duration-200"
     :class="[
       isShowNavBar
         ? 'h-[calc(100%-var(--van-tabs-line-height)-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0'

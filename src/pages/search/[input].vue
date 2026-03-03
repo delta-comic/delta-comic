@@ -109,7 +109,7 @@ const goSearch = () => {
       <DcImage :src="noneSearchTextIcon" />
     </template>
   </NResult>
-  <div class="transition-all duration-200 will-change-[height,transform] *:h-full!" v-else :class="[
+  <div class="transition-all duration-200 will-change-[height,transform] *:h-full! min-h-screen" v-else :class="[
     showSearch
       ? 'h-[calc(100vh-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0'
       : 'h-[calc(100vh-32px-var(--safe-area-inset-top))] -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]'
