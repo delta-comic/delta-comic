@@ -6,8 +6,6 @@ import { watch, shallowRef } from 'vue'
 
 import pkg from '../../package.json'
 
-import DcMarkdown from './md/DcMarkdown.vue'
-
 const oct = new Octokit()
 const markdown = computedAsync(async () => {
   // if (import.meta.env.DEV) return []
@@ -32,16 +30,11 @@ watch(markdown, markdown => (isShow.value = Boolean(markdown.length)), { immedia
 </script>
 
 <template>
-  <DcPopup
-    v-model:show="isShow"
-    round
-    position="center"
-    class="max-h-[90vh] min-w-[80vw] p-3"
-  >
+  <DcPopup v-model:show="isShow" round position="center" class="max-h-[90vh] min-w-[80vw] p-3">
     <div class="text-xl font-bold text-[--p-color]">发现新版本</div>
     <DcMarkdown
       :markdown="markdown.map(v => v[1]).join('------\n\n')"
-      class="pt-3 h-[60vh]! w-full"
+      class="h-[60vh]! w-full pt-3"
     />
     <VanButton
       type="primary"
