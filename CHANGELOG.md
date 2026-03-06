@@ -1,3 +1,20 @@
+# [1.3.0](https://github.com/delta-comic/delta-comic/compare/1.2.0...1.3.0) (2026-03-06)
+
+
+### Bug Fixes
+
+* **app:** [pub] 应用图标修复 ([7508ced](https://github.com/delta-comic/delta-comic/commit/7508ced96db321ed1a78bd9bfcfd2d8af38ae434))
+* docs link error ([22f55e0](https://github.com/delta-comic/delta-comic/commit/22f55e04265f7a66d91fb0b15c452984172cf3b4))
+* rust ([f17f105](https://github.com/delta-comic/delta-comic/commit/f17f105deda4fed0d3473a8463f7d38b41d13333))
+* settings page ([ed9b307](https://github.com/delta-comic/delta-comic/commit/ed9b307191faaf905b5a7328df97c196a5fce11a))
+* **ui:** 修复了顶栏在短列表滚动时出现抖动的现象 ([55f2a0f](https://github.com/delta-comic/delta-comic/commit/55f2a0f761c97600c66c544baf8376e22c466dfa))
+
+
+### Features
+
+* new sentry version ([546869a](https://github.com/delta-comic/delta-comic/commit/546869a1234fdf6106e71dc96b17341549c24a60))
+* **ui:** 更好的markdown渲染样式 ([86c24b2](https://github.com/delta-comic/delta-comic/commit/86c24b29e6529000bd3f76868d7bc7aec55382be))
+
 # [1.2.0](https://github.com/delta-comic/delta-comic/compare/1.1.4...1.2.0) (2026-02-22)
 
 
