@@ -5,7 +5,7 @@ authors = ["wenxig"]
 license = "AGPL-3.0-only"
 repository = "https://github.com/delta-comic/delta-comic"
 edition = "2024"
-rust-version = "1.92.0"
+rust-version = "1.94.0"
 version = "0.0.1"
 
 [profile.dev]
@@ -39,7 +39,7 @@ tokio = "1.50.0"
 mime_guess = "2.0.5"
 percent-encoding = "2.3.2"
 log = "0.4.29"
-tauri-runtime-wry = "2.10.0"
+tauri-runtime-wry = "2.10.1"
 tauri-plugin-shell = "2"
 
 [dependencies.tauri-plugin-sentry]
@@ -60,7 +60,7 @@ version = "1.0.228"
 features = ["derive"]
 
 [dependencies.tauri]
-version = "2.10.2"
+version = "2.10.3"
 features = []
 
 [dependencies.sentry]
@@ -86,7 +86,7 @@ git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls"
 branch = "main"
 
 [build-dependencies.tauri-build]
-version = "2.5.5"
+version = "2.5.6"
 features = []
 
 [features]
