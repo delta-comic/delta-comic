@@ -47,6 +47,7 @@ vant
 vicons
 Videogame
 vueuse
+Wakatime
 webp
 wenxig
 xgbuugti

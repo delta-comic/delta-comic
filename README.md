@@ -24,7 +24,7 @@ _____   _________________ ____        __________________ _____   ______
       <img src="https://img.shields.io/github/downloads/delta-comic/delta-comic/total" alt="GitHub Downloads (all assets, all releases)" />
     </a>
     <a href="https://wakatime.com/projects/delta-comic">
-      <img src="https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg" alt="wakatime" />
+      <img src="https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg" alt="Wakatime" />
     </a>
 </p>
 
@@ -38,8 +38,7 @@ _____   _________________ ____        __________________ _____   ______
 - **开源与可扩展**：插件模式让更多站点能快速接入（对普通用户透明）。
 
 > 声明：本项目主要用于技术研究与自用，尊重内容原作者与平台规则，下载后请于24小时内删除；使用时请遵守相关法律法规与站点条款。
-
-[**评论区戳我**](https://github.com/orgs/delta-comic/discussions/32)
+> [**评论区戳我**](https://github.com/orgs/delta-comic/discussions/32)!
 
 ## 实机演示
 
@@ -59,11 +58,12 @@ _____   _________________ ____        __________________ _____   ______
 
 ### 插件集合
 
-[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=awesome-plugins&user&theme=transparent)](https://github.com/delta-comic/awesome-plugins) 
+[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=awesome-plugins&user&theme=transparent)](https://github.com/delta-comic/awesome-plugins)
 
 ## 工程路线图
 
 > 代码块内是下载命令
+
 - [x] 哔咔漫画 `ap:bika` -_何以忘却_
 - [x] 禁漫天堂 `ap:jmcomic` -_何以哀怮_
 - [x] CosAv `ap:cosav` -_何以殁亡_
@@ -80,11 +80,10 @@ _____   _________________ ____        __________________ _____   ______
 [![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=delta-comic-core&user&theme=transparent)](https://github.com/delta-comic/delta-comic-core)  
  该包可为你提供许多基本的数据结构, 与便捷的`definePlugin`
 
-## Star History
+## 星图
 
 [![Star History Chart](https://api.star-history.com/svg?repos=delta-comic/delta-comic&type=Date)](https://www.star-history.com/#delta-comic/delta-comic&Date)
 
 ## 状态
 
 ![Alt](https://repobeats.axiom.co/api/embed/d29bef6ede7cc9fcfabb0d1499a656e06f5462bf.svg 'Repobeats analytics image')
-
