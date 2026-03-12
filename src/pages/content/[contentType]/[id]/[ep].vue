@@ -3,7 +3,7 @@ import { useContentStore } from '@/stores/content'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { watch } from 'vue'
-import {  useFullscreen } from '@delta-comic/core'
+import { useFullscreen } from '@delta-comic/core'
 import { uni } from '@delta-comic/model'
 import { createLoadingMessage } from '@delta-comic/ui'
 import { HistoryDB } from '@delta-comic/db'
@@ -26,6 +26,13 @@ contentStore.$load(contentType, id, ep)
 const layout = computed(() => uni.content.ContentPage.viewLayout.get(page.value.contentType))
 
 const { isFullscreen } = useFullscreen()
+const stop = $router.beforeEach(() => {
+  if (isFullscreen.value) {
+    isFullscreen.value = false
+    return false
+  }
+  stop()
+})
 
 // history
 const union = computed(() => page.value.union.value)
@@ -39,13 +46,6 @@ watch(
   },
   { immediate: true }
 )
-const stop = $router.beforeEach(() => {
-  if (isFullscreen.value) {
-    isFullscreen.value = false
-    return false
-  }
-  stop()
-})
 </script>
 
 <template>
