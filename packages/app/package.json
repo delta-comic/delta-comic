@@ -20,7 +20,6 @@
     "@delta-comic/request": "workspace:",
     "@delta-comic/ui": "workspace:",
     "@delta-comic/utils": "workspace:",
-    "@delta-comic/vite": "workspace:",
     "@octokit/rest": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/cli": "^2.10.1",
