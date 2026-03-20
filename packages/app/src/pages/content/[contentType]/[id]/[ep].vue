@@ -2,15 +2,14 @@
 import { useFullscreen } from '@delta-comic/core'
 import { HistoryDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
-import { createLoadingMessage } from '@delta-comic/ui'
-import { computed } from 'vue'
-import { watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { createLoadingMessage, usePreventBack } from '@delta-comic/ui'
+import { computed, watch, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { useContentStore } from '@/stores/content'
+
 const $route = useRoute<'/content/[contentType]/[id]/[ep]'>()
 const contentStore = useContentStore()
-const $router = useRouter()
 
 
 definePage({ meta: { statusBar: 'dark', force: true } })
@@ -33,13 +32,7 @@ const layout = computed(() => uni.content.ContentPage.viewLayout.get(page.value.
 
 
 const { isFullscreen } = useFullscreen()
-const stop = $router.beforeEach(() => {
-  if (isFullscreen.value) {
-    isFullscreen.value = false
-    return false
-  }
-  stop()
-})
+usePreventBack(isFullscreen, ref(true))
 
 
 // history

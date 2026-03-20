@@ -204,9 +204,6 @@ importers:
 
   packages/app:
     dependencies:
-      '@aptabase/tauri':
-        specifier: github:delta-comic/tauri-plugin-aptabase-rustls
-        version: https://codeload.github.com/delta-comic/tauri-plugin-aptabase-rustls/tar.gz/d189f19945caabe9a23a727a625d13659971f698
       '@delta-comic/core':
         specifier: 'workspace:'
         version: link:../core
@@ -234,9 +231,6 @@ importers:
       '@octokit/rest':
         specifier: 'catalog:'
         version: 22.0.1
-      '@sentry/vue':
-        specifier: ^10.43.0
-        version: 10.45.0(pinia@3.0.4(typescript@5.9.3)(vue@3.5.30(typescript@5.9.3)))(vue@3.5.30(typescript@5.9.3))
       '@tauri-apps/api':
         specifier: 'catalog:'
         version: 2.10.1
@@ -303,9 +297,6 @@ importers:
       tauri-plugin-m3:
         specifier: ^0.3.1
         version: 0.3.2
-      tauri-plugin-sentry-api:
-        specifier: ^0.5.0
-        version: 0.5.0
       vant:
         specifier: 'catalog:'
         version: 4.9.22(vue@3.5.30(typescript@5.9.3))
@@ -364,17 +355,26 @@ importers:
 
   packages/core:
     dependencies:
+      '@aptabase/tauri':
+        specifier: github:delta-comic/tauri-plugin-aptabase-rustls
+        version: https://codeload.github.com/delta-comic/tauri-plugin-aptabase-rustls/tar.gz/d189f19945caabe9a23a727a625d13659971f698
       '@delta-comic/model':
         specifier: workspace:*
         version: link:../model
       '@delta-comic/utils':
         specifier: workspace:*
         version: link:../utils
+      '@sentry/vue':
+        specifier: ^10.43.0
+        version: 10.45.0(pinia@3.0.4(typescript@5.9.3)(vue@3.5.30(typescript@5.9.3)))(vue@3.5.30(typescript@5.9.3))
       pinia:
         specifier: ^3.0
         version: 3.0.4(typescript@5.9.3)(vue@3.5.30(typescript@5.9.3))
+      tauri-plugin-sentry-api:
+        specifier: ^0.5.0
+        version: 0.5.0
       vue:
-        specifier: ^3.5
+        specifier: 'catalog:'
         version: 3.5.30(typescript@5.9.3)
     devDependencies:
       vite:

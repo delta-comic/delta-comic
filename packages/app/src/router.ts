@@ -2,7 +2,7 @@ import { SharedFunction } from '@delta-comic/core'
 import { uni } from '@delta-comic/model'
 import { useConfig } from '@delta-comic/plugin'
 import { M3 } from 'tauri-plugin-m3'
-import { toRef } from 'vue'
+import { toValue } from 'vue'
 import {
   createRouter,
   createWebHistory,
@@ -64,17 +64,15 @@ router.force = {
 router.beforeEach(async to => {
   const isDark = useConfig().isDark
   if (to.meta.statusBar) {
-    const sb = toRef(to.meta.statusBar).value
-    if (sb == 'auto') {
-      await M3.setBarColor(isDark ? 'dark' : 'light')
-    } else !sb ? await M3.setBarColor(sb) : undefined
-  } else {
-    await M3.setBarColor(!isDark ? 'dark' : 'light')
+    const sb = toValue(to.meta.statusBar)
+    if (sb == 'auto') await M3.setBarColor(isDark ? 'dark' : 'light')
+    else !sb ? await M3.setBarColor(sb) : undefined
+    return true
   }
+  await M3.setBarColor(!isDark ? 'dark' : 'light')
   return true
 })
 
-//@ts-ignore
 if (import.meta.hot) {
   handleHotUpdate(router)
 }

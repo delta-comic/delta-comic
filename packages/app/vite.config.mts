@@ -1,11 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import { DeltaComicUiResolver } from '@delta-comic/ui/vite'
-import tailwindcss from '@tailwindcss/vite'
-import vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
-import browserslist from 'browserslist'
-import { browserslistToTargets } from 'lightningcss'
 import MotionResolver from 'motion-v/resolver'
 import { NaiveUiResolver, VantResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
@@ -13,34 +8,23 @@ import type { UserConfig } from 'vite'
 import { defineConfig } from 'vite'
 import MsClarity from 'vite-plugin-ms-clarity'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import wasm from 'vite-plugin-wasm'
 import VueRouter from 'vue-router/vite'
 
 const host = process.env.TAURI_DEV_HOST
 
 export default defineConfig({
   plugins: [
-    // @ts-ignore
-    wasm(),
     VueRouter({ dts: 'typed-router.d.ts' }),
     vueDevTools(),
     MsClarity({ id: 'v2xgbuugti', enableInDevMode: false }),
-    vue({ template: { compilerOptions: { isCustomElement: tag => tag.startsWith('media-') } } }),
-    vueJsx(),
     Components({
       dts: true,
       resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver(), DeltaComicUiResolver()],
       dtsTsx: false
     }),
-    tailwindcss()
   ],
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
-    extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts']
-  },
-  css: {
-    transformer: 'lightningcss',
-    lightningcss: { targets: browserslistToTargets(browserslist('> 5%')) }
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) }
   },
   build: {
     // Tauri uses Chromium on Windows and WebKit on macOS and Linux
@@ -63,7 +47,5 @@ export default defineConfig({
       // tell vite to ignore watching `src-tauri`
       ignored: ['**/src-tauri/**']
     }
-  },
-  clearScreen: false,
-  envPrefix: ['VITE_', 'TAURI_ENV_*']
+  }
 } as UserConfig)

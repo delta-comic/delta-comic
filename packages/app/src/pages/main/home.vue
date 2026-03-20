@@ -76,8 +76,17 @@ const tabItem = computed(() =>
     ]"
   >
     <DcRouterTab
-      router-base="/main/home"
-      :items="[{ title: '推荐', name: 'random' }, { title: '热门', name: 'hot' }, ...tabItem]"
+      :items="[
+        { title: '推荐', name: 'random', route: { name: '/main/home/random' } },
+        { title: '热门', name: 'hot', route: { name: '/main/home/hot' } },
+        ...tabItem.map(
+          v =>
+            ({
+              ...v,
+              route: { name: '/main/home/[id]', params: { id: v.name }, query: v.queries }
+            }) as const
+        )
+      ]"
     />
     <VanIcon
       name="search"

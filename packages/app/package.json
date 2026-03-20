@@ -13,7 +13,6 @@
     "publish:self":"echo \"No need publish to npm\""
   },
   "dependencies": {
-    "@aptabase/tauri": "github:delta-comic/tauri-plugin-aptabase-rustls",
     "@delta-comic/core": "workspace:",
     "@delta-comic/db": "workspace:",
     "@delta-comic/model": "workspace:",
@@ -23,7 +22,6 @@
     "@delta-comic/utils": "workspace:",
     "@delta-comic/vite": "workspace:",
     "@octokit/rest": "catalog:",
-    "@sentry/vue": "^10.43.0",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/cli": "^2.10.1",
     "@tauri-apps/plugin-clipboard-manager": "~2.3.2",
@@ -46,7 +44,6 @@
     "semver": "catalog:",
     "tauri-plugin-better-cors-fetch": "github:delta-comic/tauri-plugin-better-cors-fetch",
     "tauri-plugin-m3": "^0.3.1",
-    "tauri-plugin-sentry-api": "^0.5.0",
     "vant": "catalog:",
     "vue": "catalog:",
     "vue-router": "catalog:"

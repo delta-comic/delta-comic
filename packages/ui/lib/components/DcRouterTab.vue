@@ -39,7 +39,7 @@ const $router = useRouter()
 const selecting = computed(() => {
   const item = $props.items.find(v => {
     const route = $router.resolve(v.route)
-    return route.name == $route.name
+    return route.path == $route.path
   })
   return item?.name ?? $props.items.at(0)?.name
 })
