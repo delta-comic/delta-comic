@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useAppStore } from '@/stores/app'
 import { db, DBUtils } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
 import { useConfig, usePluginStore } from '@delta-comic/plugin'
@@ -15,10 +14,13 @@ import { motion } from 'motion-v'
 import { NCollapseTransition } from 'naive-ui'
 import { computed, shallowRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
+
+import { useAppStore } from '@/stores/app'
 const $router = useRouter()
 const config = useConfig()
 const $window = window
 const pluginStore = usePluginStore()
+
 
 const favouriteCount = computedAsync(
   () => DBUtils.countDb(db.value.selectFrom('favouriteItem')),
@@ -26,6 +28,7 @@ const favouriteCount = computedAsync(
 )
 const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom('subscribe')), -1)
 const recentCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom('recentView')), -1)
+
 
 const app = useAppStore()
 watch(
@@ -39,7 +42,9 @@ const userNoTopUserList = computed(() =>
   Array.from(uni.user.User.userBase.entries()).filter(v => v[1] != app.activatedUser)
 )
 
+
 const showActivatedUserSelect = shallowRef(false)
+
 
 const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin: string }>()
 </script>

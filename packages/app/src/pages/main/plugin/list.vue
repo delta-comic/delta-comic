@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { MenuRound, WarningRound } from '@vicons/material'
-import { shallowReactive } from 'vue'
-import semver from 'semver'
-import { memoize } from 'es-toolkit'
-import { computedAsync } from '@vueuse/core'
-import pkg from '../../../../package.json'
 import { db, PluginArchiveDB } from '@delta-comic/db'
-import { updatePlugin } from '@delta-comic/plugin'
 import { PromiseContent } from '@delta-comic/model'
+import { updatePlugin } from '@delta-comic/plugin'
+import { MenuRound, WarningRound } from '@vicons/material'
+import { computedAsync } from '@vueuse/core'
+import { memoize } from 'es-toolkit'
+import semver from 'semver'
+import { shallowReactive } from 'vue'
+
+import pkg from '../../../../package.json'
 
 const updating = shallowReactive(new Set<string>())
 const _updatePlugin = async (plugin: PluginArchiveDB.Archive) => {
@@ -20,7 +21,9 @@ const _updatePlugin = async (plugin: PluginArchiveDB.Archive) => {
   }
 }
 
+
 const checkIsSupport = memoize((supportCore: string) => semver.satisfies(pkg.version, supportCore))
+
 
 const getCardClass = (plugin: PluginArchiveDB.Archive) => {
   if (!plugin.enable)
@@ -29,6 +32,7 @@ const getCardClass = (plugin: PluginArchiveDB.Archive) => {
     return 'border-(--nui-primary-color)/20! bg-(--nui-primary-color-hover)/10!'
   return 'border-(--nui-warning-color)/20! bg-(--nui-warning-color-hover)/10!'
 }
+
 
 const codeArchives = computedAsync(() => db.value.selectFrom('plugin').selectAll().execute(), [])
 </script>

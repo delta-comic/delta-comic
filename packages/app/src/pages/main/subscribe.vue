@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { ArrowForwardIosRound } from '@vicons/material'
-import { computed, shallowRef } from 'vue'
-import AuthorList from '@/components/subscribe/subAuthorList.vue'
-import { computedAsync } from '@vueuse/core'
 import { SubscribeDB } from '@delta-comic/db'
+import { ArrowForwardIosRound } from '@vicons/material'
+import { computedAsync } from '@vueuse/core'
+import { computed, shallowRef } from 'vue'
+
+import AuthorList from '@/components/subscribe/subAuthorList.vue'
 const isOnAllPage = shallowRef(true)
 const subscribe = computedAsync(() => SubscribeDB.getAll(), [])
 
+
 const select = shallowRef<string>()
 const selectItem = computed(() => subscribe.value.find(v => v.key == select.value))
+
 
 const isShowAllList = shallowRef(false)
 </script>

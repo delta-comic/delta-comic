@@ -14,6 +14,7 @@ const confirmAdd = async (url: string) => {
   }
   isAdding.value = true
 
+
   try {
     await createDialog({
       type: 'info',
@@ -32,6 +33,7 @@ const confirmAdd = async (url: string) => {
   }
   isAdding.value = false
 }
+
 
 const upload = toReactive(useFileDialog({ accept: '', multiple: false }))
 const useUploadPlugin = () => {

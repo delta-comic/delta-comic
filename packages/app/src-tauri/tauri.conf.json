@@ -19,22 +19,10 @@
         "fullscreen": false
       }
     ],
-    "security": {
-      "csp": null,
-      "assetProtocol": {
-        "enable": false,
-        "scope": []
-      }
-    },
+    "security": { "csp": null, "assetProtocol": { "enable": false, "scope": [] } },
     "withGlobalTauri": true
   },
-  "plugins": {
-    "sql": {
-      "preload": [
-        "sqlite:app.db"
-      ]
-    }
-  },
+  "plugins": { "sql": { "preload": ["sqlite:app.db"] } },
   "bundle": {
     "active": true,
     "targets": "all",
@@ -49,9 +37,6 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "android": {
-      "autoIncrementVersionCode": false,
-      "minSdkVersion": 26
-    }
+    "android": { "autoIncrementVersionCode": false, "minSdkVersion": 26 }
   }
 }

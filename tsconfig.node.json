@@ -16,9 +16,5 @@
     "./script/set-version.mts",
     "./script/update-version.mts"
   ],
-  "references": [
-    {
-      "path": "./packages/app/tsconfig.node.json"
-    }
-  ]
+  "references": [{ "path": "./packages/app/tsconfig.node.json" }]
 }

@@ -1,6 +1,7 @@
 import type { PluginConfig } from '@/plugin'
 
 import { PluginBooter, type PluginBooterSetMeta } from '../utils'
+
 import { testApi } from './utils'
 
 export type _TestPluginApiResult = Record<string, string | false | undefined>

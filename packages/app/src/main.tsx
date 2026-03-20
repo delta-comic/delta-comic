@@ -1,6 +1,5 @@
 import 'core-js'
 import type {} from '@delta-comic/utils'
-
 import { CORSFetch } from 'tauri-plugin-better-cors-fetch'
 CORSFetch.init({ request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } } })
 

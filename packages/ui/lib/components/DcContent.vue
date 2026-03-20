@@ -62,6 +62,7 @@ type AllVariant =
   | 'isEmpty'
   | 'done'
 
+
 const loadingVariants: Record<AllVariant, VariantType> = {
   isLoadingNoData: {
     opacity: 1,
@@ -154,6 +155,7 @@ const animateOn = computed<AllVariant>(() => {
   }
   return 'done'
 })
+
 
 const cont = useTemplateRef('cont')
 defineExpose({ cont })

@@ -8,7 +8,10 @@ const overrides = usePluginConfig()
 <template>
   <NScrollbar class="size-full">
     <div class="mb-2 ml-4 text-lg font-semibold">下载源覆写</div>
-    <NDynamicInput v-model:value="overrides" :on-create="() => ({ id: '', install: '', enabled: true })">
+    <NDynamicInput
+      v-model:value="overrides"
+      :on-create="() => ({ id: '', install: '', enabled: true })"
+    >
       <template #default="{ value }">
         <div class="flex w-[calc(100%-var(--spacing)*25)] items-center">
           <NCheckbox v-model:checked="value.enabled" class="mx-4" />

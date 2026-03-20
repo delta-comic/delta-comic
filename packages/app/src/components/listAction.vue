@@ -10,7 +10,9 @@ const $props = defineProps<{
   action: (PopoverAction & { onTrigger: (sel: T[]) => void })[]
 }>()
 
+
 const [DefineSelectPacker, SelectPacker] = createReusableTemplate<{ it: T }>()
+
 
 const showSelect = shallowRef(false)
 const selectList = shallowReactive(new Set<T>())
@@ -23,11 +25,13 @@ const selectAll = () => {
   for (const item of $props.values) selectList.add(item)
 }
 
+
 const [DefineActionBar, ActionBar] = createReusableTemplate()
 defineSlots<{
   default(arg: { ActionBar: typeof ActionBar; SelectPacker: typeof SelectPacker }): any
 }>()
 defineExpose({ showSelect, selectList })
+
 
 const config = useConfig()
 </script>

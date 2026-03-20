@@ -1,29 +1,36 @@
 <script setup lang="ts">
-import { useContentStore } from '@/stores/content'
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { watch } from 'vue'
 import { useFullscreen } from '@delta-comic/core'
+import { HistoryDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
 import { createLoadingMessage } from '@delta-comic/ui'
-import { HistoryDB } from '@delta-comic/db'
+import { computed } from 'vue'
+import { watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+import { useContentStore } from '@/stores/content'
 const $route = useRoute<'/content/[contentType]/[id]/[ep]'>()
 const contentStore = useContentStore()
 const $router = useRouter()
 
+
 definePage({ meta: { statusBar: 'dark', force: true } })
+
 
 const ep = $route.params.ep.toString()
 const id = $route.params.id.toString()
 const contentType = $route.params.contentType.toString()
 
+
 const page = computed(
   () => contentStore.history.get(contentStore.$createHistoryKey(contentType, id, ep))!
 )
 
+
 contentStore.$load(contentType, id, ep)
 
+
 const layout = computed(() => uni.content.ContentPage.viewLayout.get(page.value.contentType))
+
 
 const { isFullscreen } = useFullscreen()
 const stop = $router.beforeEach(() => {
@@ -33,6 +40,7 @@ const stop = $router.beforeEach(() => {
   }
   stop()
 })
+
 
 // history
 const union = computed(() => page.value.union.value)

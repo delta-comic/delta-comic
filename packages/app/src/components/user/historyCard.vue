@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { createDateString } from '@/utils/date'
 import type { HistoryDB, ItemStoreDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
 import { UserOutlined } from '@vicons/antd'
 import { PhoneAndroidOutlined } from '@vicons/material'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
+
+import { createDateString } from '@/utils/date'
 const $props = defineProps<{ item: ItemStoreDB.StoredItem & HistoryDB.Item }>()
+
 
 const instance = computed(() => uni.item.Item.create($props.item.item))
 </script>
@@ -26,9 +28,7 @@ const instance = computed(() => uni.item.Item.create($props.item.item))
         <NIcon color="var(--van-text-color-2)" size="14px">
           <PhoneAndroidOutlined />
         </NIcon>
-        <span class="van-haptics-feedback mr-2">{{
-          createDateString(dayjs(item.timestamp))
-        }}</span>
+        <span class="van-haptics-feedback mr-2">{{ createDateString(dayjs(item.timestamp)) }}</span>
       </div>
     </component>
   </DcVar>

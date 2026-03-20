@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import Card from './subCard.vue'
-import { motion } from 'motion-v'
-import { CloseRound } from '@vicons/material'
-import { onBeforeRouteLeave } from 'vue-router'
-import { computedAsync } from '@vueuse/core'
-import { db, SubscribeDB } from '@delta-comic/db'
-import { usePluginStore } from '@delta-comic/plugin'
 import { useTemp } from '@delta-comic/core'
+import { db, SubscribeDB } from '@delta-comic/db'
 import type { RStream, uni } from '@delta-comic/model'
+import { usePluginStore } from '@delta-comic/plugin'
+import { CloseRound } from '@vicons/material'
+import { computedAsync } from '@vueuse/core'
+import { motion } from 'motion-v'
+import { onBeforeRouteLeave } from 'vue-router'
+
+import Card from './subCard.vue'
 
 defineProps<{ selectItem: SubscribeDB.AuthorItem }>()
 const select = defineModel<string | undefined>('select', { required: true })
 
-  const pluginStore = usePluginStore()
-  const subscribe = computedAsync(() => SubscribeDB.getAll(), [])
 
-const temp = useTemp().$applyRaw(
-  'subscribeList',
-  () => new Map<string, RStream<uni.item.Item>>()
-)
+const pluginStore = usePluginStore()
+const subscribe = computedAsync(() => SubscribeDB.getAll(), [])
+
+
+const temp = useTemp().$applyRaw('subscribeList', () => new Map<string, RStream<uni.item.Item>>())
 const getSource = (si: SubscribeDB.Item) => {
   if (temp.has(si.key)) return temp.get(si.key)!
   const [plugin] = SubscribeDB.key.toJSON(si.key)
@@ -32,6 +32,7 @@ const getSource = (si: SubscribeDB.Item) => {
   }
   throw new Error('not impl')
 }
+
 
 const unsubscribe = (si: SubscribeDB.Item) => {
   select.value = undefined

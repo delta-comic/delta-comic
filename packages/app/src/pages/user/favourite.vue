@@ -1,22 +1,25 @@
 <script setup lang="ts">
-import { CloudSyncOutlined } from '@vicons/antd'
-import Layout from '@/components/user/userLayout.vue'
-import Searcher from '@/components/listSearcher.vue'
-import { CalendarViewDayRound, PlusRound, SearchFilled } from '@vicons/material'
-import { shallowRef, useTemplateRef } from 'vue'
-import { isNumber, uniqBy } from 'es-toolkit/compat'
-import FavouriteCard from '@/components/user/favouriteCard.vue'
-import CreateFavouriteCard from '@/components/createFavouriteCard.vue'
-import { computedAsync } from '@vueuse/core'
-import { pluginName } from '@/symbol'
 import { useTemp } from '@delta-comic/core'
 import { db, FavouriteDB, useNativeStore } from '@delta-comic/db'
+import { PromiseContent, type uni } from '@delta-comic/model'
 import { usePluginStore } from '@delta-comic/plugin'
 import { createDownloadMessage } from '@delta-comic/ui'
-import { PromiseContent, type uni } from '@delta-comic/model'
+import { CloudSyncOutlined } from '@vicons/antd'
+import { CalendarViewDayRound, PlusRound, SearchFilled } from '@vicons/material'
+import { computedAsync } from '@vueuse/core'
+import { isNumber, uniqBy } from 'es-toolkit/compat'
+import { shallowRef, useTemplateRef } from 'vue'
+
+import CreateFavouriteCard from '@/components/createFavouriteCard.vue'
+import Searcher from '@/components/listSearcher.vue'
+import FavouriteCard from '@/components/user/favouriteCard.vue'
+import Layout from '@/components/user/userLayout.vue'
+import { pluginName } from '@/symbol'
 const isCardMode = shallowRef(true)
 
+
 const temp = useTemp().$apply('favourite', () => ({ selectMode: 'pack' }))
+
 
 const allFavouriteCards = computedAsync(
   () => db.value.selectFrom('favouriteCard').selectAll().orderBy('createAt', 'desc').execute(),
@@ -24,7 +27,9 @@ const allFavouriteCards = computedAsync(
 )
 const searcher = useTemplateRef('searcher')
 
+
 const isSyncing = shallowRef(false)
+
 
 const pluginStore = usePluginStore()
 const syncFromCloud = () =>
@@ -90,8 +95,10 @@ const syncFromCloud = () =>
     isSyncing.value = false
   })
 
+
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const waterfall = useTemplateRef('waterfall')
+
 
 const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Array<string>())
 </script>

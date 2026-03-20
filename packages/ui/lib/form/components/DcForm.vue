@@ -3,6 +3,7 @@ import { isArray } from 'es-toolkit/compat'
 import { NForm } from 'naive-ui'
 
 import type { Configure, FormRowSlot, Result } from '../type'
+
 import DcFormItem from './DcFormItem.vue'
 
 defineProps<{
@@ -13,6 +14,7 @@ defineProps<{
   overrideRow?: boolean | O
 }>()
 const result = defineModel<Result<T>>({ default: {} })
+
 
 const slots = defineSlots<{
   row?<K extends O[number]>(args: FormRowSlot<T, O, K>): any

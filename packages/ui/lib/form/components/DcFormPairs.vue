@@ -6,7 +6,9 @@ import type { SingleResult, Type } from '@/form/type'
 
 const $props = defineProps<{ config: Type.Pairs }>()
 
+
 const createItem = () => ($props.config.defaultValue ?? [{ key: '', value: '' }])[0]
+
 
 const store = defineModel<SingleResult<Type.Pairs>>({ required: true })
 watch(store, store => {

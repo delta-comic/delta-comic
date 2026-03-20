@@ -5,7 +5,7 @@
 @import 'tailwindcss/preflight.css' layer(base);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
-@plugin "tailwindcss-safe-area-capacitor";
+@plugin 'tailwindcss-safe-area-capacitor';
 
 @import '@delta-comic/ui/style.css';
 @import '@delta-comic/plugin/style.css';

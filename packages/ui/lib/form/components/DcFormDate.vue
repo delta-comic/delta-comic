@@ -5,6 +5,7 @@ import type { SingleResult, Type } from '@/form/type'
 
 defineProps<{ config: Type.Date }>()
 
+
 const store = defineModel<SingleResult<Type.Date>>({ required: true })
 </script>
 

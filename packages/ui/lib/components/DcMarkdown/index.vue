@@ -22,6 +22,7 @@ const $props = withDefaults(
   }
 )
 
+
 const md = computed(() => {
   let md = new MarkdownIt($props.config)
   md = $props.plugins.reduce((md, plugin) => md.use(...plugin), md)
@@ -29,9 +30,12 @@ const md = computed(() => {
   return md
 })
 
+
 const eventMessage = `markdown-router-${Math.random()}`
 
+
 const pColor = useCssVar('--p-color')
+
 
 const htmlTemplateUrl = computed(
   () => `
@@ -73,6 +77,7 @@ const htmlTemplateUrl = computed(
 </html>
 `
 )
+
 
 useEventListener('message', ev => {
   const event = ev as MessageEvent

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
-import { PlusFilled } from '@vicons/material'
-import { useMessage } from 'naive-ui'
-import { computedAsync } from '@vueuse/core'
 import { db, type FavouriteDB } from '@delta-comic/db'
+import { PlusFilled } from '@vicons/material'
+import { computedAsync } from '@vueuse/core'
+import { useMessage } from 'naive-ui'
+import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())
@@ -11,6 +11,7 @@ const allFavouriteCards = computedAsync(
   () => db.value.selectFrom('favouriteCard').selectAll().execute(),
   []
 )
+
 
 const getCardItemCount = (belongTo: FavouriteDB.Card['createAt']) =>
   db.value
@@ -20,10 +21,13 @@ const getCardItemCount = (belongTo: FavouriteDB.Card['createAt']) =>
     .executeTakeFirstOrThrow()
     .then(v => v.count)
 
+
 const isShow = shallowRef(false)
 const $message = useMessage()
 
+
 let promise = Promise.withResolvers<FavouriteDB.Card['createAt'][]>()
+
 
 const create = () => {
   promise = Promise.withResolvers<FavouriteDB.Card['createAt'][]>()

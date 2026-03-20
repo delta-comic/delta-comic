@@ -66,15 +66,7 @@ features = []
 [dependencies.sentry]
 version = "0.46.2"
 default-features = false
-features = [
-  "backtrace",
-  "contexts",
-  "debug-images",
-  "panic",
-  "release-health",
-  "reqwest",
-  "rustls",
-]
+features = ["backtrace", "contexts", "debug-images", "panic", "release-health", "reqwest", "rustls"]
 
 [dependencies.tauri-plugin-sql]
 git = "https://github.com/tauri-apps/plugins-workspace"

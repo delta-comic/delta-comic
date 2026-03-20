@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import { SharedFunction, useTemp } from '@delta-comic/core'
+import { Stream, uni } from '@delta-comic/model'
+import { LikeOutlined } from '@vicons/antd'
+import { DrawOutlined } from '@vicons/material'
+import { until, useResizeObserver } from '@vueuse/core'
 import { isEmpty } from 'es-toolkit/compat'
 import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
+
 import { isShowMainHomeNavBar } from '@/symbol'
-import { until, useResizeObserver } from '@vueuse/core'
-import { LikeOutlined } from '@vicons/antd'
-import { DrawOutlined } from '@vicons/material'
-import { SharedFunction, useTemp } from '@delta-comic/core'
-import { Stream, uni } from '@delta-comic/model'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()
 const temp = useTemp().$applyRaw('randomConfig', () => ({
@@ -16,13 +17,13 @@ const temp = useTemp().$applyRaw('randomConfig', () => ({
     that.page.value = 0
     while (true) {
       that.page.value++
-      const result = await SharedFunction.callRandom('getRandomProvide', signal)
-        .result
+      const result = await SharedFunction.callRandom('getRandomProvide', signal).result
       yield result
     }
   }),
   scroll: 0
 }))
+
 
 const containBound = ref<DOMRectReadOnly>()
 useResizeObserver(
@@ -39,6 +40,7 @@ const stop = $router.beforeEach(() => {
   stop()
   temp.scroll = waterfall.value?.scrollTop ?? 0
 })
+
 
 const showNavBar = inject(isShowMainHomeNavBar)!
 watch(
@@ -57,14 +59,19 @@ console.debug('[random] waterfall', waterfall, temp.stream)
 
 <template>
   <DcWaterfall class="size-full!" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
-    <component :is="uni.item.Item.itemCard.get(item.contentType)" :item type="small" free-height
-      :key="`${index}|${item.id}`">
+    <component
+      :is="uni.item.Item.itemCard.get(item.contentType)"
+      :item
+      type="small"
+      free-height
+      :key="`${index}|${item.id}`"
+    >
       <NIcon color="var(--van-text-color-2)" size="14px">
         <DrawOutlined />
       </NIcon>
       <span class="van-ellipsis ml-0.5 max-w-2/3 text-xs text-(--van-text-color-2)">{{
         item.author.join(',')
-        }}</span>
+      }}</span>
       <template #smallTopInfo>
         <span v-if="item.viewNumber">
           <VanIcon name="eye-o" class="mr-0.5" size="14px" />

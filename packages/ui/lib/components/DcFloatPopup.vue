@@ -38,6 +38,7 @@ const anchors = computed(() =>
 const height = shallowRef(0)
 const [zIndex, isLast] = useZIndex(() => height.value > 0)
 
+
 // 路由拦截
 let stopRouterBreak = noop
 watch(show, () => {
@@ -46,6 +47,7 @@ watch(show, () => {
   else stopRouterBreak()
 })
 onBeforeRouteLeave(stopRouterBreak)
+
 
 defineExpose({
   show(node = 2) {

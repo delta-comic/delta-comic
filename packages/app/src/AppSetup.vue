@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { shallowRef, computed } from 'vue'
-import { useDialog, useLoadingBar, useMessage, useThemeVars } from 'naive-ui'
+import { Global } from '@delta-comic/plugin'
 import { useStyleTag } from '@vueuse/core'
-
 import { AnimatePresence, motion } from 'motion-v'
+import { useDialog, useLoadingBar, useMessage, useThemeVars } from 'naive-ui'
+import { shallowRef, computed } from 'vue'
+
 import App from './App.vue'
 import Plugin from './components/plugin/index.vue'
-import { Global } from '@delta-comic/plugin'
 import UpdateChecker from './components/updateChecker.vue'
 
 window.$message = useMessage()
@@ -30,7 +30,9 @@ const injectStyle = computed(() => {
 })
 useStyleTag(injectStyle)
 
+
 const isBooted = shallowRef(false)
+
 
 const showContent = shallowRef(false)
 </script>

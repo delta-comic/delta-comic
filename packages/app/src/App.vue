@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { Mutex } from 'es-toolkit'
-import { useIntervalFn } from '@vueuse/core'
-import * as Clipboard from '@tauri-apps/plugin-clipboard-manager'
-import { pluginName } from './symbol'
-import { Global } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/core'
 import { RecentDB } from '@delta-comic/db'
+import { Global } from '@delta-comic/plugin'
+import * as Clipboard from '@tauri-apps/plugin-clipboard-manager'
+import { useIntervalFn } from '@vueuse/core'
+import { Mutex } from 'es-toolkit'
+import { onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+
+import { pluginName } from './symbol'
 const $router = useRouter()
 const $route = useRoute()
 
+
 SharedFunction.define(item => RecentDB.upsert(item), pluginName, 'addRecent')
 await $router.push($route.fullPath)
+
 
 const scanned = new Set<string>()
 SharedFunction.define(
@@ -25,14 +28,13 @@ SharedFunction.define(
   'pushShareToken'
 )
 
+
 const handleShareTokenCheck = async () => {
   try {
     const chipText = await Clipboard.readText()
     if (scanned.has(chipText)) return
     scanned.add(chipText)
-    const handlers = Array.from(Global.shareToken.values()).filter(v =>
-      v.patten(chipText)
-    )
+    const handlers = Array.from(Global.shareToken.values()).filter(v => v.patten(chipText))
     console.log('new chipText discovery', chipText, handlers)
     const lock = new Mutex()
     for (const handler of handlers) {

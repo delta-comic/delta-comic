@@ -45,9 +45,11 @@ const $emit = defineEmits<{
 }>()
 const dataProcessor = (v: T[]) => $props.dataProcessor?.(v) ?? v
 
+
 const column = computed(
   () => (isArray($props.col) ? $props.col : [$props.col, $props.col]) as [min: number, max: number]
 )
+
 
 const unionSource = computed(() => ({
   ...(Stream.isStream($props.source)
@@ -80,6 +82,7 @@ const unionSource = computed(() => ({
   reset: () => (Stream.isStream($props.source) ? $props.source.reset() : $emit('reset'))
 }))
 
+
 const isPullRefreshHold = shallowRef(false)
 const isRefreshing = shallowRef(false)
 const handleRefresh = async () => {
@@ -109,6 +112,7 @@ const handleScroll = () => {
   const scrollTop = el.scrollTop
   const clientHeight = el.clientHeight
 
+
   const distanceFromBottom = scrollHeight - scrollTop - clientHeight
   if (distanceFromBottom <= 100) {
     if (isError) retry()
@@ -127,13 +131,16 @@ watch(
   { deep: 1, immediate: true }
 )
 
+
 const waterfallEl = useTemplateRef('waterfallEl')
+
 
 const waterfallIndex = useTemp().$apply('waterfall', () => ({ top: 0 }))
 const thisIndex = waterfallIndex.top++
 const sizeMapTemp = useTemp().$applyRaw(`waterfall:${thisIndex}`, () =>
   shallowReactive(new Map<T, number>())
 )
+
 
 const sizeWatcherCleaner = new Array<VoidFunction>()
 const observer = new MutationObserver(([mutation]) => {
@@ -161,6 +168,7 @@ onUnmounted(() => {
   observer.disconnect()
   for (const stop of sizeWatcherCleaner) stop()
 })
+
 
 const reloadController = shallowRef(true)
 defineExpose({

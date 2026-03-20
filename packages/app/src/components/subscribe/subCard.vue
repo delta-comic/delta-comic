@@ -1,23 +1,21 @@
 <script setup lang="ts">
-import { createDateString } from '@/utils/date'
 import { SharedFunction } from '@delta-comic/core'
 import type { uni } from '@delta-comic/model'
 import { MoreVertRound } from '@vicons/material'
+
+import { createDateString } from '@/utils/date'
 
 defineProps<{ item: uni.item.Item }>()
 defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
 </script>
 
 <template>
-  <div class="van-hairline--bottom w-full bg-(--van-background-2)" @click="
-    SharedFunction.call(
-      'routeToContent',
-      item.contentType,
-      item.id,
-      item.thisEp.index,
-      item
-    )
-    ">
+  <div
+    class="van-hairline--bottom w-full bg-(--van-background-2)"
+    @click="
+      SharedFunction.call('routeToContent', item.contentType, item.id, item.thisEp.index, item)
+    "
+  >
     <!-- user -->
     <div class="relative flex w-full py-2">
       <div class="van-ellipsis flex w-fit items-center pl-2 text-[16px] text-(--p-color)">
@@ -33,14 +31,18 @@ defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
       </div>
       <NButton class="absolute! top-1/2 right-3 -translate-y-1/2" type="tertiary" text>
         <template #icon>
-          <VanPopover placement="bottom-end" :actions="[
-            {
-              text: '取消关注',
-              onClick() {
-                $emit('unsubscribe', item)
+          <VanPopover
+            placement="bottom-end"
+            :actions="[
+              {
+                text: '取消关注',
+                onClick() {
+                  $emit('unsubscribe', item)
+                }
               }
-            }
-          ]" @select="q => q.onClick()">
+            ]"
+            @select="q => q.onClick()"
+          >
             <template #reference>
               <NIcon size="20px">
                 <MoreVertRound />

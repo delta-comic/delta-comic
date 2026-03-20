@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useContentStore } from '@/stores/content'
 import { db, type FavouriteDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
 import { LockOutlined } from '@vicons/antd'
@@ -7,7 +6,10 @@ import { ArrowForwardIosRound } from '@vicons/material'
 import { computedAsync } from '@vueuse/core'
 import { isEmpty } from 'es-toolkit/compat'
 import { useRouter } from 'vue-router'
+
+import { useContentStore } from '@/stores/content'
 const $props = defineProps<{ isCardMode?: boolean; card: FavouriteDB.Card }>()
+
 
 const favouriteItems = computedAsync(
   () =>

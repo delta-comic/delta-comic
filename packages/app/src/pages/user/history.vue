@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { MoreHorizRound, SearchFilled } from '@vicons/material'
-import { shallowRef, useTemplateRef } from 'vue'
-import HistoryCard from '@/components/user/historyCard.vue'
-import Layout from '@/components/user/userLayout.vue'
-import Searcher from '@/components/listSearcher.vue'
-import Action from '@/components/listAction.vue'
-import { computedAsync } from '@vueuse/core'
-import { pluginName } from '@/symbol'
 import { db, useNativeStore, type HistoryDB } from '@delta-comic/db'
+import { PromiseContent } from '@delta-comic/model'
 import { appConfig, useConfig } from '@delta-comic/plugin'
 import { createDialog } from '@delta-comic/ui'
-import { PromiseContent } from '@delta-comic/model'
+import { MoreHorizRound, SearchFilled } from '@vicons/material'
+import { computedAsync } from '@vueuse/core'
+import { shallowRef, useTemplateRef } from 'vue'
+
+import Action from '@/components/listAction.vue'
+import Searcher from '@/components/listSearcher.vue'
+import HistoryCard from '@/components/user/historyCard.vue'
+import Layout from '@/components/user/userLayout.vue'
+import { pluginName } from '@/symbol'
 
 const histories = computedAsync(
   () =>
@@ -25,7 +26,9 @@ const histories = computedAsync(
 const config = useConfig().$load(appConfig)
 const searcher = useTemplateRef('searcher')
 
+
 const showConfig = shallowRef(false)
+
 
 const actionController = useTemplateRef('actionController')
 const removeItems = async (item: HistoryDB.Item[]) => {
@@ -35,6 +38,7 @@ const removeItems = async (item: HistoryDB.Item[]) => {
   )
   actionController.value?.selectList.clear()
 }
+
 
 const filters = useNativeStore(pluginName, 'history.filter', new Array<string>())
 </script>

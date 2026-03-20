@@ -2,7 +2,6 @@
 import { SharedFunction } from '@delta-comic/core'
 import { Global, usePluginStore } from '@delta-comic/plugin'
 
-
 const pluginStore = usePluginStore()
 </script>
 

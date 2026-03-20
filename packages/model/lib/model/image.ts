@@ -1,4 +1,5 @@
 import type { MetaData } from '../struct'
+
 import { Resource, type RawResource, type ProcessStep_ } from './resource'
 
 export interface RawImage {

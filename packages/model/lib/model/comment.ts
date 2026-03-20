@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { type Component } from 'vue'
 
 import { SourcedKeyMap, Struct, type MetaData, type RStream } from '../struct'
+
 import type { ContentType } from './content'
 import type { Item } from './item'
 import type { User } from './user'

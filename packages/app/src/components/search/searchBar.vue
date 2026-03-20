@@ -1,22 +1,26 @@
 <script setup lang="ts">
-import { pluginName } from '@/symbol'
+import { SharedFunction } from '@delta-comic/core'
+import { useNativeStore } from '@delta-comic/db'
+import { usePluginStore } from '@delta-comic/plugin'
+import { SmartAbortController } from '@delta-comic/request'
+import { useZIndex } from '@delta-comic/ui'
 import { computedAsync } from '@vueuse/core'
 import { uniq } from 'es-toolkit'
 import { isEmpty } from 'es-toolkit/compat'
 import { motion } from 'motion-v'
 import { computed, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
-import { searchSourceKey } from './source'
+
+import { pluginName } from '@/symbol'
 import { getBarcodeList, type ThinkList } from '@/utils/search'
-import { SharedFunction } from '@delta-comic/core'
-import { useNativeStore } from '@delta-comic/db'
-import { usePluginStore } from '@delta-comic/plugin'
-import { SmartAbortController } from '@delta-comic/request'
-import { useZIndex } from '@delta-comic/ui'
+
+import { searchSourceKey } from './source'
 const $props = defineProps<{ source: string }>()
+
 
 const isSearching = shallowRef(false)
 const [zIndex] = useZIndex(isSearching)
+
 
 const searchText = defineModel<string>('searchText', { required: true })
 const source = computed(() => {
@@ -24,12 +28,14 @@ const source = computed(() => {
   return { plugin, method }
 })
 
+
 const $router = useRouter()
 const history = useNativeStore(pluginName, 'search.history', new Array<string>())
 const handleSearch = (text: string) => {
   history.value = uniq([text, ...history.value])
   return SharedFunction.call('routeToSearch', text)
 }
+
 
 const pluginStore = usePluginStore()
 const thinkListAbort = new SmartAbortController()
@@ -51,9 +57,17 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
 
 <template>
   <form action="/" @submit.prevent :class="[{ 'fixed top-0 left-0 z-1000 w-screen': isSearching }]">
-    <VanSearch ref="search" :show-action="true" v-model="searchText" placeholder="请输入搜索内容" @focus="isSearching = true"
-      @search="handleSearch(searchText)" @click-left-icon="handleSearch(searchText)" @cancel="$router.back()"
-      autocomplete="off">
+    <VanSearch
+      ref="search"
+      :show-action="true"
+      v-model="searchText"
+      placeholder="请输入搜索内容"
+      @focus="isSearching = true"
+      @search="handleSearch(searchText)"
+      @click-left-icon="handleSearch(searchText)"
+      @cancel="$router.back()"
+      autocomplete="off"
+    >
       <template #left-icon>
         <div class="inline-flex h-full translate-y-[1] items-center justify-center">
           <VanIcon name="search" size="1.2rem" />
@@ -64,18 +78,35 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
 
   <Teleport to="#popups">
     <AnimatePresence>
-      <motion.div @click="isSearching = false" v-if="isSearching" :style="{ zIndex }" :initial="{ opacity: 0 }"
-        :animate="{ opacity: 0.5 }" :exit="{ opacity: 0 }"
-        class="fixed top-safe-offset-[54px] left-0 h-screen w-screen bg-(--van-black)">
+      <motion.div
+        @click="isSearching = false"
+        v-if="isSearching"
+        :style="{ zIndex }"
+        :initial="{ opacity: 0 }"
+        :animate="{ opacity: 0.5 }"
+        :exit="{ opacity: 0 }"
+        class="fixed top-safe-offset-[54px] left-0 h-screen w-screen bg-(--van-black)"
+      >
       </motion.div>
-      <motion.div :style="{ zIndex }" :initial="{ height: 0, opacity: 0.3 }" :animate="{ height: 'auto', opacity: 1 }"
-        :exit="{ height: 0, opacity: 0.3 }" v-if="isSearching" layout :transition="{ duration: 0.1 }"
-        class="fixed top-safe-offset-[54px] flex max-h-[60vh] w-full flex-wrap justify-evenly overflow-hidden rounded-b-3xl bg-(--van-background-2) pt-1 pb-3 transition-all">
+      <motion.div
+        :style="{ zIndex }"
+        :initial="{ height: 0, opacity: 0.3 }"
+        :animate="{ height: 'auto', opacity: 1 }"
+        :exit="{ height: 0, opacity: 0.3 }"
+        v-if="isSearching"
+        layout
+        :transition="{ duration: 0.1 }"
+        class="fixed top-safe-offset-[54px] flex max-h-[60vh] w-full flex-wrap justify-evenly overflow-hidden rounded-b-3xl bg-(--van-background-2) pt-1 pb-3 transition-all"
+      >
         <VanCellGroup class="w-full">
           <template v-if="!isEmpty(thinkList)">
             <template v-for="think of thinkList">
-              <VanCell v-if="'text' in think" :title="think.text" @click="searchText = think.value"
-                class="van-haptics-feedback w-full" />
+              <VanCell
+                v-if="'text' in think"
+                :title="think.text"
+                @click="searchText = think.value"
+                class="van-haptics-feedback w-full"
+              />
               <component v-else :is="think" />
             </template>
           </template>

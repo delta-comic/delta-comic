@@ -11,6 +11,7 @@ import { type Ref, type StyleValue, shallowRef, useTemplateRef, watch } from 'vu
 import { computed } from 'vue'
 
 import type { ListFn } from '../utils'
+
 import DcContent from './DcContent.vue'
 import DcVar from './DcVar.vue'
 
@@ -25,11 +26,13 @@ const $props = defineProps<{
   itemResizable?: boolean
   dataProcessor?: PF
 
+
   unReloadable?: boolean
   style?: StyleValue
   class?: any
 }>()
 const $emit = defineEmits<{ next: [then: () => void]; reset: []; retry: [then: () => void] }>()
+
 
 const dataProcessor = (v: T[]) => $props.dataProcessor?.(v) ?? v
 const unionSource = computed(() => ({
@@ -94,6 +97,7 @@ watch(
   { immediate: true }
 )
 
+
 const vList = useTemplateRef('vList')
 const { y: listScrollTop } = useScroll(() => vList.value?.getScrollContainer())
 const handleScroll: VirtualListProps['onScroll'] = debounce(async () => {
@@ -122,6 +126,7 @@ const handleRefresh = async () => {
   isRefreshing.value = false
 }
 
+
 defineSlots<{
   default(props: {
     height: number
@@ -129,6 +134,7 @@ defineSlots<{
   }): any
 }>()
 defineExpose({ scrollTop: listScrollTop, listInstance: <Ref<VirtualListInst>>(<unknown>vList) })
+
 
 type TrueItem = IfAny<ReturnType<PF>[number], T, ReturnType<PF>[number]>
 </script>

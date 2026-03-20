@@ -1,22 +1,24 @@
 <script setup lang="ts">
-import { AutoAwesomeMosaicOutlined, CheckRound, FileDownloadOutlined } from '@vicons/material'
+import { loadAllPlugins } from '@delta-comic/plugin'
 import { SafetyOutlined, SettingOutlined } from '@vicons/antd'
-import ActionButtonGroup from './actionButtonGroup.vue'
-import LoadList from './loadList.vue'
-import List from '@/pages/main/plugin/list.vue'
-import Download from '@/pages/main/plugin/download.vue'
-import Config from '@/pages/main/plugin/config.vue'
-
+import { AutoAwesomeMosaicOutlined, CheckRound, FileDownloadOutlined } from '@vicons/material'
 import { type MenuOption, NIcon, useMessage } from 'naive-ui'
 import { type Component, h, shallowRef } from 'vue'
-import { loadAllPlugins } from '@delta-comic/plugin'
+
+import Config from '@/pages/main/plugin/config.vue'
+import Download from '@/pages/main/plugin/download.vue'
+import List from '@/pages/main/plugin/list.vue'
 
 import pkg from '../../../package.json'
+
+import ActionButtonGroup from './actionButtonGroup.vue'
+import LoadList from './loadList.vue'
 
 const show = defineModel<boolean>('show', { required: true })
 const isBooted = defineModel<boolean>('isBooted', { required: true })
 const pageSelect = shallowRef<(typeof menuOptions)[number]['key']>('list')
-const renderIcon = (icon: Component) => () => h(NIcon, null, { default: () => h(icon) })
+const renderIcon = (icon: Component) =>  () => h(NIcon, null, { default: () => h(icon) })
+
 
 const menuOptions = [
   { label: '管理', key: 'list', icon: renderIcon(AutoAwesomeMosaicOutlined), comp: List },
@@ -33,6 +35,7 @@ const boot = async (safe = false) => {
   isBooted.value = true
   show.value = false
 }
+
 
 const $message = useMessage()
 </script>

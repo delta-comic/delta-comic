@@ -3,6 +3,7 @@ import { uni } from '@delta-comic/model'
 import type { PluginConfig } from '@/plugin'
 
 import { PluginBooter, type PluginBooterSetMeta } from '../utils'
+
 import { testResourceApi } from './utils'
 
 class _TestPluginResource extends PluginBooter {
