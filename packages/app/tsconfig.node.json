@@ -3,7 +3,9 @@
     "../../tsconfig.node.json"
   ],
   "compilerOptions": {
-    "composite": true
+    "composite": true,
+    "noEmit": true,
+    "emitDeclarationOnly": false
   },
   "files": [
     "./vite.config.mts"

@@ -26,7 +26,7 @@ export class _PluginInstallByAwesome extends PluginInstaller {
     const file = await this.installer(input)
     return file
   }
-  public override async update(pluginMeta: PluginArchiveDB.Meta): Promise<File | string> {
+  public override async update(pluginMeta: PluginArchiveDB.Archive): Promise<File | string> {
     const file = await this.installer(pluginMeta.installInput)
     return file
   }

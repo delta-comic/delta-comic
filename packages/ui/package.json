@@ -42,7 +42,6 @@
     "version:patch": "pnpm version patch --no-git-tag-version || true"
   },
   "dependencies": {
-    "@delta-comic/plugin": "workspace:",
     "@lhlyu/vue-virtual-waterfall": "catalog:",
     "@tauri-apps/plugin-shell": "catalog:",
     "@vant/use": "catalog:",

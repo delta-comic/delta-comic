@@ -4,10 +4,11 @@ import { isString, Mutex } from 'es-toolkit'
 import { sortBy } from 'es-toolkit/compat'
 import { markRaw } from 'vue'
 
-import { pluginEmitter, type PluginConfig, type PluginMeta } from '@/plugin'
+import { pluginEmitter, type PluginConfig } from '@/plugin'
 
 import { coreName } from '../core'
 import { usePluginStore } from '../store'
+
 import type { PluginBooter, PluginInstaller, PluginLoader } from './utils'
 
 const rawBooters = import.meta.glob<PluginBooter>('./booter/*_*.ts', {
@@ -72,7 +73,7 @@ export const usePluginConfig = () =>
 
 export const installDepends = (
   m: DownloadMessageBind,
-  meta: PluginMeta,
+  meta: PluginArchiveDB.Meta,
   installedPlugins?: Set<string>
 ) =>
   m.createLoading('依赖安装/检查', async v => {
@@ -172,7 +173,7 @@ export const installFilePlugin = (file: File, __installedPlugins?: Set<string>) 
   })
 
 export const updatePlugin = async (
-  pluginMeta: PluginArchiveDB.Meta,
+  pluginMeta: PluginArchiveDB.Archive,
   __installedPlugins?: Set<string>
 ) =>
   createDownloadMessage(`更新插件-${pluginMeta.pluginName}`, async m => {
@@ -215,7 +216,7 @@ const loaders = sortBy(Object.entries(rawLoaders), ([fname]) =>
 const loadLocks = <Record<string, Mutex>>{}
 const getLoadLock = (pluginName: string) => (loadLocks[pluginName] ??= new Mutex())
 
-export const loadPlugin = async (meta: PluginArchiveDB.Meta) => {
+export const loadPlugin = async (meta: PluginArchiveDB.Archive) => {
   console.log(`[plugin bootPlugin] booting name "${meta.pluginName}"`)
   const lock = getLoadLock(meta.pluginName)
   const store = usePluginStore()

@@ -1,4 +1,4 @@
-import type { PluginMeta } from '@delta-comic/plugin'
+import type { PluginArchiveDB } from '@delta-comic/db'
 import { extendsDepends } from '@delta-comic/utils'
 import { merge } from 'es-toolkit'
 import { viteExternalsPlugin as external } from 'vite-plugin-externals'
@@ -54,7 +54,7 @@ export const deltaComic = (
   return result
 }
 
-export const deltaComicPlus = (meta: PluginMeta, command: 'build' | 'serve'): any => {
+export const deltaComicPlus = (meta: PluginArchiveDB.Meta, command: 'build' | 'serve'): any => {
   const plugin = {
     name: 'delta-comic-helper',
     config(config: any) {

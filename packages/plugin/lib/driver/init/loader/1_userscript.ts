@@ -3,14 +3,14 @@ import { join } from '@tauri-apps/api/path'
 import * as fs from '@tauri-apps/plugin-fs'
 import { parse } from 'userscript-meta'
 
-import { decodePluginMeta, type PluginMeta } from '@/plugin'
+import { decodePluginMeta } from '@/plugin'
 
 import { PluginLoader } from '../utils'
 import { getPluginFsPath } from '../utils'
 
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'userscript'
-  public override async installDownload(file: File): Promise<PluginMeta> {
+  public override async installDownload(file: File): Promise<PluginArchiveDB.Meta> {
     const code = await file.text()
     const meta = decodePluginMeta(parse(code))
     const path = await getPluginFsPath(meta.name.id)
@@ -22,7 +22,7 @@ class _PluginUserscriptLoader extends PluginLoader {
     return file.name.endsWith('.js')
   }
 
-  public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {
+  public override async load(pluginMeta: PluginArchiveDB.Archive): Promise<any> {
     const code = await fs.readTextFile(
       await join(await getPluginFsPath(pluginMeta.pluginName), 'us.js')
     )

@@ -23,7 +23,7 @@ export class _PluginInstallByDev extends PluginInstaller {
     const file = await this.installer(input)
     return file
   }
-  public override async update(pluginMeta: PluginArchiveDB.Meta): Promise<File> {
+  public override async update(pluginMeta: PluginArchiveDB.Archive): Promise<File> {
     const file = await this.installer(pluginMeta.installInput)
     return file
   }

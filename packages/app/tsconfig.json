@@ -15,10 +15,8 @@
     },
     "types": [
       "./components.d.ts",
-      "./env.d.ts",
       "vue-component-type-helpers",
-      "./typed-router.d.ts",
-      "vite/client"
+      "./typed-router.d.ts"
     ]
   },
   "vueCompilerOptions": {
@@ -32,10 +30,5 @@
   ],
   "exclude": [
     "./*.ts"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    }
   ]
 }

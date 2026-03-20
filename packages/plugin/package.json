@@ -46,10 +46,12 @@
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-fs": "catalog:",
     "@vueuse/core": "catalog:",
+    "axios": "catalog:",
     "jszip": "catalog:",
     "lz-string": "catalog:",
     "mitt": "catalog:",
     "userscript-meta": "catalog:",
+    "vue": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
   "devDependencies": {

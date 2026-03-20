@@ -47,7 +47,6 @@
   },
   "peerDependencies": {
     "@delta-comic/model": "workspace:*",
-    "@delta-comic/plugin": "workspace:*",
     "@delta-comic/utils": "workspace:*",
     "kysely": "^0.28",
     "vue": "^3.5"

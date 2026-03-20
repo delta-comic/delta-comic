@@ -20,6 +20,7 @@ const host = process.env.TAURI_DEV_HOST
 
 export default defineConfig({
   plugins: [
+    // @ts-ignore
     wasm(),
     VueRouter({ dts: 'typed-router.d.ts' }),
     vueDevTools(),
@@ -28,7 +29,8 @@ export default defineConfig({
     vueJsx(),
     Components({
       dts: true,
-      resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver(), DeltaComicUiResolver()]
+      resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver(), DeltaComicUiResolver()],
+      dtsTsx: false
     }),
     tailwindcss()
   ],

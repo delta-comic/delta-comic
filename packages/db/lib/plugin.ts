@@ -1,16 +1,25 @@
-import type { PluginMeta } from '@delta-comic/plugin'
 import type { JSONColumnType, Selectable } from 'kysely'
+
+export interface Meta {
+  name: { display: string; id: string }
+  version: { plugin: string; supportCore: string }
+  author: string
+  description: string
+  require: { id: string; download?: string | undefined }[]
+  entry?: { jsPath: string; cssPath?: string }
+  beforeBoot?: { path: string; slot: string }[]
+}
 
 export interface Table {
   installerName: string
   loaderName: string
   pluginName: string
-  meta: JSONColumnType<PluginMeta>
+  meta: JSONColumnType<Meta>
   enable: boolean
   installInput: string
   displayName: string
 }
-export type Meta = Selectable<Table>
+export type Archive = Selectable<Table>
 
 export async function getByEnabled(isEnabled: boolean) {
   const { db } = await import('.')

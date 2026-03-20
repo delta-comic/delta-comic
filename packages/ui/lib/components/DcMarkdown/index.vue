@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useConfig } from '@delta-comic/plugin'
 import { open } from '@tauri-apps/plugin-shell'
 import { useEventListener } from '@vant/use'
 import { useCssVar } from '@vueuse/core'
@@ -15,6 +14,7 @@ const $props = withDefaults(
     plugins?: Parameters<MarkdownIt['use']>[]
     config?: Options
     env?: object
+    isDarkMode?: boolean
   }>(),
   {
     plugins: [] as any,
@@ -28,8 +28,6 @@ const md = computed(() => {
 
   return md
 })
-
-const config = useConfig()
 
 const eventMessage = `markdown-router-${Math.random()}`
 
@@ -54,7 +52,7 @@ const htmlTemplateUrl = computed(
       :root {
         --p-color: ${pColor.value};
       }
-      ${config.isDark ? darkStyle : lightStyle}
+      ${$props.isDarkMode ? darkStyle : lightStyle}
     </style>
     <div id="write">
       ${md.value.render($props.markdown, $props.env)}

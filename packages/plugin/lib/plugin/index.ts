@@ -27,6 +27,7 @@ export type * as Search from './search'
 import type * as Auth from './auth'
 export type * as Auth from './auth'
 
+import type { PluginArchiveDB } from '@delta-comic/db'
 import mitt from 'mitt'
 
 import type * as Resource from './resource'
@@ -82,17 +83,7 @@ export interface RawPluginMeta {
   'require'?: string[] | string
 }
 
-export interface PluginMeta {
-  name: { display: string; id: string }
-  version: { plugin: string; supportCore: string }
-  author: string
-  description: string
-  require: { id: string; download?: string | undefined }[]
-  entry?: { jsPath: string; cssPath?: string }
-  beforeBoot?: { path: string; slot: string }[]
-}
-
-export const decodePluginMeta = (v: RawPluginMeta): PluginMeta => ({
+export const decodePluginMeta = (v: RawPluginMeta): PluginArchiveDB.Meta => ({
   name: { display: v['name:display'], id: v['name:id'] },
   author: v.author ?? '',
   description: v.description,

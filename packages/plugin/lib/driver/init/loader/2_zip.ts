@@ -4,14 +4,12 @@ import { join } from '@tauri-apps/api/path'
 import * as fs from '@tauri-apps/plugin-fs'
 import { loadAsync, type JSZipObject } from 'jszip'
 
-import type { PluginMeta } from '@/plugin'
-
 import { PluginLoader } from '../utils'
 import { getPluginFsPath } from '../utils'
 
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'zip'
-  public override async installDownload(file: File): Promise<PluginMeta> {
+  public override async installDownload(file: File): Promise<PluginArchiveDB.Meta> {
     console.log('[loader zip] begin:', file)
     const temp = await getPluginFsPath('__temp__')
     await fs.mkdir(temp, { recursive: true })
@@ -19,7 +17,9 @@ class _PluginUserscriptLoader extends PluginLoader {
     console.log('[loader zip] temp:', temp)
     const zip = await loadAsync(file)
     console.log(zip.files)
-    const meta = <PluginMeta>JSON.parse((await zip.file('manifest.json')?.async('string')) ?? '{}')
+    const meta = <PluginArchiveDB.Meta>(
+      JSON.parse((await zip.file('manifest.json')?.async('string')) ?? '{}')
+    )
     const root = await getPluginFsPath(meta.name.id)
     try {
       await fs.remove(root, { recursive: true })
@@ -40,7 +40,7 @@ class _PluginUserscriptLoader extends PluginLoader {
     return file.name.endsWith('.zip')
   }
 
-  public override async load(pluginMeta: PluginArchiveDB.Meta): Promise<any> {
+  public override async load(pluginMeta: PluginArchiveDB.Archive): Promise<any> {
     if (!pluginMeta.meta.entry) throw new Error('not found entry')
     const baseDir = await getPluginFsPath(pluginMeta.pluginName)
     console.log('[loader zip] baseDir:', baseDir, pluginMeta.meta.entry)

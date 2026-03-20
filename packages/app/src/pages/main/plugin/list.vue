@@ -10,7 +10,7 @@ import { updatePlugin } from '@delta-comic/plugin'
 import { PromiseContent } from '@delta-comic/model'
 
 const updating = shallowReactive(new Set<string>())
-const _updatePlugin = async (plugin: PluginArchiveDB.Meta) => {
+const _updatePlugin = async (plugin: PluginArchiveDB.Archive) => {
   if (updating.has(plugin.pluginName)) throw new Error('已经在更新')
   updating.add(plugin.pluginName)
   try {
@@ -22,7 +22,7 @@ const _updatePlugin = async (plugin: PluginArchiveDB.Meta) => {
 
 const checkIsSupport = memoize((supportCore: string) => semver.satisfies(pkg.version, supportCore))
 
-const getCardClass = (plugin: PluginArchiveDB.Meta) => {
+const getCardClass = (plugin: PluginArchiveDB.Archive) => {
   if (!plugin.enable)
     return 'bg-(--nui-icon-color-disabled)/20! border-(--nui-icon-color-pressed)/20!'
   if (checkIsSupport(plugin.meta.version.supportCore))

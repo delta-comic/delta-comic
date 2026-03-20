@@ -21,7 +21,10 @@
     "noImplicitOverride": true,
     "noImplicitThis": true,
     "jsxImportSource": "vue",
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "types": [
+      "vite/client"
+    ]
   },
   "files": [],
   "references": [
@@ -51,6 +54,9 @@
     },
     {
       "path": "./packages/db/tsconfig.json"
+    },
+    {
+      "path": "./packages/share/tsconfig.json"
     },
     {
       "path": "./tsconfig.node.json"

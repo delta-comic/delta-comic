@@ -16,7 +16,7 @@ export const loadAllPlugins = PromiseContent.fromAsyncFunction(async () => {
   */
   const foundDeps = new Set<string>([coreName])
   const plugins = await PluginArchiveDB.getByEnabled(true)
-  const allLevels = new Array<PluginArchiveDB.Meta[]>()
+  const allLevels = new Array<PluginArchiveDB.Archive[]>()
   while (true) {
     const level = plugins.filter(p => p.meta.require.every(d => foundDeps.has(d.id)))
     allLevels.push(level)
