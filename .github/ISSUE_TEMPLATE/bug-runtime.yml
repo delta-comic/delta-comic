@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        提交时请将上方标题中 `<>` 占位符替换为实际描述。
+        提交时请将上方标题中 `<>` 占位符替换为实际描述(不保留尖括号)。
 
   - type: checkboxes
     attributes:
@@ -24,7 +24,7 @@ body:
     id: tag
     attributes:
       label: release
-      description: 安装的release的tag
+      description: 启动应用时的`核心版本`的内容
     validations:
       required: true
 
