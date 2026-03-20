@@ -11,8 +11,8 @@ delete deps['@delta-comic/utils']
 export default defineConfig({
   plugins: [dtsPlugin({ include: ['./lib'], tsconfigPath: './tsconfig.json' })],
   build: {
-    lib: { entry: './lib/index.ts', name: 'DcUtils', fileName: 'index' },
+    lib: { entry: './lib/index.ts', name: 'DcUtils', fileName: 'index', formats: ['es'] },
     sourcemap: true,
-    rollupOptions: { external: Object.keys(deps), output: { globals: deps } }
+    rolldownOptions: { external: Object.keys(deps), output: { globals: deps } }
   }
 })

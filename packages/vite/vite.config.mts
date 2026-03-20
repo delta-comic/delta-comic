@@ -9,9 +9,9 @@ export default defineConfig({
   plugins: [dts({ include: ['./lib'], tsconfigPath: './tsconfig.json' })],
   base: '/',
   build: {
-    lib: { entry: [resolve(__dirname, 'lib/index.ts')], name: 'DcVite', fileName: 'index' },
+    lib: { entry: [resolve(__dirname, 'lib/index.ts')], name: 'DcVite', fileName: 'index', formats: ['es'] },
     sourcemap: true,
-    rollupOptions: {
+    rolldownOptions: {
       external: ['vite-plugin-externals', 'vite-plugin-monkey', 'vite', 'rolldown-vite']
     }
   }

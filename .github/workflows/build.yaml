@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   build:
@@ -79,20 +80,9 @@ jobs:
           echo "old_version=$OLD_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build Android App
-        id: build
-        uses: tauri-apps/tauri-action@dev
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        with:
-          mobile: 'android'
-          args: ''
-          retryAttempts: 1
-
-      - name: Restore version
         run: |
-          node ./script/set-version.mts ${{ steps.set-version.outputs.old_version }}
+          pnpm -r build
+          pnpm run build
 
       #signature
       - name: Restore keystore (decode + verify)
@@ -113,7 +103,7 @@ jobs:
             exit 1
           fi
 
-          cd src-tauri/gen/android || true
+          cd packages/app/src-tauri/gen/android || true
           printf 'storeFile=%s\n' "$RUNNER_TEMP/keystore.p12" > keystore.properties
           printf 'storePassword=%s\n' "$KEYSTORE_PASS" >> keystore.properties
           printf 'keyPassword=%s\n' "$KEYSTORE_PASS" >> keystore.properties
@@ -127,7 +117,7 @@ jobs:
           KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          APK_SRC="./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
+          APK_SRC="./packages/app/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
           if [ ! -f "$APK_SRC" ]; then
             echo "APK not found at $APK_SRC" >&2
             exit 1
@@ -158,4 +148,6 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 用于在 GitHub 上创建 release 与 tag
-        run: pnpm exec semantic-release
+        run: |
+          pnpm -r run publish:self
+          pnpm exec semantic-release

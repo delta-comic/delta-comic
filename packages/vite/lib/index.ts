@@ -67,7 +67,7 @@ export const deltaComicPlus = (meta: PluginArchiveDB.Meta, command: 'build' | 's
             name: `$$lib$$.__DcPlugin__${meta.name.id.replace('-', '_')}__`,
             formats: ['es']
           },
-          rollupOptions: {}
+          rolldownOptions: {}
         }
       })
     },

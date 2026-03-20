@@ -22,7 +22,6 @@ export default defineConfig({
     Components({ dts: true, resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver()] }),
     tailwindcss()
   ],
-  experimental: { enableNativePlugin: true },
   resolve: {
     alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) },
     extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts']
@@ -35,9 +34,13 @@ export default defineConfig({
   },
   base: '/',
   build: {
-    lib: { entry: ['lib/index.ts', 'vite/index.ts'], name: 'DcUi', fileName: 'index' },
+    lib: {
+      entry: ['lib/index.ts', 'vite/index.ts'],
+      name: 'DcUi',
+      fileName: 'index',
+      formats: ['es']
+    },
     sourcemap: true,
-    rollupOptions: { external: Object.keys(extendsDepends), output: { globals: extendsDepends } },
-    cssMinify: false
+    rolldownOptions: { external: Object.keys(extendsDepends), output: { globals: extendsDepends } }
   }
 })

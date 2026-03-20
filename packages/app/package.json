@@ -2,12 +2,15 @@
   "name": "app",
   "version": "1.0.0",
   "scripts": {
-    "dev:web": "vite",
-    "dev": "tauri dev",
-    "build:web": "vite build",
-    "build": "tauri android build",
+    "build": "echo \"Use (build:app) instead.\"",
+    "build:app": "tauri android build --release",
     "build:debug": "tauri android build --debug",
-    "build:local": "tauri build --debug"
+    "build:local": "tauri build --debug",
+    "build:web": "vite build",
+    "dev": "tauri dev",
+    "dev:web": "vite",
+    "tauri": "pnpm exec tauri",
+    "publish:self":"echo \"No need publish to npm\""
   },
   "dependencies": {
     "@aptabase/tauri": "github:delta-comic/tauri-plugin-aptabase-rustls",

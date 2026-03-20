@@ -32,9 +32,7 @@
   },
   "scripts": {
     "build": "vite build && pnpm pack --out ./dist/pack.tgz",
-    "version:major": "pnpm version major --no-git-tag-version || true",
-    "version:minor": "pnpm version minor --no-git-tag-version || true",
-    "version:patch": "pnpm version patch --no-git-tag-version || true"
+    "publish:self": "pnpm --filter plugin publish"
   },
   "dependencies": {
     "@delta-comic/core": "workspace:*",
@@ -50,6 +48,7 @@
     "jszip": "catalog:",
     "lz-string": "catalog:",
     "mitt": "catalog:",
+    "pinia": "catalog:",
     "userscript-meta": "catalog:",
     "vue": "catalog:",
     "vue-component-type-helpers": "catalog:"

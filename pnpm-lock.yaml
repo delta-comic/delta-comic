@@ -299,7 +299,7 @@ importers:
         version: 7.7.4
       tauri-plugin-better-cors-fetch:
         specifier: github:delta-comic/tauri-plugin-better-cors-fetch
-        version: https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/700e2ce0b9ade57ebba6a0b29e05c07181f8cdf2
+        version: git+https://git@github.com:delta-comic/tauri-plugin-better-cors-fetch.git#1cd9dd368c40415dc3993b630e21635206b80b85
       tauri-plugin-m3:
         specifier: ^0.3.1
         version: 0.3.2
@@ -487,6 +487,9 @@ importers:
       mitt:
         specifier: 'catalog:'
         version: 3.0.1
+      pinia:
+        specifier: 'catalog:'
+        version: 3.0.4(typescript@5.9.3)(vue@3.5.30(typescript@5.9.3))
       userscript-meta:
         specifier: 'catalog:'
         version: 1.0.1
@@ -4474,8 +4477,8 @@ packages:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
 
-  tauri-plugin-better-cors-fetch@https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/700e2ce0b9ade57ebba6a0b29e05c07181f8cdf2:
-    resolution: {tarball: https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/700e2ce0b9ade57ebba6a0b29e05c07181f8cdf2}
+  tauri-plugin-better-cors-fetch@git+https://git@github.com:delta-comic/tauri-plugin-better-cors-fetch.git#1cd9dd368c40415dc3993b630e21635206b80b85:
+    resolution: {commit: 1cd9dd368c40415dc3993b630e21635206b80b85, repo: git@github.com:delta-comic/tauri-plugin-better-cors-fetch.git, type: git}
     version: 1.2.4
 
   tauri-plugin-m3@0.3.2:
@@ -8574,7 +8577,7 @@ snapshots:
 
   tapable@2.3.0: {}
 
-  tauri-plugin-better-cors-fetch@https://codeload.github.com/delta-comic/tauri-plugin-better-cors-fetch/tar.gz/700e2ce0b9ade57ebba6a0b29e05c07181f8cdf2:
+  tauri-plugin-better-cors-fetch@git+https://git@github.com:delta-comic/tauri-plugin-better-cors-fetch.git#1cd9dd368c40415dc3993b630e21635206b80b85:
     dependencies:
       '@tauri-apps/api': 2.10.1
       es-toolkit: 1.45.1

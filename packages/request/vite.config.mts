@@ -7,8 +7,8 @@ import _package from './package.json'
 export default defineConfig({
   plugins: [dtsPlugin({ include: ['./lib'], tsconfigPath: './tsconfig.json' })],
   build: {
-    lib: { entry: './lib/index.ts', name: 'DcRequest', fileName: 'index' },
+    lib: { entry: './lib/index.ts', name: 'DcRequest', fileName: 'index', formats: ['es'] },
     sourcemap: true,
-    rollupOptions: { external: Object.keys(extendsDepends), output: { globals: extendsDepends } }
+    rolldownOptions: { external: Object.keys(extendsDepends), output: { globals: extendsDepends } }
   }
 })

@@ -18,10 +18,12 @@
     "url": "https://github.com/delta-comic/delta-comic.git"
   },
   "scripts": {
+    "build": "pnpm --filter app build:app",
     "dev": "pnpm --filter app dev",
     "lint": "pnpm exec oxlint --type-aware",
     "lint:fix": "pnpm exec oxlint --fix --type-aware",
-    "prepare": "husky"
+    "prepare": "husky",
+    "tauri": "pnpm --filter app tauri"
   },
   "dependencies": {
     "es-toolkit": "catalog:"

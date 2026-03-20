@@ -22,13 +22,11 @@
   "exports": {
     ".": {
       "types": "./dist/lib/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     },
     "./vite": {
       "types": "./dist/vite/index.d.ts",
-      "import": "./dist/index2.js",
-      "require": "./dist/index2.cjs"
+      "import": "./dist/index2.js"
     },
     "./style.css": "./dist/index.css"
   },
@@ -37,9 +35,7 @@
   },
   "scripts": {
     "build": "vite build && pnpm pack --out ./dist/pack.tgz",
-    "version:major": "pnpm version major --no-git-tag-version || true",
-    "version:minor": "pnpm version minor --no-git-tag-version || true",
-    "version:patch": "pnpm version patch --no-git-tag-version || true"
+    "publish:self": "pnpm --filter ui publish"
   },
   "dependencies": {
     "@lhlyu/vue-virtual-waterfall": "catalog:",

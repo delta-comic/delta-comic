@@ -18,7 +18,6 @@ export default defineConfig({
     dtsPlugin({ include: ['./lib'], tsconfigPath: './tsconfig.json' }),
     tailwindcss()
   ],
-  experimental: { enableNativePlugin: true },
   resolve: {
     alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) },
     dedupe: ['vue', 'vue-router'],
@@ -33,7 +32,7 @@ export default defineConfig({
   build: {
     lib: { entry: ['./lib/index.ts'], name: 'DcPlugin', fileName: 'index', formats: ['es'] },
     sourcemap: true,
-    rollupOptions: {
+    rolldownOptions: {
       external: Object.keys(extendsDepends).concat(['lightningcss']),
       output: { globals: extendsDepends }
     }

@@ -31,9 +31,7 @@
   },
   "scripts": {
     "build": "vite build && pnpm pack --out ./dist/pack.tgz",
-    "version:major": "pnpm version major --no-git-tag-version || true",
-    "version:minor": "pnpm version minor --no-git-tag-version || true",
-    "version:patch": "pnpm version patch --no-git-tag-version || true"
+    "publish:self": "pnpm --filter core publish"
   },
   "devDependencies": {
     "vite": "catalog:",
