@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="logo" src="public/favicon.png" width="120" height="120" style="margin-bottom: 10px;">
+    <img alt="logo" src="./packages/app/public/favicon.png" width="120" height="120" style="margin-bottom: 10px;">
 </p>
 
 ```python
