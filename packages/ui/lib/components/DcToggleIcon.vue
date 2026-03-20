@@ -1,21 +1,27 @@
 <script setup lang="ts">
 import { onLongPress } from '@vueuse/core'
+import { twMerge } from 'tailwind-merge'
 import { type Component as _Component, watch } from 'vue'
 import { useTemplateRef } from 'vue'
 
-const $props = defineProps<{
-  icon: _Component
-  size?: string | number
-  disChanged?: boolean
-  rowMode?: boolean
-  padding?: boolean
-}>()
+import type { StyleProps } from '@/utils'
+const $props = defineProps<
+  {
+    icon: _Component
+    size?: string | number
+    disChanged?: boolean
+    rowMode?: boolean
+    padding?: boolean
+  } & StyleProps
+>()
 const $emit = defineEmits<{ change: [mode: boolean]; click: [to: boolean]; longClick: [] }>()
-const mode = defineModel<boolean>({ default: false })
-watch(mode, mode => $emit('change', mode))
+const isActive = defineModel<boolean>({ default: false })
+
+
+watch(isActive, mode => $emit('change', mode))
 const handleClick = () => {
-  $emit('click', !mode.value)
-  if (!$props.disChanged) mode.value = !mode.value
+  $emit('click', !isActive.value)
+  if (!$props.disChanged) isActive.value = !isActive.value
 }
 
 
@@ -31,12 +37,18 @@ onLongPress(
 
 <template>
   <div
-    class="flex items-center justify-center **:transition-colors!"
-    :class="[rowMode || 'flex-col', padding && 'px-4']"
+    :class="
+      twMerge(
+        'flex items-center justify-center **:transition-colors!',
+        !rowMode && 'flex-col',
+        padding && 'px-4'
+      )
+    "
+    :style
     @click.stop="handleClick"
     ref="htmlRefHook"
   >
-    <NIcon :size :color="mode ? 'var(--p-color)' : 'var(--van-gray-7)'">
+    <NIcon :size :color="isActive ? 'var(--p-color)' : 'var(--van-gray-7)'">
       <component :is="icon" />
     </NIcon>
     <span class="mt-1 text-xs text-(--van-text-color-2)">

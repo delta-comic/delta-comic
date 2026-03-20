@@ -1,65 +1,37 @@
 <script setup lang="ts">
-import { noop } from 'es-toolkit/compat'
+import { twMerge } from 'tailwind-merge'
 import type { PopupProps } from 'vant'
-import { computed, type StyleValue } from 'vue'
-import { shallowRef, watch } from 'vue'
-import { useRouter } from 'vue-router'
 
-import { useZIndex } from '@/utils/layout'
-const $router = useRouter()
-const $props = withDefaults(
-  defineProps<
-    Partial<PopupProps & { noBorder?: boolean; useTrulyShow: boolean; style?: StyleValue }>
-  >(),
-  { position: 'center', noBorder: false, overlay: true, closeOnClickOverlay: true }
-)
-const show = defineModel<boolean>('show', { required: true })
+import type { StyleProps } from '@/utils'
+import { usePreventBack, useZIndex } from '@/utils/layout'
+
+const $props = withDefaults(defineProps<Partial<PopupProps & StyleProps>>(), {
+  position: 'center',
+  overlay: true,
+  closeOnClickOverlay: true,
+  teleport: '#popups',
+  destroyOnClose: true
+})
+
+
+const isShow = defineModel<boolean>('show', { required: true })
+const [zIndex, isLast] = useZIndex(isShow)
+usePreventBack(isShow, isLast)
+
+
 defineSlots<{ default(): void }>()
-const trulyShow = shallowRef(show.value)
-const [zIndex, isLast] = useZIndex(
-  computed(() => ($props.useTrulyShow ? trulyShow.value : show.value))
-)
-let stopRouter = noop
-watch(
-  show,
-  _show => {
-    if (_show)
-      stopRouter = $router.beforeEach(() => {
-        console.log('popup:\n', 'isLast:', isLast.value, 'show:', show.value)
-        if (isLast.value) {
-          if (show.value) {
-            return (show.value = false)
-          } else {
-            return
-          }
-        } else {
-          return
-        }
-      })
-    else stopRouter()
-  },
-  { immediate: true }
-)
 defineEmits<{ closed: [] }>()
-defineExpose({ zIndex, trulyShow })
+defineExpose({ zIndex })
 </script>
 
 <template>
   <VanPopup
     :="$props"
-    v-model:show="show"
-    :z-index
-    teleport="#popups"
-    @open="trulyShow = true"
-    @closed="
-      () => {
-        trulyShow = false
-        $emit('closed')
-      }
-    "
-    class="max-h-screen overflow-hidden overflow-y-auto!"
-    :class="!noBorder && 'border-0 border-t border-solid border-(--van-border-color)'"
+    v-model:show="isShow"
+    :zIndex
+    @closed="$emit('closed')"
+    :class="twMerge('max-h-screen overflow-x-hidden overflow-y-auto!', $props.class)"
   >
-    <slot v-if="trulyShow"></slot>
+    <slot></slot>
   </VanPopup>
 </template>

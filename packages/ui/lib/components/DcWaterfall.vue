@@ -9,32 +9,27 @@ import { VirtualWaterfall } from '@lhlyu/vue-virtual-waterfall'
 import { useEventListener } from '@vant/use'
 import { type IfAny, useResizeObserver, useScroll } from '@vueuse/core'
 import { isArray } from 'es-toolkit/compat'
-import {
-  type StyleValue,
-  type Ref,
-  computed,
-  nextTick,
-  onUnmounted,
-  shallowReactive,
-  shallowRef,
-  watch
-} from 'vue'
+import { twMerge } from 'tailwind-merge'
+import { type Ref, computed, nextTick, onUnmounted, shallowReactive, shallowRef, watch } from 'vue'
 import { useTemplateRef } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
+import type { StyleProps } from '@/utils'
+
 import DcContent from './DcContent.vue'
+
 const $props = withDefaults(
-  defineProps<{
-    source: { data: RPromiseContent<any, T[]>; isEnd?: boolean } | Stream<T>
-    style?: StyleValue
-    class?: any
-    col?: [min: number, max: number] | number
-    padding?: number
-    gap?: number
-    minHeight?: number
-    dataProcessor?: PF
-    unReloadable?: boolean
-  }>(),
+  defineProps<
+    {
+      source: { data: RPromiseContent<any, T[]>; isEnd?: boolean } | Stream<T>
+      col?: [min: number, max: number] | number
+      padding?: number
+      gap?: number
+      minHeight?: number
+      dataProcessor?: PF
+      unReloadable?: boolean
+    } & StyleProps
+  >(),
   { padding: 4, col: 2, gap: 4, minHeight: 0 }
 )
 const $emit = defineEmits<{
@@ -91,15 +86,8 @@ const handleRefresh = async () => {
   await unionSource.value.next()
   isRefreshing.value = false
 }
-defineSlots<{
-  default(props: {
-    item: IfAny<ReturnType<PF>[number], T, ReturnType<PF>[number]>
-    index: number
-    height?: number
-    minHeight: number
-    length: number
-  }): any
-}>()
+
+
 const content = useTemplateRef<ComponentExposed<typeof DcContent>>('content')
 const scrollParent = computed(() => content.value?.cont)
 const { y: contentScrollTop } = useScroll(scrollParent)
@@ -181,12 +169,23 @@ defineExpose({
     reloadController.value = true
   }
 })
+
+
+defineSlots<{
+  default(props: {
+    item: IfAny<ReturnType<PF>[number], T, ReturnType<PF>[number]>
+    index: number
+    height?: number
+    minHeight: number
+    length: number
+  }): any
+}>()
 </script>
 
 <template>
   <VanPullRefresh
     v-model="isRefreshing"
-    :class="['relative h-full', $props.class]"
+    :class="twMerge('relative h-full', $props.class)"
     v-if="reloadController"
     :disabled="
       unReloadable || unionSource.isRequesting || (!!contentScrollTop && !isPullRefreshHold)
@@ -198,26 +197,26 @@ defineExpose({
     <DcContent
       retriable
       :source="Stream.isStream(source) ? source : source.data"
-      class-loading="mt-2 !h-[24px]"
-      class-empty="h-full!"
-      class-error="h-full!"
+      classLoading="mt-2 !h-[24px]"
+      classEmpty="h-full!"
+      classError="h-full!"
       class="h-full w-full overflow-auto"
       @retry="unionSource.retry()"
-      @reset-retry="handleRefresh"
-      :hide-loading="isPullRefreshHold && unionSource.isRequesting"
+      @resetRetry="handleRefresh"
+      :hideLoading="isPullRefreshHold && unionSource.isRequesting"
       ref="content"
     >
       <VirtualWaterfall
         :items="unionSource.data"
         :gap
         :padding
-        :preload-screen-count="[0, 1]"
+        :preloadScreenCount="[0, 1]"
         ref="waterfallEl"
         v-slot="{ item, index }: { item: T; index: number }"
-        :calc-item-height="item => sizeMapTemp.get(item) ?? minHeight"
+        :calcItemHeight="item => sizeMapTemp.get(item) ?? minHeight"
         class="waterfall"
-        :min-column-count="column[0]"
-        :max-column-count="column[1]"
+        :minColumnCount="column[0]"
+        :maxColumnCount="column[1]"
       >
         <slot
           :item

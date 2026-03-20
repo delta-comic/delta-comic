@@ -2,7 +2,10 @@
 import { PromiseContent, Stream } from '@delta-comic/model'
 import { isEmpty } from 'es-toolkit/compat'
 import { motion, type VariantType } from 'motion-v'
+import { twMerge, type ClassNameValue } from 'tailwind-merge'
 import { type StyleValue, computed, useTemplateRef } from 'vue'
+
+import type { StyleProps } from '@/utils'
 
 import DcLoading from './DcLoading.vue'
 import { ReloadOutlined, WifiTetheringErrorRound } from './icons'
@@ -13,16 +16,11 @@ const $props = defineProps<
     hideEmpty?: boolean
     hideLoading?: boolean
     source: PromiseContent<any, T[]> | Stream<T> | T[] | T
-  } & {
-    class?: any
-    classError?: any
-    classEmpty?: any
-    classLoading?: any
-    style?: StyleValue
+    classError?: ClassNameValue
+    classEmpty?: ClassNameValue
     styleError?: StyleValue
     styleEmpty?: StyleValue
-    styleLoading?: StyleValue
-  }
+  } & StyleProps
 >()
 defineSlots<{ default(data: { data?: T }): any }>()
 defineEmits<{ retry: []; resetRetry: [] }>()
@@ -157,13 +155,13 @@ const animateOn = computed<AllVariant>(() => {
 })
 
 
-const cont = useTemplateRef('cont')
-defineExpose({ cont })
+const conation = useTemplateRef('conation')
+defineExpose({ cont: conation })
 </script>
 
 <template>
   <div class="relative size-full overflow-hidden">
-    <div class="relative size-full" :class="[$props.class]" ref="cont">
+    <div :class="twMerge('relative size-full', $props.class)" ref="conation">
       <slot v-if="!unionSource.isEmpty" :data="unionSource.data" />
     </div>
     <AnimatePresence>
@@ -181,17 +179,20 @@ defineExpose({ cont })
           <div v-else-if="animateOn === 'isEmpty'">
             <NEmpty
               description="无结果"
-              class="w-full justify-center!"
-              :class="[classEmpty]"
+              :class="twMerge('w-full justify-center!', classEmpty)"
               :style="[style, styleEmpty]"
             />
           </div>
           <div v-else-if="animateOn === 'isErrorNoData'" class="size-full">
             <NResult
-              class="flex size-full! flex-col items-center! justify-center! text-wrap *:w-full"
               status="error"
               title="网络错误"
-              :class="[classError]"
+              :class="
+                twMerge(
+                  'flex size-full! flex-col items-center! justify-center! text-wrap *:w-full',
+                  classError
+                )
+              "
               :style="[style, styleError]"
               :description="unionSource.errorCause ?? '未知原因'"
             >

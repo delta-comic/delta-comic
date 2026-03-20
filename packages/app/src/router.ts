@@ -46,8 +46,14 @@ SharedFunction.define(
 )
 
 const $routerForceDo = async (mode: keyof typeof router.force, to: RouteLocationRaw) => {
-  do var r = await router[mode](to)
-  while (isNavigationFailure(r, NavigationFailureType.aborted))
+  const aim = router.resolve(to)
+  aim.query.force = 'true'
+  let attempts = 0
+  let r
+  do {
+    if (attempts++ > 20) throw new Error('Navigation retry exceeded 20 attempts')
+    r = await router[mode](aim)
+  } while (isNavigationFailure(r, NavigationFailureType.aborted))
   return r
 }
 router.force = {

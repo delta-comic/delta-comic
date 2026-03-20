@@ -7,30 +7,29 @@ import { callbackToPromise, type RPromiseContent, Stream } from '@delta-comic/mo
 import { type IfAny, useScroll } from '@vueuse/core'
 import { ceil, debounce, isArray, isEmpty } from 'es-toolkit/compat'
 import { NVirtualList, type VirtualListInst, type VirtualListProps } from 'naive-ui'
-import { type Ref, type StyleValue, shallowRef, useTemplateRef, watch } from 'vue'
+import { twMerge } from 'tailwind-merge'
+import { type Ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { computed } from 'vue'
 
-import type { ListFn } from '../utils'
+import type { ListFn, StyleProps } from '../utils'
 
 import DcContent from './DcContent.vue'
 import DcVar from './DcVar.vue'
 
-const $props = defineProps<{
-  source:
-    | { data: RPromiseContent<any, T[]>; isEnd?: boolean; reloadable?: boolean }
-    | Stream<T>
-    | Array<T>
-  itemHeight: number
-  listProp?: Partial<VirtualListProps>
-  goBottom?: boolean
-  itemResizable?: boolean
-  dataProcessor?: PF
-
-
-  unReloadable?: boolean
-  style?: StyleValue
-  class?: any
-}>()
+const $props = defineProps<
+  {
+    source:
+      | { data: RPromiseContent<any, T[]>; isEnd?: boolean; reloadable?: boolean }
+      | Stream<T>
+      | Array<T>
+    itemHeight: number
+    listProp?: Partial<VirtualListProps>
+    goBottom?: boolean
+    itemResizable?: boolean
+    dataProcessor?: PF
+    unReloadable?: boolean
+  } & StyleProps
+>()
 const $emit = defineEmits<{ next: [then: () => void]; reset: []; retry: [then: () => void] }>()
 
 
@@ -142,7 +141,7 @@ type TrueItem = IfAny<ReturnType<PF>[number], T, ReturnType<PF>[number]>
 <template>
   <VanPullRefresh
     v-model="isRefreshing"
-    :class="['relative', $props.class]"
+    :class="twMerge('relative', $props.class)"
     @refresh="handleRefresh"
     :disabled="
       unReloadable ||
@@ -157,24 +156,28 @@ type TrueItem = IfAny<ReturnType<PF>[number], T, ReturnType<PF>[number]>
     <DcContent
       retriable
       :source="Stream.isStream(source) ? source : isArray(source) ? source : source.data"
-      class-loading="mt-2 !h-[24px]"
-      class-empty="!h-full"
-      class-error="!h-full"
-      @reset-retry="handleRefresh"
-      :hide-loading="isPullRefreshHold && unionSource.isRequesting"
+      classLoading="mt-2 !h-[24px]"
+      classEmpty="!h-full"
+      classError="!h-full"
+      @resetRetry="handleRefresh"
+      :hideLoading="isPullRefreshHold && unionSource.isRequesting"
       @retry="unionSource.retry()"
     >
       <DcVar :value="unionSource.data" v-slot="{ value }">
         <NVirtualList
           :="listProp ?? {}"
-          :item-resizable
-          :item-size="itemHeight"
+          :itemResizable
+          :itemSize="itemHeight"
           @scroll="handleScroll"
-          class="h-full overflow-x-hidden"
           :items="value"
           v-slot="{ item }: { item: TrueItem }"
           ref="vList"
-          :class="[isPullRefreshHold ? 'overflow-y-hidden' : 'overflow-y-auto']"
+          :class="
+            twMerge(
+              'h-full overflow-x-hidden',
+              isPullRefreshHold ? 'overflow-y-hidden' : 'overflow-y-auto'
+            )
+          "
         >
           <slot :height="itemHeight" :data="{ item, index: value.indexOf(item) }" />
         </NVirtualList>

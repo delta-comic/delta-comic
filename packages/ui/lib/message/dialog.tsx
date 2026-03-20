@@ -15,8 +15,12 @@ export const createDialog = (options: DialogOptions & { style?: CSSProperties })
   const show = shallowRef(true)
   const [zIndex, isLast, stopUse] = useZIndex(show)
   const stopStyleWatch = watch(zIndex, zIndex => ((dialog.style as CSSProperties).zIndex = zIndex))
-  const stopRouterBreak = window.$router.beforeEach(() => {
-    if (isLast) return failStop()
+  const stopRouterBreak = window.$router.beforeEach(to => {
+    if (isLast) {
+      failStop()
+      const aim = window.$router.resolve(to)
+      return aim.query.force == 'true'
+    }
     return true
   })
   const stop = () => {

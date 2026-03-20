@@ -8,7 +8,7 @@
   "tabWidth": 2,
   "singleQuote": true,
   "trailingComma": "none",
-  "sortPackageJson": true,
+  "sortPackageJson": { "sortScripts": true },
   "arrowParens": "avoid",
   "jsxSingleQuote": true,
   "singleAttributePerLine": false,
@@ -16,7 +16,9 @@
   "sortTailwindcss": {
     "preserveDuplicates": false,
     "preserveWhitespace": false,
-    "stylesheet": "./packages/app/src/index.css"
+    "stylesheet": "./packages/app/src/index.css",
+    "attributes": ["overlayClass", ":class", "Class"],
+    "functions": ["twMerge"]
   },
   "bracketSameLine": false,
   "bracketSpacing": true,

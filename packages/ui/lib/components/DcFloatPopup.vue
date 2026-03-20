@@ -1,23 +1,28 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core'
-import { isArray, noop } from 'es-toolkit/compat'
-import { computed, shallowReadonly, shallowRef, type StyleValue, watch } from 'vue'
-import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { isArray } from 'es-toolkit/compat'
+import { twMerge } from 'tailwind-merge'
+import { computed, shallowReadonly, shallowRef } from 'vue'
 
-import { useZIndex } from '@/utils'
-const $router = useRouter()
+import { usePreventBack, useZIndex, type StyleProps } from '@/utils'
+
 const $props = withDefaults(
-  defineProps<{
-    anchors?: 'high' | 'low' | number[]
-    lockScroll?: boolean
-    class?: any
-    style?: StyleValue
-    overlay?: boolean
-  }>(),
-  { anchors: 'high', lockScroll: false }
+  defineProps<
+    {
+      anchors?: 'high' | 'low' | number[]
+      lockScroll?: boolean
+      overlay?: boolean
+      contentDraggable?: boolean
+    } & StyleProps
+  >(),
+  { anchors: 'high', lockScroll: false, contentDraggable: false }
 )
-const show = shallowRef(false)
+
+
+const isShow = shallowRef(false)
 const { height: windowHeight } = useWindowSize()
+
+
 const anchors = computed(() =>
   isArray($props.anchors)
     ? $props.anchors
@@ -35,29 +40,32 @@ const anchors = computed(() =>
           Math.round(0.9 * windowHeight.value)
         ]
 )
+
+
 const height = shallowRef(0)
-const [zIndex, isLast] = useZIndex(() => height.value > 0)
-
-
-// 路由拦截
-let stopRouterBreak = noop
-watch(show, () => {
-  if (show.value)
-    stopRouterBreak = $router.beforeEach(() => (isLast.value ? (show.value = false) : undefined))
-  else stopRouterBreak()
-})
-onBeforeRouteLeave(stopRouterBreak)
+const [zIndex, isLast] = useZIndex(
+  computed({
+    get() {
+      return height.value > 0
+    },
+    set(show) {
+      if (show) return (height.value = anchors.value[2])
+      height.value = 0
+    }
+  })
+)
+usePreventBack(isShow, isLast)
 
 
 defineExpose({
   show(node = 2) {
     height.value = anchors.value[node]
-    show.value = true
+    isShow.value = true
   },
   close() {
-    show.value = false
+    isShow.value = false
   },
-  isShowing: shallowReadonly(show),
+  isShowing: shallowReadonly(isShow),
   height: shallowReadonly(height)
 })
 defineSlots<{ default(arg: { height: number }): void }>()
@@ -65,24 +73,28 @@ defineSlots<{ default(arg: { height: number }): void }>()
 
 <template>
   <Teleport to="#popups">
-    <VanOverlay :zIndex :show @click="show = false" v-if="overlay" />
+    <VanOverlay :zIndex :isShow @click="isShow = false" v-if="overlay" />
     <Transition @after-leave="height = 0" name="van-slide-up">
       <VanFloatingPanel
-        v-show="show"
-        @height-change="({ height }) => height <= 0 && (show = false)"
+        v-show="isShow"
+        @heightChange="({ height }) => (height <= 0 ? (isShow = false) : (isShow = true))"
         :anchors
         v-model:height="height"
-        :content-draggable="false"
-        :lock-scroll
+        :contentDraggable
+        :lockScroll
         :style="[style, { zIndex }]"
-        :class
-        class="overflow-hidden border-0 border-t border-solid border-(--van-border-color)"
+        :class="
+          twMerge(
+            'overflow-hidden border-0 border-t border-solid border-(--van-border-color)',
+            $props.class
+          )
+        "
       >
         <div
           class="w-full bg-(--van-background)"
           :style="{ height: `calc(${height}px - var(--van-floating-panel-header-height))` }"
         >
-          <slot v-if="height != 0" :height="height!"></slot>
+          <slot v-if="isShow" :height></slot>
         </div>
       </VanFloatingPanel>
     </Transition>

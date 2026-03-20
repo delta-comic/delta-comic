@@ -3,19 +3,24 @@ import { open } from '@tauri-apps/plugin-shell'
 import { useEventListener } from '@vant/use'
 import { useCssVar } from '@vueuse/core'
 import MarkdownIt, { type Options } from 'markdown-it'
+import { twMerge } from 'tailwind-merge'
 import { computed } from 'vue'
+
+import type { StyleProps } from '@/utils'
 
 import darkStyle from './dark.css?inline'
 import lightStyle from './light.css?inline'
 
 const $props = withDefaults(
-  defineProps<{
-    markdown: string
-    plugins?: Parameters<MarkdownIt['use']>[]
-    config?: Options
-    env?: object
-    isDarkMode?: boolean
-  }>(),
+  defineProps<
+    {
+      markdown: string
+      plugins?: Parameters<MarkdownIt['use']>[]
+      config?: Options
+      env?: object
+      isDarkMode?: boolean
+    } & StyleProps
+  >(),
   {
     plugins: [] as any,
     config: {} as any
@@ -24,7 +29,10 @@ const $props = withDefaults(
 
 
 const md = computed(() => {
-  let md = new MarkdownIt($props.config)
+  let md = new MarkdownIt({
+    ...$props.config,
+    linkify: true
+  })
   md = $props.plugins.reduce((md, plugin) => md.use(...plugin), md)
 
   return md
@@ -89,5 +97,5 @@ useEventListener('message', ev => {
 </script>
 
 <template>
-  <iframe :srcdoc="htmlTemplateUrl" />
+  <iframe :srcdoc="htmlTemplateUrl" :class="twMerge('border-0 border-none', $props.class)" :style />
 </template>

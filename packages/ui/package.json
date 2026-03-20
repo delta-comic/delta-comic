@@ -44,13 +44,18 @@
   "dependencies": {
     "@lhlyu/vue-virtual-waterfall": "catalog:",
     "@tauri-apps/plugin-shell": "catalog:",
+    "@types/linkify-it": "^5.0.0",
     "@vant/use": "catalog:",
     "@vueuse/core": "catalog:",
     "dayjs": "catalog:",
+    "dompurify": "^3.3.3",
+    "linkify-it": "^5.0.0",
     "markdown-it": "catalog:",
     "mitt": "catalog:",
     "motion-v": "catalog:",
-    "tailwindcss-safe-area-capacitor": "catalog:"
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss-safe-area-capacitor": "catalog:",
+    "tlds": "^1.261.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",

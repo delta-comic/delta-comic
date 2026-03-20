@@ -4,6 +4,7 @@ import { uni } from '@delta-comic/model'
 import { computedAsync } from '@vueuse/core'
 import { isString } from 'es-toolkit/compat'
 import { type ImageProps, NImage } from 'naive-ui'
+import { twMerge, type ClassNameValue } from 'tailwind-merge'
 import {
   type ImgHTMLAttributes,
   type StyleValue,
@@ -17,6 +18,7 @@ import {
 import { showImagePreview } from '@/utils/image'
 
 import DcLoading from './DcLoading.vue'
+import DcVar from './DcVar.vue'
 const $props = withDefaults(
   defineProps<{
     src?: uni.image.Image_
@@ -31,7 +33,7 @@ const $props = withDefaults(
     inline?: boolean
     style?: StyleValue
     imgProp?: ImgHTMLAttributes
-    useList?: { loaded: Set<string>; error: Set<string> }
+    cacheList?: { loaded: Set<string>; error: Set<string> }
     fetchpriority?: 'high' | 'low' | 'auto'
     fallback?: uni.image.Image_
   }>(),
@@ -43,7 +45,7 @@ const src = computedAsync(async () => {
     if (isString($props.src)) return $props.src
     return await $props.src.getUrl()
   } catch (error) {
-    console.error(error)
+    console.warn(error)
   }
   return ''
 }, '')
@@ -82,7 +84,7 @@ const temp = useTemp().$apply('imageState', () => ({
   loaded: new Set<string>(),
   error: new Set<string>()
 }))
-const images = $props.useList ?? temp
+const images = $props.cacheList ?? temp
 const show = shallowRef(true)
 const beginReload = () => {
   isForkEmpty = false
@@ -120,70 +122,73 @@ const NImg = window.$api.NImage as typeof NImage
 </script>
 
 <template>
-  <NImg
-    @error="handleFail"
-    v-bind="$props"
-    :object-fit="fit"
-    preview-disabled
-    :alt
-    ref="img"
-    :img-props="{
-      ...(imgProp ?? {}),
-      class: 'w-full',
-      ['fetchpriority' as any]: $props.fetchpriority
-    }"
-    :class="[{ 'rounded-full!': !!round }, inline ? 'inline-flex' : 'flex', $props.class]"
-    :style
-    v-show="!images.error.has(src) && images.loaded.has(src)"
-    v-if="show"
-    @load="handleImageLoad"
-    @click="handleClickImage"
-    :src
+  <DcVar
+    :value="twMerge(round && 'rounded-full!', inline ? 'inline-flex' : 'flex', $props.class)"
+    v-slot="{ value: cls }"
   >
-  </NImg>
-  <div
-    class="items-center justify-center"
-    v-if="!images.loaded.has(src) && !images.error.has(src) && !hideLoading"
-    :class="[{ 'rounded-full!': !!round }, inline ? 'inline-flex' : 'flex', $props.class]"
-    :style
-    @click="$emit('click')"
-  >
-    <slot name="loading" v-if="$slots.loading"></slot>
-    <DcLoading v-else />
-  </div>
-  <template v-if="images.error.has(src) && !hideError">
     <NImg
+      :="$props"
       @error="handleFail"
-      v-bind="$props"
-      :object-fit="fit"
-      preview-disabled
+      :objectFit="fit"
+      previewDisabled
       :alt
-      :img-props="{
-        ...(imgProp ?? {}),
-        class: 'w-full',
-        ['fetchpriority' as any]: $props.fetchpriority
+      ref="img"
+      :imgProps="{
+        ...imgProp,
+        class: twMerge(imgProp?.class as ClassNameValue, 'w-full'),
+        fetchpriority: $props.fetchpriority
       }"
-      :class="[{ 'rounded-full!': !!round }, inline ? 'inline-flex' : 'flex', $props.class]"
+      :class="cls"
       :style
-      v-if="fallback"
-      :src="fallbackSrc"
-    />
+      v-show="!images.error.has(src) && images.loaded.has(src)"
+      v-if="show"
+      @load="handleImageLoad"
+      @click="handleClickImage"
+      :src
+    >
+    </NImg>
     <div
-      class="flex-col items-center justify-center"
-      @click.stop="
-        () => {
-          images.error.delete(src)
-          beginReload()
-        }
-      "
-      v-else
-      :class="[{ 'rounded-full!': !!round }, inline ? 'inline-flex' : 'flex', $props.class]"
+      v-if="!images.loaded.has(src) && !images.error.has(src) && !hideLoading"
+      :class="twMerge('items-center justify-center', cls)"
+      :style
+      @click="$emit('click')"
     >
       <slot name="loading" v-if="$slots.loading"></slot>
-      <template v-else>
-        <VanIcon name="warning-o" size="2.5rem" color="var(--van-text-color-2)" />
-        <div class="text-sm text-(--van-text-color-2)">点击重试</div>
-      </template>
+      <DcLoading v-else />
     </div>
-  </template>
+    <template v-if="images.error.has(src) && !hideError">
+      <NImg
+        v-if="fallback"
+        :="$props"
+        @error="handleFail"
+        :objectFit="fit"
+        previewDisabled
+        :alt
+        :imgProps="{
+          ...imgProp,
+          class: twMerge(imgProp?.class as ClassNameValue, 'w-full'),
+          fetchpriority: $props.fetchpriority
+        }"
+        :class="cls"
+        :style
+        :src="fallbackSrc"
+      />
+      <div
+        v-else
+        @click.stop="
+          () => {
+            images.error.delete(src)
+            beginReload()
+          }
+        "
+        :class="twMerge('flex-col items-center justify-center', cls)"
+      >
+        <slot name="loading" v-if="$slots.loading"></slot>
+        <template v-else>
+          <VanIcon name="warning-o" size="2.5rem" color="var(--van-text-color-2)" />
+          <div class="text-sm text-(--van-text-color-2)">点击重试</div>
+        </template>
+      </div>
+    </template>
+  </DcVar>
 </template>

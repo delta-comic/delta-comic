@@ -1,47 +1,42 @@
 <script setup lang="ts">
-import { isNumber } from 'es-toolkit/compat'
+import DOMPurify from 'dompurify'
+import { escape } from 'es-toolkit'
+import Link from 'linkify-it'
+import { twMerge } from 'tailwind-merge'
+import tlds from 'tlds'
 import { computed } from 'vue'
 
-const $props = withDefaults(defineProps<{ text?: string; ellipsis?: number }>(), { text: '' })
-const texts = computed(() =>
-  $props.text
-    .replace(
-      /(http(s?):\/\/)?([\w-]+\.)+(\.?[a-z]+)+(:\d+)?(\/[\w-.\/?%&=]*)?/gi,
-      v => `\u1145[[${v}]]\u1145`
-    )
-    .split('\u1145')
-    .filter(Boolean)
-    .map(v =>
-      /\[\[[^\[\]]+\]\]/g.test(v)
-        ? ({ value: v.substring(2, v.length - 2), mode: 'link' } as const)
-        : ({ value: v, mode: 'text' } as const)
-    )
-)
+import type { StyleProps } from '@/utils'
+
+const $props = withDefaults(defineProps<{ text?: string } & StyleProps>(), {
+  text: ''
+})
+
+
+const linker = new Link().tlds(tlds).tlds('onion', true).set({ fuzzyIP: true })
+
+
+const texts = computed(() => {
+  const raw = escape($props.text)
+  var linked = raw
+  while (true) {
+    const matched = linker.matchAtStart(linked)
+    if (!matched) break
+
+    const pre = linked.slice(0, matched.index)
+    const link = `<a href="${matched.url}" />`
+    const post = linked.slice(matched.lastIndex)
+
+    return pre + link + post
+  }
+  return DOMPurify.sanitize(raw)
+})
 </script>
 
 <template>
   <div
-    :class="[isNumber(ellipsis) && 'overflow-hidden overflow-ellipsis']"
-    :style="[
-      isNumber(ellipsis) &&
-        `line-break: anywhere;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: ${ellipsis};`
-    ]"
-    class="whitespace-pre-wrap text-(--van-text-color)"
-  >
-    <slot />
-    <template v-for="token of texts">
-      <NButton
-        tag="a"
-        class="underline"
-        @click.stop
-        text
-        type="primary"
-        target="_blank"
-        :href="/http(s?):\/\/.+/.test(token.value) ? token.value : `https://${token.value}`"
-        v-if="token.mode === 'link'"
-        >{{ token.value }}</NButton
-      >
-      <template v-else-if="token.mode === 'text'">{{ token.value }}</template>
-    </template>
-  </div>
+    :class="twMerge('break-normal whitespace-pre-wrap text-(--van-text-color)', $props.class)"
+    :style
+    v-html="texts"
+  ></div>
 </template>

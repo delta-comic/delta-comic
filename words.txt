@@ -19,6 +19,7 @@ kysely
 Levelboard
 lhlyu
 lightningcss
+linkify
 minidump
 msvc
 nvim
@@ -29,6 +30,7 @@ pinia
 pipefail
 Popconfirm
 Popselect
+previewable
 releaserc
 reloadable
 Reloadable
@@ -48,6 +50,7 @@ tauri
 TAURI
 temurin
 thiserror
+tlds
 tsgolint
 unplugin
 userscript

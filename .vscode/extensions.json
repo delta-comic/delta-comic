@@ -1,1 +1,10 @@
-{ "recommendations": ["oxc.oxc-vscode"] }
+{
+  "recommendations": [
+    "oxc.oxc-vscode",
+    "tamasfe.even-better-toml",
+    "rust-lang.rust-analyzer",
+    "Vue.volar",
+    "streetsidesoftware.code-spell-checker",
+    "bradlc.vscode-tailwindcss"
+  ]
+}

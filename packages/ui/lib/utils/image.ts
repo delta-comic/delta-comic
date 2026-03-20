@@ -21,7 +21,11 @@ export const showImagePreview = (
     showIndex: images.length > 1,
     teleport: '#popups'
   }) as ImagePreviewInstance
-  const stopRouterGuard = window.$router.beforeEach(() => (isShowing.value = false))
+  const stopRouterGuard = window.$router.beforeEach(to => {
+    isShowing.value = false
+    const route = window.$router.resolve(to)
+    return route.query.force == 'true'
+  })
   watchOnce(isShowing, () => {
     stopRouterGuard()
     stopUse()

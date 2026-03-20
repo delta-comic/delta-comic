@@ -12,7 +12,8 @@ const fontSize = computed(() => (isNumber($props.size) ? `${$props.size}px` : $p
     <slot></slot>
   </VanLoading>
 </template>
-<style scoped lang="css">
+
+<style scoped>
 :deep(.van-loading__text) {
   font-size: v-bind(fontSize);
   margin-left: 2px;
