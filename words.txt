@@ -1,7 +1,9 @@
+androideabi
 androidx
 antd
 apksigner
 aptabase
+armv
 Aspera
 bili
 Booter
@@ -11,8 +13,10 @@ codegen
 Favourite
 favselect
 Gmailerrorred
+iarna
 kysely
 Levelboard
+lhlyu
 lightningcss
 minidump
 msvc
@@ -21,6 +25,7 @@ oxfmt
 oxfmtrc
 oxlint
 pinia
+pipefail
 Popconfirm
 Popselect
 releaserc
@@ -40,7 +45,9 @@ stylesheet
 swipeable
 tauri
 TAURI
+temurin
 thiserror
+tsgolint
 unplugin
 userscript
 vant

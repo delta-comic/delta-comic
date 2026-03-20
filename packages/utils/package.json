@@ -1,0 +1,60 @@
+{
+  "name": "@delta-comic/utils",
+  "version": "0.0.7",
+  "description": "空阙虱楼",
+  "homepage": "https://github.com/delta-comic/delta-comic",
+  "license": "AGPL-3.0-only",
+  "author": {
+    "name": "wenxig",
+    "email": "wenxinguo12@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/delta-comic/delta-comic.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build && pnpm pack --out ./dist/pack.tgz",
+    "version:major": "pnpm version major --no-git-tag-version || true",
+    "version:minor": "pnpm version minor --no-git-tag-version || true",
+    "version:patch": "pnpm version patch --no-git-tag-version || true"
+  },
+  "dependencies": {
+    "@vueuse/core": "catalog:",
+    "dayjs": "catalog:",
+    "mitt": "catalog:"
+  },
+  "devDependencies": {
+    "axios": "catalog:",
+    "vite": "catalog:"
+  },
+  "peerDependencies": {
+    "axios": "^1.13",
+    "naive-ui": "^2.43",
+    "vue": "^3.5",
+    "vue-router": "^5.0"
+  },
+  "release": {
+    "tagFormat": "utils-${version}"
+  },
+  "dist": {
+    "tarball": "./dist/pack.tgz"
+  },
+  "readme": "./README.md"
+}

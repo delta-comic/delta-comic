@@ -1,0 +1,59 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "strict": true,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitReturns": false,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitThis": true,
+    "jsxImportSource": "vue",
+    "verbatimModuleSyntax": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/app/tsconfig.json"
+    },
+    {
+      "path": "./packages/utils/tsconfig.json"
+    },
+    {
+      "path": "./packages/ui/tsconfig.json"
+    },
+    {
+      "path": "./packages/model/tsconfig.json"
+    },
+    {
+      "path": "./packages/plugin/tsconfig.json"
+    },
+    {
+      "path": "./packages/request/tsconfig.json"
+    },
+    {
+      "path": "./packages/core/tsconfig.json"
+    },
+    {
+      "path": "./packages/vite/tsconfig.json"
+    },
+    {
+      "path": "./packages/db/tsconfig.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}

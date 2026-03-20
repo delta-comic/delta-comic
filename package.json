@@ -14,53 +14,10 @@
     "url": "https://github.com/delta-comic/delta-comic.git"
   },
   "scripts": {
-    "dev:web": "bun --bun vite",
-    "dev": "bun --bun tauri dev",
-    "build:web": "bun --bun vite build",
-    "build": "bun --bun run tauri android build",
-    "build:debug": "bun --bun run tauri android build --debug",
-    "build:local": "bun --bun run tauri build --debug",
-    "lint": "bun --bun oxlint --type-aware",
-    "lint:fix": "bun --bun oxlint --fix --type-aware",
+    "dev": "pnpm --filter app dev",
+    "lint": "pnpm exec oxlint --type-aware",
+    "lint:fix": "pnpm exec oxlint --fix --type-aware",
     "prepare": "husky"
-  },
-  "dependencies": {
-    "@aptabase/tauri": "github:delta-comic/tauri-plugin-aptabase-rustls",
-    "@delta-comic/core": "^0.3.3",
-    "@delta-comic/db": "^0.0.8",
-    "@delta-comic/model": "^0.0.5",
-    "@delta-comic/plugin": "^0.3.5",
-    "@delta-comic/request": "^0.0.5",
-    "@delta-comic/ui": "^0.1.3",
-    "@delta-comic/utils": "^0.0.7",
-    "@delta-comic/vite": "^0.1.4",
-    "@octokit/rest": "^22.0.1",
-    "@sentry/vue": "^10.43.0",
-    "@tauri-apps/api": "^2.10.1",
-    "@tauri-apps/plugin-clipboard-manager": "~2.3.2",
-    "@tauri-apps/plugin-fs": "~2.4.5",
-    "@tauri-apps/plugin-shell": "~2.3.5",
-    "@tauri-apps/plugin-sql": "^2.3.2",
-    "@vicons/antd": "^0.13.0",
-    "@vicons/material": "^0.13.0",
-    "@vueuse/core": "14.2.1",
-    "axios": "^1.13.6",
-    "color": "^5.0.3",
-    "core-js": "^3.48.0",
-    "dayjs": "^1.11.20",
-    "es-toolkit": "^1.45.1",
-    "kysely": "^0.28.11",
-    "mitt": "^3.0.1",
-    "motion-v": "2.0.0",
-    "naive-ui": "^2.44.1",
-    "pinia": "^3.0.4",
-    "semver": "^7.7.4",
-    "tauri-plugin-better-cors-fetch": "github:delta-comic/tauri-plugin-better-cors-fetch",
-    "tauri-plugin-m3": "^0.3.1",
-    "tauri-plugin-sentry-api": "^0.5.0",
-    "vant": "^4.9.22",
-    "vue": "^3.5.30",
-    "vue-router": "^5.0.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.4",
@@ -73,36 +30,16 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^12.0.6",
     "@semantic-release/release-notes-generator": "^14.1.0",
-    "@tailwindcss/vite": "^4.2.1",
-    "@tauri-apps/cli": "^2.10.1",
     "@tsconfig/node24": "^24.0.4",
     "@types/iarna__toml": "^2.0.5",
-    "@types/semver": "^7.7.1",
-    "@vitejs/plugin-vue": "^6.0.5",
-    "@vitejs/plugin-vue-jsx": "^5.1.5",
-    "browserslist": "^4.28.1",
     "commitlint-plugin-cspell": "^0.6.0",
     "cspell": "^9.7.0",
     "husky": "^9.1.7",
-    "lightningcss": "^1.32.0",
     "lint-staged": "^16.3.3",
-    "oxfmt": "^0.40.0",
+    "oxfmt": "^0.41.0",
     "oxlint": "^1.54.0",
-    "oxlint-tsgolint": "^0.16.0",
-    "prettier": "^3.8.1",
-    "semantic-release": "^25.0.3",
-    "tailwindcss": "4.2.1",
-    "tailwindcss-safe-area-capacitor": "^0.5.1",
-    "typescript": "^5.9.3",
-    "unplugin-vue-components": "31.0.0",
-    "vite": "8.0.0-beta.15",
-    "vite-plugin-ms-clarity": "^1.0.0",
-    "vite-plugin-vue-devtools": "^8.0.7",
-    "vite-plugin-wasm": "^3.5.0",
-    "vue-component-type-helpers": "^3.2.5"
-  },
-  "overrides": {
-    "vite": "8.0.0-beta.15"
+    "oxlint-tsgolint": "^0.17.1",
+    "semantic-release": "^25.0.3"
   },
   "bugs": {
     "email": "wenxinguo12@gmail.com",
@@ -130,6 +67,12 @@
       "url": "https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg"
     }
   ],
-  "packageManager": "bun@1.3.10",
-  "readme": "./README.md"
+  "packageManager": "pnpm@10.30.1",
+  "readme": "./README.md",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "core-js",
+      "tauri-plugin-better-cors-fetch"
+    ]
+  }
 }

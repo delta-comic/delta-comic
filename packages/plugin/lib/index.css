@@ -1,0 +1,12 @@
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import '@delta-comic/ui/style.css';
+
+.auth-popup {
+  @apply w-[95vw]! p-6 pt-3;
+}
+.auth-popup > div {
+  @apply w-full py-1 pl-1 text-lg;
+}

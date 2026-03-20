@@ -1,30 +1,24 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
     "target": "ESNext",
-    "useDefineForClassFields": true,
     "module": "nodenext",
     "skipLibCheck": true,
     /* Bundler mode */
     "moduleResolution": "nodenext",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "noImplicitReturns": false,
-    "noImplicitAny": true,
-    "noImplicitOverride": true,
-    "noImplicitThis": true,
-    "types": []
+    "isolatedModules": true
   },
-  "include": ["vite.config.mts", "./script/**/*", "./script/*", "./*.ts", "./*.mts"],
-  "exclude": ["./src/**/*"],
-  "vueCompilerOptions": {
-    "plugins": ["vue-router/volar/sfc-typed-router", "vue-router/volar/sfc-route-blocks"]
-  }
+  "files": [
+    "./commitlint.config.ts",
+    "./.releaserc.mjs",
+    "./script/set-version.mts",
+    "./script/update-version.mts"
+  ],
+  "references": [
+    {
+      "path": "./packages/app/tsconfig.node.json"
+    }
+  ]
 }

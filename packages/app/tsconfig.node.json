@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "../../tsconfig.node.json"
+  ],
+  "compilerOptions": {
+    "composite": true
+  },
+  "files": [
+    "./vite.config.mts"
+  ]
+}

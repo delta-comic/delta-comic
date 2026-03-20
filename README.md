@@ -75,11 +75,6 @@ _____   _________________ ____        __________________ _____   ______
 - _待定_ -_无以夸矜_
 - _待定_ -_无以降神_
 
-## 想要编写插件?
-
-[![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=delta-comic-core&user&theme=transparent)](https://github.com/delta-comic/delta-comic-core)  
- 该包可为你提供许多基本的数据结构, 与便捷的`definePlugin`
-
 ## 星图
 
 [![Star History Chart](https://api.star-history.com/svg?repos=delta-comic/delta-comic&type=Date)](https://www.star-history.com/#delta-comic/delta-comic&Date)

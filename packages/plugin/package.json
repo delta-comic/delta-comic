@@ -1,0 +1,71 @@
+{
+  "name": "@delta-comic/plugin",
+  "version": "0.3.5",
+  "description": "空阙虱楼",
+  "homepage": "https://github.com/delta-comic/delta-comic",
+  "license": "AGPL-3.0-only",
+  "author": {
+    "name": "wenxig",
+    "email": "wenxinguo12@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/delta-comic/delta-comic.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/index.css"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build && pnpm pack --out ./dist/pack.tgz",
+    "version:major": "pnpm version major --no-git-tag-version || true",
+    "version:minor": "pnpm version minor --no-git-tag-version || true",
+    "version:patch": "pnpm version patch --no-git-tag-version || true"
+  },
+  "dependencies": {
+    "@delta-comic/core": "workspace:*",
+    "@delta-comic/db": "workspace:*",
+    "@delta-comic/model": "workspace:*",
+    "@delta-comic/ui": "workspace:*",
+    "@delta-comic/utils": "workspace:*",
+    "@octokit/rest": "catalog:",
+    "@tauri-apps/api": "catalog:",
+    "@tauri-apps/plugin-fs": "catalog:",
+    "@vueuse/core": "catalog:",
+    "jszip": "catalog:",
+    "lz-string": "catalog:",
+    "mitt": "catalog:",
+    "userscript-meta": "catalog:",
+    "vue-component-type-helpers": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitejs/plugin-vue-jsx": "catalog:",
+    "browserslist": "catalog:",
+    "lightningcss": "catalog:",
+    "tailwindcss": "catalog:",
+    "vite": "catalog:"
+  },
+  "release": {
+    "tagFormat": "plugin-${version}"
+  },
+  "dist": {
+    "tarball": "./dist/pack.tgz"
+  },
+  "readme": "./README.md"
+}

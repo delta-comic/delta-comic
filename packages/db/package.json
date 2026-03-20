@@ -1,0 +1,62 @@
+{
+  "name": "@delta-comic/db",
+  "version": "0.0.8",
+  "description": "空阙虱楼",
+  "homepage": "https://github.com/delta-comic/delta-comic",
+  "license": "AGPL-3.0-only",
+  "author": {
+    "name": "wenxig",
+    "email": "wenxinguo12@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/delta-comic/delta-comic.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build && pnpm pack --out ./dist/pack.tgz",
+    "version:major": "pnpm version major --no-git-tag-version || true",
+    "version:minor": "pnpm version minor --no-git-tag-version || true",
+    "version:patch": "pnpm version patch --no-git-tag-version || true"
+  },
+  "dependencies": {
+    "@tauri-apps/plugin-sql": "catalog:",
+    "@tauri-apps/plugin-store": "catalog:",
+    "@vueuse/core": "catalog:",
+    "kysely-dialect-tauri": "catalog:",
+    "kysely-plugin-serialize": "catalog:",
+    "mitt": "catalog:"
+  },
+  "devDependencies": {
+    "vite": "catalog:"
+  },
+  "peerDependencies": {
+    "@delta-comic/model": "workspace:*",
+    "@delta-comic/plugin": "workspace:*",
+    "@delta-comic/utils": "workspace:*",
+    "kysely": "^0.28",
+    "vue": "^3.5"
+  },
+  "release": {
+    "tagFormat": "db-${version}"
+  },
+  "dist": {
+    "tarball": "./dist/pack.tgz"
+  },
+  "readme": "./README.md"
+}

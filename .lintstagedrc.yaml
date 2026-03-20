@@ -1,5 +1,5 @@
 '*.{js,jsx,ts,tsx,mts,cts,mjs,cjs,vue}': |
-  bun oxlint
+  pnpm exec oxlint
 
 '*.{md,json,toml,rs,js,jsx,ts,tsx,mts,cts,mjs,cjs,vue,html}': |
-  bun cspell --no-exit-code
+  pnpm exec cspell --no-exit-code

@@ -1,0 +1,10 @@
+{
+  "extends": ["../../tsconfig.base.json"],
+  "compilerOptions": {
+    "declaration": true,
+    "lib": ["ESNext"],
+    "composite": true,
+    "paths": { "@/*": ["./lib/*"] }
+  },
+  "include": ["lib"]
+}

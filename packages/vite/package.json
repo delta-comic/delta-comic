@@ -1,0 +1,55 @@
+{
+  "name": "@delta-comic/vite",
+  "version": "0.1.4",
+  "description": "空阙虱楼",
+  "homepage": "https://github.com/delta-comic/delta-comic",
+  "license": "AGPL-3.0-only",
+  "author": {
+    "name": "wenxig",
+    "email": "wenxinguo12@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/delta-comic/delta-comic.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build && pnpm pack --out ./dist/pack.tgz",
+    "version:major": "pnpm version major --no-git-tag-version || true",
+    "version:minor": "pnpm version minor --no-git-tag-version || true",
+    "version:patch": "pnpm version patch --no-git-tag-version || true"
+  },
+  "devDependencies": {
+    "lightningcss": "catalog:",
+    "vite": "catalog:"
+  },
+  "peerDependencies": {
+    "@delta-comic/plugin": "workspace:*",
+    "@delta-comic/utils": "workspace:*",
+    "vite-plugin-externals": "^0.6.2",
+    "vite-plugin-monkey": "^7.1.8"
+  },
+  "release": {
+    "tagFormat": "vite-${version}"
+  },
+  "dist": {
+    "tarball": "./dist/pack.tgz"
+  },
+  "readme": "./README.md"
+}
