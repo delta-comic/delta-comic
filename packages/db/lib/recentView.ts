@@ -37,7 +37,7 @@ export const useUpsert = defineMutation(() => {
           .execute()
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })
@@ -52,7 +52,7 @@ export const useRemove = defineMutation(() => {
         await trx.deleteFrom('recentView').where('recentView.timestamp', 'is', items).execute()
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })

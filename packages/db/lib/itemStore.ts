@@ -37,7 +37,7 @@ export const useUpsert = defineMutation(() => {
         return k
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })

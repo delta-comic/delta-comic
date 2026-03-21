@@ -51,7 +51,7 @@ export const useUpsert = defineMutation(() => {
           .execute()
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })
@@ -66,7 +66,7 @@ export const useRemove = defineMutation(() => {
         await trx.deleteFrom('plugin').where('plugin.pluginName', 'is', keys).execute()
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })
@@ -92,7 +92,7 @@ export const useToggleEnable = defineMutation(() => {
         }
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })

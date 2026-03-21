@@ -67,7 +67,7 @@ export const definePlugin = async <T extends PluginConfig>(
   if (isFunction(config)) var cfg = config(window.$$safe$$)
   else var cfg = config
   console.log('[definePlugin] new plugin defining...', cfg)
-  await pluginEmitter.emit('definedPlugin', cfg)
+  pluginEmitter.emit('definedPlugin', cfg)
   return cfg
 }
 export type PluginExpose<T extends () => Promise<PluginConfig>> = Awaited<

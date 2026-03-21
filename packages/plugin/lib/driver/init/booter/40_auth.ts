@@ -24,7 +24,7 @@ class _PluginAuth extends PluginBooter {
       setMeta('等待其他插件鉴权结束...')
       if (!isPass) {
         setMeta('选择鉴权方式')
-        createDialog({
+        void createDialog({
           type: 'default',
           positiveText: '登录',
           negativeText: '注册',

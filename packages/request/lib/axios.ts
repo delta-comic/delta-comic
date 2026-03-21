@@ -85,7 +85,7 @@ export const createAxios = (
     return requestConfig
   })
   if (!config.noPassClientError)
-    api.interceptors.response.use(undefined, interceptors.isClientError)
+    api.interceptors.response.use(undefined, interceptors.isClientError.bind(interceptors))
   api.interceptors.response.use(undefined, interceptors.createAutoRetry(api, 10))
   return {
     get: async <T>(url: string, config: AxiosRequestConfig = {}) =>

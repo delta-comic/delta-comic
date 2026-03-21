@@ -33,6 +33,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pnpm exec oxfmt -c --config=./.oxfmtrc.json --check ./packages
-          pnpm exec cspell --no-exit-code --no-must-find-files ./packages
+          pnpm exec oxfmt --check
+          pnpm exec cspell --no-must-find-files ./packages
           pnpm exec oxlint --type-aware

@@ -57,7 +57,7 @@ export const useUpsertItem = defineMutation(() => {
           .execute()
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })
@@ -90,7 +90,7 @@ export const useMoveItem = defineMutation(() => {
           .execute()
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })
@@ -105,7 +105,7 @@ export const useCreateCard = defineMutation(() => {
         await trx.replaceInto('favouriteCard').values(card).execute()
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })

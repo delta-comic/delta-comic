@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { SubscribeDB } from '@delta-comic/db'
-
 import { computedAsync } from '@vueuse/core'
 import { computed, shallowRef } from 'vue'
 

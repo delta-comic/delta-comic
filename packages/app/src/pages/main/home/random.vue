@@ -6,8 +6,8 @@ import { isEmpty } from 'es-toolkit/compat'
 import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { isShowMainHomeNavBar } from '@/symbol'
 import { Icons } from '@/icons'
+import { isShowMainHomeNavBar } from '@/symbol'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()
 const temp = useTemp().$applyRaw('randomConfig', () => ({

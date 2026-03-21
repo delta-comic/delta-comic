@@ -5,7 +5,8 @@
   "rules": {
     "no-unused-expressions": "allow",
     "no-useless-escape": "allow",
-    "no-non-null-asserted-optional-chain": "allow"
+    "no-non-null-asserted-optional-chain": "allow",
+    "no-thenable": "allow"
   },
 
   "settings": {

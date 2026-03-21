@@ -9,8 +9,8 @@
     "build:web": "vite build",
     "dev": "tauri dev",
     "dev:web": "vite",
-    "tauri": "pnpm exec tauri",
-    "publish:self": "echo \"No need publish to npm\""
+    "publish:self": "echo \"No need publish to npm\"",
+    "tauri": "pnpm exec tauri"
   },
   "dependencies": {
     "@delta-comic/core": "workspace:",

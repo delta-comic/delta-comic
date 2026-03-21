@@ -10,8 +10,8 @@ import noneSearchTextIcon from '@/assets/images/none-search-text-icon.webp'
 import SearchBar from '@/components/search/searchBar.vue'
 import List from '@/components/search/searchList.vue'
 import { searchSourceKey } from '@/components/search/source'
-import { decodeURIDeep } from '@/utils/url'
 import { Icons } from '@/icons'
+import { decodeURIDeep } from '@/utils/url'
 const $route = useRoute<'/search/[input]'>()
 const pluginStore = usePluginStore()
 const config = useConfig().$load(appConfig)

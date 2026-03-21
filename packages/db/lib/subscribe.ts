@@ -54,7 +54,7 @@ export const useUpsert = defineMutation(() => {
           .execute()
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })
@@ -69,7 +69,7 @@ export const useRemove = defineMutation(() => {
         await trx.deleteFrom('subscribe').where('subscribe.key', 'is', keys).execute()
       }, trx),
     onSettled: () => {
-      queryCache.invalidateQueries({ key })
+      void queryCache.invalidateQueries({ key })
     },
     key
   })

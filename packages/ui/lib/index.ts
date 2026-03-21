@@ -12,11 +12,11 @@ import DcLoading from './components/DcLoading.vue'
 import DcMarkdown from './components/DcMarkdown/index.vue'
 import DcPopup from './components/DcPopup.vue'
 import DcRouterTab from './components/DcRouterTab.vue'
+import DcState from './components/DcState.vue'
 import DcText from './components/DcText.vue'
 import DcToggleIcon from './components/DcToggleIcon.vue'
 import DcVar from './components/DcVar.vue'
 import DcWaterfall from './components/DcWaterfall.vue'
-import DcState from './components/DcState.vue'
 
 export {
   DcAuthorIcon,
