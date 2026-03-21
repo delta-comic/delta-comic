@@ -5,7 +5,6 @@ import { random } from 'es-toolkit/compat'
 export interface SharedFunctions {
   getRandomProvide(signal?: AbortSignal): PromiseLike<uni.item.Item[]>
 
-  addRecent(item: uni.item.Item): PromiseLike<any>
   routeToContent(
     contentType_: uni.content.ContentType_,
     id: string,
@@ -17,10 +16,6 @@ export interface SharedFunctions {
     source?: [plugin: string, name: string],
     sort?: string
   ): PromiseLike<any>
-
-  addAuthorSubscribe(author: uni.item.Author, plugin: string): PromiseLike<void>
-  removeAuthorSubscribe(author: uni.item.Author, plugin: string): PromiseLike<void>
-  getIsAuthorSubscribe(author: uni.item.Author, plugin: string): PromiseLike<boolean>
 
   triggerSharePopup(page: uni.content.ContentPage): PromiseLike<void>
   triggerShareToken(token: string): PromiseLike<void>

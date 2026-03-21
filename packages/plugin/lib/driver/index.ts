@@ -1,4 +1,4 @@
-import { PluginArchiveDB } from '@delta-comic/db'
+import { db, PluginArchiveDB } from '@delta-comic/db'
 import { PromiseContent } from '@delta-comic/model'
 import { remove } from 'es-toolkit'
 import { isEmpty } from 'es-toolkit/compat'
@@ -15,7 +15,7 @@ export const loadAllPlugins = PromiseContent.fromAsyncFunction(async () => {
     因此无法被放入树的插件一定存在循环引用
   */
   const foundDeps = new Set<string>([coreName])
-  const plugins = await PluginArchiveDB.getByEnabled(true)
+  const plugins = await db.selectFrom('plugin').where('enable', 'is', true).selectAll().execute()
   const allLevels = new Array<PluginArchiveDB.Archive[]>()
   while (true) {
     const level = plugins.filter(p => p.meta.require.every(d => foundDeps.has(d.id)))

@@ -1,5 +1,4 @@
 import { SharedFunction } from '@delta-comic/core'
-import { db, DBUtils, SubscribeDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
 import { useGlobalVar } from '@delta-comic/utils'
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
@@ -14,46 +13,6 @@ export const $initCore = () =>
   definePlugin({
     name: coreName,
     config: [appConfig],
-    onBooted: () => {
-      SharedFunction.define(
-        async author => {
-          const count = await DBUtils.countDb(
-            db.value
-              .selectFrom('subscribe')
-              .where('key', '=', SubscribeDB.key.toString([author.$$plugin, author.label]))
-          )
-
-          return count > 0
-        },
-        coreName,
-        'getIsAuthorSubscribe'
-      )
-      SharedFunction.define(
-        async author => {
-          await SubscribeDB.upsert({
-            key: SubscribeDB.key.toString([author.$$plugin, author.label]),
-            author,
-            plugin: author.$$plugin,
-            type: 'author',
-            itemKey: null
-          })
-          return
-        },
-        coreName,
-        'addAuthorSubscribe'
-      )
-      SharedFunction.define(
-        async author => {
-          await db.value
-            .deleteFrom('subscribe')
-            .where('key', '=', SubscribeDB.key.toString([author.$$plugin, author.label]))
-            .execute()
-          return
-        },
-        coreName,
-        'removeAuthorSubscribe'
-      )
-    },
     share: {
       initiative: [
         {

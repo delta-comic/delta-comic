@@ -1,4 +1,4 @@
-import { db, useNativeStore, type PluginArchiveDB } from '@delta-comic/db'
+import { db, PluginArchiveDB, useNativeStore } from '@delta-comic/db'
 import { createDownloadMessage, type DownloadMessageBind } from '@delta-comic/ui'
 import { isString, Mutex } from 'es-toolkit'
 import { sortBy } from 'es-toolkit/compat'
@@ -81,9 +81,7 @@ export const installDepends = (
     let count = 0
     const plugins =
       installedPlugins ??
-      new Set(
-        (await db.value.selectFrom('plugin').select('pluginName').execute()).map(v => v.pluginName)
-      )
+      new Set((await db.selectFrom('plugin').select('pluginName').execute()).map(v => v.pluginName))
     const overrides = usePluginConfig()
     for (const { id, download } of meta.require) {
       const isDownloaded = plugins.has(id)
@@ -96,6 +94,8 @@ export const installDepends = (
     }
     v.description = `安装完成，共${count}个`
   })
+
+const { upsert } = PluginArchiveDB.useUpsert()
 
 export const installPlugin = (input: string, __installedPlugins?: Set<string>) =>
   createDownloadMessage(`下载插件-${input}`, async m => {
@@ -121,19 +121,19 @@ export const installPlugin = (input: string, __installedPlugins?: Set<string>) =
       const meta = await loader.installDownload(file)
 
       v.description = '写入数据库'
-      await db.value
-        .replaceInto('plugin')
-        .values({
-          displayName: meta.name.display,
-          enable: true,
-          installerName: installer.name,
-          installInput: input,
-          loaderName: loader.name,
-          meta: JSON.stringify(meta),
-          pluginName: meta.name.id
-        })
-        .execute()
-
+      await upsert({
+        archives: [
+          {
+            displayName: meta.name.display,
+            enable: true,
+            installerName: installer.name,
+            installInput: input,
+            loaderName: loader.name,
+            meta,
+            pluginName: meta.name.id
+          }
+        ]
+      })
       return meta
     })
     console.log(`安装插件成功: ${meta.name.id} ->`, meta)
@@ -152,18 +152,19 @@ export const installFilePlugin = (file: File, __installedPlugins?: Set<string>) 
       const meta = await loader.installDownload(file)
 
       v.description = '写入数据库'
-      await db.value
-        .replaceInto('plugin')
-        .values({
-          displayName: meta.name.display,
-          enable: true,
-          installerName: '',
-          installInput: '',
-          loaderName: loader.name,
-          meta: JSON.stringify(meta),
-          pluginName: meta.name.id
-        })
-        .execute()
+      await upsert({
+        archives: [
+          {
+            displayName: meta.name.display,
+            enable: true,
+            installerName: '',
+            installInput: '',
+            loaderName: loader.name,
+            meta,
+            pluginName: meta.name.id
+          }
+        ]
+      })
 
       return meta
     })
@@ -197,10 +198,7 @@ export const updatePlugin = async (
       return await loader.installDownload(file)
     })
 
-    await db.value
-      .replaceInto('plugin')
-      .values({ ...pluginMeta, meta: JSON.stringify(meta) })
-      .execute()
+    await upsert({ archives: [{ ...pluginMeta, meta }] })
 
     await installDepends(m, meta, __installedPlugins)
   })

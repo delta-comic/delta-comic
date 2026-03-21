@@ -1,6 +1,5 @@
-import { db } from '@delta-comic/db'
+import { PluginArchiveDB } from '@delta-comic/db'
 import { useGlobalVar } from '@delta-comic/utils'
-import { computedAsync } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { computed, reactive, type Raw } from 'vue'
 import { shallowReactive } from 'vue'
@@ -27,14 +26,11 @@ export const usePluginStore = useGlobalVar(
     const plugins = shallowReactive(new Map<string, Raw<PluginConfig>>())
     const pluginSteps = reactive<Record<string, PluginLoadingMicroSteps>>({})
 
-    const pluginNames = computedAsync(
-      async () =>
-        Object.fromEntries(
-          (await db.value.selectFrom('plugin').select(['pluginName', 'displayName']).execute()).map(
-            v => [v.pluginName, v.displayName] as const
-          )
-        ),
-      {}
+    const { data: pluginNames } = PluginArchiveDB.useQuery(db =>
+      db
+        .select(['pluginName', 'displayName'])
+        .execute()
+        .then(v => Object.fromEntries(v.map(v => [v.pluginName, v.displayName])))
     )
 
     const allSearchSource = computed(() =>
