@@ -40,7 +40,7 @@
     "naive-ui": "catalog:",
     "pinia": "catalog:",
     "semver": "catalog:",
-    "tauri-plugin-better-cors-fetch": "github:delta-comic/tauri-plugin-better-cors-fetch",
+    "tauri-plugin-better-cors-fetch": "github:wenxig/tauri-plugin-better-cors-fetch",
     "tauri-plugin-m3": "^0.3.1",
     "vant": "catalog:",
     "vue": "catalog:",

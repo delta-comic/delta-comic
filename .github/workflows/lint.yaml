@@ -1,4 +1,4 @@
-name: 构建和发布
+name: Lint
 
 on:
   push:

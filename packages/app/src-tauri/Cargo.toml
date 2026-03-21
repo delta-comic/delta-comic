@@ -51,7 +51,7 @@ version = "2.8.0"
 features = ["colored"]
 
 [dependencies.tauri-plugin-better-cors-fetch]
-git = "https://github.com/delta-comic/tauri-plugin-better-cors-fetch"
+git = "https://github.com/wenxig/tauri-plugin-better-cors-fetch"
 branch = "main"
 features = ["multipart", "blocking", "native-tls-vendored"]
 
