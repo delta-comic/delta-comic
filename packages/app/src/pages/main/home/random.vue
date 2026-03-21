@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { SharedFunction, useTemp } from '@delta-comic/core'
 import { Stream, uni } from '@delta-comic/model'
-import { LikeOutlined } from '@vicons/antd'
-import { DrawOutlined } from '@vicons/material'
 import { until, useResizeObserver } from '@vueuse/core'
 import { isEmpty } from 'es-toolkit/compat'
 import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { isShowMainHomeNavBar } from '@/symbol'
+import { Icons } from '@/icons'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()
 const temp = useTemp().$applyRaw('randomConfig', () => ({
@@ -67,7 +66,7 @@ console.debug('[random] waterfall', waterfall, temp.stream)
       :key="`${index}|${item.id}`"
     >
       <NIcon color="var(--van-text-color-2)" size="14px">
-        <DrawOutlined />
+        <Icons.antd.DrawOutlined />
       </NIcon>
       <span class="van-ellipsis ml-0.5 max-w-2/3 text-xs text-(--van-text-color-2)">{{
         item.author.join(',')
@@ -79,7 +78,7 @@ console.debug('[random] waterfall', waterfall, temp.stream)
         </span>
         <span v-if="item.likeNumber">
           <NIcon class="mr-0.5" size="14px" color="white">
-            <LikeOutlined />
+            <Icons.material.LikeOutlined />
           </NIcon>
           <span>{{ item.likeNumber }}</span>
         </span>

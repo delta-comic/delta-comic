@@ -42,3 +42,4 @@ catalog:
   'unplugin-vue-components': '31.0.0'
   'semver': '^7.7.4'
   '@types/semver': '^7.7.1'
+  '@pinia/colada': '^1.0.0'

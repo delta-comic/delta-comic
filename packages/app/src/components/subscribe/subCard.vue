@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { SharedFunction } from '@delta-comic/core'
 import type { uni } from '@delta-comic/model'
-import { MoreVertRound } from '@vicons/material'
 
 import { createDateString } from '@/utils/date'
+import { Icons } from '@/icons'
 
 defineProps<{ item: uni.item.Item }>()
 defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
@@ -45,7 +45,7 @@ defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
           >
             <template #reference>
               <NIcon size="20px">
-                <MoreVertRound />
+                <Icons.material.MoreVertRound />
               </NIcon>
             </template>
           </VanPopover>

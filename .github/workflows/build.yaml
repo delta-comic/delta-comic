@@ -82,6 +82,8 @@ jobs:
       - name: Build Android App
         run: |
           pnpm -r build
+          pnpm -r run publish:self
+
           pnpm run build
 
       #signature
@@ -149,5 +151,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 用于在 GitHub 上创建 release 与 tag
         run: |
-          pnpm -r run publish:self
           pnpm exec semantic-release

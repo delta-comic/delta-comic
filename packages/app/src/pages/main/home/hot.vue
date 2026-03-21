@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { uni } from '@delta-comic/model'
 import { Global } from '@delta-comic/plugin'
-import { ArrowForwardIosRound } from '@vicons/material'
 import { chunk } from 'es-toolkit'
 import { isEmpty } from 'es-toolkit/compat'
 import { computed } from 'vue'
 
 import LevelIcon from '@/components/home/hotPageIcon.vue'
+import { Icons } from '@/icons'
 
 const hotList = computed(() => Array.from(Global.mainLists.values()))
 
@@ -57,7 +57,7 @@ const getItemCard = (contentType: uni.content.ContentType_) =>
         >
           <span class="ml-3 text-xl font-bold text-(--nui-primary-color)">{{ block.name }}</span>
           <NIcon class="absolute! right-3" color="var(--van-text-color-3)" size="20px">
-            <ArrowForwardIosRound />
+            <Icons.material.ArrowForwardIosRound />
           </NIcon>
         </div>
       </VanSticky>

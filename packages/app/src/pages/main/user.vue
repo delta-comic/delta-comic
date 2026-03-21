@@ -1,20 +1,15 @@
 <script setup lang="ts">
-import { db, DBUtils } from '@delta-comic/db'
+import { DBUtils, FavouriteDB, RecentDB, SubscribeDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
 import { useConfig, usePluginStore } from '@delta-comic/plugin'
-import { FolderOutlined } from '@vicons/antd'
-import {
-  KeyboardArrowDownRound,
-  KeyboardArrowUpRound,
-  VerticalAlignTopRound
-} from '@vicons/material'
-import { computedAsync, createReusableTemplate } from '@vueuse/core'
+import { createReusableTemplate } from '@vueuse/core'
 import { isEmpty } from 'es-toolkit/compat'
 import { motion } from 'motion-v'
 import { NCollapseTransition } from 'naive-ui'
 import { computed, shallowRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { Icons } from '@/icons'
 import { useAppStore } from '@/stores/app'
 const $router = useRouter()
 const config = useConfig()
@@ -22,12 +17,21 @@ const $window = window
 const pluginStore = usePluginStore()
 
 
-const favouriteCount = computedAsync(
-  () => DBUtils.countDb(db.value.selectFrom('favouriteItem')),
-  -1
+const { data: favouriteCount } = FavouriteDB.useQueryItem(
+  db => DBUtils.countDb(db),
+  [],
+  () => -1
 )
-const subscribesCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom('subscribe')), -1)
-const recentCount = computedAsync(() => DBUtils.countDb(db.value.selectFrom('recentView')), -1)
+const { data: subscribesCount } = SubscribeDB.useQuery(
+  db => DBUtils.countDb(db),
+  [],
+  () => -1
+)
+const { data: recentCount } = RecentDB.useQuery(
+  db => DBUtils.countDb(db),
+  [],
+  () => -1
+)
 
 
 const app = useAppStore()
@@ -70,7 +74,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
           <NButton circle @click="app.activatedUser = user">
             <template #icon>
               <NIcon>
-                <VerticalAlignTopRound />
+                <Icons.material.VerticalAlignTopRound />
               </NIcon>
             </template>
           </NButton>
@@ -137,8 +141,8 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
     >
       <NDivider class="my-0! bg-(--van-background-2)">
         <NIcon @click="showActivatedUserSelect = !showActivatedUserSelect" size="20px">
-          <KeyboardArrowUpRound v-if="showActivatedUserSelect" />
-          <KeyboardArrowDownRound v-else />
+          <Icons.material.KeyboardArrowUpRound v-if="showActivatedUserSelect" />
+          <Icons.material.KeyboardArrowDownRound v-else />
         </NIcon>
       </NDivider>
     </Motion>
@@ -181,7 +185,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
         class="van-haptics-feedback flex flex-col items-center justify-center"
       >
         <NIcon name="photo-o" size="2rem" color="var(--bili-blue)">
-          <FolderOutlined />
+          <Icons.antd.FolderOutlined />
         </NIcon>
         <span class="mt-1 text-(--van-text-color)">本地缓存</span>
       </div>

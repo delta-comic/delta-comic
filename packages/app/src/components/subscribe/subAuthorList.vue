@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { useTemp } from '@delta-comic/core'
-import { db, SubscribeDB } from '@delta-comic/db'
+import { SubscribeDB } from '@delta-comic/db'
 import type { RStream, uni } from '@delta-comic/model'
 import { usePluginStore } from '@delta-comic/plugin'
-import { CloseRound } from '@vicons/material'
-import { computedAsync } from '@vueuse/core'
+import { usePreventBack, DcState } from '@delta-comic/ui'
 import { motion } from 'motion-v'
-import { onBeforeRouteLeave } from 'vue-router'
+import { computed, ref } from 'vue'
+
+import { Icons } from '@/icons'
 
 import Card from './subCard.vue'
 
@@ -15,7 +16,7 @@ const select = defineModel<string | undefined>('select', { required: true })
 
 
 const pluginStore = usePluginStore()
-const subscribe = computedAsync(() => SubscribeDB.getAll(), [])
+const { state: subscribe } = SubscribeDB.useQuery(db => db.selectAll().execute())
 
 
 const temp = useTemp().$applyRaw('subscribeList', () => new Map<string, RStream<uni.item.Item>>())
@@ -34,33 +35,43 @@ const getSource = (si: SubscribeDB.Item) => {
 }
 
 
+const { remove } = SubscribeDB.useRemove()
 const unsubscribe = (si: SubscribeDB.Item) => {
   select.value = undefined
-  return db.value.deleteFrom('subscribe').where('key', '=', si.key).execute()
+  return remove({ keys: [si.key] })
 }
-onBeforeRouteLeave(() => {
-  if (select.value) {
-    select.value = undefined
-    return false
-  }
-})
+
+
+usePreventBack(
+  computed({
+    get() {
+      return !!select.value
+    },
+    set(v) {
+      if (!v) select.value = undefined
+    }
+  }),
+  ref(true)
+)
 </script>
 
 <template>
   <AnimatePresence>
     <div class="absolute top-safe left-0 h-15 w-full" @click="select = undefined">
-      <template v-for="sub of subscribe">
-        <motion.div
-          v-if="sub.key == select"
-          :initial="{ scale: '80%', translateX: '-50%', opacity: 0 }"
-          :exit="{ scale: '80%', translateX: '-50%', opacity: 0 }"
-          :animate="{ scale: '100%', translateX: '0%', opacity: 1 }"
-          class="van-ellipsis absolute top-1 left-1 flex h-[calc(60px-(var(--spacing)*2))] w-fit max-w-[calc(100%-8px)] items-center gap-2 rounded-2xl bg-(--van-background-2) px-3 text-nowrap"
-        >
-          <DcAuthorIcon :size-spacing="10" :author="selectItem.author" />
-          <div class="text-lg font-semibold text-(--p-color)">{{ selectItem.author.label }}</div>
-        </motion.div>
-      </template>
+      <DcState :state="subscribe" v-slot="{ data }">
+        <template v-for="sub of data">
+          <motion.div
+            v-if="sub.key == select"
+            :initial="{ scale: '80%', translateX: '-50%', opacity: 0 }"
+            :exit="{ scale: '80%', translateX: '-50%', opacity: 0 }"
+            :animate="{ scale: '100%', translateX: '0%', opacity: 1 }"
+            class="van-ellipsis absolute top-1 left-1 flex h-[calc(60px-(var(--spacing)*2))] w-fit max-w-[calc(100%-8px)] items-center gap-2 rounded-2xl bg-(--van-background-2) px-3 text-nowrap"
+          >
+            <DcAuthorIcon :size-spacing="10" :author="selectItem.author" />
+            <div class="text-lg font-semibold text-(--p-color)">{{ selectItem.author.label }}</div>
+          </motion.div>
+        </template>
+      </DcState>
     </div>
     <motion.div
       class="absolute top-safe-offset-[60px] left-0 h-[calc(100%-60px)] w-full bg-(--van-background-2)"
@@ -73,43 +84,44 @@ onBeforeRouteLeave(() => {
       :dragTransition="{ bounceStiffness: 500, bounceDamping: 15 }"
       @drag-end="(_, info) => info.offset.y > 100 && (select = undefined)"
     >
-      <VanTabs
-        swipeable
-        :show-header="false"
-        class="size-full! *:*:*:size-full! *:*:size-full! *:size-full!"
-        v-model:active="select"
-      >
-        <VanTab
-          class="size-full! *:size-full!"
-          v-for="author of subscribe.filter(v => v.type == 'author')"
-          :name="author.key"
+      <DcState :state="subscribe" v-slot="{ data: subs }">
+        <VanTabs
+          swipeable
+          :show-header="false"
+          class="size-full! *:*:*:size-full! *:*:size-full! *:size-full!"
+          v-model:active="select"
         >
-          <div
-            class="van-hairline--bottom relative flex h-10 w-full items-center rounded-t-2xl bg-(--van-background-2) pl-3 text-base font-semibold"
+          <VanTab
+            class="size-full! *:size-full!"
+            v-for="author of <SubscribeDB.AuthorItem[]>subs.filter(v => v.type == 'author')"
+            :name="author.key"
           >
-            {{ author.author.label }}的动态
-            <NIcon
-              size="25px"
-              color="var(--van-text-color-3)"
-              class="absolute! right-1"
-              @click="select = undefined"
+            <div
+              class="van-hairline--bottom relative flex h-10 w-full items-center rounded-t-2xl bg-(--van-background-2) pl-3 text-base font-semibold"
             >
-              <CloseRound />
-            </NIcon>
-          </div>
-          <div @pointerdown.stop class="h-[calc(100%-40px)] w-full overflow-hidden">
-            <DcWaterfall
-              :source="getSource(author)"
-              :padding="0"
-              :col="1"
-              :gap="4"
-              v-slot="{ item }"
-            >
-              <Card :item @unsubscribe="unsubscribe(author)" />
-            </DcWaterfall>
-          </div>
-        </VanTab>
-      </VanTabs>
+              {{ author.author.label }}的动态
+              <NIcon
+                size="25px"
+                color="var(--van-text-color-3)"
+                class="absolute! right-1"
+                @click="select = undefined"
+              >
+                <Icons.material.CloseRound />
+              </NIcon>
+            </div>
+            <div @pointerdown.stop class="h-[calc(100%-40px)] w-full overflow-hidden">
+              <DcWaterfall
+                :source="getSource(author)"
+                :padding="0"
+                :col="1"
+                :gap="4"
+                v-slot="{ item }"
+              >
+                <Card :item @unsubscribe="unsubscribe(author)" />
+              </DcWaterfall>
+            </div>
+          </VanTab> </VanTabs
+      ></DcState>
     </motion.div>
   </AnimatePresence>
 </template>

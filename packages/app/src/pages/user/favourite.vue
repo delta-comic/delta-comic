@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { useTemp } from '@delta-comic/core'
-import { db, FavouriteDB, useNativeStore } from '@delta-comic/db'
+import { DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/db'
 import { PromiseContent, type uni } from '@delta-comic/model'
 import { usePluginStore } from '@delta-comic/plugin'
-import { createDownloadMessage } from '@delta-comic/ui'
-import { CloudSyncOutlined } from '@vicons/antd'
-import { CalendarViewDayRound, PlusRound, SearchFilled } from '@vicons/material'
-import { computedAsync } from '@vueuse/core'
+import { createDownloadMessage, DcState } from '@delta-comic/ui'
 import { isNumber, uniqBy } from 'es-toolkit/compat'
 import { shallowRef, useTemplateRef } from 'vue'
 
@@ -14,21 +11,28 @@ import CreateFavouriteCard from '@/components/createFavouriteCard.vue'
 import Searcher from '@/components/listSearcher.vue'
 import FavouriteCard from '@/components/user/favouriteCard.vue'
 import Layout from '@/components/user/userLayout.vue'
+import { Icons } from '@/icons'
 import { pluginName } from '@/symbol'
+
 const isCardMode = shallowRef(true)
-
-
 const temp = useTemp().$apply('favourite', () => ({ selectMode: 'pack' }))
 
 
-const allFavouriteCards = computedAsync(
-  () => db.value.selectFrom('favouriteCard').selectAll().orderBy('createAt', 'desc').execute(),
-  []
+const { state: allFavouriteCardsState } = FavouriteDB.useQueryCard(
+  db => db.selectAll().orderBy('createAt', 'desc').execute(),
+  [],
+  () => []
 )
+
+
 const searcher = useTemplateRef('searcher')
 
 
 const isSyncing = shallowRef(false)
+
+
+const { upsert: upsertFavouriteItem } = FavouriteDB.useUpsertItem()
+const { createCard } = FavouriteDB.useCreateCard()
 
 
 const pluginStore = usePluginStore()
@@ -52,38 +56,38 @@ const syncFromCloud = () =>
 
         const diff = await createLoading(
           `同步<${pluginStore.$getPluginDisplayName(plugin)}>-写入数据库`,
-          async c => {
-            c.retryable = true
-            let diff: uni.item.RawItem[] = []
-            c.description = '写入中'
-            await db.value
-              .replaceInto('favouriteCard')
-              .values({
-                title: `同步文件夹-${plugin}`,
-                description: '',
-                createAt: index,
-                private: true
+          c =>
+            DBUtils.withTransition(async trx => {
+              c.retryable = true
+              let diff: uni.item.RawItem[] = []
+              c.description = '写入中'
+              await createCard({
+                card: {
+                  title: `同步文件夹-${plugin}`,
+                  description: '',
+                  createAt: index,
+                  private: true
+                },
+                trx
               })
-              .execute()
+              for (const v of downloadItems) {
+                await upsertFavouriteItem({ item: v, belongTos: [index], trx })
+              }
 
-            for (const v of downloadItems) {
-              FavouriteDB.upsertItem(v, index)
-            }
+              c.description = '对比差异中'
+              const all = await trx
+                .selectFrom('favouriteItem')
+                .innerJoin('itemStore', 'favouriteItem.itemKey', 'itemStore.key')
+                .selectAll()
+                .execute()
 
-            c.description = '对比差异中'
-            const all = await db.value
-              .selectFrom('favouriteItem')
-              .innerJoin('itemStore', 'favouriteItem.itemKey', 'itemStore.key')
-              .selectAll()
-              .execute()
-
-            const thisPluginItems = all.filter(v => v.item.$$plugin == plugin).map(v => v.item)
-            diff = uniqBy(
-              thisPluginItems.filter(v => !downloadItems.some(r => v.id == r.id)),
-              v => v.id
-            )
-            return diff
-          }
+              const thisPluginItems = all.filter(v => v.item.$$plugin == plugin).map(v => v.item)
+              diff = uniqBy(
+                thisPluginItems.filter(v => !downloadItems.some(r => v.id == r.id)),
+                v => v.id
+              )
+              return diff
+            })
         )
 
         await createLoading(`同步<${pluginStore.$getPluginDisplayName(plugin)}>-上传`, async c => {
@@ -111,7 +115,7 @@ const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Arra
         color="var(--van-text-color-2)"
         @click="syncFromCloud"
       >
-        <CloudSyncOutlined />
+        <Icons.antd.CloudSyncOutlined />
       </NIcon>
     </template>
     <template #topNav>
@@ -142,7 +146,7 @@ const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Arra
           class="van-haptics-feedback"
           @click="searcher && (searcher!.isSearching = true)"
         >
-          <SearchFilled />
+          <Icons.material.SearchFilled />
         </NIcon>
         <NIcon
           color="var(--van-text-color-2)"
@@ -150,7 +154,7 @@ const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Arra
           class="van-haptics-feedback"
           @click="createFavouriteCard?.create()"
         >
-          <PlusRound />
+          <Icons.material.PlusFilled />
         </NIcon>
         <NIcon
           color="var(--van-text-color-2)"
@@ -163,7 +167,7 @@ const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Arra
             }
           "
         >
-          <CalendarViewDayRound v-if="isCardMode" />
+          <Icons.material.CalendarViewDayRound v-if="isCardMode" />
           <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -180,37 +184,39 @@ const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Arra
         </NIcon>
       </div>
     </template>
-    <DcWaterfall
-      class="h-full!"
-      unReloadable
-      ref="waterfall"
-      :source="{ data: PromiseContent.resolve(allFavouriteCards), isEnd: true }"
-      :data-processor="
-        v => v.filter(v => isNumber(v) || v.title.includes(searcher?.searchText ?? ''))
-      "
-      v-slot="{ item }"
-      :col="1"
-      :gap="6"
-      :padding="6"
-    >
-      <div class="flex items-center justify-center py-10" v-if="isNumber(item)">
-        <NButton
-          round
-          type="tertiary"
-          class="px-3! text-xs!"
-          size="small"
-          @click="createFavouriteCard?.create()"
-        >
-          新建收藏夹
-          <template #icon>
-            <NIcon>
-              <PlusRound />
-            </NIcon>
-          </template>
-        </NButton>
-      </div>
-      <FavouriteCard :height="130" :card="item" :isCardMode v-else />
-    </DcWaterfall>
+    <DcState :state="allFavouriteCardsState" v-slot="{ data: allFavouriteCards }">
+      <DcWaterfall
+        class="h-full!"
+        unReloadable
+        ref="waterfall"
+        :source="{ data: PromiseContent.resolve(allFavouriteCards), isEnd: true }"
+        :data-processor="
+          v => v.filter(v => isNumber(v) || v.title.includes(searcher?.searchText ?? ''))
+        "
+        v-slot="{ item }"
+        :col="1"
+        :gap="6"
+        :padding="6"
+      >
+        <div class="flex items-center justify-center py-10" v-if="isNumber(item)">
+          <NButton
+            round
+            type="tertiary"
+            class="px-3! text-xs!"
+            size="small"
+            @click="createFavouriteCard?.create()"
+          >
+            新建收藏夹
+            <template #icon>
+              <NIcon>
+                <Icons.material.PlusFilled />
+              </NIcon>
+            </template>
+          </NButton>
+        </div>
+        <FavouriteCard :height="130" :card="item" :isCardMode v-else />
+      </DcWaterfall>
+    </DcState>
   </Layout>
   <CreateFavouriteCard ref="createFavouriteCard" />
 </template>

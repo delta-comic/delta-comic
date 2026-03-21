@@ -16,6 +16,7 @@ import DcText from './components/DcText.vue'
 import DcToggleIcon from './components/DcToggleIcon.vue'
 import DcVar from './components/DcVar.vue'
 import DcWaterfall from './components/DcWaterfall.vue'
+import DcState from './components/DcState.vue'
 
 export {
   DcAuthorIcon,
@@ -32,7 +33,8 @@ export {
   DcToggleIcon,
   DcVar,
   DcWaterfall,
-  DcMarkdown
+  DcMarkdown,
+  DcState
 }
 
 declare module 'vue-router' {

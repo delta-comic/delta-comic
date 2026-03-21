@@ -33,6 +33,7 @@
     "publish:self": "pnpm --filter db publish"
   },
   "dependencies": {
+    "@pinia/colada": "catalog:",
     "@tauri-apps/plugin-sql": "catalog:",
     "@tauri-apps/plugin-store": "catalog:",
     "@vueuse/core": "catalog:",

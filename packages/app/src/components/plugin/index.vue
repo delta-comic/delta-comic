@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { loadAllPlugins } from '@delta-comic/plugin'
-import { SafetyOutlined, SettingOutlined } from '@vicons/antd'
-import { AutoAwesomeMosaicOutlined, CheckRound, FileDownloadOutlined } from '@vicons/material'
 import { type MenuOption, NIcon, useMessage } from 'naive-ui'
 import { type Component, h, shallowRef } from 'vue'
 
+import { Icons } from '@/icons'
 import Config from '@/pages/main/plugin/config.vue'
 import Download from '@/pages/main/plugin/download.vue'
 import List from '@/pages/main/plugin/list.vue'
@@ -21,9 +20,19 @@ const renderIcon = (icon: Component) =>  () => h(NIcon, null, { default: () => h
 
 
 const menuOptions = [
-  { label: '管理', key: 'list', icon: renderIcon(AutoAwesomeMosaicOutlined), comp: List },
-  { label: '安装', key: 'download', icon: renderIcon(FileDownloadOutlined), comp: Download },
-  { label: '配置', key: 'config', icon: renderIcon(SettingOutlined), comp: Config },
+  {
+    label: '管理',
+    key: 'list',
+    icon: renderIcon(Icons.material.AutoAwesomeMosaicOutlined),
+    comp: List
+  },
+  {
+    label: '安装',
+    key: 'download',
+    icon: renderIcon(Icons.material.FileDownloadOutlined),
+    comp: Download
+  },
+  { label: '配置', key: 'config', icon: renderIcon(Icons.antd.SettingOutlined), comp: Config },
   { label: `版本: ${pkg.version}`, key: 'version', disabled: true }
 ] satisfies MenuOption[]
 const isBooting = shallowRef(false)
@@ -46,9 +55,9 @@ const $message = useMessage()
     position="bottom"
     round
     class="h-[80vh]"
-    :before-close="() => !isBooting"
+    :beforeClose="() => !isBooting"
   >
-    <NSpin :show="isBooting" class="relative size-full *:first:size-full">
+    <NSpin :show="isBooting" class="relative size-full" contentClass="size-full">
       <div class="size-full overflow-hidden">
         <NMenu v-model:value="pageSelect" mode="horizontal" :options="menuOptions" responsive />
         <!-- content pages -->
@@ -70,8 +79,8 @@ const $message = useMessage()
       <!-- boot button group -->
       <ActionButtonGroup
         :actions="[
-          { title: '安全启动', icon: SafetyOutlined, onClick: () => boot(true) },
-          { title: '启动', icon: CheckRound, onClick: () => boot(false) }
+          { title: '安全启动', icon: Icons.antd.SafetyOutlined, onClick: () => boot(true) },
+          { title: '启动', icon: Icons.material.CheckRound, onClick: () => boot(false) }
         ]"
       />
       <template #description>

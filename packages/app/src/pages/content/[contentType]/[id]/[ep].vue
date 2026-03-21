@@ -9,10 +9,9 @@ import { useRoute } from 'vue-router'
 import { useContentStore } from '@/stores/content'
 
 const $route = useRoute<'/content/[contentType]/[id]/[ep]'>()
+
+
 const contentStore = useContentStore()
-
-
-definePage({ meta: { statusBar: 'dark', force: true } })
 
 
 const ep = $route.params.ep.toString()
@@ -20,15 +19,15 @@ const id = $route.params.id.toString()
 const contentType = $route.params.contentType.toString()
 
 
+contentStore.$load(contentType, id, ep)
+
+
 const page = computed(
   () => contentStore.history.get(contentStore.$createHistoryKey(contentType, id, ep))!
 )
 
 
-contentStore.$load(contentType, id, ep)
-
-
-const layout = computed(() => uni.content.ContentPage.viewLayout.get(page.value.contentType))
+const layout = computed(() => uni.content.ContentPage.viewLayout.get($route.params.contentType))
 
 
 const { isFullscreen } = useFullscreen()
@@ -47,6 +46,9 @@ watch(
   },
   { immediate: true }
 )
+
+
+definePage({ meta: { statusBar: 'dark', force: true } })
 </script>
 
 <template>

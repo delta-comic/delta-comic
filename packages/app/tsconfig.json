@@ -8,7 +8,8 @@
       "./components.d.ts",
       "vue-component-type-helpers",
       "./typed-router.d.ts",
-      "vite/client"
+      "vite/client",
+      "@delta-comic/utils"
     ]
   },
   "vueCompilerOptions": {

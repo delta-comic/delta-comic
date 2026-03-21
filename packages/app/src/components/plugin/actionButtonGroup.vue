@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { db, DBUtils } from '@delta-comic/db'
-import { CheckRound } from '@vicons/material'
-import { computedAsync } from '@vueuse/core'
+import { DBUtils, PluginArchiveDB } from '@delta-comic/db'
 import { NIcon } from 'naive-ui'
 import type { Component } from 'vue'
 import { shallowRef } from 'vue'
+
+import { Icons } from '@/icons'
 
 defineProps<{ actions: { title: string; icon: Component; onClick: () => any }[] }>()
 
@@ -16,9 +16,8 @@ const closeMenuBefore = (v: any) => {
   isShowMenu.value = false
   return v
 }
-const totalCount = computedAsync(
-  () => DBUtils.countDb(db.value.selectFrom('plugin').where('enable', '=', true)),
-  0
+const { data: totalCount } = PluginArchiveDB.useQuery(db =>
+  DBUtils.countDb(db.where('enable', '=', true))
 )
 </script>
 
@@ -33,7 +32,7 @@ const totalCount = computedAsync(
     v-model:show-menu="isShowMenu"
   >
     <NIcon :size="25">
-      <CheckRound />
+      <Icons.material.CheckRound />
     </NIcon>
     <template #menu>
       <template v-if="totalCount">

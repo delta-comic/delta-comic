@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Global } from '@delta-comic/plugin'
-import { VideogameAssetFilled } from '@vicons/material'
 import { shallowRef, provide, nextTick, useTemplateRef, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import userIcon from '@/assets/images/userIcon.webp'
 import ExtendableSearchBar from '@/components/home/mainPageSearchBar.vue'
+import { Icons } from '@/icons'
 import { useAppStore } from '@/stores/app'
 import { isShowMainHomeNavBar } from '@/symbol'
 const $router = useRouter()
@@ -62,7 +62,7 @@ const tabItem = computed(() =>
       v-if="!extendableSearchBar?.isSearching"
     >
       <NIcon color="rgb(156 163 175)" @click="$router.force.push({ name: '/' })" size="1.8rem">
-        <VideogameAssetFilled />
+        <Icons.material.VideogameAssetFilled />
       </NIcon>
       <VanIcon name="bullhorn-o" color="rgb(156 163 175)" size="1.8rem" />
     </div>

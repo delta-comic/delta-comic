@@ -16,7 +16,8 @@ const $router = useRouter()
 <template>
   <NSpin
     :show="isLoading"
-    class="h-[calc(100%-var(--safe-area-inset-top))] w-full *:first:size-full"
+    class="h-[calc(100%-var(--safe-area-inset-top))] w-full"
+    contentClass="size-full"
   >
     <div class="w-full bg-(--van-background-2) pt-safe"></div>
     <div class="flex w-full flex-col bg-(--van-background-2)" ref="topBarEl">

@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@lhlyu/vue-virtual-waterfall": "catalog:",
+    "@pinia/colada": "catalog:",
     "@tauri-apps/plugin-shell": "catalog:",
     "@types/linkify-it": "^5.0.0",
     "@vant/use": "catalog:",

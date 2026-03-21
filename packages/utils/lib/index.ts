@@ -1,4 +1,5 @@
 import type { useDialog, useLoadingBar, useMessage } from 'naive-ui'
+import type { MaybeRefOrGetter } from 'vue'
 import type { Router } from 'vue-router'
 
 declare global {
@@ -21,6 +22,7 @@ export interface ExternalLibKey {
   'axios': 'Axios'
   'vue-router': 'VR'
   'pinia': 'Pinia'
+  '@pinia/colada': 'Pc'
   '@delta-comic/ui': 'DcUi'
   '@delta-comic/model': 'DcModel'
   '@delta-comic/core': 'DcCore'
@@ -41,6 +43,7 @@ export const extendsDepends: ExternalLib = {
   'axios': 'window.$$lib$$.Axios',
   'pinia': 'window.$$lib$$.Pinia',
   'vue-router': 'window.$$lib$$.VR',
+  '@pinia/colada': 'window.$$lib$$.Pc',
   '@delta-comic/ui': 'window.$$lib$$.DcUi',
   '@delta-comic/model': 'window.$$lib$$.DcModel',
   '@delta-comic/core': 'window.$$lib$$.DcCore',
@@ -48,6 +51,16 @@ export const extendsDepends: ExternalLib = {
   '@delta-comic/utils': 'window.$$lib$$.DcUtils',
   '@delta-comic/require': 'window.$$lib$$.DcRequire',
   '@delta-comic/db': 'window.$$lib$$.DcDb'
+}
+
+declare module 'vue-router' {
+  interface Router {
+    force: { push: Router['push']; replace: Router['replace'] }
+  }
+  interface RouteMeta {
+    statusBar?: MaybeRefOrGetter<'dark' | 'light' | 'auto'>
+    force?: boolean
+  }
 }
 
 export const useGlobalVar = <T>(val: T, key: string): T =>

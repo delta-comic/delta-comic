@@ -1,3 +1,13 @@
+declare module 'vue-router' {
+  interface Router {
+    force: { push: Router['push']; replace: Router['replace'] }
+  }
+  interface RouteMeta {
+    statusBar?: Vue.MaybeRefOrGetter<'dark' | 'light' | 'auto'>
+    force?: boolean
+  }
+}
+
 import 'core-js'
 import type {} from '@delta-comic/utils'
 import { CORSFetch } from 'tauri-plugin-better-cors-fetch'

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useTemp } from '@delta-comic/core'
 import { appConfig, useConfig, usePluginStore, type Search } from '@delta-comic/plugin'
-import { CloudServerOutlined } from '@vicons/antd'
 import { fromPairs, isEmpty } from 'es-toolkit/compat'
 import type { SearchInstance } from 'vant'
 import { shallowRef, computed, useTemplateRef, watch } from 'vue'
@@ -12,6 +11,7 @@ import SearchBar from '@/components/search/searchBar.vue'
 import List from '@/components/search/searchList.vue'
 import { searchSourceKey } from '@/components/search/source'
 import { decodeURIDeep } from '@/utils/url'
+import { Icons } from '@/icons'
 const $route = useRoute<'/search/[input]'>()
 const pluginStore = usePluginStore()
 const config = useConfig().$load(appConfig)
@@ -87,7 +87,7 @@ const goSearch = () => {
             </span>
             <template #icon>
               <NIcon size="1.8rem">
-                <CloudServerOutlined />
+                <Icons.antd.CloudServerOutlined />
               </NIcon>
             </template>
           </NButton>

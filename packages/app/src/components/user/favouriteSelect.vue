@@ -1,25 +1,28 @@
 <script setup lang="ts">
-import { db, type FavouriteDB } from '@delta-comic/db'
-import { PlusFilled } from '@vicons/material'
-import { computedAsync } from '@vueuse/core'
+import { DBUtils, FavouriteDB } from '@delta-comic/db'
+import { DcState } from '@delta-comic/ui'
 import { useMessage } from 'naive-ui'
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 
+import { Icons } from '@/icons'
+
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())
-const allFavouriteCards = computedAsync(
-  () => db.value.selectFrom('favouriteCard').selectAll().execute(),
-  []
+
+
+const { state: allFavouriteCards } = FavouriteDB.useQueryCard(
+  db => db.selectAll().execute(),
+  [],
+  () => []
 )
 
 
 const getCardItemCount = (belongTo: FavouriteDB.Card['createAt']) =>
-  db.value
-    .selectFrom('favouriteItem')
-    .where('belongTo', '=', belongTo)
-    .select(db => db.fn.countAll<number>().as('count'))
-    .executeTakeFirstOrThrow()
-    .then(v => v.count)
+  FavouriteDB.useQueryItem(
+    db => DBUtils.countDb(db.where('belongTo', '=', belongTo)),
+    [belongTo],
+    () => -1
+  )
 
 
 const isShow = shallowRef(false)
@@ -66,33 +69,42 @@ defineExpose({ create })
         class="absolute top-1/2 right-8 flex -translate-y-1/2 items-center text-xs! font-normal text-(--van-text-color-2)"
       >
         <NIcon>
-          <PlusFilled />
+          <Icons.material.PlusFilled />
         </NIcon>
         新建收藏夹
       </div>
     </div>
     <VanCellGroup inset class="mb-6!">
-      <DcAwait
-        v-for="card of allFavouriteCards"
-        v-slot="{ result: count }"
-        :promise="() => getCardItemCount(card.createAt)"
+      <DcState
+        :state="allFavouriteCards"
+        v-slot="{ data: afc }"
+        class="h-fit!"
+        contentClass="h-fit!"
       >
-        <VanCell
-          center
-          :title="card.title"
-          :label="`${count ?? 0}个内容`"
-          clickable
-          @click="
-            selectList.has(card.createAt)
-              ? selectList.delete(card.createAt)
-              : selectList.add(card.createAt)
-          "
+        <DcState
+          v-for="card of afc"
+          v-slot="{ data: count }"
+          :state="getCardItemCount(card.createAt).state.value"
+          class="size-fit"
+          contentClass="size-fit"
         >
-          <template #right-icon>
-            <NCheckbox :checked="selectList.has(card.createAt)" />
-          </template>
-        </VanCell>
-      </DcAwait>
+          <VanCell
+            center
+            :title="card.title"
+            :label="`${count ?? 0}个内容`"
+            clickable
+            @click="
+              selectList.has(card.createAt)
+                ? selectList.delete(card.createAt)
+                : selectList.add(card.createAt)
+            "
+          >
+            <template #right-icon>
+              <NCheckbox :checked="selectList.has(card.createAt)" />
+            </template>
+          </VanCell>
+        </DcState>
+      </DcState>
     </VanCellGroup>
     <NButton class="m-5! w-30!" @click="submit" strong secondary type="primary" size="large">
       确定

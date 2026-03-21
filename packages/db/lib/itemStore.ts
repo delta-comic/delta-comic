@@ -1,20 +1,45 @@
 import { SourcedValue, Struct, uni } from '@delta-comic/model'
-import type { JSONColumnType, Selectable } from 'kysely'
+import { defineMutation, useMutation, useQueryCache } from '@pinia/colada'
+import type { JSONColumnType, Kysely, Selectable } from 'kysely'
+
+import { withTransition } from './utils'
+
+import type { DB } from '.'
 
 export interface Table {
+  /** @description primary key */
   key: string
   item: JSONColumnType<uni.item.RawItem>
 }
 export type StorableItem = uni.item.Item | uni.item.RawItem
 export type StoredItem = Selectable<Table>
-export const key = new SourcedValue('*')
+export const itemKey = new SourcedValue('*')
 
-export async function upsert(item: StorableItem) {
-  const { db } = await import('.')
-  const k = key.toString([uni.content.ContentPage.contentPage.toString(item.contentType), item.id])
-  await db.value
-    .replaceInto('itemStore')
-    .values({ item: Struct.toRaw(item), key: k })
-    .execute()
-  return k
+export enum QueryKey {
+  item = 'db:itemStore:'
 }
+
+const queryCache = useQueryCache()
+
+export const useUpsert = defineMutation(() => {
+  const key = [QueryKey.item]
+  const { mutateAsync, ...mutation } = useMutation({
+    mutation: async ({ item, trx }: { item: StorableItem; trx?: Kysely<DB> }) =>
+      withTransition(async trx => {
+        const k = itemKey.toString([
+          uni.content.ContentPage.contentPage.toString(item.contentType),
+          item.id
+        ])
+        await trx
+          .replaceInto('itemStore')
+          .values({ item: Struct.toRaw(item), key: k })
+          .execute()
+        return k
+      }, trx),
+    onSettled: () => {
+      queryCache.invalidateQueries({ key })
+    },
+    key
+  })
+  return { ...mutation, upsert: mutateAsync, key }
+})

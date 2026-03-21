@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { SubscribeDB } from '@delta-comic/db'
-import { ArrowForwardIosRound } from '@vicons/material'
+
 import { computedAsync } from '@vueuse/core'
 import { computed, shallowRef } from 'vue'
 
 import AuthorList from '@/components/subscribe/subAuthorList.vue'
+import { Icons } from '@/icons'
 const isOnAllPage = shallowRef(true)
 const subscribe = computedAsync(() => SubscribeDB.getAll(), [])
 
@@ -60,7 +61,7 @@ const isShowAllList = shallowRef(false)
         >
           更多
           <NIcon>
-            <ArrowForwardIosRound />
+            <Icons.material.ArrowForwardIosRound />
           </NIcon>
         </div>
       </div>
@@ -74,7 +75,7 @@ const isShowAllList = shallowRef(false)
           @click="select = sub.key"
         >
           <template v-if="sub.type == 'author'">
-            <AuthorIcon :size-spacing="12" :author="sub.author" />
+            <DcAuthorIcon :size-spacing="12" :author="sub.author" />
             <div
               class="van-multi-ellipsis--l2 mt-1 w-18 text-center text-xs text-wrap text-(--van-text-color-2)"
             >

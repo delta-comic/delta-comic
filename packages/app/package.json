@@ -10,7 +10,7 @@
     "dev": "tauri dev",
     "dev:web": "vite",
     "tauri": "pnpm exec tauri",
-    "publish:self":"echo \"No need publish to npm\""
+    "publish:self": "echo \"No need publish to npm\""
   },
   "dependencies": {
     "@delta-comic/core": "workspace:",
@@ -21,14 +21,13 @@
     "@delta-comic/ui": "workspace:",
     "@delta-comic/utils": "workspace:",
     "@octokit/rest": "catalog:",
+    "@pinia/colada": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/cli": "^2.10.1",
     "@tauri-apps/plugin-clipboard-manager": "~2.3.2",
     "@tauri-apps/plugin-fs": "catalog:",
     "@tauri-apps/plugin-shell": "catalog:",
     "@tauri-apps/plugin-sql": "catalog:",
-    "@vicons/antd": "^0.13.0",
-    "@vicons/material": "^0.13.0",
     "@vueuse/core": "catalog:",
     "axios": "catalog:",
     "color": "^5.0.3",
