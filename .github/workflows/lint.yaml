@@ -31,8 +31,9 @@ jobs:
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
 
-      - name: Install dependencies
+      - name: Lint
         run: |
+          pnpm -r build
           pnpm exec oxfmt --check
           pnpm exec cspell --no-must-find-files ./packages
           pnpm exec oxlint --type-aware
