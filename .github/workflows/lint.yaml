@@ -1,0 +1,38 @@
+name: 构建和发布
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.30.1
+
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 25
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Install dependencies
+        run: |
+          pnpm exec oxfmt -c --config=./.oxfmtrc.json --check ./packages
+          pnpm exec cspell --no-exit-code --no-must-find-files ./packages
+          pnpm exec oxlint --type-aware
