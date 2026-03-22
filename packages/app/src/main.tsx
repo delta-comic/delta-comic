@@ -24,8 +24,6 @@ import * as DcUi from '@delta-comic/ui'
 import * as DcUtils from '@delta-comic/utils'
 import * as Pc from '@pinia/colada'
 import { reactiveComputed, useCssVar, useDark } from '@vueuse/core'
-import * as Axios from 'axios'
-import axios from 'axios'
 import Color from 'color'
 import * as Naive from 'naive-ui'
 import {
@@ -56,10 +54,7 @@ import AppSetup from './AppSetup.vue'
 import { router } from './router'
 CORSFetch.init({ request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } } })
 
-axios.defaults.timeout = 7000
-axios.defaults.adapter = ['fetch']
 window.$$lib$$ = {
-  Axios: { ...Axios, ...axios, axios },
   Vue,
   Vant,
   Naive,

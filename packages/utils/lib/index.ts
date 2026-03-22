@@ -19,7 +19,6 @@ export interface ExternalLibKey {
   'vue': 'Vue'
   'vant': 'Vant'
   'naive-ui': 'Naive'
-  'axios': 'Axios'
   'vue-router': 'VR'
   'pinia': 'Pinia'
   '@pinia/colada': 'Pc'
@@ -40,7 +39,6 @@ export const extendsDepends: ExternalLib = {
   'vue': 'window.$$lib$$.Vue',
   'vant': 'window.$$lib$$.Vant',
   'naive-ui': 'window.$$lib$$.Naive',
-  'axios': 'window.$$lib$$.Axios',
   'pinia': 'window.$$lib$$.Pinia',
   'vue-router': 'window.$$lib$$.VR',
   '@pinia/colada': 'window.$$lib$$.Pc',

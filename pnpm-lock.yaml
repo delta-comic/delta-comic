@@ -78,9 +78,6 @@ catalogs:
     jszip:
       specifier: ^3.10.1
       version: 3.10.1
-    kysely:
-      specifier: ^0.28.13
-      version: 0.28.14
     kysely-dialect-tauri:
       specifier: ^1.2.1
       version: 1.2.1
@@ -264,30 +261,15 @@ importers:
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.0.0(pinia@3.0.4(typescript@5.9.3)(vue@3.5.30(typescript@5.9.3)))(vue@3.5.30(typescript@5.9.3))
-      '@tauri-apps/api':
-        specifier: 'catalog:'
-        version: 2.10.1
-      '@tauri-apps/cli':
-        specifier: ^2.10.1
-        version: 2.10.1
       '@tauri-apps/plugin-clipboard-manager':
         specifier: ~2.3.2
         version: 2.3.2
-      '@tauri-apps/plugin-fs':
-        specifier: 'catalog:'
-        version: 2.4.5
       '@tauri-apps/plugin-shell':
         specifier: 'catalog:'
         version: 2.3.5
-      '@tauri-apps/plugin-sql':
-        specifier: 'catalog:'
-        version: 2.3.2
       '@vueuse/core':
         specifier: 'catalog:'
         version: 14.2.1(vue@3.5.30(typescript@5.9.3))
-      axios:
-        specifier: 'catalog:'
-        version: 1.13.6
       color:
         specifier: ^5.0.3
         version: 5.0.3
@@ -300,12 +282,6 @@ importers:
       es-toolkit:
         specifier: 'catalog:'
         version: 1.45.1
-      kysely:
-        specifier: 'catalog:'
-        version: 0.28.14
-      mitt:
-        specifier: 'catalog:'
-        version: 3.0.1
       motion-v:
         specifier: 'catalog:'
         version: 2.0.1(@vueuse/core@14.2.1(vue@3.5.30(typescript@5.9.3)))(vue@3.5.30(typescript@5.9.3))
@@ -337,6 +313,9 @@ importers:
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.2.2(vite@8.0.1(@types/node@25.5.0)(jiti@2.6.1)(yaml@2.8.3))
+      '@tauri-apps/cli':
+        specifier: ^2.10.1
+        version: 2.10.1
       '@types/semver':
         specifier: 'catalog:'
         version: 7.7.1
@@ -3307,10 +3286,6 @@ packages:
 
   kysely@0.28.13:
     resolution: {integrity: sha512-jCkYDvlfzOyHaVsrvR4vnNZxG30oNv2jbbFBjTQAUG8n0h07HW0sZJHk4KAQIRyu9ay+Rg+L8qGa3lwt8Gve9w==}
-    engines: {node: '>=20.0.0'}
-
-  kysely@0.28.14:
-    resolution: {integrity: sha512-SU3lgh0rPvq7upc6vvdVrCsSMUG1h3ChvHVOY7wJ2fw4C9QEB7X3d5eyYEyULUX7UQtxZJtZXGuT6U2US72UYA==}
     engines: {node: '>=20.0.0'}
 
   lie@3.3.0:
@@ -7197,8 +7172,6 @@ snapshots:
       kysely: 0.28.13
 
   kysely@0.28.13: {}
-
-  kysely@0.28.14: {}
 
   lie@3.3.0:
     dependencies:
