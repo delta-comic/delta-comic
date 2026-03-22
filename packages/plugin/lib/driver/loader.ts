@@ -1,4 +1,5 @@
 import { db, type PluginArchiveDB } from '@delta-comic/db'
+import { PromiseContent } from '@delta-comic/model'
 import { Mutex, remove } from 'es-toolkit'
 import { isEmpty, sortBy } from 'es-toolkit/compat'
 
@@ -7,7 +8,6 @@ import { pluginEmitter } from '@/plugin'
 import { bootPlugin } from './booter'
 import type { PluginLoader } from './init/utils'
 import { usePluginStore } from './store'
-import { PromiseContent } from '@delta-comic/model'
 
 const rawLoaders = import.meta.glob<PluginLoader>('./init/loader/*_*.ts', {
   eager: true,

@@ -1,9 +1,11 @@
-import type { PluginConfig } from "@/plugin"
-import { isString } from "es-toolkit"
-import { markRaw } from "vue"
+import { isString } from 'es-toolkit'
 import { sortBy } from 'es-toolkit/compat'
-import type { PluginBooter } from "./init/utils"
-import { usePluginStore } from "./store"
+import { markRaw } from 'vue'
+
+import type { PluginConfig } from '@/plugin'
+
+import type { PluginBooter } from './init/utils'
+import { usePluginStore } from './store'
 
 const rawBooters = import.meta.glob<PluginBooter>('./init/booter/*_*.ts', {
   eager: true,

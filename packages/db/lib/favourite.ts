@@ -126,7 +126,8 @@ export const useQueryItem = <T>(
     },
     key: () => [QueryKey.item, QueryKey.card, query].concat(otherKeys),
     staleTime: 15000,
-    initialData
+    initialData,
+    initialDataUpdatedAt: 0
   })
 
 export const useQueryCard = <T>(
@@ -141,5 +142,7 @@ export const useQueryCard = <T>(
     },
     key: () => [QueryKey.card, query].concat(otherKeys),
     staleTime: 15000,
-    initialData
+    refetchOnMount: 'always',
+    initialData,
+    initialDataUpdatedAt: 0
   })

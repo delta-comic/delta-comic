@@ -13,6 +13,7 @@ import * as DcCore from '@delta-comic/core'
 import * as DcDb from '@delta-comic/db'
 import * as DcModel from '@delta-comic/model'
 import * as DcPlugin from '@delta-comic/plugin'
+
 import './logger'
 DcCore
 DcDb

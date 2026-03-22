@@ -72,5 +72,7 @@ export const useQuery = <T>(
     },
     key: () => [CommonQueryKey.common, QueryKey.item, query].concat(otherKeys),
     staleTime: 15000,
-    initialData
+    refetchOnMount: 'always',
+    initialData,
+    initialDataUpdatedAt: 0
   })

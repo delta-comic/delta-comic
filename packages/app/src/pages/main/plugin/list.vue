@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { db, PluginArchiveDB } from '@delta-comic/db'
+import { PluginArchiveDB } from '@delta-comic/db'
 import { PromiseContent } from '@delta-comic/model'
 import { Install } from '@delta-comic/plugin'
 import { DcState } from '@delta-comic/ui'
@@ -43,6 +43,7 @@ const { state: codeArchivesState } = PluginArchiveDB.useQuery(
   [],
   () => []
 )
+const { remove } = PluginArchiveDB.useRemove()
 </script>
 
 <template>
@@ -70,14 +71,7 @@ const { state: codeArchivesState } = PluginArchiveDB.useQuery(
                     text: plugin.enable ? '禁用' : '启用',
                     onClick: () => void toggle({ keys: [plugin.pluginName] })
                   },
-                  {
-                    text: '删除',
-                    onClick: () =>
-                      void db
-                        .deleteFrom('plugin')
-                        .where('pluginName', '=', plugin.pluginName)
-                        .execute()
-                  },
+                  { text: '删除', onClick: () => void remove({ keys: [plugin.pluginName] }) },
                   {
                     text: '从下载源更新',
                     disabled: updating.has(plugin.pluginName),

@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { Global } from '@delta-comic/plugin'
-import { useQueryCache } from '@pinia/colada'
 import { useStyleTag } from '@vueuse/core'
 import { AnimatePresence, motion } from 'motion-v'
 import { useDialog, useLoadingBar, useMessage, useThemeVars } from 'naive-ui'
-import { shallowRef, computed, onMounted } from 'vue'
-
-import { CommonQueryKey } from '../../db/dist/lib/utils'
+import { shallowRef, computed } from 'vue'
 
 import App from './App.vue'
 import Plugin from './components/plugin/index.vue'
@@ -36,12 +33,6 @@ useStyleTag(injectStyle)
 
 const isBooted = shallowRef(false)
 const showContent = shallowRef(false)
-
-
-onMounted(() => {
-  const queryCache = useQueryCache()
-  queryCache.invalidateQueries({ key: [CommonQueryKey.common] })
-})
 </script>
 
 <template>
