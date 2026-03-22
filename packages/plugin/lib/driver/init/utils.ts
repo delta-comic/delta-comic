@@ -12,6 +12,7 @@ export interface PluginInstallerDescription {
 }
 export abstract class PluginInstaller {
   public abstract install(input: string): Promise<File | string>
+  public abstract checkIsUpdate(pluginMeta: PluginArchiveDB.Archive): Promise<boolean>
   public abstract update(pluginMeta: PluginArchiveDB.Archive): Promise<File | string>
   public abstract isMatched(input: string): boolean
   public abstract name: string
