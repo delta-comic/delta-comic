@@ -7,7 +7,7 @@ import {
 } from '@pinia/colada'
 import type { JSONColumnType, Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
-import { withTransition } from './utils'
+import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
 
@@ -41,10 +41,10 @@ export type Item = AuthorItem | EpItem
 export enum QueryKey {
   item = 'db:subscribe:'
 }
-const queryCache = useQueryCache()
 
 export const useUpsert = defineMutation(() => {
-  const key = [QueryKey.item]
+  const queryCache = useQueryCache()
+  const key = [CommonQueryKey.common, QueryKey.item]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({ items, trx }: { items: Item[]; trx?: Kysely<DB> }) =>
       withTransition(async trx => {
@@ -62,7 +62,8 @@ export const useUpsert = defineMutation(() => {
 })
 
 export const useRemove = defineMutation(() => {
-  const key = [QueryKey.item]
+  const queryCache = useQueryCache()
+  const key = [CommonQueryKey.common, QueryKey.item]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({ keys, trx }: { keys: Item['key'][]; trx?: Kysely<DB> }) =>
       withTransition(async trx => {
@@ -86,7 +87,7 @@ export const useQuery = <T>(
       const { db } = await import('.')
       return await query(db.selectFrom('subscribe'))
     },
-    key: () => [QueryKey.item, query].concat(otherKeys),
+    key: () => [CommonQueryKey.common, QueryKey.item, query].concat(otherKeys),
     staleTime: 15000,
     initialData
   })

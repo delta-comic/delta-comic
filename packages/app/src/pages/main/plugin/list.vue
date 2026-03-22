@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { db, PluginArchiveDB } from '@delta-comic/db'
 import { PromiseContent } from '@delta-comic/model'
-import { updatePlugin } from '@delta-comic/plugin'
+import { Install } from '@delta-comic/plugin'
 import { DcState } from '@delta-comic/ui'
 import { memoize } from 'es-toolkit'
 import semver from 'semver'
@@ -12,11 +12,11 @@ import { Icons } from '@/icons'
 import pkg from '../../../../package.json'
 
 const updating = shallowReactive(new Set<string>())
-const _updatePlugin = async (plugin: PluginArchiveDB.Archive) => {
+const updatePlugin = async (plugin: PluginArchiveDB.Archive) => {
   if (updating.has(plugin.pluginName)) throw new Error('已经在更新')
   updating.add(plugin.pluginName)
   try {
-    await updatePlugin(plugin)
+    await Install.updatePlugin(plugin)
   } finally {
     updating.delete(plugin.pluginName)
   }
@@ -81,7 +81,7 @@ const { state: codeArchivesState } = PluginArchiveDB.useQuery(
                   {
                     text: '从下载源更新',
                     disabled: updating.has(plugin.pluginName),
-                    onClick: () => _updatePlugin(plugin)
+                    onClick: () => updatePlugin(plugin)
                   }
                 ]"
                 placement="left-start"

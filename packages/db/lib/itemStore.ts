@@ -2,7 +2,7 @@ import { SourcedValue, Struct, uni } from '@delta-comic/model'
 import { defineMutation, useMutation, useQueryCache } from '@pinia/colada'
 import type { JSONColumnType, Kysely, Selectable } from 'kysely'
 
-import { withTransition } from './utils'
+import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
 
@@ -19,10 +19,9 @@ export enum QueryKey {
   item = 'db:itemStore:'
 }
 
-const queryCache = useQueryCache()
-
 export const useUpsert = defineMutation(() => {
-  const key = [QueryKey.item]
+  const queryCache = useQueryCache()
+  const key = [CommonQueryKey.common, QueryKey.item]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({ item, trx }: { item: StorableItem; trx?: Kysely<DB> }) =>
       withTransition(async trx => {

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { installFilePlugin, installPlugin, pluginInstallers } from '@delta-comic/plugin'
+import { Install } from '@delta-comic/plugin'
 import { createDialog } from '@delta-comic/ui'
 import { toReactive, useFileDialog } from '@vueuse/core'
 import { useMessage } from 'naive-ui'
 import { ref } from 'vue'
+const { installFilePlugin, installPlugin, installers } = Install
+
+
 const inputUrl = ref('')
 const isAdding = ref(false)
 const $message = useMessage()
@@ -106,8 +109,8 @@ const useUploadPlugin = () => {
         :class="[index == 0 && inputUrl && 'bg-green-300/60']"
         :key="desc.name"
         v-for="(desc, index) of inputUrl.length == 0
-          ? pluginInstallers
-          : pluginInstallers.filter(v => v.isMatched(inputUrl))"
+          ? installers
+          : installers.filter(v => v.isMatched(inputUrl))"
       >
         <span
           class="item-center size-2 shrink-0 rounded-full bg-(--van-text-color)"

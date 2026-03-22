@@ -7,7 +7,7 @@ import {
 import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
 import * as ItemStoreDB from './itemStore'
-import { withTransition } from './utils'
+import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
 
@@ -22,11 +22,11 @@ export type Item = Selectable<Table>
 export enum QueryKey {
   item = 'db:recentView:'
 }
-const queryCache = useQueryCache()
 
 export const useUpsert = defineMutation(() => {
+  const queryCache = useQueryCache()
   const { key: iKey, upsert } = ItemStoreDB.useUpsert()
-  const key = [QueryKey.item, ...iKey]
+  const key = [CommonQueryKey.common, QueryKey.item, ...iKey]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({ item, trx }: { item: ItemStoreDB.StorableItem; trx?: Kysely<DB> }) =>
       withTransition(async trx => {
@@ -45,7 +45,8 @@ export const useUpsert = defineMutation(() => {
 })
 
 export const useRemove = defineMutation(() => {
-  const key = [QueryKey.item]
+  const queryCache = useQueryCache()
+  const key = [CommonQueryKey.common, QueryKey.item]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({ items, trx }: { items: Item['timestamp'][]; trx?: Kysely<DB> }) =>
       withTransition(async trx => {
@@ -69,7 +70,7 @@ export const useQuery = <T>(
       const { db } = await import('.')
       return await query(db.selectFrom('recentView'))
     },
-    key: () => [QueryKey.item, query].concat(otherKeys),
+    key: () => [CommonQueryKey.common, QueryKey.item, query].concat(otherKeys),
     staleTime: 15000,
     initialData
   })

@@ -10,7 +10,11 @@ export class _PluginInstallByFallbackUrl extends PluginInstaller {
   }
   public override name = 'fallbackUrl'
   private async installer(input: string): Promise<File> {
-    const res = await axios.request<Blob>({ url: input, responseType: 'blob' })
+    const res = await axios.request<Blob>({
+      url: input,
+      responseType: 'blob',
+      timeout: 1000 * 60 * 5
+    })
     const name = input.split('/').at(-1) ?? 'us.js'
     return new File([res.data], name)
   }

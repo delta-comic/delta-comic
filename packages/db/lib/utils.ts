@@ -21,3 +21,7 @@ export async function countDb(sql: SelectQueryBuilder<DB, any, object>) {
   const v = await sql.select(db => db.fn.countAll<number>().as('count')).executeTakeFirstOrThrow()
   return v.count
 }
+
+export enum CommonQueryKey {
+  common = 'db'
+}

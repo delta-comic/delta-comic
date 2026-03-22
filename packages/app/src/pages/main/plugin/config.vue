@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { usePluginConfig } from '@delta-comic/plugin'
+import { Install } from '@delta-comic/plugin'
 import { NDynamicInput } from 'naive-ui'
 
-const overrides = usePluginConfig()
+const overrides = Install.usePluginConfig()
 </script>
 
 <template>

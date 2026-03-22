@@ -6,7 +6,7 @@ import {
 } from '@pinia/colada'
 import type { JSONColumnType, Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
-import { withTransition } from './utils'
+import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
 
@@ -38,10 +38,9 @@ export enum QueryKey {
   item = 'db:plugin:'
 }
 
-const queryCache = useQueryCache()
-
 export const useUpsert = defineMutation(() => {
-  const key = [QueryKey.item]
+  const queryCache = useQueryCache()
+  const key = [CommonQueryKey.common, QueryKey.item]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({ archives, trx }: { archives: Archive[]; trx?: Kysely<DB> }) =>
       withTransition(async trx => {
@@ -59,7 +58,8 @@ export const useUpsert = defineMutation(() => {
 })
 
 export const useRemove = defineMutation(() => {
-  const key = [QueryKey.item]
+  const queryCache = useQueryCache()
+  const key = [CommonQueryKey.common, QueryKey.item]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({ keys, trx }: { keys: Archive['pluginName'][]; trx?: Kysely<DB> }) =>
       withTransition(async trx => {
@@ -74,7 +74,8 @@ export const useRemove = defineMutation(() => {
 })
 
 export const useToggleEnable = defineMutation(() => {
-  const key = [QueryKey.item]
+  const queryCache = useQueryCache()
+  const key = [CommonQueryKey.common, QueryKey.item]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({ keys, trx }: { keys: Archive['pluginName'][]; trx?: Kysely<DB> }) =>
       withTransition(async trx => {
@@ -109,7 +110,7 @@ export const useQuery = <T>(
       const { db } = await import('.')
       return await query(db.selectFrom('plugin'))
     },
-    key: () => [QueryKey.item, query].concat(otherKeys),
+    key: () => [CommonQueryKey.common, QueryKey.item, query].concat(otherKeys),
     staleTime: 15000,
     initialData
   })

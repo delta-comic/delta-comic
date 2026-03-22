@@ -29,7 +29,8 @@ export class _PluginInstallByNormalUrl extends PluginInstaller {
 
     const { data } = await axios.request<Blob>({
       url: asset.browser_download_url,
-      responseType: 'blob'
+      responseType: 'blob',
+      timeout: 1000 * 60 * 5
     })
 
     return new File([data], asset.name)

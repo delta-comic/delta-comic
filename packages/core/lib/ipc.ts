@@ -32,7 +32,7 @@ export class SharedFunction {
     plugin: string,
     name: TKey
   ) {
-    console.debug('[SharedFunction.define] defined new function', plugin, ':', name, '->', fn)
+    console.debug('[SharedFunction.define] defined new function', plugin, ':', name)
     this.sharedFunctions.set(name, [...(this.sharedFunctions.get(name) ?? []), { fn, plugin }])
     return fn
   }
@@ -57,7 +57,7 @@ export class SharedFunction {
     const it = all[index]
     if (!it)
       throw new Error(`[SharedFunction.callRandom] call ${name}, but not resigner any function.`)
-    console.log(`[SharedFunction.callRandom] call index: ${index} in ${all.length}`, it)
+    console.log(`[SharedFunction.callRandom] call index: ${index} in ${all.length}`, it.plugin)
     const result: ReturnType<SharedFunctions[TKey]> = (<any>it.fn)(...args)
     const ins = { result, ...it }
     const results = (async () => ({ ...it, result: await result }))()

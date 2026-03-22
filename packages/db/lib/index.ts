@@ -4,22 +4,17 @@ import { CamelCasePlugin, Kysely, Migrator, type Migration } from 'kysely'
 import { TauriSqliteDialect } from 'kysely-dialect-tauri'
 import { SerializePlugin } from 'kysely-plugin-serialize'
 
-import type * as PluginArchiveDB from './plugin'
-export * as PluginArchiveDB from './plugin'
-
 import type * as FavouriteDB from './favourite'
-export * as FavouriteDB from './favourite'
-
+export * as PluginArchiveDB from './plugin'
 import type * as HistoryDB from './history'
-export * as HistoryDB from './history'
-
+export * as FavouriteDB from './favourite'
 import type * as ItemStoreDB from './itemStore'
+export * as HistoryDB from './history'
+import type * as PluginArchiveDB from './plugin'
 export * as ItemStoreDB from './itemStore'
-
-import type * as SubscribeDB from './subscribe'
-export * as SubscribeDB from './subscribe'
-
 import type * as RecentDB from './recentView'
+export * as SubscribeDB from './subscribe'
+import type * as SubscribeDB from './subscribe'
 export * as RecentDB from './recentView'
 
 const migrations = import.meta.glob<Migration>('./migrations/*.ts', {
@@ -36,6 +31,8 @@ export interface DB {
   subscribe: SubscribeDB.Table
   plugin: PluginArchiveDB.Table
 }
+
+console.log('[db] loading')
 const database = useGlobalVar(await Database.load(`sqlite:app.db`), 'core/db/raw')
 
 export const db = useGlobalVar(

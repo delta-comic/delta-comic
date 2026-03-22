@@ -7,7 +7,7 @@ import {
 import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
 import * as ItemStoreDB from './itemStore'
-import { withTransition } from './utils'
+import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
 
@@ -34,11 +34,11 @@ export enum QueryKey {
   item = 'db:favouriteItem:',
   card = 'db:favouriteCard:'
 }
-const queryCache = useQueryCache()
 
 export const useUpsertItem = defineMutation(() => {
+  const queryCache = useQueryCache()
   const { key: iKey, upsert } = ItemStoreDB.useUpsert()
-  const key = [QueryKey.item, ...iKey]
+  const key = [CommonQueryKey.common, QueryKey.item, ...iKey]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({
       item,
@@ -65,6 +65,7 @@ export const useUpsertItem = defineMutation(() => {
 })
 
 export const useMoveItem = defineMutation(() => {
+  const queryCache = useQueryCache()
   const key = [QueryKey.item]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({
@@ -98,6 +99,7 @@ export const useMoveItem = defineMutation(() => {
 })
 
 export const useCreateCard = defineMutation(() => {
+  const queryCache = useQueryCache()
   const key = [QueryKey.card, QueryKey.item]
   const { mutateAsync, ...mutation } = useMutation({
     mutation: async ({ card, trx }: { card: Card; trx?: Kysely<DB> }) =>

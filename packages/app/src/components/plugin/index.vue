@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { loadAllPlugins } from '@delta-comic/plugin'
+import { Loader } from '@delta-comic/plugin'
 import { type MenuOption, NIcon, useMessage } from 'naive-ui'
 import { type Component, h, shallowRef } from 'vue'
 
@@ -40,7 +40,7 @@ const boot = async (safe = false) => {
   if (isBooting.value || isBooted.value) return $message.warning('正在启动中')
   isBooting.value = true
   window.$$safe$$ = safe
-  await loadAllPlugins()
+  await Loader.loadAllPlugins()
   isBooted.value = true
   show.value = false
 }
