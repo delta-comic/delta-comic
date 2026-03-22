@@ -5,6 +5,7 @@
     "rust-lang.rust-analyzer",
     "Vue.volar",
     "streetsidesoftware.code-spell-checker",
-    "bradlc.vscode-tailwindcss"
+    "bradlc.vscode-tailwindcss",
+    "DavidAnson.vscode-markdownlint"
   ]
 }
