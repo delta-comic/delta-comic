@@ -26,7 +26,7 @@ export const useUpsert = defineMutation(() => {
     mutation: async ({ item, trx }: { item: StorableItem; trx?: Kysely<DB> }) =>
       withTransition(async trx => {
         const k = itemKey.toString([
-          uni.content.ContentPage.contentPage.toString(item.contentType),
+          uni.content.ContentPage.contentPages.key.toString(item.contentType),
           item.id
         ])
         await trx

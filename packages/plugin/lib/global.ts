@@ -8,16 +8,16 @@ import type { GlobalInjectionsConfig } from './env'
 
 class _Global {
   public share = shallowReactive(
-    SourcedKeyMap.create<[plugin: string, key: string], Share.InitiativeItem>()
+    SourcedKeyMap.createReactive<[plugin: string, key: string], Share.InitiativeItem>()
   )
   public shareToken = shallowReactive(
-    SourcedKeyMap.create<[plugin: string, key: string], Share.ShareToken>()
+    SourcedKeyMap.createReactive<[plugin: string, key: string], Share.ShareToken>()
   )
   public userActions = shallowReactive(
-    SourcedKeyMap.create<[plugin: string, key: string], User.UserAction>()
+    SourcedKeyMap.createReactive<[plugin: string, key: string], User.UserAction>()
   )
   public subscribes = shallowReactive(
-    SourcedKeyMap.create<[plugin: string, key: string], Subscribe.Config>()
+    SourcedKeyMap.createReactive<[plugin: string, key: string], Subscribe.Config>()
   )
   public globalNodes = shallowReactive(new Array<Raw<Component>>())
 

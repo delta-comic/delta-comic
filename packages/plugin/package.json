@@ -41,6 +41,7 @@
     "@delta-comic/ui": "workspace:*",
     "@delta-comic/utils": "workspace:*",
     "@octokit/rest": "catalog:",
+    "@pinia/colada": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-fs": "catalog:",
     "@vueuse/core": "catalog:",

@@ -1,5 +1,6 @@
-import type { RPromiseContent, RStream, uni } from '@delta-comic/model'
-import type { Component } from 'vue'
+import type { uni } from '@delta-comic/model'
+import type { UseInfiniteQueryReturn, UseQueryReturn } from '@pinia/colada'
+import type { Component, VNodeChild } from 'vue'
 
 export interface Config {
   /**
@@ -30,20 +31,20 @@ export interface SearchMethod {
     sort: string,
     page: number,
     signal?: AbortSignal
-  ): PromiseLike<uni.item.Item[]>
+  ): PromiseLike<{ items: uni.item.Item[]; nextPage?: number }>
   getAutoComplete(
     input: string,
     signal: AbortSignal
-  ): PromiseLike<({ text: string; value: string } | Component)[]>
+  ): PromiseLike<({ text: string; value: string } | VNodeChild)[]>
 }
 
 export interface HotLevelboard {
   name: string
-  content: () => RStream<uni.item.Item> | RPromiseContent<any, uni.item.Item[]>
+  content: () => UseInfiniteQueryReturn<uni.item.Item> | UseQueryReturn<any, uni.item.Item[]>
 }
 export interface HotMainList {
   name: string
-  content: () => RStream<uni.item.Item> | RPromiseContent<any, uni.item.Item[]>
+  content: () => UseInfiniteQueryReturn<uni.item.Item> | UseQueryReturn<any, uni.item.Item[]>
   onClick?(): any
 }
 export interface HotTopButton {
@@ -69,7 +70,7 @@ export type RouteToContent = (
   contentType_: uni.content.ContentType_,
   id: string,
   ep: string,
-  preload?: uni.content.PreloadValue
+  preload?: uni.item.Item
 ) => PromiseLike<any>
 
 export interface Barcode {

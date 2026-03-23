@@ -3,7 +3,7 @@ import type { Component, MaybeRefOrGetter } from 'vue'
 
 export interface Config {
   edit?: Component
-  card?: uni.user.UserCardComp
+  card?: uni.user.UserCardComponent
   authorIcon?: Record<string, Component>
   /**
    * 1. download

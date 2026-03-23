@@ -1,8 +1,14 @@
-import type { UseInfiniteQueryReturn } from '@pinia/colada'
 import dayjs from 'dayjs'
 import { type Component } from 'vue'
 
-import { SourcedKeyMap, Struct, type Metadata, type Metadatable } from '../struct'
+import {
+  SourcedKeyMap,
+  Struct,
+  type Metadata,
+  type Metadatable,
+  type PageKey,
+  type RangedResult
+} from '../struct'
 
 import type { ContentType } from './content'
 import type { Item } from './item'
@@ -55,5 +61,5 @@ export abstract class Comment extends Struct<RawComment> implements RawComment {
   public abstract like(signal?: AbortSignal): PromiseLike<boolean>
   public abstract report(signal?: AbortSignal): PromiseLike<any>
   public abstract sendComment(text: string, signal?: AbortSignal): PromiseLike<any>
-  public abstract children: UseInfiniteQueryReturn<Comment>
+  public abstract fetchChildren: (page: PageKey, signal?: AbortSignal) => RangedResult<Comment>
 }

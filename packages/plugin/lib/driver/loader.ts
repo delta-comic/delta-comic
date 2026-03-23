@@ -1,5 +1,4 @@
 import { db, type PluginArchiveDB } from '@delta-comic/db'
-import { PromiseContent } from '@delta-comic/model'
 import { Mutex, remove } from 'es-toolkit'
 import { isEmpty, sortBy } from 'es-toolkit/compat'
 
@@ -47,7 +46,7 @@ pluginEmitter.on('definedPlugin', async cfg => {
   lock.release()
 })
 
-export const loadAllPlugins = PromiseContent.fromAsyncFunction(async () => {
+export const loadAllPlugins = async () => {
   const { $initCore, coreName } = await import('./core')
   await $initCore()
   /*
@@ -71,4 +70,4 @@ export const loadAllPlugins = PromiseContent.fromAsyncFunction(async () => {
   for (const level of allLevels) await Promise.all(level.map(p => loadPlugin(p)))
 
   console.log('[plugin bootPlugin] all load done')
-})
+}

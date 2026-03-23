@@ -17,9 +17,9 @@ class _ConfigSetter extends PluginBooter {
         ct,
         { commentRow, contentPage, itemCard, layout, itemTranslator }
       ] of Object.entries(content)) {
-        if (layout) uni.content.ContentPage.viewLayout.set(ct, layout)
-        if (itemCard) uni.item.Item.itemCard.set(ct, itemCard)
-        if (contentPage) uni.content.ContentPage.contentPage.set(ct, contentPage)
+        if (layout) uni.content.ContentPage.layouts.set(ct, layout)
+        if (itemCard) uni.item.Item.itemCards.set(ct, itemCard)
+        if (contentPage) uni.content.ContentPage.contentPages.set(ct, contentPage)
         if (commentRow) uni.comment.Comment.commentRow.set(ct, commentRow)
         if (itemTranslator) uni.item.Item.itemTranslator.set(ct, itemTranslator)
       }
@@ -44,6 +44,7 @@ class _ConfigSetter extends PluginBooter {
       }
     }
     if (user) {
+      if (user.card) uni.user.User.userCards.set(plugin, user.card)
       if (user.edit) uni.user.User.userEditorBase.set(plugin, user.edit)
       if (user.userActions)
         for (const [type, value] of Object.entries(user.userActions))

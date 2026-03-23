@@ -1,4 +1,4 @@
-import type { uni, RStream } from '@delta-comic/model'
+import type { PageKey, RangedResult, uni } from '@delta-comic/model'
 
 export interface Config {
   getUpdateList(
@@ -7,5 +7,9 @@ export interface Config {
   ): PromiseLike<{ isUpdated: boolean; whichUpdated: uni.item.Author[] }>
   onAdd?(author: uni.item.Author): any
   onRemove?(author: uni.item.Author): any
-  getListStream(author: uni.item.Author): RStream<uni.item.Item>
+  fetchAuthorContent(
+    author: uni.item.Author,
+    page: PageKey,
+    signal?: AbortSignal
+  ): RangedResult<uni.item.Item>
 }

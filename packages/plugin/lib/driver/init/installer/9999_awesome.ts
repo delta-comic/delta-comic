@@ -22,7 +22,7 @@ export class _PluginInstallByAwesome extends PluginInstaller {
     const { data } = await axios.get<ItemSchema>(`${linkBase}/${id}.json`, { responseType: 'json' })
     return data.download
   }
-  public override async install(input: string): Promise<File | string> {
+  public override async download(input: string): Promise<File | string> {
     const file = await this.installer(input)
     return file
   }

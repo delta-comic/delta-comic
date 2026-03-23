@@ -63,7 +63,7 @@ const installPluginFile = async (
     if (!loader) throw new Error('没有符合的安装器')
     v.description = loader.name
 
-    const meta = await loader.installDownload(file)
+    const meta = await loader.install(file)
 
     v.description = '写入数据库'
     const { upsert } = PluginArchiveDB.useUpsert()
@@ -96,7 +96,7 @@ export const installPlugin = (input: string, __installedPlugins?: Set<string>) =
         const installer = installers.filter(ins => ins.isMatched(dlCommend)).at(0)
         if (!installer) throw new Error('没有符合的下载器:' + dlCommend)
         v.description = installer.name
-        const meta = await installer.install(dlCommend)
+        const meta = await installer.download(dlCommend)
         if (isString(meta)) dlCommend = meta
         else return [meta, installer] as const
       }
@@ -132,7 +132,7 @@ export const updatePlugin = async (
       v.retryable = true
       const loader = loaders.find(v => v.name == pluginMeta.loaderName)
       if (!loader) throw new Error('没有符合的安装器')
-      return await loader.installDownload(file)
+      return await loader.install(file)
     })
 
     const { upsert } = PluginArchiveDB.useUpsert()

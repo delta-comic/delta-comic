@@ -19,7 +19,7 @@ export class _PluginInstallByFallbackUrl extends PluginInstaller {
     return new File([res.data], name)
   }
 
-  public override async install(input: string): Promise<File> {
+  public override async download(input: string): Promise<File> {
     const file = await this.installer(input)
     return file
   }

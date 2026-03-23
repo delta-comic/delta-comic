@@ -1,5 +1,4 @@
 import { useGlobalVar } from '@delta-comic/utils'
-import { type UseMutationReturn } from '@pinia/colada'
 import dayjs from 'dayjs'
 import { type Component } from 'vue'
 
@@ -96,9 +95,9 @@ export abstract class Item extends Struct<RawItem> implements RawItem {
     'uni/item/itemCards'
   )
 
-  public abstract like(): UseMutationReturn<void, void, Error>
-  public abstract report(): UseMutationReturn<void, void, Error>
-  public abstract sendComment(text: string): UseMutationReturn<void, void, Error>
+  public abstract like(): Promise<any>
+  public abstract report(): Promise<any>
+  public abstract sendComment(text: string): Promise<any>
 
   public static is(value: unknown): value is Item {
     return value instanceof this

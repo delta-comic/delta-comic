@@ -10,7 +10,7 @@ import { getPluginFsPath } from '../utils'
 
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'userscript'
-  public override async installDownload(file: File): Promise<PluginArchiveDB.Meta> {
+  public override async install(file: File): Promise<PluginArchiveDB.Meta> {
     const code = await file.text()
     const meta = decodePluginMeta(parse(code))
     const path = await getPluginFsPath(meta.name.id)
@@ -42,6 +42,11 @@ class _PluginUserscriptLoader extends PluginLoader {
     script.async = true
     script.src = url
     document.body.appendChild(script)
+  }
+  public override async decodeMeta(file: File): Promise<PluginArchiveDB.Meta> {
+    const code = await file.text()
+    const meta = decodePluginMeta(parse(code))
+    return meta
   }
 }
 

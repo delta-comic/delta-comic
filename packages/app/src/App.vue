@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { SharedFunction } from '@delta-comic/core'
-import { RecentDB } from '@delta-comic/db'
 import { Global } from '@delta-comic/plugin'
 import * as Clipboard from '@tauri-apps/plugin-clipboard-manager'
 import { useIntervalFn } from '@vueuse/core'
@@ -12,10 +11,7 @@ import { pluginName } from './symbol'
 const $router = useRouter()
 const $route = useRoute()
 
-
-SharedFunction.define(item => RecentDB.upsert(item), pluginName, 'addRecent')
 await $router.push($route.fullPath)
-
 
 const scanned = new Set<string>()
 SharedFunction.define(

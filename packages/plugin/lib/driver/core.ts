@@ -16,17 +16,19 @@ export const $initCore = () =>
     share: {
       initiative: [
         {
-          filter: () => true,
+          filter: page => !!page.preload,
           icon: TagOutlined,
           key: 'token',
           name: '复制口令',
           async call(page) {
-            const item = page.union.value!.toJSON()
+            const item = page.preload?.toJSON()
+            if (!item) throw new Error('Not found preload in content. Maybe not fetch detail?')
+
             const compressed = compressToEncodedURIComponent(
               JSON.stringify(<CorePluginTokenShareMeta>{
                 item: {
-                  contentType: uni.content.ContentPage.contentPage.toString(item.contentType),
-                  ep: item.thisEp.index,
+                  contentType: uni.content.ContentPage.contentPages.key.toString(item.contentType),
+                  ep: item.thisEp.id,
                   name: item.title
                 },
                 plugin: page.plugin,
@@ -35,29 +37,31 @@ export const $initCore = () =>
             )
             await SharedFunction.call(
               'pushShareToken',
-              `[${page.union.value?.title}](复制这条口令，打开Delta Comic)${compressed}`
+              `[${item.title}](复制这条口令，打开Delta Comic)${compressed}`
             )
           }
         },
         {
-          filter: () => true,
+          filter: page => !!page.preload,
           icon: OfflineShareRound,
           key: 'native',
           name: '原生分享',
           async call(page) {
-            const item = page.union.value!.toJSON()
+            const item = page.preload?.toJSON()
+            if (!item) throw new Error('Not found preload in content. Maybe not fetch detail?')
+
             const compressed = compressToEncodedURIComponent(
               JSON.stringify(<CorePluginTokenShareMeta>{
                 item: {
-                  contentType: uni.content.ContentPage.contentPage.toString(item.contentType),
-                  ep: item.thisEp.index,
+                  contentType: uni.content.ContentPage.contentPages.key.toString(item.contentType),
+                  ep: item.thisEp.id,
                   name: item.title
                 },
                 plugin: page.plugin,
                 id: page.id
               })
             )
-            const token = `[${page.union.value?.title}](复制这条口令，打开Delta Comic)${compressed}`
+            const token = `[${item.title}](复制这条口令，打开Delta Comic)${compressed}`
             await navigator.share({ title: 'Delta Comic内容分享', text: token })
           }
         }
@@ -83,7 +87,7 @@ export const $initCore = () =>
               onPositive() {
                 return SharedFunction.call(
                   'routeToContent',
-                  meta.item.contentType,
+                  uni.content.ContentPage.contentPages.key.toJSON(meta.item.contentType),
                   meta.id,
                   meta.item.ep
                 )

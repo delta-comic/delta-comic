@@ -11,8 +11,7 @@ export interface PluginInstallerDescription {
   description: string
 }
 export abstract class PluginInstaller {
-  public abstract install(input: string): Promise<File | string>
-  public abstract checkIsUpdate(pluginMeta: PluginArchiveDB.Archive): Promise<boolean>
+  public abstract download(input: string): Promise<File | string>
   public abstract update(pluginMeta: PluginArchiveDB.Archive): Promise<File | string>
   public abstract isMatched(input: string): boolean
   public abstract name: string
@@ -22,7 +21,8 @@ export abstract class PluginInstaller {
 export abstract class PluginLoader {
   public abstract name: string
   public abstract load(pluginMeta: PluginArchiveDB.Archive): Promise<any>
-  public abstract installDownload(file: File): Promise<PluginArchiveDB.Meta>
+  public abstract install(file: File): Promise<PluginArchiveDB.Meta>
+  public abstract decodeMeta(file: File): Promise<PluginArchiveDB.Meta>
   public abstract canInstall(file: File): boolean
 }
 

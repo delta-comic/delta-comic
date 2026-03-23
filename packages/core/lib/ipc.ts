@@ -9,7 +9,7 @@ export interface SharedFunctions {
     contentType_: uni.content.ContentType_,
     id: string,
     ep: string,
-    preload?: uni.content.PreloadValue
+    preload?: uni.item.Item
   ): PromiseLike<any>
   routeToSearch(
     input: string,

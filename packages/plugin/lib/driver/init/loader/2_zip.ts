@@ -9,7 +9,7 @@ import { getPluginFsPath } from '../utils'
 
 class _PluginUserscriptLoader extends PluginLoader {
   public override name = 'zip'
-  public override async installDownload(file: File): Promise<PluginArchiveDB.Meta> {
+  public override async install(file: File): Promise<PluginArchiveDB.Meta> {
     console.log('[loader zip] begin:', file)
     const temp = await getPluginFsPath('__temp__')
     await fs.mkdir(temp, { recursive: true })
@@ -77,6 +77,14 @@ class _PluginUserscriptLoader extends PluginLoader {
     style.rel = 'stylesheet'
     style.href = decodeURIComponent(convertFileSrc(await join(baseDir, filePath), 'local'))
     document.head.appendChild(style)
+  }
+  public override async decodeMeta(file: File): Promise<PluginArchiveDB.Meta> {
+    const zip = await loadAsync(file)
+    console.log(zip.files)
+    const meta = <PluginArchiveDB.Meta>(
+      JSON.parse((await zip.file('manifest.json')?.async('string')) ?? '{}')
+    )
+    return meta
   }
 }
 

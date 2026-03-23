@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { PluginArchiveDB } from '@delta-comic/db'
-import { PromiseContent } from '@delta-comic/model'
 import { Install } from '@delta-comic/plugin'
 import { DcState } from '@delta-comic/ui'
 import { memoize } from 'es-toolkit'

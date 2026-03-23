@@ -1,8 +1,7 @@
 import { useGlobalVar } from '@delta-comic/utils'
-import { type UseInfiniteQueryReturn, type UseQueryReturn } from '@pinia/colada'
-import { computed, shallowRef, type Component } from 'vue'
+import { type Component } from 'vue'
 
-import { SourcedKeyMap, type SourcedKeyType } from '../struct'
+import { SourcedKeyMap, type PageKey, type RangedResult, type SourcedKeyType } from '../struct'
 
 import * as comment from './comment'
 import * as ep from './ep'
@@ -31,28 +30,25 @@ export abstract class ContentPage {
   )
 
   constructor(
-    preload: item.Item | undefined,
+    public preload: item.Item | undefined,
     public id: string,
     public ep: string
-  ) {
-    this.preload.value = preload
-  }
+  ) {}
   public abstract plugin: string
   public abstract contentType: ContentType
 
-  public shortId = shallowRef<UseQueryReturn<string>>()
+  public abstract fetchShortId: (signal?: AbortSignal) => Promise<string>
 
-  public preload = shallowRef<item.Item | undefined>()
-  public detail = shallowRef<UseQueryReturn<item.Item>>()
-  public union = computed(() => this.detail.value?.data.value ?? this.preload.value)
+  public abstract fetchDetail: (signal?: AbortSignal) => Promise<item.Item>
 
-  public recommends = shallowRef<UseQueryReturn<item.Item[]>>()
+  public abstract fetchRecommends: (page: PageKey, signal?: AbortSignal) => RangedResult<item.Item>
 
-  public comments = shallowRef<UseInfiniteQueryReturn<comment.Comment>>()
+  public abstract fetchComments: (
+    page: PageKey,
+    signal?: AbortSignal
+  ) => RangedResult<comment.Comment>
 
-  public eps = Promise.withResolvers<ep.Ep[]>()
-
-  public abstract loadAll(signal?: AbortSignal): Promise<this>
+  public abstract fetchEps: (page: PageKey, signal?: AbortSignal) => RangedResult<ep.Ep>
 
   public abstract ViewComponent: ViewComponent
 }

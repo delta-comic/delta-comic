@@ -16,7 +16,7 @@ export class _PluginInstallByLocal extends PluginInstaller {
     const buffer = await readFile(path)
     return new File([buffer], name)
   }
-  public override async install(input: string): Promise<File> {
+  public override async download(input: string): Promise<File> {
     const file = await this.installer(input)
     return file
   }
