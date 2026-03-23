@@ -2,7 +2,7 @@ import { useGlobalVar } from '@delta-comic/utils'
 import { isEmpty, isString } from 'es-toolkit/compat'
 import { shallowReactive } from 'vue'
 
-import { SourcedKeyMap, Struct, type MetaData } from '../struct'
+import { SourcedKeyMap, Struct, type Metadata, type Metadatable } from '../struct'
 
 export type ProcessInstance = (
   nowPath: string,
@@ -19,25 +19,23 @@ export interface ResourceType {
   urls: string[]
   test: (url: string, signal: AbortSignal) => PromiseLike<void>
 }
-export interface RawResource {
-  $$plugin: string
-  $$meta?: MetaData
+export interface RawResource extends Metadatable{
   pathname: string
   type: string
   processSteps?: ProcessStep_[]
 }
 export class Resource extends Struct<RawResource> implements RawResource {
   public static processInstances = useGlobalVar(
-    SourcedKeyMap.create<[plugin: string, referenceName: string], ProcessInstance>(),
+    SourcedKeyMap.createReactive<[plugin: string, referenceName: string], ProcessInstance>(),
     'uni/resource/processInstances'
   )
 
   public static fork = useGlobalVar(
-    SourcedKeyMap.create<[plugin: string, type: string], ResourceType>(),
+    SourcedKeyMap.createReactive<[plugin: string, type: string], ResourceType>(),
     'uni/resource/fork'
   )
   public static precedenceFork = useGlobalVar(
-    SourcedKeyMap.create<[plugin: string, type: string], string>(),
+    SourcedKeyMap.createReactive<[plugin: string, type: string], string>(),
     'uni/resource/precedenceFork'
   )
 
@@ -60,7 +58,7 @@ export class Resource extends Struct<RawResource> implements RawResource {
   public type: string
   public pathname: string
   public processSteps: ProcessStep[]
-  public $$meta?: MetaData
+  public $$meta?: Metadata
   public $$plugin: string
   public async getUrl(): Promise<string> {
     let resultPath = this.pathname

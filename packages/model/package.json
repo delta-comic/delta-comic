@@ -33,6 +33,7 @@
     "publish:self": "pnpm --filter model publish"
   },
   "dependencies": {
+    "@pinia/colada": "catalog:",
     "@vueuse/core": "catalog:",
     "dayjs": "catalog:",
     "mitt": "catalog:"

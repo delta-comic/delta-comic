@@ -1,19 +1,17 @@
-import { Struct, type MetaData } from '../struct'
-export interface RawEp {
+import { Struct, type Metadata, type Metadatable } from '../struct'
+export interface RawEp extends Metadatable {
   name: string
-  index: string
-  $$plugin: string
-  $$meta?: MetaData
+  id: string
 }
 export class Ep extends Struct<RawEp> implements RawEp {
   public name: string
-  public index: string
+  public id: string
   public $$plugin: string
-  public $$meta?: MetaData
+  public $$meta?: Metadata
   constructor(v: RawEp) {
     super(v)
     this.name = v.name
-    this.index = v.index
+    this.id = v.id
     this.$$plugin = v.$$plugin
     this.$$meta = v.$$meta
   }

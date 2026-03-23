@@ -1,10 +1,8 @@
-import type { MetaData } from '../struct'
+import type { Metadatable } from '../struct'
 
 import { Resource, type RawResource, type ProcessStep_ } from './resource'
 
-export interface RawImage {
-  $$plugin: string
-  $$meta?: MetaData
+export interface RawImage extends Metadatable {
   path: string
   forkNamespace: string
   processSteps?: ProcessStep_[]
@@ -21,7 +19,7 @@ export class Image extends Resource {
     if ('forkNamespace' in v)
       super({
         $$plugin: v.$$plugin,
-        $$meta: { ...v.$$meta, ...aspect },
+        $$meta: { ...v.$$meta, aspect },
         pathname: v.path,
         type: v.forkNamespace,
         processSteps: v.processSteps
@@ -29,12 +27,14 @@ export class Image extends Resource {
     else super(v)
   }
   public get aspect() {
-    return this.$$meta! as Partial<ImageAspect>
+    return this.$$meta!.aspect as Partial<ImageAspect> | undefined
   }
   public set aspect(v) {
+    if (!v) return
     this.$$meta ??= {}
-    this.$$meta.width = v.width
-    this.$$meta.height = v.height
+    this.$$meta.aspect ??= {}
+    this.$$meta.aspect.width = v.width
+    this.$$meta.aspect.height = v.height
   }
 }
 export interface ImageAspect {

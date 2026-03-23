@@ -22,24 +22,18 @@ export class SourcedValue<T extends [string, string]> {
   }
   constructor(public separator = ':') {}
 }
-export type SourcedKeyType<T extends SourcedKeyMap<[string, string], any> | SourcedValue<any>> =
-  T extends SourcedKeyMap<[string, string], any>
-    ? Parameters<T['get']>[0]
-    : Parameters<T['toJSON']>[0]
 /**
  * 相比较于普通的Map，这个元素的key操作可以是`TKey | string`
- * _但内部保存仍使用`SourcedValue.toString`作为key_
+ * _但内部保存仍使用`SourcedValue.key.toString`作为key_
  */
-export class SourcedKeyMap<TKey extends [string, string], TValue>
-  extends SourcedValue<TKey>
-  implements Map<string, TValue>
-{
-  public static create<TKey extends [string, string], TValue>(separator = ':') {
+export class SourcedKeyMap<TKey extends [string, string], TValue> implements Map<string, TValue> {
+  public static createReactive<TKey extends [string, string], TValue>(separator = ':') {
     return shallowReactive(new this<TKey, TValue>(separator))
   }
-  private constructor(separator = ':') {
-    super(separator)
+  public constructor(separator = ':') {
+    this.key = new SourcedValue<TKey>(separator)
   }
+  public key: SourcedValue<TKey>
   private store = shallowReactive(new Map<string, TValue>())
   public get size(): number {
     return this.store.size
@@ -49,7 +43,7 @@ export class SourcedKeyMap<TKey extends [string, string], TValue>
     this.store.clear()
   }
   public delete(key: string | TKey): boolean {
-    return this.store.delete(this.toString(key))
+    return this.store.delete(this.key.toString(key))
   }
   public forEach(
     callbackfn: (value: TValue, key: string, map: Map<string, TValue>) => void,
@@ -60,13 +54,13 @@ export class SourcedKeyMap<TKey extends [string, string], TValue>
     })
   }
   public get(key: string | TKey): TValue | undefined {
-    return this.store.get(this.toString(key))
+    return this.store.get(this.key.toString(key))
   }
   public has(key: string | TKey): boolean {
-    return this.store.has(this.toString(key))
+    return this.store.has(this.key.toString(key))
   }
   public set(key: string | TKey, value: TValue): this {
-    this.store.set(this.toString(key), value)
+    this.store.set(this.key.toString(key), value)
     return this
   }
   public entries() {
@@ -82,3 +76,7 @@ export class SourcedKeyMap<TKey extends [string, string], TValue>
     return this.entries()
   }
 }
+
+export type SourcedKeyType<
+  T extends SourcedKeyMap<[string, string], any> | SourcedValue<[string, string]>
+> = T extends SourcedKeyMap<infer K, any> ? K : T extends SourcedValue<infer K> ? K : never

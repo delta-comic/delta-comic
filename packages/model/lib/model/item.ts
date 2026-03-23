@@ -1,21 +1,22 @@
 import { useGlobalVar } from '@delta-comic/utils'
+import { type UseMutationReturn } from '@pinia/colada'
 import dayjs from 'dayjs'
 import { type Component } from 'vue'
 
-import { SourcedKeyMap, Struct, type MetaData } from '../struct'
+import { SourcedKeyMap, Struct, type Metadatable } from '../struct'
 
 import { ContentPage, type ContentType, type ContentType_ } from './content'
 import { Ep, type RawEp } from './ep'
 import * as image from './image'
 import type { RawResource } from './resource'
 
-export interface Category {
+export interface Category extends Metadatable {
   name: string
   group: string
   search: { keyword: string; source: string; sort: string }
 }
 
-export interface Author {
+export interface Author extends Metadatable {
   label: string
   icon: RawResource | image.RawImage | string
   description: string
@@ -24,11 +25,9 @@ export interface Author {
    * 否则传入的为`defineConfig`中定义的`subscribe.type`
    */ subscribe?: string
   actions?: string[]
-  $$meta?: MetaData
-  $$plugin: string
 }
 
-export interface RawItem {
+export interface RawItem extends Metadatable {
   cover: RawResource | image.RawImage
   title: string
   id: string
@@ -44,15 +43,13 @@ export interface RawItem {
   contentType: ContentType_
   length: string
   epLength: string
-  $$plugin: string
-  $$meta: MetaData
   description?: Description
   thisEp: RawEp
   commentSendable: boolean
   customIsSafe?: boolean
 }
 
-export type ItemCardComp = Component<
+export type ItemCardComponent = Component<
   {
     item: Item
     freeHeight?: boolean
@@ -77,7 +74,7 @@ export type Description =
   | { type: 'text'; content: string }
 
 export abstract class Item extends Struct<RawItem> implements RawItem {
-  public static itemTranslator = SourcedKeyMap.create<
+  public static itemTranslator = SourcedKeyMap.createReactive<
     [plugin: string, name: string],
     ItemTranslator
   >()
@@ -85,20 +82,23 @@ export abstract class Item extends Struct<RawItem> implements RawItem {
     const translator = this.itemTranslator.get(raw.contentType)
     if (!translator)
       throw new Error(
-        `can not found itemTranslator contentType:"${ContentPage.contentPage.toString(raw.contentType)}"`
+        `can not found itemTranslator contentType:"${ContentPage.contentPages.key.toString(raw.contentType)}"`
       )
     return translator(raw)
   }
-  public static authorIcon = SourcedKeyMap.create<[plugin: string, name: string], Component>()
+  public static authorIcon = SourcedKeyMap.createReactive<
+    [plugin: string, name: string],
+    Component
+  >()
 
-  public static itemCard = useGlobalVar(
-    SourcedKeyMap.create<ContentType, ItemCardComp>(),
-    'uni/item/itemCard'
+  public static itemCards = useGlobalVar(
+    SourcedKeyMap.createReactive<ContentType, ItemCardComponent>(),
+    'uni/item/itemCards'
   )
 
-  public abstract like(signal?: AbortSignal): PromiseLike<boolean>
-  public abstract report(signal?: AbortSignal): PromiseLike<any>
-  public abstract sendComment(text: string, signal?: AbortSignal): PromiseLike<any>
+  public abstract like(): UseMutationReturn<void, void, Error>
+  public abstract report(): UseMutationReturn<void, void, Error>
+  public abstract sendComment(text: string): UseMutationReturn<void, void, Error>
 
   public static is(value: unknown): value is Item {
     return value instanceof this
@@ -147,7 +147,7 @@ export abstract class Item extends Struct<RawItem> implements RawItem {
     this.commentNumber = v.commentNumber
     this.isLiked = v.isLiked
     this.customIsAI = v.customIsAI
-    this.contentType = ContentPage.contentPage.toJSON(v.contentType)
+    this.contentType = ContentPage.contentPages.key.toJSON(v.contentType)
     this.length = v.length
     this.epLength = v.epLength
     this.description = v.description

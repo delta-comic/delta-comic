@@ -69,6 +69,7 @@ declare module 'vue-router/auto-routes' {
       | '/main/plugin/download'
       | '/main/plugin/list'
       | '/main/plugin/shop'
+      | '/main/search'
       | '/main/subscribe'
       | '/main/user'
     >,
@@ -140,6 +141,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/main/search': RouteRecordInfo<
+      '/main/search',
+      '/main/search',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/main/subscribe': RouteRecordInfo<
       '/main/subscribe',
       '/main/subscribe',
@@ -154,11 +162,11 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/search/[input]': RouteRecordInfo<
-      '/search/[input]',
-      '/search/:input',
-      { input: ParamValue<true> },
-      { input: ParamValue<false> },
+    '/search/[keyword]/[sort]/[method]': RouteRecordInfo<
+      '/search/[keyword]/[sort]/[method]',
+      '/search/:keyword/:sort/:method',
+      { keyword: ParamValue<true>, sort: ParamValue<true>, method: ParamValue<true> },
+      { keyword: ParamValue<false>, sort: ParamValue<false>, method: ParamValue<false> },
       | never
     >,
     '/setting': RouteRecordInfo<
@@ -259,6 +267,7 @@ declare module 'vue-router/auto-routes' {
         | '/main/plugin/download'
         | '/main/plugin/list'
         | '/main/plugin/shop'
+        | '/main/search'
         | '/main/subscribe'
         | '/main/user'
       views:
@@ -325,6 +334,12 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
+    'src/pages/main/search.vue': {
+      routes:
+        | '/main/search'
+      views:
+        | never
+    }
     'src/pages/main/subscribe.vue': {
       routes:
         | '/main/subscribe'
@@ -337,9 +352,9 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
-    'src/pages/search/[input].vue': {
+    'src/pages/search/[keyword]/[sort]/[method].vue': {
       routes:
-        | '/search/[input]'
+        | '/search/[keyword]/[sort]/[method]'
       views:
         | never
     }

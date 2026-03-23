@@ -25,7 +25,12 @@ export interface SearchMethod {
   name: string
   sorts: { text: string; value: string }[]
   defaultSort: string
-  getStream(input: string, sort: string): RStream<uni.item.Item>
+  search(
+    input: string,
+    sort: string,
+    page: number,
+    signal?: AbortSignal
+  ): PromiseLike<uni.item.Item[]>
   getAutoComplete(
     input: string,
     signal: AbortSignal

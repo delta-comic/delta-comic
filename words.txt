@@ -11,6 +11,9 @@ booters
 cdylib
 codegen
 colada
+daterange
+datetimerange
+disretry
 Favourite
 favselect
 Gmailerrorred
@@ -21,7 +24,10 @@ Levelboard
 lhlyu
 lightningcss
 linkify
+localdata
+Metadatable
 minidump
+miui
 msvc
 nvim
 oxfmt
@@ -44,6 +50,7 @@ rustflags
 rustls
 serde
 sider
+splited
 staticlib
 stylesheet
 swipeable
@@ -63,10 +70,4 @@ Wakatime
 webp
 wenxig
 xgbuugti
-localdata
-splited
-datetimerange
-daterange
-disretry
-miui
 Yahei

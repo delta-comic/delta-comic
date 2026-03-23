@@ -1,13 +1,14 @@
+import type { UseInfiniteQueryReturn } from '@pinia/colada'
 import dayjs from 'dayjs'
 import { type Component } from 'vue'
 
-import { SourcedKeyMap, Struct, type MetaData, type RStream } from '../struct'
+import { SourcedKeyMap, Struct, type Metadata, type Metadatable } from '../struct'
 
 import type { ContentType } from './content'
 import type { Item } from './item'
 import type { User } from './user'
 
-export interface RawComment {
+export interface RawComment extends Metadatable {
   sender: User
   content: { type: 'string' | 'html'; text: string }
   time: number
@@ -16,15 +17,13 @@ export interface RawComment {
   likeCount: number
   isLiked: boolean
   reported: boolean
-  $$plugin: string
-  $$meta?: MetaData
   isTop: boolean
 }
 
 export type CommentRow = Component<{ comment: Comment; item: Item; parentComment?: Comment }>
 
 export abstract class Comment extends Struct<RawComment> implements RawComment {
-  public static commentRow = SourcedKeyMap.create<ContentType, CommentRow>()
+  public static commentRow = SourcedKeyMap.createReactive<ContentType, CommentRow>()
 
   constructor(v: RawComment) {
     super(v)
@@ -52,9 +51,9 @@ export abstract class Comment extends Struct<RawComment> implements RawComment {
   public isLiked: boolean
   public reported: boolean
   public $$plugin: string
-  public $$meta?: MetaData
+  public $$meta?: Metadata
   public abstract like(signal?: AbortSignal): PromiseLike<boolean>
   public abstract report(signal?: AbortSignal): PromiseLike<any>
   public abstract sendComment(text: string, signal?: AbortSignal): PromiseLike<any>
-  public abstract children: RStream<Comment>
+  public abstract children: UseInfiniteQueryReturn<Comment>
 }
