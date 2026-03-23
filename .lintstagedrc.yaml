@@ -1,5 +1,6 @@
 '*.{js,jsx,ts,tsx,mts,cts,mjs,cjs,vue}': |
   pnpm exec oxlint
+  pnpm exec oxfmt
 
 '*.{md,json,toml,rs,js,jsx,ts,tsx,mts,cts,mjs,cjs,vue,html}': |
   pnpm exec cspell --no-exit-code --no-must-find-files
