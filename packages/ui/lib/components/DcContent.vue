@@ -24,8 +24,8 @@ const $props = defineProps<
           type: 'raw'
           data: T
           isLoading: boolean
-          error?: Error
-          refetch?: () => Promise<any>
+          error?: Error | null
+          refetch?: () => any
         }
     classError?: ClassNameValue
     classEmpty?: ClassNameValue
