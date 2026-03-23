@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T">
-import { PromiseContent, Stream } from '@delta-comic/model'
+import type { UseQueryReturn } from '@pinia/colada'
+import { omit } from 'es-toolkit'
 import { isEmpty } from 'es-toolkit/compat'
 import { motion, type VariantType } from 'motion-v'
 import { twMerge, type ClassNameValue } from 'tailwind-merge'
@@ -11,47 +12,44 @@ import DcLoading from './DcLoading.vue'
 import { ReloadOutlined, WifiTetheringErrorRound } from './icons'
 const $props = defineProps<
   {
-    retriable?: boolean
     hideError?: boolean
     hideEmpty?: boolean
     hideLoading?: boolean
-    source: PromiseContent<any, T[]> | Stream<T> | T[] | T
+    source:
+      | {
+          type: 'query'
+          query: UseQueryReturn<T>
+        }
+      | {
+          type: 'raw'
+          data: T
+          isLoading: boolean
+          error?: Error
+          refetch?: () => Promise<any>
+        }
     classError?: ClassNameValue
     classEmpty?: ClassNameValue
     styleError?: StyleValue
     styleEmpty?: StyleValue
   } & StyleProps
 >()
-defineSlots<{ default(data: { data?: T }): any }>()
-defineEmits<{ retry: []; resetRetry: [] }>()
-const unionSource = computed(() =>
-  Stream.isStream($props.source)
+
+
+const source = computed(() =>
+  $props.source.type == 'query'
     ? {
-        isLoading: $props.source.isRequesting.value,
-        isError: $props.source.error.value,
-        errorCause: $props.source.error.value?.message,
-        isEmpty: $props.source.isEmpty.value,
-        data: <T>$props.source.data.value,
-        isNoResult: $props.source.isNoData.value
+        data: $props.source.query.data.value,
+        isLoading: $props.source.query.isLoading.value,
+        error: $props.source.query.error.value,
+        refetch() {
+          if ($props.source.type != 'query') return $props.source.refetch?.()
+          return $props.source.query.refetch(false)
+        }
       }
-    : PromiseContent.isPromiseContent($props.source)
-      ? {
-          isLoading: $props.source.isLoading.value,
-          isError: $props.source.isError.value,
-          errorCause: $props.source.errorCause.value?.message,
-          isEmpty: $props.source.isEmpty.value,
-          data: <T>$props.source.data.value,
-          isNoResult: $props.source.isEmpty.value
-        }
-      : {
-          isLoading: false,
-          isError: false,
-          errorCause: undefined,
-          isEmpty: isEmpty($props.source),
-          data: <T>$props.source,
-          isNoResult: isEmpty($props.source)
-        }
+    : omit($props.source, ['type'])
 )
+
+
 type AllVariant =
   | 'isLoadingNoData'
   | 'isErrorNoData'
@@ -59,9 +57,7 @@ type AllVariant =
   | 'isErrorData'
   | 'isEmpty'
   | 'done'
-
-
-const loadingVariants: Record<AllVariant, VariantType> = {
+const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
   isLoadingNoData: {
     opacity: 1,
     translateY: 0,
@@ -79,7 +75,7 @@ const loadingVariants: Record<AllVariant, VariantType> = {
     opacity: 1,
     translateY: '-50%',
     width: '70%',
-    minHeight: $props.retriable ? '22rem' : '20rem',
+    minHeight: source.value.refetch ? '22rem' : '20rem',
     paddingBlock: '2px',
     paddingInline: '2px',
     left: '50%',
@@ -140,15 +136,15 @@ const loadingVariants: Record<AllVariant, VariantType> = {
     backgroundColor: 'var(--p-color)',
     borderRadius: '4px'
   }
-}
+}))
 const animateOn = computed<AllVariant>(() => {
-  if (!$props.hideLoading && unionSource.value.isLoading) {
-    if (unionSource.value.isEmpty) return 'isLoadingNoData'
+  if (!$props.hideLoading && source.value.isLoading) {
+    if (isEmpty(source.value.data)) return 'isLoadingNoData'
     else return 'isLoadingData'
-  } else if (!$props.hideError && unionSource.value.isError) {
-    if (unionSource.value.isEmpty) return 'isErrorNoData'
+  } else if (!$props.hideError && source.value.error) {
+    if (isEmpty(source.value.data)) return 'isErrorNoData'
     else return 'isErrorData'
-  } else if (!$props.hideEmpty && unionSource.value.isNoResult) {
+  } else if (!$props.hideEmpty && isEmpty(source.value.data)) {
     return 'isEmpty'
   }
   return 'done'
@@ -157,12 +153,13 @@ const animateOn = computed<AllVariant>(() => {
 
 const conation = useTemplateRef('conation')
 defineExpose({ cont: conation })
+defineSlots<{ default(data: { data?: T }): any }>()
 </script>
 
 <template>
   <div class="relative size-full overflow-hidden">
     <div :class="twMerge('relative size-full', $props.class)" ref="conation">
-      <slot v-if="!unionSource.isEmpty" :data="unionSource.data" />
+      <slot v-if="!isEmpty(source.data)" :data="source.data" />
     </div>
     <AnimatePresence>
       <motion.div
@@ -194,10 +191,12 @@ defineExpose({ cont: conation })
                 )
               "
               :style="[style, styleError]"
-              :description="unionSource.errorCause ?? '未知原因'"
+              :description="source.error?.message ?? '未知原因'"
             >
               <template #footer>
-                <NButton v-if="retriable" @click="$emit('resetRetry')" type="primary">重试</NButton>
+                <NButton v-if="source.refetch" @click="source.refetch()" type="primary"
+                  >重试</NButton
+                >
               </template>
               <template #icon>
                 <NIcon size="10rem" color="var(--nui-error-color)">
@@ -215,9 +214,15 @@ defineExpose({ cont: conation })
             </NIcon>
             <div class="flex flex-col justify-center gap-2 text-white">
               <div class="text-sm">网络错误</div>
-              <div class="text-xs text-wrap">{{ unionSource.errorCause ?? '未知原因' }}</div>
+              <div class="text-xs text-wrap">{{ source.error?.message ?? '未知原因' }}</div>
             </div>
-            <NButton circle type="error" size="large" @click="$emit('retry')">
+            <NButton
+              circle
+              type="error"
+              size="large"
+              v-if="source.refetch"
+              @click="source.refetch()"
+            >
               <template #icon>
                 <NIcon color="white">
                   <ReloadOutlined />
