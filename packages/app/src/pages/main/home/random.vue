@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SharedFunction, useTemp } from '@delta-comic/core'
-import { Stream, uni } from '@delta-comic/model'
+import { uni } from '@delta-comic/model'
+import { useInfiniteQuery } from '@pinia/colada'
 import { until, useResizeObserver } from '@vueuse/core'
 import { isEmpty } from 'es-toolkit/compat'
 import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
@@ -11,17 +12,21 @@ import { isShowMainHomeNavBar } from '@/symbol'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()
 const temp = useTemp().$applyRaw('randomConfig', () => ({
-  stream: Stream.create<uni.item.Item>(async function* (signal, that) {
-    that.pages.value = Infinity
-    that.page.value = 0
-    while (true) {
-      that.page.value++
-      const result = await SharedFunction.callRandom('getRandomProvide', signal).result
-      yield result
-    }
-  }),
+  // stream: Stream.create<uni.item.Item>(async function* (signal, that) {
+  //   that.pages.value = Infinity
+  //   that.page.value = 0
+  //   while (true) {
+  //     that.page.value++
+  //     const result = await SharedFunction.callRandom('getRandomProvide', signal).result
+  //     yield result
+  //   }
+  // }),
   scroll: 0
 }))
+useInfiniteQuery({
+  key: () => ['random'],
+  query: async () => []
+})
 
 
 const containBound = ref<DOMRectReadOnly>()
