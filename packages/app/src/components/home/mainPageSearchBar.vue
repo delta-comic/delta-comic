@@ -51,7 +51,7 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
   <div class="ml-3 h-9 w-1/2">
     <div
       :class="[
-        isSearching ? 'left-1 w-[calc(100%-18px)] rounded-lg' : 'left-10.25 ml-3 w-1/2 rounded-full'
+        isSearching ? 'left-1 w-[calc(100%-18px)] rounded-lg' : 'left-10.25 ml-3 rounded-full'
       ]"
       class="absolute z-1000! flex h-9 items-center border border-solid border-gray-400 px-1 text-gray-400 transition-all duration-200"
     >

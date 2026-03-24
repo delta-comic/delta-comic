@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-import type { UseQueryReturn } from '@pinia/colada'
+import type { UseInfiniteQueryReturn, UseQueryReturn } from '@pinia/colada'
 import { omit } from 'es-toolkit'
 import { isEmpty } from 'es-toolkit/compat'
 import { motion, type VariantType } from 'motion-v'
@@ -19,6 +19,10 @@ const $props = defineProps<
       | {
           type: 'query'
           query: UseQueryReturn<T>
+        }
+      | {
+          type: 'infinite'
+          stream: UseInfiniteQueryReturn<T>
         }
       | {
           type: 'raw'
@@ -42,11 +46,21 @@ const source = computed(() =>
         isLoading: $props.source.query.isLoading.value,
         error: $props.source.query.error.value,
         refetch() {
-          if ($props.source.type != 'query') return $props.source.refetch?.()
+          if ($props.source.type != 'query') return
           return $props.source.query.refetch(false)
         }
       }
-    : omit($props.source, ['type'])
+    : $props.source.type == 'infinite'
+      ? {
+          data: $props.source.stream.data.value?.pages.flat(1) as T | undefined,
+          isLoading: $props.source.stream.isLoading.value,
+          error: $props.source.stream.error.value,
+          refetch() {
+            if ($props.source.type != 'infinite') return
+            return $props.source.stream.refetch(false)
+          }
+        }
+      : omit($props.source, ['type'])
 )
 
 

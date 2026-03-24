@@ -13,7 +13,7 @@ defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
   <div
     class="van-hairline--bottom w-full bg-(--van-background-2)"
     @click="
-      SharedFunction.call('routeToContent', item.contentType, item.id, item.thisEp.index, item)
+      SharedFunction.call('routeToContent', item.contentType, item.id, item.thisEp.id, item)
     "
   >
     <!-- user -->

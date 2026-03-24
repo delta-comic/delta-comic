@@ -14,7 +14,7 @@ const instance = computed(() => uni.item.Item.create($props.item.item))
 
 <template>
   <DcVar v-if="item" :value="item?.item" v-slot="{ value }">
-    <component :item="instance" :is="uni.item.Item.itemCard.get(instance.contentType)">
+    <component :item="instance" :is="uni.item.Item.itemCards.get(instance.contentType)">
       <div class="van-ellipsis flex flex-nowrap items-center *:text-nowrap">
         <NIcon color="var(--van-text-color-2)" size="14px">
           <Icons.antd.UserOutlined />

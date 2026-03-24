@@ -14,7 +14,7 @@ const $emit = defineEmits<{ change: [] }>()
         v-for="[plugin, value] in Object.entries(
           Object.groupBy(
             Array.from(uni.image.Image.fork.entries()).map(([key, { urls: forks }]) => {
-              const [plugin, namespace] = uni.image.Image.fork.toJSON(key)
+              const [plugin, namespace] = uni.image.Image.fork.key.toJSON(key)
               return {
                 plugin,
                 namespace,

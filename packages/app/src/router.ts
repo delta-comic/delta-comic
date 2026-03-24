@@ -27,7 +27,7 @@ SharedFunction.define(
       params: {
         id: encodeURI(id),
         ep: encodeURI(ep),
-        contentType: uni.content.ContentPage.contentPage.toString(contentType_)
+        contentType: uni.content.ContentPage.contentPages.key.toString(contentType_)
       }
     })
   },
@@ -37,9 +37,12 @@ SharedFunction.define(
 SharedFunction.define(
   (input, source, sort) => {
     return router.force.push({
-      name: '/search/[input]',
-      params: { input: encodeURI(input) },
-      query: { source: source ? searchSourceKey.toString(source) : undefined, sort: sort }
+      name: '/search/[keyword]/[sort]/[method]',
+      params: {
+        keyword: encodeURI(input),
+        method: encodeURI(source ? searchSourceKey.toString(source) : 'unknown'),
+        sort: encodeURI(sort ?? 'unknown')
+      }
     })
   },
   pluginName,

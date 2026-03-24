@@ -1,6 +1,6 @@
 import type { uni } from '@delta-comic/model'
-import type { UseInfiniteQueryReturn, UseQueryReturn } from '@pinia/colada'
-import type { Component, VNodeChild } from 'vue'
+import type { UseQueryReturn } from '@pinia/colada'
+import type { Component } from 'vue'
 
 export interface Config {
   /**
@@ -35,16 +35,16 @@ export interface SearchMethod {
   getAutoComplete(
     input: string,
     signal: AbortSignal
-  ): PromiseLike<({ text: string; value: string } | VNodeChild)[]>
+  ): PromiseLike<({ text: string; value: string } | Component)[]>
 }
 
 export interface HotLevelboard {
   name: string
-  content: () => UseInfiniteQueryReturn<uni.item.Item> | UseQueryReturn<any, uni.item.Item[]>
+  content: () => UseQueryReturn<uni.item.Item[]>
 }
 export interface HotMainList {
   name: string
-  content: () => UseInfiniteQueryReturn<uni.item.Item> | UseQueryReturn<any, uni.item.Item[]>
+  content: () => UseQueryReturn<uni.item.Item[]>
   onClick?(): any
 }
 export interface HotTopButton {

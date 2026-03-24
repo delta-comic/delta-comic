@@ -79,4 +79,9 @@ export class SourcedKeyMap<TKey extends [string, string], TValue> implements Map
 
 export type SourcedKeyType<
   T extends SourcedKeyMap<[string, string], any> | SourcedValue<[string, string]>
-> = T extends SourcedKeyMap<infer K, any> ? K : T extends SourcedValue<infer K> ? K : never
+> =
+  T extends SourcedKeyMap<infer K, any>
+    ? K | string
+    : T extends SourcedValue<infer K>
+      ? K | string
+      : never

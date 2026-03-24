@@ -5,14 +5,13 @@ import { chunk } from 'es-toolkit'
 import { isEmpty } from 'es-toolkit/compat'
 import { computed } from 'vue'
 
-import LevelIcon from '@/components/home/hotPageIcon.vue'
 import { Icons } from '@/icons'
 
 const hotList = computed(() => Array.from(Global.mainLists.values()))
 
 
 const getItemCard = (contentType: uni.content.ContentType_) =>
-  uni.item.Item.itemCard.get(contentType)
+  uni.item.Item.itemCards.get(contentType)
 </script>
 
 <template>
@@ -28,7 +27,7 @@ const getItemCard = (contentType: uni.content.ContentType_) =>
             : {
                 bgColor: '#ff9212',
                 name: '排行榜',
-                icon: LevelIcon,
+                icon: Icons.other.HotLevel,
                 onClick() {
                   const first = Global.levelboard.keys().next().value!
                   return $router.force.push({ name: '/hot', query: { plugin: first } })
@@ -62,7 +61,7 @@ const getItemCard = (contentType: uni.content.ContentType_) =>
         </div>
       </VanSticky>
       <DcVar :value="block.content()" v-slot="{ value }">
-        <DcContent :source="value">
+        <DcContent :source="{ type: 'query', query: value }">
           <div class="flex gap-1 px-1">
             <div
               class="flex w-full flex-col gap-1"

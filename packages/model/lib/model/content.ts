@@ -1,7 +1,7 @@
 import { useGlobalVar } from '@delta-comic/utils'
 import { type Component } from 'vue'
 
-import { SourcedKeyMap, type PageKey, type RangedResult, type SourcedKeyType } from '../struct'
+import { SourcedKeyMap, type StreamQuery, type SourcedKeyType } from '../struct'
 
 import * as comment from './comment'
 import * as ep from './ep'
@@ -41,14 +41,11 @@ export abstract class ContentPage {
 
   public abstract fetchDetail: (signal?: AbortSignal) => Promise<item.Item>
 
-  public abstract fetchRecommends: (page: PageKey, signal?: AbortSignal) => RangedResult<item.Item>
+  public abstract fetchRecommends: StreamQuery<[], item.Item>
 
-  public abstract fetchComments: (
-    page: PageKey,
-    signal?: AbortSignal
-  ) => RangedResult<comment.Comment>
+  public abstract fetchComments: StreamQuery<[], comment.Comment>
 
-  public abstract fetchEps: (page: PageKey, signal?: AbortSignal) => RangedResult<ep.Ep>
+  public abstract fetchEps: StreamQuery<[], ep.Ep>
 
   public abstract ViewComponent: ViewComponent
 }

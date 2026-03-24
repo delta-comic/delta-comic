@@ -27,7 +27,7 @@ const $router = useRouter()
 const contentStore = useContentStore()
 const handleClick = (rawItem: uni.item.RawItem) => {
   const item = uni.item.Item.create(rawItem)
-  return contentStore.$load(item.contentType, item.id, item.$thisEp.index, item)
+  return contentStore.$load(item.contentType, item.id, item.$thisEp.id, item)
 }
 </script>
 

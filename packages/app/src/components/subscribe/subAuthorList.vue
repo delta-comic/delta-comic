@@ -1,38 +1,18 @@
 <script setup lang="ts">
-import { useTemp } from '@delta-comic/core'
 import { SubscribeDB } from '@delta-comic/db'
-import type { RStream, uni } from '@delta-comic/model'
-import { usePluginStore } from '@delta-comic/plugin'
-import { usePreventBack, DcState } from '@delta-comic/ui'
+import { usePreventBack, DcState, useZIndex } from '@delta-comic/ui'
 import { motion } from 'motion-v'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 import { Icons } from '@/icons'
 
-import Card from './subCard.vue'
+import SubList from './subList.vue'
 
-defineProps<{ selectItem: SubscribeDB.AuthorItem }>()
+const props = defineProps<{ selectItem: SubscribeDB.AuthorItem }>()
 const select = defineModel<string | undefined>('select', { required: true })
 
 
-const pluginStore = usePluginStore()
 const { state: subscribe } = SubscribeDB.useQuery(db => db.selectAll().execute())
-
-
-const temp = useTemp().$applyRaw('subscribeList', () => new Map<string, RStream<uni.item.Item>>())
-const getSource = (si: SubscribeDB.Item) => {
-  if (temp.has(si.key)) return temp.get(si.key)!
-  const [plugin] = SubscribeDB.key.toJSON(si.key)
-  if (si.type == 'author') {
-    const type = si.author.subscribe!
-    const sub = pluginStore.plugins.get(plugin)?.subscribe?.[type]
-    if (!sub) throw new Error(`can not found subscribe config which type:${type}, plugin:${plugin}`)
-    const stream = sub.getListStream(si.author)
-    temp.set(si.key, stream)
-    return stream
-  }
-  throw new Error('not impl')
-}
 
 
 const { remove } = SubscribeDB.useRemove()
@@ -42,17 +22,16 @@ const unsubscribe = (si: SubscribeDB.Item) => {
 }
 
 
-usePreventBack(
-  computed({
-    get() {
-      return !!select.value
-    },
-    set(v) {
-      if (!v) select.value = undefined
-    }
-  }),
-  ref(true)
-)
+const isShow = computed({
+  get() {
+    return !!select.value
+  },
+  set(v) {
+    if (!v) select.value = undefined
+  }
+})
+const [, isLast] = useZIndex(isShow)
+usePreventBack(isShow, isLast)
 </script>
 
 <template>
@@ -110,18 +89,11 @@ usePreventBack(
               </NIcon>
             </div>
             <div @pointerdown.stop class="h-[calc(100%-40px)] w-full overflow-hidden">
-              <DcWaterfall
-                :source="getSource(author)"
-                :padding="0"
-                :col="1"
-                :gap="4"
-                v-slot="{ item }"
-              >
-                <Card :item @unsubscribe="unsubscribe(author)" />
-              </DcWaterfall>
+              <SubList @unsubscribe="unsubscribe(author)" :source="author" />
             </div>
-          </VanTab> </VanTabs
-      ></DcState>
+          </VanTab>
+        </VanTabs>
+      </DcState>
     </motion.div>
   </AnimatePresence>
 </template>

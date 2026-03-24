@@ -19,7 +19,7 @@ const $props = withDefaults(
     {
       source:
         | { type: 'query'; value: UseQueryReturn<T[]>; next?: () => any }
-        | { type: 'infinite'; value: UseInfiniteQueryReturn<T> }
+        | { type: 'infinite'; value: UseInfiniteQueryReturn<T[]> }
         | {
             type: 'array'
             value: Array<T>
@@ -64,7 +64,7 @@ const source = computed(() =>
       }
     : $props.source.type == 'infinite'
       ? {
-          data: dataProcessor($props.source.value.data.value?.pages ?? []),
+          data: dataProcessor($props.source.value.data.value?.pages.flat(1) ?? []),
           isDone: $props.source.value.hasNextPage.value,
           isLoading: $props.source.value.isLoading.value,
           error: $props.source.value.error.value,

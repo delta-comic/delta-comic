@@ -2,23 +2,20 @@
 import { useFullscreen } from '@delta-comic/core'
 import { HistoryDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
-import { createLoadingMessage, usePreventBack } from '@delta-comic/ui'
-import { computed, watch, ref } from 'vue'
+import { usePreventBack } from '@delta-comic/ui'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useContentStore } from '@/stores/content'
 
+definePage({ meta: { statusBar: 'dark', force: true } })
 const $route = useRoute<'/content/[contentType]/[id]/[ep]'>()
+const ep = $route.params.ep.toString()
+const id = $route.params.id.toString()
+const contentType = $route.params.contentType
 
 
 const contentStore = useContentStore()
-
-
-const ep = $route.params.ep.toString()
-const id = $route.params.id.toString()
-const contentType = $route.params.contentType.toString()
-
-
 contentStore.$load(contentType, id, ep)
 
 
@@ -27,7 +24,7 @@ const page = computed(
 )
 
 
-const layout = computed(() => uni.content.ContentPage.viewLayout.get($route.params.contentType))
+const layout = computed(() => uni.content.ContentPage.layouts.get($route.params.contentType))
 
 
 const { isFullscreen } = useFullscreen()
@@ -35,28 +32,18 @@ usePreventBack(isFullscreen, ref(true))
 
 
 // history
-const union = computed(() => page.value.union.value)
-if (!union.value) var loading = createLoadingMessage()
-watch(
-  union,
-  union => {
-    if (!union) return
-    loading?.success()
-    HistoryDB.upsert(union)
-  },
-  { immediate: true }
+const { upsert } = HistoryDB.useUpsert()
+page.value.fetchDetail().then(item =>
+  upsert({
+    item: item.toJSON()
+  })
 )
-
-
-definePage({ meta: { statusBar: 'dark', force: true } })
 </script>
 
 <template>
-  <template v-if="union">
-    <component :page :is="layout" v-if="layout">
-      <template #view>
-        <component :page :is="page.ViewComp" :isFullScreen="isFullscreen" />
-      </template>
-    </component>
-  </template>
+  <component :page :is="layout" v-if="layout">
+    <template #view>
+      <component :page :is="page.ViewComponent" :isFullScreen="isFullscreen" />
+    </template>
+  </component>
 </template>
