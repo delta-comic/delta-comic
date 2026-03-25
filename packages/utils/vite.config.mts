@@ -1,18 +1,17 @@
 import { cloneDeep } from 'es-toolkit'
-import { defineConfig } from 'vite'
-import dtsPlugin from 'vite-plugin-dts'
+import { defineConfig } from 'vite-plus'
 
 import { extendsDepends, type ExternalLib } from './lib'
-import _package from './package.json'
 
 const deps = cloneDeep(extendsDepends) as Partial<ExternalLib>
 delete deps['@delta-comic/utils']
 
 export default defineConfig({
-  plugins: [dtsPlugin({ include: ['./lib'], tsconfigPath: './tsconfig.json' })],
-  build: {
-    lib: { entry: './lib/index.ts', name: 'DcUtils', fileName: 'index', formats: ['es'] },
+  pack: {
+    dts: true,
+    entry: './lib/index.ts',
     sourcemap: true,
-    rolldownOptions: { external: Object.keys(deps), output: { globals: deps } }
+    format: 'es',
+    deps: { neverBundle: Object.keys(deps) }
   }
 })

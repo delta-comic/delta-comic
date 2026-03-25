@@ -34,7 +34,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vite build && pnpm pack --out ./dist/pack.tgz",
+    "build": "vp build && pnpm pack --out ./dist/pack.tgz",
     "publish:self": "pnpm --filter ui publish"
   },
   "dependencies": {
@@ -64,6 +64,7 @@
     "tailwindcss": "catalog:",
     "unplugin-vue-components": "catalog:",
     "vite": "catalog:",
+    "vite-plus": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
   "peerDependencies": {

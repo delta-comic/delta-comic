@@ -9,14 +9,12 @@ import { browserslistToTargets } from 'lightningcss'
 import MotionResolver from 'motion-v/resolver'
 import { NaiveUiResolver, VantResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
-import { defineConfig } from 'vite'
-import dts from 'vite-plugin-dts'
-
-import _package from './package.json'
+import dtsPlugin from 'vite-plugin-dts'
+import { defineConfig } from 'vite-plus'
 
 export default defineConfig({
   plugins: [
-    dts({ include: ['./lib', './vite'], tsconfigPath: './tsconfig.json' }),
+    dtsPlugin({ include: ['./lib', './vite'], tsconfigPath: './tsconfig.json' }),
     vue(),
     vueJsx(),
     Components({ dts: true, resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver()] }),

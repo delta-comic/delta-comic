@@ -6,9 +6,9 @@
     "build:app": "tauri android build --release",
     "build:debug": "tauri android build --debug",
     "build:local": "tauri build --debug",
-    "build:web": "vite build",
+    "build:web": "vp build",
     "dev": "tauri dev",
-    "dev:web": "vite",
+    "dev:web": "vp dev",
     "publish:self": "echo \"No need publish to npm\"",
     "tauri": "pnpm exec tauri"
   },
@@ -41,10 +41,10 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
+    "@tauri-apps/cli": "^2.10.1",
     "@types/semver": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "@vitejs/plugin-vue-jsx": "catalog:",
-    "@tauri-apps/cli": "^2.10.1",
     "browserslist": "catalog:",
     "lightningcss": "catalog:",
     "tailwindcss": "catalog:",
@@ -55,6 +55,7 @@
     "vite-plugin-ms-clarity": "^1.0.0",
     "vite-plugin-vue-devtools": "^8.0.7",
     "vite-plugin-wasm": "^3.5.0",
+    "vite-plus": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
   "readme": "../../README.md"

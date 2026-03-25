@@ -43,14 +43,10 @@
     "@types/iarna__toml": "^2.0.5",
     "commitlint-plugin-cspell": "^0.6.0",
     "cspell": "^9.7.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
-    "oxfmt": "^0.41.0",
-    "oxlint": "^1.56.0",
-    "oxlint-tsgolint": "^0.17.1",
     "semantic-release": "^25.0.3",
     "vite": "catalog:",
-    "vite-plugin-dts": "^4.5.4"
+    "vite-plugin-dts": "^4.5.4",
+    "vite-plus": "catalog:"
   },
   "badges": [
     {
@@ -79,10 +75,7 @@
     "onlyBuiltDependencies": [
       "core-js",
       "tauri-plugin-better-cors-fetch"
-    ],
-    "overrides": {
-      "vite": "catalog:"
-    }
+    ]
   },
   "readme": "./README.md"
 }

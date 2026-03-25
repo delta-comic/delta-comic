@@ -9,11 +9,11 @@ import { browserslistToTargets } from 'lightningcss'
 import MotionResolver from 'motion-v/resolver'
 import { NaiveUiResolver, VantResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
-import type { UserConfig } from 'vite'
-import { defineConfig } from 'vite'
 import MsClarity from 'vite-plugin-ms-clarity'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import wasm from 'vite-plugin-wasm'
+import type { UserConfig } from 'vite-plus'
+import { defineConfig } from 'vite-plus'
 import VueRouter from 'vue-router/vite'
 
 const host = process.env.TAURI_DEV_HOST

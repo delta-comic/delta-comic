@@ -6,8 +6,8 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
-import { defineConfig } from 'vite'
 import dtsPlugin from 'vite-plugin-dts'
+import { defineConfig } from 'vite-plus'
 
 import _package from './package.json'
 

@@ -1,6 +1,6 @@
 import { extendsDepends } from '@delta-comic/utils'
-import { defineConfig } from 'vite'
 import dtsPlugin from 'vite-plugin-dts'
+import { defineConfig } from 'vite-plus'
 
 import _package from './package.json'
 

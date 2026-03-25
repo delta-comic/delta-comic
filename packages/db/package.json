@@ -29,7 +29,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vite build && pnpm pack --out ./dist/pack.tgz",
+    "build": "vp build && pnpm pack --out ./dist/pack.tgz",
     "publish:self": "pnpm --filter db publish"
   },
   "dependencies": {
@@ -42,7 +42,8 @@
     "mitt": "catalog:"
   },
   "devDependencies": {
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "@delta-comic/model": "workspace:*",

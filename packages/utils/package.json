@@ -29,7 +29,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vite build && pnpm pack --out ./dist/pack.tgz",
+    "build": "vp build && pnpm pack --out ./dist/pack.tgz",
     "publish:self": "pnpm --filter utils publish"
   },
   "dependencies": {
@@ -39,7 +39,8 @@
   },
   "devDependencies": {
     "axios": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "axios": "^1.13",

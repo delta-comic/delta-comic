@@ -31,7 +31,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vite build && pnpm pack --out ./dist/pack.tgz",
+    "build": "vp build && pnpm pack --out ./dist/pack.tgz",
     "publish:self": "pnpm --filter plugin publish"
   },
   "dependencies": {
@@ -61,7 +61,8 @@
     "browserslist": "catalog:",
     "lightningcss": "catalog:",
     "tailwindcss": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
   },
   "release": {
     "tagFormat": "plugin-${version}"

@@ -29,12 +29,12 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vite build && pnpm pack --out ./dist/pack.tgz",
+    "build": "vp pack && pnpm pack --out ./dist/pack.tgz",
     "publish:self": "pnpm --filter vite publish"
   },
   "devDependencies": {
-    "lightningcss": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "@delta-comic/db": "workspace:*",
