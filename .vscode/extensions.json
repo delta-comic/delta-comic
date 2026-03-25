@@ -6,6 +6,7 @@
     "Vue.volar",
     "streetsidesoftware.code-spell-checker",
     "bradlc.vscode-tailwindcss",
-    "DavidAnson.vscode-markdownlint"
+    "DavidAnson.vscode-markdownlint",
+    "VoidZero.vite-plus-extension-pack"
   ]
 }
