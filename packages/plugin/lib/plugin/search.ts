@@ -1,4 +1,4 @@
-import type { uni } from '@delta-comic/model'
+import type { StreamQuery, uni } from '@delta-comic/model'
 import type { UseQueryReturn } from '@pinia/colada'
 import type { Component } from 'vue'
 
@@ -26,12 +26,7 @@ export interface SearchMethod {
   name: string
   sorts: { text: string; value: string }[]
   defaultSort: string
-  search(
-    input: string,
-    sort: string,
-    page: number,
-    signal?: AbortSignal
-  ): PromiseLike<{ items: uni.item.Item[]; nextPage?: number }>
+  fetchSearchResult: StreamQuery<[input: string, sort: string], uni.item.Item>
   getAutoComplete(
     input: string,
     signal: AbortSignal

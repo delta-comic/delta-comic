@@ -12,20 +12,19 @@ import { isShowMainHomeNavBar } from '@/symbol'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()
 const temp = useTemp().$applyRaw('randomConfig', () => ({
-  // stream: Stream.create<uni.item.Item>(async function* (signal, that) {
-  //   that.pages.value = Infinity
-  //   that.page.value = 0
-  //   while (true) {
-  //     that.page.value++
-  //     const result = await SharedFunction.callRandom('getRandomProvide', signal).result
-  //     yield result
-  //   }
-  // }),
   scroll: 0
 }))
-useInfiniteQuery({
+
+
+let index = 0
+const source = useInfiniteQuery({
   key: () => ['random'],
-  query: async () => []
+  initialPageParam: 1,
+  getNextPageParam: () => (index += 1),
+  query: async ({ signal }) => {
+    const result = await SharedFunction.callRandom('getRandomProvide', signal).result
+    return result
+  }
 })
 
 
@@ -35,7 +34,7 @@ useResizeObserver(
   ([b]) => (containBound.value = b.contentRect)
 )
 onMounted(async () => {
-  if (!isEmpty(temp.stream._data)) {
+  if (!isEmpty(source.data.value)) {
     await until(() => (containBound.value?.height ?? 0) > 8).toBeTruthy()
     waterfall.value?.scrollParent?.scroll(0, temp.scroll)
   }
@@ -56,22 +55,24 @@ watch(
   },
   { immediate: true }
 )
-
-
-console.debug('[random] waterfall', waterfall, temp.stream)
 </script>
 
 <template>
-  <DcWaterfall class="size-full!" :source="temp.stream" v-slot="{ item, index }" ref="waterfall">
+  <DcWaterfall
+    class="size-full!"
+    :source="{ type: 'infinite', value: source }"
+    v-slot="{ item, index }"
+    ref="waterfall"
+  >
     <component
-      :is="uni.item.Item.itemCard.get(item.contentType)"
+      :is="uni.item.Item.itemCards.get(item.contentType)"
       :item
       type="small"
       free-height
       :key="`${index}|${item.id}`"
     >
       <NIcon color="var(--van-text-color-2)" size="14px">
-        <Icons.antd.DrawOutlined />
+        <Icons.material.DrawOutlined />
       </NIcon>
       <span class="van-ellipsis ml-0.5 max-w-2/3 text-xs text-(--van-text-color-2)">{{
         item.author.join(',')
@@ -83,7 +84,7 @@ console.debug('[random] waterfall', waterfall, temp.stream)
         </span>
         <span v-if="item.likeNumber">
           <NIcon class="mr-0.5" size="14px" color="white">
-            <Icons.material.LikeOutlined />
+            <Icons.antd.LikeOutlined />
           </NIcon>
           <span>{{ item.likeNumber }}</span>
         </span>

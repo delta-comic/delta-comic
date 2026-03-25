@@ -18,11 +18,11 @@ const $props = defineProps<
     source:
       | {
           type: 'query'
-          query: UseQueryReturn<T>
+          query: UseQueryReturn<T, any, any>
         }
       | {
           type: 'infinite'
-          stream: UseInfiniteQueryReturn<T>
+          stream: UseInfiniteQueryReturn<T, any, any>
         }
       | {
           type: 'raw'

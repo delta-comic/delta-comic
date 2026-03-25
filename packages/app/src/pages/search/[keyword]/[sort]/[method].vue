@@ -1,24 +1,3 @@
-<!-- <script lang="ts">
-import { usePluginStore } from '@delta-comic/plugin'
-import { defineColadaLoader } from 'vue-router/experimental/pinia-colada'
-
-import { searchSourceKey } from '@/components/search/source'
-import { useInfiniteQuery } from '@pinia/colada'
-export const useSearch = defineColadaLoader('/search/[keyword]/[sort]/[method]', {
-  key: to => [
-    'search',
-    { keyword: to.params.keyword, sort: to.params.sort, method: to.params.method }
-  ],
-  query: ({ params: { keyword, method: source, sort } }, { signal }) => {
-    const pluginStore = usePluginStore()
-    const [plugin, name] = searchSourceKey.toJSON(source)
-    const method = Object.fromEntries(Object.fromEntries(pluginStore.allSearchSource)[plugin])[name]
-
-    method.search(keyword, sort, page)
-  }
-})
-</script> -->
-
 <script setup lang="ts">
 import { usePluginStore } from '@delta-comic/plugin'
 import { useInfiniteQuery } from '@pinia/colada'
@@ -42,11 +21,16 @@ const { state } = useInfiniteQuery({
     'search',
     { keyword: $route.params.keyword, sort: $route.params.sort, method: $route.params.method }
   ],
-  initialPageParam: 1,
+  initialPageParam: method.value.fetchSearchResult.initialPageParam,
   query: async ({ signal, pageParam }) => {
-    return await method.value.search($route.params.keyword, $route.params.sort, pageParam, signal)
+    return await method.value.fetchSearchResult(
+      $route.params.keyword,
+      $route.params.sort,
+      pageParam,
+      signal
+    )
   },
-  getNextPageParam: (_, __, lastPageParam) => lastPageParam + 1
+  getNextPageParam: lp => lp.nextPage
 })
 </script>
 

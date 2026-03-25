@@ -18,8 +18,8 @@ const $props = withDefaults(
   defineProps<
     {
       source:
-        | { type: 'query'; value: UseQueryReturn<T[]>; next?: () => any }
-        | { type: 'infinite'; value: UseInfiniteQueryReturn<T[]> }
+        | { type: 'query'; value: UseQueryReturn<T[], any, any>; next?: () => any }
+        | { type: 'infinite'; value: UseInfiniteQueryReturn<T[], any, any> }
         | {
             type: 'array'
             value: Array<T>

@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { SubscribeDB } from '@delta-comic/db'
-import { computedAsync } from '@vueuse/core'
+import { DcState } from '@delta-comic/ui'
 import { computed, shallowRef } from 'vue'
 
 import AuthorList from '@/components/subscribe/subAuthorList.vue'
 import { Icons } from '@/icons'
 const isOnAllPage = shallowRef(true)
-const subscribe = computedAsync(() => SubscribeDB.getAll(), [])
+const subscribeQuery = SubscribeDB.useQuery(db =>
+  db.where('type', 'is', 'author').selectAll().execute()
+) // computedAsync(() => SubscribeDB.getAll(), [])
 
 
 const select = shallowRef<string>()
-const selectItem = computed(() => subscribe.value.find(v => v.key == select.value))
+const selectItem = computed(
+  () => subscribeQuery.data.value.find(v => v.key == select.value) as SubscribeDB.Item | undefined
+)
 
 
 const isShowAllList = shallowRef(false)
@@ -68,20 +72,27 @@ const isShowAllList = shallowRef(false)
       <div
         class="scrollbar flex h-fit w-full gap-1 overflow-x-auto overflow-y-hidden bg-(--van-background-2) px-1 py-1"
       >
-        <div
-          v-for="sub of subscribe"
-          class="flex h-full w-fit flex-col items-center justify-around"
-          @click="select = sub.key"
+        <DcState
+          :state="subscribeQuery.state.value"
+          contentClass="h-fit w-full"
+          class="h-fit! w-full!"
+          v-slot="{ data }"
         >
-          <template v-if="sub.type == 'author'">
-            <DcAuthorIcon :size-spacing="12" :author="sub.author" />
-            <div
-              class="van-multi-ellipsis--l2 mt-1 w-18 text-center text-xs text-wrap text-(--van-text-color-2)"
-            >
-              {{ sub.author.label }}
-            </div>
-          </template>
-        </div>
+          <div
+            v-for="sub of <SubscribeDB.Item[]>data"
+            class="flex h-full w-fit flex-col items-center justify-around"
+            @click="select = sub.key"
+          >
+            <template v-if="sub.type == 'author'">
+              <DcAuthorIcon :size-spacing="12" :author="sub.author" />
+              <div
+                class="van-multi-ellipsis--l2 mt-1 w-18 text-center text-xs text-wrap text-(--van-text-color-2)"
+              >
+                {{ sub.author.label }}
+              </div>
+            </template>
+          </div>
+        </DcState>
       </div>
     </div>
     <!-- list -->
@@ -91,30 +102,39 @@ const isShowAllList = shallowRef(false)
     <AuthorList v-model:select="select" :select-item v-if="selectItem?.type == 'author'" />
   </div>
   <DcPopup v-model:show="isShowAllList" position="bottom" round class="h-[70vh]">
-    <div
-      v-for="sub of subscribe"
-      class="van-hairline--bottom relative w-full py-2"
-      @click="
-        () => {
-          isShowAllList = false
-          select = sub.key
-        }
-      "
+    <DcState
+      :state="subscribeQuery.state.value"
+      contentClass="h-fit w-full"
+      class="h-fit! w-full!"
+      v-slot="{ data }"
     >
-      <DcVar :value="sub.author" v-if="sub.type == 'author'" v-slot="{ value: author }">
-        <div class="van-ellipsis flex w-fit items-center pl-2 text-[16px] text-(--p-color)">
-          <DcAuthorIcon :size-spacing="8.5" :author class="mx-2" />
-          <div class="flex w-full flex-col text-nowrap">
-            <div class="flex items-center text-(--nui-primary-color)">
-              {{ author.label }}
-            </div>
-            <div class="-mt-0.5 flex max-w-2/3 items-center text-[11px] text-(--van-text-color-2)">
-              {{ author.description }}
+      <div
+        v-for="sub of <SubscribeDB.Item[]>data"
+        class="van-hairline--bottom relative w-full py-2"
+        @click="
+          () => {
+            isShowAllList = false
+            select = sub.key
+          }
+        "
+      >
+        <DcVar :value="sub.author" v-if="sub.type == 'author'" v-slot="{ value: author }">
+          <div class="van-ellipsis flex w-fit items-center pl-2 text-[16px] text-(--p-color)">
+            <DcAuthorIcon :size-spacing="8.5" :author class="mx-2" />
+            <div class="flex w-full flex-col text-nowrap">
+              <div class="flex items-center text-(--nui-primary-color)">
+                {{ author.label }}
+              </div>
+              <div
+                class="-mt-0.5 flex max-w-2/3 items-center text-[11px] text-(--van-text-color-2)"
+              >
+                {{ author.description }}
+              </div>
             </div>
           </div>
-        </div>
-      </DcVar>
-    </div>
+        </DcVar>
+      </div>
+    </DcState>
   </DcPopup>
 </template>
 <style scoped lang="css">

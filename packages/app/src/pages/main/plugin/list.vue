@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { PluginArchiveDB } from '@delta-comic/db'
 import { Install } from '@delta-comic/plugin'
-import { DcState } from '@delta-comic/ui'
 import { memoize } from 'es-toolkit'
 import semver from 'semver'
 import { shallowReactive } from 'vue'
@@ -37,7 +36,7 @@ const getCardClass = (plugin: PluginArchiveDB.Archive) => {
 const { toggle } = PluginArchiveDB.useToggleEnable()
 
 
-const { state: codeArchivesState } = PluginArchiveDB.useQuery(
+const codeArchives = PluginArchiveDB.useQuery(
   db => db.selectAll().execute(),
   [],
   () => []
@@ -46,73 +45,75 @@ const { remove } = PluginArchiveDB.useRemove()
 </script>
 
 <template>
-  <DcState :state="codeArchivesState" v-slot="{ data: codeArchives }">
-    <DcContent :source="PromiseContent.resolve(codeArchives)" class="size-full">
-      <NScrollbar class="size-full">
-        <TransitionGroup tag="ul" name="list">
-          <NCard
-            v-for="plugin of codeArchives"
-            :key="plugin.pluginName"
-            :title="plugin.meta.name.display ?? plugin.pluginName"
-            header-class="pt-1! pb-0! px-3!"
-            content-class="pb-1! px-3!"
-            :class="[getCardClass(plugin)]"
-            class="mx-auto mt-1 w-[calc(100%-6px)]! duration-100!"
+  <DcContent
+    :source="{ type: 'query', query: codeArchives }"
+    class="size-full"
+    v-slot="{ data: query }"
+  >
+    <NScrollbar class="size-full">
+      <TransitionGroup tag="ul" name="list">
+        <NCard
+          v-for="plugin of query"
+          :key="plugin.pluginName"
+          :title="plugin.meta.name.display ?? plugin.pluginName"
+          header-class="pt-1! pb-0! px-3!"
+          content-class="pb-1! px-3!"
+          :class="[getCardClass(plugin)]"
+          class="mx-auto mt-1 w-[calc(100%-6px)]! duration-100!"
+        >
+          <template #header-extra>
+            <!-- n-base-select-menu__empty -->
+            <span class="font-light text-(--text-color-3) italic">{{
+              plugin.enable ? '已启用' : '未启用'
+            }}</span>
+            <VanPopover
+              :actions="[
+                {
+                  text: plugin.enable ? '禁用' : '启用',
+                  onClick: () => void toggle({ keys: [plugin.pluginName] })
+                },
+                { text: '删除', onClick: () => void remove({ keys: [plugin.pluginName] }) },
+                {
+                  text: '从下载源更新',
+                  disabled: updating.has(plugin.pluginName),
+                  onClick: () => updatePlugin(plugin)
+                }
+              ]"
+              placement="left-start"
+              @select="v => v.onClick()"
+            >
+              <template #reference>
+                <NButton circle quaternary class="ml-3!">
+                  <template #icon>
+                    <NIcon>
+                      <Icons.material.MenuRound />
+                    </NIcon>
+                  </template>
+                </NButton>
+              </template>
+            </VanPopover>
+          </template>
+          <span
+            class="mr-3 font-bold text-(--nui-text-color-disabled) italic"
+            v-if="plugin.meta.version"
           >
-            <template #header-extra>
-              <!-- n-base-select-menu__empty -->
-              <span class="font-light text-(--text-color-3) italic">{{
-                plugin.enable ? '已启用' : '未启用'
-              }}</span>
-              <VanPopover
-                :actions="[
-                  {
-                    text: plugin.enable ? '禁用' : '启用',
-                    onClick: () => void toggle({ keys: [plugin.pluginName] })
-                  },
-                  { text: '删除', onClick: () => void remove({ keys: [plugin.pluginName] }) },
-                  {
-                    text: '从下载源更新',
-                    disabled: updating.has(plugin.pluginName),
-                    onClick: () => updatePlugin(plugin)
-                  }
-                ]"
-                placement="left-start"
-                @select="v => v.onClick()"
-              >
-                <template #reference>
-                  <NButton circle quaternary class="ml-3!">
-                    <template #icon>
-                      <NIcon>
-                        <Icons.material.MenuRound />
-                      </NIcon>
-                    </template>
-                  </NButton>
-                </template>
-              </VanPopover>
-            </template>
-            <span
-              class="mr-3 font-bold text-(--nui-text-color-disabled) italic"
-              v-if="plugin.meta.version"
-            >
-              {{ semver.valid(semver.coerce(plugin.meta.version.plugin ?? 'v0')) }}
-            </span>
-            <span class="text-(--nui-text-color-3)">{{ plugin.meta.description }}</span>
-            <div class="w-full text-xs text-(--nui-text-color-disabled)">
-              适应核心版本: {{ plugin.meta.version.supportCore }}
-            </div>
-            <div
-              class="mt-1 flex w-full items-center gap-1 text-sm! font-bold"
-              v-if="!checkIsSupport(plugin.meta.version.supportCore)"
-            >
-              <NIcon color="var(--nui-warning-color)" size="1.2rem">
-                <Icons.material.WarningRound />
-              </NIcon>
-              插件不支持当前核心版本
-            </div>
-          </NCard>
-        </TransitionGroup>
-      </NScrollbar>
-    </DcContent>
-  </DcState>
+            {{ semver.valid(semver.coerce(plugin.meta.version.plugin ?? 'v0')) }}
+          </span>
+          <span class="text-(--nui-text-color-3)">{{ plugin.meta.description }}</span>
+          <div class="w-full text-xs text-(--nui-text-color-disabled)">
+            适应核心版本: {{ plugin.meta.version.supportCore }}
+          </div>
+          <div
+            class="mt-1 flex w-full items-center gap-1 text-sm! font-bold"
+            v-if="!checkIsSupport(plugin.meta.version.supportCore)"
+          >
+            <NIcon color="var(--nui-warning-color)" size="1.2rem">
+              <Icons.material.WarningRound />
+            </NIcon>
+            插件不支持当前核心版本
+          </div>
+        </NCard>
+      </TransitionGroup>
+    </NScrollbar>
+  </DcContent>
 </template>
