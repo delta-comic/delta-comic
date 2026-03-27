@@ -18,9 +18,9 @@
     "url": "https://github.com/delta-comic/delta-comic.git"
   },
   "scripts": {
-    "build": "pnpm --filter app build:app",
-    "dev": "pnpm --filter app dev",
-    "tauri": "pnpm --filter app tauri"
+    "build": "vp run --filter app build:app",
+    "dev": "vp run --filter app dev",
+    "tauri": "vp run --filter app tauri"
   },
   "dependencies": {
     "es-toolkit": "catalog:"
