@@ -14,19 +14,15 @@ const create = (defaultValue = formDataRaw) => {
   show.value = true
 }
 
-
 const formDataRaw = { title: '', description: '', isPrivate: true }
 const formData = ref(formDataRaw)
-
 
 const cancel = () => {
   formData.value = formDataRaw
   show.value = false
 }
 
-
 const { createCard } = FavouriteDB.useCreateCard()
-
 
 const onSubmit = async () => {
   await createCard({

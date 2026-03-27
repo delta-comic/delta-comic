@@ -1,13 +1,7 @@
 import dayjs from 'dayjs'
 import { type Component } from 'vue'
 
-import {
-  SourcedKeyMap,
-  Struct,
-  type Metadata,
-  type Metadatable,
-  type StreamQuery
-} from '../struct'
+import { SourcedKeyMap, Struct, type Metadata, type Metadatable, type StreamQuery } from '../struct'
 
 import type { ContentType } from './content'
 import type { Item } from './item'

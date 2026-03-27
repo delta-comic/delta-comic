@@ -22,9 +22,7 @@ const { state: recentState } = RecentDB.useQuery(
   () => []
 )
 
-
 const searcher = useTemplateRef('searcher')
-
 
 const { remove } = RecentDB.useRemove()
 const actionController = useTemplateRef('actionController')
@@ -33,7 +31,6 @@ const removeItems = async (item: RecentDB.Item[]) => {
   await remove({ items: item.map(v => v.timestamp) })
   actionController.value?.selectList.clear()
 }
-
 
 const filters = useNativeStore(pluginName, 'recentView.filter', new Array<string>())
 </script>

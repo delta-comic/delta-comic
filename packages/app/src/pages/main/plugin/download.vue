@@ -6,7 +6,6 @@ import { useMessage } from 'naive-ui'
 import { ref } from 'vue'
 const { installFilePlugin, installPlugin, installers } = Install
 
-
 const inputUrl = ref('')
 const isAdding = ref(false)
 const $message = useMessage()
@@ -16,7 +15,6 @@ const confirmAdd = async (url: string) => {
     return
   }
   isAdding.value = true
-
 
   try {
     await createDialog({
@@ -36,7 +34,6 @@ const confirmAdd = async (url: string) => {
   }
   isAdding.value = false
 }
-
 
 const upload = toReactive(useFileDialog({ accept: '', multiple: false }))
 const useUploadPlugin = () => {

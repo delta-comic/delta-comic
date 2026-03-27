@@ -18,9 +18,7 @@ const $route = useRoute<'/hot'>()
 const plugin = computed(() => $route.query.plugin?.toString() ?? '')
 const sourceList = computed(() => Global.levelboard.get(plugin.value))
 
-
 const selectLevelKey = new SourcedValue<[plugin: string, name: string]>()
-
 
 const temp = useTemp().$apply('level', () => ({
   selectLevel: selectLevelKey.toString([
@@ -57,9 +55,7 @@ const source = computed(() => {
   return Stream.isStream(s) ? s : { data: s, isEnd: true }
 })
 
-
 const getItemCard = (item: uni.item.Item) => uni.item.Item.itemCard.get(item.contentType)
-
 
 const getColor = (index: number) => {
   if (index == 0) {

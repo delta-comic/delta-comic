@@ -12,7 +12,6 @@ defineProps<
   } & StyleProps
 >()
 
-
 defineSlots<{
   default(args: { data: T['data'] }): any
 }>()

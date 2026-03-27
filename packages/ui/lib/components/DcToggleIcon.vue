@@ -17,13 +17,11 @@ const $props = defineProps<
 const $emit = defineEmits<{ change: [mode: boolean]; click: [to: boolean]; longClick: [] }>()
 const isActive = defineModel<boolean>({ default: false })
 
-
 watch(isActive, mode => $emit('change', mode))
 const handleClick = () => {
   $emit('click', !isActive.value)
   if (!$props.disChanged) isActive.value = !isActive.value
 }
-
 
 const htmlRefHook = useTemplateRef('htmlRefHook')
 onLongPress(

@@ -5,7 +5,6 @@ import type { SingleResult, Type } from '@/form/type'
 
 defineProps<{ config: Type.Switch }>()
 
-
 const store = defineModel<SingleResult<Type.Switch>>({ required: true })
 </script>
 

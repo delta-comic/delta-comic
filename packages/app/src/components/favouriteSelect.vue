@@ -9,17 +9,14 @@ import { Icons } from '@/icons'
 
 const $props = defineProps<{ item: uni.item.Item; plain?: boolean }>()
 
-
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())
-
 
 const { state: allFavouriteCards } = FavouriteDB.useQueryCard(
   db => db.selectAll().execute(),
   [],
   () => []
 )
-
 
 const getCardCount = (createAt: FavouriteDB.Card['createAt']) =>
   FavouriteDB.useQueryItem(
@@ -28,13 +25,10 @@ const getCardCount = (createAt: FavouriteDB.Card['createAt']) =>
     () => 0
   )
 
-
 const isShow = shallowRef(false)
 const $message = useMessage()
 
-
 let promise = Promise.withResolvers<FavouriteDB.Card['createAt'][]>()
-
 
 const create = async () => {
   console.log('create popup for favselect')
@@ -65,9 +59,7 @@ const submit = () => {
   isShow.value = false
 }
 
-
 const { upsert: upsertItem } = FavouriteDB.useUpsertItem()
-
 
 const favouriteThis = (inCard: FavouriteDB.Card['createAt'][]) =>
   DBUtils.withTransition(trx =>
@@ -81,7 +73,6 @@ const favouriteThis = (inCard: FavouriteDB.Card['createAt'][]) =>
       )
     )
   )
-
 
 const { data: thisFavouriteCount } = FavouriteDB.useQueryItem(db =>
   DBUtils.countDb(db.where('itemKey', '=', $props.item.id))

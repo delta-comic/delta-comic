@@ -18,10 +18,8 @@ const $props = withDefaults(
   { anchors: 'high', lockScroll: false, contentDraggable: false }
 )
 
-
 const isShow = shallowRef(false)
 const { height: windowHeight } = useWindowSize()
-
 
 const anchors = computed(() =>
   isArray($props.anchors)
@@ -41,7 +39,6 @@ const anchors = computed(() =>
         ]
 )
 
-
 const height = shallowRef(0)
 const [zIndex, isLast] = useZIndex(
   computed({
@@ -55,7 +52,6 @@ const [zIndex, isLast] = useZIndex(
   })
 )
 usePreventBack(isShow, isLast)
-
 
 defineExpose({
   show(node = 2) {

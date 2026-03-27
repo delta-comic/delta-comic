@@ -17,7 +17,6 @@ import { pluginName } from '@/symbol'
 const $route = useRoute<'/user/favourite/[id]'>()
 const $router = useRouter()
 
-
 const cardKey = computed(() => Number($route.params.id))
 const { state: cardState } = FavouriteDB.useQueryCard(
   db => db.where('createAt', '=', cardKey.value).selectAll().executeTakeFirst(),
@@ -35,7 +34,6 @@ const { state: itemsState } = FavouriteDB.useQueryItem(
   () => []
 )
 
-
 const cancel = () => {
   actionController.value!.showSelect = false
   actionController.value?.selectList.clear()
@@ -43,17 +41,13 @@ const cancel = () => {
 const actionController = useTemplateRef('actionController')
 const selCard = useTemplateRef('selCard')
 
-
 const searcher = useTemplateRef('searcher')
 
-
 const isShowMore = shallowRef(false)
-
 
 const { move } = FavouriteDB.useMoveItem()
 const { upsert } = FavouriteDB.useUpsertItem()
 const PromiseAll = Promise.all
-
 
 const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Array<string>())
 </script>

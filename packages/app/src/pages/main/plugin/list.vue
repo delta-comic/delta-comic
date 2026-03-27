@@ -20,9 +20,7 @@ const updatePlugin = async (plugin: PluginArchiveDB.Archive) => {
   }
 }
 
-
 const checkIsSupport = memoize((supportCore: string) => semver.satisfies(pkg.version, supportCore))
-
 
 const getCardClass = (plugin: PluginArchiveDB.Archive) => {
   if (!plugin.enable)
@@ -32,9 +30,7 @@ const getCardClass = (plugin: PluginArchiveDB.Archive) => {
   return 'border-(--nui-warning-color)/20! bg-(--nui-warning-color-hover)/10!'
 }
 
-
 const { toggle } = PluginArchiveDB.useToggleEnable()
-
 
 const codeArchives = PluginArchiveDB.useQuery(
   db => db.selectAll().execute(),

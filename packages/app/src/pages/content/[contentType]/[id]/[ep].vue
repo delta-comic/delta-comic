@@ -14,22 +14,17 @@ const ep = $route.params.ep.toString()
 const id = $route.params.id.toString()
 const contentType = $route.params.contentType
 
-
 const contentStore = useContentStore()
 contentStore.$load(contentType, id, ep)
-
 
 const page = computed(
   () => contentStore.history.get(contentStore.$createHistoryKey(contentType, id, ep))!
 )
 
-
 const layout = computed(() => uni.content.ContentPage.layouts.get($route.params.contentType))
-
 
 const { isFullscreen } = useFullscreen()
 usePreventBack(isFullscreen, ref(true))
-
 
 // history
 const { upsert } = HistoryDB.useUpsert()

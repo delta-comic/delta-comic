@@ -5,7 +5,6 @@ import type { SingleResult, Type } from '@/form/type'
 
 defineProps<{ config: Type.Checkbox }>()
 
-
 const store = defineModel<SingleResult<Type.Checkbox>>({ required: true })
 </script>
 

@@ -10,12 +10,10 @@ const subscribeQuery = SubscribeDB.useQuery(db =>
   db.where('type', 'is', 'author').selectAll().execute()
 ) // computedAsync(() => SubscribeDB.getAll(), [])
 
-
 const select = shallowRef<string>()
 const selectItem = computed(
   () => subscribeQuery.data.value.find(v => v.key == select.value) as SubscribeDB.Item | undefined
 )
-
 
 const isShowAllList = shallowRef(false)
 </script>

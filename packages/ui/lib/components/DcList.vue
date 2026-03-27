@@ -32,7 +32,6 @@ const $props = defineProps<
   } & StyleProps
 >()
 
-
 const dataProcessor = (v: T[]) => $props.dataProcessor?.(v) ?? v
 const source = computed(() =>
   $props.source.type == 'query'
@@ -81,7 +80,6 @@ const source = computed(() =>
         }
 )
 
-
 watch(
   source,
   source => {
@@ -93,7 +91,6 @@ watch(
   },
   { immediate: true }
 )
-
 
 const vList = useTemplateRef('vList')
 const { y: listScrollTop } = useScroll(() => vList.value?.getScrollContainer())
@@ -121,9 +118,7 @@ const handleRefresh = async () => {
   isRefreshing.value = false
 }
 
-
 type TrueItem = IfAny<ReturnType<PF>[number], T, ReturnType<PF>[number]>
-
 
 defineSlots<{
   default(props: { height: number; data: { item: TrueItem; index: number } }): any

@@ -5,7 +5,6 @@ import { computed } from 'vue'
 import { Icons } from '@/icons'
 const $props = defineProps<{ item: uni.item.RawItem; ep: uni.ep.Ep['id'] }>()
 
-
 const item = computed(() => uni.item.Item.create($props.item))
 </script>
 

@@ -11,16 +11,13 @@ import SubList from './subList.vue'
 const props = defineProps<{ selectItem: SubscribeDB.AuthorItem }>()
 const select = defineModel<string | undefined>('select', { required: true })
 
-
 const { state: subscribe } = SubscribeDB.useQuery(db => db.selectAll().execute())
-
 
 const { remove } = SubscribeDB.useRemove()
 const unsubscribe = (si: SubscribeDB.Item) => {
   select.value = undefined
   return remove({ keys: [si.key] })
 }
-
 
 const isShow = computed({
   get() {

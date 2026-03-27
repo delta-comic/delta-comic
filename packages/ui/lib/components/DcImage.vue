@@ -50,9 +50,7 @@ const src = computedAsync(async () => {
   return ''
 }, '')
 
-
 const $emit = defineEmits<{ load: any[]; click: []; error: [] }>()
-
 
 let reloadTime = 0
 let isForkEmpty = false
@@ -79,7 +77,6 @@ const handleFail = async () => {
   show.value = true
 }
 
-
 const temp = useTemp().$apply('imageState', () => ({
   loaded: new Set<string>(),
   error: new Set<string>()
@@ -104,7 +101,6 @@ const fallbackSrc = computedAsync(async () => {
   }
   return ''
 }, '')
-
 
 const handleClickImage = (e: Event) => {
   $emit('click')

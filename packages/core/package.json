@@ -30,7 +30,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vp build && pnpm pack --out ./dist/pack.tgz",
+    "build": "vp build && vp pack --out ./dist/pack.tgz",
     "publish:self": "pnpm --filter core publish"
   },
   "dependencies": {

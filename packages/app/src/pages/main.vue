@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router'
 const route = useRoute<'/main'>()
 const name = computed(() => route.path.match(/(?<=\/main\/)\w+(?=\/)?/g)?.[0])
 
-
 const showForkSelect = shallowRef(false)
 </script>
 

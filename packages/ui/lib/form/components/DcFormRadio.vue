@@ -5,7 +5,6 @@ import type { SingleResult, Type } from '@/form/type'
 
 defineProps<{ config: Type.Radio }>()
 
-
 const store = defineModel<SingleResult<Type.Radio>>({ required: true })
 </script>
 

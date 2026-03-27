@@ -12,9 +12,7 @@ defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
 <template>
   <div
     class="van-hairline--bottom w-full bg-(--van-background-2)"
-    @click="
-      SharedFunction.call('routeToContent', item.contentType, item.id, item.thisEp.id, item)
-    "
+    @click="SharedFunction.call('routeToContent', item.contentType, item.id, item.thisEp.id, item)"
   >
     <!-- user -->
     <div class="relative flex w-full py-2">

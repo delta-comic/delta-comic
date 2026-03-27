@@ -61,7 +61,7 @@ export default defineConfig({
 
     watch: {
       // tell vite to ignore watching `src-tauri`
-      ignored: ['**/src-tauri/**']
+      ignored: ['**/src-tauri/**', 'src-tauri']
     }
   },
   clearScreen: false,

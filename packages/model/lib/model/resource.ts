@@ -19,7 +19,7 @@ export interface ResourceType {
   urls: string[]
   test: (url: string, signal: AbortSignal) => PromiseLike<void>
 }
-export interface RawResource extends Metadatable{
+export interface RawResource extends Metadatable {
   pathname: string
   type: string
   processSteps?: ProcessStep_[]

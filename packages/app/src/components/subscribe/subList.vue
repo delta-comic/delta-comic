@@ -13,7 +13,6 @@ const $emit = defineEmits<{
   unsubscribe: []
 }>()
 
-
 const pluginStore = usePluginStore()
 const subscribe = computed(() => {
   const [plugin] = SubscribeDB.key.toJSON($props.source.key)

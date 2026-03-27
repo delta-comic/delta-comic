@@ -16,7 +16,6 @@ const config = useConfig()
 const $window = window
 const pluginStore = usePluginStore()
 
-
 const { data: favouriteCount } = FavouriteDB.useQueryItem(
   db => DBUtils.countDb(db),
   [],
@@ -33,7 +32,6 @@ const { data: recentCount } = RecentDB.useQuery(
   () => -1
 )
 
-
 const app = useAppStore()
 watch(
   () => uni.user.User.userBase,
@@ -46,9 +44,7 @@ const userNoTopUserList = computed(() =>
   Array.from(uni.user.User.userBase.entries()).filter(v => v[1] != app.activatedUser)
 )
 
-
 const showActivatedUserSelect = shallowRef(false)
-
 
 const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin: string }>()
 </script>

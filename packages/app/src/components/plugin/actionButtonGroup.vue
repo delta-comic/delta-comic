@@ -8,9 +8,7 @@ import { Icons } from '@/icons'
 
 defineProps<{ actions: { title: string; icon: Component; onClick: () => any }[] }>()
 
-
 const isShowMenu = shallowRef(false)
-
 
 const closeMenuBefore = (v: any) => {
   isShowMenu.value = false

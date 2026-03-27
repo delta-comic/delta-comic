@@ -15,7 +15,6 @@ defineProps<{
 }>()
 const result = defineModel<Result<T>>({ default: {} })
 
-
 const slots = defineSlots<{
   row?<K extends O[number]>(args: FormRowSlot<T, O, K>): any
   top?(args: { config: T }): any

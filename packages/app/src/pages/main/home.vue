@@ -12,12 +12,9 @@ const $router = useRouter()
 const isShowNavBar = shallowRef(true)
 provide(isShowMainHomeNavBar, isShowNavBar)
 
-
 definePage({ redirect: { name: '/main/home/random' } })
 
-
 const extendableSearchBar = useTemplateRef('extendableSearchBar')
-
 
 const toSearchInHideMode = async () => {
   isShowNavBar.value = true
@@ -25,9 +22,7 @@ const toSearchInHideMode = async () => {
   extendableSearchBar.value?.inputEl?.focus()
 }
 
-
 const app = useAppStore()
-
 
 const tabItem = computed(() =>
   Array.from(Global.tabbar.entries()).flatMap(pair =>

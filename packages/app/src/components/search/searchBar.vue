@@ -17,10 +17,8 @@ import { getBarcodeList, type ThinkList } from '@/utils/search'
 import { searchSourceKey } from './source'
 const $props = defineProps<{ source: string }>()
 
-
 const isSearching = shallowRef(false)
 const [zIndex] = useZIndex(isSearching)
-
 
 const searchText = defineModel<string>('searchText', { required: true })
 const source = computed(() => {
@@ -28,14 +26,12 @@ const source = computed(() => {
   return { plugin, method }
 })
 
-
 const $router = useRouter()
 const history = useNativeStore(pluginName, 'search.history', new Array<string>())
 const handleSearch = (text: string) => {
   history.value = uniq([text, ...history.value])
   return SharedFunction.call('routeToSearch', text)
 }
-
 
 const pluginStore = usePluginStore()
 const thinkListAbort = new SmartAbortController()

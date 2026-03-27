@@ -38,7 +38,6 @@ const $props = defineProps<
   } & StyleProps
 >()
 
-
 const source = computed(() =>
   $props.source.type == 'query'
     ? {
@@ -62,7 +61,6 @@ const source = computed(() =>
         }
       : omit($props.source, ['type'])
 )
-
 
 type AllVariant =
   | 'isLoadingNoData'
@@ -163,7 +161,6 @@ const animateOn = computed<AllVariant>(() => {
   }
   return 'done'
 })
-
 
 const conation = useTemplateRef('conation')
 defineExpose({ cont: conation })

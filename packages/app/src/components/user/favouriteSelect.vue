@@ -9,13 +9,11 @@ import { Icons } from '@/icons'
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())
 
-
 const { state: allFavouriteCards } = FavouriteDB.useQueryCard(
   db => db.selectAll().execute(),
   [],
   () => []
 )
-
 
 const getCardItemCount = (belongTo: FavouriteDB.Card['createAt']) =>
   FavouriteDB.useQueryItem(
@@ -24,13 +22,10 @@ const getCardItemCount = (belongTo: FavouriteDB.Card['createAt']) =>
     () => -1
   )
 
-
 const isShow = shallowRef(false)
 const $message = useMessage()
 
-
 let promise = Promise.withResolvers<FavouriteDB.Card['createAt'][]>()
-
 
 const create = () => {
   promise = Promise.withResolvers<FavouriteDB.Card['createAt'][]>()

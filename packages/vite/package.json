@@ -29,7 +29,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vp pack && pnpm pack --out ./dist/pack.tgz",
+    "build": "vp pack && vp pack --out ./dist/pack.tgz",
     "publish:self": "pnpm --filter vite publish"
   },
   "devDependencies": {

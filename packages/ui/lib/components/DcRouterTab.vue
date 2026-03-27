@@ -31,10 +31,8 @@ const $props = withDefaults(
   }
 )
 
-
 const $route = useRoute()
 const $router = useRouter()
-
 
 const selecting = computed(() => {
   const item = $props.items.find(v => {
@@ -44,7 +42,6 @@ const selecting = computed(() => {
   return item?.name ?? $props.items.at(0)?.name
 })
 
-
 const routeLock = new Mutex()
 const handleRoute = async (aimName: string) => {
   if (routeLock.isLocked) return false
@@ -52,14 +49,12 @@ const handleRoute = async (aimName: string) => {
     const item = $props.items.find(v => v.name == aimName)
     if (!item) throw new Error('Not found item in <DcRouterTab>, name: ' + aimName)
 
-
     await $router.force[$props.mode](item.route)
     return true
   } finally {
     routeLock.release()
   }
 }
-
 
 defineSlots<{ left(): any; right(): any; bottom(): any }>()
 </script>

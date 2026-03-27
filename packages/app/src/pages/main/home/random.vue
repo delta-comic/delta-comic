@@ -15,7 +15,6 @@ const temp = useTemp().$applyRaw('randomConfig', () => ({
   scroll: 0
 }))
 
-
 let index = 0
 const source = useInfiniteQuery({
   key: () => ['random'],
@@ -26,7 +25,6 @@ const source = useInfiniteQuery({
     return result
   }
 })
-
 
 const containBound = ref<DOMRectReadOnly>()
 useResizeObserver(
@@ -43,7 +41,6 @@ const stop = $router.beforeEach(() => {
   stop()
   temp.scroll = waterfall.value?.scrollTop ?? 0
 })
-
 
 const showNavBar = inject(isShowMainHomeNavBar)!
 watch(

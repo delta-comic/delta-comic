@@ -9,7 +9,6 @@ import { Icons } from '@/icons'
 
 const hotList = computed(() => Array.from(Global.mainLists.values()))
 
-
 const getItemCard = (contentType: uni.content.ContentType_) =>
   uni.item.Item.itemCards.get(contentType)
 </script>

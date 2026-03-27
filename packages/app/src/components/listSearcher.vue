@@ -6,11 +6,9 @@ import { shallowRef } from 'vue'
 
 const filtersHistory = defineModel<string[]>('filtersHistory', { required: true })
 
-
 const isSearching = shallowRef(false)
 const searchText = shallowRef('')
 const [zIndex] = useZIndex(isSearching)
-
 
 defineExpose({ isSearching, searchText })
 </script>

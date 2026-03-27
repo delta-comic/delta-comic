@@ -15,21 +15,16 @@ import { getBarcodeList, type ThinkList } from '@/utils/search'
 const isSearching = defineModel<boolean>('isSearching', { default: false })
 const text = defineModel<string>('text', { default: '' })
 
-
 const handleSearch = (text: string) => {
   history.value = uniq([text, ...history.value])
   return SharedFunction.call('routeToSearch', text)
 }
 
-
 const inputEl = useTemplateRef('inputEl')
-
 
 defineExpose({ inputEl, isSearching })
 
-
 const [zIndex] = useZIndex(isSearching)
-
 
 const history = useNativeStore(pluginName, 'search.history', new Array<string>())
 const thinkListAbort = new SmartAbortController()

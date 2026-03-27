@@ -12,9 +12,7 @@ const $props = withDefaults(defineProps<{ text?: string } & StyleProps>(), {
   text: ''
 })
 
-
 const linker = new Link().tlds(tlds).tlds('onion', true).set({ fuzzyIP: true })
-
 
 const texts = computed(() => {
   const raw = escape($props.text)

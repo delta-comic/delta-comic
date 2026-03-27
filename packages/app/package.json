@@ -10,7 +10,7 @@
     "dev": "tauri dev",
     "dev:web": "vp dev",
     "publish:self": "echo \"No need publish to npm\"",
-    "tauri": "pnpm exec tauri"
+    "tauri": "vp exec tauri"
   },
   "dependencies": {
     "@delta-comic/core": "workspace:",

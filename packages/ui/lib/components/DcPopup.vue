@@ -13,11 +13,9 @@ const $props = withDefaults(defineProps<Partial<PopupProps & StyleProps>>(), {
   destroyOnClose: true
 })
 
-
 const isShow = defineModel<boolean>('show', { required: true })
 const [zIndex, isLast] = useZIndex(isShow)
 usePreventBack(isShow, isLast)
-
 
 defineSlots<{ default(): void }>()
 defineEmits<{ closed: [] }>()

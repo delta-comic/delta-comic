@@ -24,7 +24,6 @@ SharedFunction.define(
   'pushShareToken'
 )
 
-
 const handleShareTokenCheck = async () => {
   try {
     const chipText = await Clipboard.readText()

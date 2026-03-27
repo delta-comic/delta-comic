@@ -16,8 +16,7 @@ import LoadList from './loadList.vue'
 const show = defineModel<boolean>('show', { required: true })
 const isBooted = defineModel<boolean>('isBooted', { required: true })
 const pageSelect = shallowRef<(typeof menuOptions)[number]['key']>('list')
-const renderIcon = (icon: Component) =>  () => h(NIcon, null, { default: () => h(icon) })
-
+const renderIcon = (icon: Component) => () => h(NIcon, null, { default: () => h(icon) })
 
 const menuOptions = [
   {
@@ -44,7 +43,6 @@ const boot = async (safe = false) => {
   isBooted.value = true
   show.value = false
 }
-
 
 const $message = useMessage()
 </script>

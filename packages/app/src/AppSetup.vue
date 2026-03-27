@@ -30,7 +30,6 @@ const injectStyle = computed(() => {
 })
 useStyleTag(injectStyle)
 
-
 const isBooted = shallowRef(false)
 const showContent = shallowRef(false)
 </script>

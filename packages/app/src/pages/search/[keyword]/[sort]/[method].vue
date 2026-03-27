@@ -8,13 +8,11 @@ import { searchSourceKey } from '@/components/search/source'
 
 const $route = useRoute<'/search/[keyword]/[sort]/[method]'>()
 
-
 const pluginStore = usePluginStore()
 const method = computed(() => {
   const [plugin, name] = searchSourceKey.toJSON($route.params.method)
   return Object.fromEntries(Object.fromEntries(pluginStore.allSearchSource)[plugin])[name]
 })
-
 
 const { state } = useInfiniteQuery({
   key: () => [

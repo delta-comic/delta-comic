@@ -38,11 +38,9 @@ const $props = withDefaults(
   { padding: 4, col: 2, gap: 4, minHeight: 0 }
 )
 
-
 const column = computed(
   () => (isArray($props.col) ? $props.col : [$props.col, $props.col]) as [min: number, max: number]
 )
-
 
 const dataProcessor = (v: T[]) => $props.dataProcessor?.(v) ?? v
 const source = computed(() =>
@@ -92,7 +90,6 @@ const source = computed(() =>
         }
 )
 
-
 const isPullRefreshHold = shallowRef(false)
 const isRefreshing = shallowRef(false)
 const handleRefresh = async () => {
@@ -100,11 +97,9 @@ const handleRefresh = async () => {
   isRefreshing.value = false
 }
 
-
 const content = useTemplateRef<ComponentExposed<typeof DcContent>>('content')
 const scrollParent = computed(() => content.value?.cont)
 const { y: contentScrollTop } = useScroll(scrollParent)
-
 
 useEventListener(
   'scroll',
@@ -127,16 +122,13 @@ useEventListener(
 )
 // i remove a watch
 
-
 const waterfallEl = useTemplateRef('waterfallEl')
-
 
 const waterfallIndex = useTemp().$apply('waterfall', () => ({ top: 0 }))
 const thisIndex = waterfallIndex.top++
 const sizeMapTemp = useTemp().$applyRaw(`waterfall:${thisIndex}`, () =>
   shallowReactive(new Map<T, number>())
 )
-
 
 const sizeWatcherCleaner = new Array<VoidFunction>()
 const observer = new MutationObserver(([mutation]) => {
@@ -165,7 +157,6 @@ onUnmounted(() => {
   for (const stop of sizeWatcherCleaner) stop()
 })
 
-
 const reloadController = shallowRef(true)
 defineExpose({
   scrollTop: contentScrollTop,
@@ -177,7 +168,6 @@ defineExpose({
     reloadController.value = true
   }
 })
-
 
 defineSlots<{
   default(props: {

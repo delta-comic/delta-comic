@@ -6,8 +6,7 @@ import { h } from 'vue'
 import { Icons } from '@/icons'
 definePage({ redirect: { name: '/main/plugin/list' } })
 
-
-const icon = (icon: Component) =>  () => h(NIcon, null, { default: () => h(icon) })
+const icon = (icon: Component) => () => h(NIcon, null, { default: () => h(icon) })
 const menuOptions = [
   { label: '管理', key: 'list', icon: icon(Icons.material.AutoAwesomeMosaicOutlined) },
   { label: '安装', key: 'download', icon: icon(Icons.material.FileDownloadOutlined) },

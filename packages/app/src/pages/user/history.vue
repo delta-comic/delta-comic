@@ -25,9 +25,7 @@ const { state: historiesState } = HistoryDB.useQuery(
 const config = useConfig().$load(appConfig)
 const searcher = useTemplateRef('searcher')
 
-
 const showConfig = shallowRef(false)
-
 
 const { remove } = HistoryDB.useRemove()
 const actionController = useTemplateRef('actionController')
@@ -36,7 +34,6 @@ const removeItems = async (item: HistoryDB.Item[]) => {
   await remove({ keys: item.map(v => v.timestamp) })
   actionController.value?.selectList.clear()
 }
-
 
 const filters = useNativeStore(pluginName, 'history.filter', new Array<string>())
 </script>

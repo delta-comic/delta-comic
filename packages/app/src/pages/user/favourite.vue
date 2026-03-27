@@ -17,23 +17,18 @@ import { pluginName } from '@/symbol'
 const isCardMode = shallowRef(true)
 const temp = useTemp().$apply('favourite', () => ({ selectMode: 'pack' }))
 
-
 const { state: allFavouriteCardsState } = FavouriteDB.useQueryCard(
   db => db.selectAll().orderBy('createAt', 'desc').execute(),
   [],
   () => []
 )
 
-
 const searcher = useTemplateRef('searcher')
-
 
 const isSyncing = shallowRef(false)
 
-
 const { upsert: upsertFavouriteItem } = FavouriteDB.useUpsertItem()
 const { createCard } = FavouriteDB.useCreateCard()
-
 
 const pluginStore = usePluginStore()
 const syncFromCloud = () =>
@@ -99,10 +94,8 @@ const syncFromCloud = () =>
     isSyncing.value = false
   })
 
-
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const waterfall = useTemplateRef('waterfall')
-
 
 const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Array<string>())
 </script>

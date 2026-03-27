@@ -8,7 +8,6 @@ import { Icons } from '@/icons'
 import { createDateString } from '@/utils/date'
 const $props = defineProps<{ item: ItemStoreDB.StoredItem & HistoryDB.Item }>()
 
-
 const instance = computed(() => uni.item.Item.create($props.item.item))
 </script>
 

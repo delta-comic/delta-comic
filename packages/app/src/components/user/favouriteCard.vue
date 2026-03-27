@@ -9,7 +9,6 @@ import { Icons } from '@/icons'
 import { useContentStore } from '@/stores/content'
 const $props = defineProps<{ isCardMode?: boolean; card: FavouriteDB.Card }>()
 
-
 const { state: favouriteItems } = FavouriteDB.useQueryItem(
   db =>
     db
@@ -21,7 +20,6 @@ const { state: favouriteItems } = FavouriteDB.useQueryItem(
   [() => $props.card.createAt],
   () => []
 )
-
 
 const $router = useRouter()
 const contentStore = useContentStore()
