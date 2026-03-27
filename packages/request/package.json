@@ -29,8 +29,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vp build && vp pack --out ./dist/pack.tgz",
-    "publish:self": "pnpm --filter request publish"
+    "build": "vp build && pnpm pack --out ./dist/pack.tgz"
   },
   "dependencies": {
     "@vueuse/core": "catalog:",

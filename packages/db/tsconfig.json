@@ -6,5 +6,6 @@
     "composite": true,
     "paths": { "@/*": ["./lib/*"] }
   },
-  "include": ["lib", "*.mts"]
+  "include": ["lib"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

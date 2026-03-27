@@ -2,8 +2,9 @@
 import { twMerge } from 'tailwind-merge'
 import type { PopupProps } from 'vant'
 
-import type { StyleProps } from '@/utils'
 import { usePreventBack, useZIndex } from '@/utils/layout'
+
+import type { StyleProps } from '../utils'
 
 const $props = withDefaults(defineProps<Partial<PopupProps & StyleProps>>(), {
   position: 'center',

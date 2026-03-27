@@ -2,7 +2,7 @@ import { noop } from 'es-toolkit'
 import type { DialogReactive, DialogOptions } from 'naive-ui'
 import { type CSSProperties, shallowRef, watch } from 'vue'
 
-import { useZIndex } from '@/utils'
+import { useZIndex } from '../utils'
 
 type PromiseWith<T, D> = Promise<T> & Partial<D>
 export const createDialog = (options: DialogOptions & { style?: CSSProperties }) => {

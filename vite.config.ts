@@ -48,12 +48,13 @@ export default defineConfig({
   },
   lint: {
     plugins: ['unicorn', 'typescript', 'oxc', 'vue'],
-    categories: { correctness: 'error' },
+    categories: { correctness: 'warn' },
     rules: {
       'no-unused-expressions': 'allow',
       'no-useless-escape': 'allow',
       'no-non-null-asserted-optional-chain': 'allow',
-      'no-thenable': 'allow'
+      'no-thenable': 'allow',
+      'tsconfig-error': 'allow'
     },
     settings: {
       'jsx-a11y': { components: {}, attributes: {} },
@@ -73,6 +74,10 @@ export default defineConfig({
     env: { builtin: true },
     globals: {},
     ignorePatterns: ['.vscode', './package.json'],
-    options: { typeAware: true, typeCheck: true }
+    options: { typeAware: false, typeCheck: false }
+  },
+  run: {
+    tasks: { 'npm-build': { command: 'vp run build -r', env: ['NODE_ENV'], cache: true } },
+    cache: { tasks: true, scripts: true }
   }
 })

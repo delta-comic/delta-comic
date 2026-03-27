@@ -6,7 +6,7 @@ import { motion, type VariantType } from 'motion-v'
 import { twMerge, type ClassNameValue } from 'tailwind-merge'
 import { type StyleValue, computed, useTemplateRef } from 'vue'
 
-import type { StyleProps } from '@/utils'
+import type { StyleProps } from '../utils'
 
 import DcLoading from './DcLoading.vue'
 import { ReloadOutlined, WifiTetheringErrorRound } from './icons'

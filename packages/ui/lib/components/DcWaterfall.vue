@@ -10,7 +10,7 @@ import { type Ref, computed, nextTick, onUnmounted, shallowReactive, shallowRef,
 import { useTemplateRef } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
-import type { ListFn, StyleProps } from '@/utils'
+import type { ListFn, StyleProps } from '../utils'
 
 import DcContent from './DcContent.vue'
 

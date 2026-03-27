@@ -16,5 +16,5 @@
     "plugins": ["vue-router/volar/sfc-typed-router", "vue-router/volar/sfc-route-blocks"]
   },
   "include": ["./src/**/*"],
-  "exclude": ["./*.ts"]
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

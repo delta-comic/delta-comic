@@ -4,7 +4,7 @@ import { twMerge } from 'tailwind-merge'
 import { type Component as _Component, watch } from 'vue'
 import { useTemplateRef } from 'vue'
 
-import type { StyleProps } from '@/utils'
+import type { StyleProps } from '../utils'
 const $props = defineProps<
   {
     icon: _Component

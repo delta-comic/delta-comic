@@ -1,11 +1,21 @@
+import { resolve } from 'node:path'
+
+import dts from 'vite-plugin-dts'
 import { defineConfig } from 'vite-plus'
 
 export default defineConfig({
-  pack: {
-    dts: true,
-    format: 'es',
-    entry: ['./lib/index.ts'],
+  plugins: [dts({ include: ['./lib'], tsconfigPath: './tsconfig.json' })],
+  base: '/',
+  build: {
+    lib: {
+      entry: [resolve(__dirname, 'lib/index.ts')],
+      name: 'DcVite',
+      fileName: 'index',
+      formats: ['es']
+    },
     sourcemap: true,
-    deps: { neverBundle: ['vite-plugin-externals', 'vite-plugin-monkey'] }
+    rollupOptions: {
+      external: ['vite-plugin-externals', 'vite-plugin-monkey', 'vite', 'rolldown-vite']
+    }
   }
 })

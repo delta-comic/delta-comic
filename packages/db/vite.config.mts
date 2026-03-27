@@ -2,8 +2,6 @@ import { extendsDepends } from '@delta-comic/utils'
 import dtsPlugin from 'vite-plugin-dts'
 import { defineConfig } from 'vite-plus'
 
-import _package from './package.json'
-
 export default defineConfig({
   plugins: [dtsPlugin({ include: ['./lib'], tsconfigPath: './tsconfig.json' })],
   build: {

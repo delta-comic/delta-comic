@@ -14,7 +14,7 @@ import { twMerge } from 'tailwind-merge'
 import { computed } from 'vue'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 
-import type { StyleProps } from '@/utils'
+import type { StyleProps } from '../utils'
 
 const $props = withDefaults(
   defineProps<

@@ -4,7 +4,7 @@ import { isArray } from 'es-toolkit/compat'
 import { twMerge } from 'tailwind-merge'
 import { computed, shallowReadonly, shallowRef } from 'vue'
 
-import { usePreventBack, useZIndex, type StyleProps } from '@/utils'
+import { usePreventBack, useZIndex, type StyleProps } from '../utils'
 
 const $props = withDefaults(
   defineProps<

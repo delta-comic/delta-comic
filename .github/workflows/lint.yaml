@@ -17,22 +17,16 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10.30.1
-
-      - name: Use Node.js
-        uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: 25
-          cache: pnpm
+          cache: true
 
       - name: Install dependencies
-        run: pnpm i --frozen-lockfile
+        run: vp install
 
       - name: Lint
         run: |
-          pnpm -r build
+          vp run -r build
           pnpm exec cspell --no-must-find-files ./packages
           pnpm exec oxlint --type-aware

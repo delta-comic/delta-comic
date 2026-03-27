@@ -6,7 +6,7 @@ import MarkdownIt, { type Options } from 'markdown-it'
 import { twMerge } from 'tailwind-merge'
 import { computed } from 'vue'
 
-import type { StyleProps } from '@/utils'
+import type { StyleProps } from '../../utils'
 
 import darkStyle from './dark.css?inline'
 import lightStyle from './light.css?inline'

@@ -9,8 +9,6 @@ import { browserslistToTargets } from 'lightningcss'
 import dtsPlugin from 'vite-plugin-dts'
 import { defineConfig } from 'vite-plus'
 
-import _package from './package.json'
-
 export default defineConfig({
   plugins: [
     vue(),

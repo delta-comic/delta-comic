@@ -14,7 +14,18 @@
     "./commitlint.config.ts",
     "./.releaserc.mjs",
     "./script/set-version.mts",
-    "./script/update-version.mts"
+    "./script/update-version.mts",
+    "./vite.config.ts"
   ],
-  "references": [{ "path": "./packages/app/tsconfig.node.json" }]
+  "references": [
+    { "path": "./packages/app/tsconfig.node.json" },
+    { "path": "./packages/core/tsconfig.node.json" },
+    { "path": "./packages/db/tsconfig.node.json" },
+    { "path": "./packages/model/tsconfig.node.json" },
+    { "path": "./packages/plugin/tsconfig.node.json" },
+    { "path": "./packages/request/tsconfig.node.json" },
+    { "path": "./packages/ui/tsconfig.node.json" },
+    { "path": "./packages/utils/tsconfig.node.json" },
+    { "path": "./packages/vite/tsconfig.node.json" }
+  ]
 }

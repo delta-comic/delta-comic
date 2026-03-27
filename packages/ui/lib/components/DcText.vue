@@ -6,7 +6,7 @@ import { twMerge } from 'tailwind-merge'
 import tlds from 'tlds'
 import { computed } from 'vue'
 
-import type { StyleProps } from '@/utils'
+import type { StyleProps } from '../utils'
 
 const $props = withDefaults(defineProps<{ text?: string } & StyleProps>(), {
   text: ''

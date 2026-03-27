@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "scripts": {
     "build": "echo \"Use (build:app) instead.\"",
-    "build:app": "tauri android build --release",
-    "build:debug": "tauri android build --debug",
-    "build:local": "tauri build --debug",
-    "build:web": "vp build",
     "dev": "tauri dev",
     "dev:web": "vp dev",
-    "publish:self": "echo \"No need publish to npm\"",
+    "release": "tauri android build",
+    "release:debug": "tauri android build --debug",
+    "release:local": "tauri build --debug",
+    "release:web": "vp build",
     "tauri": "vp exec tauri"
   },
   "dependencies": {

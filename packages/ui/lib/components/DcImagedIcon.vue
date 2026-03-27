@@ -3,7 +3,7 @@ import { uni } from '@delta-comic/model'
 import { twMerge } from 'tailwind-merge'
 import type { Component } from 'vue'
 
-import type { StyleProps } from '@/utils'
+import type { StyleProps } from '../utils'
 
 import DcImage from './DcImage.vue'
 import DcVar from './DcVar.vue'

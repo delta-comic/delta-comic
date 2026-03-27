@@ -34,8 +34,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vp build && vp pack --out ./dist/pack.tgz",
-    "publish:self": "pnpm --filter ui publish"
+    "build": "vp build && pnpm pack --out ./dist/pack.tgz"
   },
   "dependencies": {
     "@lhlyu/vue-virtual-waterfall": "catalog:",

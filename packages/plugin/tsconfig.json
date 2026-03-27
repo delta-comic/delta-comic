@@ -7,5 +7,6 @@
     "paths": { "@/*": ["./lib/*"] },
     "types": ["./env.d.ts"]
   },
-  "include": ["lib"]
+  "include": ["lib"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

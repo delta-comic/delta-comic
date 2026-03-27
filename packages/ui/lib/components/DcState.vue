@@ -3,7 +3,7 @@ import { type DataState } from '@pinia/colada'
 import { NSpin } from 'naive-ui'
 import { twMerge, type ClassNameValue } from 'tailwind-merge'
 
-import type { StyleProps } from '@/utils'
+import type { StyleProps } from '../utils'
 
 defineProps<
   {
