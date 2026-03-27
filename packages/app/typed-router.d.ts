@@ -48,11 +48,11 @@ declare module 'vue-router/auto-routes' {
       { contentType: ParamValue<false>, id: ParamValue<false>, ep: ParamValue<false> },
       | never
     >,
-    '/hot': RouteRecordInfo<
-      '/hot',
-      '/hot',
-      Record<never, never>,
-      Record<never, never>,
+    '/hot/[plugin]': RouteRecordInfo<
+      '/hot/[plugin]',
+      '/hot/:plugin',
+      { plugin: ParamValue<true> },
+      { plugin: ParamValue<false> },
       | never
     >,
     '/main': RouteRecordInfo<
@@ -249,9 +249,9 @@ declare module 'vue-router/auto-routes' {
       views:
         | never
     }
-    'src/pages/hot.vue': {
+    'src/pages/hot/[plugin].vue': {
       routes:
-        | '/hot'
+        | '/hot/[plugin]'
       views:
         | never
     }
