@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTemp } from '@delta-comic/core'
 import { DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/db'
-import { PromiseContent, type uni } from '@delta-comic/model'
+import { type uni } from '@delta-comic/model'
 import { usePluginStore } from '@delta-comic/plugin'
 import { createDownloadMessage, DcState } from '@delta-comic/ui'
 import { isNumber, uniqBy } from 'es-toolkit/compat'
@@ -182,7 +182,7 @@ const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Arra
         class="h-full!"
         unReloadable
         ref="waterfall"
-        :source="{ data: PromiseContent.resolve(allFavouriteCards), isEnd: true }"
+        :source="{ type: 'array', value: allFavouriteCards }"
         :data-processor="
           v => v.filter(v => isNumber(v) || v.title.includes(searcher?.searchText ?? ''))
         "

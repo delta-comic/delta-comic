@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RecentDB, useNativeStore } from '@delta-comic/db'
-import { PromiseContent } from '@delta-comic/model'
 import { createDialog, DcState } from '@delta-comic/ui'
 import { useTemplateRef } from 'vue'
 
@@ -100,7 +99,7 @@ const filters = useNativeStore(pluginName, 'recentView.filter', new Array<string
         <DcWaterfall
           class="h-full!"
           un-reloadable
-          :source="{ data: PromiseContent.resolve(recent), isEnd: true }"
+          :source="{ type: 'array', value: recent }"
           v-slot="{ item }"
           :col="1"
           :gap="0"

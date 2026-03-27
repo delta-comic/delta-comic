@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { db, DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/db'
-import { PromiseContent } from '@delta-comic/model'
 import { createDialog, createLoadingMessage, DcState } from '@delta-comic/ui'
 import { computed, shallowRef } from 'vue'
 import { useTemplateRef } from 'vue'
@@ -171,7 +170,7 @@ const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Arra
           <DcWaterfall
             class="h-full!"
             un-reloadable
-            :source="{ data: PromiseContent.resolve(items), isEnd: true }"
+            :source="{ type: 'array', value: items }"
             v-slot="{ item }"
             :col="1"
             :gap="0"
@@ -185,7 +184,7 @@ const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Arra
             "
           >
             <component :is="SelectPacker" :it="item">
-              <FavouriteItem :ep="item.item.thisEp.index" :item="item.item" />
+              <FavouriteItem :ep="item.item.thisEp.id" :item="item.item" />
             </component>
           </DcWaterfall>
         </Layout>

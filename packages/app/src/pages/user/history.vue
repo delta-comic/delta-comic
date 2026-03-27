@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { HistoryDB, useNativeStore } from '@delta-comic/db'
-import { PromiseContent } from '@delta-comic/model'
 import { appConfig, useConfig } from '@delta-comic/plugin'
 import { createDialog, DcState } from '@delta-comic/ui'
 import { shallowRef, useTemplateRef } from 'vue'
@@ -115,8 +114,8 @@ const filters = useNativeStore(pluginName, 'history.filter', new Array<string>()
         </template>
         <DcWaterfall
           class="h-full!"
-          un-reloadable
-          :source="{ data: PromiseContent.resolve(histories), isEnd: true }"
+          unReloadable
+          :source="{ type: 'array', value: histories }"
           v-slot="{ item }"
           :col="1"
           :gap="0"

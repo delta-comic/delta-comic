@@ -2,7 +2,26 @@
 import { computed, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute<'/main'>()
-const name = computed(() => route.path.match(/(?<=\/main\/)\w+(?=\/)?/g)?.[0])
+const name = computed(() => {
+  switch (route.name) {
+    case '/main/home':
+    case '/main/home/[id]':
+    case '/main/home/hot':
+    case '/main/home/random':
+      return 'home'
+    case '/main/subscribe':
+      return 'subscribe'
+    case '/main/plugin':
+    case '/main/plugin/config':
+    case '/main/plugin/download':
+    case '/main/plugin/list':
+    case '/main/plugin/shop':
+      return 'plugin'
+    case '/main/user':
+      return 'user'
+  }
+  return 'home'
+})
 
 const showForkSelect = shallowRef(false)
 </script>
