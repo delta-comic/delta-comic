@@ -76,6 +76,7 @@ jobs:
       - name: Build Android App
         run: |
           vp run build -r
+          vp pm publish -r --no-git-checks
           vp run app#build:app
 
       #signature
@@ -143,4 +144,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 用于在 GitHub 上创建 release 与 tag
         run: |
-          pnpm exec semantic-release
+          vp exec semantic-release || pnpm exec semantic-release

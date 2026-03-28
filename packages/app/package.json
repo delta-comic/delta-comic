@@ -1,6 +1,7 @@
 {
   "name": "app",
   "version": "1.3.0",
+  "private": true,
   "scripts": {
     "build": "echo \"Use (build:app) instead.\"",
     "build:app": "tauri android build",
@@ -9,6 +10,7 @@
     "build:web": "vp build",
     "dev": "tauri dev",
     "dev:web": "vp dev",
+    "publish": "echo \"No need to publish to npm.\"",
     "tauri": "vp exec tauri"
   },
   "dependencies": {
