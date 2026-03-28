@@ -27,5 +27,5 @@ jobs:
 
       - name: Lint
         run: |
-          vp run -r build
+          vp run npm-build
           vp check

@@ -76,8 +76,5 @@ export default defineConfig({
     ignorePatterns: ['.vscode', './package.json'],
     options: { typeAware: false, typeCheck: false }
   },
-  run: {
-    tasks: { 'npm-build': { command: 'vp run build -r', env: ['NODE_ENV'], cache: true } },
-    cache: { tasks: true, scripts: true }
-  }
+  run: { cache: { tasks: true, scripts: true } }
 })

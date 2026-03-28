@@ -75,7 +75,7 @@ jobs:
 
       - name: Build Android App
         run: |
-          vp run build -r
+          vp run npm-build
           vp pm publish -r --no-git-checks
           vp run app#build:app
 

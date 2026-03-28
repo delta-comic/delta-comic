@@ -20,8 +20,10 @@
   },
   "type": "module",
   "scripts": {
+    "build": "echo \"Root skip.\"",
     "dev": "vp run --filter app dev",
     "lint": "vp lint",
+    "npm-build": "pnpm run build --filter ui && vp run build -r",
     "tauri": "vp run --filter app tauri"
   },
   "dependencies": {

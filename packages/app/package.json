@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "echo \"Use (build:app) instead.\"",
-    "build:app": "tauri android build",
+    "build:app": "export TRUE_BUILD_MAIN_APP=\"true\" && tauri android build",
     "build:debug": "tauri android build --debug",
     "build:local": "tauri build --debug",
     "build:web": "vp build",

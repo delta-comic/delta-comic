@@ -1,6 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
 
-import { DeltaComicUiResolver } from '@delta-comic/ui/vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -17,6 +16,7 @@ import { defineConfig } from 'vite-plus'
 import VueRouter from 'vue-router/vite'
 
 const host = process.env.TAURI_DEV_HOST
+const trueBuild = process.env.TRUE_BUILD_MAIN_APP == 'true'
 
 export default defineConfig({
   plugins: [
@@ -29,7 +29,12 @@ export default defineConfig({
     vueJsx(),
     Components({
       dts: true,
-      resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver(), DeltaComicUiResolver()],
+      resolvers: [
+        VantResolver(),
+        MotionResolver(),
+        NaiveUiResolver(),
+        trueBuild && (await import('@delta-comic/ui/vite')).DeltaComicUiResolver()
+      ],
       dtsTsx: false
     }),
     tailwindcss()

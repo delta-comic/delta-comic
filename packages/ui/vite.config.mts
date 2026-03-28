@@ -14,7 +14,7 @@ import { defineConfig } from 'vite-plus'
 
 export default defineConfig({
   plugins: [
-    dtsPlugin({ include: ['./lib', './vite'], tsconfigPath: './tsconfig.json' }),
+    dtsPlugin({ include: ['./lib', './vite'], tsconfigPath: './tsconfig.app.json' }),
     vue(),
     vueJsx(),
     Components({ dts: true, resolvers: [VantResolver(), MotionResolver(), NaiveUiResolver()] }),

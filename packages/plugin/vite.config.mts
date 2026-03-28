@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
-    dtsPlugin({ include: ['./lib'], tsconfigPath: './tsconfig.json' }),
+    dtsPlugin({ include: ['./lib'], tsconfigPath: './tsconfig.app.json' }),
     tailwindcss()
   ],
   resolve: {
