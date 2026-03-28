@@ -65,6 +65,7 @@ userscript
 vant
 vicons
 Videogame
+voidzero
 vueuse
 Wakatime
 webp

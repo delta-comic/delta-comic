@@ -28,5 +28,4 @@ jobs:
       - name: Lint
         run: |
           vp run -r build
-          pnpm exec cspell --no-must-find-files ./packages
-          pnpm exec oxlint --type-aware
+          vp check

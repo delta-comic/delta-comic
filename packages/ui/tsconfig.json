@@ -1,12 +1,5 @@
 {
-  "extends": ["../../tsconfig.base.json"],
-  "compilerOptions": {
-    "declaration": true,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "composite": true,
-    "paths": { "@/*": ["./lib/*"] },
-    "types": ["./components.d.ts", "./env.d.ts"]
-  },
-  "include": ["lib"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "extends": "../../tsconfig.base.json",
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }

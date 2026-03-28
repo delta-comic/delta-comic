@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import TOML from '@iarna/toml'
 
 const packageJsonPaths = [
+  '../package.json',
   '../packages/app/package.json',
   '../packages/app/src-tauri/tauri.conf.json',
   '../packages/core/package.json',

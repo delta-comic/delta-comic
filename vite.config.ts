@@ -48,13 +48,13 @@ export default defineConfig({
   },
   lint: {
     plugins: ['unicorn', 'typescript', 'oxc', 'vue'],
-    categories: { correctness: 'warn' },
+    categories: { correctness: 'error' },
     rules: {
       'no-unused-expressions': 'allow',
       'no-useless-escape': 'allow',
       'no-non-null-asserted-optional-chain': 'allow',
-      'no-thenable': 'allow',
-      'tsconfig-error': 'allow'
+      'no-thenable': 'allow'
+      // 'tsconfig-error': 'allow'
     },
     settings: {
       'jsx-a11y': { components: {}, attributes: {} },

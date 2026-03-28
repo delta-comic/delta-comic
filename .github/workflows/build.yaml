@@ -29,19 +29,13 @@ jobs:
           targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
 
       # js
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10.30.1
-
-      - name: Use Node.js
-        uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: 25
-          cache: pnpm
+          cache: true
 
       - name: Install dependencies
-        run: pnpm i --frozen-lockfile
+        run: vp install
 
       # java
       - name: JDK 23
@@ -67,7 +61,7 @@ jobs:
       - name: Init android project
         run: |
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
-          pnpm exec tauri android init
+          vp run app#tauri android init
 
       # build
       - name: Change version
@@ -81,10 +75,8 @@ jobs:
 
       - name: Build Android App
         run: |
-          pnpm -r build
-          pnpm -r run publish:self
-
-          pnpm run build
+          vp run build -r
+          vp run app#build:app
 
       #signature
       - name: Restore keystore (decode + verify)

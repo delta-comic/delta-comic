@@ -1,11 +1,5 @@
 {
-  "extends": ["../../tsconfig.base.json"],
-  "compilerOptions": {
-    "declaration": true,
-    "lib": ["ESNext"],
-    "composite": true,
-    "paths": { "@/*": ["./lib/*"] }
-  },
-  "include": ["lib"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "extends": "../../tsconfig.base.json",
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }
