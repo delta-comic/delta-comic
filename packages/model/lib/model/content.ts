@@ -16,7 +16,7 @@ export type ContentPageLike = new (
 export type ContentType_ = SourcedKeyType<typeof ContentPage.contentPages>
 export type ContentType = Exclude<ContentType_, string>
 
-export type ViewComponent = Component<{ page: ContentPage; isFullScreen: boolean }>
+export type ViewComponent = Component<{ page: ContentPage; union?: item.Item }>
 export type LayoutComponent = Component<{ page: ContentPage }>
 
 export abstract class ContentPage {
