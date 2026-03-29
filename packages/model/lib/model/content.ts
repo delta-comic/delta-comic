@@ -17,7 +17,15 @@ export type ContentType_ = SourcedKeyType<typeof ContentPage.contentPages>
 export type ContentType = Exclude<ContentType_, string>
 
 export type ViewComponent = Component<{ page: ContentPage; union?: item.Item }>
-export type LayoutComponent = Component<{ page: ContentPage }>
+export type LayoutComponent = Component<
+  { page: ContentPage },
+  any,
+  any,
+  any,
+  any,
+  any,
+  { view(args: { item?: item.Item }): any }
+>
 
 export abstract class ContentPage {
   public static layouts = useGlobalVar(
