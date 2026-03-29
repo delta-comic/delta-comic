@@ -1050,7 +1050,7 @@ dependencies = [
 
 [[package]]
 name = "delta-comic"
-version = "1.3.2"
+version = "1.3.3"
 dependencies = [
  "log",
  "mime_guess",

@@ -37,8 +37,8 @@ page.value.fetchDetail().then(item =>
 
 <template>
   <component :page :is="layout" v-if="layout">
-    <template #view>
-      <component :page :is="page.ViewComponent" :isFullScreen="isFullscreen" />
+    <template #view="{ item }">
+      <component :page :is="page.ViewComponent" :union="item" />
     </template>
   </component>
 </template>
