@@ -19,6 +19,10 @@ const $props = defineProps<
       | { type: 'query'; value: UseQueryReturn<T[]>; next?: () => any }
       | {
           type: 'infinite'
+          value: UseInfiniteQueryReturn<T[]>
+        }
+      | {
+          type: 'stream'
           value: UseInfiniteQueryReturn<Awaited<ReturnType<StreamQuery<T>['query']>>>
         }
       | {
@@ -38,24 +42,26 @@ const $props = defineProps<
 
 const dataProcessor = (v: T[]) => $props.dataProcessor?.(v) ?? v
 const source = computed(() =>
-  $props.source.type == 'query'
-    ? {
-        data: dataProcessor($props.source.value.data.value ?? []),
-        isDone: true,
-        isLoading: $props.source.value.isLoading.value,
-        error: $props.source.value.error.value,
-        refetch() {
-          if ($props.source.type != 'query') return
-          return $props.source.value.refetch(false)
-        },
-        refresh() {
-          if ($props.source.type != 'query') return
-          return $props.source.value.refresh(false)
-        },
-        next: $props.source.next
-      }
-    : $props.source.type == 'infinite'
-      ? {
+  (() => {
+    switch ($props.source.type) {
+      case 'query':
+        return {
+          data: dataProcessor($props.source.value.data.value ?? []),
+          isDone: true,
+          isLoading: $props.source.value.isLoading.value,
+          error: $props.source.value.error.value,
+          refetch() {
+            if ($props.source.type != 'query') return
+            return $props.source.value.refetch(false)
+          },
+          refresh() {
+            if ($props.source.type != 'query') return
+            return $props.source.value.refresh(false)
+          },
+          next: $props.source.next
+        }
+      case 'stream':
+        return {
           data: dataProcessor(
             $props.source.value.data.value?.pages.reduce(
               (acc, v) => acc.concat(v.data),
@@ -78,7 +84,28 @@ const source = computed(() =>
             return $props.source.value.loadNextPage({ cancelRefetch: true })
           }
         }
-      : {
+      case 'infinite':
+        return {
+          data: dataProcessor($props.source.value.data.value?.pages.flat(1) ?? []),
+          isDone: $props.source.value.hasNextPage.value,
+          isLoading: $props.source.value.isLoading.value,
+          error: $props.source.value.error.value,
+          refetch() {
+            if ($props.source.type != 'stream') return
+            return $props.source.value.refetch(false)
+          },
+          refresh() {
+            if ($props.source.type != 'stream') return
+            return $props.source.value.refresh(false)
+          },
+          next() {
+            if ($props.source.type != 'stream') return
+            return $props.source.value.loadNextPage({ cancelRefetch: true })
+          }
+        }
+      case 'array':
+      default:
+        return {
           data: dataProcessor($props.source.value),
           isDone: true,
           isLoading: false,
@@ -87,6 +114,8 @@ const source = computed(() =>
           refresh: $props.source.refresh,
           next: $props.source.next
         }
+    }
+  })()
 )
 
 watch(

@@ -24,11 +24,13 @@ const query = useInfiniteQuery({
     'search',
     { keyword: route.params.keyword, sort: route.params.sort, method: route.params.method }
   ],
-  initialPageParam: method.value.fetchSearchResult.initialPageParam,
+  initialPageParam: method.value.fetchSearchResult.initPage,
   query: async ({ signal, pageParam }) => {
-    return await method.value.fetchSearchResult(
-      decodeURIComponent(route.params.keyword),
-      route.params.sort,
+    return await method.value.fetchSearchResult.query(
+      {
+        input: decodeURIComponent(route.params.keyword),
+        sort: route.params.sort
+      },
       pageParam,
       signal
     )
@@ -151,7 +153,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
       v-slot="{ data: { item } }"
       class="h-full transition-all duration-200 will-change-[transform,height]"
       ref="list"
-      :source="{ type: 'infinite', value: query }"
+      :source="{ type: 'stream', value: query }"
       :dataProcessor="data => (config.showAIProject ? data : data.filter(comic => !comic.$isAi))"
     >
       <component :is="uni.item.Item.itemCards.get(item.contentType)" :item />

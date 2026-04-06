@@ -45,7 +45,7 @@ const source = useInfiniteQuery({
 
 <template>
   <DcWaterfall
-    :source="{ type: 'infinite', value: source }"
+    :source="{ type: 'stream', value: source }"
     :padding="0"
     :col="1"
     :gap="4"
