@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T extends object, PF extends ListFn<T>">
 import { useTemp } from '@delta-comic/core'
+import type { StreamQuery } from '@delta-comic/model'
 import { VirtualWaterfall } from '@lhlyu/vue-virtual-waterfall'
 import type { UseInfiniteQueryReturn, UseQueryReturn } from '@pinia/colada'
 import { useEventListener } from '@vant/use'
@@ -18,8 +19,15 @@ const $props = withDefaults(
   defineProps<
     {
       source:
-        | { type: 'query'; value: UseQueryReturn<T[], any, any>; next?: () => any }
-        | { type: 'infinite'; value: UseInfiniteQueryReturn<T[], any, any> }
+        | {
+            type: 'query'
+            value: UseQueryReturn<T[], any, any>
+            next?: () => any
+          }
+        | {
+            type: 'infinite'
+            value: UseInfiniteQueryReturn<Awaited<ReturnType<StreamQuery<T>['query']>>>
+          }
         | {
             type: 'array'
             value: Array<T>
@@ -62,7 +70,12 @@ const source = computed(() =>
       }
     : $props.source.type == 'infinite'
       ? {
-          data: dataProcessor($props.source.value.data.value?.pages.flat(1) ?? []),
+          data: dataProcessor(
+            $props.source.value.data.value?.pages.reduce(
+              (acc, v) => acc.concat(v.data),
+              new Array<T>()
+            ) ?? []
+          ),
           isDone: $props.source.value.hasNextPage.value,
           isLoading: $props.source.value.isLoading.value,
           error: $props.source.value.error.value,

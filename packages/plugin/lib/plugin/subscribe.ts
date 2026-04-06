@@ -7,5 +7,5 @@ export interface Config {
   ): PromiseLike<{ isUpdated: boolean; whichUpdated: uni.item.Author[] }>
   onAdd?(author: uni.item.Author): any
   onRemove?(author: uni.item.Author): any
-  fetchAuthorContent: StreamQuery<[author: uni.item.Author], uni.item.Item>
+  fetchAuthorContent: StreamQuery<uni.item.Item, { author: uni.item.Author }>
 }

@@ -1,6 +1,6 @@
 {
   "name": "delta-comic",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "private": true,
   "description": "Per Aspera, Ad Astra",
   "homepage": "https://github.com/delta-comic",
@@ -23,7 +23,8 @@
     "build": "echo \"Root skip.\"",
     "dev": "vp run --filter app dev",
     "lint": "vp lint",
-    "npm-build": "pnpm run build --filter ui && vp run build -r",
+    "npm-build": "vp run build -r",
+    "set-ver": "node ./script/set-version.mts",
     "tauri": "vp run --filter app tauri"
   },
   "dependencies": {

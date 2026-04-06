@@ -54,5 +54,5 @@ export abstract class Comment extends Struct<RawComment> implements RawComment {
   public abstract like(signal?: AbortSignal): PromiseLike<boolean>
   public abstract report(signal?: AbortSignal): PromiseLike<any>
   public abstract sendComment(text: string, signal?: AbortSignal): PromiseLike<any>
-  public abstract fetchChildren: StreamQuery<[], Comment>
+  public abstract fetchChildren: StreamQuery<Comment>
 }

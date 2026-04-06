@@ -49,11 +49,11 @@ export abstract class ContentPage {
 
   public abstract fetchDetail: (signal?: AbortSignal) => Promise<item.Item>
 
-  public abstract fetchRecommends: StreamQuery<[], item.Item>
+  public abstract fetchRecommends: StreamQuery<item.Item>
 
-  public abstract fetchComments: StreamQuery<[], comment.Comment>
+  public abstract fetchComments: StreamQuery<comment.Comment>
 
-  public abstract fetchEps: StreamQuery<[], ep.Ep>
+  public abstract fetchEps: StreamQuery<ep.Ep>
 
   public abstract ViewComponent: ViewComponent
 }

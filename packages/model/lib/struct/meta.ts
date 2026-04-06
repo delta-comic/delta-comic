@@ -5,9 +5,13 @@ export interface Metadatable {
 export type Metadata = Record<string | number, any>
 
 export type PageKey = string | number
-export interface StreamQuery<TParameters extends any[], TItem> {
-  (
-    ...args: [...TParameters, page: PageKey, signal?: AbortSignal]
-  ): Promise<TItem[] & { nextPage?: PageKey }>
-  initialPageParam: PageKey
+export class StreamQuery<TResult, TData extends object = {}> {
+  constructor(
+    public query: (
+      data: TData,
+      page: PageKey,
+      signal?: AbortSignal
+    ) => Promise<{ data: TResult[]; lastPage?: PageKey; nextPage?: PageKey }>,
+    public initPage: PageKey
+  ) {}
 }

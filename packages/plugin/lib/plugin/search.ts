@@ -26,7 +26,7 @@ export interface SearchMethod {
   name: string
   sorts: { text: string; value: string }[]
   defaultSort: string
-  fetchSearchResult: StreamQuery<[input: string, sort: string], uni.item.Item>
+  fetchSearchResult: StreamQuery<uni.item.Item, { input: string; sort: string }>
   getAutoComplete(
     input: string,
     signal: AbortSignal

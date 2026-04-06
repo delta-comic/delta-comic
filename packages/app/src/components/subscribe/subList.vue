@@ -26,13 +26,19 @@ const subscribe = computed(() => {
 })
 const source = useInfiniteQuery({
   query: async ({ pageParam, signal }) =>
-    subscribe.value.fetchAuthorContent($props.source.author!, pageParam, signal),
+    subscribe.value.fetchAuthorContent.query(
+      {
+        author: $props.source.author!
+      },
+      pageParam,
+      signal
+    ),
   key: () => [
     {
       item: () => $props.source.key
     }
   ],
-  initialPageParam: subscribe.value.fetchAuthorContent.initialPageParam,
+  initialPageParam: subscribe.value.fetchAuthorContent.initPage,
   getNextPageParam: lastPage => lastPage.nextPage ?? null
 })
 </script>
