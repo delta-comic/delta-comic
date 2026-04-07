@@ -27,6 +27,24 @@ export class SourcedValue<T extends [string, string]> {
  * _但内部保存仍使用`SourcedValue.key.toString`作为key_
  */
 export class SourcedKeyMap<TKey extends [string, string], TValue> implements Map<string, TValue> {
+  public getOrInsert(key: string | TKey, value: TValue): TValue {
+    const storeKey = this.key.toString(key)
+    if (this.store.has(storeKey)) {
+      return this.store.get(storeKey) as TValue
+    }
+    this.store.set(storeKey, value)
+    return value
+  }
+
+  public getOrInsertComputed(key: string | TKey, compute: (key: string) => TValue): TValue {
+    const storeKey = this.key.toString(key)
+    if (this.store.has(storeKey)) {
+      return this.store.get(storeKey) as TValue
+    }
+    const value = compute(storeKey)
+    this.store.set(storeKey, value)
+    return value
+  }
   public static createReactive<TKey extends [string, string], TValue>(separator = ':') {
     return shallowReactive(new this<TKey, TValue>(separator))
   }

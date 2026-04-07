@@ -55,7 +55,7 @@ class _PluginAuth extends PluginBooter {
                 void formInstance.data.then(() => (show.value = false))
                 return () =>
                   h(
-                    DcPopup,
+                    DcPopup as any,
                     {
                       show: show.value,
                       position: 'center',

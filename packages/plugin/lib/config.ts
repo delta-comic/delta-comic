@@ -52,7 +52,7 @@ export const appConfig = useGlobalVar(
 )
 
 export const useConfig = defineStore('config', helper => {
-  const form = shallowReactive(new Map<symbol, { form: ConfigDescription; value: Ref<any> }>())
+  const form = shallowReactive(new Map<symbol, { form: ConfigDescription; value: any }>())
 
   const $load = helper.action(
     <T extends ConfigPointer>(pointer: T): Ref<FormType.Result<T['config']>> => {

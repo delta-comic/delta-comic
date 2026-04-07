@@ -45,13 +45,13 @@ class _ConfigSetter extends PluginBooter {
     }
     if (user) {
       if (user.card) uni.user.User.userCards.set(plugin, user.card)
-      if (user.edit) uni.user.User.userEditorBase.set(plugin, user.edit)
+      if (user.edit) uni.user.User.userEditorBase.set(plugin, user.edit as any)
       if (user.userActions)
         for (const [type, value] of Object.entries(user.userActions))
           Global.userActions.set([plugin, type], value)
       if (user.authorIcon)
         for (const [key, value] of Object.entries(user.authorIcon))
-          uni.item.Item.authorIcon.set([plugin, key], value)
+          uni.item.Item.authorIcon.set([plugin, key], value as any)
     }
     if (subscribe) {
       for (const [key, value] of Object.entries(subscribe))
