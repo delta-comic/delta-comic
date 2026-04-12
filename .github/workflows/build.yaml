@@ -57,9 +57,13 @@ jobs:
           ndk-version: r29
           link-to-sdk: true
           local-cache: true
+          add-to-path: true
 
       - name: Init android project
         run: |
+          echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
+          echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "NDK_HOME=$ANDROID_SDK_ROOT/ndk/r29" >> $GITHUB_ENV
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
           vp run app#tauri android init
 
@@ -74,9 +78,13 @@ jobs:
           echo "old_version=$OLD_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build Android App
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
           vp run npm-build
-          vp pm publish -r --no-git-checks
+          vp pm publish -r --no-git-checks || echo "no need to publish"
           vp run app#build:app
 
       #signature
