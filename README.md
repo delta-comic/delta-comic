@@ -60,10 +60,10 @@ _____   _________________ ____        __________________ _____   ______
 [![Readme Card](https://wenxig-grs.vercel.app/api/pin/?username=delta-comic&repo=awesome-plugins&user&theme=transparent)](https://github.com/delta-comic/awesome-plugins)
 
 ## ?
-<details>
 
+<details>
   <summary>?</summary>
-  
+
 > 你错了😠，我不是❌bug😈。（向前一步）如果bug🦹♀是码间之恶👿，那就应该清除🧹。既然如此，那就由我来修复bug😠🔪。能做出最好的漫画应用🌏的，只有我😠！（打开`vscode`）我要从这个世界上，将bug🦹♀消灭❌❌🧯🧯！（拉取项目）（敲键盘）🔪🔪🔪🩸🩸🩸啊哈哈哈哈！bug😈😈去死🩸！去死去死去死👿👿🩸🩸🩸！
 
 > `tsc`🌸，你通过检查🍚了吗？有没有因为`找不到模块“”或其相应的类型声明。`🐱袭击💘而受伤🩸？我真的、真的很担心🥀你……啊啊，原来你在这里啊😇，`tsc`🌸!我一直在找你☺️……`tsc`🌸检查出错了吗😖……？我一直都是**史山仙人**😔……很寂寞🥀……请不要抛弃我😇……怎么会💔……连`tsc`🌸也……太过分了😡😡😡。果然我还是**史山仙人**🥀🥀🥀……啊😇……只有`rustc`能理解我😇……好想见`rustc`啊😇……
