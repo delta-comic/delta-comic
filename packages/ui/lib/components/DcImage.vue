@@ -4,7 +4,6 @@ import { uni } from '@delta-comic/model'
 import { computedAsync } from '@vueuse/core'
 import { isString } from 'es-toolkit/compat'
 import { type ImageProps, NImage } from 'naive-ui'
-import { twMerge, type ClassNameValue } from 'tailwind-merge'
 import {
   type ImgHTMLAttributes,
   type StyleValue,
@@ -15,6 +14,7 @@ import {
   watch
 } from 'vue'
 
+import { cn } from '@/utils'
 import { showImagePreview } from '@/utils/image'
 
 import DcLoading from './DcLoading.vue'
@@ -119,7 +119,7 @@ const NImg = window.$api.NImage as typeof NImage
 
 <template>
   <DcVar
-    :value="twMerge(round && 'rounded-full!', inline ? 'inline-flex' : 'flex', $props.class)"
+    :value="cn(round && 'rounded-full!', inline ? 'inline-flex' : 'flex', $props.class)"
     v-slot="{ value: cls }"
   >
     <NImg
@@ -131,7 +131,7 @@ const NImg = window.$api.NImage as typeof NImage
       ref="img"
       :imgProps="{
         ...imgProp,
-        class: twMerge(imgProp?.class as ClassNameValue, 'w-full'),
+        class: cn(imgProp?.class, 'w-full'),
         fetchpriority: $props.fetchpriority
       }"
       :class="cls"
@@ -145,7 +145,7 @@ const NImg = window.$api.NImage as typeof NImage
     </NImg>
     <div
       v-if="!images.loaded.has(src) && !images.error.has(src) && !hideLoading"
-      :class="twMerge('items-center justify-center', cls)"
+      :class="cn('items-center justify-center', cls)"
       :style
       @click="$emit('click')"
     >
@@ -162,7 +162,7 @@ const NImg = window.$api.NImage as typeof NImage
         :alt
         :imgProps="{
           ...imgProp,
-          class: twMerge(imgProp?.class as ClassNameValue, 'w-full'),
+          class: cn(imgProp?.class, 'w-full'),
           fetchpriority: $props.fetchpriority
         }"
         :class="cls"
@@ -177,7 +177,7 @@ const NImg = window.$api.NImage as typeof NImage
             beginReload()
           }
         "
-        :class="twMerge('flex-col items-center justify-center', cls)"
+        :class="cn('flex-col items-center justify-center', cls)"
       >
         <slot name="loading" v-if="$slots.loading"></slot>
         <template v-else>

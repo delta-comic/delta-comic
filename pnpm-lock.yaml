@@ -138,9 +138,6 @@ catalogs:
     vant:
       specifier: ^4.9.22
       version: 4.9.24
-    vite:
-      specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
-      version: 0.1.16
     vite-plugin-externals:
       specifier: ^0.6.2
       version: 0.6.2
@@ -161,7 +158,7 @@ catalogs:
       version: 5.0.4
 
 overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@latest
+  vite: npm:@voidzero-dev/vite-plus-core@^0.1.16
   vitest: npm:@voidzero-dev/vite-plus-test@latest
 
 importers:
@@ -218,7 +215,7 @@ importers:
         specifier: ^25.0.3
         version: 25.0.3(typescript@5.9.3)
       vite:
-        specifier: 'catalog:'
+        specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
         version: '@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plugin-dts:
         specifier: ^4.5.4
@@ -339,7 +336,7 @@ importers:
         specifier: 'catalog:'
         version: 31.0.0(vue@3.5.32(typescript@5.9.3))
       vite:
-        specifier: npm:@voidzero-dev/vite-plus-core@latest
+        specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
         version: '@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plugin-ms-clarity:
         specifier: ^1.0.0
@@ -382,7 +379,7 @@ importers:
         version: 3.5.32(typescript@5.9.3)
     devDependencies:
       vite:
-        specifier: npm:@voidzero-dev/vite-plus-core@latest
+        specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
         version: '@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plus:
         specifier: 'catalog:'
@@ -428,7 +425,7 @@ importers:
         version: 3.5.30(typescript@5.9.3)
     devDependencies:
       vite:
-        specifier: npm:@voidzero-dev/vite-plus-core@latest
+        specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
         version: '@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plus:
         specifier: 'catalog:'
@@ -456,7 +453,7 @@ importers:
         version: 3.5.30(typescript@5.9.3)
     devDependencies:
       vite:
-        specifier: npm:@voidzero-dev/vite-plus-core@latest
+        specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
         version: '@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plus:
         specifier: 'catalog:'
@@ -538,7 +535,7 @@ importers:
         specifier: 'catalog:'
         version: 4.2.2
       vite:
-        specifier: npm:@voidzero-dev/vite-plus-core@latest
+        specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
         version: '@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plus:
         specifier: 'catalog:'
@@ -560,7 +557,7 @@ importers:
         specifier: 'catalog:'
         version: 1.14.0
       vite:
-        specifier: npm:@voidzero-dev/vite-plus-core@latest
+        specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
         version: '@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plus:
         specifier: 'catalog:'
@@ -663,7 +660,7 @@ importers:
         specifier: 'catalog:'
         version: 31.0.0(vue@3.5.30(typescript@5.9.3))
       vite:
-        specifier: npm:@voidzero-dev/vite-plus-core@latest
+        specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
         version: '@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plus:
         specifier: 'catalog:'
@@ -697,7 +694,7 @@ importers:
         specifier: 'catalog:'
         version: 1.14.0
       vite:
-        specifier: npm:@voidzero-dev/vite-plus-core@latest
+        specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
         version: '@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plus:
         specifier: 'catalog:'
@@ -719,7 +716,7 @@ importers:
         version: 7.1.9(@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3))(postcss@8.5.8)
     devDependencies:
       vite:
-        specifier: npm:@voidzero-dev/vite-plus-core@latest
+        specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16
         version: '@voidzero-dev/vite-plus-core@0.1.16(@types/node@25.5.2)(jiti@2.6.1)(typescript@5.9.3)(yaml@2.8.3)'
       vite-plus:
         specifier: 'catalog:'

@@ -4,11 +4,10 @@ import type { UseInfiniteQueryReturn, UseQueryReturn } from '@pinia/colada'
 import { type IfAny, useScroll } from '@vueuse/core'
 import { ceil, debounce } from 'es-toolkit/compat'
 import { NVirtualList, type VirtualListInst, type VirtualListProps } from 'naive-ui'
-import { twMerge } from 'tailwind-merge'
 import { type Ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { computed } from 'vue'
 
-import type { ListFn, StyleProps } from '../utils'
+import { cn, type ListFn, type StyleProps } from '../utils'
 
 import DcContent from './DcContent.vue'
 import DcVar from './DcVar.vue'
@@ -167,7 +166,7 @@ defineExpose({ scrollTop: listScrollTop, listInstance: <Ref<VirtualListInst>>(<u
 <template>
   <VanPullRefresh
     v-model="isRefreshing"
-    :class="twMerge('relative', $props.class)"
+    :class="cn('relative', $props.class)"
     @refresh="handleRefresh"
     :disabled="
       unReloadable ||
@@ -202,7 +201,7 @@ defineExpose({ scrollTop: listScrollTop, listInstance: <Ref<VirtualListInst>>(<u
           v-slot="{ item }: { item: TrueItem }"
           ref="vList"
           :class="
-            twMerge(
+            cn(
               'h-full overflow-x-hidden',
               isPullRefreshHold ? 'overflow-y-hidden' : 'overflow-y-auto'
             )

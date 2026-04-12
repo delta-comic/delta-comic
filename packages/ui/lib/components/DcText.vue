@@ -2,11 +2,10 @@
 import DOMPurify from 'dompurify'
 import { escape } from 'es-toolkit'
 import Link from 'linkify-it'
-import { twMerge } from 'tailwind-merge'
 import tlds from 'tlds'
 import { computed } from 'vue'
 
-import type { StyleProps } from '../utils'
+import { cn, type StyleProps } from '../utils'
 
 const $props = withDefaults(defineProps<{ text?: string } & StyleProps>(), {
   text: ''
@@ -33,7 +32,7 @@ const texts = computed(() => {
 
 <template>
   <div
-    :class="twMerge('break-normal whitespace-pre-wrap text-(--van-text-color)', $props.class)"
+    :class="cn('break-normal whitespace-pre-wrap text-(--van-text-color)', $props.class)"
     :style
     v-html="texts"
   ></div>

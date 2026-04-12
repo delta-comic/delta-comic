@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { uni } from '@delta-comic/model'
-import { twMerge } from 'tailwind-merge'
 import type { Component } from 'vue'
 
-import type { StyleProps } from '../utils'
+import { cn, type StyleProps } from '../utils'
 
 import DcImage from './DcImage.vue'
 import DcVar from './DcVar.vue'
@@ -26,7 +25,7 @@ const $props = defineProps<
     v-slot="{ value: style }"
   >
     <DcImage
-      :class="twMerge('aspect-square size-[--spacing(var(--box-size))] shrink-0', $props.class)"
+      :class="cn('aspect-square size-[--spacing(var(--box-size))] shrink-0', $props.class)"
       v-if="uni.image.Image.is(icon) || uni.resource.Resource.is(icon)"
       :src="uni.resource.Resource.is(icon) ? uni.image.Image.create(icon) : icon"
       round
@@ -35,7 +34,7 @@ const $props = defineProps<
     />
     <div
       :class="
-        twMerge(
+        cn(
           'flex aspect-square size-[--spacing(var(--box-size))] items-center justify-center rounded-full bg-gray-200',
           $props.class
         )

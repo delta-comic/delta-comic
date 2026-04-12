@@ -10,9 +10,10 @@
   "
 >
 import { Mutex } from 'es-toolkit'
-import { twMerge } from 'tailwind-merge'
 import { computed } from 'vue'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
+
+import { cn } from '@/utils'
 
 import type { StyleProps } from '../utils'
 
@@ -65,7 +66,7 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
     shrink
     :active="selecting"
     :beforeChange="handleRoute"
-    :class="twMerge('w-full', $props.class)"
+    :class="cn('w-full', $props.class)"
     :style
   >
     <template #nav-left>

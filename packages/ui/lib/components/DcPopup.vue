@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { twMerge } from 'tailwind-merge'
 import type { PopupProps } from 'vant'
 
 import { usePreventBack, useZIndex } from '@/utils/layout'
 
-import type { StyleProps } from '../utils'
+import { cn, type StyleProps } from '../utils'
 
 const $props = withDefaults(defineProps<Partial<PopupProps & StyleProps>>(), {
   position: 'center',
@@ -29,7 +28,7 @@ defineExpose({ zIndex })
     v-model:show="isShow"
     :zIndex
     @closed="$emit('closed')"
-    :class="twMerge('max-h-screen overflow-x-hidden overflow-y-auto!', $props.class)"
+    :class="cn('max-h-screen overflow-x-hidden overflow-y-auto!', $props.class)"
   >
     <slot></slot>
   </VanPopup>

@@ -11,6 +11,6 @@
   "[jsonc]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
   "vue.suggest.componentNameCasing": "alwaysPascalCase",
   "vue.suggest.propNameCasing": "alwaysCamelCase",
-  "tailwindCSS.classFunctions": ["twMerge"],
+  "tailwindCSS.classFunctions": ["twMerge", "cn"],
   "tailwindCSS.classAttributes": ["class", "className", "ngClass", "class:list", ":class"]
 }

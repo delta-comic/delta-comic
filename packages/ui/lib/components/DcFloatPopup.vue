@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useWindowSize } from '@vueuse/core'
 import { isArray } from 'es-toolkit/compat'
-import { twMerge } from 'tailwind-merge'
 import { computed, shallowReadonly, shallowRef } from 'vue'
 
-import { usePreventBack, useZIndex, type StyleProps } from '../utils'
+import { cn, usePreventBack, useZIndex, type StyleProps } from '../utils'
 
 const $props = withDefaults(
   defineProps<
@@ -64,6 +63,7 @@ defineExpose({
   isShowing: shallowReadonly(isShow),
   height: shallowReadonly(height)
 })
+
 defineSlots<{ default(arg: { height: number }): void }>()
 </script>
 
@@ -80,7 +80,7 @@ defineSlots<{ default(arg: { height: number }): void }>()
         :lockScroll
         :style="[style, { zIndex }]"
         :class="
-          twMerge(
+          cn(
             'overflow-hidden border-0 border-t border-solid border-(--van-border-color)',
             $props.class
           )

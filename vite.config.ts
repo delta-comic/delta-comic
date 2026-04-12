@@ -25,7 +25,7 @@ export default defineConfig({
       preserveWhitespace: false,
       stylesheet: './packages/app/src/index.css',
       attributes: ['overlayClass', ':class', 'Class'],
-      functions: ['twMerge']
+      functions: ['twMerge', 'cn']
     },
     bracketSameLine: false,
     bracketSpacing: true,

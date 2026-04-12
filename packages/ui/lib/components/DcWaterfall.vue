@@ -6,10 +6,11 @@ import type { UseInfiniteQueryReturn, UseQueryReturn } from '@pinia/colada'
 import { useEventListener } from '@vant/use'
 import { type IfAny, useResizeObserver, useScroll } from '@vueuse/core'
 import { isArray } from 'es-toolkit/compat'
-import { twMerge } from 'tailwind-merge'
 import { type Ref, computed, nextTick, onUnmounted, shallowReactive, shallowRef, watch } from 'vue'
 import { useTemplateRef } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
+
+import { cn } from '@/utils'
 
 import type { ListFn, StyleProps } from '../utils'
 
@@ -225,7 +226,7 @@ defineSlots<{
 <template>
   <VanPullRefresh
     v-model="isRefreshing"
-    :class="twMerge('relative h-full', $props.class)"
+    :class="cn('relative h-full', $props.class)"
     v-if="reloadController"
     :disabled="
       unReloadable ||

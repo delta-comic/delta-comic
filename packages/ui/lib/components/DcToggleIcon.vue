@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { onLongPress } from '@vueuse/core'
-import { twMerge } from 'tailwind-merge'
 import { type Component as _Component, watch } from 'vue'
 import { useTemplateRef } from 'vue'
 
-import type { StyleProps } from '../utils'
+import { cn, type StyleProps } from '../utils'
 const $props = defineProps<
   {
     icon: _Component
@@ -36,7 +35,7 @@ onLongPress(
 <template>
   <div
     :class="
-      twMerge(
+      cn(
         'flex items-center justify-center **:transition-colors!',
         !rowMode && 'flex-col',
         padding && 'px-4'

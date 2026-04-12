@@ -3,10 +3,9 @@ import type { UseInfiniteQueryReturn, UseQueryReturn } from '@pinia/colada'
 import { omit } from 'es-toolkit'
 import { isEmpty } from 'es-toolkit/compat'
 import { motion, type VariantType } from 'motion-v'
-import { twMerge, type ClassNameValue } from 'tailwind-merge'
 import { type StyleValue, computed, useTemplateRef } from 'vue'
 
-import type { StyleProps } from '../utils'
+import { cn, type StyleProps } from '../utils'
 
 import DcLoading from './DcLoading.vue'
 import { ReloadOutlined, WifiTetheringErrorRound } from './icons'
@@ -31,8 +30,8 @@ const $props = defineProps<
           error?: Error | null
           refetch?: () => any
         }
-    classError?: ClassNameValue
-    classEmpty?: ClassNameValue
+    classError?: any
+    classEmpty?: any
     styleError?: StyleValue
     styleEmpty?: StyleValue
   } & StyleProps
@@ -169,7 +168,7 @@ defineSlots<{ default(data: { data?: T }): any }>()
 
 <template>
   <div class="relative size-full overflow-hidden">
-    <div :class="twMerge('relative size-full', $props.class)" ref="conation">
+    <div :class="cn('relative size-full', $props.class)" ref="conation">
       <slot v-if="!isEmpty(source.data)" :data="source.data" />
     </div>
     <AnimatePresence>
@@ -187,7 +186,7 @@ defineSlots<{ default(data: { data?: T }): any }>()
           <div v-else-if="animateOn === 'isEmpty'">
             <NEmpty
               description="无结果"
-              :class="twMerge('w-full justify-center!', classEmpty)"
+              :class="cn('w-full justify-center!', classEmpty)"
               :style="[style, styleEmpty]"
             />
           </div>
@@ -196,7 +195,7 @@ defineSlots<{ default(data: { data?: T }): any }>()
               status="error"
               title="网络错误"
               :class="
-                twMerge(
+                cn(
                   'flex size-full! flex-col items-center! justify-center! text-wrap *:w-full',
                   classError
                 )
