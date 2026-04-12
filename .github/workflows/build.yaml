@@ -77,7 +77,7 @@ jobs:
           OLD_VERSION="$(node ./script/update-version.mts)"
           echo "old_version=$OLD_VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Build Android App
+      - name: Build Deps
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
@@ -85,7 +85,24 @@ jobs:
         run: |
           vp run npm-build
           vp pm publish -r --no-git-checks || echo "no need to publish"
-          vp run app#build:app
+
+      - name: Build Android App
+        id: build
+        uses: tauri-apps/tauri-action@dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        with:
+          mobile: 'android'
+          args: ''
+          retryAttempts: 1
+          projectPath: packages/app
+
+      - name: Restore version
+        run: |
+          node ./script/set-version.mts ${{ steps.set-version.outputs.old_version }}
+
 
       #signature
       - name: Restore keystore (decode + verify)
