@@ -26,6 +26,11 @@ jobs:
         with:
           targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.33.0
+
       - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: 25
@@ -72,7 +77,7 @@ jobs:
           # 这样 tauri CLI 能通过 process.argv[1] 获取自身绝对路径，
           # 从而在 tauri.properties 中写入正确的 tauriScript
           cd packages/app
-          vp pm exec tauri android init
+          vp exec tauri android init || pnpm exec tauri android init
 
       - name: Change version
         id: set-version
@@ -90,7 +95,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
           vp run npm-build
-          vp pm publish -r --no-git-checks || echo "no need to publish"
+          vp pm publish -r --no-git-checks || pnpm publish -r --no-git-checks || echo "no need to publish"
 
       # ✅ 修复4: 同样直接用 pnpm 运行 tauri android build，
       #          不再使用 tauri-action（它内部会重新调用 generate_tauri_properties
@@ -104,7 +109,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
           cd packages/app
-          vp pm exec tauri android build --apk
+          vp exec tauri android build --apk || pnpm exec tauri android build --apk
 
       - name: Restore version
         run: |
@@ -173,4 +178,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          vp exec semantic-release || vp pm exec semantic-release
+          vp exec semantic-release || pnpm exec semantic-release
