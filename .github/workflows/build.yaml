@@ -72,7 +72,7 @@ jobs:
           # 这样 tauri CLI 能通过 process.argv[1] 获取自身绝对路径，
           # 从而在 tauri.properties 中写入正确的 tauriScript
           cd packages/app
-          pnpm exec tauri android init
+          vp pm exec tauri android init
 
       - name: Change version
         id: set-version
@@ -104,7 +104,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
           cd packages/app
-          pnpm exec tauri android build --apk
+          vp pm exec tauri android build --apk
 
       - name: Restore version
         run: |
@@ -173,4 +173,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          vp exec semantic-release || pnpm exec semantic-release
+          vp exec semantic-release || vp pm exec semantic-release
