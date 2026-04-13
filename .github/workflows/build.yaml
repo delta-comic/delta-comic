@@ -16,19 +16,16 @@ jobs:
     env:
       HUSKY: 0
     steps:
-      #restore
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      # rust
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
 
-      # js
       - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: 25
@@ -37,7 +34,6 @@ jobs:
       - name: Install dependencies
         run: vp install
 
-      # java
       - name: JDK 23
         uses: actions/setup-java@v4
         with:
@@ -59,15 +55,25 @@ jobs:
           local-cache: true
           add-to-path: true
 
+      # ✅ 修复1: 使用 pnpm 直接运行 tauri，而不是通过 vp 包装器
+      # 原因: vp 会改变进程上下文，导致 tauri CLI 无法正确检测 pnpm，
+      #       进而将 tauriScript 写成裸名 "tauri" 而非完整的绝对路径
       - name: Init android project
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
+          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
-          echo "NDK_HOME=$ANDROID_SDK_ROOT/ndk/r29" >> $GITHUB_ENV
-          echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
-          vp run app#tauri android init
+          # ✅ 修复2: 正确的 NDK_HOME（原来是 $ANDROID_SDK_ROOT/ndk/r29，是错误路径）
+          echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          
+          # ✅ 修复3: 直接 cd 到 packages/app，用 pnpm 执行 tauri
+          # 这样 tauri CLI 能通过 process.argv[1] 获取自身绝对路径，
+          # 从而在 tauri.properties 中写入正确的 tauriScript
+          cd packages/app
+          pnpm exec tauri android init
 
-      # build
       - name: Change version
         id: set-version
         env:
@@ -86,25 +92,24 @@ jobs:
           vp run npm-build
           vp pm publish -r --no-git-checks || echo "no need to publish"
 
+      # ✅ 修复4: 同样直接用 pnpm 运行 tauri android build，
+      #          不再使用 tauri-action（它内部会重新调用 generate_tauri_properties
+      #          导致 tauriScript 再次被覆盖为错误的裸名）
       - name: Build Android App
         id: build
-        uses: tauri-apps/tauri-action@dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        with:
-          mobile: 'android'
-          args: ''
-          retryAttempts: 1
-          projectPath: packages/app
+        run: |
+          cd packages/app
+          pnpm exec tauri android build --apk
 
       - name: Restore version
         run: |
           node ./script/set-version.mts ${{ steps.set-version.outputs.old_version }}
 
-
-      #signature
       - name: Restore keystore (decode + verify)
         env:
           KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
@@ -159,7 +164,6 @@ jobs:
           echo '-----------'
           ls -la ./dist
 
-      #publish
       - name: Configure git author
         run: |
           git config user.name "delta-comic-bot"
@@ -167,6 +171,6 @@ jobs:
 
       - name: Run semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 用于在 GitHub 上创建 release 与 tag
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           vp exec semantic-release || pnpm exec semantic-release
