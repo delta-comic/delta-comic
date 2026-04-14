@@ -24,7 +24,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
+          targets: aarch64-linux-android, armv7-linux-androideabi
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -60,9 +60,6 @@ jobs:
           local-cache: true
           add-to-path: true
 
-      # ✅ 修复1: 使用 pnpm 直接运行 tauri，而不是通过 vp 包装器
-      # 原因: vp 会改变进程上下文，导致 tauri CLI 无法正确检测 pnpm，
-      #       进而将 tauriScript 写成裸名 "tauri" 而非完整的绝对路径
       - name: Init android project
         env:
           ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
@@ -70,14 +67,10 @@ jobs:
         run: |
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
-          # ✅ 修复2: 正确的 NDK_HOME（原来是 $ANDROID_SDK_ROOT/ndk/r29，是错误路径）
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
-          
-          # ✅ 修复3: 直接 cd 到 packages/app，用 pnpm 执行 tauri
-          # 这样 tauri CLI 能通过 process.argv[1] 获取自身绝对路径，
-          # 从而在 tauri.properties 中写入正确的 tauriScript
+
           cd packages/app
-          vp exec tauri android init || pnpm exec tauri android init
+          pnpm exec tauri android init
 
       - name: Change version
         id: set-version
@@ -97,19 +90,19 @@ jobs:
           vp run npm-build
           vp pm publish -r --no-git-checks || pnpm publish -r --no-git-checks || echo "no need to publish"
 
-      # ✅ 修复4: 同样直接用 pnpm 运行 tauri android build，
-      #          不再使用 tauri-action（它内部会重新调用 generate_tauri_properties
-      #          导致 tauriScript 再次被覆盖为错误的裸名）
+      - name: Make gradlew executable
+        run: chmod +x ./packages/app/src-tauri/gen/android/gradlew
+
       - name: Build Android App
         id: build
+        working-directory: packages/app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
-          cd packages/app
-          vp exec tauri android build --apk || pnpm exec tauri android build --apk
+          vp run build:app
 
       - name: Restore version
         run: |
