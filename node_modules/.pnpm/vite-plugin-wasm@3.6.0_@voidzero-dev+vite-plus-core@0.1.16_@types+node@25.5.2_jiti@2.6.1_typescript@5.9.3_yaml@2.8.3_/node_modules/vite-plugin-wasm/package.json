@@ -1,0 +1,68 @@
+{
+  "name": "vite-plugin-wasm",
+  "version": "3.6.0",
+  "description": "Add WebAssembly ESM integration (aka. Webpack's `asyncWebAssembly`) to Vite and support `wasm-pack` generated modules.",
+  "types": "./exports/require.d.cts",
+  "main": "./exports/require.cjs",
+  "module": "./exports/import.mjs",
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./exports/import.mjs"
+    },
+    "require": {
+      "types": "./exports/require.d.cts",
+      "default": "./exports/require.cjs"
+    }
+  },
+  "repository": "https://github.com/Menci/vite-plugin-wasm",
+  "author": "Menci <huanghaorui301@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "vite",
+    "plugin",
+    "wasm",
+    "webassembly",
+    "wasm-pack",
+    "es-modules",
+    "modules"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "node src/wasm-parser.spec.mjs && node e2e/vite2/e2e-vite2.test.mjs && node e2e/vite3/e2e-vite3.test.mjs && node e2e/vite4/e2e-vite4.test.mjs && node e2e/vite5/e2e-vite5.test.mjs && node e2e/vite6/e2e-vite6.test.mjs && node e2e/vite7/e2e-vite7.test.mjs && node e2e/vite8/e2e-vite8.test.mjs",
+    "format": "prettier --write '**/*.{mjs,cjs,js,mts,cts,ts}'",
+    "pretest": "yarn --cwd e2e && playwright install firefox && playwright install chromium"
+  },
+  "packageManager": "yarn@1.22.21",
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@jsona/openapi": "^0.2.5",
+    "@syntect/wasm": "^0.0.4",
+    "@types/express": "^5.0.0",
+    "@wasm-fmt/gofmt": "0.7.3",
+    "cz-conventional-changelog": "^3.3.0",
+    "express": "^4.21.2",
+    "mime": "^4.0.6",
+    "playwright": "1.23.3",
+    "playwright-core": "1.23.3",
+    "prettier": "^3.4.2",
+    "terser": "^5.37.0",
+    "test": "^3.3.0",
+    "typescript": "^5.7.2",
+    "vite": "7",
+    "wait-port": "^1.1.0"
+  },
+  "peerDependencies": {
+    "vite": "^2 || ^3 || ^4 || ^5 || ^6 || ^7 || ^8"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "files": [
+    "/dist",
+    "/exports"
+  ]
+}

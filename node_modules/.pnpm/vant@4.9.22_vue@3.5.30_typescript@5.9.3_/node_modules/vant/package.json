@@ -1,0 +1,83 @@
+{
+  "name": "vant",
+  "version": "4.9.22",
+  "description": "Mobile UI Components built on Vue",
+  "main": "lib/vant.cjs.js",
+  "module": "es/index.mjs",
+  "style": "lib/index.css",
+  "typings": "lib/index.d.ts",
+  "unpkg": "lib/vant.min.js",
+  "jsdelivr": "lib/vant.min.js",
+  "files": [
+    "es",
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vant-ui/vant.git",
+    "directory": "packages/vant"
+  },
+  "bugs": "https://github.com/vant-ui/vant/issues",
+  "author": "chenjiahan",
+  "license": "MIT",
+  "keywords": [
+    "ui",
+    "vue",
+    "vue3",
+    "mobile",
+    "frontend",
+    "component",
+    "components"
+  ],
+  "dependencies": {
+    "@vue/shared": "^3.5.25",
+    "@vant/use": "^1.6.0",
+    "@vant/popperjs": "^1.3.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vitejs/plugin-vue-jsx": "^4.2.0",
+    "@vitest/coverage-istanbul": "^3.2.4",
+    "@vue/runtime-core": "^3.5.25",
+    "@vue/test-utils": "^2.4.6",
+    "csstype": "^3.2.3",
+    "diffable-html": "^6.0.1",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.20",
+    "vitest": "^3.2.4",
+    "vitest-canvas-mock": "^0.3.3",
+    "vue": "^3.5.25",
+    "vue-router": "^4.6.3",
+    "@vant/area-data": "2.1.0",
+    "@vant/cli": "7.1.0",
+    "@vant/eslint-config": "4.0.0",
+    "@vant/icons": "3.0.2"
+  },
+  "sideEffects": [
+    "es/**/style/*",
+    "lib/**/style/*",
+    "*.css"
+  ],
+  "web-types": "lib/web-types.json",
+  "scripts": {
+    "dev": "vant-cli dev",
+    "lint": "vant-cli lint",
+    "test": "vitest run",
+    "build": "vant-cli build",
+    "build:site": "vant-cli build-site",
+    "release": "cp ../../README.md ./ && vant-cli release --gitTag && rm ./README.md",
+    "release:site": "pnpm build:site && npx gh-pages -d site-dist --add",
+    "test:update": "vitest run -u",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "open:coverage": "open test/coverage/lcov-report/index.html"
+  }
+}

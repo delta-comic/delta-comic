@@ -1,3 +1,38 @@
+# [2.0.0](https://github.com/delta-comic/delta-comic/compare/1.3.0...2.0.0) (2026-04-14)
+
+
+### Bug Fixes
+
+* colada实例随调用初始化 ([8fa7928](https://github.com/delta-comic/delta-comic/commit/8fa79285fd60451c40381948d640b23343f6a722))
+* **docs:** 修复文档图标 ([dde680d](https://github.com/delta-comic/delta-comic/commit/dde680dcc0c46acbce14fb81b03589310c5de939))
+* tw-merge类型意外泄漏 ([2edfb5e](https://github.com/delta-comic/delta-comic/commit/2edfb5e747ce6867b4b1c1e9a935dc13e737945f))
+* **ui:** 修复返回拦截问题 ([8d4c2ab](https://github.com/delta-comic/delta-comic/commit/8d4c2ab2d911362b1eb418f77cff6d9888896121))
+* 修复了循环依赖(plugin,db,ui) ([1b828f2](https://github.com/delta-comic/delta-comic/commit/1b828f2ca78c989e874bf7fd4a981db8bdf69b8e))
+* 修复了样式检查 ([fcff6ed](https://github.com/delta-comic/delta-comic/commit/fcff6ed11496b07129dd3c69b38fb5344f00146f))
+* 修复数据库初始同步失效问题 ([f3545ad](https://github.com/delta-comic/delta-comic/commit/f3545ad8710297c710432f91b3cfcbcb0a97cbf5))
+* 构建使用官方 [pub] ([cf0d1ab](https://github.com/delta-comic/delta-comic/commit/cf0d1abc1db9fe4b3f30217444eec6a0d4b632ce))
+* 构建流程sdk无法找到 [pub] ([ac33a33](https://github.com/delta-comic/delta-comic/commit/ac33a330c97f39fd49a0640fda68c54531b607e5))
+
+
+### Features
+
+* **db,app:** 使用`@pinia/colada`重构数据库的响应式系统 ([f6fd159](https://github.com/delta-comic/delta-comic/commit/f6fd159213953b292568d1d1c33cc3f951098ccb))
+* **plugin:** 完成响应式数据库重构 ([1aa519c](https://github.com/delta-comic/delta-comic/commit/1aa519c210dc61d03c6ccb9fc3c541294dc44bb8))
+* **ui:** 优化了导航栏的行为 ([12af4bd](https://github.com/delta-comic/delta-comic/commit/12af4bd83d2164ecaa66291c49ad651b3b7365c3))
+* 为list添加stream模式 ([82ab5eb](https://github.com/delta-comic/delta-comic/commit/82ab5eb35bfcafc52b83a6853ff1e358eadd5e4e))
+* 优化fetch返回 [pub] ([3661464](https://github.com/delta-comic/delta-comic/commit/36614649c757b35b0d423a69be0a9fde09a108fe))
+
+
+### pref
+
+* 新版本发布触发 ([2b0e051](https://github.com/delta-comic/delta-comic/commit/2b0e0517c911311a783e8546436bc860ddfbcc3d))
+
+
+### BREAKING CHANGES
+
+* 插件底层大改，旧插件要完全重构
+* 插件底层大改，旧插件要完全重构
+
 # [1.3.0](https://github.com/delta-comic/delta-comic/compare/1.2.0...1.3.0) (2026-03-06)
 
 

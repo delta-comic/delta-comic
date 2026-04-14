@@ -1,0 +1,33 @@
+{
+  "name": "seemly",
+  "version": "0.3.10",
+  "description": "Utils for user interface.",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "sideEffects": false,
+  "files": [
+    "lib",
+    "es"
+  ],
+  "author": "07akioni",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-typescript": "^7.12.7",
+    "babel-jest": "^28.0.2",
+    "jest": "^27.0.4",
+    "typescript": "^5.6.2",
+    "@types/jest": "^27.0.1"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
+  "scripts": {
+    "build": "pnpm run clean && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "clean": "rm -rf es lib",
+    "test-dts": "tsc -p tsconfig.json",
+    "test": "pnpm run test-dts && jest src/**/*.spec.ts",
+    "release": "pnpm run build && pnpm publish"
+  }
+}
