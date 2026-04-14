@@ -93,29 +93,29 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./packages/app/src-tauri/gen/android/gradlew
 
-      - name: Build Android App
-        id: build
-        working-directory: packages/app
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        run: |
-          vp run build:app
-
       # - name: Build Android App
       #   id: build
-      #   uses: tauri-apps/tauri-action@dev
+      #   working-directory: packages/app
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #     NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      #     ANDROID_HOME: ${{ env.ANDROID_HOME }}
       #     TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-      #   with:
-      #     mobile: 'android'
-      #     args: ''
-      #     retryAttempts: 0
-      #     projectPath: packages/app
+      #   run: |
+      #     vp run build:app
+
+      - name: Build Android App
+        id: build
+        uses: tauri-apps/tauri-action@dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        with:
+          mobile: 'android'
+          args: ''
+          retryAttempts: 0
+          projectPath: packages/app
 
       - name: Restore version
         run: |
