@@ -16,7 +16,7 @@ catalogs:
       specifier: ^22.0.1
       version: 22.0.1
     '@pinia/colada':
-      specifier: ^1.0.0
+      specifier: ^1.1.0
       version: 1.1.0
     '@sentry/vue':
       specifier: ^10.45.0
@@ -439,9 +439,12 @@ importers:
       '@delta-comic/utils':
         specifier: workspace:*
         version: link:../utils
+      '@pinia/colada':
+        specifier: 'catalog:'
+        version: 1.1.0(pinia@3.0.4(typescript@5.9.3)(vue@3.5.32(typescript@5.9.3)))(vue@3.5.32(typescript@5.9.3))
       '@vueuse/core':
         specifier: 'catalog:'
-        version: 14.2.1(vue@3.5.30(typescript@5.9.3))
+        version: 14.2.1(vue@3.5.32(typescript@5.9.3))
       dayjs:
         specifier: 'catalog:'
         version: 1.11.20
@@ -450,7 +453,7 @@ importers:
         version: 3.0.1
       vue:
         specifier: ^3.5
-        version: 3.5.30(typescript@5.9.3)
+        version: 3.5.32(typescript@5.9.3)
     devDependencies:
       vite:
         specifier: npm:@voidzero-dev/vite-plus-core@^0.1.16

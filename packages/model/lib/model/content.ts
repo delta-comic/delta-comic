@@ -1,4 +1,5 @@
 import { useGlobalVar } from '@delta-comic/utils'
+import type { UseQueryReturn } from '@pinia/colada'
 import { type Component } from 'vue'
 
 import { SourcedKeyMap, type StreamQuery, type SourcedKeyType } from '../struct'
@@ -45,9 +46,9 @@ export abstract class ContentPage {
   public abstract plugin: string
   public abstract contentType: ContentType
 
-  public abstract fetchShortId: (signal?: AbortSignal) => Promise<string>
+  public abstract fetchShortId: (signal?: AbortSignal) => UseQueryReturn<string>
 
-  public abstract fetchDetail: (signal?: AbortSignal) => Promise<item.Item>
+  public abstract fetchDetail: (signal?: AbortSignal) => UseQueryReturn<item.Item>
 
   public abstract fetchRecommends: StreamQuery<item.Item>
 

@@ -5,7 +5,7 @@ catalog:
   '@aptabase/tauri': ^0.4.1
   '@lhlyu/vue-virtual-waterfall': 1.0.8
   '@octokit/rest': ^22.0.1
-  '@pinia/colada': ^1.0.0
+  '@pinia/colada': ^1.1.0
   '@sentry/vue': ^10.45.0
   '@tailwindcss/vite': ^4.2.1
   '@tauri-apps/api': ^2.10.1

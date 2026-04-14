@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/model",
-  "version": "1.3.6",
+  "version": "2.0.0",
   "description": "空阙虱楼",
   "homepage": "https://github.com/delta-comic/delta-comic",
   "license": "AGPL-3.0-only",
@@ -32,6 +32,7 @@
     "build": "vp build && pnpm pack --out ./dist/pack.tgz"
   },
   "dependencies": {
+    "@pinia/colada": "catalog:",
     "@vueuse/core": "catalog:",
     "dayjs": "catalog:",
     "mitt": "catalog:"
