@@ -2,6 +2,8 @@ name: Lint
 
 on:
   push:
+    paths: 
+      - packages
 
 permissions:
   contents: read

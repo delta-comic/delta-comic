@@ -92,7 +92,6 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./packages/app/src-tauri/gen/android/gradlew
-
       # - name: Build Android App
       #   id: build
       #   working-directory: packages/app
