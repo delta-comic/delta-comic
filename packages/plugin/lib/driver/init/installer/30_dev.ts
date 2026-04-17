@@ -1,5 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import axios from 'axios'
+import ky from 'ky'
 
 import { PluginInstaller, type PluginInstallerDescription } from '../utils'
 
@@ -10,13 +10,14 @@ export class _PluginInstallByDev extends PluginInstaller {
   }
   public override name = 'devUrl'
   private async installer(input: string): Promise<File> {
-    const res = await axios.request<string>({
-      url: `http://${/:\d+$/.test(input) ? input : input + ':6173'}/__vite-plugin-monkey.install.user.js?origin=http%3A%2F%2F${input}%3A6173`,
-      responseType: 'text'
-    })
+    const res = await ky
+      .get(
+        `http://${/:\d+$/.test(input) ? input : input + ':6173'}/__vite-plugin-monkey.install.user.js?origin=http%3A%2F%2F${input}%3A6173`
+      )
+      .text()
     const noPort = input.replace(/:\d+$/, '')
 
-    const processed = res.data.replaceAll('localhost', noPort).replaceAll('127.0.0.1', noPort)
+    const processed = res.replaceAll('localhost', noPort).replaceAll('127.0.0.1', noPort)
     return new File([processed], 'us.js')
   }
   public override async download(input: string): Promise<File> {

@@ -1,7 +1,7 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import { Octokit } from '@octokit/rest'
-import axios from 'axios'
 import { isEmpty } from 'es-toolkit/compat'
+import ky from 'ky'
 
 import { appConfig, useConfig } from '@/config'
 
@@ -27,11 +27,9 @@ export class _PluginInstallByNormalUrl extends PluginInstaller {
     const asset = release.assets[0]
     if (!asset) throw new Error('未找到资源')
 
-    const { data } = await axios.request<Blob>({
-      url: asset.browser_download_url,
-      responseType: 'blob',
-      timeout: 1000 * 60 * 5
-    })
+    const data = await ky
+      .get(asset.browser_download_url, { retry: 2, timeout: 1000 * 60 * 5 })
+      .blob()
 
     return new File([data], asset.name)
   }

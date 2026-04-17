@@ -2,7 +2,7 @@
 import { SharedFunction } from '@delta-comic/core'
 import { useNativeStore } from '@delta-comic/db'
 import { usePluginStore } from '@delta-comic/plugin'
-import { SmartAbortController } from '@delta-comic/request'
+import { ReuseableAbortController } from '@delta-comic/request'
 import { useZIndex } from '@delta-comic/ui'
 import { computedAsync } from '@vueuse/core'
 import { uniq } from 'es-toolkit'
@@ -34,7 +34,7 @@ const handleSearch = (text: string) => {
 }
 
 const pluginStore = usePluginStore()
-const thinkListAbort = new SmartAbortController()
+const thinkListAbort = new ReuseableAbortController()
 const thinkList = computedAsync<ThinkList>(async onCancel => {
   onCancel(() => thinkListAbort.abort())
   const { method, plugin } = source.value

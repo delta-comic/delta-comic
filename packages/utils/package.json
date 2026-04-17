@@ -37,12 +37,10 @@
     "mitt": "catalog:"
   },
   "devDependencies": {
-    "axios": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
-    "axios": "^1.13",
     "naive-ui": "^2.43",
     "vue": "^3.5",
     "vue-router": "^5.0"

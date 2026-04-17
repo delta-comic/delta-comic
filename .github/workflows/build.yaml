@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    if: ${{ github.event.head_commit && contains(github.event.head_commit.message, '[pub]') }}
+    if: ${{ contains(github.event.head_commit.message, '[pub]') }}
     runs-on: ubuntu-latest
     env:
       HUSKY: 0
@@ -92,18 +92,9 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./packages/app/src-tauri/gen/android/gradlew
-      # - name: Build Android App
-      #   id: build
-      #   working-directory: packages/app
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-      #     ANDROID_HOME: ${{ env.ANDROID_HOME }}
-      #     TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-      #   run: |
-      #     vp run build:app
 
       - name: Build Android App
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         id: build
         uses: tauri-apps/tauri-action@dev
         env:
@@ -121,6 +112,7 @@ jobs:
           node ./script/set-version.mts ${{ steps.set-version.outputs.old_version }}
 
       - name: Restore keystore (decode + verify)
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         env:
           KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -145,9 +137,11 @@ jobs:
           printf 'keyAlias=%s\n' "${{ secrets.ANDROID_KEY_ALIAS }}" >> keystore.properties
 
       - name: Install apksigner
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         run: sudo apt-get update && sudo apt-get install -y apksigner
 
       - name: Sign APK
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         env:
           KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -175,11 +169,13 @@ jobs:
           ls -la ./dist
 
       - name: Configure git author
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         run: |
           git config user.name "delta-comic-bot"
           git config user.email "delta-comic-bot@proton.me"
 
       - name: Run semantic-release
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

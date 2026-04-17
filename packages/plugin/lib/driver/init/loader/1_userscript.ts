@@ -31,17 +31,7 @@ class _PluginUserscriptLoader extends PluginLoader {
     const blob = new Blob([code.slice(0, lastIndex)], { type: 'text/javascript' })
 
     const url = URL.createObjectURL(blob)
-    const script = document.createElement('script')
-    script.addEventListener('load', () => {
-      URL.revokeObjectURL(url)
-    })
-    script.addEventListener('error', err => {
-      URL.revokeObjectURL(url)
-      throw err
-    })
-    script.async = true
-    script.src = url
-    document.body.appendChild(script)
+    await import(/* @vite-ignore */ url)
   }
   public override async decodeMeta(file: File): Promise<PluginArchiveDB.Meta> {
     const code = await file.text()

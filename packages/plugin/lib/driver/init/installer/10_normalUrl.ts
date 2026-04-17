@@ -1,5 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import axios from 'axios'
+import ky from 'ky'
 
 import { PluginInstaller, type PluginInstallerDescription } from '../utils'
 
@@ -10,13 +10,9 @@ export class _PluginInstallByFallbackUrl extends PluginInstaller {
   }
   public override name = 'fallbackUrl'
   private async installer(input: string): Promise<File> {
-    const res = await axios.request<Blob>({
-      url: input,
-      responseType: 'blob',
-      timeout: 1000 * 60 * 5
-    })
+    const res = await ky.get(input, { retry: 3, timeout: 1000 * 60 * 5 }).blob()
     const name = input.split('/').at(-1) ?? 'us.js'
-    return new File([res.data], name)
+    return new File([res], name)
   }
 
   public override async download(input: string): Promise<File> {

@@ -36,13 +36,11 @@
     "mitt": "catalog:"
   },
   "devDependencies": {
-    "axios": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {
-    "@delta-comic/utils": "workspace:*",
-    "axios": "^1.13"
+    "@delta-comic/utils": "workspace:*"
   },
   "release": {
     "tagFormat": "request-${version}"

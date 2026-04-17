@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SharedFunction } from '@delta-comic/core'
 import { useNativeStore } from '@delta-comic/db'
-import { SmartAbortController } from '@delta-comic/request'
+import { ReuseableAbortController } from '@delta-comic/request'
 import { useZIndex } from '@delta-comic/ui'
 import { computedAsync } from '@vueuse/core'
 import { uniq } from 'es-toolkit'
@@ -27,7 +27,7 @@ defineExpose({ inputEl, isSearching })
 const [zIndex] = useZIndex(isSearching)
 
 const history = useNativeStore(pluginName, 'search.history', new Array<string>())
-const thinkListAbort = new SmartAbortController()
+const thinkListAbort = new ReuseableAbortController()
 const thinkList = computedAsync<ThinkList>(async onCancel => {
   onCancel(() => thinkListAbort.abort())
   const st = text.value

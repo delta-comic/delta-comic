@@ -46,9 +46,9 @@ export abstract class ContentPage {
   public abstract plugin: string
   public abstract contentType: ContentType
 
-  public abstract fetchShortId: (signal?: AbortSignal) => UseQueryReturn<string>
+  public abstract fetchShortId(): UseQueryReturn<string>
 
-  public abstract fetchDetail: (signal?: AbortSignal) => UseQueryReturn<item.Item>
+  public abstract fetchDetail(): UseQueryReturn<item.Item>
 
   public abstract fetchRecommends: StreamQuery<item.Item>
 

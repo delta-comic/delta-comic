@@ -1,6 +1,6 @@
 import mitt from 'mitt'
 
-export class SmartAbortController implements AbortController {
+export class ReuseableAbortController implements AbortController {
   private _controller = new AbortController()
   private mitt = mitt<{ abort: void }>()
   public get signal() {

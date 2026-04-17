@@ -1,5 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import axios from 'axios'
+import ky from 'ky'
 
 import { PluginInstaller, type PluginInstallerDescription } from '../utils'
 
@@ -19,7 +19,9 @@ export class _PluginInstallByAwesome extends PluginInstaller {
   public override name = 'awesome'
   private async installer(input: string): Promise<File | string> {
     const id = input.replace(/^ap:/, '')
-    const { data } = await axios.get<ItemSchema>(`${linkBase}/${id}.json`, { responseType: 'json' })
+    const data = await ky
+      .get<ItemSchema>(`${id}.json`, { timeout: 1000 * 30, baseUrl: linkBase })
+      .json()
     return data.download
   }
   public override async download(input: string): Promise<File | string> {

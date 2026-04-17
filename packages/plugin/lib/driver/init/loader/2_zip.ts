@@ -44,16 +44,10 @@ class _PluginUserscriptLoader extends PluginLoader {
     if (!pluginMeta.meta.entry) throw new Error('not found entry')
     const baseDir = await getPluginFsPath(pluginMeta.pluginName)
     console.log('[loader zip] baseDir:', baseDir, pluginMeta.meta.entry)
-    const script = document.createElement('script')
-    script.addEventListener('error', err => {
-      throw err
-    })
-    script.type = 'module'
-    script.async = true
-    script.src = decodeURIComponent(
+    const src = decodeURIComponent(
       convertFileSrc(await join(baseDir, pluginMeta.meta.entry.jsPath), 'local')
     )
-    document.body.appendChild(script)
+    await import(/* @vite-ignore */ src)
 
     if (!pluginMeta.meta.entry?.cssPath) return
     const cssPath = pluginMeta.meta.entry.cssPath
