@@ -7,19 +7,26 @@ import { watch, shallowRef } from 'vue'
 import pkg from '../../package.json'
 
 const oct = new Octokit()
-const markdown = computedAsync(async () => {
-  // if (import.meta.env.DEV) return []
+const markdown = computedAsync(async onCancel => {
+  const { abort, signal } = new AbortController()
+  onCancel(() => {
+    abort()
+  })
   try {
     const releases = await oct.rest.repos.listReleases({
       owner: 'delta-comic',
       repo: 'delta-comic',
-      per_page: 20
+      per_page: 20,
+      request: {
+        signal
+      }
     })
     return releases.data
       .slice(
         0,
         releases.data.findIndex(v => v.tag_name == pkg.version)
       )
+      .filter(v => !v.prerelease && !v.draft)
       .map(r => [r.tag_name, r.body ?? `## ${r.tag_name}`] as const)
   } catch {
     return []

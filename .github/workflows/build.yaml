@@ -22,6 +22,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Rust
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android, armv7-linux-androideabi
@@ -40,6 +41,7 @@ jobs:
         run: vp install
 
       - name: JDK 23
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -47,11 +49,13 @@ jobs:
           cache: 'gradle'
 
       - name: Setup Android SDK
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         uses: android-actions/setup-android@v3.2.2
         with:
           log-accepted-android-sdk-licenses: false
 
       - name: Setup Android NDK
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         uses: nttld/setup-ndk@v1.5.0
         id: setup-ndk
         with:
@@ -61,6 +65,7 @@ jobs:
           add-to-path: true
 
       - name: Init android project
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         env:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
@@ -91,6 +96,7 @@ jobs:
           vp pm publish -r --no-git-checks || pnpm publish -r --no-git-checks || echo "no need to publish"
 
       - name: Make gradlew executable
+        if: ${{ !contains(github.event.head_commit.message, '[only-lib]') }}
         run: chmod +x ./packages/app/src-tauri/gen/android/gradlew
 
       - name: Build Android App
