@@ -1,6 +1,6 @@
 {
   "name": "delta-comic",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "private": true,
   "description": "Per Aspera, Ad Astra",
   "homepage": "https://github.com/delta-comic",
@@ -72,7 +72,7 @@
       "url": "https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg"
     }
   ],
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@11.2.2",
   "pnpm": {
     "onlyBuiltDependencies": [
       "core-js",
