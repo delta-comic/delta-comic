@@ -33,19 +33,19 @@ export default defineConfig({
         VantResolver(),
         MotionResolver(),
         NaiveUiResolver(),
-        trueBuild && (await import('@delta-comic/ui/vite')).DeltaComicUiResolver()
+        trueBuild && (await import('@delta-comic/ui/vite')).DeltaComicUiResolver(),
       ],
-      dtsTsx: false
+      dtsTsx: false,
     }),
-    tailwindcss()
+    tailwindcss(),
   ],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
-    extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts']
+    extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],
   },
   css: {
     transformer: 'lightningcss',
-    lightningcss: { targets: browserslistToTargets(browserslist('> 5%')) }
+    lightningcss: { targets: browserslistToTargets(browserslist('> 5%')) },
   },
   build: {
     // Tauri uses Chromium on Windows and WebKit on macOS and Linux
@@ -53,7 +53,7 @@ export default defineConfig({
     // don't minify for debug builds
     minify: !process.env.TAURI_ENV_DEBUG ? 'oxc' : false,
     // produce sourcemaps for debug builds
-    sourcemap: !!process.env.TAURI_ENV_DEBUG
+    sourcemap: !!process.env.TAURI_ENV_DEBUG,
   },
   base: '/',
   server: {
@@ -66,9 +66,9 @@ export default defineConfig({
 
     watch: {
       // tell vite to ignore watching `src-tauri`
-      ignored: ['**/src-tauri/**', 'src-tauri']
-    }
+      ignored: ['**/src-tauri/**', 'src-tauri'],
+    },
   },
   clearScreen: false,
-  envPrefix: ['VITE_', 'TAURI_ENV_*']
+  envPrefix: ['VITE_', 'TAURI_ENV_*'],
 } as UserConfig)

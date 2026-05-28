@@ -17,14 +17,12 @@ const markdown = computedAsync(async onCancel => {
       owner: 'delta-comic',
       repo: 'delta-comic',
       per_page: 20,
-      request: {
-        signal
-      }
+      request: { signal },
     })
     return releases.data
       .slice(
         0,
-        releases.data.findIndex(v => v.tag_name == pkg.version)
+        releases.data.findIndex(v => v.tag_name == pkg.version),
       )
       .filter(v => !v.prerelease && !v.draft)
       .map(r => [r.tag_name, r.body ?? `## ${r.tag_name}`] as const)

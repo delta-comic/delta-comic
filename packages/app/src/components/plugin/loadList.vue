@@ -11,7 +11,7 @@ const pluginStore = usePluginStore()
 const allErrors = computed(() =>
   Object.entries(pluginStore.pluginSteps)
     .filter(v => v[1].now.error)
-    .map(v => [v[0], v[1].now.error!] as [plugin: string, error: Error])
+    .map(v => [v[0], v[1].now.error!] as [plugin: string, error: Error]),
 )
 
 const rebootApp = () => {

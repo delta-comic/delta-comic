@@ -10,7 +10,7 @@ import { PluginInstaller, type PluginInstallerDescription } from '../utils'
 export class _PluginInstallByNormalUrl extends PluginInstaller {
   public override description: PluginInstallerDescription = {
     title: '通过Github安装插件',
-    description: '输入形如: "gh:owner/repo"的内容'
+    description: '输入形如: "gh:owner/repo"的内容',
   }
   public override name = 'github'
   private async installer(input: string): Promise<File> {

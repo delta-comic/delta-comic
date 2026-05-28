@@ -26,8 +26,8 @@ const app = useAppStore()
 
 const tabItem = computed(() =>
   Array.from(Global.tabbar.entries()).flatMap(pair =>
-    pair[1].map(val => ({ title: val.title, name: val.id, queries: { plugin: pair[0] } }))
-  )
+    pair[1].map(val => ({ title: val.title, name: val.id, queries: { plugin: pair[0] } })),
+  ),
 )
 </script>
 
@@ -35,7 +35,7 @@ const tabItem = computed(() =>
   <div class="w-full bg-(--van-background-2) pt-safe"></div>
   <header
     :class="[
-      isShowNavBar ? 'translate-y-0' : '-translate-y-[calc(var(--safe-area-inset-top)+100%)]'
+      isShowNavBar ? 'translate-y-0' : '-translate-y-[calc(var(--safe-area-inset-top)+100%)]',
     ]"
     class="relative flex h-13.5 w-full items-center overflow-hidden bg-(--van-background-2) transition-transform duration-200 *:overflow-hidden"
   >
@@ -67,7 +67,7 @@ const tabItem = computed(() =>
     :class="[
       isShowNavBar
         ? 'translate-y-0'
-        : '-translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]'
+        : '-translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]',
     ]"
   >
     <DcRouterTab
@@ -78,9 +78,9 @@ const tabItem = computed(() =>
           v =>
             ({
               ...v,
-              route: { name: '/main/home/[id]', params: { id: v.name }, query: v.queries }
-            }) as const
-        )
+              route: { name: '/main/home/[id]', params: { id: v.name }, query: v.queries },
+            }) as const,
+        ),
       ]"
     />
     <VanIcon
@@ -106,7 +106,7 @@ const tabItem = computed(() =>
     :class="[
       isShowNavBar
         ? 'h-[calc(100%-var(--van-tabs-line-height)-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0'
-        : 'h-[calc(100%-var(--safe-area-inset-top)-var(--van-tabs-line-height))]! -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]'
+        : 'h-[calc(100%-var(--safe-area-inset-top)-var(--van-tabs-line-height))]! -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]',
     ]"
   >
     <RouterView />

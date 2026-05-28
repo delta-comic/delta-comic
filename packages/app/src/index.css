@@ -8,7 +8,6 @@
 @plugin 'tailwindcss-safe-area-capacitor';
 
 @import '@delta-comic/ui/style.css';
-@import '@delta-comic/plugin/style.css';
 
 * {
   user-select: none;

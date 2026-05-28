@@ -29,7 +29,7 @@ export interface SearchMethod {
   fetchSearchResult: StreamQuery<uni.item.Item, { input: string; sort: string }>
   getAutoComplete(
     input: string,
-    signal: AbortSignal
+    signal: AbortSignal,
   ): PromiseLike<({ text: string; value: string } | Component)[]>
 }
 
@@ -65,7 +65,7 @@ export type RouteToContent = (
   contentType_: uni.content.ContentType_,
   id: string,
   ep: string,
-  preload?: uni.item.Item
+  preload?: uni.item.Item,
 ) => PromiseLike<any>
 
 export interface Barcode {

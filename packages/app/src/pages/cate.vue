@@ -17,7 +17,7 @@ const pluginStore = usePluginStore()
         </NH1>
         <div
           v-for="[namespace, category] in Object.entries(
-            Object.groupBy(categories, v => v.namespace)
+            Object.groupBy(categories, v => v.namespace),
           )"
           class="mx-auto mb-2 w-[calc(100%-8px)] rounded-2xl bg-(--van-background-2) py-3"
         >
@@ -31,7 +31,7 @@ const pluginStore = usePluginStore()
                   'routeToSearch',
                   cate.search.input,
                   [plugin, cate.search.methodId],
-                  cate.search.sort
+                  cate.search.sort,
                 )
               "
             >

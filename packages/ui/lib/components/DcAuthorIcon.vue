@@ -12,7 +12,7 @@ const $props = defineProps<{
 const icon = computed(() =>
   isString($props.author.icon)
     ? uni.item.Item.authorIcon.get([$props.author.$$plugin, $props.author.icon])!
-    : uni.image.Image.create($props.author.icon)
+    : uni.image.Image.create($props.author.icon),
 )
 </script>
 

@@ -7,7 +7,7 @@ import monkey from 'vite-plugin-monkey'
 
 export const deltaComic = (
   meta: PluginArchiveDB.Meta,
-  command: 'build' | 'serve'
+  command: 'build' | 'serve',
 ): PluginOption => {
   const isServer = command == 'serve'
   const plugin: Plugin = {
@@ -20,25 +20,25 @@ export const deltaComic = (
             fileName: 'index',
             cssFileName: 'index',
             name: `$$lib$$.__DcPlugin__${meta.name.id.replace('-', '_')}__`,
-            formats: ['es']
-          }
-        }
+            formats: ['es'],
+          },
+        },
       })
     },
     generateBundle() {
       this.emitFile({
         type: 'asset',
         fileName: 'manifest.json',
-        source: JSON.stringify(meta, null, 2)
+        source: JSON.stringify(meta, null, 2),
       })
-    }
+    },
   }
   return [
     external(
       Object.fromEntries(
-        Object.entries(extendsDepends).map(([key, val]) => [key, val.split('.').slice(1)])
+        Object.entries(extendsDepends).map(([key, val]) => [key, val.split('.').slice(1)]),
       ),
-      { disableInServe: false }
+      { disableInServe: false },
     ),
     ...(isServer
       ? [
@@ -46,9 +46,9 @@ export const deltaComic = (
             entry: meta.entry?.jsPath ?? 'src/main.ts',
             userscript: { description: JSON.stringify(meta) },
             build: { externalGlobals: isServer ? {} : extendsDepends },
-            server: { mountGmApi: false, open: false, prefix: '[DEV] ' }
-          })
+            server: { mountGmApi: false, open: false, prefix: '[DEV] ' },
+          }),
         ]
-      : [plugin])
+      : [plugin]),
   ]
 }

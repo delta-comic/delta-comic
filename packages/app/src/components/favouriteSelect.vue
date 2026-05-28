@@ -15,14 +15,14 @@ const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())
 const { state: allFavouriteCards } = FavouriteDB.useQueryCard(
   db => db.selectAll().execute(),
   [],
-  () => []
+  () => [],
 )
 
 const getCardCount = (createAt: FavouriteDB.Card['createAt']) =>
   FavouriteDB.useQueryItem(
     db => DBUtils.countDb(db.where('belongTo', '=', createAt)),
     [createAt],
-    () => 0
+    () => 0,
   )
 
 const isShow = shallowRef(false)
@@ -63,19 +63,11 @@ const { upsert: upsertItem } = FavouriteDB.useUpsertItem()
 
 const favouriteThis = (inCard: FavouriteDB.Card['createAt'][]) =>
   DBUtils.withTransition(trx =>
-    Promise.all(
-      inCard.map(card =>
-        upsertItem({
-          item: $props.item,
-          belongTos: [card],
-          trx
-        })
-      )
-    )
+    Promise.all(inCard.map(card => upsertItem({ item: $props.item, belongTos: [card], trx }))),
   )
 
 const { data: thisFavouriteCount } = FavouriteDB.useQueryItem(db =>
-  DBUtils.countDb(db.where('itemKey', '=', $props.item.id))
+  DBUtils.countDb(db.where('itemKey', '=', $props.item.id)),
 )
 </script>
 

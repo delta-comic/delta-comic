@@ -6,7 +6,7 @@ import { SourcedKeyMap, Struct, type Metadata, type Metadatable } from '../struc
 
 export type ProcessInstance = (
   nowPath: string,
-  resource: Resource
+  resource: Resource,
 ) => Promise<[path: string, exit: boolean]>
 export interface ProcessStep {
   referenceName: string
@@ -27,16 +27,16 @@ export interface RawResource extends Metadatable {
 export class Resource extends Struct<RawResource> implements RawResource {
   public static processInstances = useGlobalVar(
     SourcedKeyMap.createReactive<[plugin: string, referenceName: string], ProcessInstance>(),
-    'uni/resource/processInstances'
+    'uni/resource/processInstances',
   )
 
   public static fork = useGlobalVar(
     SourcedKeyMap.createReactive<[plugin: string, type: string], ResourceType>(),
-    'uni/resource/fork'
+    'uni/resource/fork',
   )
   public static precedenceFork = useGlobalVar(
     SourcedKeyMap.createReactive<[plugin: string, type: string], string>(),
-    'uni/resource/precedenceFork'
+    'uni/resource/precedenceFork',
   )
 
   public static is(value: unknown): value is Resource {
@@ -52,7 +52,7 @@ export class Resource extends Struct<RawResource> implements RawResource {
     this.pathname = v.pathname
     this.type = v.type
     this.processSteps = (v.processSteps ?? []).map<ProcessStep>(v =>
-      isString(v) ? { referenceName: v, ignoreExit: false } : v
+      isString(v) ? { referenceName: v, ignoreExit: false } : v,
     )
   }
   public type: string
@@ -67,7 +67,7 @@ export class Resource extends Struct<RawResource> implements RawResource {
       const instance = Resource.processInstances.get([this.$$plugin, option.referenceName])
       if (!instance) {
         console.warn(
-          `[Resource.getUrl] process not found, fullname: [${this.$$plugin}, ${option.referenceName}]`
+          `[Resource.getUrl] process not found, fullname: [${this.$$plugin}, ${option.referenceName}]`,
         )
         continue
       }
@@ -93,7 +93,7 @@ export class Resource extends Struct<RawResource> implements RawResource {
     }
     if (!fork)
       throw new Error(
-        `[Resource.getThisFork] fork not found, type: [${this.$$plugin}, ${this.type}]`
+        `[Resource.getThisFork] fork not found, type: [${this.$$plugin}, ${this.type}]`,
       )
     return fork
   }

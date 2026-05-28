@@ -25,13 +25,7 @@ const cancel = () => {
 const { createCard } = FavouriteDB.useCreateCard()
 
 const onSubmit = async () => {
-  await createCard({
-    card: {
-      ...formData.value,
-      private: false,
-      createAt: Date.now()
-    }
-  })
+  await createCard({ card: { ...formData.value, private: false, createAt: Date.now() } })
   formData.value = formDataRaw
   show.value = false
 }

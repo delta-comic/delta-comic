@@ -26,7 +26,7 @@ const confirmAdd = async (url: string) => {
       },
       onNegativeClick: () => {
         isAdding.value = false
-      }
+      },
     })
     await installPlugin(url)
   } catch (error) {

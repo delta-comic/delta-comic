@@ -14,7 +14,7 @@ const $props = withDefaults(
       contentDraggable?: boolean
     } & StyleProps
   >(),
-  { anchors: 'high', lockScroll: false, contentDraggable: false }
+  { anchors: 'high', lockScroll: false, contentDraggable: false },
 )
 
 const isShow = shallowRef(false)
@@ -28,14 +28,14 @@ const anchors = computed(() =>
           0,
           Math.round(0.4 * windowHeight.value),
           Math.round(0.7 * windowHeight.value),
-          windowHeight.value
+          windowHeight.value,
         ]
       : [
           0,
           Math.round(0.3 * windowHeight.value),
           Math.round(0.6 * windowHeight.value),
-          Math.round(0.9 * windowHeight.value)
-        ]
+          Math.round(0.9 * windowHeight.value),
+        ],
 )
 
 const height = shallowRef(0)
@@ -47,8 +47,8 @@ const [zIndex, isLast] = useZIndex(
     set(show) {
       if (show) return (height.value = anchors.value[2])
       height.value = 0
-    }
-  })
+    },
+  }),
 )
 usePreventBack(isShow, isLast)
 
@@ -61,7 +61,7 @@ defineExpose({
     isShow.value = false
   },
   isShowing: shallowReadonly(isShow),
-  height: shallowReadonly(height)
+  height: shallowReadonly(height),
 })
 
 defineSlots<{ default(arg: { height: number }): void }>()
@@ -82,7 +82,7 @@ defineSlots<{ default(arg: { height: number }): void }>()
         :class="
           cn(
             'overflow-hidden border-0 border-t border-solid border-(--van-border-color)',
-            $props.class
+            $props.class,
           )
         "
       >

@@ -18,7 +18,7 @@ const { state: recentState } = RecentDB.useQuery(
       .orderBy('recentView.timestamp', 'desc')
       .execute(),
   [],
-  () => []
+  () => [],
 )
 
 const searcher = useTemplateRef('searcher')
@@ -49,10 +49,10 @@ const filters = useNativeStore(pluginName, 'recentView.filter', new Array<string
               content: `你确认删除${sel.length}项?`,
               positiveText: '确定',
               negativeText: '取消',
-              onPositiveClick: () => removeItems(sel)
+              onPositiveClick: () => removeItems(sel),
             })
-          }
-        }
+          },
+        },
       ]"
       :values="recent"
       v-slot="{ ActionBar, SelectPacker }"

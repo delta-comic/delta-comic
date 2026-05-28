@@ -20,7 +20,7 @@ export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise
           value={searchText}
           class='van-haptics-feedback w-full'
         />
-      ))
-    )
+      )),
+    ),
   )
 }

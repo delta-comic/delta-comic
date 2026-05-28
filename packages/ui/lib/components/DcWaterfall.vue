@@ -20,15 +20,8 @@ const $props = withDefaults(
   defineProps<
     {
       source:
-        | {
-            type: 'query'
-            value: UseQueryReturn<T[]>
-            next?: () => any
-          }
-        | {
-            type: 'infinite'
-            value: UseInfiniteQueryReturn<T[]>
-          }
+        | { type: 'query'; value: UseQueryReturn<T[]>; next?: () => any }
+        | { type: 'infinite'; value: UseInfiniteQueryReturn<T[]> }
         | {
             type: 'stream'
             value: UseInfiniteQueryReturn<Awaited<ReturnType<StreamQuery<T>['query']>>>
@@ -48,11 +41,11 @@ const $props = withDefaults(
       unReloadable?: boolean
     } & StyleProps
   >(),
-  { padding: 4, col: 2, gap: 4, minHeight: 0 }
+  { padding: 4, col: 2, gap: 4, minHeight: 0 },
 )
 
 const column = computed(
-  () => (isArray($props.col) ? $props.col : [$props.col, $props.col]) as [min: number, max: number]
+  () => (isArray($props.col) ? $props.col : [$props.col, $props.col]) as [min: number, max: number],
 )
 
 const dataProcessor = (v: T[]) => $props.dataProcessor?.(v) ?? v
@@ -73,15 +66,15 @@ const source = computed(() =>
             if ($props.source.type != 'query') return
             return $props.source.value.refresh(false)
           },
-          next: $props.source.next
+          next: $props.source.next,
         }
       case 'stream':
         return {
           data: dataProcessor(
             $props.source.value.data.value?.pages.reduce(
               (acc, v) => acc.concat(v.data),
-              new Array<T>()
-            ) ?? []
+              new Array<T>(),
+            ) ?? [],
           ),
           isDone: $props.source.value.hasNextPage.value,
           isLoading: $props.source.value.isLoading.value,
@@ -97,7 +90,7 @@ const source = computed(() =>
           next() {
             if ($props.source.type != 'infinite') return
             return $props.source.value.loadNextPage({ cancelRefetch: true })
-          }
+          },
         }
       case 'infinite':
         return {
@@ -116,7 +109,7 @@ const source = computed(() =>
           next() {
             if ($props.source.type != 'stream') return
             return $props.source.value.loadNextPage({ cancelRefetch: true })
-          }
+          },
         }
       case 'array':
       default:
@@ -127,10 +120,10 @@ const source = computed(() =>
           error: undefined,
           refetch: $props.source.refetch,
           refresh: $props.source.refresh,
-          next: $props.source.next
+          next: $props.source.next,
         }
     }
-  })()
+  })(),
 )
 
 const isPullRefreshHold = shallowRef(false)
@@ -161,7 +154,7 @@ useEventListener(
       else next?.()
     }
   },
-  { target: <Ref<HTMLDivElement>>scrollParent }
+  { target: <Ref<HTMLDivElement>>scrollParent },
 )
 // i remove a watch
 
@@ -170,7 +163,7 @@ const waterfallEl = useTemplateRef('waterfallEl')
 const waterfallIndex = useTemp().$apply('waterfall', () => ({ top: 0 }))
 const thisIndex = waterfallIndex.top++
 const sizeMapTemp = useTemp().$applyRaw(`waterfall:${thisIndex}`, () =>
-  shallowReactive(new Map<T, number>())
+  shallowReactive(new Map<T, number>()),
 )
 
 const sizeWatcherCleaner = new Array<VoidFunction>()
@@ -209,7 +202,7 @@ defineExpose({
     sizeMapTemp.clear()
     await nextTick()
     reloadController.value = true
-  }
+  },
 })
 
 defineSlots<{
@@ -245,7 +238,7 @@ defineSlots<{
         data: source.data,
         error: source.error,
         isLoading: source.isLoading,
-        refetch: source.refetch
+        refetch: source.refetch,
       }"
       classLoading="mt-2 !h-[24px]"
       classEmpty="h-full!"

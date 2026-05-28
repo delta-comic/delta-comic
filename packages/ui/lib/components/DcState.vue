@@ -7,16 +7,9 @@ import { cn } from '@/utils'
 
 import type { StyleProps } from '../utils'
 
-defineProps<
-  {
-    state: T
-    contentClass?: ClassNameValue
-  } & StyleProps
->()
+defineProps<{ state: T; contentClass?: ClassNameValue } & StyleProps>()
 
-defineSlots<{
-  default(args: { data: T['data'] }): any
-}>()
+defineSlots<{ default(args: { data: T['data'] }): any }>()
 </script>
 
 <template>

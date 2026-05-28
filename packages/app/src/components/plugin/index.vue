@@ -23,16 +23,16 @@ const menuOptions = [
     label: '管理',
     key: 'list',
     icon: renderIcon(Icons.material.AutoAwesomeMosaicOutlined),
-    comp: List
+    comp: List,
   },
   {
     label: '安装',
     key: 'download',
     icon: renderIcon(Icons.material.FileDownloadOutlined),
-    comp: Download
+    comp: Download,
   },
   { label: '配置', key: 'config', icon: renderIcon(Icons.antd.SettingOutlined), comp: Config },
-  { label: `版本: ${pkg.version}`, key: 'version', disabled: true }
+  { label: `版本: ${pkg.version}`, key: 'version', disabled: true },
 ] satisfies MenuOption[]
 const isBooting = shallowRef(false)
 const boot = async (safe = false) => {
@@ -78,7 +78,7 @@ const $message = useMessage()
       <ActionButtonGroup
         :actions="[
           { title: '安全启动', icon: Icons.antd.SafetyOutlined, onClick: () => boot(true) },
-          { title: '启动', icon: Icons.material.CheckRound, onClick: () => boot(false) }
+          { title: '启动', icon: Icons.material.CheckRound, onClick: () => boot(false) },
         ]"
       />
       <template #description>

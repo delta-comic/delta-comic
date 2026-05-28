@@ -22,7 +22,7 @@ export class Image extends Resource {
         $$meta: { ...v.$$meta, aspect },
         pathname: v.path,
         type: v.forkNamespace,
-        processSteps: v.processSteps
+        processSteps: v.processSteps,
       })
     else super(v)
   }

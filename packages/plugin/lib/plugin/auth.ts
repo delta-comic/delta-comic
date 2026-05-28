@@ -9,7 +9,7 @@ export interface Config {
 
 export type Method = {
   form<T extends FormType.Configure>(
-    form: T
+    form: T,
   ): Promise<{
     [x in keyof T]: FormType.SingleResult<T[x]>
   }>

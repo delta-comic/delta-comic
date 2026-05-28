@@ -11,7 +11,7 @@ import * as item from './item'
 export type ContentPageLike = new (
   preload: item.Item | undefined,
   id: string,
-  ep: string
+  ep: string,
 ) => ContentPage
 
 export type ContentType_ = SourcedKeyType<typeof ContentPage.contentPages>
@@ -31,17 +31,17 @@ export type LayoutComponent = Component<
 export abstract class ContentPage {
   public static layouts = useGlobalVar(
     SourcedKeyMap.createReactive<ContentType, LayoutComponent>(),
-    'uni/contentPage/layouts'
+    'uni/contentPage/layouts',
   )
   public static contentPages = useGlobalVar(
     SourcedKeyMap.createReactive<[plugin: string, name: string], ContentPageLike>(),
-    'uni/contentPage/contentPages'
+    'uni/contentPage/contentPages',
   )
 
   constructor(
     public preload: item.Item | undefined,
     public id: string,
-    public ep: string
+    public ep: string,
   ) {}
   public abstract plugin: string
   public abstract contentType: ContentType

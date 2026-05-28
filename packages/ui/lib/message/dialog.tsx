@@ -69,7 +69,7 @@ export const createDialog = (options: DialogOptions & { style?: CSSProperties })
     onAfterLeave() {
       options.onAfterLeave?.()
       stop()
-    }
+    },
   })
   result.ins = dialog
   return result

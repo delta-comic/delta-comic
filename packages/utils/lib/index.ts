@@ -47,7 +47,7 @@ export const extendsDepends: ExternalLib = {
   '@delta-comic/core': 'window.$$lib$$.DcCore',
   '@delta-comic/plugin': 'window.$$lib$$.DcPlugin',
   '@delta-comic/utils': 'window.$$lib$$.DcUtils',
-  '@delta-comic/db': 'window.$$lib$$.DcDb'
+  '@delta-comic/db': 'window.$$lib$$.DcDb',
 }
 
 declare module 'vue-router' {

@@ -15,7 +15,7 @@ import {
   withDirectives,
   vShow,
   TransitionGroup,
-  nextTick
+  nextTick,
 } from 'vue'
 
 import { CloseRound, ReloadOutlined, DoneRound, FileDownloadRound } from '@/components/icons'
@@ -30,20 +30,20 @@ export interface DownloadMessageLoading {
 export interface DownloadMessageBind {
   createProgress<TResult>(
     title: string,
-    fn: (ins: Reactive<DownloadMessageProgress>) => Promise<TResult>
+    fn: (ins: Reactive<DownloadMessageProgress>) => Promise<TResult>,
   ): Promise<TResult>
   createLoading<TResult>(
     title: string,
-    fn: (ins: Reactive<DownloadMessageLoading>) => Promise<TResult>
+    fn: (ins: Reactive<DownloadMessageLoading>) => Promise<TResult>,
   ): Promise<TResult>
 }
 const allDownloadMessagesIsMinsize = useGlobalVar(
   reactive(new Array<boolean | undefined>()),
-  'utils/message/allDownloadMessagesIsMinsize'
+  'utils/message/allDownloadMessagesIsMinsize',
 )
 export const createDownloadMessage = async <T,>(
   title: string,
-  bind: (method: DownloadMessageBind) => Promise<T>
+  bind: (method: DownloadMessageBind) => Promise<T>,
 ): Promise<T> => {
   const index = allDownloadMessagesIsMinsize.length
   allDownloadMessagesIsMinsize[index] = false
@@ -57,7 +57,7 @@ export const createDownloadMessage = async <T,>(
         progress?: number
         pc: PromiseWithResolvers<any>
       } & ({ state: 'success' | undefined } | { state: 'error'; error: Error })
-    >()
+    >(),
   )
   const minsize = ref(false)
   const minsizeWatcher = watch(
@@ -66,7 +66,7 @@ export const createDownloadMessage = async <T,>(
       if (min) allDownloadMessagesIsMinsize[index] = true
       else allDownloadMessagesIsMinsize[index] = false
     },
-    { immediate: true }
+    { immediate: true },
   )
   const indexOnMinList = computed(() => {
     const afters = allDownloadMessagesIsMinsize.slice(0, index)
@@ -88,15 +88,15 @@ export const createDownloadMessage = async <T,>(
             paddingBlock: '2px',
             position: 'fixed',
             left: `${indexOnMinList.value * 40 + 8}px`,
-            top: 'calc(var(--safe-area-inset-top) + 4px)'
+            top: 'calc(var(--safe-area-inset-top) + 4px)',
           },
           maxsize: {
             borderRadius: '8px',
             width: '90vw',
             paddingInline: '8px',
             paddingBlock: '12px',
-            height: 'fit-content'
-          }
+            height: 'fit-content',
+          },
         }}
         onDragEnd={(_, { offset }) => offset.y < -30 && (minsize.value = true)}
         animate={minsize.value ? 'minsize' : 'maxsize'}
@@ -147,7 +147,7 @@ export const createDownloadMessage = async <T,>(
                         show-indicator={false}
                         class={[
                           'transition-all **:in-[.n-progress-graph-line-fill]:hidden!',
-                          v.state == 'error' && v.retry ? 'w-[60%]!' : 'w-[95%]!'
+                          v.state == 'error' && v.retry ? 'w-[60%]!' : 'w-[95%]!',
                         ]}
                         height={7}
                         status={v.state}
@@ -170,7 +170,7 @@ export const createDownloadMessage = async <T,>(
                                   <NIcon>
                                     <CloseRound />
                                   </NIcon>
-                                )
+                                ),
                               }}
                             </NButton>
                             <NButton tertiary circle onClick={v.retry} class='size-10!'>
@@ -179,11 +179,11 @@ export const createDownloadMessage = async <T,>(
                                   <NIcon>
                                     <ReloadOutlined />
                                   </NIcon>
-                                )
+                                ),
                               }}
                             </NButton>
                           </div>,
-                          [[vShow, v.state == 'error' && v.retry]]
+                          [[vShow, v.state == 'error' && v.retry]],
                         )}
                       </Transition>
                     </div>
@@ -201,13 +201,13 @@ export const createDownloadMessage = async <T,>(
         </Transition>
       </motion.div>
     ),
-    duration: 0
+    duration: 0,
   })
 
   const createLine = <T extends object, TResult extends PromiseLike<any>>(
     title: string,
     config: T,
-    fn: (config: Reactive<{ description: string; retryable: boolean } & T>) => TResult
+    fn: (config: Reactive<{ description: string; retryable: boolean } & T>) => TResult,
   ) => {
     const pc = Promise.withResolvers<Awaited<TResult>>()
     const state = ref<(typeof messageList)[number]['state']>()
@@ -223,10 +223,10 @@ export const createDownloadMessage = async <T,>(
           error,
           pc,
           retry: _config.retryable ? call : undefined,
-          ..._config
+          ..._config,
         }
       },
-      { immediate: true }
+      { immediate: true },
     )
     const call = async () => {
       state.value = undefined

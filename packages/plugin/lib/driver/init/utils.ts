@@ -20,14 +20,16 @@ export abstract class PluginInstaller {
 
 export abstract class PluginLoader {
   public abstract name: string
-  public abstract load(pluginMeta: PluginArchiveDB.Archive): Promise<PluginConfigFactory | undefined>
+  public abstract load(
+    pluginMeta: PluginArchiveDB.Archive,
+  ): Promise<PluginConfigFactory | undefined>
   public abstract install(file: File): Promise<PluginArchiveDB.Meta>
   public abstract decodeMeta(file: File): Promise<PluginArchiveDB.Meta>
   public abstract canInstall(file: File): boolean
 }
 
 export type PluginBooterSetMeta = (
-  meta: Partial<{ description: string; name: string }> | string
+  meta: Partial<{ description: string; name: string }> | string,
 ) => void
 
 export abstract class PluginBooter {
@@ -35,6 +37,6 @@ export abstract class PluginBooter {
   public abstract call(
     cfg: PluginConfig,
     setMeta: PluginBooterSetMeta,
-    env: Record<any, any>
+    env: Record<any, any>,
   ): Promise<any>
 }

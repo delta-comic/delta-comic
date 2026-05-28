@@ -13,7 +13,7 @@ const packageJsonPaths = [
   '../packages/plugin/package.json',
   '../packages/ui/package.json',
   '../packages/utils/package.json',
-  '../packages/vite/package.json'
+  '../packages/vite/package.json',
 ]
 const cargoTomlPaths = ['../packages/app/src-tauri/Cargo.toml']
 export async function setVersion(version: string) {

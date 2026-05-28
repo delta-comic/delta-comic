@@ -10,7 +10,7 @@ const item = computed(
   () =>
     pluginStore.plugins
       .get(plugin)
-      ?.user?.userActionPages?.map(v => v.items.find(item => item.key == key)!)[0]
+      ?.user?.userActionPages?.map(v => v.items.find(item => item.key == key)!)[0],
 )
 </script>
 

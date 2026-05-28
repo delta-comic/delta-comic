@@ -21,7 +21,7 @@ defineExpose({ isSearching, searchText })
           ? 'right-1 w-[calc(100%-8px)] rounded-lg'
           : isEmpty(searchText)
             ? 'pointer-events-none right-10.25 w-1/2 rounded-full opacity-0!'
-            : 'right-10.25 ml-3 w-1/2 rounded-full'
+            : 'right-10.25 ml-3 w-1/2 rounded-full',
       ]"
       class="absolute z-1000! flex h-9 items-center border border-solid border-gray-400 bg-(--van-background-2) px-1 text-gray-400 opacity-100 transition-all duration-200"
     >

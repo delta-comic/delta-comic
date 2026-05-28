@@ -35,7 +35,7 @@ const { toggle } = PluginArchiveDB.useToggleEnable()
 const codeArchives = PluginArchiveDB.useQuery(
   db => db.selectAll().execute(),
   [],
-  () => []
+  () => [],
 )
 const { remove } = PluginArchiveDB.useRemove()
 </script>
@@ -66,14 +66,14 @@ const { remove } = PluginArchiveDB.useRemove()
               :actions="[
                 {
                   text: plugin.enable ? '禁用' : '启用',
-                  onClick: () => void toggle({ keys: [plugin.pluginName] })
+                  onClick: () => void toggle({ keys: [plugin.pluginName] }),
                 },
                 { text: '删除', onClick: () => void remove({ keys: [plugin.pluginName] }) },
                 {
                   text: '从下载源更新',
                   disabled: updating.has(plugin.pluginName),
-                  onClick: () => updatePlugin(plugin)
-                }
+                  onClick: () => updatePlugin(plugin),
+                },
               ]"
               placement="left-start"
               @select="v => v.onClick()"

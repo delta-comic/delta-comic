@@ -12,10 +12,10 @@ async function up(db: Kysely<any>) {
     .addPrimaryKeyConstraint('primary_key', ['addTime', 'belongTo', 'itemKey'])
     .addUniqueConstraint('uniqueKey', ['belongTo', 'itemKey'])
     .addForeignKeyConstraint('itemKeyForeign', ['itemKey'], 'itemStore', ['key'], cb =>
-      cb.onDelete('cascade')
+      cb.onDelete('cascade'),
     )
     .addForeignKeyConstraint('belongToForeign', ['belongTo'], 'favouriteCard', ['createAt'], cb =>
-      cb.onDelete('cascade')
+      cb.onDelete('cascade'),
     )
     .execute()
 
@@ -48,10 +48,10 @@ async function down(db: Kysely<any>) {
     .addPrimaryKeyConstraint('primary_key', ['addTime', 'belongTo', 'itemKey'])
     .addUniqueConstraint('uniqueKey', ['belongTo', 'itemKey'])
     .addForeignKeyConstraint('itemKeyForeign', ['itemKey'], 'itemStore', ['createAt'], cb =>
-      cb.onDelete('cascade')
+      cb.onDelete('cascade'),
     )
     .addForeignKeyConstraint('belongToForeign', ['belongTo'], 'favouriteCard', ['key'], cb =>
-      cb.onDelete('cascade')
+      cb.onDelete('cascade'),
     )
     .execute()
 

@@ -11,7 +11,7 @@ import {
   nextTick,
   shallowRef,
   useTemplateRef,
-  watch
+  watch,
 } from 'vue'
 
 import { cn } from '@/utils'
@@ -37,7 +37,7 @@ const $props = withDefaults(
     fetchpriority?: 'high' | 'low' | 'auto'
     fallback?: uni.image.Image_
   }>(),
-  { fetchpriority: 'auto', retryMax: 4 }
+  { fetchpriority: 'auto', retryMax: 4 },
 )
 const src = computedAsync(async () => {
   try {
@@ -79,7 +79,7 @@ const handleFail = async () => {
 
 const temp = useTemp().$apply('imageState', () => ({
   loaded: new Set<string>(),
-  error: new Set<string>()
+  error: new Set<string>(),
 }))
 const images = $props.cacheList ?? temp
 const show = shallowRef(true)
@@ -132,7 +132,7 @@ const NImg = window.$api.NImage as typeof NImage
       :imgProps="{
         ...imgProp,
         class: cn(imgProp?.class, 'w-full'),
-        fetchpriority: $props.fetchpriority
+        fetchpriority: $props.fetchpriority,
       }"
       :class="cls"
       :style
@@ -163,7 +163,7 @@ const NImg = window.$api.NImage as typeof NImage
         :imgProps="{
           ...imgProp,
           class: cn(imgProp?.class, 'w-full'),
-          fetchpriority: $props.fetchpriority
+          fetchpriority: $props.fetchpriority,
         }"
         :class="cls"
         :style

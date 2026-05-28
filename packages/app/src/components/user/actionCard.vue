@@ -22,7 +22,7 @@ const pluginStore = usePluginStore()
           @click="
             $router.force.push({
               name: '/user/action/[plugin]/[key]',
-              params: { plugin: pluginName, key: item.key }
+              params: { plugin: pluginName, key: item.key },
             })
           "
           span="1"

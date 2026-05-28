@@ -19,7 +19,7 @@ export * as RecentDB from './recentView'
 
 const migrations = import.meta.glob<Migration>('./migrations/*.ts', {
   eager: true,
-  import: 'default'
+  import: 'default',
 })
 
 export interface DB {
@@ -39,7 +39,7 @@ export const db = useGlobalVar(
   await (async () => {
     const db = new Kysely<DB>({
       dialect: new TauriSqliteDialect({ database }),
-      plugins: [new CamelCasePlugin(), new SerializePlugin()]
+      plugins: [new CamelCasePlugin(), new SerializePlugin()],
     })
 
     const migrator = new Migrator({
@@ -47,13 +47,13 @@ export const db = useGlobalVar(
       provider: {
         async getMigrations() {
           return migrations
-        }
-      }
+        },
+      },
     })
     await migrator.migrateToLatest()
     return db
   })(),
-  'core/db/ins'
+  'core/db/ins',
 )
 
 export * as DBUtils from './utils'

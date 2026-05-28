@@ -12,14 +12,14 @@ const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())
 const { state: allFavouriteCards } = FavouriteDB.useQueryCard(
   db => db.selectAll().execute(),
   [],
-  () => []
+  () => [],
 )
 
 const getCardItemCount = (belongTo: FavouriteDB.Card['createAt']) =>
   FavouriteDB.useQueryItem(
     db => DBUtils.countDb(db.where('belongTo', '=', belongTo)),
     [belongTo],
-    () => -1
+    () => -1,
   )
 
 const isShow = shallowRef(false)

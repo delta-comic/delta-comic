@@ -2,7 +2,7 @@ import {
   defineMutation,
   useMutation,
   useQueryCache,
-  useQuery as useColadaQuery
+  useQuery as useColadaQuery,
 } from '@pinia/colada'
 import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
@@ -32,7 +32,7 @@ export type Item = Selectable<ItemTable>
 
 export enum QueryKey {
   item = 'db:favouriteItem:',
-  card = 'db:favouriteCard:'
+  card = 'db:favouriteCard:',
 }
 
 export const useUpsertItem = defineMutation(() => {
@@ -43,7 +43,7 @@ export const useUpsertItem = defineMutation(() => {
     mutation: async ({
       item,
       belongTos,
-      trx
+      trx,
     }: {
       item: ItemStoreDB.StorableItem
       belongTos: Item['belongTo'][]
@@ -59,7 +59,7 @@ export const useUpsertItem = defineMutation(() => {
     onSettled: () => {
       void queryCache.invalidateQueries({ key })
     },
-    key
+    key,
   })
   return { ...mutation, upsert: mutateAsync, key }
 })
@@ -72,7 +72,7 @@ export const useMoveItem = defineMutation(() => {
       item,
       from,
       aims,
-      trx
+      trx,
     }: {
       item: ItemStoreDB.StorableItem
       from: Item['belongTo']
@@ -93,7 +93,7 @@ export const useMoveItem = defineMutation(() => {
     onSettled: () => {
       void queryCache.invalidateQueries({ key })
     },
-    key
+    key,
   })
   return { ...mutation, move: mutateAsync, key }
 })
@@ -109,7 +109,7 @@ export const useCreateCard = defineMutation(() => {
     onSettled: () => {
       void queryCache.invalidateQueries({ key })
     },
-    key
+    key,
   })
   return { ...mutation, createCard: mutateAsync, key }
 })
@@ -117,7 +117,7 @@ export const useCreateCard = defineMutation(() => {
 export const useQueryItem = <T>(
   query: (db: SelectQueryBuilder<DB, 'favouriteItem', {}>) => Promise<T>,
   otherKeys: any[] = [],
-  initialData?: () => T
+  initialData?: () => T,
 ) =>
   useColadaQuery({
     query: async () => {
@@ -127,13 +127,13 @@ export const useQueryItem = <T>(
     key: () => [QueryKey.item, QueryKey.card, query].concat(otherKeys),
     staleTime: 15000,
     initialData,
-    initialDataUpdatedAt: 0
+    initialDataUpdatedAt: 0,
   })
 
 export const useQueryCard = <T>(
   query: (db: SelectQueryBuilder<DB, 'favouriteCard', {}>) => Promise<T>,
   otherKeys: any[] = [],
-  initialData?: () => T
+  initialData?: () => T,
 ) =>
   useColadaQuery({
     query: async () => {
@@ -144,5 +144,5 @@ export const useQueryCard = <T>(
     staleTime: 15000,
     refetchOnMount: 'always',
     initialData,
-    initialDataUpdatedAt: 0
+    initialDataUpdatedAt: 0,
   })

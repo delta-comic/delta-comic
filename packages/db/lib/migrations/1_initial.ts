@@ -18,7 +18,7 @@ async function up(db: Kysely<any>) {
     .addColumn('timestamp', 'datetime', col => col.notNull().primaryKey())
     .addColumn('itemKey', 'text', col => col.notNull().unique())
     .addForeignKeyConstraint('itemKeyForeign', ['itemKey'], 'itemStore', ['key'], cb =>
-      cb.onDelete('cascade')
+      cb.onDelete('cascade'),
     )
     .execute()
 
@@ -31,7 +31,7 @@ async function up(db: Kysely<any>) {
     .addColumn('timestamp', 'datetime', col => col.notNull().primaryKey())
     .addColumn('itemKey', 'text', col => col.notNull().unique())
     .addForeignKeyConstraint('itemKeyForeign', ['itemKey'], 'itemStore', ['key'], cb =>
-      cb.onDelete('cascade')
+      cb.onDelete('cascade'),
     )
     .addColumn('isViewed', 'boolean', col => col.notNull())
     .execute()
@@ -73,10 +73,10 @@ async function up(db: Kysely<any>) {
     .addPrimaryKeyConstraint('primary_key', ['addTime', 'belongTo', 'itemKey'])
     .addUniqueConstraint('uniqueKey', ['belongTo', 'itemKey'])
     .addForeignKeyConstraint('itemKeyForeign', ['itemKey'], 'itemStore', ['createAt'], cb =>
-      cb.onDelete('cascade')
+      cb.onDelete('cascade'),
     )
     .addForeignKeyConstraint('belongToForeign', ['belongTo'], 'favouriteCard', ['key'], cb =>
-      cb.onDelete('cascade')
+      cb.onDelete('cascade'),
     )
     .execute()
 
@@ -93,7 +93,7 @@ async function up(db: Kysely<any>) {
     .createTable('subscribe')
     .addColumn('itemKey', 'text')
     .addForeignKeyConstraint('itemKeyForeign', ['itemKey'], 'itemStore', ['key'], cb =>
-      cb.onDelete('cascade')
+      cb.onDelete('cascade'),
     )
     .addColumn('author', 'text')
     .addColumn('type', 'text', col => col.notNull())

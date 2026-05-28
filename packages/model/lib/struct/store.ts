@@ -65,7 +65,7 @@ export class SourcedKeyMap<TKey extends [string, string], TValue> implements Map
   }
   public forEach(
     callbackfn: (value: TValue, key: string, map: Map<string, TValue>) => void,
-    thisArg?: any
+    thisArg?: any,
   ): void {
     this.store.forEach((v, k) => {
       callbackfn.call(thisArg, v, k, this)
@@ -96,7 +96,7 @@ export class SourcedKeyMap<TKey extends [string, string], TValue> implements Map
 }
 
 export type SourcedKeyType<
-  T extends SourcedKeyMap<[string, string], any> | SourcedValue<[string, string]>
+  T extends SourcedKeyMap<[string, string], any> | SourcedValue<[string, string]>,
 > =
   T extends SourcedKeyMap<infer K, any>
     ? K | string

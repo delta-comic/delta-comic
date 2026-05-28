@@ -11,7 +11,7 @@ const file = fs.createWriteStream('./log.log')
 const result = await semantic(config, {
   env: { ...process.env, IS_DUR_RUN: true },
   stdout: file as any,
-  stderr: file as any
+  stderr: file as any,
 })
 
 if (result) {

@@ -20,7 +20,7 @@ const $props = defineProps<
   <DcVar
     :value="[
       `--box-size:${sizeSpacing};background-color:${bgColor ?? ' var(--color-gray-200)'};`,
-      $props.style
+      $props.style,
     ]"
     v-slot="{ value: style }"
   >
@@ -36,7 +36,7 @@ const $props = defineProps<
       :class="
         cn(
           'flex aspect-square size-[--spacing(var(--box-size))] items-center justify-center rounded-full bg-gray-200',
-          $props.class
+          $props.class,
         )
       "
       :style

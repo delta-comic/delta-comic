@@ -16,10 +16,7 @@ const $props = defineProps<
   {
     source:
       | { type: 'query'; value: UseQueryReturn<T[]>; next?: () => any }
-      | {
-          type: 'infinite'
-          value: UseInfiniteQueryReturn<T[]>
-        }
+      | { type: 'infinite'; value: UseInfiniteQueryReturn<T[]> }
       | {
           type: 'stream'
           value: UseInfiniteQueryReturn<Awaited<ReturnType<StreamQuery<T>['query']>>>
@@ -57,15 +54,15 @@ const source = computed(() =>
             if ($props.source.type != 'query') return
             return $props.source.value.refresh(false)
           },
-          next: $props.source.next
+          next: $props.source.next,
         }
       case 'stream':
         return {
           data: dataProcessor(
             $props.source.value.data.value?.pages.reduce(
               (acc, v) => acc.concat(v.data),
-              new Array<T>()
-            ) ?? []
+              new Array<T>(),
+            ) ?? [],
           ),
           isDone: $props.source.value.hasNextPage.value,
           isLoading: $props.source.value.isLoading.value,
@@ -81,7 +78,7 @@ const source = computed(() =>
           next() {
             if ($props.source.type != 'infinite') return
             return $props.source.value.loadNextPage({ cancelRefetch: true })
-          }
+          },
         }
       case 'infinite':
         return {
@@ -100,7 +97,7 @@ const source = computed(() =>
           next() {
             if ($props.source.type != 'stream') return
             return $props.source.value.loadNextPage({ cancelRefetch: true })
-          }
+          },
         }
       case 'array':
       default:
@@ -111,10 +108,10 @@ const source = computed(() =>
           error: undefined,
           refetch: $props.source.refetch,
           refresh: $props.source.refresh,
-          next: $props.source.next
+          next: $props.source.next,
         }
     }
-  })()
+  })(),
 )
 
 watch(
@@ -126,7 +123,7 @@ watch(
         else source.next?.()
       }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const vList = useTemplateRef('vList')
@@ -157,9 +154,7 @@ const handleRefresh = async () => {
 
 type TrueItem = IfAny<ReturnType<PF>[number], T, ReturnType<PF>[number]>
 
-defineSlots<{
-  default(props: { height: number; data: { item: TrueItem; index: number } }): any
-}>()
+defineSlots<{ default(props: { height: number; data: { item: TrueItem; index: number } }): any }>()
 defineExpose({ scrollTop: listScrollTop, listInstance: <Ref<VirtualListInst>>(<unknown>vList) })
 </script>
 
@@ -184,7 +179,7 @@ defineExpose({ scrollTop: listScrollTop, listInstance: <Ref<VirtualListInst>>(<u
         data: source.data,
         error: source.error,
         isLoading: source.isLoading,
-        refetch: source.refetch
+        refetch: source.refetch,
       }"
       classLoading="mt-2 !h-[24px]"
       classEmpty="!h-full"
@@ -203,7 +198,7 @@ defineExpose({ scrollTop: listScrollTop, listInstance: <Ref<VirtualListInst>>(<u
           :class="
             cn(
               'h-full overflow-x-hidden',
-              isPullRefreshHold ? 'overflow-y-hidden' : 'overflow-y-auto'
+              isPullRefreshHold ? 'overflow-y-hidden' : 'overflow-y-auto',
             )
           "
         >

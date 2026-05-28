@@ -36,8 +36,8 @@ defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
                 text: '取消关注',
                 onClick() {
                   $emit('unsubscribe', item)
-                }
-              }
+                },
+              },
             ]"
             @select="q => q.onClick()"
           >

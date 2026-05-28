@@ -25,7 +25,7 @@ const isShow = computed({
   },
   set(v) {
     if (!v) select.value = undefined
-  }
+  },
 })
 const [, isLast] = useZIndex(isShow)
 usePreventBack(isShow, isLast)

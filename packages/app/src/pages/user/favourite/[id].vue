@@ -19,7 +19,7 @@ const $router = useRouter()
 const cardKey = computed(() => Number($route.params.id))
 const { state: cardState } = FavouriteDB.useQueryCard(
   db => db.where('createAt', '=', cardKey.value).selectAll().executeTakeFirst(),
-  [cardKey]
+  [cardKey],
 )
 const { state: itemsState } = FavouriteDB.useQueryItem(
   db =>
@@ -30,7 +30,7 @@ const { state: itemsState } = FavouriteDB.useQueryItem(
       .orderBy('addTime', 'desc')
       .execute(),
   [cardKey],
-  () => []
+  () => [],
 )
 
 const cancel = () => {
@@ -67,12 +67,12 @@ const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Arra
               createLoadingMessage('移动中').bind(
                 DBUtils.withTransition(trx =>
                   PromiseAll(
-                    sel.map(v => move({ from: cardKey, aims: selectCardKeys, item: v.item, trx }))
-                  )
-                )
+                    sel.map(v => move({ from: cardKey, aims: selectCardKeys, item: v.item, trx })),
+                  ),
+                ),
               )
               cancel()
-            }
+            },
           },
           {
             text: '复制',
@@ -81,11 +81,13 @@ const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Arra
               const selectCardKeys = await selCard!.create()
               createLoadingMessage('复制中').bind(
                 DBUtils.withTransition(trx =>
-                  PromiseAll(sel.map(v => upsert({ item: v.item, belongTos: selectCardKeys, trx })))
-                )
+                  PromiseAll(
+                    sel.map(v => upsert({ item: v.item, belongTos: selectCardKeys, trx })),
+                  ),
+                ),
               )
               cancel()
-            }
+            },
           },
           {
             text: '删除',
@@ -105,15 +107,15 @@ const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Arra
                           .deleteFrom('favouriteItem')
                           .where('itemKey', '=', v.itemKey)
                           .where('belongTo', '=', cardKey)
-                          .execute()
-                      )
-                    )
+                          .execute(),
+                      ),
+                    ),
                   )
                   cancel()
-                }
+                },
               })
-            }
-          }
+            },
+          },
         ]"
         :values="items"
         v-slot="{ ActionBar, SelectPacker }"

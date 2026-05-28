@@ -16,10 +16,10 @@ const production = {
       '@semantic-release/git',
       {
         assets: ['**/package.json', '**/Cargo.toml', 'package.json', 'Cargo.toml', 'CHANGELOG.md'],
-        message: 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
-      }
-    ]
-  ]
+        message: 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
+      },
+    ],
+  ],
 }
 
 /** @type {import("semantic-release").GlobalConfig} */

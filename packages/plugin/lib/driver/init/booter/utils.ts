@@ -8,7 +8,7 @@ export const testApi = async (cfg: NonNullable<PluginConfig['api']>[string]) => 
 }
 
 export const testResourceApi = (
-  cfg: NonNullable<NonNullable<PluginConfig['resource']>['types']>[number]
+  cfg: NonNullable<NonNullable<PluginConfig['resource']>['types']>[number],
 ) => {
   const forks = cfg.urls
   return test(forks, cfg.test)
@@ -16,7 +16,7 @@ export const testResourceApi = (
 
 const test = async (
   forks: string[],
-  test: (url: string, signal: AbortSignal) => PromiseLike<any>
+  test: (url: string, signal: AbortSignal) => PromiseLike<any>,
 ) => {
   if (isEmpty(forks)) throw new Error('[plugin test] no fork found')
   const record: [url: string, result: false | number][] = []
@@ -40,14 +40,14 @@ const test = async (
           record.push([fork, false])
           console.log(`[plugin test] fetch url ${fork} can not connected`)
         }
-      })
+      }),
     )
   } catch (err) {
     console.log('[plugin test] fetch test aborted', err)
   }
   const result = sortBy(
     record.filter(v => v[1] != false),
-    v => v[1]
+    v => v[1],
   )[0]
   console.log(`[plugin test] fetch test done`, result)
   if (!result) {

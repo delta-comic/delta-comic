@@ -6,7 +6,7 @@ const saveKey = new SourcedValue<[namespace: string, key: string]>()
 export const useNativeStore = <T extends object>(
   namespace: string,
   key: MaybeRefOrGetter<string>,
-  defaultValue: MaybeRefOrGetter<T>
+  defaultValue: MaybeRefOrGetter<T>,
 ) => {
   return useLocalStorage(saveKey.toString([namespace, toValue(key)]), defaultValue)
   //   return useStorageAsync<T>(saveKey.toString([namespace, toRef(key).value]), defaultValue, {

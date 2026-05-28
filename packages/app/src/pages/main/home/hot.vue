@@ -30,9 +30,9 @@ const getItemCard = (contentType: uni.content.ContentType_) =>
                 onClick() {
                   const first = Global.levelboard.keys().next().value!
                   return $router.force.push({ name: '/hot', query: { plugin: first } })
-                }
+                },
               },
-          ...Array.from(Global.topButton.values()).flat()
+          ...Array.from(Global.topButton.values()).flat(),
         ].filter(v => !!v)"
       >
         <button
@@ -66,7 +66,7 @@ const getItemCard = (contentType: uni.content.ContentType_) =>
               class="flex w-full flex-col gap-1"
               v-for="items of chunk(
                 value.data.value ?? [],
-                Math.floor((value.data.value ?? []).length / 2)
+                Math.floor((value.data.value ?? []).length / 2),
               )"
             >
               <component

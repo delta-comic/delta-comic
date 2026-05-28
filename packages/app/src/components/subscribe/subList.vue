@@ -6,12 +6,8 @@ import { computed } from 'vue'
 
 import Card from './subCard.vue'
 
-const $props = defineProps<{
-  source: SubscribeDB.Item
-}>()
-const $emit = defineEmits<{
-  unsubscribe: []
-}>()
+const $props = defineProps<{ source: SubscribeDB.Item }>()
+const $emit = defineEmits<{ unsubscribe: [] }>()
 
 const pluginStore = usePluginStore()
 const subscribe = computed(() => {
@@ -26,20 +22,10 @@ const subscribe = computed(() => {
 })
 const source = useInfiniteQuery({
   query: async ({ pageParam, signal }) =>
-    subscribe.value.fetchAuthorContent.query(
-      {
-        author: $props.source.author!
-      },
-      pageParam,
-      signal
-    ),
-  key: () => [
-    {
-      item: () => $props.source.key
-    }
-  ],
+    subscribe.value.fetchAuthorContent.query({ author: $props.source.author! }, pageParam, signal),
+  key: () => [{ item: () => $props.source.key }],
   initialPageParam: subscribe.value.fetchAuthorContent.initPage,
-  getNextPageParam: lastPage => lastPage.nextPage ?? null
+  getNextPageParam: lastPage => lastPage.nextPage ?? null,
 })
 </script>
 

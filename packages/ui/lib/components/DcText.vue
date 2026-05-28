@@ -7,9 +7,7 @@ import { computed } from 'vue'
 
 import { cn, type StyleProps } from '../utils'
 
-const $props = withDefaults(defineProps<{ text?: string } & StyleProps>(), {
-  text: ''
-})
+const $props = withDefaults(defineProps<{ text?: string } & StyleProps>(), { text: '' })
 
 const linker = new Link().tlds(tlds).tlds('onion', true).set({ fuzzyIP: true })
 

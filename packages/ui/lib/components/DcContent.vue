@@ -15,21 +15,9 @@ const $props = defineProps<
     hideEmpty?: boolean
     hideLoading?: boolean
     source:
-      | {
-          type: 'query'
-          query: UseQueryReturn<T, any, any>
-        }
-      | {
-          type: 'infinite'
-          stream: UseInfiniteQueryReturn<T, any, any>
-        }
-      | {
-          type: 'raw'
-          data: T
-          isLoading: boolean
-          error?: Error | null
-          refetch?: () => any
-        }
+      | { type: 'query'; query: UseQueryReturn<T, any, any> }
+      | { type: 'infinite'; stream: UseInfiniteQueryReturn<T, any, any> }
+      | { type: 'raw'; data: T; isLoading: boolean; error?: Error | null; refetch?: () => any }
     classError?: any
     classEmpty?: any
     styleError?: StyleValue
@@ -46,7 +34,7 @@ const source = computed(() =>
         refetch() {
           if ($props.source.type != 'query') return
           return $props.source.query.refetch(false)
-        }
+        },
       }
     : $props.source.type == 'infinite'
       ? {
@@ -56,9 +44,9 @@ const source = computed(() =>
           refetch() {
             if ($props.source.type != 'infinite') return
             return $props.source.stream.refetch(false)
-          }
+          },
         }
-      : omit($props.source, ['type'])
+      : omit($props.source, ['type']),
 )
 
 type AllVariant =
@@ -80,7 +68,7 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     top: '8px',
     translateX: '-50%',
     backgroundColor: 'var(--van-background-2)',
-    borderRadius: '100%'
+    borderRadius: '100%',
   },
   isErrorNoData: {
     opacity: 1,
@@ -93,7 +81,7 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     top: '50%',
     translateX: '-50%',
     backgroundColor: 'var(--van-background-2)',
-    borderRadius: '4px'
+    borderRadius: '4px',
   },
   isLoadingData: {
     opacity: 0.7,
@@ -106,7 +94,7 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     top: 'calc(100% - 8px - 1rem)',
     translateX: '0%',
     backgroundColor: 'var(--p-color)',
-    borderRadius: '1.3rem'
+    borderRadius: '1.3rem',
   },
   isErrorData: {
     opacity: 0.7,
@@ -119,7 +107,7 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     top: 'calc(100% - 8px - 4rem)',
     translateX: '0%',
     backgroundColor: 'var(--p-color)',
-    borderRadius: '4px'
+    borderRadius: '4px',
   },
   isEmpty: {
     opacity: 1,
@@ -132,7 +120,7 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     top: '50%',
     translateX: '-50%',
     backgroundColor: 'var(--van-background-2)',
-    borderRadius: '4px'
+    borderRadius: '4px',
   },
   done: {
     width: '4rem',
@@ -145,8 +133,8 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     top: 'calc(100% - 8px - 1rem)',
     translateX: '0%',
     backgroundColor: 'var(--p-color)',
-    borderRadius: '4px'
-  }
+    borderRadius: '4px',
+  },
 }))
 const animateOn = computed<AllVariant>(() => {
   if (!$props.hideLoading && source.value.isLoading) {
@@ -197,7 +185,7 @@ defineSlots<{ default(data: { data?: T }): any }>()
               :class="
                 cn(
                   'flex size-full! flex-col items-center! justify-center! text-wrap *:w-full',
-                  classError
+                  classError,
                 )
               "
               :style="[style, styleError]"

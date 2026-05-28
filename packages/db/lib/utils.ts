@@ -4,7 +4,7 @@ import type { DB } from '.'
 
 export const withTransition = async <T>(
   handler: (trx: Kysely<DB>) => Promise<T>,
-  trx?: Kysely<DB>
+  trx?: Kysely<DB>,
 ) => {
   if (trx) return await handler(trx)
   else {
@@ -23,5 +23,5 @@ export async function countDb(sql: SelectQueryBuilder<DB, any, object>) {
 }
 
 export enum CommonQueryKey {
-  common = 'db'
+  common = 'db',
 }

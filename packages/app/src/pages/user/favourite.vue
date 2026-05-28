@@ -20,7 +20,7 @@ const temp = useTemp().$apply('favourite', () => ({ selectMode: 'pack' }))
 const { state: allFavouriteCardsState } = FavouriteDB.useQueryCard(
   db => db.selectAll().orderBy('createAt', 'desc').execute(),
   [],
-  () => []
+  () => [],
 )
 
 const searcher = useTemplateRef('searcher')
@@ -46,7 +46,7 @@ const syncFromCloud = () =>
             c.retryable = true
             const downloadItems = await download()
             return downloadItems
-          }
+          },
         )
 
         const diff = await createLoading(
@@ -61,9 +61,9 @@ const syncFromCloud = () =>
                   title: `同步文件夹-${plugin}`,
                   description: '',
                   createAt: index,
-                  private: true
+                  private: true,
                 },
-                trx
+                trx,
               })
               for (const v of downloadItems) {
                 await upsertFavouriteItem({ item: v, belongTos: [index], trx })
@@ -79,17 +79,17 @@ const syncFromCloud = () =>
               const thisPluginItems = all.filter(v => v.item.$$plugin == plugin).map(v => v.item)
               diff = uniqBy(
                 thisPluginItems.filter(v => !downloadItems.some(r => v.id == r.id)),
-                v => v.id
+                v => v.id,
               )
               return diff
-            })
+            }),
         )
 
         await createLoading(`同步<${pluginStore.$getPluginDisplayName(plugin)}>-上传`, async c => {
           c.retryable = true
           await upload(diff)
         })
-      })
+      }),
     )
     isSyncing.value = false
   })

@@ -9,7 +9,7 @@ import type { PluginConfigFactory } from '@/plugin'
 import { PluginLoader } from '../utils'
 import { getPluginFsPath } from '../utils'
 
-export default new class extends PluginLoader {
+export default new (class extends PluginLoader {
   public override name = 'zip'
   public override async install(file: File): Promise<PluginArchiveDB.Meta> {
     console.log('[loader zip] begin:', file)
@@ -42,12 +42,14 @@ export default new class extends PluginLoader {
     return file.name.endsWith('.zip')
   }
 
-  public override async load(pluginMeta: PluginArchiveDB.Archive): Promise<PluginConfigFactory | undefined> {
+  public override async load(
+    pluginMeta: PluginArchiveDB.Archive,
+  ): Promise<PluginConfigFactory | undefined> {
     if (!pluginMeta.meta.entry) throw new Error('not found entry')
     const baseDir = await getPluginFsPath(pluginMeta.pluginName)
     console.log('[loader zip] baseDir:', baseDir, pluginMeta.meta.entry)
     const src = decodeURIComponent(
-      convertFileSrc(await join(baseDir, pluginMeta.meta.entry.jsPath), 'local')
+      convertFileSrc(await join(baseDir, pluginMeta.meta.entry.jsPath), 'local'),
     )
     const config = await import(/* @vite-ignore */ src)
     const result = config.default as PluginConfigFactory | undefined
@@ -85,4 +87,4 @@ export default new class extends PluginLoader {
     )
     return meta
   }
-}
+})()

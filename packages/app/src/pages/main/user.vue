@@ -19,17 +19,17 @@ const pluginStore = usePluginStore()
 const { data: favouriteCount } = FavouriteDB.useQueryItem(
   db => DBUtils.countDb(db),
   [],
-  () => -1
+  () => -1,
 )
 const { data: subscribesCount } = SubscribeDB.useQuery(
   db => DBUtils.countDb(db),
   [],
-  () => -1
+  () => -1,
 )
 const { data: recentCount } = RecentDB.useQuery(
   db => DBUtils.countDb(db),
   [],
-  () => -1
+  () => -1,
 )
 
 const app = useAppStore()
@@ -38,10 +38,10 @@ watch(
   user => {
     if (!app.activatedUser) app.activatedUser = Array.from(user.values()).at(0)
   },
-  { immediate: true }
+  { immediate: true },
 )
 const userNoTopUserList = computed(() =>
-  Array.from(uni.user.User.userBase.entries()).filter(v => v[1] != app.activatedUser)
+  Array.from(uni.user.User.userBase.entries()).filter(v => v[1] != app.activatedUser),
 )
 
 const showActivatedUserSelect = shallowRef(false)

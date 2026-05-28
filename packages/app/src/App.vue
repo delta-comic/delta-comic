@@ -21,7 +21,7 @@ SharedFunction.define(
     window.$message.success('复制成功')
   },
   pluginName,
-  'pushShareToken'
+  'pushShareToken',
 )
 
 const handleShareTokenCheck = async () => {
@@ -50,7 +50,7 @@ const handleShareTokenCheck = async () => {
         onNegativeClick() {
           detail.onNegative()
           lock.release()
-        }
+        },
       })
     }
   } catch {}

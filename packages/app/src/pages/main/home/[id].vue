@@ -6,9 +6,9 @@ import { useRoute } from 'vue-router'
 const $route = useRoute<'/main/home/[id]'>()
 const plugin = computed(() => $route.query.plugin?.toString() ?? '')
 const id = computed(() => $route.params.id)
-const tabbar = computed(() => Global.tabbar.get(plugin.value)?.find(v => v.id == id.value)!)
+const tabbar = computed(() => Global.tabbar.get(plugin.value)?.find(v => v.id == id.value))
 </script>
 
 <template>
-  <component isActive :tabbar :is="tabbar.comp" />
+  <component isActive :tabbar :is="tabbar.comp" v-if="tabbar" />
 </template>

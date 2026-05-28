@@ -22,20 +22,17 @@ const method = computed(() => {
 const query = useInfiniteQuery({
   key: () => [
     'search',
-    { keyword: route.params.keyword, sort: route.params.sort, method: route.params.method }
+    { keyword: route.params.keyword, sort: route.params.sort, method: route.params.method },
   ],
   initialPageParam: method.value.fetchSearchResult.initPage,
   query: async ({ signal, pageParam }) => {
     return await method.value.fetchSearchResult.query(
-      {
-        input: decodeURIComponent(route.params.keyword),
-        sort: route.params.sort
-      },
+      { input: decodeURIComponent(route.params.keyword), sort: route.params.sort },
       pageParam,
-      signal
+      signal,
     )
   },
-  getNextPageParam: lp => lp.nextPage
+  getNextPageParam: lp => lp.nextPage,
 })
 
 const showSearch = shallowRef(true)
@@ -58,8 +55,8 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
               label: pluginStore.$getPluginDisplayName(plugin),
               children: sources.map(([id, { name }]) => ({
                 label: name,
-                value: searchSourceKey.toString([plugin, id])
-              }))
+                value: searchSourceKey.toString([plugin, id]),
+              })),
             }))
           "
           :value="route.params.method"
@@ -92,7 +89,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
                 'routeToSearch',
                 searchText,
                 searchSourceKey.parse(route.params.method),
-                v
+                v,
               )
           "
         >
@@ -116,7 +113,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
             SharedFunction.call(
               'routeToSearch',
               searchText,
-              searchSourceKey.parse(route.params.method)
+              searchSourceKey.parse(route.params.method),
             )
         "
         :class="[showSearch ? 'translate-x-full' : '-translate-x-2']"
@@ -145,7 +142,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
     :class="[
       showSearch
         ? 'h-[calc(100vh-var(--van-tabs-line-height)-var(--van-tabs-padding-bottom)-var(--safe-area-inset-top))] translate-y-0'
-        : 'h-[calc(100vh-32px-var(--safe-area-inset-top))] -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]'
+        : 'h-[calc(100vh-32px-var(--safe-area-inset-top))] -translate-y-[calc(var(--van-tabs-line-height)+var(--van-tabs-padding-bottom))]',
     ]"
   >
     <DcList

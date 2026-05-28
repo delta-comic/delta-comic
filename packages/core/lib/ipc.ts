@@ -9,12 +9,12 @@ export interface SharedFunctions {
     contentType_: uni.content.ContentType_,
     id: string,
     ep: string,
-    preload?: uni.item.Item
+    preload?: uni.item.Item,
   ): PromiseLike<any>
   routeToSearch(
     input: string,
     source?: [plugin: string, name: string],
-    sort?: string
+    sort?: string,
   ): PromiseLike<any>
 
   triggerSharePopup(page: uni.content.ContentPage): PromiseLike<void>
@@ -25,12 +25,12 @@ export interface SharedFunctions {
 export class SharedFunction {
   private static sharedFunctions = useGlobalVar(
     new Map<string, { fn: SharedFunctions[keyof SharedFunctions]; plugin: string }[]>(),
-    'utils/SharedFunction/sharedFunctions'
+    'utils/SharedFunction/sharedFunctions',
   )
   public static define<TKey extends keyof SharedFunctions>(
     fn: SharedFunctions[TKey],
     plugin: string,
-    name: TKey
+    name: TKey,
   ) {
     console.debug('[SharedFunction.define] defined new function', plugin, ':', name)
     this.sharedFunctions.set(name, [...(this.sharedFunctions.get(name) ?? []), { fn, plugin }])
@@ -72,7 +72,7 @@ export class SharedFunction {
     const them = all.filter(c => c.plugin === plugin)
     if (!them.length)
       throw new Error(
-        `[SharedFunction.callWitch] not found plugin function (plugin: ${plugin}, name: ${name})`
+        `[SharedFunction.callWitch] not found plugin function (plugin: ${plugin}, name: ${name})`,
       )
 
     const ins = them.map(v => {

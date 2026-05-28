@@ -11,7 +11,7 @@ class _TestPluginApi extends PluginBooter {
   public override async call(
     cfg: PluginConfig,
     setMeta: PluginBooterSetMeta,
-    env: Record<any, any>
+    env: Record<any, any>,
   ): Promise<any> {
     if (!cfg.api) return
     setMeta('开始并发测试')

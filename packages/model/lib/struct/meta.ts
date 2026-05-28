@@ -10,8 +10,8 @@ export class StreamQuery<TResult, TData extends object = {}> {
     public query: (
       data: TData,
       page: PageKey,
-      signal?: AbortSignal
+      signal?: AbortSignal,
     ) => Promise<{ data: TResult[]; lastPage?: PageKey; nextPage?: PageKey }>,
-    public initPage: PageKey
+    public initPage: PageKey,
   ) {}
 }

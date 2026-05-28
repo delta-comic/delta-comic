@@ -81,7 +81,7 @@ export abstract class Item extends Struct<RawItem> implements RawItem {
     const translator = this.itemTranslator.get(raw.contentType)
     if (!translator)
       throw new Error(
-        `can not found itemTranslator contentType:"${ContentPage.contentPages.key.toString(raw.contentType)}"`
+        `can not found itemTranslator contentType:"${ContentPage.contentPages.key.toString(raw.contentType)}"`,
       )
     return translator(raw)
   }
@@ -92,7 +92,7 @@ export abstract class Item extends Struct<RawItem> implements RawItem {
 
   public static itemCards = useGlobalVar(
     SourcedKeyMap.createReactive<ContentType, ItemCardComponent>(),
-    'uni/item/itemCards'
+    'uni/item/itemCards',
   )
 
   public abstract like(): Promise<any>
@@ -156,7 +156,7 @@ export abstract class Item extends Struct<RawItem> implements RawItem {
   public commentSendable: boolean
   public customIsAI?: boolean
   public get $isAi() {
-    const check = (str: string) => /(^|[\(（\[\s【])ai[】\)）\]\s]?/gi.test(str)
+    const check = (str: string) => /(^|[(（[\s【])ai[】)）\]\s]?/gi.test(str)
     return (
       this.customIsAI ||
       check(this.title) ||

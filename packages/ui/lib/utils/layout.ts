@@ -8,7 +8,7 @@ const allLayers = useGlobalVar(shallowReactive<symbol[]>([]), 'utils/layers')
 export type LayerIndex = [
   index: ComputedRef<number>,
   isLast: ComputedRef<boolean>,
-  watcher: WatchHandle
+  watcher: WatchHandle,
 ]
 /**
  * @description
@@ -26,7 +26,7 @@ export const useZIndex = (isShow: Ref<boolean>): LayerIndex => {
       }
       allLayers.splice(allLayers.indexOf(symbol), 1)
     },
-    { immediate: true }
+    { immediate: true },
   )
   tryOnUnmounted(() => watcher.stop())
   const zIndex = computed(() => (allLayers.indexOf(symbol) + 1) * 10)
@@ -56,7 +56,7 @@ export const usePreventBack = (isShow: Ref<boolean>, isLast: Ref<boolean>) => {
         return (isShow.value = false)
       })
     },
-    { immediate: true }
+    { immediate: true },
   )
   tryOnUnmounted(() => watcher.stop())
   return watcher

@@ -30,7 +30,9 @@ export default new (class extends PluginLoader {
     return file.name.endsWith('.js')
   }
 
-  public override async load(pluginMeta: PluginArchiveDB.Archive): Promise<PluginConfigFactory | undefined> {
+  public override async load(
+    pluginMeta: PluginArchiveDB.Archive,
+  ): Promise<PluginConfigFactory | undefined> {
     const code = await fs.readTextFile(
       await join(await getPluginFsPath(pluginMeta.pluginName), 'us.js'),
     )

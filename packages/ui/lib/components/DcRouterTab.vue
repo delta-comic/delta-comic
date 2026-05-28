@@ -1,13 +1,7 @@
 <script
   setup
   lang="ts"
-  generic="
-    T extends {
-      name: string
-      title: string
-      route: RouteLocationRaw
-    }
-  "
+  generic="T extends { name: string; title: string; route: RouteLocationRaw }"
 >
 import { Mutex } from 'es-toolkit'
 import { computed } from 'vue'
@@ -27,9 +21,7 @@ const $props = withDefaults(
       mode?: 'replace' | 'push'
     } & StyleProps
   >(),
-  {
-    mode: 'replace'
-  }
+  { mode: 'replace' },
 )
 
 const $route = useRoute()

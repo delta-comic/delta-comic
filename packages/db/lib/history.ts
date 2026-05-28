@@ -3,7 +3,7 @@ import {
   defineMutation,
   useMutation,
   useQueryCache,
-  useQuery as useColadaQuery
+  useQuery as useColadaQuery,
 } from '@pinia/colada'
 import type { JSONColumnType, Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
@@ -22,7 +22,7 @@ export interface Table {
 export type Item = Selectable<Table>
 
 export enum QueryKey {
-  item = 'db:history:'
+  item = 'db:history:',
 }
 
 export const useUpsert = defineMutation(() => {
@@ -41,7 +41,7 @@ export const useUpsert = defineMutation(() => {
     onSettled: () => {
       void queryCache.invalidateQueries({ key })
     },
-    key
+    key,
   })
   return { ...mutation, upsert: mutateAsync, key }
 })
@@ -57,7 +57,7 @@ export const useRemove = defineMutation(() => {
     onSettled: () => {
       void queryCache.invalidateQueries({ key })
     },
-    key
+    key,
   })
   return { ...mutation, remove: mutateAsync, key }
 })
@@ -65,7 +65,7 @@ export const useRemove = defineMutation(() => {
 export const useQuery = <T>(
   query: (db: SelectQueryBuilder<DB, 'history', {}>) => Promise<T>,
   otherKeys: any[] = [],
-  initialData?: () => T
+  initialData?: () => T,
 ) =>
   useColadaQuery({
     query: async () => {
@@ -76,5 +76,5 @@ export const useQuery = <T>(
     staleTime: 15000,
     refetchOnMount: 'always',
     initialData,
-    initialDataUpdatedAt: 0
+    initialDataUpdatedAt: 0,
   })

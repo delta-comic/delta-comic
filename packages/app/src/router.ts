@@ -9,7 +9,7 @@ import {
   createWebHistory,
   isNavigationFailure,
   NavigationFailureType,
-  type RouteLocationRaw
+  type RouteLocationRaw,
 } from 'vue-router'
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 
@@ -27,12 +27,12 @@ SharedFunction.define(
       params: {
         id: encodeURI(id),
         ep: encodeURI(ep),
-        contentType: uni.content.ContentPage.contentPages.key.toString(contentType_)
-      }
+        contentType: uni.content.ContentPage.contentPages.key.toString(contentType_),
+      },
     })
   },
   pluginName,
-  'routeToContent'
+  'routeToContent',
 )
 SharedFunction.define(
   (input, source, sort) => {
@@ -41,12 +41,12 @@ SharedFunction.define(
       params: {
         keyword: encodeURI(input),
         method: encodeURI(source ? searchSourceKey.toString(source) : 'unknown'),
-        sort: encodeURI(sort ?? 'unknown')
-      }
+        sort: encodeURI(sort ?? 'unknown'),
+      },
     })
   },
   pluginName,
-  'routeToSearch'
+  'routeToSearch',
 )
 
 const $routerForceDo = async (mode: keyof typeof router.force, to: RouteLocationRaw) => {
@@ -62,7 +62,7 @@ const $routerForceDo = async (mode: keyof typeof router.force, to: RouteLocation
 }
 router.force = {
   push: to => $routerForceDo('push', to),
-  replace: to => $routerForceDo('replace', to)
+  replace: to => $routerForceDo('replace', to),
 }
 
 router.beforeEach(async to => {
@@ -70,7 +70,7 @@ router.beforeEach(async to => {
   if (to.meta.statusBar) {
     const sb = toValue(to.meta.statusBar)
     if (sb == 'auto') await M3.setBarColor(isDark ? 'dark' : 'light')
-    else !sb ? await M3.setBarColor(sb) : undefined
+    else if (sb) await M3.setBarColor(sb)
     return true
   }
   await M3.setBarColor(!isDark ? 'dark' : 'light')

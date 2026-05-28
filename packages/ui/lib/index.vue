@@ -13,9 +13,9 @@ const config = {
     selects: [
       { label: 'Never', value: 'never' },
       { label: 'Often', value: 'often' },
-      { label: 'Everyday', value: 'everyday' }
-    ]
-  }
+      { label: 'Everyday', value: 'everyday' },
+    ],
+  },
 } satisfies Configure
 </script>
 

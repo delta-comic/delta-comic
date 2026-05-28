@@ -15,7 +15,7 @@ const closeMenuBefore = (v: any) => {
   return v
 }
 const { data: totalCount } = PluginArchiveDB.useQuery(db =>
-  DBUtils.countDb(db.where('enable', '=', true))
+  DBUtils.countDb(db.where('enable', '=', true)),
 )
 </script>
 

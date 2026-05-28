@@ -6,13 +6,13 @@ import { PluginInstaller, type PluginInstallerDescription } from '../utils'
 export class _PluginInstallByDev extends PluginInstaller {
   public override description: PluginInstallerDescription = {
     title: '安装Develop Userscript插件',
-    description: '输入形如: "localhost"或者一个可以不含port的ip'
+    description: '输入形如: "localhost"或者一个可以不含port的ip',
   }
   public override name = 'devUrl'
   private async installer(input: string): Promise<File> {
     const res = await ky
       .get(
-        `http://${/:\d+$/.test(input) ? input : input + ':6173'}/__vite-plugin-monkey.install.user.js?origin=http%3A%2F%2F${input}%3A6173`
+        `http://${/:\d+$/.test(input) ? input : input + ':6173'}/__vite-plugin-monkey.install.user.js?origin=http%3A%2F%2F${input}%3A6173`,
       )
       .text()
     const noPort = input.replace(/:\d+$/, '')

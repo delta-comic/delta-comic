@@ -18,7 +18,7 @@ const { state: favouriteItems } = FavouriteDB.useQueryItem(
       .orderBy('addTime', 'desc')
       .execute(),
   [() => $props.card.createAt],
-  () => []
+  () => [],
 )
 
 const $router = useRouter()

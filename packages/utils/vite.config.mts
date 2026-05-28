@@ -4,6 +4,6 @@ export default defineConfig({
   pack: {
     entry: './lib/index.ts',
     sourcemap: true,
-    dts: { oxc: true, tsconfig: './tsconfig.app.json' }
-  }
+    dts: { oxc: true, tsconfig: './tsconfig.app.json' },
+  },
 })

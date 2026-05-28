@@ -11,9 +11,7 @@ import { Icons } from '@/icons'
 import { isShowMainHomeNavBar } from '@/symbol'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()
-const temp = useTemp().$applyRaw('randomConfig', () => ({
-  scroll: 0
-}))
+const temp = useTemp().$applyRaw('randomConfig', () => ({ scroll: 0 }))
 
 let index = 0
 const source = useInfiniteQuery({
@@ -23,13 +21,13 @@ const source = useInfiniteQuery({
   query: async ({ signal }) => {
     const result = await SharedFunction.callRandom('getRandomProvide', signal).result
     return result
-  }
+  },
 })
 
 const containBound = ref<DOMRectReadOnly>()
 useResizeObserver(
   () => <HTMLDivElement | null>waterfall.value?.scrollParent?.firstElementChild,
-  ([b]) => (containBound.value = b.contentRect)
+  ([b]) => (containBound.value = b.contentRect),
 )
 onMounted(async () => {
   if (!isEmpty(source.data.value)) {
@@ -50,7 +48,7 @@ watch(
     if (scrollTop - old > 0) showNavBar.value = false
     else showNavBar.value = true
   },
-  { immediate: true }
+  { immediate: true },
 )
 </script>
 

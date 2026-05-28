@@ -35,7 +35,7 @@ const _useTemp = useGlobalVar(
     }, 'onlyGetRaw')
     return { $apply, $has, $onlyGet, $applyRaw, $hasRaw, $onlyGetRaw }
   }),
-  'store/temp'
+  'store/temp',
 )
 
 export const useTemp = () => _useTemp(window.$api.piniaInstance)

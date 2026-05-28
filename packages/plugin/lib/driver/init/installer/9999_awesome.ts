@@ -14,7 +14,7 @@ interface ItemSchema {
 export class _PluginInstallByAwesome extends PluginInstaller {
   public override description: PluginInstallerDescription = {
     title: '快速安装插件',
-    description: '输入形如: "ap:jmcomic"的内容'
+    description: '输入形如: "ap:jmcomic"的内容',
   }
   public override name = 'awesome'
   private async installer(input: string): Promise<File | string> {
@@ -33,7 +33,7 @@ export class _PluginInstallByAwesome extends PluginInstaller {
     return file
   }
   public override isMatched(input: string): boolean {
-    return /^ap:[A-Za-z0-9\-\_]+$/.test(input)
+    return /^ap:[A-Za-z0-9\-_]+$/.test(input)
   }
 }
 

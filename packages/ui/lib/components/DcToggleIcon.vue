@@ -28,7 +28,7 @@ onLongPress(
   () => {
     $emit('longClick')
   },
-  { modifiers: { prevent: true } }
+  { modifiers: { prevent: true } },
 )
 </script>
 
@@ -38,7 +38,7 @@ onLongPress(
       cn(
         'flex items-center justify-center **:transition-colors!',
         !rowMode && 'flex-col',
-        padding && 'px-4'
+        padding && 'px-4',
       )
     "
     :style

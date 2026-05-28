@@ -10,7 +10,7 @@ const $props = withDefaults(defineProps<Partial<PopupProps & StyleProps>>(), {
   overlay: true,
   closeOnClickOverlay: true,
   teleport: '#popups',
-  destroyOnClose: true
+  destroyOnClose: true,
 })
 
 const isShow = defineModel<boolean>('show', { required: true })

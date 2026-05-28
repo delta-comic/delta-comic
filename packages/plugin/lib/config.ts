@@ -14,7 +14,7 @@ export class ConfigPointer<T extends ConfigDescription = ConfigDescription> {
   constructor(
     public pluginName: string,
     public config: T,
-    public configName: string
+    public configName: string,
   ) {
     this.key = Symbol.for(`config:${pluginName}`)
   }
@@ -35,20 +35,20 @@ export const appConfig = useGlobalVar(
         selects: [
           { label: '浅色', value: 'light' },
           { label: '暗色', value: 'dark' },
-          { label: '跟随系统', value: 'system' }
-        ]
+          { label: '跟随系统', value: 'system' },
+        ],
       },
       easilyTitle: { type: 'switch', defaultValue: false, info: '简化标题(实验)' },
       githubToken: {
         type: 'string',
         defaultValue: '',
         info: 'github的token',
-        placeholder: '仅用于解除api访问限制'
-      }
+        placeholder: '仅用于解除api访问限制',
+      },
     },
-    '核心'
+    '核心',
   ),
-  'core/plugin/config'
+  'core/plugin/config',
 )
 
 export const useConfig = defineStore('config', helper => {
@@ -60,7 +60,7 @@ export const useConfig = defineStore('config', helper => {
       if (!v) throw new Error(`not found config by plugin "${pointer.pluginName}"`)
       return v.value
     },
-    'load'
+    'load',
   )
 
   const isSystemDark = usePreferredDark()
@@ -80,14 +80,14 @@ export const useConfig = defineStore('config', helper => {
   })
   const $isExistConfig = helper.action(
     (pointer: ConfigPointer) => form.has(pointer.key),
-    'isExistConfig'
+    'isExistConfig',
   )
   const $resignerConfig = helper.action((pointer: ConfigPointer) => {
     const cfg = useConfig()
     const store = useNativeStore(
       pointer.pluginName,
       'config',
-      fromPairs(Object.entries(pointer.config).map(([name, desc]) => [name, desc.defaultValue]))
+      fromPairs(Object.entries(pointer.config).map(([name, desc]) => [name, desc.defaultValue])),
     )
     cfg.form.set(pointer.key, { form: pointer.config, value: store })
   }, 'resignerConfig')

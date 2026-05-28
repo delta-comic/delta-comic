@@ -4,7 +4,7 @@ import { type MaybeRefOrGetter, computed, isRef, watch } from 'vue'
 export type LoadingInstance = ReturnType<typeof createLoadingMessage>
 export const createLoadingMessage = (
   text: MaybeRefOrGetter<string> = '加载中',
-  api = window.$message
+  api = window.$message,
 ) => {
   const data = computed(() => (isRef(text) ? text.value : isFunction(text) ? text() : text))
   let loading = api.loading(data.value, { duration: 0 })
@@ -16,19 +16,19 @@ export const createLoadingMessage = (
     promise?: T,
     throwError?: false,
     successText?: string,
-    failText?: string
+    failText?: string,
   ): Promise<Awaited<T>>
   async function bind<T extends PromiseLike<any>>(
     promise?: T,
     throwError?: true,
     successText?: string,
-    failText?: string
+    failText?: string,
   ): Promise<Awaited<T> | undefined>
   async function bind<T extends PromiseLike<any>>(
     promise?: T,
     throwError = true,
     successText?: string,
-    failText?: string
+    failText?: string,
   ): Promise<Awaited<T> | undefined> {
     try {
       const res = await promise
@@ -78,7 +78,7 @@ export const createLoadingMessage = (
     [Symbol.dispose]() {
       this.destroy()
     },
-    instance: loading
+    instance: loading,
   }
   return ctx
 }

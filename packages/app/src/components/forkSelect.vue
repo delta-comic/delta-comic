@@ -20,11 +20,11 @@ const $emit = defineEmits<{ change: [] }>()
                 namespace,
                 forks,
                 active: uni.image.Image.precedenceFork.get(key)!,
-                key
+                key,
               }
             }),
-            v => v.plugin
-          )
+            v => v.plugin,
+          ),
         )"
       >
         <div class="text-lg text-(--p-color)">{{ plugin }}</div>

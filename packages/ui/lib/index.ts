@@ -34,7 +34,7 @@ export {
   DcVar,
   DcWaterfall,
   DcMarkdown,
-  DcState
+  DcState,
 }
 
 declare module 'vue-router' {
@@ -70,7 +70,7 @@ export {
   DcFormDateRange,
   DcFormRadio,
   DcFormNumber,
-  DcFormSwitch
+  DcFormSwitch,
 }
 
 export * as FormType from './form/type'

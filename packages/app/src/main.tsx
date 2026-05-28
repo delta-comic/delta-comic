@@ -15,12 +15,7 @@ import * as DcModel from '@delta-comic/model'
 import * as DcPlugin from '@delta-comic/plugin'
 
 import './logger'
-DcCore
-DcDb
-DcModel
-DcPlugin
 import * as DcUi from '@delta-comic/ui'
-import * as DcRequire from '@delta-comic/utils'
 import * as DcUtils from '@delta-comic/utils'
 import * as Pc from '@pinia/colada'
 import { reactiveComputed, useCssVar, useDark } from '@vueuse/core'
@@ -34,7 +29,7 @@ import {
   zhCN,
   type GlobalThemeOverrides,
   darkTheme,
-  NGlobalStyle
+  NGlobalStyle,
 } from 'naive-ui'
 import * as Pinia from 'pinia'
 import { createPinia } from 'pinia'
@@ -54,21 +49,7 @@ import AppSetup from './AppSetup.vue'
 import { router } from './router'
 CORSFetch.init({ request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } } })
 
-window.$$lib$$ = {
-  Vue,
-  Vant,
-  Naive,
-  VR,
-  Pinia,
-  DcModel,
-  DcUi,
-  DcCore,
-  DcPlugin,
-  DcUtils,
-  DcRequire,
-  DcDb,
-  Pc
-}
+window.$$lib$$ = { Vue, Vant, Naive, VR, Pinia, DcModel, DcUi, DcCore, DcPlugin, DcUtils, DcDb, Pc }
 window.$api.NImage = Naive.NImage
 window.$api.showImagePreview = Vant.showImagePreview
 window.$api.M3 = M3
@@ -81,15 +62,15 @@ const handleSafeAreaChange = (v: InsetsScheme | false) => {
   const { adjustedInsetBottom, adjustedInsetLeft, adjustedInsetRight, adjustedInsetTop } = v
   document.documentElement.style.setProperty(
     `--safe-area-inset-bottom`,
-    `${adjustedInsetBottom ?? 0}px`
+    `${adjustedInsetBottom ?? 0}px`,
   )
   document.documentElement.style.setProperty(
     `--safe-area-inset-left`,
-    `${adjustedInsetLeft ?? 0}px`
+    `${adjustedInsetLeft ?? 0}px`,
   )
   document.documentElement.style.setProperty(
     `--safe-area-inset-right`,
-    `${adjustedInsetRight ?? 0}px`
+    `${adjustedInsetRight ?? 0}px`,
   )
   document.documentElement.style.setProperty(`--safe-area-inset-top`, `${adjustedInsetTop ?? 0}px`)
 }
@@ -107,15 +88,15 @@ const app = createApp(
         primaryColorHover: Color(themeColor).lighten(0.2).hex(),
         primaryColorPressed: themeColorDark,
         primaryColorSuppl: themeColorDark,
-        cardColor: config.isDark ? '#17181a' : undefined
-      }
+        cardColor: config.isDark ? '#17181a' : undefined,
+      },
     }))
     const fontBold = useCssVar('--nui-font-weight')
 
     const isUseDarkMode = useDark({ listenToStorageChanges: false })
     watch(
       () => config.isDark,
-      isDark => (isUseDarkMode.value = isDark)
+      isDark => (isUseDarkMode.value = isDark),
     )
     return () => (
       <NConfigProvider
@@ -140,7 +121,7 @@ const app = createApp(
 
                   background: config.isDark ? themeOverrides.common?.cardColor : undefined,
 
-                  fontBold: fontBold.value
+                  fontBold: fontBold.value,
                 } as ConfigProviderThemeVars
               }
               class='h-full overflow-hidden'
@@ -155,7 +136,7 @@ const app = createApp(
         </NLoadingBarProvider>
       </NConfigProvider>
     )
-  })
+  }),
 )
 DcCore.initSentry(app)
 

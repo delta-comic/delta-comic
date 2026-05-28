@@ -9,11 +9,11 @@ import { usePluginStore } from './store'
 
 const rawBooters = import.meta.glob<PluginBooter>('./init/booter/*_*.ts', {
   eager: true,
-  import: 'default'
+  import: 'default',
 })
 export const booters = sortBy(Object.entries(rawBooters), ([fname]) =>
   // oxlint-disable-next-line no-useless-escape
-  Number(fname.match(/[\d\.]+(?=_)/)?.[0])
+  Number(fname.match(/[\d\.]+(?=_)/)?.[0]),
 ).map(v => v[1])
 
 export const bootPlugin = async (cfg: PluginConfig) => {
@@ -37,7 +37,7 @@ export const bootPlugin = async (cfg: PluginConfig) => {
             if (meta.name) pluginSteps[cfg.name].steps[msIndex].name = meta.name
           }
         },
-        env
+        env,
       )
     }
     pluginSteps[cfg.name].now.stepsIndex++ // undefined to hide

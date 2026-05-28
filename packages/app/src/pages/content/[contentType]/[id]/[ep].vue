@@ -18,7 +18,7 @@ const contentStore = useContentStore()
 contentStore.$load(contentType, id, ep)
 
 const page = computed(
-  () => contentStore.history.get(contentStore.$createHistoryKey(contentType, id, ep))!
+  () => contentStore.history.get(contentStore.$createHistoryKey(contentType, id, ep))!,
 )
 
 const layout = computed(() => uni.content.ContentPage.layouts.get($route.params.contentType))
@@ -28,11 +28,7 @@ usePreventBack(isFullscreen, ref(true))
 
 // history
 const { upsert } = HistoryDB.useUpsert()
-page.value.fetchDetail().then(item =>
-  upsert({
-    item: item.toJSON()
-  })
-)
+page.value.fetchDetail().then(item => upsert({ item: item.toJSON() }))
 </script>
 
 <template>

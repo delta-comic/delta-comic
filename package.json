@@ -21,13 +21,13 @@
   "type": "module",
   "scripts": {
     "dev": "vp run --filter app dev",
-    "lint": "vp lint",
     "lib-build": "vp run -r build",
-    "set-ver": "node ./script/set-version.mts",
-    "tauri": "vp run --filter app tauri",
-    "pub:npm": "vp run lib-build && vp pm publish -r --no-git-checks",
+    "lint": "vp lint",
+    "pub:all": "vp run pub:npm && vp run pub:github",
     "pub:github": "vp run lib-build && pnpm -r publish --no-git-checks --registry https://npm.pkg.github.com/",
-    "pub:all": "vp run pub:npm && vp run pub:github"
+    "pub:npm": "vp run lib-build && vp pm publish -r --no-git-checks",
+    "set-ver": "node ./script/set-version.mts",
+    "tauri": "vp run --filter app tauri"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.0.1",

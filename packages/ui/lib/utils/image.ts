@@ -6,7 +6,7 @@ import { useZIndex } from './layout'
 
 export const showImagePreview = (
   images: string[],
-  config: Omit<ImagePreviewOptions, 'images' | 'teleport'> = {}
+  config: Omit<ImagePreviewOptions, 'images' | 'teleport'> = {},
 ) => {
   const isShowing = shallowRef(true)
   const [, , stopUse] = useZIndex(isShowing)
@@ -19,7 +19,7 @@ export const showImagePreview = (
       isShowing.value = false
     },
     showIndex: images.length > 1,
-    teleport: '#popups'
+    teleport: '#popups',
   }) as ImagePreviewInstance
   const stopRouterGuard = window.$router.beforeEach(to => {
     isShowing.value = false
@@ -35,6 +35,6 @@ export const showImagePreview = (
     isShowing: computed(() => previewInstance.show),
     close: () => {
       isShowing.value = false
-    }
+    },
   }
 }

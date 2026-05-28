@@ -19,7 +19,7 @@ const { state: historiesState } = HistoryDB.useQuery(
       .orderBy('history.timestamp', 'desc')
       .execute(),
   [],
-  () => []
+  () => [],
 )
 const config = useConfig().$load(appConfig)
 const searcher = useTemplateRef('searcher')
@@ -57,10 +57,10 @@ const filters = useNativeStore(pluginName, 'history.filter', new Array<string>()
               content: `你确认删除${sel.length}项?`,
               positiveText: '确定',
               negativeText: '取消',
-              onPositiveClick: () => removeItems(sel)
+              onPositiveClick: () => removeItems(sel),
             })
-          }
-        }
+          },
+        },
       ]"
       :values="histories"
       v-slot="{ ActionBar, SelectPacker }"

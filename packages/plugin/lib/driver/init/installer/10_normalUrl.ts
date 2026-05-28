@@ -6,7 +6,7 @@ import { PluginInstaller, type PluginInstallerDescription } from '../utils'
 export class _PluginInstallByFallbackUrl extends PluginInstaller {
   public override description: PluginInstallerDescription = {
     title: '通过任意URL安装插件',
-    description: '从任何你给定的url获取内容，无论内容是什么'
+    description: '从任何你给定的url获取内容，无论内容是什么',
   }
   public override name = 'fallbackUrl'
   private async installer(input: string): Promise<File> {

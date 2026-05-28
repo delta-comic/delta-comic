@@ -10,7 +10,7 @@ watch(
   _promise => {
     if ($props.autoLoad) load()
   },
-  { immediate: true }
+  { immediate: true },
 )
 </script>
 

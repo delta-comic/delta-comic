@@ -39,8 +39,8 @@ const routeToLevel = (source: string) => {
               label: plugin,
               children: sources.map(s => ({
                 label: s.name,
-                value: selectLevelKey.toString([plugin, s.name])
-              }))
+                value: selectLevelKey.toString([plugin, s.name]),
+              })),
             }))
           "
           :value="selectLevel"

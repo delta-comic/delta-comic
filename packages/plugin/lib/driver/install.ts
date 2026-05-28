@@ -9,10 +9,10 @@ import { loaders } from './loader'
 
 const rawInstallers = import.meta.glob<PluginInstaller>('./init/installer/*_*.ts', {
   eager: true,
-  import: 'default'
+  import: 'default',
 })
 export const installers = sortBy(Object.entries(rawInstallers), ([fname]) =>
-  Number(fname.match(/[\d\.]+(?=_)/)?.[0])
+  Number(fname.match(/[\d.]+(?=_)/)?.[0]),
 )
   .map(v => v[1])
   .reverse()
@@ -29,7 +29,7 @@ export const usePluginConfig = () =>
 export const installDepends = (
   m: DownloadMessageBind,
   meta: PluginArchiveDB.Meta,
-  installedPlugins?: Set<string>
+  installedPlugins?: Set<string>,
 ) =>
   m.createLoading('依赖安装/检查', async v => {
     v.retryable = true
@@ -55,7 +55,7 @@ const installPluginFile = async (
   file: File,
   installerName: string,
   installInput: string,
-  __installedPlugins?: Set<string>
+  __installedPlugins?: Set<string>,
 ) => {
   const meta = await m.createLoading('安装插件', async v => {
     v.retryable = true
@@ -76,9 +76,9 @@ const installPluginFile = async (
           installInput,
           loaderName: loader.name,
           meta,
-          pluginName: meta.name.id
-        }
-      ]
+          pluginName: meta.name.id,
+        },
+      ],
     })
     return meta
   })
@@ -112,7 +112,7 @@ export const installFilePlugin = (file: File, __installedPlugins?: Set<string>) 
 
 export const updatePlugin = async (
   pluginMeta: PluginArchiveDB.Archive,
-  __installedPlugins?: Set<string>
+  __installedPlugins?: Set<string>,
 ) =>
   createDownloadMessage(`更新插件-${pluginMeta.pluginName}`, async m => {
     const file = await m.createLoading('更新', async v => {

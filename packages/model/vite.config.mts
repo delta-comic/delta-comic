@@ -7,6 +7,6 @@ export default defineConfig({
   build: {
     lib: { entry: './lib/index.ts', name: 'DcModel', fileName: 'index', formats: ['es'] },
     sourcemap: true,
-    rolldownOptions: { external: Object.keys(extendsDepends), output: { globals: extendsDepends } }
-  }
+    rolldownOptions: { external: Object.keys(extendsDepends), output: { globals: extendsDepends } },
+  },
 })

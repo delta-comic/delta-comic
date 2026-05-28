@@ -55,10 +55,10 @@ export const createForm = <T extends FormType.Configure>(configs: T) => {
             >
               提交
             </NButton>
-          )
+          ),
         }}
       </DcForm>
     ),
-    data: c.promise
+    data: c.promise,
   }
 }

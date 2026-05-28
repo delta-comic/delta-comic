@@ -11,7 +11,7 @@ const menuOptions = [
   { label: '管理', key: 'list', icon: icon(Icons.material.AutoAwesomeMosaicOutlined) },
   { label: '安装', key: 'download', icon: icon(Icons.material.FileDownloadOutlined) },
   { label: '市场', key: 'shop', icon: icon(Icons.material.ShoppingBagOutlined) },
-  { label: '配置', key: 'config', icon: icon(Icons.antd.SettingOutlined) }
+  { label: '配置', key: 'config', icon: icon(Icons.antd.SettingOutlined) },
 ] as MenuOption[]
 </script>
 

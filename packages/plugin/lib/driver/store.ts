@@ -30,7 +30,7 @@ export const usePluginStore = useGlobalVar(
       db
         .select(['pluginName', 'displayName'])
         .execute()
-        .then(v => Object.fromEntries(v.map(v => [v.pluginName, v.displayName])))
+        .then(v => Object.fromEntries(v.map(v => [v.pluginName, v.displayName]))),
     )
 
     const allSearchSource = computed(() =>
@@ -40,17 +40,17 @@ export const usePluginStore = useGlobalVar(
           v =>
             [v.name, Object.entries(v.search?.methods ?? {})] as [
               plugin: string,
-              sources: [name: string, method: Search.SearchMethod][]
-            ]
-        )
+              sources: [name: string, method: Search.SearchMethod][],
+            ],
+        ),
     )
 
     const $getPluginDisplayName = helper.action(
       (key: string) => pluginNames.value[key] || key,
-      'getPluginDisplayName'
+      'getPluginDisplayName',
     )
 
     return { $getPluginDisplayName, plugins, allSearchSource, pluginSteps }
   }),
-  'core/plugin/store'
+  'core/plugin/store',
 )

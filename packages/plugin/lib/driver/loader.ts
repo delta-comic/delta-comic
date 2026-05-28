@@ -6,17 +6,17 @@ import { reactive } from 'vue'
 import type { PluginConfigFactory } from '@/plugin'
 
 import { bootPlugin } from './booter'
+import { coreName } from './core'
 import type { PluginLoader } from './init/utils'
 import { usePluginStore } from './store'
-import { coreName } from './core'
 
 const rawLoaders = import.meta.glob<PluginLoader>('./init/loader/*_*.ts', {
   eager: true,
-  import: 'default'
+  import: 'default',
 })
 export const loaders = sortBy(Object.entries(rawLoaders), ([fname]) =>
   // oxlint-disable-next-line no-useless-escape
-  Number(fname.match(/[\d\.]+(?=_)/)?.[0])
+  Number(fname.match(/[\d\.]+(?=_)/)?.[0]),
 ).map(v => v[1])
 
 const loadLocks = <Record<string, Mutex>>{}
@@ -28,7 +28,7 @@ const bootConfig = async (configFactory: PluginConfigFactory) => {
   const cfg = configFactory({ safe: true })
   store.pluginSteps[cfg.name] = {
     now: { status: 'wait', stepsIndex: 0 },
-    steps: [{ name: '等待', description: '插件载入中' }]
+    steps: [{ name: '等待', description: '插件载入中' }],
   }
   await bootPlugin(cfg)
 }
@@ -71,11 +71,8 @@ export interface PluginLoadError {
  */
 function buildTopologicalOrder(
   plugins: PluginArchiveDB.Archive[],
-  coreName: string
-): {
-  levels: PluginArchiveDB.Archive[][]
-  cyclic: PluginArchiveDB.Archive[]
-} {
+  coreName: string,
+): { levels: PluginArchiveDB.Archive[][]; cyclic: PluginArchiveDB.Archive[] } {
   const nameToPlugin = new Map(plugins.map(p => [p.pluginName, p]))
   const inDegree = new Map<string, number>()
   const adjacency = new Map<string, string[]>()
@@ -120,16 +117,10 @@ function buildTopologicalOrder(
 /**
  * 从循环引用插件集合中查找具体的循环路径（用于友好报错）
  */
-function findCyclePaths(
-  cyclic: PluginArchiveDB.Archive[],
-  coreName: string
-): string[][] {
+function findCyclePaths(cyclic: PluginArchiveDB.Archive[], coreName: string): string[][] {
   const cyclicNames = new Set(cyclic.map(p => p.pluginName))
   const nameToDeps = new Map(
-    cyclic.map(p => [
-      p.pluginName,
-      p.meta.require.filter(d => d.id !== coreName).map(d => d.id)
-    ])
+    cyclic.map(p => [p.pluginName, p.meta.require.filter(d => d.id !== coreName).map(d => d.id)]),
   )
   const paths: string[][] = []
 
@@ -220,11 +211,7 @@ export const loadAllPlugins = (): PluginLoadError[] & Promise<void> => {
           const reason = r.reason instanceof Error ? r.reason.message : String(r.reason)
           console.error(`[plugin] 加载失败: ${pluginName}`, r.reason)
 
-          const errorItem: PluginLoadError = {
-            pluginName,
-            reason,
-            ignore: () => {},
-          }
+          const errorItem: PluginLoadError = { pluginName, reason, ignore: () => {} }
 
           // 将 ignore 绑定到内部 resolver
           const waitPromise = new Promise<void>(resolve => {

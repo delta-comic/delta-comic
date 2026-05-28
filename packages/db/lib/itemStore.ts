@@ -16,7 +16,7 @@ export type StoredItem = Selectable<Table>
 export const itemKey = new SourcedValue('*')
 
 export enum QueryKey {
-  item = 'db:itemStore:'
+  item = 'db:itemStore:',
 }
 
 export const useUpsert = defineMutation(() => {
@@ -27,7 +27,7 @@ export const useUpsert = defineMutation(() => {
       withTransition(async trx => {
         const k = itemKey.toString([
           uni.content.ContentPage.contentPages.key.toString(item.contentType),
-          item.id
+          item.id,
         ])
         await trx
           .replaceInto('itemStore')
@@ -38,7 +38,7 @@ export const useUpsert = defineMutation(() => {
     onSettled: () => {
       void queryCache.invalidateQueries({ key })
     },
-    key
+    key,
   })
   return { ...mutation, upsert: mutateAsync, key }
 })

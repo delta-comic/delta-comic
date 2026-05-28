@@ -8,6 +8,6 @@ export function DeltaComicUiResolver(): ComponentResolver {
     resolve: (name: string) => {
       if (name.match(/^(Dc[A-Z]|dc-[a-z])/)) return { name, from: pkgName }
       return
-    }
+    },
   }
 }

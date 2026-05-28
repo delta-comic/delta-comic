@@ -17,11 +17,11 @@ export interface GlobalInjections extends Record<string, Component> {}
 
 export const addInjection = <
   T extends keyof GlobalInjections,
-  TCfg extends GlobalInjectionsConfig<T> = GlobalInjectionsConfig<T>
+  TCfg extends GlobalInjectionsConfig<T> = GlobalInjectionsConfig<T>,
 >(
   key: TCfg['key'],
   value: TCfg['component'],
-  condition?: TCfg['condition']
+  condition?: TCfg['condition'],
 ) => {
   Global.envExtends.add({ key, component: value, condition: condition ?? (() => true) })
 }

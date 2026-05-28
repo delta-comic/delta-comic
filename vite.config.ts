@@ -4,7 +4,7 @@ export default defineConfig({
   staged: {
     '*': 'vp check --fix',
     '*.{md,json,toml,rs,js,jsx,ts,tsx,mts,cts,mjs,cjs,vue,html}':
-      'vp exec cspell --no-exit-code --no-must-find-files'
+      'vp exec cspell --no-exit-code --no-must-find-files',
   },
   fmt: {
     ignorePatterns: ['*.md', 'components.d.ts', 'typed-router.d.ts'],
@@ -24,7 +24,7 @@ export default defineConfig({
       preserveWhitespace: true,
       stylesheet: './packages/app/src/index.css',
       attributes: ['overlayClass', ':class', 'Class'],
-      functions: ['twMerge', 'cn']
+      functions: ['twMerge', 'cn'],
     },
     bracketSameLine: false,
     bracketSpacing: true,
@@ -42,9 +42,9 @@ export default defineConfig({
         ['internal', 'type-internal'],
         ['parent', 'type-parent'],
         ['sibling', 'type-sibling'],
-        ['index', 'type-index']
-      ]
-    }
+        ['index', 'type-index'],
+      ],
+    },
   },
   lint: {
     plugins: ['unicorn', 'typescript', 'oxc', 'vue'],
@@ -53,7 +53,7 @@ export default defineConfig({
       // 'no-unused-expressions': 'allow',
       // 'no-useless-escape': 'allow',
       // 'no-non-null-asserted-optional-chain': 'allow',
-      'no-thenable': 'allow'
+      'no-thenable': 'allow',
       // 'tsconfig-error': 'allow'
     },
     settings: {
@@ -67,14 +67,14 @@ export default defineConfig({
         augmentsExtendsReplacesDocs: false,
         implementsReplacesDocs: false,
         exemptDestructuredRootsFromChecks: false,
-        tagNamePreference: {}
+        tagNamePreference: {},
       },
-      'vitest': { typecheck: false }
+      'vitest': { typecheck: false },
     },
     env: { builtin: true },
     globals: {},
     ignorePatterns: ['.vscode', './package.json'],
-    options: { typeAware: false, typeCheck: false }
+    options: { typeAware: false, typeCheck: false },
   },
-  run: { cache: { tasks: true, scripts: true } }
+  run: { cache: { tasks: true, scripts: true } },
 })

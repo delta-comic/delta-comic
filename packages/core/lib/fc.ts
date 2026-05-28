@@ -9,7 +9,7 @@ const isFullscreen = useGlobalVar(
     })
     return isFc
   })(),
-  'core/isFc'
+  'core/isFc',
 )
 
 export const useFullscreen = () => ({
@@ -22,5 +22,5 @@ export const useFullscreen = () => ({
   },
   toggle() {
     isFullscreen.value = !isFullscreen.value
-  }
+  },
 })
