@@ -9,7 +9,7 @@ import { definePlugin, type PluginExpose } from '@/plugin'
 
 import { OfflineShareRound, TagOutlined } from './icon'
 import { usePluginStore } from './store'
-export const $initCore = () =>
+export const getCorePluginConfig = () =>
   definePlugin({
     name: coreName,
     config: [appConfig],
@@ -29,17 +29,17 @@ export const $initCore = () =>
                 item: {
                   contentType: uni.content.ContentPage.contentPages.key.toString(item.contentType),
                   ep: item.thisEp.id,
-                  name: item.title
+                  name: item.title,
                 },
                 plugin: page.plugin,
-                id: page.id
-              })
+                id: page.id,
+              }),
             )
             await SharedFunction.call(
               'pushShareToken',
-              `[${item.title}](复制这条口令，打开Delta Comic)${compressed}`
+              `[${item.title}](复制这条口令，打开Delta Comic)${compressed}`,
             )
-          }
+          },
         },
         {
           filter: page => !!page.preload,
@@ -55,16 +55,16 @@ export const $initCore = () =>
                 item: {
                   contentType: uni.content.ContentPage.contentPages.key.toString(item.contentType),
                   ep: item.thisEp.id,
-                  name: item.title
+                  name: item.title,
                 },
                 plugin: page.plugin,
-                id: page.id
-              })
+                id: page.id,
+              }),
             )
             const token = `[${item.title}](复制这条口令，打开Delta Comic)${compressed}`
             await navigator.share({ title: 'Delta Comic内容分享', text: token })
-          }
-        }
+          },
+        },
       ],
       tokenListen: [
         {
@@ -77,8 +77,8 @@ export const $initCore = () =>
             const pluginStore = usePluginStore()
             const meta: CorePluginTokenShareMeta = JSON.parse(
               decompressFromEncodedURIComponent(
-                chipboard.replace(/^\[.+\]/, '').replaceAll('(复制这条口令，打开Delta Comic)', '')
-              )
+                chipboard.replace(/^\[.+\]/, '').replaceAll('(复制这条口令，打开Delta Comic)', ''),
+              ),
             )
             return {
               title: '口令',
@@ -89,14 +89,14 @@ export const $initCore = () =>
                   'routeToContent',
                   uni.content.ContentPage.contentPages.key.toJSON(meta.item.contentType),
                   meta.id,
-                  meta.item.ep
+                  meta.item.ep,
                 )
-              }
+              },
             }
-          }
-        }
-      ]
-    }
+          },
+        },
+      ],
+    },
   })
 interface CorePluginTokenShareMeta {
   item: { name: string; contentType: string; ep: string }
@@ -106,6 +106,6 @@ interface CorePluginTokenShareMeta {
 
 export const coreName = 'core'
 export const core = useGlobalVar(
-  declareDepType<PluginExpose<typeof $initCore>>(coreName),
-  'core/plugin/coreFlag'
+  declareDepType<PluginExpose<ReturnType<typeof getCorePluginConfig>>>(coreName),
+  'core/plugin/coreFlag',
 )

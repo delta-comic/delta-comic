@@ -1,7 +1,7 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import { appLocalDataDir, join } from '@tauri-apps/api/path'
 
-import type { PluginConfig } from '@/plugin'
+import type { PluginConfig, PluginConfigFactory } from '@/plugin'
 
 const appLocalDataDirPath = await appLocalDataDir()
 export const getPluginFsPath = async (pluginName: string) =>
@@ -20,7 +20,7 @@ export abstract class PluginInstaller {
 
 export abstract class PluginLoader {
   public abstract name: string
-  public abstract load(pluginMeta: PluginArchiveDB.Archive): Promise<any>
+  public abstract load(pluginMeta: PluginArchiveDB.Archive): Promise<PluginConfigFactory | undefined>
   public abstract install(file: File): Promise<PluginArchiveDB.Meta>
   public abstract decodeMeta(file: File): Promise<PluginArchiveDB.Meta>
   public abstract canInstall(file: File): boolean

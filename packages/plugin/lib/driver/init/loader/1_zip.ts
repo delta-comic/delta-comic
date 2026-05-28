@@ -4,6 +4,8 @@ import { join } from '@tauri-apps/api/path'
 import * as fs from '@tauri-apps/plugin-fs'
 import { loadAsync, type JSZipObject } from 'jszip'
 
+import type { PluginConfigFactory } from '@/plugin'
+
 import { PluginLoader } from '../utils'
 import { getPluginFsPath } from '../utils'
 
@@ -40,16 +42,17 @@ export default new class extends PluginLoader {
     return file.name.endsWith('.zip')
   }
 
-  public override async load(pluginMeta: PluginArchiveDB.Archive): Promise<any> {
+  public override async load(pluginMeta: PluginArchiveDB.Archive): Promise<PluginConfigFactory | undefined> {
     if (!pluginMeta.meta.entry) throw new Error('not found entry')
     const baseDir = await getPluginFsPath(pluginMeta.pluginName)
     console.log('[loader zip] baseDir:', baseDir, pluginMeta.meta.entry)
     const src = decodeURIComponent(
       convertFileSrc(await join(baseDir, pluginMeta.meta.entry.jsPath), 'local')
     )
-    await import(/* @vite-ignore */ src)
+    const config = await import(/* @vite-ignore */ src)
+    const result = config.default as PluginConfigFactory | undefined
 
-    if (!pluginMeta.meta.entry?.cssPath) return
+    if (!pluginMeta.meta.entry?.cssPath) return result
     const cssPath = pluginMeta.meta.entry.cssPath
 
     if (cssPath == 'auto') {
@@ -71,6 +74,8 @@ export default new class extends PluginLoader {
     style.rel = 'stylesheet'
     style.href = decodeURIComponent(convertFileSrc(await join(baseDir, filePath), 'local'))
     document.head.appendChild(style)
+
+    return result
   }
   public override async decodeMeta(file: File): Promise<PluginArchiveDB.Meta> {
     const zip = await loadAsync(file)

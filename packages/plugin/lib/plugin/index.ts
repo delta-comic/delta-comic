@@ -1,4 +1,3 @@
-import { isString, isUndefined } from 'es-toolkit'
 import { isFunction } from 'es-toolkit/compat'
 
 import type { ConfigPointer } from '@/config'
@@ -27,7 +26,6 @@ export type * as Search from './search'
 import type * as Auth from './auth'
 export type * as Auth from './auth'
 
-import type { PluginArchiveDB } from '@delta-comic/db'
 import mitt from 'mitt'
 
 import type * as Resource from './resource'
@@ -35,7 +33,7 @@ export type * as Resource from './resource'
 
 export const pluginEmitter = mitt<{ definedPlugin: PluginConfig }>()
 
-export interface PluginConfig {
+export interface PluginConfigValues {
   name: string
   content?: Content.Config
   resource?: Resource.Content
@@ -43,65 +41,41 @@ export interface PluginConfig {
   user?: User.Config
   auth?: Auth.Config
   otherProgress?: OtherProgress.Config[]
-  /**
-   * 返回值如果不为空，则会await后作为expose暴露
-   */
-  onBooted?(ins: DefineResult): (PromiseLike<object> | object) | void
   search?: Search.Config
   /**
    * 插件的配置项需在此处注册
    * 传入`Store.ConfigPointer`
    */
   config?: ConfigPointer[]
-
   subscribe?: Record<string, Subscribe.Config>
-
   share?: Share.Config
 }
 
 export type DefineResult = { api?: Record<string, string | undefined | false> }
-
-export const definePlugin = async <T extends PluginConfig>(
-  config: T | ((safe: boolean) => T)
-): Promise<T> => {
-  if (isFunction(config)) var cfg = config(window.$$safe$$)
-  else var cfg = config
-  console.log('[definePlugin] new plugin defining...', cfg)
-  pluginEmitter.emit('definedPlugin', cfg)
-  return cfg
+export interface PluginConfigHooks {
+  /**
+   * 返回值如果不为空，则会await后作为expose暴露
+   */
+  onBooted?(ins: DefineResult): (PromiseLike<object> | object) | void
 }
-export type PluginExpose<T extends () => Promise<PluginConfig>> = Awaited<
-  ReturnType<NonNullable<Awaited<ReturnType<T>>['onBooted']>>
+
+export type PluginConfig = PluginConfigValues & PluginConfigHooks
+
+export interface ConfigEnv {
+  safe: boolean
+}
+/**
+ * 这仅是个辅助定义的函数，没有副作用
+ */
+export const definePlugin = <T extends PluginConfig>(
+  config: T | ((env: ConfigEnv) => T),
+): ((env: ConfigEnv) => T) => {
+  if (isFunction(config)) return config
+  return () => config
+}
+
+export type PluginExpose<T extends PluginConfig> = ReturnType<
+  T['onBooted'] extends () => object ? T['onBooted'] : () => void
 >
 
-export interface RawPluginMeta {
-  'name:display': string
-  'name:id': string
-  'version': string
-  'author': string | undefined
-  'description': string
-  'require'?: string[] | string
-}
-
-export const decodePluginMeta = (v: RawPluginMeta): PluginArchiveDB.Meta => ({
-  name: { display: v['name:display'], id: v['name:id'] },
-  author: v.author ?? '',
-  description: v.description,
-  require: (v.require ? (isString(v.require) ? [v.require] : v.require) : [])
-    .map(dep => {
-      const [name, ...download] = dep.split(':')
-      if (!name.startsWith('dc|')) return
-      return { id: name.replace(/^dc\|/, ''), download: download.join(':') }
-    })
-    .filter(v => !isUndefined(v)),
-  version: {
-    plugin: v.version.split('/')[0],
-    supportCore: (() => {
-      const raw = v.version.split('/')[1]
-      if (v.version.split('/')[2]) {
-        return raw.replaceAll('>=', '^')
-      }
-      return raw
-    })()
-  }
-})
+export type PluginConfigFactory = (env: ConfigEnv) => PluginConfig

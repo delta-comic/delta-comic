@@ -12,6 +12,7 @@ const rawBooters = import.meta.glob<PluginBooter>('./init/booter/*_*.ts', {
   import: 'default'
 })
 export const booters = sortBy(Object.entries(rawBooters), ([fname]) =>
+  // oxlint-disable-next-line no-useless-escape
   Number(fname.match(/[\d\.]+(?=_)/)?.[0])
 ).map(v => v[1])
 
