@@ -17,7 +17,14 @@ export default defineConfig({
     vueJsx(),
     Components({ dts: true, resolvers: [MotionResolver(), NaiveUiResolver()] }) as any,
     tailwindcss(),
-    dtsPlugin({ include: './lib', tsconfigPath: './tsconfig.app.json', bundleTypes: true }),
+    dtsPlugin({
+      processor: 'vue',
+      include: ['env.d.ts', 'components.d.ts', 'lib/**/*.ts', 'lib/**/*.tsx', 'lib/**/*.vue'],
+      entryRoot: 'lib',
+      tsconfigPath: './tsconfig.app.json',
+      cleanVueFileName: true,
+      bundleTypes: true,
+    }),
   ],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) },
