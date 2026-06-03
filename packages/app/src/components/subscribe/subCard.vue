@@ -23,7 +23,7 @@ defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
             {{ item.author[0].label }}
           </div>
           <div class="-mt-0.5 flex items-center text-[11px] text-(--van-text-color-2)">
-            {{ createDateString(item.$updateTime) }}·投稿了内容
+            {{ createDateString(item.updateTime) }}·投稿了内容
           </div>
         </div>
       </div>

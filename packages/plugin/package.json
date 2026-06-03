@@ -42,7 +42,6 @@
     "@pinia/colada": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-fs": "catalog:",
-    "@vueuse/core": "catalog:",
     "es-toolkit": "catalog:",
     "jszip": "catalog:",
     "ky": "^2.0.1",
@@ -51,6 +50,7 @@
     "vue": "catalog:"
   },
   "devDependencies": {
-    "@typescript/native-preview": "catalog:"
+    "@typescript/native-preview": "catalog:",
+    "vue-component-type-helpers": "catalog:"
   }
 }

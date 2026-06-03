@@ -12,7 +12,7 @@ const pluginStore = usePluginStore()
       <div v-for="[plugin, categories] in Global.categories.entries()">
         <NH1 prefix="bar" align-text type="success" class="mb-0! ml-2!">
           <NText type="primary">
-            {{ pluginStore.$getPluginDisplayName(plugin) }}
+            {{ pluginStore.$getI18nName(plugin) }}
           </NText>
         </NH1>
         <div

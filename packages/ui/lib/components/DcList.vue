@@ -26,6 +26,16 @@ defineExpose({
     return waterfall.value?.reloadList()
   },
 })
+
+defineSlots<{
+  default(props: {
+    item: T
+    index: number
+    height?: number
+    minHeight: number
+    length: number
+  }): any
+}>()
 </script>
 
 <template>
@@ -39,5 +49,8 @@ defineExpose({
     :gap="0"
     :padding="0"
     ref="waterfall"
-  />
+    v-slot="{ index, item, length, minHeight, height }"
+  >
+    <slot :index :item :length :minHeight :height></slot>
+  </DcWaterfall>
 </template>

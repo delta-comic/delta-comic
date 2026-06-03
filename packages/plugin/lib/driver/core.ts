@@ -82,7 +82,7 @@ export const getCorePluginConfig = () =>
             )
             return {
               title: '口令',
-              detail: `发现分享的内容: ${meta.item.name}，需要的插件: ${pluginStore.$getPluginDisplayName(meta.plugin)}`,
+              detail: `发现分享的内容: ${meta.item.name}，需要的插件: ${pluginStore.$getI18nName(meta.plugin)}`,
               onNegative() {},
               onPositive() {
                 return SharedFunction.call(

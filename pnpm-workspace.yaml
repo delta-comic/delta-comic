@@ -59,7 +59,7 @@ catalog:
   vite-plus: ^0.1.22
   vitest: npm:@voidzero-dev/vite-plus-test@^0.1.22
   vue: ^3.5.30
-  vue-component-type-helpers: ^3.2.6
+  vue-component-type-helpers: ^3.3.1
   vue-router: ^5.0.4
 
 overrides:

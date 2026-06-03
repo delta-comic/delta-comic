@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Loader } from '@delta-comic/plugin'
 import { type MenuOption, NIcon, useMessage } from 'naive-ui'
-import { type Component, h, shallowRef } from 'vue'
+import { type Component, h, ref, shallowRef, watch } from 'vue'
 
 import { Icons } from '@/icons'
 import Config from '@/pages/main/plugin/config.vue'
@@ -34,14 +34,23 @@ const menuOptions = [
   { label: '配置', key: 'config', icon: renderIcon(Icons.antd.SettingOutlined), comp: Config },
   { label: `版本: ${pkg.version}`, key: 'version', disabled: true },
 ] satisfies MenuOption[]
-const isBooting = shallowRef(false)
+
+const bootingSteps = ref<Record<string, Loader.PluginLoadingInfo>>()
 const boot = async (safe = false) => {
-  if (isBooting.value || isBooted.value) return $message.warning('正在启动中')
-  isBooting.value = true
+  if (bootingSteps.value || isBooted.value) return $message.warning('正在启动中')
   window.$$safe$$ = safe
-  await Loader.loadAllPlugins()
+  const steps = Loader.loadAllPlugins()
+  const watcher = watch(steps, steps => (bootingSteps.value = steps), {
+    immediate: true,
+    deep: true,
+  })
   isBooted.value = true
   show.value = false
+  try {
+    await steps
+  } finally {
+    watcher.stop()
+  }
 }
 
 const $message = useMessage()
@@ -53,9 +62,9 @@ const $message = useMessage()
     position="bottom"
     round
     class="h-[80vh]"
-    :beforeClose="() => !isBooting"
+    :beforeClose="() => !bootingSteps"
   >
-    <NSpin :show="isBooting" class="relative size-full" contentClass="size-full">
+    <NSpin :show="!!bootingSteps" class="relative size-full" contentClass="size-full">
       <div class="size-full overflow-hidden">
         <NMenu v-model:value="pageSelect" mode="horizontal" :options="menuOptions" responsive />
         <!-- content pages -->
@@ -83,7 +92,7 @@ const $message = useMessage()
       />
       <template #description>
         <AnimatePresence>
-          <LoadList :isBooting />
+          <LoadList :bootingSteps v-if="bootingSteps" />
         </AnimatePresence>
       </template>
     </NSpin>

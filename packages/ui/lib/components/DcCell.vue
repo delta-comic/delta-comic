@@ -34,7 +34,6 @@ const $props = withDefaults(
 )
 
 const slots = useSlots()
-const $router = useRouter()
 const vm = getCurrentInstance()!.proxy!
 
 function navigate() {

@@ -11,7 +11,7 @@ const pluginStore = usePluginStore()
     <div class="w-full pl-4 text-lg font-semibold">
       {{ card.title }}
       <span class="text-[16px] text-(--van-text-color-3) italic"
-        >#{{ pluginStore.$getPluginDisplayName(pluginName) }}</span
+        >#{{ pluginStore.$getI18nName(pluginName) }}</span
       >
     </div>
     <NGrid class="w-full" :cols="4" :y-gap="10">

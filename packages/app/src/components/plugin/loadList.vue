@@ -1,29 +1,26 @@
 <script setup lang="ts">
-import { usePluginStore } from '@delta-comic/plugin'
-import { createLoadingMessage } from '@delta-comic/ui'
+import { usePluginStore, type Loader } from '@delta-comic/plugin'
+import { createLoadingMessage, DcCell } from '@delta-comic/ui'
 import { motion } from 'motion-v'
 import { computed } from 'vue'
 
-defineProps<{ isBooting: boolean }>()
+const $props = defineProps<{ bootingSteps: Record<string, Loader.PluginLoadingInfo> }>()
 
 const pluginStore = usePluginStore()
-
-const allErrors = computed(() =>
-  Object.entries(pluginStore.pluginSteps)
-    .filter(v => v[1].now.error)
-    .map(v => [v[0], v[1].now.error!] as [plugin: string, error: Error]),
-)
 
 const rebootApp = () => {
   createLoadingMessage('重启中')
   location.reload()
 }
+
+const isHaveError = computed(() =>
+  Object.values($props.bootingSteps).some(v => v.progress.status == 'error'),
+)
 </script>
 
 <template>
   <!-- loading list -->
   <motion.div
-    v-if="isBooting"
     :initial="{ opacity: 0, scale: '50%', translateY: '85px' }"
     :exit="{ opacity: 0, scale: '50%', translateY: '85px' }"
     :animate="{ opacity: 1, scale: '100%', translateY: '0px' }"
@@ -37,13 +34,19 @@ const rebootApp = () => {
           </template>
         </DcCell>
         <!-- acutely item -->
-        <template v-for="[plugin, { steps, now }] in Object.entries(pluginStore.pluginSteps)">
+        <template v-for="[plugin, { steps, progress }] in Object.entries(bootingSteps)">
           <DcCell
-            :title="pluginStore.$getPluginDisplayName(plugin)"
-            v-if="steps[now.stepsIndex]"
+            :title="pluginStore.$getI18nName(plugin)"
+            v-if="progress.status != 'done'"
             :key="plugin"
-            :label="`${steps[now.stepsIndex].name}: ${steps[now.stepsIndex].description}`"
-            :class="[now.status == 'error' && 'bg-(--nui-error-color)/20!']"
+            :label="
+              `${steps[progress.stepsIndex].name}: ${steps[progress.stepsIndex].description}` +
+                progress.status ==
+              'error'
+                ? `\n${progress.errorReason}`
+                : ''
+            "
+            :class="[progress.status == 'error' && 'bg-(--nui-error-color)/20!']"
           />
         </template>
       </TransitionGroup>
@@ -56,7 +59,7 @@ const rebootApp = () => {
     :exit="{ opacity: 0, scale: '50%', translateY: '85px' }"
     class="relative"
     :animate="{ opacity: 1, scale: '100%', translateY: '0px' }"
-    v-if="allErrors.length"
+    v-if="isHaveError"
   >
     <NButton type="primary" class="absolute! right-10!" @click="rebootApp">重新加载</NButton>
   </motion.div>

@@ -1,14 +1,13 @@
 import { useNativeStore } from '@delta-comic/db'
-import type { FormType } from '@delta-comic/ui'
+import type { FormResult, FormSingleConfigure } from '@delta-comic/model'
 import { useGlobalVar } from '@delta-comic/utils'
-import { usePreferredDark } from '@vueuse/core'
 import { fromPairs } from 'es-toolkit/compat'
 import { defineStore } from 'pinia'
 import { computed, shallowReactive, type Ref } from 'vue'
 
 export type ConfigDescription = Record<
   string,
-  Required<Pick<FormType.SingleConfigure, 'defaultValue'>> & FormType.SingleConfigure
+  Required<Pick<FormSingleConfigure, 'defaultValue'>> & FormSingleConfigure
 >
 export class ConfigPointer<T extends ConfigDescription = ConfigDescription> {
   constructor(
@@ -55,7 +54,7 @@ export const useConfig = defineStore('config', helper => {
   const form = shallowReactive(new Map<symbol, { form: ConfigDescription; value: any }>())
 
   const $load = helper.action(
-    <T extends ConfigPointer>(pointer: T): Ref<FormType.Result<T['config']>> => {
+    <T extends ConfigPointer>(pointer: T): Ref<FormResult<T['config']>> => {
       const v = form.get(pointer.key)
       if (!v) throw new Error(`not found config by plugin "${pointer.pluginName}"`)
       return v.value
@@ -63,9 +62,9 @@ export const useConfig = defineStore('config', helper => {
     'load',
   )
 
-  const isSystemDark = usePreferredDark()
+  const isSystemDark = matchMedia('(prefers-color-scheme: dark)').matches
   const isDark = computed(() => {
-    if (!$isExistConfig(appConfig)) return isSystemDark.value
+    if (!$isExistConfig(appConfig)) return isSystemDark
     const cfg = $load(appConfig).value
     switch (cfg.darkMode) {
       case 'light':
@@ -73,7 +72,7 @@ export const useConfig = defineStore('config', helper => {
       case 'dark':
         return true
       case 'system':
-        return isSystemDark.value
+        return isSystemDark
       default:
         return false
     }

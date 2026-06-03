@@ -10,7 +10,7 @@
     "dev": "tauri dev",
     "dev:web": "vp dev",
     "tauri": "vp exec tauri",
-    "typecheck": "vue-tsc"
+    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit"
   },
   "dependencies": {
     "@delta-comic/core": "workspace:",

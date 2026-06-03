@@ -51,7 +51,7 @@ const routeToLevel = (source: string) => {
           <NButton text>
             <span class="text-xs text-(--nui-primary-color)">
               <DcVar :value="selectLevelKey.toJSON(selectLevel)" v-slot="{ value: [plugin, name] }">
-                {{ pluginStore.$getPluginDisplayName(plugin) }}:{{ name }}
+                {{ pluginStore.$getI18nName(plugin) }}:{{ name }}
               </DcVar>
             </span>
           </NButton>
@@ -62,8 +62,8 @@ const routeToLevel = (source: string) => {
       <DcList
         v-if="source"
         :source="{ type: 'query', value: source.content() }"
-        :item-height="140"
-        v-slot="{ data: { item, index }, height }"
+        :minHeight="140"
+        v-slot="{ item, index, height }"
         class="size-full!"
       >
         <div :style="{ height: `${height}px` }" class="relative w-full overflow-hidden">

@@ -16,7 +16,7 @@ export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise
           onClick={async () =>
             SharedFunction.call('routeToContent', ...(await i.getContent(searchText, signal)))
           }
-          label={`来源:${store.$getPluginDisplayName(r[0])}`}
+          label={`来源:${store.$getI18nName(r[0])}`}
           value={searchText}
           class='van-haptics-feedback w-full'
         />

@@ -29,7 +29,7 @@ const getItemCard = (contentType: uni.content.ContentType_) =>
                 icon: Icons.other.HotLevel,
                 onClick() {
                   const first = Global.levelboard.keys().next().value!
-                  return $router.force.push({ name: '/hot', query: { plugin: first } })
+                  return $router.force.push({ name: '/hot/[plugin]', params: { plugin: first } })
                 },
               },
           ...Array.from(Global.topButton.values()).flat(),

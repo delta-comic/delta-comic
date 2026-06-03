@@ -73,3 +73,4 @@ webp
 wenxig
 xgbuugti
 Yahei
+Strs

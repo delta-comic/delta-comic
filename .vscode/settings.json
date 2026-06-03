@@ -13,5 +13,6 @@
   "vue.suggest.propNameCasing": "alwaysCamelCase",
   "tailwindCSS.classFunctions": ["twMerge", "cn"],
   "tailwindCSS.classAttributes": ["class", "className", "ngClass", "class:list", ":class"],
-  "[markdown]": { "editor.defaultFormatter": "DavidAnson.vscode-markdownlint" }
+  "[markdown]": { "editor.defaultFormatter": "DavidAnson.vscode-markdownlint" },
+  "cSpell.words": ["Strs"]
 }

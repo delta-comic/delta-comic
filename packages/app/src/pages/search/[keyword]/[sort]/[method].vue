@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SharedFunction } from '@delta-comic/core'
 import { uni } from '@delta-comic/model'
-import { appConfig, useConfig, usePluginStore } from '@delta-comic/plugin'
+import { appConfig, useConfig, usePluginStore, type Search } from '@delta-comic/plugin'
 import { useInfiniteQuery } from '@pinia/colada'
 import { isEmpty } from 'es-toolkit/compat'
 import { computed, shallowRef } from 'vue'
@@ -15,22 +15,45 @@ const route = useRoute<'/search/[keyword]/[sort]/[method]'>()
 const pluginStore = usePluginStore()
 const config = useConfig().$load(appConfig)
 
+const allSearchSource = computed(() =>
+  Array.from(pluginStore.plugins.values())
+    .filter(v => v.search?.methods)
+    .map(
+      v =>
+        [v.name, Object.entries(v.search?.methods ?? {})] as [
+          plugin: string,
+          sources: [name: string, method: Search.SearchMethod][],
+        ],
+    ),
+)
+
 const method = computed(() => {
   const [plugin, name] = searchSourceKey.toJSON(route.params.method)
-  return Object.fromEntries(Object.fromEntries(pluginStore.allSearchSource)[plugin])[name]
+  return Object.fromEntries(Object.fromEntries(allSearchSource.value)[plugin])[name]
 })
 const query = useInfiniteQuery({
   key: () => [
     'search',
-    { keyword: route.params.keyword, sort: route.params.sort, method: route.params.method },
+    {
+      keyword: route.params.keyword,
+      sort: route.params.sort,
+      method: route.params.method,
+      showAI: config.value.showAIProject,
+    },
   ],
   initialPageParam: method.value.fetchSearchResult.initPage,
   query: async ({ signal, pageParam }) => {
-    return await method.value.fetchSearchResult.query(
-      { input: decodeURIComponent(route.params.keyword), sort: route.params.sort },
-      pageParam,
-      signal,
-    )
+    return await method.value.fetchSearchResult
+      .query(
+        { input: decodeURIComponent(route.params.keyword), sort: route.params.sort },
+        pageParam,
+        signal,
+      )
+      .then(item =>
+        config.value.showAIProject
+          ? item
+          : { ...item, data: item.data.filter(item => !item.$isAi) },
+      )
   },
   getNextPageParam: lp => lp.nextPage,
 })
@@ -50,9 +73,9 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
       <div class="scroll flex w-full items-center gap-2 overflow-x-auto pr-2 *:text-nowrap!">
         <NPopselect
           :options="
-            pluginStore.allSearchSource.map(([plugin, sources]) => ({
+            allSearchSource.map(([plugin, sources]) => ({
               type: 'group',
-              label: pluginStore.$getPluginDisplayName(plugin),
+              label: pluginStore.$getI18nName(plugin),
               children: sources.map(([id, { name }]) => ({
                 label: name,
                 value: searchSourceKey.toString([plugin, id]),
@@ -69,9 +92,9 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
         >
           <NButton quaternary>
             搜索源:<span class="text-xs text-(--nui-primary-color)">
-              {{
-                pluginStore.$getPluginDisplayName(searchSourceKey.toJSON(route.params.method)[0])
-              }}:{{ method.name }}
+              {{ pluginStore.$getI18nName(searchSourceKey.toJSON(route.params.method)[0]) }}:{{
+                method.name
+              }}
             </span>
             <template #icon>
               <NIcon size="1.8rem">
@@ -147,26 +170,12 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
   >
     <DcList
       :minHeight="140"
-      v-slot="{ data: { item } }"
+      v-slot="{ item }"
       class="h-full transition-all duration-200 will-change-[transform,height]"
       ref="list"
       :source="{ type: 'stream', value: query }"
-      :dataProcessor="data => (config.showAIProject ? data : data.filter(comic => !comic.$isAi))"
     >
       <component :is="uni.item.Item.itemCards.get(item.contentType)" :item />
     </DcList>
   </div>
 </template>
-<style scoped>
-:deep(.van-swipe-item) {
-  height: 100% !important;
-}
-
-:deep(.van-tab__panel) {
-  height: 100% !important;
-}
-
-.scroll::-webkit-scrollbar {
-  display: none;
-}
-</style>

@@ -1,7 +1,10 @@
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
+import { isNumber } from 'es-toolkit'
 
-export const createDateString = (date: Dayjs = dayjs()) => {
+export const createDateString = (date: Dayjs | number = dayjs()) => {
+  if (isNumber(date)) date = dayjs(date)
+
   const today = dayjs()
   const isThisYear = date.isSame(today, 'year')
   const isInSameMonth = isThisYear && date.isSame(today, 'month')

@@ -15,7 +15,7 @@ class _PluginAuth extends PluginBooter {
     if (!cfg.auth) return
     const pluginStore = usePluginStore()
     try {
-      const pluginName = pluginStore.$getPluginDisplayName(cfg.name)
+      const pluginName = pluginStore.$getI18nName(cfg.name)
       setMeta('判定鉴权状态中...')
       const isPass = await cfg.auth.passSelect()
       const waitMethod = Promise.withResolvers<'logIn' | 'signUp'>()

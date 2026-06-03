@@ -5,7 +5,7 @@ import { type uni } from '@delta-comic/model'
 import { usePluginStore } from '@delta-comic/plugin'
 import { createDownloadMessage, DcState } from '@delta-comic/ui'
 import { isNumber, uniqBy } from 'es-toolkit/compat'
-import { shallowRef, useTemplateRef } from 'vue'
+import { computed, shallowRef, useTemplateRef } from 'vue'
 
 import CreateFavouriteCard from '@/components/createFavouriteCard.vue'
 import Searcher from '@/components/listSearcher.vue'
@@ -17,13 +17,15 @@ import { pluginName } from '@/symbol'
 const isCardMode = shallowRef(true)
 const temp = useTemp().$apply('favourite', () => ({ selectMode: 'pack' }))
 
+const searcher = useTemplateRef<InstanceType<typeof Searcher>>('searcher')
+
+const st = computed(() => searcher.value?.searchText ?? '')
+
 const { state: allFavouriteCardsState } = FavouriteDB.useQueryCard(
-  db => db.selectAll().orderBy('createAt', 'desc').execute(),
+  db => db.selectAll().where('title', '=', `%${st.value}%`).orderBy('createAt', 'desc').execute(),
   [],
   () => [],
 )
-
-const searcher = useTemplateRef('searcher')
 
 const isSyncing = shallowRef(false)
 
@@ -41,7 +43,7 @@ const syncFromCloud = () =>
 
         const { download, upload } = user.syncFavourite
         const downloadItems = await createLoading(
-          `同步<${pluginStore.$getPluginDisplayName(plugin)}>-下载`,
+          `同步<${pluginStore.$getI18nName(plugin)}>-下载`,
           async c => {
             c.retryable = true
             const downloadItems = await download()
@@ -50,7 +52,7 @@ const syncFromCloud = () =>
         )
 
         const diff = await createLoading(
-          `同步<${pluginStore.$getPluginDisplayName(plugin)}>-写入数据库`,
+          `同步<${pluginStore.$getI18nName(plugin)}>-写入数据库`,
           c =>
             DBUtils.withTransition(async trx => {
               c.retryable = true
@@ -85,7 +87,7 @@ const syncFromCloud = () =>
             }),
         )
 
-        await createLoading(`同步<${pluginStore.$getPluginDisplayName(plugin)}>-上传`, async c => {
+        await createLoading(`同步<${pluginStore.$getI18nName(plugin)}>-上传`, async c => {
           c.retryable = true
           await upload(diff)
         })
@@ -183,9 +185,6 @@ const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Arra
         unReloadable
         ref="waterfall"
         :source="{ type: 'array', value: allFavouriteCards }"
-        :data-processor="
-          v => v.filter(v => isNumber(v) || v.title.includes(searcher?.searchText ?? ''))
-        "
         v-slot="{ item }"
         :col="1"
         :gap="6"

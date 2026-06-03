@@ -1,56 +1,21 @@
 import { PluginArchiveDB } from '@delta-comic/db'
-import { useGlobalVar } from '@delta-comic/utils'
 import { defineStore } from 'pinia'
-import { computed, reactive, type Raw } from 'vue'
+import type { Raw } from 'vue'
 import { shallowReactive } from 'vue'
 
-import type { PluginConfig, Search } from '@/plugin'
+import type { PluginConfig } from '@/plugin'
 
-export interface SavePluginBlob {
-  key: string
-  blob: Blob
-}
+export const usePluginStore = defineStore('plugin', helper => {
+  const plugins = shallowReactive(new Map<string, Raw<PluginConfig>>())
 
-export interface PluginData {
-  key: string
-  value: any
-}
+  const { data: pluginNames } = PluginArchiveDB.useQuery(db =>
+    db
+      .select(['pluginName', 'displayName'])
+      .execute()
+      .then(v => Object.fromEntries(v.map(v => [v.pluginName, v.displayName]))),
+  )
 
-export type PluginLoadingMicroSteps = {
-  steps: { name: string; description: string }[]
-  now: { stepsIndex: number; status: 'process' | 'error' | 'finish' | 'wait'; error?: Error }
-}
+  const $getI18nName = helper.action((key: string) => pluginNames.value[key] || key, 'getI18nName')
 
-export const usePluginStore = useGlobalVar(
-  defineStore('plugin', helper => {
-    const plugins = shallowReactive(new Map<string, Raw<PluginConfig>>())
-    const pluginSteps = reactive<Record<string, PluginLoadingMicroSteps>>({})
-
-    const { data: pluginNames } = PluginArchiveDB.useQuery(db =>
-      db
-        .select(['pluginName', 'displayName'])
-        .execute()
-        .then(v => Object.fromEntries(v.map(v => [v.pluginName, v.displayName]))),
-    )
-
-    const allSearchSource = computed(() =>
-      Array.from(plugins.values())
-        .filter(v => v.search?.methods)
-        .map(
-          v =>
-            [v.name, Object.entries(v.search?.methods ?? {})] as [
-              plugin: string,
-              sources: [name: string, method: Search.SearchMethod][],
-            ],
-        ),
-    )
-
-    const $getPluginDisplayName = helper.action(
-      (key: string) => pluginNames.value[key] || key,
-      'getPluginDisplayName',
-    )
-
-    return { $getPluginDisplayName, plugins, allSearchSource, pluginSteps }
-  }),
-  'core/plugin/store',
-)
+  return { $getI18nName, plugins }
+})

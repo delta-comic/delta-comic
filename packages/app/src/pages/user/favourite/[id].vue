@@ -172,18 +172,15 @@ const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Arra
           <DcWaterfall
             class="h-full!"
             un-reloadable
-            :source="{ type: 'array', value: items }"
+            :source="{
+              type: 'array',
+              value: items.filter(v => v.item.title.includes(searcher?.searchText ?? '')),
+            }"
             v-slot="{ item }"
             :col="1"
             :gap="0"
             :padding="0"
             :minHeight="0"
-            :data-processor="
-              v =>
-                searcher?.isSearching
-                  ? v.filter(v => v.item.title.includes(searcher?.searchText ?? ''))
-                  : v
-            "
           >
             <component :is="SelectPacker" :it="item">
               <FavouriteItem :ep="item.item.thisEp.id" :item="item.item" />
