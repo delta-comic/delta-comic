@@ -3,11 +3,15 @@
   lang="ts"
   generic="T extends { name: string; title: string; route?: RouteLocationRaw }"
 >
-import { useResizeObserver } from '@vueuse/core'
 import { Mutex } from 'es-toolkit'
-import { motion } from 'motion-v'
-import { computed, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { FreeMode } from 'swiper/modules'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import 'swiper/css'
+import 'swiper/css/free-mode'
 import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
+
+import type { Swiper as SwiperInstance } from 'swiper/types'
 
 import { cn } from '@/utils'
 
@@ -36,6 +40,7 @@ const $props = withDefaults(
 
 const $route = useRoute()
 const $router = useRouter()
+const swiperModules = [FreeMode]
 
 const selecting = computed<string | undefined>(() => {
   if ($props.router) {
@@ -56,6 +61,7 @@ const selecting = computed<string | undefined>(() => {
 const routeLock = new Mutex()
 const handleRoute = async (aimName: string) => {
   if (routeLock.isLocked) return false
+  await routeLock.acquire()
   try {
     const item = $props.items.find(v => v.name == aimName)
     if (!item) throw new Error('Not found item in <DcTab>, name: ' + aimName)
@@ -72,9 +78,9 @@ const handleRoute = async (aimName: string) => {
   }
 }
 
-// ============ 下划线动画 ============
-const scrollRef = useTemplateRef('scrollRef')
-const listRef = useTemplateRef('listRef')
+// ============ Swiper 导航与下划线动画 ============
+const swiperRef = ref<SwiperInstance>()
+const swiperContainerRef = useTemplateRef('swiperContainerRef')
 const tabRefs = ref<Record<string, HTMLElement>>({})
 
 const indicatorX = ref(0)
@@ -82,12 +88,15 @@ const indicatorWidth = ref(0)
 /** 首次渲染不显示下划线，避免从0位置闪动到目标 */
 const indicatorReady = ref(false)
 
+const selectedIndex = computed(() => $props.items.findIndex(v => v.name === selecting.value))
+
 function setTabRef(name: string) {
   return (el: unknown) => {
     if (el instanceof HTMLElement) {
       tabRefs.value[name] = el
       // 首个标签出现后标记就绪
       if (!indicatorReady.value) indicatorReady.value = true
+      requestAnimationFrame(updateIndicator)
     }
   }
 }
@@ -96,32 +105,53 @@ function updateIndicator() {
   const name = selecting.value
   if (!name) return
   const el = tabRefs.value[name]
-  if (!el || !scrollRef.value) return
-  const scrollRect = scrollRef.value.getBoundingClientRect()
+  if (!el || !swiperContainerRef.value) return
+  const swiperRect = swiperContainerRef.value.getBoundingClientRect()
   const elRect = el.getBoundingClientRect()
-  indicatorX.value = elRect.left - scrollRect.left + scrollRef.value.scrollLeft
+  indicatorX.value = elRect.left - swiperRect.left
   indicatorWidth.value = elRect.width
 }
 
-// 选中项变化时更新
-watch(selecting, () => requestAnimationFrame(updateIndicator))
-// items 数量变化时更新（动态 tab）
+function slideToSelecting() {
+  const index = selectedIndex.value
+  if (index < 0) return
+  swiperRef.value?.slideTo(index)
+}
+
+function onSwiper(swiper: SwiperInstance) {
+  swiperRef.value = swiper
+  requestAnimationFrame(() => {
+    slideToSelecting()
+    updateIndicator()
+  })
+}
+
+// 选中项变化时更新并滚动到选中 tab
+watch(selecting, async () => {
+  await nextTick()
+  slideToSelecting()
+  requestAnimationFrame(updateIndicator)
+})
+// items 变化时让 Swiper 重新计算 slide 宽度（动态 tab）
 watch(
   () => $props.items.length,
-  () => requestAnimationFrame(updateIndicator),
+  async () => {
+    await nextTick()
+    swiperRef.value?.update()
+    slideToSelecting()
+    requestAnimationFrame(updateIndicator)
+  },
 )
-// 容器尺寸变化时更新
-useResizeObserver(listRef, updateIndicator)
 
-// ============ 手势滑动切换 ============
-const selectedIndex = computed(() => $props.items.findIndex(v => v.name === selecting.value))
+const onSwipeEnd = (swiper: SwiperInstance) => {
+  requestAnimationFrame(updateIndicator)
+  if (!$props.swipeable) return
 
-const onSwipeEnd = (_evt: unknown, info?: { offset: { x: number } }) => {
-  if (!info || !$props.swipeable) return
   const threshold = 60
-  if (info.offset.x < -threshold && selectedIndex.value < $props.items.length - 1) {
+  const diff = swiper.touches.diff
+  if (diff < -threshold && selectedIndex.value < $props.items.length - 1) {
     handleRoute($props.items[selectedIndex.value + 1].name)
-  } else if (info.offset.x > threshold && selectedIndex.value > 0) {
+  } else if (diff > threshold && selectedIndex.value > 0) {
     handleRoute($props.items[selectedIndex.value - 1].name)
   }
 }
@@ -133,33 +163,38 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
   <div :class="cn('dc-tabs w-full', $props.class)" :style="style">
     <div class="dc-tabs__nav">
       <slot name="left" />
-      <div ref="scrollRef" class="dc-tabs__scroll">
-        <motion.div
-          ref="listRef"
-          :class="cn('dc-tabs__list', shrink && 'dc-tabs__list--shrink')"
-          :drag="swipeable ? 'x' : false"
-          :drag-constraints="swipeable ? { left: -120, right: 120 } : undefined"
-          :drag-elastic="0.1"
-          :drag-momentum="false"
-          :on-drag-end="onSwipeEnd"
+      <div ref="swiperContainerRef" class="dc-tabs__swiper">
+        <Swiper
+          class="dc-tabs__swiper-core"
+          :modules="swiperModules"
+          :slides-per-view="shrink ? 'auto' : items.length || 1"
+          :free-mode="true"
+          :watch-slides-progress="true"
+          @swiper="onSwiper"
+          @resize="updateIndicator"
+          @set-translate="updateIndicator"
+          @transition-end="updateIndicator"
+          @touch-end="onSwipeEnd"
         >
-          <div
+          <SwiperSlide
             v-for="item of items"
             :key="item.name"
-            :ref="setTabRef(item.name)"
-            class="dc-tabs__tab"
-            :class="{ 'dc-tabs__tab--active': selecting === item.name }"
-            @click="handleRoute(item.name)"
+            :class="cn('dc-tabs__slide', shrink && 'dc-tabs__slide--shrink')"
           >
-            <span class="dc-tabs__tab-text">{{ item.title }}</span>
-          </div>
-        </motion.div>
-        <motion.div
+            <div
+              :ref="setTabRef(item.name)"
+              class="dc-tabs__tab"
+              :class="{ 'dc-tabs__tab--active': selecting === item.name }"
+              @click="handleRoute(item.name)"
+            >
+              <span class="dc-tabs__tab-text">{{ item.title }}</span>
+            </div>
+          </SwiperSlide>
+        </Swiper>
+        <div
           v-show="indicatorReady"
           class="dc-tabs__indicator"
-          :animate="{ x: indicatorX, width: indicatorWidth }"
-          :transition="{ type: 'spring', stiffness: 400, damping: 28, mass: 0.8 }"
-          :initial="false"
+          :style="{ transform: `translate3d(${indicatorX}px, 0, 0)`, width: `${indicatorWidth}px` }"
         />
       </div>
       <slot name="right" />
@@ -177,28 +212,25 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
   background: var(--van-background-2);
 }
 
-.dc-tabs__scroll {
+.dc-tabs__swiper {
   flex: 1;
-  overflow-x: auto;
   position: relative;
   height: 100%;
-  scrollbar-width: none;
+  min-width: 0;
 }
 
-.dc-tabs__scroll::-webkit-scrollbar {
-  display: none;
+.dc-tabs__swiper-core {
+  height: 100%;
 }
 
-.dc-tabs__list {
+.dc-tabs__slide {
   display: flex;
   height: 100%;
-  align-items: center;
-  min-width: 100%;
+  min-width: 0;
 }
 
-.dc-tabs__list--shrink {
-  display: inline-flex;
-  min-width: auto;
+.dc-tabs__slide--shrink {
+  width: auto;
 }
 
 .dc-tabs__tab {
@@ -215,7 +247,7 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
   touch-action: manipulation;
 }
 
-.dc-tabs__list--shrink .dc-tabs__tab {
+.dc-tabs__slide--shrink .dc-tabs__tab {
   flex: none;
   min-width: 0;
 }
@@ -242,5 +274,8 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
   border-radius: 3px;
   background: var(--van-tabs-bottom-bar-color, var(--p-color, #1989fa));
   pointer-events: none;
+  transition:
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>
