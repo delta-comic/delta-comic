@@ -18,7 +18,6 @@
     "sql:allow-execute",
     "m3:default",
     "aptabase:allow-track-event",
-    "sentry:default",
     "log:default",
     "plugin:default",
     "db:default",

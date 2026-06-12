@@ -127,7 +127,6 @@ const app = createApp(
     )
   }),
 )
-DcUtils.initSentry(app)
 
 app.use(DataLoaderPlugin, { router })
 

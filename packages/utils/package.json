@@ -34,11 +34,9 @@
   },
   "dependencies": {
     "@aptabase/tauri": "catalog:",
-    "@sentry/vue": "catalog:",
     "@vue/language-core": "catalog:",
     "es-toolkit": "catalog:",
     "mitt": "catalog:",
-    "tauri-plugin-sentry-api": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   },

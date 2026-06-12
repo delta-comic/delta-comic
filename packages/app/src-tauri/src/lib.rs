@@ -1,6 +1,5 @@
 mod fs_scheme;
 mod logger;
-mod sentry;
 
 use tauri_plugin_aptabase::EventTracker;
 
@@ -12,7 +11,6 @@ pub async fn run() {
   let builder = fs_scheme::init(
     tauri::Builder::default()
       .plugin(tauri_plugin_fs::init())
-      .plugin(sentry::init())
       .plugin(logger::init()),
   );
   let builder = builder
