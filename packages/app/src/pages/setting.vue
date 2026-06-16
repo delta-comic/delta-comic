@@ -69,46 +69,25 @@ const config = useConfig()
         <DcVar v-else-if="config.type == 'date'" :value="{ show: false }" v-slot="{ value }">
           <DcCell center :title="config.info" clickable @click="value.show = true">
             {{ store.value[name] }}
-            <DcPopup
-              v-model:show="value.show"
-              overlay
-              round
-              closeable
-              position="center"
-              class="flex justify-center"
-            >
+            <NModal v-model:show="value.show" preset="dialog" :title="store.value[name]">
               <DcFormDate :config v-model="store.value[name]" class="max-w-[80vw]!" />
-            </DcPopup>
+            </NModal>
           </DcCell>
         </DcVar>
         <DcVar v-else-if="config.type == 'dateRange'" :value="{ show: false }" v-slot="{ value }">
           <DcCell center :title="config.info" clickable @click="value.show = true">
             {{ store.value[name] }}
-            <DcPopup
-              v-model:show="value.show"
-              overlay
-              round
-              closeable
-              position="center"
-              class="flex justify-center"
-            >
+            <NModal v-model:show="value.show" preset="dialog" :title="store.value[name]">
               <DcFormDateRange :config v-model="store.value[name]" class="max-w-[80vw]!" />
-            </DcPopup>
+            </NModal>
           </DcCell>
         </DcVar>
         <DcVar v-else-if="config.type == 'pairs'" :value="{ show: false }" v-slot="{ value }">
           <DcCell center :title="config.info" clickable @click="value.show = true">
             {{ store.value[name] }}
-            <DcPopup
-              v-model:show="value.show"
-              overlay
-              round
-              closeable
-              position="center"
-              class="flex justify-center"
-            >
+            <NModal v-model:show="value.show" preset="dialog" :title="store.value[name]">
               <DcFormPairs :config v-model="store.value[name]" class="max-w-[80vw]!" />
-            </DcPopup>
+            </NModal>
           </DcCell>
         </DcVar>
       </template>

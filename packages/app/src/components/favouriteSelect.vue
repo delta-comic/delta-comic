@@ -82,13 +82,7 @@ const { data: thisFavouriteCount } = FavouriteDB.useQueryItem(db =>
   >
     {{ plain ? '' : '收藏' }}
   </DcToggleIcon>
-  <DcPopup
-    v-model:show="isShow"
-    position="bottom"
-    round
-    class="bg-(--van-background)!"
-    @closed="promise.reject()"
-  >
+  <NDrawer v-model:show="isShow" placement="bottom" @closed="promise.reject()">
     <div class="relative m-(--van-cell-group-inset-padding) mt-2 mb-2! w-full font-semibold">
       选择收藏夹
       <div
@@ -133,6 +127,6 @@ const { data: thisFavouriteCount } = FavouriteDB.useQueryItem(db =>
     <NButton class="m-5! w-30!" @click="submit" strong secondary type="primary" size="large">
       确定
     </NButton>
-  </DcPopup>
+  </NDrawer>
   <CreateFavouriteCard ref="createFavouriteCard" />
 </template>

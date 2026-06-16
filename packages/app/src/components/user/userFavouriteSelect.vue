@@ -50,13 +50,7 @@ defineExpose({ create })
 </script>
 
 <template>
-  <DcPopup
-    v-model:show="isShow"
-    position="bottom"
-    round
-    class="bg-(--van-background)!"
-    @closed="promise.reject()"
-  >
+  <NDrawer v-model:show="isShow" placement="bottom" @afterLeave="promise.reject()">
     <div class="relative m-(--van-cell-group-inset-padding) mt-2 mb-2! w-full font-semibold">
       选择收藏夹
       <div
@@ -104,6 +98,6 @@ defineExpose({ create })
     <NButton class="m-5! w-30!" @click="submit" strong secondary type="primary" size="large">
       确定
     </NButton>
-  </DcPopup>
+  </NDrawer>
   <CreateFavouriteCard ref="createFavouriteCard" />
 </template>

@@ -55,7 +55,8 @@
     "vite-plugin-wasm": "catalog:",
     "vite-plus": "catalog:",
     "vue-component-type-helpers": "catalog:",
-    "vue-tsc": "catalog:"
+    "vue-tsc": "catalog:",
+    "vue-tsgo": "catalog:"
   },
   "readme": "../../README.md"
 }

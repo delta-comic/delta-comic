@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RecentDB, useNativeStore } from '@delta-comic/db'
-import { createDialog, DcState } from '@delta-comic/ui'
+import { DcState } from '@delta-comic/ui'
+import { useDialog } from 'naive-ui'
 import { useTemplateRef } from 'vue'
 
 import Action from '@/components/listAction.vue'
@@ -32,6 +33,8 @@ const removeItems = async (item: RecentDB.Item[]) => {
 }
 
 const filters = useNativeStore(pluginName, 'recentView.filter', new Array<string>())
+
+const $dialog = useDialog()
 </script>
 
 <template>
@@ -43,7 +46,7 @@ const filters = useNativeStore(pluginName, 'recentView.filter', new Array<string
           text: '删除',
           color: 'var(--van-danger-color)',
           onTrigger(sel) {
-            createDialog({
+            $dialog.create({
               type: 'warning',
               title: '警告',
               content: `你确认删除${sel.length}项?`,

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { db, DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/db'
-import { createDialog, createLoadingMessage, DcState } from '@delta-comic/ui'
+import { createLoadingMessage, DcState } from '@delta-comic/ui'
+import { useDialog } from 'naive-ui'
 import { computed, shallowRef } from 'vue'
 import { useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -49,6 +50,8 @@ const { upsert } = FavouriteDB.useUpsertItem()
 const PromiseAll = Promise.all
 
 const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Array<string>())
+
+const $dialog = useDialog()
 </script>
 
 <template>
@@ -93,7 +96,7 @@ const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Arra
             text: '删除',
             color: 'var(--van-danger-color)',
             onTrigger(sel) {
-              createDialog({
+              $dialog.create({
                 type: 'warning',
                 title: '警告',
                 content: `你确认删除${sel.length}项?`,
@@ -191,7 +194,7 @@ const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Arra
     </DcState>
   </DcState>
 
-  <DcPopup v-model:show="isShowMore" position="bottom" round class="bg-(--van-background)! py-6!">
+  <NDrawer v-model:show="isShowMore" placement="bottom">
     <DcCellGroup inset>
       <NPopconfirm
         @positive-click="
@@ -223,5 +226,5 @@ const infoFilters = useNativeStore(pluginName, 'favourite.infoFilters', new Arra
         删除后内容不可恢复
       </NPopconfirm>
     </DcCellGroup>
-  </DcPopup>
+  </NDrawer>
 </template>

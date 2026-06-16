@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FavouriteDB } from '@delta-comic/db'
-import { useMessage } from 'naive-ui'
+import { useMessage, type NDrawer } from 'naive-ui'
 import { ref, shallowRef } from 'vue'
 
 const show = shallowRef(false)
@@ -33,13 +33,7 @@ defineExpose({ create })
 </script>
 
 <template>
-  <DcPopup
-    v-model:show="show"
-    position="bottom"
-    round
-    @closed="cancel"
-    class="bg-(--van-background)!"
-  >
+  <NDrawer v-model:show="show" placement="bottom" @afterLeave="cancel">
     <div class="my-2 flex h-8 w-full items-center pl-5 font-semibold">创建收藏夹</div>
     <VanForm @submit="onSubmit">
       <DcCellGroup inset>
@@ -67,5 +61,5 @@ defineExpose({ create })
         提交
       </NButton>
     </VanForm>
-  </DcPopup>
+  </NDrawer>
 </template>

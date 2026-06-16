@@ -7,7 +7,7 @@ const $emit = defineEmits<{ change: [] }>()
 </script>
 
 <template>
-  <DcPopup v-model:show="show" position="bottom" overlay round>
+  <NDrawer v-model:show="show" placement="bottom">
     <div class="min-h-60 w-full px-2">
       <div class="mb-2 pt-3 pl-5 text-2xl">数据源更改</div>
       <div
@@ -43,5 +43,5 @@ const $emit = defineEmits<{ change: [] }>()
         </div>
       </div>
     </div>
-  </DcPopup>
+  </NDrawer>
 </template>

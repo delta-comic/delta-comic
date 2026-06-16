@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SubscribeDB } from '@delta-comic/db'
-import { usePreventBack, DcState, useZIndex } from '@delta-comic/ui'
+import { usePreventBack, DcState } from '@delta-comic/ui'
 import { motion } from 'motion-v'
 import { computed } from 'vue'
 
@@ -27,8 +27,8 @@ const isShow = computed({
     if (!v) select.value = undefined
   },
 })
-const [, isLast] = useZIndex(isShow)
-usePreventBack(isShow, isLast)
+
+usePreventBack(isShow)
 </script>
 
 <template>

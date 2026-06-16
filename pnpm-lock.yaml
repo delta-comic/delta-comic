@@ -400,6 +400,9 @@ importers:
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.5(typescript@6.0.3)
+      vue-tsgo:
+        specifier: 'catalog:'
+        version: 0.2.2(@typescript/native-preview@7.0.0-dev.20260614.1)
 
   packages/db:
     dependencies:

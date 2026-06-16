@@ -20,6 +20,8 @@ export interface Config {
   }
 
   barcode?: Barcode[]
+
+  fetchRandomItems?: (signal?: AbortSignal) => Promise<uni.item.Item[]>
 }
 
 export interface SearchMethod {

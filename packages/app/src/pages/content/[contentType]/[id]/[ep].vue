@@ -3,7 +3,7 @@ import { HistoryDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
 import { usePreventBack } from '@delta-comic/ui'
 import { useFullscreen } from '@delta-comic/utils'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useContentStore } from '@/stores/content'
@@ -24,7 +24,7 @@ const page = computed(
 const layout = computed(() => uni.content.ContentPage.layouts.get($route.params.contentType))
 
 const { isFullscreen } = useFullscreen()
-usePreventBack(isFullscreen, ref(true))
+usePreventBack(isFullscreen)
 
 // history
 const { upsert } = HistoryDB.useUpsert()

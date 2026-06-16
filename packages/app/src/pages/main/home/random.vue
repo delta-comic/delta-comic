@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { uni } from '@delta-comic/model'
-import { SharedFunction, useTemp } from '@delta-comic/utils'
+import { usePluginStore } from '@delta-comic/plugin'
+import { useTemp } from '@delta-comic/utils'
 import { useInfiniteQuery } from '@pinia/colada'
 import { until, useResizeObserver } from '@vueuse/core'
+import { random } from 'es-toolkit'
 import { isEmpty } from 'es-toolkit/compat'
-import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { computed, inject, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { Icons } from '@/icons'
@@ -12,6 +14,19 @@ import { isShowMainHomeNavBar } from '@/symbol'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()
 const temp = useTemp().$applyRaw('randomConfig', () => ({ scroll: 0 }))
+const plugin = usePluginStore()
+
+const randomProvider = computed(() =>
+  plugin.plugins
+    .values()
+    .toArray()
+    .map(v => v.search?.fetchRandomItems)
+    .filter(v => !!v),
+)
+const getRandomItems = (signal?: AbortSignal) => {
+  const index = random(randomProvider.value.length)
+  return randomProvider.value[index](signal)
+}
 
 let index = 0
 const source = useInfiniteQuery({
@@ -19,8 +34,7 @@ const source = useInfiniteQuery({
   initialPageParam: 1,
   getNextPageParam: () => (index += 1),
   query: async ({ signal }) => {
-    const result = await SharedFunction.callRandom('getRandomProvide', signal).result
-    return result
+    return await getRandomItems(signal)
   },
 })
 

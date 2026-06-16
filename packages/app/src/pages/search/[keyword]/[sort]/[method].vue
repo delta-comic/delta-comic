@@ -38,7 +38,7 @@ const query = useInfiniteQuery({
       keyword: route.params.keyword,
       sort: route.params.sort,
       method: route.params.method,
-      showAI: config.value.showAIProject,
+      showAI: config.value.value.showAIProject,
     },
   ],
   initialPageParam: method.value.fetchSearchResult.initPage,
@@ -50,7 +50,7 @@ const query = useInfiniteQuery({
         signal,
       )
       .then(item =>
-        config.value.showAIProject
+        config.value.value.showAIProject
           ? item
           : { ...item, data: item.data.filter(item => !item.$isAi) },
       )
@@ -127,7 +127,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
           </NButton>
         </NPopselect>
         <div class="van-haptics-feedback flex h-full items-center justify-start text-sm">
-          <NSwitch v-model:value="config.showAIProject" />展示AI作品
+          <NSwitch v-model:value="config.value.value.showAIProject" />展示AI作品
         </div>
       </div>
       <VanIcon

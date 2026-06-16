@@ -57,23 +57,12 @@ const $message = useMessage()
 </script>
 
 <template>
-  <DcPopup
-    v-model:show="show"
-    position="bottom"
-    round
-  overlay
-    :beforeClose="() => !bootingSteps"
-  >
+  <NDrawer v-model:show="show" placement="bottom">
     <NSpin :show="!!bootingSteps" class="relative size-full" contentClass="size-full">
       <div class="size-full overflow-hidden">
         <NMenu v-model:value="pageSelect" mode="horizontal" :options="menuOptions" responsive />
         <!-- content pages -->
-        <VanTabs
-          v-model:active="pageSelect"
-          swipeable
-          :show-header="false"
-          class="h-[calc(100%-42px)]! w-full! **:[.van-swipe-item]:h-full! **:[.van-tabs__content]:size-full!"
-        >
+        <VanTabs v-model:active="pageSelect" swipeable :show-header="false">
           <VanTab
             v-for="menu in menuOptions.filter(v => !v.disabled)"
             :name="menu.key"
@@ -96,5 +85,5 @@ const $message = useMessage()
         </AnimatePresence>
       </template>
     </NSpin>
-  </DcPopup>
+  </NDrawer>
 </template>

@@ -1,7 +1,7 @@
 import { uni } from '@delta-comic/model'
 import { useConfig } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
-import type {} from '@delta-comic/utils'
+import type { DeltaRouter } from '@delta-comic/utils'
 import { M3 } from 'tauri-plugin-m3'
 import { toValue } from 'vue'
 import {
@@ -9,14 +9,24 @@ import {
   createWebHistory,
   isNavigationFailure,
   NavigationFailureType,
-  type RouteLocationRaw,
+  type _RouterClassic,
+  type RouteLocationAsPathGeneric,
+  type RouteLocationAsRelativeGeneric,
 } from 'vue-router'
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 
 import { searchSourceKey } from '@/components/search/source'
 import { useContentStore } from '@/stores/content'
 import { pluginName } from '@/symbol'
-export const router = (window.$router = createRouter({ history: createWebHistory(), routes }))
+
+type RouteAim = string | RouteLocationAsRelativeGeneric | RouteLocationAsPathGeneric
+
+export const router = (window.$router = Object.assign(
+  createRouter({ history: createWebHistory(), routes }),
+  {
+    force: { push: to => $routerForceDo('push', to), replace: to => $routerForceDo('replace', to) },
+  } as Pick<DeltaRouter, 'force'>,
+) as DeltaRouter & _RouterClassic)
 
 SharedFunction.define(
   (contentType_, id, ep, preload) => {
@@ -49,8 +59,8 @@ SharedFunction.define(
   'routeToSearch',
 )
 
-const $routerForceDo = async (mode: keyof typeof router.force, to: RouteLocationRaw) => {
-  const aim = router.resolve(to)
+const $routerForceDo = async (mode: keyof typeof router.force, to: RouteAim) => {
+  const aim = router.resolve(to as any)
   aim.query.force = 'true'
   let attempts = 0
   let r
@@ -59,10 +69,6 @@ const $routerForceDo = async (mode: keyof typeof router.force, to: RouteLocation
     r = await router[mode](aim)
   } while (isNavigationFailure(r, NavigationFailureType.aborted))
   return r
-}
-router.force = {
-  push: to => $routerForceDo('push', to),
-  replace: to => $routerForceDo('replace', to),
 }
 
 router.beforeEach(async to => {

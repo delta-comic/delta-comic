@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { Install } from '@delta-comic/plugin'
-import { createDialog } from '@delta-comic/ui'
 import { toReactive, useFileDialog } from '@vueuse/core'
-import { useMessage } from 'naive-ui'
+import { useDialog, useMessage } from 'naive-ui'
 import { ref } from 'vue'
 const { installFilePlugin, installPlugin, installers } = Install
 
 const inputUrl = ref('')
 const isAdding = ref(false)
+
 const $message = useMessage()
+const $dialog = useDialog()
+
 const confirmAdd = async (url: string) => {
   if (isAdding.value) {
     $message.warning('正在添加插件')
@@ -17,7 +19,7 @@ const confirmAdd = async (url: string) => {
   isAdding.value = true
 
   try {
-    await createDialog({
+    await $dialog.create({
       type: 'info',
       title: '确认添加插件？',
       content: `添加来自"${url}"的插件`,

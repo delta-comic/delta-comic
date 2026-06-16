@@ -39,7 +39,7 @@ defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
                 },
               },
             ]"
-            @select="q => q.onClick()"
+            @select="q => q?.onClick()"
           >
             <template #reference>
               <NIcon size="20px">

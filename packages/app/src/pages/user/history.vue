@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { HistoryDB, useNativeStore } from '@delta-comic/db'
 import { appConfig, useConfig } from '@delta-comic/plugin'
-import { createDialog, DcState } from '@delta-comic/ui'
+import { DcState } from '@delta-comic/ui'
+import { useDialog } from 'naive-ui'
 import { shallowRef, useTemplateRef } from 'vue'
 
 import Action from '@/components/listAction.vue'
@@ -35,6 +36,8 @@ const removeItems = async (item: HistoryDB.Item[]) => {
 }
 
 const filters = useNativeStore(pluginName, 'history.filter', new Array<string>())
+
+const $dialog = useDialog()
 </script>
 
 <template>
@@ -51,7 +54,7 @@ const filters = useNativeStore(pluginName, 'history.filter', new Array<string>()
           text: '删除',
           color: 'var(--van-danger-color)',
           onTrigger(sel) {
-            createDialog({
+            $dialog.create({
               type: 'warning',
               title: '警告',
               content: `你确认删除${sel.length}项?`,
@@ -140,7 +143,7 @@ const filters = useNativeStore(pluginName, 'history.filter', new Array<string>()
       </Layout>
     </Action>
   </DcState>
-  <DcPopup v-model:show="showConfig" position="bottom" round class="bg-(--van-background)!">
+  <NDrawer v-model:show="showConfig" position="bottom" round class="bg-(--van-background)!">
     <div class="m-(--van-cell-group-inset-padding) mt-4 mb-2! w-full font-semibold">
       历史记录设置
     </div>
@@ -149,12 +152,12 @@ const filters = useNativeStore(pluginName, 'history.filter', new Array<string>()
         center
         title="追踪历史记录"
         label="记录并展示新的历史足迹"
-        @click="config.recordHistory = !config.recordHistory"
+        @click="config.value.value.recordHistory = !config.value.value.recordHistory"
       >
         <template #right-icon>
-          <VanSwitch size="large" v-model="config.recordHistory" />
+          <VanSwitch size="large" v-model="config.value.value.recordHistory" />
         </template>
       </DcCell>
     </DcCellGroup>
-  </DcPopup>
+  </NDrawer>
 </template>

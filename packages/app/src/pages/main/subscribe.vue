@@ -99,7 +99,7 @@ const isShowAllList = shallowRef(false)
     </div>
     <AuthorList v-model:select="select" :select-item v-if="selectItem?.type == 'author'" />
   </div>
-  <DcPopup v-model:show="isShowAllList" position="bottom" round class="h-[70vh]">
+  <NDrawer v-model:show="isShowAllList" placement="bottom" class="h-[70vh]">
     <DcState
       :state="subscribeQuery.state.value"
       contentClass="h-fit w-full"
@@ -133,7 +133,7 @@ const isShowAllList = shallowRef(false)
         </DcVar>
       </div>
     </DcState>
-  </DcPopup>
+  </NDrawer>
 </template>
 <style scoped lang="css">
 .scrollbar::-webkit-scrollbar {

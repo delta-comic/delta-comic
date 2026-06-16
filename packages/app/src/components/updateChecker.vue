@@ -35,20 +35,22 @@ watch(markdown, markdown => (isShow.value = Boolean(markdown.length)), { immedia
 </script>
 
 <template>
-  <DcPopup v-model:show="isShow" round position="center" class="max-h-[90vh] min-w-[80vw] p-3">
-    <div class="text-xl font-bold text-[--p-color]">发现新版本</div>
-    <DcMarkdown
-      :markdown="markdown.map(v => v[1]).join('------\n\n')"
-      class="h-[60vh]! w-full pt-3"
-    />
-    <NButton
-      type="primary"
-      class="absolute! bottom-2 left-1/2 w-[calc(100%-24px)]! -translate-x-1/2"
-      size="small"
-      block
-      @click="open('https://github.com/delta-comic/delta-comic/releases/latest')"
-    >
-      在github打开
-    </NButton>
-  </DcPopup>
+  <NModal v-model:show="isShow">
+    <div class="max-h-[90vh] min-w-[80vw] rounded-lg p-3">
+      <div class="text-xl font-bold text-[--p-color]">发现新版本</div>
+      <DcMarkdown
+        :markdown="markdown.map(v => v[1]).join('------\n\n')"
+        class="h-[60vh]! w-full pt-3"
+      />
+      <NButton
+        type="primary"
+        class="absolute! bottom-2 left-1/2 w-[calc(100%-24px)]! -translate-x-1/2"
+        size="small"
+        block
+        @click="open('https://github.com/delta-comic/delta-comic/releases/latest')"
+      >
+        在github打开
+      </NButton>
+    </div>
+  </NModal>
 </template>

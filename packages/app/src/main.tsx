@@ -95,8 +95,8 @@ const app = createApp(
         themeOverrides={themeOverrides}
       >
         <NGlobalStyle />
-        <NLoadingBarProvider container-class='z-200000'>
-          <NDialogProvider to='#popups'>
+        <NLoadingBarProvider>
+          <NDialogProvider>
             <VanConfigProvider
               themeVars={
                 {
@@ -117,7 +117,7 @@ const app = createApp(
               theme={config.isDark ? 'dark' : 'light'}
               themeVarsScope='global'
             >
-              <NMessageProvider max={5} to='#messages'>
+              <NMessageProvider max={5}>
                 <AppSetup />
               </NMessageProvider>
             </VanConfigProvider>
@@ -142,3 +142,9 @@ meta.name = 'naive-ui-style'
 document.head.appendChild(meta)
 
 app.mount('#app')
+
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    $router: DcUtils.DeltaRouter
+  }
+}

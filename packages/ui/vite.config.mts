@@ -10,12 +10,20 @@ import { browserslistToTargets } from 'lightningcss'
 import { dts } from 'rolldown-plugin-dts'
 import { defineConfig, type UserConfig } from 'vite-plus'
 
+const externalDepends = [...Object.keys(extendsDepends), 'highlight.js']
+const isExternal = (id: string) =>
+  externalDepends.some(dep => id === dep || id.startsWith(`${dep}/`))
+
 export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
     tailwindcss(),
-    dts({ vue: true, tsconfig: resolve(import.meta.dirname, './tsconfig.app.json') ,}),
+    dts({
+      vue: true,
+      tsconfig: resolve(import.meta.dirname, './tsconfig.app.json'),
+      sourcemap: true,
+    }),
   ],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) },
@@ -34,8 +42,12 @@ export default defineConfig({
     lib: { entry: 'lib/index.ts', fileName: 'index', formats: ['es'] },
     sourcemap: true,
     rolldownOptions: {
-      external: [...Object.keys(extendsDepends), 'highlight.js'],
-      output: { globals: extendsDepends },
+      external: isExternal,
+      output: {
+        entryFileNames: chunk =>
+          chunk.name.endsWith('.d') ? `${chunk.name.slice(0, -2)}.d.ts` : `${chunk.name}.js`,
+        globals: extendsDepends,
+      },
     },
   },
   pack: {
