@@ -7,5 +7,5 @@
     "paths": { "@/*": ["./lib/*"] },
     "types": ["./env.d.ts"]
   },
-  "include": ["env.d.ts", "lib/**/*", "./package.json"]
+  "include": ["env.d.ts", "lib/**/*", "src/**/*", "./package.json"]
 }

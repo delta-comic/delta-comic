@@ -8,22 +8,29 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
 import { dts } from 'rolldown-plugin-dts'
-import { defineConfig, type UserConfig } from 'vite-plus'
+import type { UserConfig } from 'vite-plus'
+import { defineConfig } from 'vite-plus'
+import VueRouter from 'vue-router/vite'
 
 const externalDepends = [...Object.keys(extendsDepends), 'highlight.js']
 const isExternal = (id: string) =>
   externalDepends.some(dep => id === dep || id.startsWith(`${dep}/`))
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
+    VueRouter({ dts: false }),
     vue(),
     vueJsx(),
     tailwindcss(),
-    dts({
-      vue: true,
-      tsconfig: resolve(import.meta.dirname, './tsconfig.app.json'),
-      sourcemap: true,
-    }),
+    ...(command === 'build'
+      ? [
+          dts({
+            vue: true,
+            tsconfig: resolve(import.meta.dirname, './tsconfig.app.json'),
+            sourcemap: true,
+          }),
+        ]
+      : []),
   ],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) },
@@ -37,6 +44,7 @@ export default defineConfig({
   },
   base: '/',
   oxc: { exclude: [/\.js$/, /\.d\.[cm]?ts$/] },
+  server: {},
   // builds
   build: {
     lib: { entry: 'lib/index.ts', fileName: 'index', formats: ['es'] },
@@ -57,4 +65,4 @@ export default defineConfig({
     sourcemap: true,
     deps: { neverBundle: ['unplugin-vue-components'] },
   },
-}) as UserConfig
+})) as UserConfig

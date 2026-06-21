@@ -36,6 +36,7 @@
   },
   "scripts": {
     "build": "vp build && vp pack",
+    "dev": "vp dev",
     "typecheck": "vue-tsgo -p tsconfig.app.json --noEmit"
   },
   "dependencies": {
