@@ -1,7 +1,6 @@
 import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
-import { extendsDepends } from '@delta-comic/utils/vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -12,6 +11,15 @@ import type { UserConfig } from 'vite-plus'
 import { defineConfig } from 'vite-plus'
 import VueRouter from 'vue-router/vite'
 
+const extendsDepends = await (async () => {
+  try {
+    const { extendsDepends } = await import('@delta-comic/utils/vite')
+    return extendsDepends
+  } catch (error) {
+    console.warn(error, 'Fail to import `@delta-comic/utils/vite`')
+    return {}
+  }
+})()
 const externalDepends = [...Object.keys(extendsDepends), 'highlight.js']
 const isExternal = (id: string) =>
   externalDepends.some(dep => id === dep || id.startsWith(`${dep}/`))

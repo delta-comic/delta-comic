@@ -50,7 +50,6 @@
     "typescript": "catalog:",
     "unplugin-vue-components": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-ms-clarity": "catalog:",
     "vite-plugin-vue-devtools": "catalog:",
     "vite-plugin-wasm": "catalog:",
     "vite-plus": "catalog:",

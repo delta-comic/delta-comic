@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'main'
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,6 +14,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
+    if: ${{ contains(github.event.head_commit.message,'[pub]') }}
     runs-on: ubuntu-latest
     env:
       HUSKY: 0

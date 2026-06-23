@@ -1,4 +1,4 @@
-name: 风格检查
+name: 单元测试
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: vp install
 
-      - name: Lint
+      - name: Test
         run: |
           vp run lib-build
-          vp check
+          vp test
