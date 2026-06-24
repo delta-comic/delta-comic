@@ -1,0 +1,9 @@
+{
+  "name": "@delta-comic/server",
+  "description": "南天门直梯",
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.49",
+    "elysia": "^1.4.29",
+    "openapi-types": "^12.1.3"
+  }
+}

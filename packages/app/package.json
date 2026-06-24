@@ -2,6 +2,7 @@
   "name": "app",
   "version": "2.3.0",
   "private": true,
+  "description": "阿赖耶识",
   "scripts": {
     "build:app": "export TRUE_BUILD_MAIN_APP=\"true\" && tauri android build",
     "build:debug": "tauri android build --debug",

@@ -1,6 +1,6 @@
 [package]
 name = "delta-comic"
-description = "Per Aspera, Ad Astra"
+description = "阿赖耶识"
 version = "2.3.0"
 
 [package.authors]
