@@ -21,6 +21,9 @@
   "type": "module",
   "scripts": {
     "changeset": "vp exec changeset",
+    "vp:install": "vp install",
+    "check": "vp check",
+    "test": "vp test",
     "dev": "vp run --filter app dev",
     "lib-build": "vp run -t app#build",
     "release": "vp run lib-build && vp exec changeset publish",
