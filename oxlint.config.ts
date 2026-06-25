@@ -21,6 +21,6 @@ export default {
   },
   env: { builtin: true },
   globals: {},
-  ignorePatterns: ['.vscode', './package.json'],
+  ignorePatterns: ['.vscode', '*.md'],
   options: { typeAware: false, typeCheck: false },
 } satisfies OxlintConfig
