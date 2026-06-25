@@ -2,16 +2,16 @@
 
 # Using Vite+, the Unified Toolchain for the Web
 
-This project is using Vite+, a unified toolchain built on top of Vite, Rolldown, Vitest, tsdown, Oxlint, Oxfmt, and Vite Task. Vite+ wraps runtime management, package management, and frontend tooling in a single global CLI called `vp`. Vite+ is distinct from Vite, but it invokes Vite through `vp dev` and `vp build`. Run `vp help` to print a list of commands and `vp <command> --help` for information about a specific command.
+This project is using Vite+, a unified toolchain built on top of Vite, Rolldown, Vitest, tsdown, Oxlint, Oxfmt, and Vite Task. Vite+ wraps runtime management, package management, and frontend tooling in a CLI called `vp`. CI installs the global CLI through `voidzero-dev/setup-vp`; in Cloud Codex or other environments where global `vp` is unavailable, use the project-local CLI with `pnpm exec vp <command>` or the root package scripts (`pnpm run check`, `pnpm run test`, `pnpm run vp:install`). Vite+ is distinct from Vite, but it invokes Vite through `vp dev` and `vp build`. Run `pnpm exec vp help` to print a list of commands and `pnpm exec vp <command> --help` for information about a specific command.
 
 Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.dev/guide/.
 
 ## Review Checklist
 
-- [ ] Run `vp install` after pulling remote changes and before getting started.
-- [ ] Run `vp check` and `vp test` to format, lint, type check and test changes.
-- [ ] Check if there are `vite.config.ts` tasks or `package.json` scripts necessary for validation, run via `vp run <script>`.
-- [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
+- [ ] Run `vp install` after pulling remote changes and before getting started; if global `vp` is unavailable, run `pnpm run vp:install` or `pnpm exec vp install`.
+- [ ] Run `vp check` and `vp test` to format, lint, type check and test changes; if global `vp` is unavailable, run `pnpm run check` and `pnpm run test`.
+- [ ] Check if there are `vite.config.ts` tasks or `package.json` scripts necessary for validation, run via `vp run <script>` or `pnpm exec vp run <script>`.
+- [ ] If setup, runtime, or package-manager behavior looks wrong, run `pnpm exec vp config --help` and include the relevant output when asking for help.
 
 <!--VITE PLUS END-->
 
@@ -177,10 +177,11 @@ packages/app/src-tauri (delta_comic)
 | `lib/recentView.ts` | 最近浏览记录 |
 | `lib/subscribe.ts` | 订阅管理（作者/EP 订阅） |
 | `lib/utils.ts` | 工具函数（`withTransaction`、`countDb`） |
-| `lib/nativeStore/` | 基于 `native_store_*` 命令的持久化存储 |
+| `lib/nativeStore/` | 基于 SQLite `native_store` 表的响应式持久化存储，保留 localStorage 兜底迁移 |
+| `lib/config.ts` | 基于 SQLite `config` 表的响应式配置存储，按所属保存表单结构与配置数据 |
 | `lib/test/` | 数据库层测试辅助 |
 
-**7 张表**：`item_store`、`history`、`recent_view`、`favourite_card`、`favourite_item`、`subscribe`、`plugin`
+**9 张表**：`item_store`、`history`、`recent_view`、`favourite_card`、`favourite_item`、`subscribe`、`plugin`、`native_store`、`config`
 
 **Kysely 配置**：`CamelCasePlugin` + `SerializePlugin`，通过 `TauriSqliteDialect` 连接
 
@@ -338,13 +339,13 @@ packages/app/src-tauri (delta_comic)
 
 | 命令 | 作用 |
 |------|------|
-| `vp install` | 安装依赖（等同于 `pnpm install`） |
+| `vp install` / `pnpm run vp:install` | 安装依赖（等同于 `pnpm install`；Cloud Codex 无全局 `vp` 时使用后者） |
 | `vp dev` | 启动 Vite 开发服务器 |
 | `vp build` | 生产构建 |
-| `vp check` | 运行 lint + fmt + typecheck |
+| `vp check` / `pnpm run check` | 运行 lint + fmt + typecheck |
 | `vp lint` | 运行 Oxlint |
 | `vp fmt` | 运行 Oxfmt 格式化 |
-| `vp test` | 运行 Vitest 测试 |
+| `vp test` / `pnpm run test` | 运行 Vitest 测试 |
 | `vp run tauri dev` | 启动 Tauri 桌面应用开发 |
 | `vp run tauri build` | 构建 Tauri 桌面应用 |
 | `vp run typecheck` | TypeScript 类型检查 |
@@ -355,7 +356,7 @@ packages/app/src-tauri (delta_comic)
 | `vp add <pkg>` | 添加依赖 |
 | `vp remove <pkg>` | 卸载依赖 |
 
-注意：`vp dev` 始终运行 Vite+ 内置的 dev server。要运行自定义脚本，使用 `vp run <script>`。
+注意：`vp dev` 始终运行 Vite+ 内置的 dev server。要运行自定义脚本，使用 `vp run <script>`。在 Cloud Codex 等没有全局 `vp` 的环境中，统一使用 `pnpm exec vp <command>` 或根目录 `pnpm run ...` fallback。
 
 ---
 
@@ -366,6 +367,7 @@ packages/app/src-tauri (delta_comic)
 | 添加/修改数据类型 | `packages/model/lib/model/` 对应子模块 |
 | 添加通用数据结构 | `packages/model/lib/struct/` |
 | 修改数据库表结构 | `packages/db/src/migrations.rs` 新增迁移 + 更新 `lib/index.ts` DB 接口 |
+| 修改配置持久化 | `packages/db/lib/config.ts` + `packages/plugin/lib/config.ts` |
 | 修改数据库 CRUD 操作 | `packages/db/lib/` 对应文件 |
 | 修改 native_store 命令 | `packages/db/src/commands.rs` |
 | 添加/修改插件 | `packages/plugin/lib/plugin/` + `packages/plugin/lib/driver/` |

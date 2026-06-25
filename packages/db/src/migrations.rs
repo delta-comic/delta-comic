@@ -68,6 +68,21 @@ CREATE TABLE IF NOT EXISTS plugin (
 );
 CREATE INDEX IF NOT EXISTS plugin_enable ON plugin (enable);
 CREATE INDEX IF NOT EXISTS plugin_plugin_name ON plugin (plugin_name);
+
+CREATE TABLE IF NOT EXISTS native_store (
+  namespace TEXT NOT NULL,
+  key TEXT NOT NULL,
+  value TEXT NOT NULL,
+  CONSTRAINT primary_key PRIMARY KEY (namespace, key)
+);
+CREATE INDEX IF NOT EXISTS native_store_namespace_key ON native_store (namespace, key);
+
+CREATE TABLE IF NOT EXISTS config (
+  belong_to TEXT PRIMARY KEY NOT NULL,
+  form TEXT NOT NULL,
+  data TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS config_belong_to ON config (belong_to);
 "#;
 
 const FIX_DISPLAY_NAME: &str = r#"

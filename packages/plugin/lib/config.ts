@@ -1,6 +1,5 @@
-import { useNativeStore } from '@delta-comic/db'
+import { useConfig as useDbConfig } from '@delta-comic/db'
 import type { FormResult, FormSingleConfigure } from '@delta-comic/model'
-import { fromPairs } from 'es-toolkit/compat'
 import { defineStore } from 'pinia'
 import { computed, shallowReactive, type Ref } from 'vue'
 
@@ -87,11 +86,7 @@ export const useConfig = defineStore('config', helper => {
     'isExistConfig',
   )
   const $resignerConfig = helper.action((pointer: ConfigPointer) => {
-    const store = useNativeStore(
-      pointer.pluginName,
-      'config',
-      fromPairs(Object.entries(pointer.config).map(([name, desc]) => [name, desc.defaultValue])),
-    )
+    const store = useDbConfig(pointer.pluginName, pointer.config)
     configDescription.set(pointer.key, {
       form: pointer.config,
       data: store,

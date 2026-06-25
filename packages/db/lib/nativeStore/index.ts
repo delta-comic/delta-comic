@@ -1,16 +1,13 @@
 import { SourcedValue } from '@delta-comic/model'
-import { invoke } from '@tauri-apps/api/core'
 import { ref, toValue, watch, type MaybeRefOrGetter, type Ref } from 'vue'
 
+export interface Table {
+  namespace: string
+  key: string
+  value: string
+}
+
 const saveKey = new SourcedValue<[namespace: string, key: string]>()
-const call = <T>(command: string, args: Record<string, unknown>) =>
-  invoke<T>(`plugin:db|${command}`, args)
-
-const getNativeStore = (namespace: string, key: string) =>
-  call<string | null>('native_store_get', { key, namespace })
-
-const setNativeStore = (namespace: string, key: string, value: string) =>
-  call<void>('native_store_set', { key, namespace, value })
 
 const cloneDefault = <T extends object>(defaultValue: MaybeRefOrGetter<T>): T => {
   const value = toValue(defaultValue)
@@ -39,6 +36,23 @@ const parseValue = <T extends object>(
   }
 }
 
+const getStoreValue = async (namespace: string, key: string) => {
+  const { db } = await import('../index')
+  return (
+    (await db
+      .selectFrom('nativeStore')
+      .select('value')
+      .where('namespace', '=', namespace)
+      .where('key', '=', key)
+      .executeTakeFirst())?.value ?? null
+  )
+}
+
+const setStoreValue = async (namespace: string, key: string, value: string) => {
+  const { db } = await import('../index')
+  await db.replaceInto('nativeStore').values({ namespace, key, value }).execute()
+}
+
 export const useNativeStore = <T extends object>(
   namespace: string,
   key: MaybeRefOrGetter<string>,
@@ -53,7 +67,7 @@ export const useNativeStore = <T extends object>(
     if (saveTimer) clearTimeout(saveTimer)
     const encoded = JSON.stringify(value)
     saveTimer = setTimeout(() => {
-      void setNativeStore(namespace, resolvedKey, encoded).catch(error => {
+      void setStoreValue(namespace, resolvedKey, encoded).catch(error => {
         console.warn('[db] failed to persist native store value', error)
       })
     }, 100)
@@ -64,12 +78,12 @@ export const useNativeStore = <T extends object>(
     const resolvedKey = toValue(key)
     hydrated = false
     try {
-      const nativeValue = await getNativeStore(namespace, resolvedKey)
-      const storedValue = nativeValue ?? legacyValue(namespace, resolvedKey)
+      const storeValue = await getStoreValue(namespace, resolvedKey)
+      const storedValue = storeValue ?? legacyValue(namespace, resolvedKey)
       if (current !== version) return
       state.value = parseValue(storedValue, defaultValue)
       hydrated = true
-      if (nativeValue === null) persist(resolvedKey, state.value)
+      if (storeValue === null) persist(resolvedKey, state.value)
     } catch (error) {
       console.warn('[db] failed to load native store value', error)
       if (current !== version) return
