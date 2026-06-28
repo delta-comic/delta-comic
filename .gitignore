@@ -31,6 +31,8 @@ release
 .vercel
 
 .wrangler
+.dev.vars
+.dev.vars.*
 
 target
 dist-vite

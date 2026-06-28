@@ -21,6 +21,6 @@ export default {
   },
   env: { builtin: true },
   globals: {},
-  ignorePatterns: ['.vscode', '*.md'],
+  ignorePatterns: ['.vscode', '*.md', '**/worker-configuration.d.ts'],
   options: { typeAware: false, typeCheck: false },
 } satisfies OxlintConfig

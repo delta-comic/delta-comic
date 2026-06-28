@@ -1,15 +1,10 @@
 import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
-import tailwindcss from '@tailwindcss/vite'
-import vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
-import { dts } from 'rolldown-plugin-dts'
 import type { UserConfig } from 'vite-plus'
-import { defineConfig } from 'vite-plus'
-import VueRouter from 'vue-router/vite'
+import { defineConfig, lazyPlugins } from 'vite-plus'
 
 const extendsDepends = await (async () => {
   try {
@@ -25,21 +20,37 @@ const isExternal = (id: string) =>
   externalDepends.some(dep => id === dep || id.startsWith(`${dep}/`))
 
 export default defineConfig(({ command }) => ({
-  plugins: [
-    VueRouter({ dts: 'typed-router.d.ts' }),
-    vue(),
-    vueJsx(),
-    tailwindcss(),
-    ...(command === 'build'
-      ? [
-          dts({
-            vue: true,
-            tsconfig: resolve(import.meta.dirname, './tsconfig.app.json'),
-            sourcemap: true,
-          }),
-        ]
-      : []),
-  ],
+  plugins: lazyPlugins(async () => {
+    const [
+      { default: tailwindcss },
+      { default: vue },
+      { default: vueJsx },
+      { dts },
+      { default: VueRouter },
+    ] = await Promise.all([
+      import('@tailwindcss/vite'),
+      import('@vitejs/plugin-vue'),
+      import('@vitejs/plugin-vue-jsx'),
+      import('rolldown-plugin-dts'),
+      import('vue-router/vite'),
+    ])
+
+    return [
+      VueRouter({ dts: 'typed-router.d.ts' }),
+      vue(),
+      vueJsx(),
+      tailwindcss(),
+      ...(command === 'build'
+        ? [
+            dts({
+              vue: true,
+              tsconfig: resolve(import.meta.dirname, './tsconfig.app.json'),
+              sourcemap: true,
+            }),
+          ]
+        : []),
+    ]
+  }),
   resolve: {
     alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) },
     extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],

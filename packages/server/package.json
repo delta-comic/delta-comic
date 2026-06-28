@@ -1,9 +1,26 @@
 {
   "name": "@delta-comic/server",
+  "private": true,
   "description": "南天门直梯",
+  "type": "module",
+  "scripts": {
+    "build": "vp build",
+    "cf-typegen": "wrangler types",
+    "deploy": "vp build && wrangler deploy",
+    "dev": "vp dev",
+    "preview": "vp build && vp preview",
+    "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
+  },
   "dependencies": {
-    "@sinclair/typebox": "^0.34.49",
-    "elysia": "^1.4.29",
-    "openapi-types": "^12.1.3"
+    "@sinclair/typebox": "catalog:",
+    "elysia": "catalog:",
+    "openapi-types": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "catalog:",
+    "@types/node": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "wrangler": "catalog:"
   }
 }

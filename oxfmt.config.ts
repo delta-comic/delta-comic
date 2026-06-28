@@ -1,7 +1,12 @@
 import type { OxfmtConfig } from 'vite-plus/fmt'
 
 export default {
-  ignorePatterns: ['components.d.ts', 'typed-router.d.ts', '**/permissions/**'],
+  ignorePatterns: [
+    'components.d.ts',
+    'typed-router.d.ts',
+    '**/permissions/**',
+    '**/worker-configuration.d.ts',
+  ],
   endOfLine: 'lf',
   semi: false,
   useTabs: false,

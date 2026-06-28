@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "delta-comic-server",
+  "main": "./app/index.ts",
+  "compatibility_date": "2026-06-28",
+  "observability": {
+    "enabled": true,
+    "logs": { "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 0.01 },
+  },
+  "upload_source_maps": true,
+  
+}

@@ -31,6 +31,7 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 
 - **前端**：Vue 3 + TypeScript 6 + Vite + NaiveUI + Vant + Pinia + Vue Router
 - **后端**：Rust (Tauri 2.x, edition 2024) + SQLite + Kysely ORM
+- **云服务**：Elysia + Cloudflare Workers + Cloudflare Vite Plugin + Wrangler
 - **数据库**：本地 SQLite，由 `tauri-plugin-sql` 提供 Rust 驱动，Kysely 做类型安全查询
 - **插件系统**：分级可扩展架构，Rust 端提供命令 API，TS 端通过 Composition API 注入页面和功能
 - **线上仓库**：<https://github.com/delta-comic/delta-comic.git>
@@ -53,6 +54,8 @@ packages/plugin        ← 依赖 model（同时是 Tauri 插件 crate: tauri-pl
 packages/ui            ← 依赖 model
   ↑
 packages/app           ← 依赖所有包 + src-tauri（Rust 主应用）
+
+packages/server        ← 独立 Cloudflare Worker 服务，无 workspace 依赖
 ```
 
 ### Rust Crate 依赖关系
@@ -308,6 +311,20 @@ packages/app/src-tauri (delta_comic)
 
 ---
 
+### 7. `packages/server` — 云服务（@delta-comic/server）
+
+**职责**：运行在 Cloudflare Workers 上的 Elysia 服务，使用 Cloudflare Vite Plugin 在本地 `workerd` 环境中开发和构建，由 Wrangler 管理配置、类型生成与部署。
+
+| 文件 | 说明 |
+|------|------|
+| `packages/server/app/index.ts` | Worker 入口，启用 Elysia Cloudflare adapter 并导出已编译应用 |
+| `packages/server/wrangler.jsonc` | Worker 名称、入口、兼容日期、Node.js 兼容标记与可观测性配置 |
+| `packages/server/worker-configuration.d.ts` | 由 `wrangler types` 根据配置生成的 Workers 运行时类型 |
+| `packages/server/vite.config.mts` | 接入 Cloudflare Vite Plugin 的 Vite+ 配置 |
+| `packages/server/package.json` | `dev`、`build`、`preview`、`deploy`、`cf-typegen` 与类型检查脚本 |
+
+---
+
 ## 根目录工程配置文件
 
 | 文件 | 说明 |
@@ -352,6 +369,9 @@ packages/app/src-tauri (delta_comic)
 | `vp run lib-build` | 构建所有库（以 app 的 build 为拓扑起点） |
 | `vp run version-packages` | 执行 Changesets 版本升级并生成根 CHANGELOG |
 | `vp run release` | 构建库并执行 `changeset publish` 发布 npm 包 |
+| `vp run --filter @delta-comic/server dev` | 在本地 Workers 运行时启动云服务 |
+| `vp run --filter @delta-comic/server cf-typegen` | 重新生成 Cloudflare Worker 类型 |
+| `vp run --filter @delta-comic/server deploy` | 构建并部署 Cloudflare Worker |
 | `vp dlx` | 执行一次性二进制（替代 npx/dlx） |
 | `vp add <pkg>` | 添加依赖 |
 | `vp remove <pkg>` | 卸载依赖 |
@@ -382,9 +402,10 @@ packages/app/src-tauri (delta_comic)
 | 修改工具函数 | `packages/utils/lib/` |
 | 修改 WebView 外链鉴权命令 | `packages/utils/src/commands/` + `packages/utils/lib/webviewAuth.ts` |
 | 修改 Android WebView cookie 兼容层 | `packages/utils/android/src/main/java/UtilsPlugin.kt` + `packages/utils/src/mobile.rs` |
+| 修改 Cloudflare 云服务 | `packages/server/app/` + `packages/server/wrangler.jsonc` |
 | 修改样式 | `packages/ui/lib/index.css` 或各组件内的 `<style>` |
 | 修改图标 | `packages/app/src/icons.tsx` |
-| 修改构建配置 | 各包的 `vite.config.mts` |
+| 修改构建配置 | 各包的 `vite.config.mts`（`plugins` 统一使用 `lazyPlugins` + 动态 `import()` 延迟加载） |
 | 修改 Oxlint 规则 | `oxlint.config.ts` |
 | 修改 Oxfmt 配置 | `oxfmt.config.ts` |
 | 修改 pnpm catalog 依赖版本 | `pnpm-workspace.yaml` |

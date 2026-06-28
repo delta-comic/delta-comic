@@ -15,6 +15,7 @@ daterange
 datetimerange
 disretry
 dtolnay
+elysia
 Favourite
 favselect
 Gmailerrorred
@@ -62,6 +63,7 @@ TAURI
 temurin
 thiserror
 tlds
+typebox
 tsgo
 tsgolint
 unplugin
@@ -74,6 +76,7 @@ vueuse
 Wakatime
 webp
 wenxig
+workerd
+wrangler
 xgbuugti
 Yahei
-Strs
