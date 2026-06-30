@@ -18,6 +18,9 @@ catalog:
   '@microsoft/api-extractor': '^7.58.7'
   '@aptabase/tauri': ^0.4.1
   '@cloudflare/vite-plugin': 1.42.3
+  '@elysiajs/bearer': ^1.4.4
+  '@elysiajs/cors': ^1.4.2
+  '@elysiajs/openapi': ^1.4.15
   '@sinclair/typebox': ^0.34.49
   '@typescript/native-preview': 7.0.0-dev.20260614.1
   '@lhlyu/vue-virtual-waterfall': 1.0.8

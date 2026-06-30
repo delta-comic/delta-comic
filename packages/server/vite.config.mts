@@ -5,7 +5,10 @@ import { defineConfig, lazyPlugins } from 'vite-plus'
 const root = fileURLToPath(new URL('.', import.meta.url))
 
 export default defineConfig({
-  pack: { entry: './app/index.ts', dts: { tsgo: true, tsconfig: './tsconfig.app.json' } },
+  pack: [
+    { entry: './app/index.ts', dts: { tsgo: true, tsconfig: './tsconfig.app.json' } },
+    { entry: './lib/index.ts', dts: { tsgo: true, tsconfig: './tsconfig.lib.json' } },
+  ],
   plugins: lazyPlugins(async () => {
     if (process.env.VP_COMMAND == 'test') return []
     const { cloudflare } = await import('@cloudflare/vite-plugin')

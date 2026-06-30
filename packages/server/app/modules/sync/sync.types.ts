@@ -1,8 +1,30 @@
 import type { syncCollections } from './collections'
+import type {
+  SyncAction,
+  SyncChange,
+  SyncOperationResult,
+  SyncPullRequest,
+  SyncPullResponse,
+  SyncPushItemResult,
+  SyncPushOperation,
+  SyncPushRequest,
+  SyncPushResponse,
+  SyncSnapshotRequest,
+} from './sync.schemas'
 
 export type SyncCollection = keyof typeof syncCollections
-export type SyncAction = 'upsert' | 'delete'
-export type SyncOperationResult = 'applied' | 'replayed' | 'ignored_stale' | 'conflict' | 'failed'
+export type {
+  SyncAction,
+  SyncChange,
+  SyncOperationResult,
+  SyncPullRequest,
+  SyncPullResponse,
+  SyncPushItemResult,
+  SyncPushOperation,
+  SyncPushRequest,
+  SyncPushResponse,
+  SyncSnapshotRequest,
+}
 
 export interface SyncEntityRow {
   user_id: string
@@ -51,85 +73,8 @@ export interface SyncOpRow {
   received_at: number
 }
 
-export interface SyncPushOperation {
-  opId: string
-  collection: SyncCollection
-  entityId: string
-  action: SyncAction
-  data?: unknown
-  dataHash?: string
-  baseVersion?: string
-  clientChangedAt: number
-}
-
 export interface NormalizedSyncOperation extends SyncPushOperation {
   dataJson: string | null
   dataHash: string
   version: string
-}
-
-export interface SyncSnapshotRequest {
-  schemaVersion: 1
-  snapshotId: string
-  collections: Partial<Record<SyncCollection, unknown[]>>
-}
-
-export interface SyncPushRequest {
-  schemaVersion: 1
-  operations: SyncPushOperation[]
-}
-
-export interface SyncPullRequest {
-  sinceSeq: number
-  limit?: number
-  collections?: SyncCollection[]
-  includeOwn?: boolean
-}
-
-export interface SyncPushItemResult {
-  opId: string
-  collection: SyncCollection
-  entityId: string
-  result: SyncOperationResult
-  serverSeq?: number
-  entityVersion?: string
-  error?: {
-    code: string
-    message: string
-  }
-}
-
-export interface SyncCheckpoint {
-  latestSeq: number
-  serverTime: number
-}
-
-export interface SyncPushResponse {
-  results: SyncPushItemResult[]
-  checkpoint: SyncCheckpoint
-}
-
-export interface SyncChange {
-  serverSeq: number
-  collection: SyncCollection
-  entityId: string
-  action: SyncAction
-  data?: unknown
-  dataHash: string
-  version: string
-  clientChangedAt: number
-  serverChangedAt: number
-  deletedAt?: number
-  originTerminalUuid: string
-  originOpId: string
-}
-
-export interface SyncPullResponse {
-  checkpoint: {
-    sinceSeq: number
-    nextSeq: number
-    latestSeq: number
-    hasMore: boolean
-  }
-  changes: SyncChange[]
 }

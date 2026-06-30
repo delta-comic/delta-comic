@@ -1,0 +1,1 @@
+export type { App } from '../app/index'

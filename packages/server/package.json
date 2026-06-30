@@ -12,13 +12,17 @@
     "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
-    "@sinclair/typebox": "catalog:",
-    "elysia": "catalog:",
-    "openapi-types": "catalog:"
+    
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:",
+    "@elysiajs/bearer": "catalog:",
+    "@elysiajs/cors": "catalog:",
+    "@elysiajs/openapi": "catalog:",
+    "@sinclair/typebox": "catalog:",
     "@types/node": "catalog:",
+    "elysia": "catalog:",
+    "openapi-types": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",

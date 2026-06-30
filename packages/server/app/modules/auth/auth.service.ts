@@ -1,5 +1,4 @@
-import { getRuntime, readNumberVar } from '@/env'
-import { getDb } from '@/infrastructure/d1/database'
+import { readNumberVar } from '@/env'
 import { AppError } from '@/shared/errors'
 import { createId, isUuid } from '@/shared/ids'
 import { now as readNow } from '@/shared/time'
@@ -24,37 +23,27 @@ const optionalString = (value: string | undefined): string | null => {
   return trimmed ? trimmed : null
 }
 
+export interface AuthServiceConfig {
+  authPepper?: string
+  tokenPepper?: string
+  accessTtlSeconds?: string
+  refreshTtlSeconds?: string
+}
+
 export class AuthService {
-  private readonly repository: AuthRepository
   private readonly authPepper: string
   private readonly tokenPepper: string
   private readonly accessTtlSeconds: number
   private readonly refreshTtlSeconds: number
 
   constructor(
-    db: D1Database,
-    config: {
-      authPepper?: string
-      tokenPepper?: string
-      accessTtlSeconds?: string
-      refreshTtlSeconds?: string
-    },
+    private readonly repository: AuthRepository,
+    config: AuthServiceConfig,
   ) {
-    this.repository = new AuthRepository(db)
     this.authPepper = config.authPepper ?? ''
     this.tokenPepper = config.tokenPepper ?? ''
     this.accessTtlSeconds = readNumberVar(config.accessTtlSeconds, 900)
     this.refreshTtlSeconds = readNumberVar(config.refreshTtlSeconds, 2_592_000)
-  }
-
-  static fromRequest(request: Request): AuthService {
-    const runtime = getRuntime(request)
-    return new AuthService(getDb(request), {
-      accessTtlSeconds: runtime.env.ACCESS_TOKEN_TTL_SECONDS,
-      authPepper: runtime.env.AUTH_PEPPER,
-      refreshTtlSeconds: runtime.env.REFRESH_TOKEN_TTL_SECONDS,
-      tokenPepper: runtime.env.TOKEN_PEPPER,
-    })
   }
 
   async register(input: RegisterRequest): Promise<AuthTokensResponse> {
@@ -271,3 +260,6 @@ export class AuthService {
     }
   }
 }
+
+export const createAuthService = (db: D1Database, config: AuthServiceConfig): AuthService =>
+  new AuthService(new AuthRepository(db), config)

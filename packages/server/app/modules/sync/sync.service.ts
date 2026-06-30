@@ -1,5 +1,4 @@
-import { getRuntime, readNumberVar } from '@/env'
-import { getDb } from '@/infrastructure/d1/database'
+import { readNumberVar } from '@/env'
 import { AppError, isAppError } from '@/shared/errors'
 import { parseJson } from '@/shared/json'
 import { now as readNow } from '@/shared/time'
@@ -22,29 +21,21 @@ import type {
   SyncSnapshotRequest,
 } from './sync.types'
 
+export interface SyncServiceConfig {
+  maxPullChanges?: string
+  maxPushOps?: string
+}
+
 export class SyncService {
-  private readonly repository: SyncRepository
   private readonly maxPushOps: number
   private readonly maxPullChanges: number
 
   constructor(
-    db: D1Database,
-    config: {
-      maxPullChanges?: string
-      maxPushOps?: string
-    },
+    private readonly repository: SyncRepository,
+    config: SyncServiceConfig,
   ) {
-    this.repository = new SyncRepository(db)
     this.maxPushOps = readNumberVar(config.maxPushOps, 100)
     this.maxPullChanges = readNumberVar(config.maxPullChanges, 500)
-  }
-
-  static fromRequest(request: Request): SyncService {
-    const runtime = getRuntime(request)
-    return new SyncService(getDb(request), {
-      maxPullChanges: runtime.env.SYNC_MAX_PULL_CHANGES,
-      maxPushOps: runtime.env.SYNC_MAX_PUSH_OPS,
-    })
   }
 
   async snapshot(auth: AuthContext, input: SyncSnapshotRequest): Promise<SyncPushResponse> {
@@ -256,3 +247,6 @@ export class SyncService {
     }
   }
 }
+
+export const createSyncService = (db: D1Database, config: SyncServiceConfig): SyncService =>
+  new SyncService(new SyncRepository(db), config)

@@ -22,7 +22,7 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 ## 开发思想
 
 - **模块**：使用文件系统分割模块来保证结构工整；对于按步骤流程运行不同模块的，或许可以使用glob引入执行实现由文件驱动模块
-- **思想**：优先使用oop(面向对象)思想编写代码，但要避免过度封装，继承链最好不要超过5层。使用`依赖注入`思想优化耦合，但也要避免过度封装。
+- **思想**：优先使用oop(面向对象)思想编写代码，但要避免过度封装，继承链最好不要超过5层。使用`依赖注入`思想优化耦合，但也要避免过度封装。最好遵守`dry`(不要重复自己)规则。
 - **格式**：使用类似"条件反转"等技巧减少代码嵌套，但不要过度的不加分辨的使用
 
 ## 项目概览
@@ -317,11 +317,14 @@ packages/app/src-tauri (delta_comic)
 
 | 文件 | 说明 |
 |------|------|
-| `packages/server/app/index.ts` | Worker 入口，启用 Elysia Cloudflare adapter，绑定每个请求的 Cloudflare `env/ctx` runtime，并统一接入 `/api/v1` |
+| `packages/server/app/index.ts` | Worker 入口，启用 Elysia Cloudflare adapter，接入 `@elysiajs/cors`、`@elysiajs/openapi`、全局错误处理和 `/api/v1`；导出 `App` 类型供 Eden/客户端类型共享 |
 | `packages/server/app/env.ts` | Worker runtime 访问层：通过 `WeakMap<Request, AppRuntime>` 为 Elysia 路由提供 D1、secrets、vars、ExecutionContext |
-| `packages/server/app/shared/` | API 响应、错误、crypto/hash、stable JSON、时间、HTTP auth guard/CORS 等共享基础设施 |
-| `packages/server/app/modules/auth/` | 第一方登录注册鉴权模块：用户、终端 UUID、session/token hash、注册/登录/刷新/注销/me 接口 |
-| `packages/server/app/modules/sync/` | D1 数据同步模块：collection 白名单、snapshot 一次性推送、push 动态变更、pull checkpoint 拉取、幂等 op 记录、LWW 冲突处理、tombstone 删除 |
+| `packages/server/app/infrastructure/http/serverContext.ts` | Elysia request-scoped DI 插件：从 Cloudflare runtime 注入 `db`、`runtime`、`authService`、`syncService` |
+| `packages/server/app/shared/` | API 响应、错误、crypto/hash、stable JSON、时间、HTTP auth guard/CORS 等共享基础设施；`authGuard` 使用 `@elysiajs/bearer` + Elysia `resolve` 注入 `auth` 上下文 |
+| `packages/server/app/modules/auth/` | 第一方登录注册鉴权模块：用户、终端 UUID、session/token hash、注册/登录/刷新/注销/me 接口；schemas 同时作为 TypeBox 校验、类型推导、OpenAPI model 来源 |
+| `packages/server/app/modules/sync/` | D1 数据同步模块：collection 白名单、snapshot 一次性推送、push 动态变更、pull checkpoint 拉取、幂等 op 记录、LWW 冲突处理、tombstone 删除；schemas 同时作为 TypeBox 校验、类型推导、OpenAPI model 来源 |
+| `packages/server/app/index.test.ts` | Elysia/Worker route 级测试：覆盖 health、请求校验错误、auth guard、OpenAPI JSON 暴露 |
+| `packages/server/lib/index.ts` | 导出 `App` 类型，供前端或 Eden 客户端复用 server 类型契约 |
 | `packages/server/migrations/0001_auth.sql` | D1 鉴权表：`auth_users`、`auth_terminals`、`auth_sessions` |
 | `packages/server/migrations/0002_sync.sql` | D1 同步表：`sync_entities`、`sync_changes`、`sync_ops`、`sync_terminal_cursors` |
 | `packages/server/wrangler.jsonc` | Worker 名称、入口、兼容日期、`nodejs_compat` 兼容标记、D1 binding、免费 Workers Logs 可观测性与 sync/auth vars；secrets 使用 `AUTH_PEPPER`、`TOKEN_PEPPER` |
@@ -329,7 +332,7 @@ packages/app/src-tauri (delta_comic)
 | `packages/server/vite.config.mts` | 接入 Cloudflare Vite Plugin 的 Vite+ 配置；测试模式跳过 Cloudflare 插件并配置 `@ -> app` alias |
 | `packages/server/package.json` | `dev`、`build`、`preview`、`deploy`、`cf-typegen`、类型检查与 Vitest 依赖 |
 
-**Server API 概览**：统一前缀 `/api/v1`。`/health` 为健康检查；`/auth/register`、`/auth/login`、`/auth/refresh`、`/auth/logout`、`/auth/me` 提供第一方鉴权；`/sync/snapshot`、`/sync/push`、`/sync/pull` 提供本地 SQLite 数据同步。同步范围包括 `itemStore`、`favouriteCard`、`favouriteItem`、`history`、`recentView`、`subscribe`、`config`，明确排除 `plugin` 与 `nativeStore`。
+**Server API 概览**：统一前缀 `/api/v1`。`/health` 为健康检查；`/auth/register`、`/auth/login`、`/auth/refresh`、`/auth/logout`、`/auth/me` 提供第一方鉴权；`/sync/snapshot`、`/sync/push`、`/sync/pull` 提供本地 SQLite 数据同步。同步范围包括 `itemStore`、`favouriteCard`、`favouriteItem`、`history`、`recentView`、`subscribe`、`config`，明确排除 `plugin` 与 `nativeStore`。OpenAPI 文档挂载于 `/api/openapi`，JSON schema 位于 `/api/openapi/json`，鉴权路由通过 bearer security 标记。
 
 ---
 

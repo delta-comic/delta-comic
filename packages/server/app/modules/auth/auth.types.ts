@@ -1,3 +1,12 @@
+import type {
+  AuthTokensResponse,
+  LoginRequest,
+  RefreshRequest,
+  RegisterRequest,
+} from './auth.schemas'
+
+export type { AuthTokensResponse, LoginRequest, RefreshRequest, RegisterRequest }
+
 export interface AuthUserRow {
   id: string
   login_name: string
@@ -33,47 +42,18 @@ export interface AuthSessionRow {
   revoked_at: number | null
 }
 
-export interface TerminalInput {
+interface TerminalInput {
   terminalUuid: string
   terminalName?: string
   platform?: string
   appVersion?: string
 }
 
-export interface RegisterRequest extends TerminalInput {
-  loginName: string
-  password: string
-}
-
-export interface LoginRequest extends TerminalInput {
-  loginName: string
-  password: string
-}
-
-export interface RefreshRequest {
-  refreshToken: string
-}
+export type TerminalRequestInput = TerminalInput
 
 export interface AuthContext {
   userId: string
   loginName: string
   terminalUuid: string
   sessionId: string
-}
-
-export interface AuthTokensResponse {
-  user: {
-    id: string
-    loginName: string
-  }
-  terminal: {
-    terminalUuid: string
-    displayName?: string
-  }
-  tokens: {
-    accessToken: string
-    accessExpiresAt: number
-    refreshToken: string
-    refreshExpiresAt: number
-  }
 }

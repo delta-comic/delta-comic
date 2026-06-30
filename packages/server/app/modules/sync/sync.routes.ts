@@ -1,35 +1,37 @@
 import Elysia from 'elysia'
 
-import { requireAuth } from '@/shared/http/authGuard'
+import { authGuard } from '@/shared/http/authGuard'
 import { ok } from '@/shared/response'
 
-import { syncPullSchema, syncPushSchema, syncSnapshotSchema } from './sync.schemas'
-import { SyncService } from './sync.service'
-
-import type { SyncPullRequest, SyncPushRequest, SyncSnapshotRequest } from './sync.types'
+import { syncModels } from './sync.schemas'
 
 export const syncRoutes = new Elysia({ prefix: '/sync' })
+  .use(syncModels)
+  .use(authGuard)
   .post(
     '/snapshot',
-    async ({ body, request }) => {
-      const auth = await requireAuth(request)
-      return ok(await SyncService.fromRequest(request).snapshot(auth, body as SyncSnapshotRequest))
+    async ({ auth, body, syncService }) => ok(await syncService.snapshot(auth, body)),
+    {
+      body: 'Sync.SnapshotRequest',
+      detail: { summary: 'Push a full local snapshot as sync operations', tags: ['Sync'] },
+      response: { 200: 'Response.SyncPush' },
     },
-    { body: syncSnapshotSchema },
   )
   .post(
     '/push',
-    async ({ body, request }) => {
-      const auth = await requireAuth(request)
-      return ok(await SyncService.fromRequest(request).push(auth, body as SyncPushRequest))
+    async ({ auth, body, syncService }) => ok(await syncService.push(auth, body)),
+    {
+      body: 'Sync.PushRequest',
+      detail: { summary: 'Push incremental sync operations', tags: ['Sync'] },
+      response: { 200: 'Response.SyncPush' },
     },
-    { body: syncPushSchema },
   )
   .post(
     '/pull',
-    async ({ body, request }) => {
-      const auth = await requireAuth(request)
-      return ok(await SyncService.fromRequest(request).pull(auth, body as SyncPullRequest))
+    async ({ auth, body, syncService }) => ok(await syncService.pull(auth, body)),
+    {
+      body: 'Sync.PullRequest',
+      detail: { summary: 'Pull remote sync changes after a checkpoint', tags: ['Sync'] },
+      response: { 200: 'Response.SyncPull' },
     },
-    { body: syncPullSchema },
   )

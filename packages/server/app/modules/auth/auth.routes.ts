@@ -1,37 +1,47 @@
 import Elysia from 'elysia'
 
-import { requireAuth } from '@/shared/http/authGuard'
+import { serverContext } from '@/infrastructure/http/serverContext'
+import { authGuard } from '@/shared/http/authGuard'
 import { ok } from '@/shared/response'
 
-import { AuthService } from './auth.service'
-import { loginSchema, refreshSchema, registerSchema } from './auth.schemas'
-
-import type { LoginRequest, RefreshRequest, RegisterRequest } from './auth.types'
+import { authModels } from './auth.schemas'
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
+  .use(serverContext)
+  .use(authModels)
   .post(
     '/register',
-    async ({ body, request }) => ok(await AuthService.fromRequest(request).register(body as RegisterRequest)),
-    { body: registerSchema },
+    async ({ authService, body }) => ok(await authService.register(body)),
+    {
+      body: 'Auth.RegisterRequest',
+      detail: { summary: 'Register and create a terminal session', tags: ['Auth'] },
+      response: { 200: 'Response.AuthTokens' },
+    },
   )
   .post(
     '/login',
-    async ({ body, request }) => ok(await AuthService.fromRequest(request).login(body as LoginRequest)),
-    { body: loginSchema },
+    async ({ authService, body }) => ok(await authService.login(body)),
+    {
+      body: 'Auth.LoginRequest',
+      detail: { summary: 'Login and create a terminal session', tags: ['Auth'] },
+      response: { 200: 'Response.AuthTokens' },
+    },
   )
   .post(
     '/refresh',
-    async ({ body, request }) => {
-      const input = body as RefreshRequest
-      return ok(await AuthService.fromRequest(request).refresh(input.refreshToken))
+    async ({ authService, body }) => ok(await authService.refresh(body.refreshToken)),
+    {
+      body: 'Auth.RefreshRequest',
+      detail: { summary: 'Rotate an active refresh token', tags: ['Auth'] },
+      response: { 200: 'Response.AuthTokens' },
     },
-    { body: refreshSchema },
   )
-  .post('/logout', async ({ request }) => {
-    const auth = await requireAuth(request)
-    return ok(await AuthService.fromRequest(request).logout(auth))
+  .use(authGuard)
+  .post('/logout', async ({ auth, authService }) => ok(await authService.logout(auth)), {
+    detail: { summary: 'Logout current session', tags: ['Auth'] },
+    response: { 200: 'Response.AuthLogout' },
   })
-  .get('/me', async ({ request }) => {
-    const auth = await requireAuth(request)
-    return ok(await AuthService.fromRequest(request).me(auth))
+  .get('/me', async ({ auth, authService }) => ok(await authService.me(auth)), {
+    detail: { summary: 'Get current user and terminal', tags: ['Auth'] },
+    response: { 200: 'Response.AuthMe' },
   })
