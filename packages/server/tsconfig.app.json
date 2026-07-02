@@ -7,5 +7,5 @@
     "paths": { "@/*": ["./app/*"] },
     "types": ["vite-plus/client"]
   },
-  "include": ["app", "worker-configuration.d.ts"]
+  "include": ["app", "lib", "worker-configuration.d.ts"]
 }

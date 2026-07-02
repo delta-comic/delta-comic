@@ -2,7 +2,7 @@
   "name": "delta-comic",
   "version": "2.3.0",
   "private": true,
-  "description": "阿赖耶识",
+  "description": "Per aspera Ad astra",
   "homepage": "https://github.com/delta-comic",
   "bugs": {
     "url": "https://github.com/delta-comic/delta-comic/issues",
@@ -59,6 +59,6 @@
       "url": "https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg"
     }
   ],
-  "packageManager": "pnpm@11.6.0",
+  "packageManager": "pnpm@11.9.0",
   "readme": "./README.md"
 }

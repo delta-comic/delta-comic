@@ -37,7 +37,7 @@
   "scripts": {
     "build": "vp build && vp pack",
     "dev": "vp dev",
-    "typecheck": "vue-tsgo -p tsconfig.app.json --noEmit"
+    "typecheck": "vue-tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "@lhlyu/vue-virtual-waterfall": "catalog:",

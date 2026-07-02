@@ -30,7 +30,7 @@
   },
   "scripts": {
     "build": "vp pack",
-    "typecheck": "tsgo -p tsconfig.app.json --noEmit"
+    "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "es-toolkit": "catalog:"

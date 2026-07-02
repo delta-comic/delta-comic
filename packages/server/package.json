@@ -21,11 +21,13 @@
     "@elysiajs/openapi": "catalog:",
     "@sinclair/typebox": "catalog:",
     "@types/node": "catalog:",
-    "elysia": "catalog:",
-    "openapi-types": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",
     "wrangler": "catalog:"
+  },
+  "peerDependencies": {
+    "elysia": "catalog:",
+    "openapi-types": "catalog:"
   }
 }
