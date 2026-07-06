@@ -1,0 +1,14 @@
+@import "../../ui/lib/index.css";
+@import "vant/lib/index.css";
+@import "tailwindcss";
+
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #f6f7fb;
+}
