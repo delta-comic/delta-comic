@@ -1,0 +1,21 @@
+{
+  "name": "@delta-comic/server-config",
+  "private": true,
+  "description": "Delta Comic server modular configuration shared by API and admin packages.",
+  "type": "module",
+  "main": "./lib/index.ts",
+  "module": "./lib/index.ts",
+  "types": "./lib/index.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.ts",
+      "import": "./lib/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsgo -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@typescript/native-preview": "catalog:"
+  }
+}

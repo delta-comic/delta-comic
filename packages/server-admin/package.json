@@ -1,0 +1,42 @@
+{
+  "name": "@delta-comic/server-admin",
+  "private": true,
+  "description": "Cloudflare Pages admin panel for Delta Comic server.",
+  "type": "module",
+  "scripts": {
+    "build": "vp build",
+    "dev": "vp dev",
+    "preview": "vp preview",
+    "pages:preview": "wrangler pages dev dist --compatibility-date=2026-06-28",
+    "deploy": "vp build && wrangler pages deploy dist --project-name=delta-comic-server-admin",
+    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
+  },
+  "dependencies": {
+    "@delta-comic/server": "workspace:",
+    "@delta-comic/server-config": "workspace:",
+    "@delta-comic/ui": "workspace:",
+    "@vueuse/core": "catalog:",
+    "naive-ui": "catalog:",
+    "pinia": "catalog:",
+    "vant": "catalog:",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@typescript/native-preview": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitejs/plugin-vue-jsx": "catalog:",
+    "lightningcss": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "unplugin-vue-components": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-vue-devtools": "catalog:",
+    "vite-plus": "catalog:",
+    "vue-component-type-helpers": "catalog:",
+    "vue-tsc": "catalog:",
+    "vue-tsgo": "catalog:",
+    "wrangler": "catalog:"
+  }
+}

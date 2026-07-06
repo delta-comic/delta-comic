@@ -55,7 +55,9 @@ packages/ui            ← 依赖 model
   ↑
 packages/app           ← 依赖所有包 + src-tauri（Rust 主应用，包含 @delta-comic/server 客户端接入）
 
-packages/server        ← Cloudflare Worker 服务 + 客户端 SDK，无 workspace 依赖
+packages/server-config ← Server 系列共享模块/运行时配置，无 workspace 依赖
+packages/server        ← Cloudflare Worker 服务 + 客户端 SDK，依赖 server-config
+packages/server-admin  ← Cloudflare Pages 管理面板，依赖 server/server-config/ui
 ```
 
 ### Rust Crate 依赖关系
@@ -340,6 +342,33 @@ packages/app/src-tauri (delta_comic)
 
 **Server API 概览**：统一前缀 `/api`，不使用 `/v1` 等路径版本控制策略。`/health` 为健康检查；`/auth/register`、`/auth/login`、`/auth/refresh`、`/auth/logout`、`/auth/me` 提供第一方鉴权；`/sync/snapshot`、`/sync/push`、`/sync/pull` 提供本地 SQLite 数据同步。同步范围包括 `itemStore`、`favouriteCard`、`favouriteItem`、`history`、`recentView`、`subscribe`、`config`，明确排除 `plugin` 与 `nativeStore`。OpenAPI 文档挂载于 `/api/openapi`，JSON schema 位于 `/api/openapi/json`，鉴权路由通过 bearer security 标记。客户端接入默认离线优先：core config 中 `cloudEnabled` 默认关闭，`cloudServerUrl` 为空时不会发起网络请求；实际请求统一由 `ky` 执行。
 
+
+---
+
+### 8. `packages/server-config` — Server 系列共享配置（@delta-comic/server-config）
+
+**职责**：为 server 系列包提供模块清单、Cloudflare binding/env 约束、管理面板路由和同步集合白名单等纯类型/常量配置，避免 Worker 与 Pages 面板重复维护配置。
+
+| 文件 | 说明 |
+|------|------|
+| `packages/server-config/lib/index.ts` | 导出 `serverModules`、`defaultServerRuntimeConfig`、`serverCollections` 及相关类型 |
+
+---
+
+### 9. `packages/server-admin` — Cloudflare Pages 管理面板（@delta-comic/server-admin）
+
+**职责**：运行在 Cloudflare Pages 上的 Vue 3 管理面板，复用 app/ui 技术栈（Vue、Pinia、Vue Router、NaiveUI、Vant、@delta-comic/ui），以纯静态前端方式管理/观察 `@delta-comic/server` Worker API。遵守 Pages 浏览器环境限制：不读取 Worker secret、不直接访问 D1 binding，仅通过公开的 `/api`、`/api/health`、`/api/modules`、`/api/openapi` 与 Worker 通信。
+
+| 文件 | 说明 |
+|------|------|
+| `packages/server-admin/src/main.ts` | Pages 管理面板入口，注册 Pinia、Router、NaiveUI provider |
+| `packages/server-admin/src/App.vue` | 管理面板整体布局与模块菜单 |
+| `packages/server-admin/src/router.ts` | 管理面板路由 |
+| `packages/server-admin/src/stores/admin.ts` | API 根地址与运行时配置持久化 |
+| `packages/server-admin/src/pages/` | 概览、模块配置、OpenAPI 页面 |
+| `packages/server-admin/src/components/dashboard/` | Server endpoint 表单、健康检查、模块概览组件 |
+| `packages/server-admin/vite.config.mts` | Pages 面板 Vite+ 配置，复用 Vue/JSX/Components/Tailwind 插件 |
+
 ---
 
 ## 根目录工程配置文件
@@ -389,6 +418,8 @@ packages/app/src-tauri (delta_comic)
 | `vp run --filter @delta-comic/server dev` | 在本地 Workers 运行时启动云服务 |
 | `vp run --filter @delta-comic/server cf-typegen` | 重新生成 Cloudflare Worker 类型 |
 | `vp run --filter @delta-comic/server deploy` | 构建并部署 Cloudflare Worker |
+| `vp run --filter @delta-comic/server-admin dev` | 启动 Cloudflare Pages 管理面板开发服务器 |
+| `vp run --filter @delta-comic/server-admin deploy` | 构建并部署 Cloudflare Pages 管理面板 |
 | `vp dlx` | 执行一次性二进制（替代 npx/dlx） |
 | `vp add <pkg>` | 添加依赖 |
 | `vp remove <pkg>` | 卸载依赖 |
@@ -421,6 +452,8 @@ packages/app/src-tauri (delta_comic)
 | 修改 WebView 外链鉴权命令 | `packages/utils/src/commands/` + `packages/utils/lib/webviewAuth.ts` |
 | 修改 Android WebView cookie 兼容层 | `packages/utils/android/src/main/java/UtilsPlugin.kt` + `packages/utils/src/mobile.rs` |
 | 修改 Cloudflare 云服务 | `packages/server/app/` + `packages/server/wrangler.jsonc` |
+| 修改 Server 系列共享配置 | `packages/server-config/lib/index.ts` |
+| 修改 Cloudflare Pages 管理面板 | `packages/server-admin/src/` + `packages/server-admin/vite.config.mts` |
 | 修改样式 | `packages/ui/lib/index.css` 或各组件内的 `<style>` |
 | 修改图标 | `packages/app/src/icons.tsx` |
 | 修改构建配置 | 各包的 `vite.config.mts`（`plugins` 统一使用 `lazyPlugins` + 动态 `import()` 延迟加载） |
