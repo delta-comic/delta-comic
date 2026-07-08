@@ -14,17 +14,17 @@ const healthUrl = computed(() =>
 </script>
 
 <template>
-  <n-space vertical size="large">
-    <n-card>
-      <n-space vertical>
-        <n-gradient-text type="primary" :size="28">Delta Comic Server Admin</n-gradient-text>
-        <n-text>
+  <NSpace vertical size="large">
+    <NCard>
+      <NSpace vertical>
+        <NGradientText type="primary" :size="28">Delta Comic Server Admin</NGradientText>
+        <NText>
           面板以 Cloudflare Pages 静态资源部署，Worker API、D1、secrets 仍保持在 server 包运行时中。
-        </n-text>
-      </n-space>
-    </n-card>
+        </NText>
+      </NSpace>
+    </NCard>
     <ServerEndpointForm v-model="adminStore.apiBaseUrl" @save="adminStore.setApiBaseUrl" />
     <HealthPanel :health-url="healthUrl" :disabled="!adminStore.isConfigured" />
     <ModuleOverview :modules="serverModules" />
-  </n-space>
+  </NSpace>
 </template>

@@ -30,15 +30,15 @@ const check = async () => {
 </script>
 
 <template>
-  <n-card title="Worker 健康检查" embedded>
-    <n-space vertical>
-      <n-text code>{{ healthUrl || '请先配置 Server API 地址' }}</n-text>
-      <n-space align="center">
-        <n-button :disabled="disabled" :loading="loading" type="primary" @click="check"
-          >立即检测</n-button
+  <NCard title="Worker 健康检查" embedded>
+    <NSpace vertical>
+      <NText code>{{ healthUrl || '请先配置 Server API 地址' }}</NText>
+      <NSpace align="center">
+        <NButton :disabled="disabled" :loading="loading" type="primary" @click="check"
+          >立即检测</NButton
         >
-        <n-tag :type="tagType">{{ message }}</n-tag>
-      </n-space>
-    </n-space>
-  </n-card>
+        <NTag :type="tagType">{{ message }}</NTag>
+      </NSpace>
+    </NSpace>
+  </NCard>
 </template>

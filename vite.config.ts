@@ -14,5 +14,15 @@ export default defineConfig({
   fmt: fmt as OxfmtConfig,
   lint: lint as OxlintConfig,
   run: { cache: { tasks: true, scripts: true } },
-  test: { exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'] },
+  test: {
+    exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
+    projects: [
+      { test: { name: 'root', environment: 'node', include: ['script/**/*.test.ts'] } },
+      'packages/db',
+      'packages/model',
+      'packages/plugin',
+      'packages/server',
+      'packages/utils',
+    ],
+  },
 })

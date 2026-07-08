@@ -19,7 +19,7 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 
 ## 开发思想
 
-- **组建**：组件样式必须使用PascalCase
+- **组建**：组件样式必须使用PascalCase，例如：`<NButton></NButton>`、`<DcList></DcList>`
 - **模块**：使用文件系统分割模块来保证结构工整；对于按步骤流程运行不同模块的，或许可以使用glob引入执行实现由文件驱动模块
 - **思想**：优先使用oop(面向对象)思想编写代码，但要避免过度封装，继承链最好不要超过5层。使用`依赖注入`思想优化耦合，但也要避免过度封装。最好遵守`dry`(不要重复自己)规则。
 - **格式**：使用类似"条件反转"等技巧减少代码嵌套，但不要过度的不加分辨的使用

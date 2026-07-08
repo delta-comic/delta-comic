@@ -14,26 +14,26 @@ const menuOptions = [
 </script>
 
 <template>
-  <n-layout class="min-h-screen">
-    <n-layout-header bordered class="px-6 py-4">
-      <n-space justify="space-between" align="center">
-        <n-text strong>Delta Comic Server</n-text>
-        <n-tag type="success">Cloudflare Pages</n-tag>
-      </n-space>
-    </n-layout-header>
-    <n-layout has-sider>
-      <n-layout-sider
+  <NLayout class="min-h-screen">
+    <NLayoutHeader bordered class="px-6 py-4">
+      <NSpace justify="space-between" align="center">
+        <NText strong>Delta Comic Server</NText>
+        <NTag type="success">Cloudflare Pages</NTag>
+      </NSpace>
+    </NLayoutHeader>
+    <NLayout has-sider>
+      <NLayoutSider
         bordered
         collapse-mode="width"
         :collapsed-width="0"
         :width="240"
         show-trigger="bar"
       >
-        <n-menu :options="menuOptions" :value="$route.path" @update:value="go" />
-      </n-layout-sider>
-      <n-layout-content class="p-6">
+        <NMenu :options="menuOptions" :value="$route.path" @update:value="go" />
+      </NLayoutSider>
+      <NLayoutContent class="p-6">
         <RouterView />
-      </n-layout-content>
-    </n-layout>
-  </n-layout>
+      </NLayoutContent>
+    </NLayout>
+  </NLayout>
 </template>
