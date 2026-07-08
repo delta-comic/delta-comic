@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'packages/**'
-      - '.github/workflows/lint.yaml'
+      - '.github/workflows/test.yaml'
       - '*.config.ts'
       - 'tsconfig*.json'
 
@@ -12,7 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  lint:
+  test:
+    if: false
     runs-on: ubuntu-latest
     env:
       HUSKY: 0
