@@ -55,14 +55,16 @@ onMounted(() => {
 
 <style scoped>
 .admin-shell {
-  min-height: 100%;
+  height: 100%;
   background: var(--dc-surface);
+  position: relative;
 }
 
 .admin-shell__workspace {
   min-width: 0;
-  min-height: 100vh;
+  max-height: 100%;
   margin-left: var(--dc-sidebar-width);
+  overflow-y: auto;
 }
 
 .admin-shell__main {

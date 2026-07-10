@@ -1,3 +1,10 @@
+@charset "UTF-8";
+
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
 :root {
   color: #18202d;
   background: #ffffff;
@@ -41,10 +48,10 @@
 
 html,
 body,
-#app {
-  width: 100%;
-  min-width: 320px;
-  height: 100%;
+#app,
+.n-config-provider {
+  width: 100% !important;
+  height: 100% !important;
   margin: 0;
 }
 

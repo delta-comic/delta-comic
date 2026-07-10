@@ -1,11 +1,13 @@
 import './index.css'
+import { usePreferredDark } from '@vueuse/core'
 import {
-  type GlobalThemeOverrides,
   NConfigProvider,
   NDialogProvider,
   NGlobalStyle,
   NMessageProvider,
   zhCN,
+  darkTheme,
+  lightTheme,
 } from 'naive-ui'
 import { createPinia } from 'pinia'
 import { createApp, defineComponent, h } from 'vue'
@@ -13,21 +15,13 @@ import { createApp, defineComponent, h } from 'vue'
 import App from './App.vue'
 import { router } from './router'
 
-const themeOverrides: GlobalThemeOverrides = {
-  common: {
-    primaryColor: '#135fe8',
-    primaryColorHover: '#2d72ee',
-    primaryColorPressed: '#0e4fc4',
-    primaryColorSuppl: '#135fe8',
-  },
-}
-
 const app = createApp(
-  defineComponent(
-    () => () =>
+  defineComponent(() => {
+    const isDark = usePreferredDark()
+    return () =>
       h(
         NConfigProvider,
-        { locale: zhCN, themeOverrides },
+        { locale: zhCN, theme: isDark.value ? darkTheme : lightTheme },
         {
           default: () => [
             h(NGlobalStyle),
@@ -36,8 +30,8 @@ const app = createApp(
             }),
           ],
         },
-      ),
-  ),
+      )
+  }),
 )
 
 app.use(createPinia())

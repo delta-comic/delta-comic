@@ -51,15 +51,15 @@ const save = async () => {
               autocomplete="current-password"
             />
           </NFormItem>
-          <NAlert type="info" :show-icon="false">
+          <NAlert type="info" :show-icon="false" style="margin-bottom: 1rem">
             API 地址保存在 localStorage；管理员令牌只保存在当前标签页域的
             sessionStorage，关闭会话后不会长期保留。
           </NAlert>
           <div v-if="formError" class="dc-error-banner settings-page__error">{{ formError }}</div>
           <NSpace justify="end">
-            <NButton v-if="connection.adminToken" @click="connection.clearToken"
-              >清除会话令牌</NButton
-            >
+            <NButton v-if="connection.adminToken" @click="connection.clearToken">
+              清除会话令牌
+            </NButton>
             <NButton attr-type="submit" type="primary" :loading="saving">保存并验证</NButton>
           </NSpace>
         </NForm>
