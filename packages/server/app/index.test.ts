@@ -10,6 +10,7 @@ const createExecutionContext = (): ExecutionContext =>
 const createEnv = (overrides: Partial<AppEnv> = {}): AppEnv => ({
   ACCESS_TOKEN_TTL_SECONDS: '900',
   AUTH_PEPPER: 'auth-pepper',
+  CF_VERSION_METADATA: { id: 'test-version', tag: 'test', timestamp: '2026-07-10T00:00:00.000Z' },
   DB: {} as D1Database,
   REFRESH_TOKEN_TTL_SECONDS: '2592000',
   SYNC_MAX_PULL_CHANGES: '500',

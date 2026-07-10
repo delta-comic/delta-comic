@@ -1,4 +1,11 @@
-export type ServerModuleKey = 'auth' | 'sync' | 'openapi' | 'health'
+export type ServerModuleKey =
+  | 'admin'
+  | 'auth'
+  | 'health'
+  | 'observability'
+  | 'openapi'
+  | 'plugins'
+  | 'sync'
 
 export interface ServerModuleDefinition {
   key: ServerModuleKey
@@ -18,6 +25,15 @@ export const serverModules = [
     apiPrefix: '/api/health',
     cloudflareBindings: [],
     workerEnvVars: [],
+    adminRoute: '/',
+  },
+  {
+    key: 'admin',
+    name: '管理 API',
+    description: '独立管理员令牌保护的能力、就绪状态和运行指标控制面。',
+    apiPrefix: '/api/admin',
+    cloudflareBindings: ['DB', 'CF_VERSION_METADATA'],
+    workerEnvVars: ['SERVER_ADMIN_TOKEN'],
     adminRoute: '/',
   },
   {
@@ -44,6 +60,24 @@ export const serverModules = [
     adminRoute: '/modules/sync',
   },
   {
+    key: 'plugins',
+    name: '服务端插件',
+    description: '服务端插件注册、安装状态、依赖计划、任务与审计记录。',
+    apiPrefix: '/api/admin/plugins',
+    cloudflareBindings: ['DB'],
+    workerEnvVars: ['SERVER_ADMIN_TOKEN'],
+    adminRoute: '/plugins',
+  },
+  {
+    key: 'observability',
+    name: '可观测性',
+    description: 'D1 就绪探针、固定资源计数、部署版本元数据和插件近期活动。',
+    apiPrefix: '/api/admin/overview',
+    cloudflareBindings: ['DB', 'CF_VERSION_METADATA'],
+    workerEnvVars: ['SERVER_ADMIN_TOKEN', 'AUTH_PEPPER', 'TOKEN_PEPPER'],
+    adminRoute: '/',
+  },
+  {
     key: 'openapi',
     name: 'OpenAPI',
     description: '服务端公开接口文档和 schema 入口。',
@@ -55,6 +89,7 @@ export const serverModules = [
 ] as const satisfies readonly ServerModuleDefinition[]
 
 export interface ServerRuntimeConfig {
+  adminPath: string
   apiBaseUrl: string
   docsPath: string
   openapiJsonPath: string
@@ -62,6 +97,7 @@ export interface ServerRuntimeConfig {
 }
 
 export const defaultServerRuntimeConfig = {
+  adminPath: '/api/admin',
   apiBaseUrl: '',
   docsPath: '/api/openapi',
   openapiJsonPath: '/api/openapi/json',

@@ -17,13 +17,16 @@
     "cf-typegen": "wrangler types",
     "deploy": "vp build && wrangler deploy",
     "dev": "wrangler dev --config wrangler.jsonc",
+    "migrate:local": "wrangler d1 migrations apply delta-comic-server-db --local",
+    "migrate:remote": "wrangler d1 migrations apply delta-comic-server-db --remote",
     "preview": "vp build && vp preview",
     "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "@delta-comic/server-config": "workspace:",
     "@elysia/eden": "catalog:",
-    "ky": "catalog:"
+    "ky": "catalog:",
+    "semver": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:",
@@ -32,6 +35,7 @@
     "@elysiajs/openapi": "catalog:",
     "@sinclair/typebox": "catalog:",
     "@types/node": "catalog:",
+    "@types/semver": "catalog:",
     "@typescript/native-preview": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",

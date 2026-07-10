@@ -1,0 +1,15 @@
+export type AppIconName =
+  | 'api'
+  | 'chevron-right'
+  | 'close'
+  | 'copy'
+  | 'cube'
+  | 'gear'
+  | 'home'
+  | 'menu'
+  | 'metrics'
+  | 'plugins'
+  | 'refresh'
+  | 'search'
+
+export type StatusTone = 'danger' | 'muted' | 'success' | 'warning'

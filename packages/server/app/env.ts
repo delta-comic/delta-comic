@@ -1,11 +1,11 @@
-export interface AppEnv {
-  DB: D1Database
+/**
+ * Wrangler owns bindings and non-secret vars through the generated global Env type.
+ * Secret bindings are declared here because Wrangler deliberately does not write them to config.
+ */
+export interface AppEnv extends Env {
   AUTH_PEPPER?: string
+  SERVER_ADMIN_TOKEN?: string
   TOKEN_PEPPER?: string
-  ACCESS_TOKEN_TTL_SECONDS?: string
-  REFRESH_TOKEN_TTL_SECONDS?: string
-  SYNC_MAX_PUSH_OPS?: string
-  SYNC_MAX_PULL_CHANGES?: string
 }
 
 export interface AppRuntime {

@@ -22,6 +22,7 @@ export default defineConfig({
       'packages/model',
       'packages/plugin',
       'packages/server',
+      'packages/server-admin',
       'packages/utils',
     ],
   },

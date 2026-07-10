@@ -1,14 +1,124 @@
-@import '../../ui/lib/index.css';
-@import 'vant/lib/index.css';
-@import 'tailwindcss';
+:root {
+  color: #18202d;
+  background: #ffffff;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'PingFang SC',
+    'Hiragino Sans GB',
+    'Microsoft YaHei',
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --dc-blue: #135fe8;
+  --dc-blue-soft: #edf4ff;
+  --dc-blue-border: #80aaf8;
+  --dc-green: #168b48;
+  --dc-green-soft: #edf8f1;
+  --dc-amber: #c38200;
+  --dc-amber-soft: #fff7e5;
+  --dc-red: #dc3e42;
+  --dc-red-soft: #fff0f0;
+  --dc-text: #18202d;
+  --dc-text-secondary: #4f5b6b;
+  --dc-text-muted: #7c8797;
+  --dc-border: #dbe2ec;
+  --dc-border-strong: #cbd5e2;
+  --dc-surface: #ffffff;
+  --dc-surface-soft: #f7f9fc;
+  --dc-sidebar: #f8fafc;
+  --dc-shadow: 0 14px 35px rgb(22 34 51 / 12%);
+  --dc-header-height: 60px;
+  --dc-sidebar-width: 236px;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 html,
 body,
 #app {
-  min-height: 100%;
+  width: 100%;
+  min-width: 320px;
+  height: 100%;
   margin: 0;
 }
 
 body {
-  background: #f6f7fb;
+  overflow: hidden;
+  background: var(--dc-surface);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  color: #ffffff;
+  background: var(--dc-blue);
+}
+
+.dc-page {
+  min-width: 0;
+  padding: 28px 28px 48px;
+}
+
+.dc-panel {
+  overflow: hidden;
+  background: var(--dc-surface);
+  border: 1px solid var(--dc-border);
+  border-radius: 5px;
+}
+
+.dc-error-banner {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  color: #962b2e;
+  background: var(--dc-red-soft);
+  border: 1px solid #f2b9bb;
+  border-radius: 4px;
+}
+
+.dc-empty {
+  display: grid;
+  min-height: 230px;
+  place-items: center;
+  color: var(--dc-text-muted);
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .dc-page {
+    padding: 20px 16px 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

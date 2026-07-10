@@ -1,0 +1,1 @@
+export { pluginRoutes as pluginsModule } from './plugins.routes'

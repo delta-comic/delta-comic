@@ -4,7 +4,9 @@ import { Elysia, t } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
 
 import { bindRuntime, type AppEnv } from './env'
+import { adminModule } from './modules/admin/admin.module'
 import { authModule } from './modules/auth/auth.module'
+import { pluginsModule } from './modules/plugins/plugins.module'
 import { syncModule } from './modules/sync/sync.module'
 import { cors } from './shared/http/cors'
 import { apiSuccessSchema, errorResponse, ok } from './shared/response'
@@ -31,11 +33,18 @@ export const app = new Elysia({ adapter: CloudflareAdapter, prefix: '/api' })
   .use(
     openapi({
       documentation: {
-        components: { securitySchemes: { bearerAuth: { scheme: 'bearer', type: 'http' } } },
+        components: {
+          securitySchemes: {
+            adminBearerAuth: { scheme: 'bearer', type: 'http' },
+            bearerAuth: { scheme: 'bearer', type: 'http' },
+          },
+        },
         info: { title: 'Delta Comic Server API', version: '1.0.0' },
         tags: [
           { description: 'Health check and service metadata', name: 'Health' },
           { description: 'Runtime module metadata for admin panels', name: 'Modules' },
+          { description: 'Protected server administration and operational metrics', name: 'Admin' },
+          { description: 'Server plugin lifecycle and control plane', name: 'Plugins' },
           { description: 'First-party account and terminal session APIs', name: 'Auth' },
           { description: 'SQLite data sync APIs', name: 'Sync' },
         ],
@@ -50,6 +59,10 @@ export const app = new Elysia({ adapter: CloudflareAdapter, prefix: '/api' })
   })
   .get('/health', () => ok({ service: 'delta-comic-server', status: 'ok' as const }), {
     detail: { summary: 'Health check', tags: ['Health'] },
+    response: { 200: 'Response.Health' },
+  })
+  .get('/health/live', () => ok({ service: 'delta-comic-server', status: 'ok' as const }), {
+    detail: { summary: 'Worker liveness check', tags: ['Health'] },
     response: { 200: 'Response.Health' },
   })
   .get(
@@ -67,6 +80,8 @@ export const app = new Elysia({ adapter: CloudflareAdapter, prefix: '/api' })
       response: { 200: 'Response.Modules' },
     },
   )
+  .use(adminModule)
+  .use(pluginsModule)
   .use(authModule)
   .use(syncModule)
 

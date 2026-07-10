@@ -40,6 +40,7 @@
     "commitlint-plugin-cspell": "catalog:",
     "cspell": "catalog:",
     "oxlint-tsgolint": "catalog:",
+    "typescript": "catalog:",
     "vite-plus": "catalog:"
   },
   "badges": [

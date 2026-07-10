@@ -16,6 +16,7 @@
     ".agents",
     "target",
     ".codex",
-    "AGENTS.md"
+    "AGENTS.md",
+    "worker-configuration.d.ts"
   ]
 }

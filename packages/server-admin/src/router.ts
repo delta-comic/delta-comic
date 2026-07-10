@@ -1,14 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import DashboardPage from '@/pages/DashboardPage.vue'
-import ModulesPage from '@/pages/ModulesPage.vue'
-import OpenApiPage from '@/pages/OpenApiPage.vue'
+import { featureRoutes } from '@/app/featureRegistry'
 
 export const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/', component: DashboardPage, name: 'dashboard' },
-    { path: '/modules/:key', component: ModulesPage, name: 'modules' },
-    { path: '/openapi', component: OpenApiPage, name: 'openapi' },
+    ...featureRoutes,
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/features/not-found/NotFoundPage.vue'),
+      meta: { title: '页面不存在' },
+    },
   ],
+  scrollBehavior: () => ({ left: 0, top: 0 }),
+})
+
+router.afterEach(route => {
+  const title = typeof route.meta.title === 'string' ? route.meta.title : '管理面板'
+  document.title = `${title} · Delta Comic Server`
 })
