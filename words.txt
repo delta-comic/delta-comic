@@ -46,6 +46,7 @@ pinia
 pipefail
 Popconfirm
 Popselect
+preboot
 previewable
 releaserc
 reloadable
@@ -70,10 +71,12 @@ TAURI
 temurin
 thiserror
 tlds
+topbar
 tsgo
 tsgolint
 typebox
 unplugin
+unstub
 userscript
 vant
 vicons
@@ -88,5 +91,3 @@ wrangler
 xgbuugti
 Yahei
 yxxx
-topbar
-unstub
