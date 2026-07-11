@@ -88,98 +88,98 @@ onMounted(() => {
 
 <style scoped>
 .observability-page {
-  max-width: 1440px;
-  margin: 0 auto;
+  @apply [max-width:1440px];
+  @apply [margin:0_auto];
 }
 
 .observability-page__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 330px;
-  gap: 22px;
+  @apply [display:grid];
+  @apply [grid-template-columns:minmax(0,_1fr)_330px];
+  @apply [gap:22px];
 }
 
 .observability-page header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [display:flex];
+  @apply [align-items:center];
+  @apply [justify-content:space-between];
+  @apply [padding:18px_20px];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .observability-page h2 {
-  margin: 0;
-  font-size: 15px;
+  @apply [margin:0];
+  @apply [font-size:15px];
 }
 
 .observability-page header span {
-  color: var(--dc-text-muted);
-  font-size: 11px;
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:11px];
 }
 
 .observability-page__metric-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  @apply [display:grid];
+  @apply [grid-template-columns:repeat(3,_minmax(0,_1fr))];
 }
 
 .observability-page__metric-grid article {
-  display: grid;
-  min-height: 150px;
-  align-content: center;
-  padding: 20px;
-  border-right: 1px solid var(--dc-border);
-  border-bottom: 1px solid var(--dc-border);
+  @apply [display:grid];
+  @apply [min-height:150px];
+  @apply [align-content:center];
+  @apply [padding:20px];
+  @apply [border-right:1px_solid_var(--dc-border)];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .observability-page__metric-grid article > div {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--dc-text-secondary);
-  font-size: 12px;
+  @apply [display:flex];
+  @apply [gap:8px];
+  @apply [align-items:center];
+  @apply [justify-content:space-between];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [font-size:12px];
 }
 
 .observability-page__metric-grid strong {
-  margin: 14px 0 8px;
-  font-size: 30px;
-  font-weight: 640;
+  @apply [margin:14px_0_8px];
+  @apply [font-size:30px];
+  @apply [font-weight:640];
 }
 
 .observability-page__metric-grid code {
-  color: var(--dc-text-muted);
-  font-size: 10px;
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:10px];
 }
 
 .observability-page__readiness {
-  align-self: start;
-  padding-bottom: 20px;
+  @apply [align-self:start];
+  @apply [padding-bottom:20px];
 }
 
 .observability-page__readiness > :not(header) {
-  margin: 18px 20px 0;
+  @apply [margin:18px_20px_0];
 }
 
 .observability-page__readiness dl {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 11px;
-  color: var(--dc-text-secondary);
-  font-size: 11px;
+  @apply [display:grid];
+  @apply [grid-template-columns:1fr_auto];
+  @apply [gap:11px];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [font-size:11px];
 }
 
 .observability-page__readiness dd {
-  margin: 0;
+  @apply [margin:0];
 }
 
 @media (max-width: 1040px) {
   .observability-page__layout {
-    grid-template-columns: 1fr;
+    @apply [grid-template-columns:1fr];
   }
 }
 
 @media (max-width: 680px) {
   .observability-page__metric-grid {
-    grid-template-columns: 1fr 1fr;
+    @apply [grid-template-columns:1fr_1fr];
   }
 }
 </style>

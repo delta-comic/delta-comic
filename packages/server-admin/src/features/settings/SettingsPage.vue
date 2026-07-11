@@ -102,27 +102,27 @@ const save = async () => {
 
 <style scoped>
 .settings-page {
-  max-width: 1180px;
-  margin: 0 auto;
+  @apply [max-width:1180px];
+  @apply [margin:0_auto];
 }
 
 .settings-page__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
-  gap: 22px;
+  @apply [display:grid];
+  @apply [grid-template-columns:minmax(0,_1.25fr)_minmax(300px,_0.75fr)];
+  @apply [gap:22px];
 }
 
 .settings-page__error {
-  margin: 16px 0;
+  @apply [margin:16px_0];
 }
 
 .settings-page__status {
-  margin-bottom: 18px;
+  @apply [margin-bottom:18px];
 }
 
 @media (max-width: 840px) {
   .settings-page__layout {
-    grid-template-columns: 1fr;
+    @apply [grid-template-columns:1fr];
   }
 }
 </style>

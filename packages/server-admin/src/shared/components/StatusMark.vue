@@ -13,42 +13,42 @@ withDefaults(defineProps<{ label: string; tone?: StatusTone }>(), { tone: 'muted
 
 <style scoped>
 .status-mark {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  color: var(--dc-text-secondary);
-  font-size: 13px;
-  white-space: nowrap;
+  @apply [display:inline-flex];
+  @apply [gap:8px];
+  @apply [align-items:center];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [font-size:13px];
+  @apply [white-space:nowrap];
 }
 
 .status-mark__dot {
-  width: 8px;
-  height: 8px;
-  background: #98a2b1;
-  border-radius: 1px;
+  @apply [width:8px];
+  @apply [height:8px];
+  @apply [background:var(--dc-status-muted)];
+  @apply [border-radius:1px];
 }
 
 .status-mark--success .status-mark__dot {
-  background: var(--dc-green);
+  @apply [background:var(--dc-green)];
 }
 
 .status-mark--warning .status-mark__dot {
-  background: #e0a000;
+  @apply [background:var(--dc-amber)];
 }
 
 .status-mark--danger .status-mark__dot {
-  background: var(--dc-red);
+  @apply [background:var(--dc-red)];
 }
 
 .status-mark--success {
-  color: #176f3f;
+  @apply [color:var(--dc-green-text)];
 }
 
 .status-mark--warning {
-  color: #8b6300;
+  @apply [color:var(--dc-amber-text)];
 }
 
 .status-mark--danger {
-  color: #a42d31;
+  @apply [color:var(--dc-red-text)];
 }
 </style>

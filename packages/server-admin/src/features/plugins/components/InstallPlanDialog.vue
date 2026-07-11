@@ -68,46 +68,46 @@ const confirm = () => {
 
 <style scoped>
 .install-plan {
-  width: min(560px, calc(100vw - 32px));
+  @apply [width:min(560px,_calc(100vw_-_32px))];
 }
 
 .install-plan p {
-  margin: 0 0 18px;
-  color: var(--dc-text-secondary);
-  line-height: 1.6;
+  @apply [margin:0_0_18px];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [line-height:1.6];
 }
 
 .install-plan__rows {
-  margin-bottom: 18px;
-  border: 1px solid var(--dc-border);
+  @apply [margin-bottom:18px];
+  @apply [border:1px_solid_var(--dc-border)];
 }
 
 .install-plan__row {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  font-size: 12px;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [display:flex];
+  @apply [gap:20px];
+  @apply [align-items:center];
+  @apply [justify-content:space-between];
+  @apply [padding:12px_14px];
+  @apply [font-size:12px];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .install-plan__row:last-child {
-  border-bottom: 0;
+  @apply [border-bottom:0];
 }
 
 .install-plan__row > div {
-  display: grid;
-  gap: 3px;
+  @apply [display:grid];
+  @apply [gap:3px];
 }
 
 .install-plan__row code,
 .install-plan__row span {
-  color: var(--dc-text-muted);
-  font-size: 10px;
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:10px];
 }
 
 .install-plan__row--target {
-  background: var(--dc-blue-soft);
+  @apply [background:var(--dc-blue-soft)];
 }
 </style>

@@ -55,25 +55,26 @@ onMounted(() => {
 
 <style scoped>
 .admin-shell {
-  height: 100%;
-  background: var(--dc-surface);
-  position: relative;
+  @apply [height:100%];
+  @apply [color:var(--dc-text)];
+  @apply [background:var(--dc-surface)];
+  @apply [position:relative];
 }
 
 .admin-shell__workspace {
-  min-width: 0;
-  max-height: 100%;
-  margin-left: var(--dc-sidebar-width);
-  overflow-y: auto;
+  @apply [min-width:0];
+  @apply [max-height:100%];
+  @apply [margin-left:var(--dc-sidebar-width)];
+  @apply [overflow-y:auto];
 }
 
 .admin-shell__main {
-  min-width: 0;
+  @apply [min-width:0];
 }
 
 @media (max-width: 860px) {
   .admin-shell__workspace {
-    margin-left: 0;
+    @apply [margin-left:0];
   }
 }
 </style>

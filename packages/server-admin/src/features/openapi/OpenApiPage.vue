@@ -45,11 +45,11 @@ const jsonUrl = computed(() =>
 
 <style scoped>
 .openapi-page {
-  max-width: 960px;
-  margin: 0 auto;
+  @apply [max-width:960px];
+  @apply [margin:0_auto];
 }
 
 .openapi-page__actions {
-  margin-top: 20px;
+  @apply [margin-top:20px];
 }
 </style>

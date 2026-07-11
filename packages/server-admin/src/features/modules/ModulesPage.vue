@@ -66,72 +66,72 @@ const selected = computed(() =>
 
 <style scoped>
 .modules-page {
-  max-width: 1380px;
-  margin: 0 auto;
+  @apply [max-width:1380px];
+  @apply [margin:0_auto];
 }
 
 .modules-page__layout {
-  display: grid;
-  grid-template-columns: minmax(280px, 0.42fr) minmax(0, 0.58fr);
-  min-height: 520px;
+  @apply [display:grid];
+  @apply [grid-template-columns:minmax(280px,_0.42fr)_minmax(0,_0.58fr)];
+  @apply [min-height:520px];
 }
 
 .modules-page__list {
-  border-right: 1px solid var(--dc-border);
+  @apply [border-right:1px_solid_var(--dc-border)];
 }
 
 .modules-page__row {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [display:flex];
+  @apply [gap:20px];
+  @apply [align-items:center];
+  @apply [justify-content:space-between];
+  @apply [padding:16px_18px];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .modules-page__row:hover,
 .modules-page__row--selected {
-  background: var(--dc-blue-soft);
+  @apply [background:var(--dc-blue-soft)];
 }
 
 .modules-page__row div {
-  display: grid;
-  gap: 5px;
+  @apply [display:grid];
+  @apply [gap:5px];
 }
 
 .modules-page__row strong {
-  font-size: 13px;
+  @apply [font-size:13px];
 }
 
 .modules-page__row small {
-  color: var(--dc-text-muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 10px;
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-family:ui-monospace,_SFMono-Regular,_Menlo,_monospace];
+  @apply [font-size:10px];
 }
 
 .modules-page__detail {
-  padding: 28px;
+  @apply [padding:28px];
 }
 
 .modules-page__detail h2 {
-  margin: 0;
-  font-size: 21px;
+  @apply [margin:0];
+  @apply [font-size:21px];
 }
 
 .modules-page__detail p {
-  margin: 10px 0 24px;
-  color: var(--dc-text-secondary);
-  line-height: 1.7;
+  @apply [margin:10px_0_24px];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [line-height:1.7];
 }
 
 @media (max-width: 760px) {
   .modules-page__layout {
-    grid-template-columns: 1fr;
+    @apply [grid-template-columns:1fr];
   }
 
   .modules-page__list {
-    border-right: 0;
-    border-bottom: 1px solid var(--dc-border);
+    @apply [border-right:0];
+    @apply [border-bottom:1px_solid_var(--dc-border)];
   }
 }
 </style>

@@ -70,7 +70,7 @@ defineProps<{ name: AppIconName; size?: number }>()
 
 <style scoped>
 .app-icon {
-  display: block;
-  flex: none;
+  @apply [display:block];
+  @apply [flex:none];
 }
 </style>

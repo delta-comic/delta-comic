@@ -5,7 +5,38 @@
 @import 'tailwindcss/preflight.css' layer(base);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
+@theme inline {
+  --font-sans:
+    Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-dc-blue: var(--dc-blue);
+  --color-dc-blue-soft: var(--dc-blue-soft);
+  --color-dc-green: var(--dc-green);
+  --color-dc-green-text: var(--dc-green-text);
+  --color-dc-amber: var(--dc-amber);
+  --color-dc-amber-text: var(--dc-amber-text);
+  --color-dc-red: var(--dc-red);
+  --color-dc-red-soft: var(--dc-red-soft);
+  --color-dc-red-border: var(--dc-red-border);
+  --color-dc-red-text: var(--dc-red-text);
+  --color-dc-text: var(--dc-text);
+  --color-dc-text-secondary: var(--dc-text-secondary);
+  --color-dc-text-muted: var(--dc-text-muted);
+  --color-dc-border: var(--dc-border);
+  --color-dc-surface: var(--dc-surface);
+  --color-dc-surface-soft: var(--dc-surface-soft);
+  --color-dc-sidebar: var(--dc-sidebar);
+  --color-dc-topbar: var(--dc-topbar);
+  --color-dc-status-muted: var(--dc-status-muted);
+  --shadow-dc-panel: var(--dc-shadow);
+  --spacing-dc-header: var(--dc-header-height);
+  --spacing-dc-sidebar: var(--dc-sidebar-width);
+  --radius-dc: 5px;
+}
+
 :root {
+  color-scheme: light;
   color: #18202d;
   background: #ffffff;
   font-family:
@@ -25,10 +56,14 @@
   --dc-blue-border: #80aaf8;
   --dc-green: #168b48;
   --dc-green-soft: #edf8f1;
+  --dc-green-text: #176f3f;
   --dc-amber: #c38200;
   --dc-amber-soft: #fff7e5;
+  --dc-amber-text: #8b6300;
   --dc-red: #dc3e42;
   --dc-red-soft: #fff0f0;
+  --dc-red-border: #f2b9bb;
+  --dc-red-text: #962b2e;
   --dc-text: #18202d;
   --dc-text-secondary: #4f5b6b;
   --dc-text-muted: #7c8797;
@@ -37,27 +72,58 @@
   --dc-surface: #ffffff;
   --dc-surface-soft: #f7f9fc;
   --dc-sidebar: #f8fafc;
+  --dc-topbar: rgb(255 255 255 / 94%);
+  --dc-status-muted: #98a2b1;
   --dc-shadow: 0 14px 35px rgb(22 34 51 / 12%);
   --dc-header-height: 60px;
   --dc-sidebar-width: 236px;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    color: #f0f2f5;
+    background: #101014;
+    --dc-blue: #82adff;
+    --dc-blue-soft: #1c2a44;
+    --dc-blue-border: #456ca8;
+    --dc-green: #62d18e;
+    --dc-green-soft: #183123;
+    --dc-green-text: #78dda0;
+    --dc-amber: #e6ad3a;
+    --dc-amber-soft: #352a14;
+    --dc-amber-text: #f0c361;
+    --dc-red: #ff7377;
+    --dc-red-soft: #3a2022;
+    --dc-red-border: #714046;
+    --dc-red-text: #ff9a9d;
+    --dc-text: #f0f2f5;
+    --dc-text-secondary: #b8c0cc;
+    --dc-text-muted: #8f9aaa;
+    --dc-border: #343944;
+    --dc-border-strong: #4a5260;
+    --dc-surface: #18181c;
+    --dc-surface-soft: #202227;
+    --dc-sidebar: #14161a;
+    --dc-topbar: rgb(24 24 28 / 92%);
+    --dc-status-muted: #7d8794;
+    --dc-shadow: 0 14px 35px rgb(0 0 0 / 35%);
+  }
+}
+
 * {
-  box-sizing: border-box;
+  @apply box-border;
 }
 
 html,
 body,
 #app,
 .n-config-provider {
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0;
+  @apply m-0 h-full! w-full!;
 }
 
 body {
-  overflow: hidden;
-  background: var(--dc-surface);
+  @apply bg-dc-surface overflow-hidden;
 }
 
 button,
@@ -73,49 +139,32 @@ a {
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+  @apply text-inherit no-underline;
 }
 
 ::selection {
-  color: #ffffff;
-  background: var(--dc-blue);
+  @apply bg-dc-blue text-white;
 }
 
 .dc-page {
-  min-width: 0;
-  padding: 28px 28px 48px;
+  @apply min-w-0 px-[28px] pt-[28px] pb-[48px];
 }
 
 .dc-panel {
-  overflow: hidden;
-  background: var(--dc-surface);
-  border: 1px solid var(--dc-border);
-  border-radius: 5px;
+  @apply text-dc-text rounded-dc border-dc-border bg-dc-surface overflow-hidden border;
 }
 
 .dc-error-banner {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  padding: 12px 14px;
-  color: #962b2e;
-  background: var(--dc-red-soft);
-  border: 1px solid #f2b9bb;
-  border-radius: 4px;
+  @apply bg-dc-red-soft border-dc-red-border text-dc-red-text flex items-start gap-[10px] rounded-[4px] border px-[14px] py-3;
 }
 
 .dc-empty {
-  display: grid;
-  min-height: 230px;
-  place-items: center;
-  color: var(--dc-text-muted);
-  text-align: center;
+  @apply text-dc-text-muted grid min-h-[230px] place-items-center text-center;
 }
 
 @media (max-width: 760px) {
   .dc-page {
-    padding: 20px 16px 36px;
+    @apply px-4 pt-5 pb-9;
   }
 }
 

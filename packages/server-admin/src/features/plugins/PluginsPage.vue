@@ -170,48 +170,48 @@ onMounted(() => {
 
 <style scoped>
 .plugins-page {
-  max-width: 1600px;
-  margin: 0 auto;
+  @apply [max-width:1600px];
+  @apply [margin:0_auto];
 }
 
 .plugins-page__tabs {
-  display: flex;
-  gap: 26px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [display:flex];
+  @apply [gap:26px];
+  @apply [margin-bottom:20px];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .plugins-page__tabs button {
-  padding: 11px 2px;
-  color: var(--dc-text-secondary);
-  font-size: 13px;
-  background: transparent;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
+  @apply [padding:11px_2px];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [font-size:13px];
+  @apply [background:transparent];
+  @apply [border:0];
+  @apply [border-bottom:2px_solid_transparent];
+  @apply [cursor:pointer];
 }
 
 .plugins-page__tabs button.active {
-  color: var(--dc-blue);
-  font-weight: 620;
-  border-color: var(--dc-blue);
+  @apply [color:var(--dc-blue)];
+  @apply [font-weight:620];
+  @apply [border-color:var(--dc-blue)];
 }
 
 .plugins-page__error {
-  margin-bottom: 16px;
+  @apply [margin-bottom:16px];
 }
 
 .plugins-page__filters {
-  display: grid;
-  grid-template-columns: minmax(240px, 360px) 160px;
-  gap: 12px;
-  padding: 16px;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [display:grid];
+  @apply [grid-template-columns:minmax(240px,_360px)_160px];
+  @apply [gap:12px];
+  @apply [padding:16px];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 @media (max-width: 640px) {
   .plugins-page__filters {
-    grid-template-columns: 1fr;
+    @apply [grid-template-columns:1fr];
   }
 }
 </style>

@@ -229,95 +229,95 @@ const can = (action: ServerPluginAction): boolean =>
 
 <style scoped>
 .plugin-detail__title {
-  display: grid;
-  gap: 4px;
+  @apply [display:grid];
+  @apply [gap:4px];
 }
 
 .plugin-detail__title code {
-  color: var(--dc-text-muted);
-  font-size: 10px;
-  font-weight: 400;
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:10px];
+  @apply [font-weight:400];
 }
 
 .plugin-detail__state {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  padding: 16px;
-  background: var(--dc-surface-soft);
-  border: 1px solid var(--dc-border);
+  @apply [display:grid];
+  @apply [grid-template-columns:1fr_1fr];
+  @apply [gap:16px];
+  @apply [padding:16px];
+  @apply [background:var(--dc-surface-soft)];
+  @apply [border:1px_solid_var(--dc-border)];
 }
 
 .plugin-detail__state > div {
-  display: grid;
-  gap: 8px;
+  @apply [display:grid];
+  @apply [gap:8px];
 }
 
 .plugin-detail__state > div > span {
-  color: var(--dc-text-muted);
-  font-size: 11px;
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:11px];
 }
 
 .plugin-detail__tabs {
-  display: flex;
-  gap: 24px;
-  margin-top: 22px;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [display:flex];
+  @apply [gap:24px];
+  @apply [margin-top:22px];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .plugin-detail__tabs button {
-  padding: 10px 2px;
-  color: var(--dc-text-secondary);
-  font-size: 12px;
-  background: transparent;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
+  @apply [padding:10px_2px];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [font-size:12px];
+  @apply [background:transparent];
+  @apply [border:0];
+  @apply [border-bottom:2px_solid_transparent];
+  @apply [cursor:pointer];
 }
 
 .plugin-detail__tabs button.active {
-  color: var(--dc-blue);
-  border-color: var(--dc-blue);
+  @apply [color:var(--dc-blue)];
+  @apply [border-color:var(--dc-blue)];
 }
 
 .plugin-detail__content {
-  display: grid;
-  gap: 24px;
-  padding: 22px 0;
+  @apply [display:grid];
+  @apply [gap:24px];
+  @apply [padding:22px_0];
 }
 
 .plugin-detail__content h3 {
-  margin: 0 0 10px;
-  font-size: 12px;
+  @apply [margin:0_0_10px];
+  @apply [font-size:12px];
 }
 
 .plugin-detail__content p {
-  margin: 0;
-  color: var(--dc-text-secondary);
-  font-size: 12px;
-  line-height: 1.7;
+  @apply [margin:0];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [font-size:12px];
+  @apply [line-height:1.7];
 }
 
 .plugin-detail__dependencies {
-  border: 1px solid var(--dc-border);
+  @apply [border:1px_solid_var(--dc-border)];
 }
 
 .plugin-detail__dependencies > div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [display:flex];
+  @apply [align-items:center];
+  @apply [justify-content:space-between];
+  @apply [padding:10px_12px];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .plugin-detail__dependencies > div:last-child {
-  border-bottom: 0;
+  @apply [border-bottom:0];
 }
 
 .plugin-detail__dependencies code,
 .plugin-detail__dependencies span,
 .plugin-detail__muted {
-  color: var(--dc-text-muted);
-  font-size: 10px;
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:10px];
 }
 </style>

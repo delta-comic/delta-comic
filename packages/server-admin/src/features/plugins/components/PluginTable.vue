@@ -141,60 +141,60 @@ const actionLabel: Partial<Record<ServerPluginAction, string>> = {
 
 <style scoped>
 .plugin-table-wrap {
-  overflow-x: auto;
+  @apply [overflow-x:auto];
 }
 
 .plugin-table {
-  width: 100%;
-  min-width: 980px;
-  border-collapse: collapse;
-  font-size: 12px;
+  @apply [width:100%];
+  @apply [min-width:980px];
+  @apply [border-collapse:collapse];
+  @apply [font-size:12px];
 }
 
 .plugin-table th,
 .plugin-table td {
-  padding: 12px 14px;
-  text-align: left;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [padding:12px_14px];
+  @apply [text-align:left];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .plugin-table th {
-  color: var(--dc-text-secondary);
-  font-size: 11px;
-  font-weight: 600;
-  background: var(--dc-surface-soft);
+  @apply [color:var(--dc-text-secondary)];
+  @apply [font-size:11px];
+  @apply [font-weight:600];
+  @apply [background:var(--dc-surface-soft)];
 }
 
 .plugin-table tbody tr {
-  cursor: pointer;
+  @apply [cursor:pointer];
 }
 
 .plugin-table tbody tr:hover,
 .plugin-table__row--selected {
-  background: #f3f7ff;
+  @apply [background:var(--dc-blue-soft)];
 }
 
 .plugin-table td:first-child {
-  display: grid;
-  min-width: 190px;
-  gap: 4px;
+  @apply [display:grid];
+  @apply [min-width:190px];
+  @apply [gap:4px];
 }
 
 .plugin-table strong {
-  color: var(--dc-text);
-  font-size: 12px;
+  @apply [color:var(--dc-text)];
+  @apply [font-size:12px];
 }
 
 .plugin-table code,
 .plugin-table__muted {
-  color: var(--dc-text-muted);
-  font-size: 10px;
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:10px];
 }
 
 .plugin-table__capabilities {
-  display: flex;
-  max-width: 260px;
-  gap: 4px;
-  flex-wrap: wrap;
+  @apply [display:flex];
+  @apply [max-width:260px];
+  @apply [gap:4px];
+  @apply [flex-wrap:wrap];
 }
 </style>

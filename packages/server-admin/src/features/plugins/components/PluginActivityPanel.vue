@@ -92,48 +92,48 @@ const formatTime = (value: number): string =>
 
 <style scoped>
 .plugin-activity {
-  display: grid;
-  gap: 20px;
+  @apply [display:grid];
+  @apply [gap:20px];
 }
 
 .plugin-activity header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [display:flex];
+  @apply [align-items:center];
+  @apply [justify-content:space-between];
+  @apply [padding:16px_18px];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .plugin-activity h2 {
-  margin: 0;
-  font-size: 14px;
+  @apply [margin:0];
+  @apply [font-size:14px];
 }
 
 .plugin-activity header span {
-  color: var(--dc-text-muted);
-  font-size: 11px;
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:11px];
 }
 
 .plugin-activity table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 11px;
+  @apply [width:100%];
+  @apply [border-collapse:collapse];
+  @apply [font-size:11px];
 }
 
 .plugin-activity th,
 .plugin-activity td {
-  padding: 11px 14px;
-  text-align: left;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [padding:11px_14px];
+  @apply [text-align:left];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .plugin-activity th {
-  color: var(--dc-text-muted);
-  font-weight: 550;
-  background: var(--dc-surface-soft);
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-weight:550];
+  @apply [background:var(--dc-surface-soft)];
 }
 
 .plugin-activity code {
-  font-size: 10px;
+  @apply [font-size:10px];
 }
 </style>

@@ -45,125 +45,125 @@ const emit = defineEmits<{ close: []; navigate: [path: string] }>()
 
 <style scoped>
 .admin-sidebar {
-  position: fixed;
-  z-index: 30;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  width: var(--dc-sidebar-width);
-  flex-direction: column;
-  background: var(--dc-sidebar);
-  border-right: 1px solid var(--dc-border);
+  @apply [position:fixed];
+  @apply [z-index:30];
+  @apply [top:0];
+  @apply [bottom:0];
+  @apply [left:0];
+  @apply [display:flex];
+  @apply [width:var(--dc-sidebar-width)];
+  @apply [flex-direction:column];
+  @apply [background:var(--dc-sidebar)];
+  @apply [border-right:1px_solid_var(--dc-border)];
 }
 
 .admin-sidebar__brand {
-  display: flex;
-  height: var(--dc-header-height);
-  gap: 10px;
-  align-items: center;
-  padding: 0 20px;
-  color: var(--dc-text);
-  font-size: 15px;
-  font-weight: 680;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
+  @apply [display:flex];
+  @apply [height:var(--dc-header-height)];
+  @apply [gap:10px];
+  @apply [align-items:center];
+  @apply [padding:0_20px];
+  @apply [color:var(--dc-text)];
+  @apply [font-size:15px];
+  @apply [font-weight:680];
+  @apply [background:transparent];
+  @apply [border:0];
+  @apply [cursor:pointer];
 }
 
 .admin-sidebar__mark {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  color: #fff;
-  font-size: 17px;
-  background: var(--dc-blue);
-  border-radius: 5px;
-  place-items: center;
+  @apply [display:grid];
+  @apply [width:28px];
+  @apply [height:28px];
+  @apply [color:#fff];
+  @apply [font-size:17px];
+  @apply [background:var(--dc-blue)];
+  @apply [border-radius:5px];
+  @apply [place-items:center];
 }
 
 .admin-sidebar__nav {
-  display: grid;
-  gap: 4px;
-  padding: 20px 10px;
+  @apply [display:grid];
+  @apply [gap:4px];
+  @apply [padding:20px_10px];
 }
 
 .admin-sidebar__item {
-  position: relative;
-  display: flex;
-  min-height: 44px;
-  gap: 14px;
-  align-items: center;
-  padding: 0 14px;
-  color: #354052;
-  font-size: 14px;
-  text-align: left;
-  background: transparent;
-  border: 0;
-  border-radius: 5px;
-  cursor: pointer;
+  @apply [position:relative];
+  @apply [display:flex];
+  @apply [min-height:44px];
+  @apply [gap:14px];
+  @apply [align-items:center];
+  @apply [padding:0_14px];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [font-size:14px];
+  @apply [text-align:left];
+  @apply [background:transparent];
+  @apply [border:0];
+  @apply [border-radius:5px];
+  @apply [cursor:pointer];
 }
 
 .admin-sidebar__item:hover {
-  color: var(--dc-blue);
-  background: #f0f4fa;
+  @apply [color:var(--dc-blue)];
+  @apply [background:var(--dc-surface-soft)];
 }
 
 .admin-sidebar__item--selected {
-  color: var(--dc-blue);
-  font-weight: 630;
-  background: var(--dc-blue-soft);
+  @apply [color:var(--dc-blue)];
+  @apply [font-weight:630];
+  @apply [background:var(--dc-blue-soft)];
 }
 
 .admin-sidebar__item--selected::before {
-  position: absolute;
-  top: 8px;
-  bottom: 8px;
-  left: -10px;
-  width: 3px;
-  background: var(--dc-blue);
+  @apply [position:absolute];
+  @apply [top:8px];
+  @apply [bottom:8px];
+  @apply [left:-10px];
+  @apply [width:3px];
+  @apply [background:var(--dc-blue)];
   content: '';
 }
 
 .admin-sidebar__footer {
-  display: flex;
-  gap: 9px;
-  align-items: center;
-  margin-top: auto;
-  padding: 18px 22px;
-  color: var(--dc-text-muted);
-  font-size: 12px;
-  border-top: 1px solid var(--dc-border);
+  @apply [display:flex];
+  @apply [gap:9px];
+  @apply [align-items:center];
+  @apply [margin-top:auto];
+  @apply [padding:18px_22px];
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:12px];
+  @apply [border-top:1px_solid_var(--dc-border)];
 }
 
 .admin-sidebar__status-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--dc-green);
-  border-radius: 1px;
+  @apply [width:8px];
+  @apply [height:8px];
+  @apply [background:var(--dc-green)];
+  @apply [border-radius:1px];
 }
 
 .admin-sidebar__scrim {
-  display: none;
+  @apply [display:none];
 }
 
 @media (max-width: 860px) {
   .admin-sidebar {
-    transform: translateX(-100%);
-    transition: transform 180ms ease;
+    @apply [transform:translateX(-100%)];
+    @apply [transition:transform_180ms_ease];
   }
 
   .admin-sidebar--open {
-    transform: translateX(0);
+    @apply [transform:translateX(0)];
   }
 
   .admin-sidebar__scrim {
-    position: fixed;
-    z-index: 20;
-    inset: 0;
-    display: block;
-    background: rgb(20 29 43 / 35%);
-    border: 0;
+    @apply [position:fixed];
+    @apply [z-index:20];
+    @apply [inset:0];
+    @apply [display:block];
+    @apply [background:rgb(20_29_43_/_35%)];
+    @apply [border:0];
   }
 }
 </style>

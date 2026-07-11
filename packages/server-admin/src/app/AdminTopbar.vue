@@ -46,89 +46,89 @@ const statusTone = (): StatusTone => {
 
 <style scoped>
 .admin-topbar {
-  position: sticky;
-  z-index: 10;
-  top: 0;
-  display: flex;
-  height: var(--dc-header-height);
-  gap: 24px;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0 28px;
-  background: rgb(255 255 255 / 94%);
-  border-bottom: 1px solid var(--dc-border);
-  backdrop-filter: blur(12px);
+  @apply [position:sticky];
+  @apply [z-index:10];
+  @apply [top:0];
+  @apply [display:flex];
+  @apply [height:var(--dc-header-height)];
+  @apply [gap:24px];
+  @apply [align-items:center];
+  @apply [justify-content:flex-end];
+  @apply [padding:0_28px];
+  @apply [background:var(--dc-topbar)];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
+  @apply [backdrop-filter:blur(12px)];
 }
 
 .admin-topbar__menu {
-  display: none;
-  color: var(--dc-text);
-  background: none;
-  border: 0;
+  @apply [display:none];
+  @apply [color:var(--dc-text)];
+  @apply [background:none];
+  @apply [border:0];
 }
 
 .admin-topbar__endpoint {
-  display: flex;
-  min-width: 0;
-  gap: 10px;
-  align-items: center;
-  color: var(--dc-text-muted);
-  font-size: 12px;
+  @apply [display:flex];
+  @apply [min-width:0];
+  @apply [gap:10px];
+  @apply [align-items:center];
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:12px];
 }
 
 .admin-topbar__endpoint code {
-  overflow: hidden;
-  max-width: min(40vw, 520px);
-  padding: 7px 10px;
-  color: #3b4657;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  background: var(--dc-surface-soft);
-  border: 1px solid var(--dc-border);
-  border-radius: 4px;
+  @apply [overflow:hidden];
+  @apply [max-width:min(40vw,_520px)];
+  @apply [padding:7px_10px];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [font-family:ui-monospace,_SFMono-Regular,_Menlo,_monospace];
+  @apply [font-size:12px];
+  @apply [text-overflow:ellipsis];
+  @apply [white-space:nowrap];
+  @apply [background:var(--dc-surface-soft)];
+  @apply [border:1px_solid_var(--dc-border)];
+  @apply [border-radius:4px];
 }
 
 .admin-topbar__actions {
-  display: flex;
-  gap: 20px;
-  align-items: center;
+  @apply [display:flex];
+  @apply [gap:20px];
+  @apply [align-items:center];
 }
 
 .admin-topbar__settings {
-  display: flex;
-  gap: 7px;
-  align-items: center;
-  padding: 6px;
-  color: var(--dc-text-secondary);
-  font-size: 12px;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
+  @apply [display:flex];
+  @apply [gap:7px];
+  @apply [align-items:center];
+  @apply [padding:6px];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [font-size:12px];
+  @apply [background:transparent];
+  @apply [border:0];
+  @apply [cursor:pointer];
 }
 
 .admin-topbar__settings:hover {
-  color: var(--dc-blue);
+  @apply [color:var(--dc-blue)];
 }
 
 @media (max-width: 860px) {
   .admin-topbar {
-    justify-content: space-between;
-    padding: 0 16px;
+    @apply [justify-content:space-between];
+    @apply [padding:0_16px];
   }
 
   .admin-topbar__menu {
-    display: block;
+    @apply [display:block];
   }
 
   .admin-topbar__endpoint > span,
   .admin-topbar__settings span {
-    display: none;
+    @apply [display:none];
   }
 
   .admin-topbar__endpoint code {
-    max-width: 42vw;
+    @apply [max-width:42vw];
   }
 }
 </style>

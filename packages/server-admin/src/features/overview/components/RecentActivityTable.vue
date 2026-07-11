@@ -49,62 +49,62 @@ const formatTime = (value: number): string =>
 
 <style scoped>
 .activity-panel {
-  min-width: 0;
+  @apply [min-width:0];
 }
 
 .activity-panel__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 22px 14px;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [display:flex];
+  @apply [align-items:center];
+  @apply [justify-content:space-between];
+  @apply [padding:20px_22px_14px];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .activity-panel__header h2 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 650;
+  @apply [margin:0];
+  @apply [font-size:15px];
+  @apply [font-weight:650];
 }
 
 .activity-panel__header a {
-  color: var(--dc-blue);
-  font-size: 12px;
+  @apply [color:var(--dc-blue)];
+  @apply [font-size:12px];
 }
 
 .activity-panel__table-wrap {
-  overflow-x: auto;
+  @apply [overflow-x:auto];
 }
 
 .activity-panel__table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
+  @apply [width:100%];
+  @apply [border-collapse:collapse];
+  @apply [font-size:12px];
 }
 
 .activity-panel__table th,
 .activity-panel__table td {
-  padding: 13px 18px;
-  text-align: left;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [padding:13px_18px];
+  @apply [text-align:left];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .activity-panel__table th {
-  color: var(--dc-text-muted);
-  font-size: 11px;
-  font-weight: 550;
-  background: var(--dc-surface-soft);
+  @apply [color:var(--dc-text-muted)];
+  @apply [font-size:11px];
+  @apply [font-weight:550];
+  @apply [background:var(--dc-surface-soft)];
 }
 
 .activity-panel__table td {
-  color: var(--dc-text-secondary);
+  @apply [color:var(--dc-text-secondary)];
 }
 
 .activity-panel__table code {
-  color: var(--dc-text);
-  font-size: 11px;
+  @apply [color:var(--dc-text)];
+  @apply [font-size:11px];
 }
 
 .activity-panel__empty {
-  min-height: 250px;
+  @apply [min-height:250px];
 }
 </style>

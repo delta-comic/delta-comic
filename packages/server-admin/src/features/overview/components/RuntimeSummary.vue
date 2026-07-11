@@ -67,59 +67,59 @@ const formatTime = (value: string | number): string =>
 
 <style scoped>
 .runtime-summary {
-  border-left: 1px solid var(--dc-border);
+  @apply [border-left:1px_solid_var(--dc-border)];
 }
 
 .runtime-summary section {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--dc-border);
+  @apply [padding:20px_24px];
+  @apply [border-bottom:1px_solid_var(--dc-border)];
 }
 
 .runtime-summary h2 {
-  margin: 0 0 16px;
-  font-size: 15px;
-  font-weight: 650;
+  @apply [margin:0_0_16px];
+  @apply [font-size:15px];
+  @apply [font-weight:650];
 }
 
 .runtime-summary dl {
-  display: grid;
-  grid-template-columns: minmax(90px, 0.8fr) minmax(0, 1.2fr);
-  gap: 10px 14px;
-  margin: 0;
-  font-size: 12px;
+  @apply [display:grid];
+  @apply [grid-template-columns:minmax(90px,_0.8fr)_minmax(0,_1.2fr)];
+  @apply [gap:10px_14px];
+  @apply [margin:0];
+  @apply [font-size:12px];
 }
 
 .runtime-summary dt {
-  color: var(--dc-text-muted);
+  @apply [color:var(--dc-text-muted)];
 }
 
 .runtime-summary dd {
-  overflow: hidden;
-  margin: 0;
-  color: var(--dc-text-secondary);
-  text-overflow: ellipsis;
+  @apply [overflow:hidden];
+  @apply [margin:0];
+  @apply [color:var(--dc-text-secondary)];
+  @apply [text-overflow:ellipsis];
 }
 
 .runtime-summary code {
-  font-size: 10px;
+  @apply [font-size:10px];
 }
 
 .runtime-summary__checks {
-  display: grid;
-  gap: 12px;
+  @apply [display:grid];
+  @apply [gap:12px];
 }
 
 .runtime-summary__issues {
-  margin: 16px 0 0;
-  padding-left: 18px;
-  color: #9a6710;
-  font-size: 11px;
+  @apply [margin:16px_0_0];
+  @apply [padding-left:18px];
+  @apply [color:var(--dc-amber-text)];
+  @apply [font-size:11px];
 }
 
 @media (max-width: 960px) {
   .runtime-summary {
-    border-top: 1px solid var(--dc-border);
-    border-left: 0;
+    @apply [border-top:1px_solid_var(--dc-border)];
+    @apply [border-left:0];
   }
 }
 </style>

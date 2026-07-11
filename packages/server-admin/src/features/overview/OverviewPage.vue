@@ -56,19 +56,19 @@ onMounted(() => {
 
 <style scoped>
 .overview-page {
-  max-width: 1600px;
-  margin: 0 auto;
+  @apply [max-width:1600px];
+  @apply [margin:0_auto];
 }
 
 .overview-page__body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  margin-top: 24px;
+  @apply [display:grid];
+  @apply [grid-template-columns:minmax(0,_1fr)_360px];
+  @apply [margin-top:24px];
 }
 
 @media (max-width: 960px) {
   .overview-page__body {
-    grid-template-columns: 1fr;
+    @apply [grid-template-columns:1fr];
   }
 }
 </style>
