@@ -26,6 +26,8 @@ export type * as Search from './search'
 import type * as Auth from './auth'
 export type * as Auth from './auth'
 
+import type { PluginArchiveDB } from '@delta-comic/db'
+
 import type * as Resource from './resource'
 export type * as Resource from './resource'
 
@@ -48,10 +50,11 @@ export interface PluginConfigValues {
 }
 
 export type DefineResult = { api?: Record<string, string | undefined | false> }
+export type Platform = 'tauri' | 'web'
 export interface PluginConfigHooks {
   /** Runs before Vue createApp. Preboot plugins must avoid Vue injection APIs in this hook. */
   onPreboot?(context: {
-    platform: 'tauri' | 'web'
+    platform: Platform
     safe: boolean
   }): (() => Promise<void> | void) | Promise<(() => Promise<void> | void) | void> | void
   /**
@@ -68,13 +71,14 @@ export type PluginConfig = PluginConfigValues & PluginConfigHooks
 
 export interface ConfigEnv {
   safe: boolean
+  platform: Platform
 }
 /**
  * 这仅是个辅助定义的函数，没有副作用
  */
 export const definePlugin = <T extends PluginConfig>(
-  config: T | ((env: ConfigEnv) => T),
-): ((env: ConfigEnv) => T) => {
+  config: T | PluginConfigFactory<T>,
+): PluginConfigFactory<T> => {
   if (isFunction(config)) return config
   return () => config
 }
@@ -83,4 +87,11 @@ export type PluginExpose<T extends PluginConfig> = ReturnType<
   T['onBooted'] extends () => object ? T['onBooted'] : () => void
 >
 
-export type PluginConfigFactory = (env: ConfigEnv) => PluginConfig
+export type PluginConfigFactory<T extends PluginConfig = PluginConfig> = (env: ConfigEnv) => T
+
+/**
+ * 这仅是个辅助定义的函数，没有副作用
+ */
+export const defineInnerPlugin = (
+  definition: (env: ConfigEnv) => { meta: PluginArchiveDB.Meta; config: PluginConfigFactory },
+) => definition

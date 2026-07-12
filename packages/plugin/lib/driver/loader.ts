@@ -7,6 +7,7 @@ import type { PluginConfig, PluginConfigFactory } from '@/plugin'
 
 import { bootPlugin } from './booter'
 import { cleanupPlugin } from './cleanup'
+import { isTauriRuntime } from './init/storage'
 import type { PluginLoader } from './init/utils'
 
 const rawLoaders = import.meta.glob<PluginLoader>(
@@ -65,7 +66,7 @@ export const bootConfig = async (
 
   let cfg: PluginConfig | undefined
   try {
-    cfg = configFactory({ safe: true })
+    cfg = configFactory({ safe: true, platform: isTauriRuntime() ? 'tauri' : 'web' })
     if (expectedName && cfg.name !== expectedName) {
       throw new Error(`plugin name mismatch: ${expectedName} / ${cfg.name}`)
     }

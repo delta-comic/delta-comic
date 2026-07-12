@@ -99,17 +99,15 @@ class PluginRuntime {
       for (const level of plan.levels) {
         for (const archive of level) {
           await Global.withRegistrationOwner(archive.pluginName, async () => {
+            const platform = isTauriRuntime() ? 'tauri' : 'web'
             const factory = await loadPluginConfig(archive)
             if (!factory)
               throw new Error(`plugin entry has no default export: ${archive.pluginName}`)
-            const config = factory({ safe: true })
+            const config = factory({ safe: true, platform })
             if (config.name !== archive.pluginName) {
               throw new Error(`plugin name mismatch: ${archive.pluginName} / ${config.name}`)
             }
-            const cleanup = await config.onPreboot?.({
-              platform: isTauriRuntime() ? 'tauri' : 'web',
-              safe: true,
-            })
+            const cleanup = await config.onPreboot?.({ platform, safe: true })
             if (cleanup) this.prebootCleanups.set(config.name, cleanup)
             this.preparedPreboot.set(config.name, config)
           })
@@ -157,7 +155,7 @@ class PluginRuntime {
       try {
         await Global.withRegistrationOwner(pluginName, async () => {
           const factory = await loadPluginConfig(archive)
-          config = factory?.({ safe: true })
+          config = factory?.({ safe: true, platform: isTauriRuntime() ? 'tauri' : 'web' })
           await config?.onUninstall?.()
         })
       } catch (error) {
@@ -256,7 +254,10 @@ class PluginRuntime {
           await Global.withRegistrationOwner(name, async () => {
             const factory = await loadPluginConfig(archive)
             if (!factory) throw new Error(`plugin entry has no default export: ${name}`)
-            config = factory({ safe: globalThis.window?.$$safe$$ ?? true })
+            config = factory({
+              safe: globalThis.window?.$$safe$$ ?? true,
+              platform: isTauriRuntime() ? 'tauri' : 'web',
+            })
             if (config.name !== name) {
               throw new Error(`plugin name mismatch: ${name} / ${config.name}`)
             }

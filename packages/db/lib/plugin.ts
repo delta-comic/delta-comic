@@ -17,7 +17,6 @@ export interface Meta {
   description: string
   require: { id: string; download?: string | undefined }[]
   entry?: { jsPath: string; cssPath?: string }
-  beforeBoot?: { path: string; slot: string }[]
   kind?: 'normal' | 'preboot'
   integrity?: { algorithm: 'blake3' | 'sha256'; digest: string }
 }

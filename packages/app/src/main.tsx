@@ -18,6 +18,7 @@ import {
   zhCN,
   type GlobalThemeOverrides,
   darkTheme,
+  lightTheme,
   NGlobalStyle,
 } from 'naive-ui'
 import * as Pinia from 'pinia'
@@ -30,34 +31,20 @@ import * as VR from 'vue-router'
 import { DataLoaderPlugin } from 'vue-router/experimental'
 
 import AppSetup from './AppSetup.vue'
-import { initializePlatform, type SafeAreaInsets } from './platform'
+import { initializePlatform } from './platform'
 import { router } from './router'
 
 window.$$lib$$ = { Vue, Naive, VR, Pinia, DcModel, DcUi, DcPlugin, DcUtils, DcDb, Pc }
-window.$api.NImage = Naive.NImage
 
 document.addEventListener('contextmenu', e => e.preventDefault())
 
-const handleSafeAreaChange = (v: SafeAreaInsets | false) => {
-  if (!v)
-    v = { adjustedInsetBottom: 0, adjustedInsetLeft: 0, adjustedInsetRight: 0, adjustedInsetTop: 0 }
-  const { adjustedInsetBottom, adjustedInsetLeft, adjustedInsetRight, adjustedInsetTop } = v
-  document.documentElement.style.setProperty(
-    `--safe-area-inset-bottom`,
-    `${adjustedInsetBottom ?? 0}px`,
-  )
-  document.documentElement.style.setProperty(
-    `--safe-area-inset-left`,
-    `${adjustedInsetLeft ?? 0}px`,
-  )
-  document.documentElement.style.setProperty(
-    `--safe-area-inset-right`,
-    `${adjustedInsetRight ?? 0}px`,
-  )
-  document.documentElement.style.setProperty(`--safe-area-inset-top`, `${adjustedInsetTop ?? 0}px`)
-}
-
-handleSafeAreaChange(await initializePlatform())
+await initializePlatform().then(v => {
+  for (const direction of ['Top', 'Bottom', 'Left', 'Right'] as const)
+    document.documentElement.style.setProperty(
+      `--safe-area-inset-${direction.toLowerCase()}`,
+      `${(v || {})[`adjustedInset${direction}`] ?? 0}px`,
+    )
+})
 
 const preboot = await DcPlugin.pluginRuntime.preparePreboot()
 if (preboot.reloadRequired) {
@@ -93,7 +80,7 @@ const app = createApp(
       <NConfigProvider
         locale={zhCN}
         abstract
-        theme={config.isDark ? darkTheme : undefined}
+        theme={config.isDark ? darkTheme : lightTheme}
         themeOverrides={themeOverrides}
       >
         <NGlobalStyle />
