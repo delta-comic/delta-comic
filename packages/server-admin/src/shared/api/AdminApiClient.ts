@@ -9,7 +9,7 @@ export interface AdminApiClientOptions {
 
 export interface AdminRequestOptions {
   body?: unknown
-  method?: 'DELETE' | 'GET' | 'PATCH' | 'POST'
+  method?: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT'
   signal?: AbortSignal
 }
 
@@ -57,6 +57,10 @@ export class AdminApiClient {
 
   patch<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
     return this.request<T>(path, { body, method: 'PATCH', signal })
+  }
+
+  put<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
+    return this.request<T>(path, { body, method: 'PUT', signal })
   }
 
   delete<T>(path: string, signal?: AbortSignal): Promise<T> {

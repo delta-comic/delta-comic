@@ -4,27 +4,57 @@ import type {
   ServerPluginConfig,
   ServerPluginConfigChoice,
   ServerPluginConfigValue,
+  ServerPluginScript,
+  ServerPluginScriptRun,
   ServerPluginSnapshotEntry,
 } from '@delta-comic/server'
-import { shallowRef, watch } from 'vue'
+import { reactive, shallowRef, watch } from 'vue'
 
 import StatusMark from '@/shared/components/StatusMark.vue'
 
 const show = defineModel<boolean>('show', { required: true })
-const props = defineProps<{ pending?: ServerPluginAction; plugin?: ServerPluginSnapshotEntry }>()
+const props = defineProps<{
+  pending?: ServerPluginAction
+  plugin?: ServerPluginSnapshotEntry
+  script?: ServerPluginScript | null
+  scriptPending?: boolean
+  scriptRuns?: ServerPluginScriptRun[]
+}>()
 const emit = defineEmits<{
   action: [plugin: ServerPluginSnapshotEntry, action: ServerPluginAction]
   configure: [pluginId: string, config: ServerPluginConfig]
+  runScript: [pluginId: string, input: unknown]
+  saveScript: [
+    pluginId: string,
+    input: Pick<ServerPluginScript, 'enabled' | 'intervalHours' | 'source'>,
+  ]
 }>()
 
-const tab = shallowRef<'config' | 'details'>('details')
+const tab = shallowRef<'code' | 'config' | 'details'>('details')
 const draft = shallowRef<ServerPluginConfig>({})
+const scriptDraft = reactive({
+  enabled: false,
+  input: '{}',
+  intervalHours: 1,
+  source: 'return { pluginId: context.pluginId, input, trigger: context.trigger }',
+})
 
 watch(
   () => props.plugin,
   plugin => {
     draft.value = { ...plugin?.config }
     tab.value = 'details'
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.script,
+  script => {
+    scriptDraft.enabled = script?.enabled ?? false
+    scriptDraft.intervalHours = script?.intervalHours ?? 1
+    scriptDraft.source =
+      script?.source ?? 'return { pluginId: context.pluginId, input, trigger: context.trigger }'
   },
   { immediate: true },
 )
@@ -51,6 +81,17 @@ const setChoice = (key: string, choices: readonly ServerPluginConfigChoice[], in
 
 const can = (action: ServerPluginAction): boolean =>
   Boolean(props.plugin?.allowedActions.includes(action))
+
+const runCode = () => {
+  if (!props.plugin) return
+  let input: unknown
+  try {
+    input = JSON.parse(scriptDraft.input)
+  } catch {
+    input = scriptDraft.input
+  }
+  emit('runScript', props.plugin.manifest.id, input)
+}
 </script>
 
 <template>
@@ -101,6 +142,14 @@ const can = (action: ServerPluginAction): boolean =>
         >
           配置
         </button>
+        <button
+          :class="{ active: tab === 'code' }"
+          type="button"
+          :disabled="!plugin.installedVersion"
+          @click="tab = 'code'"
+        >
+          隔离代码
+        </button>
       </div>
 
       <div v-if="tab === 'details'" class="plugin-detail__content">
@@ -150,7 +199,7 @@ const can = (action: ServerPluginAction): boolean =>
         }}</NAlert>
       </div>
 
-      <NForm v-else class="plugin-detail__content" label-placement="top">
+      <NForm v-else-if="tab === 'config'" class="plugin-detail__content" label-placement="top">
         <NFormItem
           v-for="(field, key) in plugin.manifest.configSchema.properties"
           :key="key"
@@ -189,6 +238,64 @@ const can = (action: ServerPluginAction): boolean =>
           >保存配置</NButton
         >
       </NForm>
+
+      <div v-else class="plugin-detail__content">
+        <NAlert type="warning" title="隔离执行">
+          代码在 Dynamic Worker 中运行，无网络访问，CPU 上限 50ms；计划任务最小粒度为一小时。
+        </NAlert>
+        <NForm label-placement="top">
+          <NFormItem label="函数体">
+            <NInput
+              v-model:value="scriptDraft.source"
+              type="textarea"
+              :autosize="{ minRows: 12, maxRows: 24 }"
+              placeholder="使用 input 和只读 context，并通过 return 返回 JSON 值"
+            />
+          </NFormItem>
+          <div class="plugin-detail__script-grid">
+            <NFormItem label="启用计划任务">
+              <NSwitch v-model:value="scriptDraft.enabled" />
+            </NFormItem>
+            <NFormItem label="运行间隔（小时）">
+              <NInputNumber v-model:value="scriptDraft.intervalHours" :min="1" :max="168" />
+            </NFormItem>
+          </div>
+          <NSpace>
+            <NButton
+              type="primary"
+              :loading="scriptPending"
+              @click="
+                emit('saveScript', plugin.manifest.id, {
+                  enabled: scriptDraft.enabled,
+                  intervalHours: scriptDraft.intervalHours,
+                  source: scriptDraft.source,
+                })
+              "
+            >
+              保存代码
+            </NButton>
+          </NSpace>
+          <NFormItem class="plugin-detail__run-input" label="手动运行输入（JSON）">
+            <NInput v-model:value="scriptDraft.input" type="textarea" :autosize="{ minRows: 3 }" />
+          </NFormItem>
+          <NButton :loading="scriptPending" :disabled="!script" @click="runCode">立即运行</NButton>
+        </NForm>
+
+        <section>
+          <h3>最近运行</h3>
+          <NList v-if="scriptRuns?.length" bordered>
+            <NListItem v-for="run in scriptRuns" :key="run.id">
+              <NThing :title="`${run.trigger} · ${run.status}`">
+                <template #description>{{ new Date(run.startedAt).toLocaleString() }}</template>
+                <pre class="plugin-detail__run-result">{{
+                  run.errorMessage ?? JSON.stringify(run.result, null, 2)
+                }}</pre>
+              </NThing>
+            </NListItem>
+          </NList>
+          <NEmpty v-else description="尚无代码运行记录" size="small" />
+        </section>
+      </div>
 
       <template #footer>
         <NSpace justify="space-between">
@@ -319,5 +426,24 @@ const can = (action: ServerPluginAction): boolean =>
 .plugin-detail__muted {
   @apply [color:var(--dc-text-muted)];
   @apply [font-size:10px];
+}
+
+.plugin-detail__script-grid {
+  @apply [display:grid];
+  @apply [grid-template-columns:1fr_1fr];
+  @apply [gap:16px];
+}
+
+.plugin-detail__run-input {
+  @apply [margin-top:18px];
+}
+
+.plugin-detail__run-result {
+  @apply [overflow:auto];
+  @apply [margin:8px_0_0];
+  @apply [padding:10px];
+  @apply [background:var(--dc-surface-soft)];
+  @apply [font-size:10px];
+  @apply [white-space:pre-wrap];
 }
 </style>

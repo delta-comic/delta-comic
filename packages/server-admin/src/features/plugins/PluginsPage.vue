@@ -2,6 +2,7 @@
 import type {
   ServerPluginAction,
   ServerPluginConfig,
+  ServerPluginScript,
   ServerPluginSnapshotEntry,
 } from '@delta-comic/server'
 import { useDialog, useMessage } from 'naive-ui'
@@ -24,8 +25,19 @@ const dialog = useDialog()
 const message = useMessage()
 const connection = useConnectionStore()
 const store = usePluginsStore()
-const { error, loading, pending, plugins, selected, selectedId, snapshot } = storeToRefs(store)
-const { load, runAction, select } = store
+const {
+  error,
+  loading,
+  pending,
+  plugins,
+  script,
+  scriptPending,
+  scriptRuns,
+  selected,
+  selectedId,
+  snapshot,
+} = storeToRefs(store)
+const { load, loadScript, runAction, runScript, saveScript, select } = store
 
 const tab = shallowRef<'activity' | 'available' | 'installed'>(
   route.query.tab === 'activity' ? 'activity' : 'installed',
@@ -53,6 +65,21 @@ const listed = computed(() => {
 const openPlugin = (pluginId: string) => {
   select(pluginId)
   drawerOpen.value = true
+  void loadScript(pluginId)
+}
+
+const savePluginScript = async (
+  pluginId: string,
+  input: Pick<ServerPluginScript, 'enabled' | 'intervalHours' | 'source'>,
+) => {
+  if (await saveScript(pluginId, input)) message.success('插件代码已保存')
+}
+
+const executePluginScript = async (pluginId: string, input: unknown) => {
+  const result = await runScript(pluginId, input)
+  if (!result) return
+  if (result.status === 'succeeded') message.success('插件代码运行完成')
+  else message.error(result.errorMessage ?? '插件代码运行失败')
 }
 
 const execute = async (
@@ -162,8 +189,13 @@ onMounted(() => {
       v-model:show="drawerOpen"
       :pending="selected ? pending[selected.manifest.id] : undefined"
       :plugin="selected"
+      :script="script"
+      :script-pending="scriptPending"
+      :script-runs="scriptRuns"
       @action="requestAction"
       @configure="(pluginId, config) => execute(pluginId, 'configure', config)"
+      @run-script="executePluginScript"
+      @save-script="savePluginScript"
     />
   </div>
 </template>

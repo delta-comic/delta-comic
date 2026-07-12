@@ -53,6 +53,18 @@ describe('AdminApiClient', () => {
     })
   })
 
+  it('sends JSON payloads with PUT requests', async () => {
+    const fetcher = vi.fn<typeof fetch>(async (_input, init) => {
+      expect(init?.method).toBe('PUT')
+      expect(new Headers(init?.headers).get('content-type')).toBe('application/json')
+      expect(init?.body).toBe('{"enabled":true}')
+      return Response.json({ data: { saved: true }, ok: true })
+    })
+    const client = new AdminApiClient({ baseUrl: 'https://server.example', fetcher })
+
+    await expect(client.put('/plugin/script', { enabled: true })).resolves.toEqual({ saved: true })
+  })
+
   it('rejects an invalid response envelope', async () => {
     const client = new AdminApiClient({
       baseUrl: 'https://server.example',

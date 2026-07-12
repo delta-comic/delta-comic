@@ -9,7 +9,7 @@ export default defineConfig({
       { default: tailwindcss },
       { default: vue },
       { default: vueJsx },
-      { NaiveUiResolver, VantResolver },
+      { NaiveUiResolver },
       { default: Components },
       { default: vueDevTools },
     ] = await Promise.all([
@@ -24,7 +24,7 @@ export default defineConfig({
       vueDevTools(),
       vue(),
       vueJsx(),
-      Components({ dts: true, dtsTsx: false, resolvers: [NaiveUiResolver(), VantResolver()] }),
+      Components({ dts: true, dtsTsx: false, resolvers: [NaiveUiResolver()] }),
       tailwindcss(),
     ]
   }) as any),

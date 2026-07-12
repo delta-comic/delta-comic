@@ -4,6 +4,8 @@ import type {
   ServerPluginJob,
   ServerPluginSnapshot,
   ServerPluginSnapshotEntry,
+  ServerPluginScript,
+  ServerPluginScriptRun,
 } from '@delta-comic/server'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { computed, shallowRef } from 'vue'
@@ -19,6 +21,9 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
   const error = shallowRef('')
   const selectedId = shallowRef('')
   const pending = shallowRef<Record<string, ServerPluginAction>>({})
+  const script = shallowRef<ServerPluginScript | null>(null)
+  const scriptRuns = shallowRef<ServerPluginScriptRun[]>([])
+  const scriptPending = shallowRef(false)
 
   const plugins = computed(() => snapshot.value?.plugins ?? [])
   const available = computed(() => plugins.value.filter(plugin => !plugin.installedVersion))
@@ -85,6 +90,63 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
     selectedId.value = pluginId
   }
 
+  const loadScript = async (pluginId: string): Promise<void> => {
+    scriptPending.value = true
+    error.value = ''
+    try {
+      const client = connection.createClient()
+      const path = `/api/admin/plugins/${encodeURIComponent(pluginId)}/script`
+      const [nextScript, nextRuns] = await Promise.all([
+        client.get<ServerPluginScript | null>(path),
+        client.get<ServerPluginScriptRun[]>(`${path}/runs`),
+      ])
+      script.value = nextScript
+      scriptRuns.value = nextRuns
+    } catch (cause) {
+      error.value = readableApiError(cause)
+    } finally {
+      scriptPending.value = false
+    }
+  }
+
+  const saveScript = async (
+    pluginId: string,
+    input: Pick<ServerPluginScript, 'enabled' | 'intervalHours' | 'source'>,
+  ): Promise<boolean> => {
+    scriptPending.value = true
+    error.value = ''
+    try {
+      const path = `/api/admin/plugins/${encodeURIComponent(pluginId)}/script`
+      script.value = await connection.createClient().put<ServerPluginScript>(path, input)
+      await loadScript(pluginId)
+      return true
+    } catch (cause) {
+      error.value = readableApiError(cause)
+      return false
+    } finally {
+      scriptPending.value = false
+    }
+  }
+
+  const runScript = async (
+    pluginId: string,
+    input: unknown,
+  ): Promise<ServerPluginScriptRun | null> => {
+    scriptPending.value = true
+    error.value = ''
+    try {
+      const path = `/api/admin/plugins/${encodeURIComponent(pluginId)}/script/run`
+      const result = await connection.createClient().post<ServerPluginScriptRun>(path, { input })
+      await loadScript(pluginId)
+      return result
+    } catch (cause) {
+      error.value = readableApiError(cause)
+      return null
+    } finally {
+      scriptPending.value = false
+    }
+  }
+
   return {
     available,
     error,
@@ -94,6 +156,12 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
     pending,
     plugins,
     runAction,
+    runScript,
+    saveScript,
+    script,
+    scriptPending,
+    scriptRuns,
+    loadScript,
     select,
     selected,
     selectedId,
