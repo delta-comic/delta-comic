@@ -45,10 +45,12 @@
     "jszip": "catalog:",
     "ky": "catalog:",
     "lz-string": "catalog:",
+    "semver": "catalog:",
     "vite-plugin-externals": "catalog:",
     "vite-plugin-monkey": "catalog:"
   },
   "devDependencies": {
+    "@types/semver": "catalog:",
     "@typescript/native-preview": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
