@@ -10,19 +10,8 @@
 
 ## app侧清单
 
-- [x] 从项目中完全删去组件库，所有涉及组件均已替换为项目内的 `Dc*` 组件并按职责拆分
-- [x] 重构客户端 plugin 的整体架构，使其结构更优、可扩展性更高
-- [x] 为客户端插件分为两种类型
-  1. `normal plugin`：开屏后由用户加载，支持“重新加载所有”、`onUnload` 和 `onUninstall`
-  2. `preboot plugin`：在 `createApp` 前准备；失败时禁用本次启动的全部 preboot 插件、刷新并显示恢复警告；配置变更在下次启动生效
-- [x] 将现有设计风格扩展为桌面侧栏、移动端底栏的响应式界面
-- [x] 支持普通浏览器运行：Tauri API 在 TS 侧回退，SQLite 使用 WASM + OPFS/IndexedDB，归档指纹使用 BLAKE3 WASM
+- [ ] 让`preboot`插件类型支持添加`config`
+- [ ] 为plugin添加`内置插件`功能，随应用打包存在，可以启用和禁用
+- [ ] 在完成上述内容后，将`core`整合进内部插件
 
-## server侧清单
-
-- [x] 为 server 插件添加隔离的任意 JavaScript 代码运行能力
-- [x] 添加每小时一次的 Worker scheduled 触发器，并支持插件按计划时间运行代码及记录执行结果
-
-## 测试问题
-
-- [x] 完成 Web 化迁移，并覆盖插件运行计划、存储事务与回滚、浏览器平台回退、认证弹窗、服务端脚本与定时调度等关键路径
+以上内容存在一个非常简单的雏形，位于`packages/plugin/lib/features/core/feature.ts`，你完全可以改进或重构任何部分和实现
