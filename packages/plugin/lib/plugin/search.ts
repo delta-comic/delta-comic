@@ -1,5 +1,4 @@
 import type { StreamQuery, uni } from '@delta-comic/model'
-import type { UseQueryReturn } from '@pinia/colada'
 import type { Component } from 'vue'
 
 export interface Config {
@@ -21,7 +20,7 @@ export interface Config {
 
   barcode?: Barcode[]
 
-  fetchRandomItems?: (signal?: AbortSignal) => Promise<uni.item.Item[]>
+  fetchRandomItems?: (signal: AbortSignal) => uni.item.Item[]
 }
 
 export interface SearchMethod {
@@ -37,11 +36,11 @@ export interface SearchMethod {
 
 export interface HotLevelboard {
   name: string
-  content: () => UseQueryReturn<uni.item.Item[]>
+  content: (signal: AbortSignal) => uni.item.Item[]
 }
 export interface HotMainList {
   name: string
-  content: () => UseQueryReturn<uni.item.Item[]>
+  content: (signal: AbortSignal) => uni.item.Item[]
   onClick?(): any
 }
 export interface HotTopButton {
