@@ -17,8 +17,10 @@ import {
   NLoadingBarProvider,
   dateEnUS,
   dateZhCN,
+  dateZhTW,
   enUS as naiveEnUS,
   zhCN as naiveZhCN,
+  zhTW as naiveZhTW,
   type GlobalThemeOverrides,
   darkTheme,
   lightTheme,
@@ -59,11 +61,16 @@ const app = createApp(
     const themeColorDark = Color(themeColor).darken(0.2).hex()
     const config = DcPlugin.useConfig()
     const locale = computed(() => resolveAppLocale(config.$loadApp().data.value.language))
-    const naiveLocale = computed(() =>
-      locale.value === 'zh-CN'
-        ? { dateLocale: dateZhCN, locale: naiveZhCN }
-        : { dateLocale: dateEnUS, locale: naiveEnUS },
-    )
+    const naiveLocale = computed(() => {
+      switch (locale.value) {
+        case 'zh-CN':
+          return { dateLocale: dateZhCN, locale: naiveZhCN }
+        case 'zh-TW':
+          return { dateLocale: dateZhTW, locale: naiveZhTW }
+        default:
+          return { dateLocale: dateEnUS, locale: naiveEnUS }
+      }
+    })
 
     watch(
       locale,
