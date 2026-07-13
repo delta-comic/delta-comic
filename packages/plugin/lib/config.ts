@@ -64,7 +64,7 @@ export class ConfigStore {
     const saved: ConfigSave<any> = {
       form: pointer.config,
       data: store,
-      name: pointer.pluginName,
+      name: pointer.configName,
       ready: (store as typeof store & { ready: Promise<void> }).ready,
     }
     this.form.set(pointer.key, saved)

@@ -3,6 +3,16 @@ import { describe, expect, it } from 'vite-plus/test'
 
 import { findCyclePaths, formatPluginLoadPlanError, planPluginLoadOrder } from './loadPlan'
 
+const translateLoadPlanError = (key: string, params: Record<string, number | string>) => {
+  if (key === 'plugin.runtime.errors.missingDependencies') {
+    return `插件依赖缺失:\n${params.missing}`
+  }
+  if (key === 'plugin.runtime.errors.dependencyCycles') {
+    return `插件循环引用:\n${params.paths}`
+  }
+  return key
+}
+
 const archive = (pluginName: string, dependencies: string[] = []): PluginArchiveDB.Archive => ({
   pluginName,
   loaderName: 'test',
@@ -42,7 +52,9 @@ describe('planPluginLoadOrder', () => {
     expect(levelNames(plan.levels)).toEqual([['reader']])
     expect(plan.missing).toEqual([{ pluginName: 'reader', dependencyName: 'missing-source' }])
     expect(plan.cycles).toEqual([])
-    expect(formatPluginLoadPlanError(plan)).toBe('插件依赖缺失:\nreader -> missing-source')
+    expect(formatPluginLoadPlanError(plan, translateLoadPlanError)).toBe(
+      '插件依赖缺失:\nreader -> missing-source',
+    )
   })
 
   it('detects dependency cycle paths', () => {
@@ -53,6 +65,8 @@ describe('planPluginLoadOrder', () => {
     const plan = planPluginLoadOrder(plugins)
     expect(plan.levels).toEqual([])
     expect(plan.cycles).toEqual([['a', 'b', 'c', 'a']])
-    expect(formatPluginLoadPlanError(plan)).toBe('插件循环引用:\na -> b -> c -> a')
+    expect(formatPluginLoadPlanError(plan, translateLoadPlanError)).toBe(
+      '插件循环引用:\na -> b -> c -> a',
+    )
   })
 })

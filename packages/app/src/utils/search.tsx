@@ -2,6 +2,8 @@ import { Global, type Search, usePluginStore } from '@delta-comic/plugin'
 import { DcCell } from '@delta-comic/ui'
 import { SharedFunction } from '@delta-comic/utils'
 
+import { i18n } from '@/i18n'
+
 export type ThinkList = Awaited<ReturnType<Search.SearchMethod['getAutoComplete']>>
 
 export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise<ThinkList> => {
@@ -12,13 +14,13 @@ export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise
     matched.flatMap(r =>
       r[1].map(i => (
         <DcCell
-          title={`转至${i.name}`}
+          title={i18n.global.t('search.goTo', { name: i.name })}
           onClick={() => {
             void i
               .getContent(searchText, signal)
               .then(content => SharedFunction.call('routeToContent', ...content))
           }}
-          label={`来源:${store.$getI18nName(r[0])}`}
+          label={i18n.global.t('search.sourceLabel', { source: store.$getI18nName(r[0]) })}
           value={searchText}
           class='dc-interactive w-full'
         />

@@ -14,6 +14,7 @@ import {
   watch,
 } from 'vue'
 
+import { translateUi } from '@/i18n'
 import { cn } from '@/utils'
 
 import DcLoading from './DcLoading.vue'
@@ -149,7 +150,9 @@ defineExpose({ isLoaded, imageEl: computed(() => img.value?.imageRef), imageIns:
           <NIcon size="2.5rem" color="var(--dc-color-text-secondary)">
             <WarningRound />
           </NIcon>
-          <div class="text-sm text-(--dc-color-text-secondary)">点击重试</div>
+          <div class="text-sm text-(--dc-color-text-secondary)">
+            {{ translateUi('image.retry') }}
+          </div>
         </template>
       </div>
     </template>

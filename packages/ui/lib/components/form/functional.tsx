@@ -2,6 +2,8 @@ import type { FormConfigure, FormResult, FormSingleResult } from '@delta-comic/m
 import { NButton } from 'naive-ui'
 import { ref } from 'vue'
 
+import { translateUi } from '../../i18n'
+
 import DcForm from './components/DcForm.vue'
 
 export const createForm = <T extends FormConfigure>(configs: T) => {
@@ -51,7 +53,7 @@ export const createForm = <T extends FormConfigure>(configs: T) => {
                 }
               }}
             >
-              提交
+              {translateUi('actions.submit')}
             </NButton>
           ),
         }}

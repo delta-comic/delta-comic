@@ -1,6 +1,7 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 
 import { PluginInstaller, type PluginInstallerDescription } from '../../../driver/extensionTypes'
+import { pluginI18n, pluginMessageKey } from '../../../i18n'
 import {
   AwesomeRegistryClient,
   marketplaceDownloadToInstallInput,
@@ -14,8 +15,8 @@ export interface AwesomeInstallerRegistry {
 
 export class _PluginInstallByAwesome extends PluginInstaller {
   public override description: PluginInstallerDescription = {
-    title: '快速安装插件',
-    description: '输入形如: "ap:jmcomic"的内容',
+    title: pluginMessageKey('plugin.install.methods.marketplace.title'),
+    description: pluginMessageKey('plugin.install.methods.marketplace.description'),
   }
   public override name = 'awesome'
   public constructor(
@@ -26,7 +27,9 @@ export class _PluginInstallByAwesome extends PluginInstaller {
 
   private async listing(input: string) {
     const match = /^ap:([A-Za-z0-9][A-Za-z0-9_-]{0,63})$/.exec(input)
-    if (!match) throw new Error(`无效的 awesome-plugins 安装标识: ${input}`)
+    if (!match) {
+      throw new Error(pluginI18n.translate('plugin.install.errors.invalidMarketplaceId', { input }))
+    }
     return await this.registry.findListing(match[1])
   }
 

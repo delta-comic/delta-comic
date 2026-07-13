@@ -5,6 +5,7 @@ import ky from 'ky'
 import pkg from '../../../../package.json'
 import { useConfig } from '../../../config'
 import { PluginInstaller, type PluginInstallerDescription } from '../../../driver/extensionTypes'
+import { pluginI18n, pluginMessageKey } from '../../../i18n'
 import { isPluginManifestCompatible, parsePluginManifest } from '../../../manifest'
 
 type GitHubRelease = Awaited<ReturnType<Octokit['rest']['repos']['listReleases']>>['data'][number]
@@ -42,7 +43,9 @@ const defaultDependencies: GitHubInstallerDependencies = {
 
 const parseRepository = (input: string) => {
   const [owner, repo, ...rest] = input.replace(/^gh:/, '').split('/')
-  if (!owner || !repo || rest.length > 0) throw new Error(`无效的 GitHub 插件地址: ${input}`)
+  if (!owner || !repo || rest.length > 0) {
+    throw new Error(pluginI18n.translate('plugin.install.errors.invalidGitHub', { input }))
+  }
   return { owner, repo }
 }
 
@@ -61,8 +64,8 @@ interface CompatibleRelease {
 
 export class _PluginInstallByNormalUrl extends PluginInstaller {
   public override description: PluginInstallerDescription = {
-    title: '通过Github安装插件',
-    description: '输入形如: "gh:owner/repo"的内容',
+    title: pluginMessageKey('plugin.install.methods.github.title'),
+    description: pluginMessageKey('plugin.install.methods.github.description'),
   }
   public override name = 'github'
 
@@ -92,7 +95,11 @@ export class _PluginInstallByNormalUrl extends PluginInstaller {
       }
     }
 
-    throw new Error(`未找到支持 Delta Comic ${this.dependencies.coreVersion} 的插件版本`)
+    throw new Error(
+      pluginI18n.translate('plugin.install.errors.noCompatibleRelease', {
+        version: this.dependencies.coreVersion,
+      }),
+    )
   }
 
   private async installer(input: string): Promise<File> {

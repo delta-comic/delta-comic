@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Global, usePluginStore } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 const $router = useRouter()
 const pluginStore = usePluginStore()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -12,7 +14,7 @@ const pluginStore = usePluginStore()
     <div
       class="box-content flex h-(--dc-page-header-height) items-center bg-(--dc-surface) px-4 pt-safe"
     >
-      <NPageHeader class="w-full" title="全部分类" @back="$router.back()" />
+      <NPageHeader class="w-full" :title="t('category.all')" @back="$router.back()" />
     </div>
     <NScrollbar class="h-[calc(100%-var(--dc-page-header-height)-var(--safe-area-inset-top))]!">
       <div class="mx-auto w-full max-w-6xl py-2">

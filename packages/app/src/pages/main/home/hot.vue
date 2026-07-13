@@ -2,11 +2,13 @@
 import { Global } from '@delta-comic/plugin'
 import { isEmpty } from 'es-toolkit/compat'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { Icons } from '@/icons'
 
 const $router = useRouter()
+const { t } = useI18n()
 const hotList = computed(() =>
   Array.from(Global.mainLists.entries()).flatMap(([plugin, blocks]) =>
     blocks.map((block, blockIndex) => ({ block, blockIndex, plugin })),
@@ -17,7 +19,7 @@ const topButtons = computed(() => {
   if (!isEmpty(Global.levelboard)) {
     buttons.unshift({
       bgColor: '#ff9212',
-      name: '排行榜',
+      name: t('home.ranking'),
       icon: Icons.other.HotLevel,
       onClick() {
         const first = Global.levelboard.keys().next().value!

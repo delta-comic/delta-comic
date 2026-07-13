@@ -4,6 +4,7 @@ import { usePreventBack, DcState } from '@delta-comic/ui'
 import { motion } from 'motion-v'
 import { NButton, NIcon, NTabPane, NTabs } from 'naive-ui'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
 
@@ -11,6 +12,7 @@ import SubList from './subList.vue'
 
 const props = defineProps<{ selectItem: SubscribeDB.AuthorItem }>()
 const select = defineModel<string | undefined>('select', { required: true })
+const { t } = useI18n()
 
 const { state: subscribe } = SubscribeDB.useQuery(
   async db => (await db.selectAll().execute()) as SubscribeDB.Item[],
@@ -86,12 +88,12 @@ usePreventBack(isShow)
             <div
               class="dc-hairline--bottom relative flex h-10 w-full items-center rounded-t-2xl bg-(--dc-background-2) pl-3 text-base font-semibold"
             >
-              {{ author.author.label }}的动态
+              {{ t('subscription.authorActivity', { author: author.author.label }) }}
               <NButton
                 text
                 circle
                 class="absolute! right-1"
-                aria-label="关闭作者动态"
+                :aria-label="t('subscription.actions.closeAuthorActivity')"
                 @click.stop="select = undefined"
               >
                 <template #icon>

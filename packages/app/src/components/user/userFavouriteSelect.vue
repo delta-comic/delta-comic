@@ -3,6 +3,7 @@ import { DBUtils, FavouriteDB } from '@delta-comic/db'
 import { DcState } from '@delta-comic/ui'
 import { useMessage } from 'naive-ui'
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
 
@@ -24,13 +25,14 @@ const getCardItemCount = (belongTo: FavouriteDB.Card['createAt']) =>
 
 const isShow = shallowRef(false)
 const $message = useMessage()
+const { t } = useI18n()
 
 let promise = Promise.withResolvers<FavouriteDB.Card['createAt'][]>()
 
 const create = () => {
   promise = Promise.withResolvers<FavouriteDB.Card['createAt'][]>()
   if (isShow.value) {
-    $message.warning('正在选择中')
+    $message.warning(t('common.feedback.selecting'))
     promise.reject()
     return promise.promise
   }
@@ -40,7 +42,7 @@ const create = () => {
 }
 const submit = () => {
   if (selectList.size === 0) {
-    return $message.warning('不可为空')
+    return $message.warning(t('common.validation.selectionRequired'))
   }
   promise.resolve([...selectList])
   selectList.clear()
@@ -52,7 +54,7 @@ defineExpose({ create })
 <template>
   <NDrawer v-model:show="isShow" placement="bottom" @afterLeave="promise.reject()">
     <div class="relative m-(--dc-content-padding) mt-2 mb-2! w-full font-semibold">
-      选择收藏夹
+      {{ t('favourite.select.title') }}
       <div
         @click="createFavouriteCard?.create()"
         class="absolute top-1/2 right-8 flex -translate-y-1/2 items-center text-xs! font-normal text-(--dc-text-secondary)"
@@ -60,7 +62,7 @@ defineExpose({ create })
         <NIcon>
           <Icons.material.PlusFilled />
         </NIcon>
-        新建收藏夹
+        {{ t('favourite.actions.newFolder') }}
       </div>
     </div>
     <DcCellGroup inset class="mb-6!">
@@ -80,7 +82,7 @@ defineExpose({ create })
           <DcCell
             center
             :title="card.title"
-            :label="`${count ?? 0}个内容`"
+            :label="t('common.units.contentCount', { count: count ?? 0 })"
             clickable
             @click="
               selectList.has(card.createAt)
@@ -96,7 +98,7 @@ defineExpose({ create })
       </DcState>
     </DcCellGroup>
     <NButton class="m-5! w-30!" @click="submit" strong secondary type="primary" size="large">
-      确定
+      {{ t('common.actions.confirm') }}
     </NButton>
   </NDrawer>
   <CreateFavouriteCard ref="createFavouriteCard" />

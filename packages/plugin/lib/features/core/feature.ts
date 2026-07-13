@@ -1,3 +1,4 @@
+import { pluginMessageKey } from '../../i18n'
 import { defineInnerPlugin } from '../../plugin'
 
 import { coreConfig } from './config'
@@ -8,9 +9,9 @@ export default defineInnerPlugin({
   meta: {
     kind: 'preboot',
     author: 'Delta Comic',
-    description: 'Delta Comic 应用核心功能与配置。',
+    description: pluginMessageKey('plugin.core.description'),
     require: [],
-    name: { display: '核心', id: 'core' },
+    name: { display: pluginMessageKey('settings.core.title'), id: 'core' },
     version: { plugin: '2.3.0', supportCore: '*' },
   },
   enabledByDefault: true,

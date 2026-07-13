@@ -4,6 +4,7 @@ import { SharedFunction } from '@delta-comic/utils'
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
 import { shallowReactive, type Component, type Raw } from 'vue'
 
+import { pluginI18n, pluginMessageKey } from '@/i18n'
 import type { Search, Share, Subscribe, User } from '@/plugin'
 
 import { usePluginStore } from './driver'
@@ -116,7 +117,7 @@ Global.share.set(['core', 'token'], {
   filter: page => !!page.preload,
   icon: TagOutlined,
   key: 'token',
-  name: '复制口令',
+  name: pluginMessageKey('plugin.share.copyToken'),
   async call(page) {
     const item = page.preload?.toJSON()
     if (!item) throw new Error('Not found preload in content. Maybe not fetch detail?')
@@ -140,7 +141,7 @@ Global.share.set(['core', 'native'], {
   filter: page => !!page.preload,
   icon: OfflineShareRound,
   key: 'native',
-  name: '原生分享',
+  name: pluginMessageKey('plugin.share.native'),
   async call(page) {
     const item = page.preload?.toJSON()
     if (!item) throw new Error('Not found preload in content. Maybe not fetch detail?')
@@ -157,7 +158,7 @@ Global.share.set(['core', 'native'], {
       }),
     )
     const token = `[${item.title}](复制这条口令，打开Delta Comic)${compressed}`
-    await navigator.share({ title: 'Delta Comic内容分享', text: token })
+    await navigator.share({ title: pluginI18n.translate('plugin.share.nativeTitle'), text: token })
 
     return { token }
   },
@@ -165,7 +166,7 @@ Global.share.set(['core', 'native'], {
 
 Global.shareToken.set(['core', 'token'], {
   key: 'token',
-  name: '默认口令',
+  name: pluginMessageKey('plugin.share.defaultToken'),
   patten(chipboard) {
     return /^\[.+\]\(复制这条口令，打开Delta Comic\).+/.test(chipboard)
   },
@@ -177,8 +178,11 @@ Global.shareToken.set(['core', 'token'], {
       ),
     )
     return {
-      title: '口令',
-      detail: `发现分享的内容: ${meta.item.name}，需要的插件: ${pluginStore.$getI18nName(meta.plugin)}`,
+      title: pluginI18n.translate('plugin.share.tokenTitle'),
+      detail: pluginI18n.translate('plugin.share.tokenDetail', {
+        item: meta.item.name,
+        plugin: pluginStore.$getI18nName(meta.plugin),
+      }),
       onNegative() {},
       onPositive() {
         return SharedFunction.call(

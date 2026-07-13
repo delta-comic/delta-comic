@@ -2,11 +2,12 @@ import type { PluginArchiveDB } from '@delta-comic/db'
 import ky from 'ky'
 
 import { PluginInstaller, type PluginInstallerDescription } from '../../../driver/extensionTypes'
+import { pluginMessageKey } from '../../../i18n'
 
 export class _PluginInstallByFallbackUrl extends PluginInstaller {
   public override description: PluginInstallerDescription = {
-    title: '通过任意URL安装插件',
-    description: '从你给定的url下载插件文件，并假设其为userscript',
+    title: pluginMessageKey('plugin.install.methods.url.title'),
+    description: pluginMessageKey('plugin.install.methods.url.description'),
   }
   public override name = 'fallbackUrl'
   private async installer(input: string): Promise<File> {

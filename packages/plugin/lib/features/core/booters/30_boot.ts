@@ -1,10 +1,11 @@
 import { declareDepType, provide } from '@/depends'
+import { pluginMessageKey } from '@/i18n'
 import type { PluginConfig } from '@/plugin'
 
 import { PluginBooter } from '../../../driver/extensionTypes'
 
 class _ExposeBootPlugin extends PluginBooter {
-  public override name = '自定义初始化'
+  public override name = pluginMessageKey('plugin.runtime.steps.customBoot.title')
   public override async call(cfg: PluginConfig, _: any, env: Record<any, any>): Promise<any> {
     if (!cfg.onBooted) return
     const expose = await cfg.onBooted({ api: env.api })

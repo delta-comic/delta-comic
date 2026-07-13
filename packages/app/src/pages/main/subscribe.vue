@@ -2,10 +2,12 @@
 import { SubscribeDB } from '@delta-comic/db'
 import { DcState } from '@delta-comic/ui'
 import { computed, shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import AuthorList from '@/components/subscribe/subAuthorList.vue'
 import { Icons } from '@/icons'
 const isOnAllPage = shallowRef(true)
+const { t } = useI18n()
 const subscribeQuery = SubscribeDB.useQuery(db =>
   db.where('type', 'is', 'author').selectAll().execute(),
 ) // computedAsync(() => SubscribeDB.getAll(), [])
@@ -28,7 +30,7 @@ const isShowAllList = shallowRef(false)
       <div
         class="dc-hairline--bottom relative flex h-12 w-full items-end justify-center bg-(--dc-surface) pt-safe text-lg font-semibold"
       >
-        <span class="pb-1">关注</span>
+        <span class="pb-1">{{ t('subscription.title') }}</span>
       </div>
       <!-- tab -->
       <div class="flex h-fit w-full justify-around bg-(--dc-surface) py-1 text-nowrap">
@@ -39,7 +41,7 @@ const isShowAllList = shallowRef(false)
           class="w-[calc(50%-5px)]!"
           @click="isOnAllPage = true"
         >
-          全部
+          {{ t('common.filters.all') }}
         </NButton>
         <NButton
           tertiary
@@ -48,7 +50,7 @@ const isShowAllList = shallowRef(false)
           class="w-[calc(50%-5px)]!"
           @click="isOnAllPage = false"
         >
-          追更
+          {{ t('subscription.followingUpdates') }}
         </NButton>
       </div>
       <!-- more -->
@@ -56,11 +58,11 @@ const isShowAllList = shallowRef(false)
         class="relative flex w-full items-center bg-(--dc-surface) pt-3 pb-3 text-nowrap"
         @click="isShowAllList = true"
       >
-        <div class="ml-3 h-fit font-semibold">最常访问</div>
+        <div class="ml-3 h-fit font-semibold">{{ t('subscription.mostVisited') }}</div>
         <div
           class="absolute top-safe-offset-3 right-3 flex items-center text-xs text-(--dc-text-secondary)"
         >
-          更多
+          {{ t('common.actions.more') }}
           <NIcon>
             <Icons.material.ArrowForwardIosRound />
           </NIcon>
@@ -95,7 +97,7 @@ const isShowAllList = shallowRef(false)
     </div>
     <!-- list -->
     <div class="flex min-h-0 w-full flex-1 items-center justify-center">
-      <NEmpty size="huge"> 选择任意一项以查看内容 </NEmpty>
+      <NEmpty size="huge">{{ t('subscription.selectHint') }}</NEmpty>
     </div>
     <AuthorList v-model:select="select" :select-item v-if="selectItem?.type == 'author'" />
   </div>

@@ -41,6 +41,9 @@ import { initializePlatform } from './platform'
 import { router } from './router'
 
 window.$$lib$$ = { Vue, Naive, VR, Pinia, DcModel, DcUi, DcPlugin, DcUtils, DcDb, Pc }
+DcUi.configureUiI18n((key: DcUi.UiMessageKey, params?: DcUi.UiMessageParams) =>
+  i18n.global.t(`ui.${key}`, params as Record<string, number | string>),
+)
 
 document.addEventListener('contextmenu', e => e.preventDefault())
 

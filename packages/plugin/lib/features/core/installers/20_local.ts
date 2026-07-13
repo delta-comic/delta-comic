@@ -3,11 +3,12 @@ import type { PluginArchiveDB } from '@delta-comic/db'
 import { PluginInstaller, type PluginInstallerDescription } from '../../../driver/extensionTypes'
 import { readLocalFile } from '../../../driver/init/native'
 import { isTauriRuntime } from '../../../driver/init/storage'
+import { pluginMessageKey } from '../../../i18n'
 
 export class _PluginInstallByLocal extends PluginInstaller {
   public override description: PluginInstallerDescription = {
-    title: '安装本地插件',
-    description: '输入以: "local:"开头，后接全路径的文本',
+    title: pluginMessageKey('plugin.install.methods.local.title'),
+    description: pluginMessageKey('plugin.install.methods.local.description'),
   }
   public override name = 'local'
   private async installer(input: string): Promise<File> {

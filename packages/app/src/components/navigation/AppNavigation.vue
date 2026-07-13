@@ -1,21 +1,38 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
+import { computed, type Component } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
 
 defineProps<{ active: string }>()
 defineEmits<{ create: [] }>()
+const { t } = useI18n()
 
-const items: Array<{ icon: Component; key: string; label: string; to: string }> = [
-  { icon: Icons.material.AutoAwesomeMosaicOutlined, key: 'home', label: '首页', to: '/main/home' },
-  { icon: Icons.other.SubscribeTab, key: 'subscribe', label: '关注', to: '/main/subscribe' },
-  { icon: Icons.material.ShoppingBagOutlined, key: 'plugin', label: '插件', to: '/main/plugin' },
-  { icon: Icons.antd.UserOutlined, key: 'user', label: '我的', to: '/main/user' },
-]
+const items = computed<Array<{ icon: Component; key: string; label: string; to: string }>>(() => [
+  {
+    icon: Icons.material.AutoAwesomeMosaicOutlined,
+    key: 'home',
+    label: t('navigation.home'),
+    to: '/main/home',
+  },
+  {
+    icon: Icons.other.SubscribeTab,
+    key: 'subscribe',
+    label: t('navigation.subscribe'),
+    to: '/main/subscribe',
+  },
+  {
+    icon: Icons.material.ShoppingBagOutlined,
+    key: 'plugin',
+    label: t('navigation.plugin'),
+    to: '/main/plugin',
+  },
+  { icon: Icons.antd.UserOutlined, key: 'user', label: t('navigation.user'), to: '/main/user' },
+])
 </script>
 
 <template>
-  <nav class="app-navigation" aria-label="主导航">
+  <nav class="app-navigation" :aria-label="t('navigation.aria.main')">
     <div class="app-navigation__brand" aria-hidden="true">Δ</div>
     <RouterLink
       v-for="item in items.slice(0, 2)"
@@ -31,7 +48,7 @@ const items: Array<{ icon: Component; key: string; label: string; to: string }> 
       class="app-navigation__create"
       type="primary"
       circle
-      aria-label="创建分支"
+      :aria-label="t('navigation.aria.createFork')"
       @click="$emit('create')"
     >
       <template #icon><Icons.other.ForkTab /></template>

@@ -4,6 +4,7 @@ import { createLoadingMessage, DcState } from '@delta-comic/ui'
 import { useDialog } from 'naive-ui'
 import { computed, shallowRef } from 'vue'
 import { useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import Action from '@/components/listAction.vue'
@@ -16,6 +17,7 @@ import { pluginName } from '@/symbol'
 
 const $route = useRoute<'/user/favourite/[id]'>()
 const $router = useRouter()
+const { t } = useI18n()
 
 const cardKey = computed(() => Number($route.params.id))
 const { state: cardState } = FavouriteDB.useQueryCard(
@@ -62,12 +64,12 @@ const $dialog = useDialog()
         ref="actionController"
         :action="[
           {
-            text: '移动',
+            text: t('common.actions.move'),
             async onTrigger(sel) {
               if (!selCard) return
               const selectCardKeys = await selCard!.create()
 
-              createLoadingMessage('移动中').bind(
+              createLoadingMessage(t('common.progress.moving')).bind(
                 DBUtils.withTransition(trx =>
                   PromiseAll(
                     sel.map(v => move({ from: cardKey, aims: selectCardKeys, item: v.item, trx })),
@@ -78,11 +80,11 @@ const $dialog = useDialog()
             },
           },
           {
-            text: '复制',
+            text: t('common.actions.copy'),
             async onTrigger(sel) {
               if (!selCard) return
               const selectCardKeys = await selCard!.create()
-              createLoadingMessage('复制中').bind(
+              createLoadingMessage(t('common.progress.copying')).bind(
                 DBUtils.withTransition(trx =>
                   PromiseAll(
                     sel.map(v => upsert({ item: v.item, belongTos: selectCardKeys, trx })),
@@ -93,17 +95,17 @@ const $dialog = useDialog()
             },
           },
           {
-            text: '删除',
+            text: t('common.actions.delete'),
             color: 'var(--dc-error)',
             onTrigger(sel) {
               $dialog.create({
                 type: 'warning',
-                title: '警告',
-                content: `你确认删除${sel.length}项?`,
-                positiveText: '确定',
-                negativeText: '取消',
+                title: t('common.dialog.warning'),
+                content: t('common.dialog.confirmDeleteItems', { count: sel.length }),
+                positiveText: t('common.actions.confirm'),
+                negativeText: t('common.actions.cancel'),
                 onPositiveClick: () => {
-                  createLoadingMessage('删除中').bind(
+                  createLoadingMessage(t('common.progress.deleting')).bind(
                     PromiseAll(
                       sel.map(v =>
                         db
@@ -165,7 +167,9 @@ const $dialog = useDialog()
             <div class="mt-3 mb-4 flex w-full flex-col pl-5" v-if="card">
               <div class="mb-1 text-lg font-semibold">{{ card.title }}</div>
               <div class="mb-2 text-sm text-(--dc-text-secondary)">{{ card.description }}</div>
-              <div class="text-xs text-(--dc-text-secondary)/80">{{ items.length }}个内容</div>
+              <div class="text-xs text-(--dc-text-secondary)/80">
+                {{ t('common.units.contentCount', { count: items.length }) }}
+              </div>
             </div>
           </template>
           <template #topNav>
@@ -204,7 +208,7 @@ const $dialog = useDialog()
         "
       >
         <template #trigger>
-          <DcCell center title="删除收藏夹">
+          <DcCell center :title="t('favourite.actions.deleteFolder')">
             <template #icon>
               <NIcon size="1.4rem">
                 <svg
@@ -223,7 +227,7 @@ const $dialog = useDialog()
             </template>
           </DcCell>
         </template>
-        删除后内容不可恢复
+        {{ t('favourite.deleteIrreversible') }}
       </NPopconfirm>
     </DcCellGroup>
   </NDrawer>

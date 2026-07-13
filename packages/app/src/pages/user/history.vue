@@ -4,6 +4,7 @@ import { useConfig } from '@delta-comic/plugin'
 import { DcState } from '@delta-comic/ui'
 import { useDialog } from 'naive-ui'
 import { shallowRef, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import Action from '@/components/listAction.vue'
 import Searcher from '@/components/listSearcher.vue'
@@ -38,6 +39,7 @@ const removeItems = async (item: HistoryDB.Item[]) => {
 const filters = useNativeStore(pluginName, 'history.filter', new Array<string>())
 
 const $dialog = useDialog()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -51,15 +53,15 @@ const $dialog = useDialog()
       ref="actionController"
       :action="[
         {
-          text: '删除',
+          text: t('common.actions.delete'),
           color: 'var(--dc-error)',
           onTrigger(sel) {
             $dialog.create({
               type: 'warning',
-              title: '警告',
-              content: `你确认删除${sel.length}项?`,
-              positiveText: '确定',
-              negativeText: '取消',
+              title: t('common.dialog.warning'),
+              content: t('common.dialog.confirmDeleteItems', { count: sel.length }),
+              positiveText: t('common.actions.confirm'),
+              negativeText: t('common.actions.cancel'),
               onPositiveClick: () => removeItems(sel),
             })
           },
@@ -68,7 +70,7 @@ const $dialog = useDialog()
       :values="histories"
       v-slot="{ ActionBar, SelectPacker }"
     >
-      <Layout title="历史记录">
+      <Layout :title="t('history.title')">
         <template #rightNav>
           <NIcon
             size="calc(var(--spacing) * 6.5)"
@@ -131,14 +133,16 @@ const $dialog = useDialog()
             </div>
             <div class="flex w-18 shrink-0 items-center justify-center px-2 sm:w-24">
               <NPopconfirm
-                positive-text="删除"
-                negative-text="取消"
+                :positive-text="t('common.actions.delete')"
+                :negative-text="t('common.actions.cancel')"
                 @positive-click="removeItems([item])"
               >
                 <template #trigger>
-                  <NButton type="error" secondary class="w-full">删除</NButton>
+                  <NButton type="error" secondary class="w-full">
+                    {{ t('common.actions.delete') }}
+                  </NButton>
                 </template>
-                确认删除这条历史记录？
+                {{ t('history.confirmDelete') }}
               </NPopconfirm>
             </div>
           </div>
@@ -147,12 +151,14 @@ const $dialog = useDialog()
     </Action>
   </DcState>
   <NDrawer v-model:show="showConfig" position="bottom" round class="bg-(--dc-background)!">
-    <div class="m-(--dc-content-padding) mt-4 mb-2! w-full font-semibold">历史记录设置</div>
+    <div class="m-(--dc-content-padding) mt-4 mb-2! w-full font-semibold">
+      {{ t('history.settings.title') }}
+    </div>
     <DcCellGroup inset class="mb-6!">
       <DcCell
         center
-        title="追踪历史记录"
-        label="记录并展示新的历史足迹"
+        :title="t('history.settings.tracking')"
+        :label="t('history.settings.trackingDescription')"
         @click="config.data.value.recordHistory = !config.data.value.recordHistory"
       >
         <template #right-icon>

@@ -2,11 +2,13 @@
 import { Octokit } from '@octokit/rest'
 import { computedAsync } from '@vueuse/core'
 import { watch, shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import pkg from '../../package.json'
 import { openExternal } from '../platform'
 
 const oct = new Octokit()
+const { t } = useI18n()
 const markdown = computedAsync(async onCancel => {
   const { abort, signal } = new AbortController()
   onCancel(() => {
@@ -37,7 +39,7 @@ watch(markdown, markdown => (isShow.value = Boolean(markdown.length)), { immedia
 <template>
   <NModal v-model:show="isShow">
     <div class="max-h-[90vh] min-w-[min(80vw,840px)] rounded-lg bg-(--dc-background) p-3">
-      <div class="text-xl font-bold text-[--p-color]">发现新版本</div>
+      <div class="text-xl font-bold text-[--p-color]">{{ t('update.available') }}</div>
       <DcMarkdown
         :markdown="markdown.map(v => v[1]).join('------\n\n')"
         class="h-[60vh]! w-full pt-3"
@@ -49,7 +51,7 @@ watch(markdown, markdown => (isShow.value = Boolean(markdown.length)), { immedia
         block
         @click="openExternal('https://github.com/delta-comic/delta-comic/releases/latest')"
       >
-        在github打开
+        {{ t('update.openOnGitHub') }}
       </NButton>
     </div>
   </NModal>

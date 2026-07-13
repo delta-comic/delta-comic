@@ -140,7 +140,7 @@ describe('GitHub plugin installer', () => {
     )
 
     await expect(installer.download('gh:owner/repo')).rejects.toThrow(
-      '未找到支持 Delta Comic 2.3.0 的插件版本',
+      'plugin.install.errors.noCompatibleRelease',
     )
     expect(requestedPages).toEqual([1, 2])
   })

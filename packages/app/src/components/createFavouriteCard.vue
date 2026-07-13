@@ -11,7 +11,8 @@ import {
   type FormRules,
   useMessage,
 } from 'naive-ui'
-import { reactive, shallowRef, useTemplateRef } from 'vue'
+import { computed, reactive, shallowRef, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 interface FavouriteFormData {
   title: string
@@ -28,11 +29,14 @@ const createEmptyFormData = (): FavouriteFormData => ({
 const show = shallowRef(false)
 const submitting = shallowRef(false)
 const $message = useMessage()
+const { t } = useI18n()
 const formRef = useTemplateRef<FormInst>('form')
 const formData = reactive(createEmptyFormData())
-const formRules: FormRules = {
-  title: [{ required: true, message: '请填写名称', trigger: ['input', 'blur'] }],
-}
+const formRules = computed<FormRules>(() => ({
+  title: [
+    { required: true, message: t('favourite.validation.nameRequired'), trigger: ['input', 'blur'] },
+  ],
+}))
 
 const resetForm = (value: Partial<FavouriteFormData> = {}) => {
   Object.assign(formData, createEmptyFormData(), value)
@@ -41,7 +45,7 @@ const resetForm = (value: Partial<FavouriteFormData> = {}) => {
 
 const create = (defaultValue: Partial<FavouriteFormData> = {}) => {
   if (show.value) {
-    $message.warning('正在创建中')
+    $message.warning(t('favourite.feedback.creating'))
     return
   }
   resetForm(defaultValue)
@@ -84,7 +88,9 @@ defineExpose({ create })
 
 <template>
   <NDrawer v-model:show="show" placement="bottom" @after-leave="cancel">
-    <div class="my-2 flex h-8 w-full items-center pl-5 font-semibold">创建收藏夹</div>
+    <div class="my-2 flex h-8 w-full items-center pl-5 font-semibold">
+      {{ t('favourite.create.title') }}
+    </div>
     <form @submit.prevent="onSubmit">
       <DcCellGroup inset>
         <NForm
@@ -95,18 +101,18 @@ defineExpose({ create })
           label-width="70"
           class="px-4 pt-4"
         >
-          <NFormItem label="名称" path="title">
-            <NInput v-model:value="formData.title" placeholder="名称" />
+          <NFormItem :label="t('favourite.fields.name')" path="title">
+            <NInput v-model:value="formData.title" :placeholder="t('favourite.fields.name')" />
           </NFormItem>
-          <NFormItem label="简介" path="description">
+          <NFormItem :label="t('favourite.fields.description')" path="description">
             <NInput
               v-model:value="formData.description"
               type="textarea"
-              placeholder="可选的"
+              :placeholder="t('common.form.optional')"
               :autosize="{ minRows: 2, maxRows: 5 }"
             />
           </NFormItem>
-          <NFormItem label="私密的" path="isPrivate">
+          <NFormItem :label="t('favourite.fields.private')" path="isPrivate">
             <NSwitch v-model:value="formData.isPrivate" />
           </NFormItem>
         </NForm>
@@ -120,7 +126,7 @@ defineExpose({ create })
         size="large"
         :loading="submitting"
       >
-        提交
+        {{ t('common.actions.submit') }}
       </NButton>
     </form>
   </NDrawer>

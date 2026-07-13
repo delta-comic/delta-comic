@@ -18,6 +18,9 @@ const i18nAdapter: PluginI18nAdapter = {
     const composer = i18n.global as unknown as PluginI18nAdapter
     composer.setLocaleMessage(locale, message)
   },
+  translate(key, params) {
+    return i18n.global.t(key, params ?? {})
+  },
 }
 
 pluginI18n.install(i18nAdapter, localeMessages as unknown as PluginLocaleMessages)

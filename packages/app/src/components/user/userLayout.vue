@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core'
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { Icons } from '@/icons'
@@ -13,6 +14,7 @@ useResizeObserver(topBarEl, () => {
   height.value = topBarEl.value?.getBoundingClientRect().height ?? 0
 })
 const $router = useRouter()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -29,7 +31,7 @@ const $router = useRouter()
           class="dc-interactive absolute! left-3 rotate-180"
           @click="$router.back()"
           color="var(--dc-text-secondary)"
-          aria-label="返回"
+          :aria-label="t('common.actions.back')"
         >
           <Icons.material.ArrowForwardIosRound />
         </NIcon>

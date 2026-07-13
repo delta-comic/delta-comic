@@ -10,6 +10,7 @@ import { isEmpty } from 'es-toolkit/compat'
 import { motion } from 'motion-v'
 import { NButton, NIcon, NInput } from 'naive-ui'
 import { computed, shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { Icons } from '@/icons'
@@ -18,6 +19,7 @@ import { getBarcodeList, type ThinkList } from '@/utils/search'
 
 import { searchSourceKey } from './source'
 const $props = defineProps<{ source: string }>()
+const { t } = useI18n()
 
 const isSearching = shallowRef(false)
 usePreventBack(isSearching)
@@ -64,7 +66,7 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
         v-model:value="searchText"
         round
         clearable
-        placeholder="请输入搜索内容"
+        :placeholder="t('search.placeholder.full')"
         :input-props="{ autocomplete: 'off' }"
         @focus="isSearching = true"
       >
@@ -72,14 +74,16 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
           <button
             type="button"
             class="inline-flex items-center border-0 bg-transparent p-0 text-inherit"
-            aria-label="搜索"
+            :aria-label="t('search.actions.search')"
             @click="handleSearch(searchText)"
           >
             <NIcon size="1.2rem"><Icons.material.SearchFilled /></NIcon>
           </button>
         </template>
       </NInput>
-      <NButton text type="primary" attr-type="button" @click="$router.back()">取消</NButton>
+      <NButton text type="primary" attr-type="button" @click="$router.back()">
+        {{ t('common.actions.cancel') }}
+      </NButton>
     </div>
   </form>
 

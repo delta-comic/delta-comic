@@ -3,11 +3,13 @@ import { SourcedValue, uni } from '@delta-comic/model'
 import { Global, usePluginStore } from '@delta-comic/plugin'
 import { useQuery } from '@pinia/colada'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 const $router = useRouter()
 const $route = useRoute<'/hot/[plugin]'>()
 const pluginStore = usePluginStore()
+const { t } = useI18n()
 const selectLevelKey = new SourcedValue<[plugin: string, name: string]>()
 
 const plugin = computed(() => $route.params.plugin.toString())
@@ -42,7 +44,7 @@ const routeToLevel = (source: string) => {
     <div
       class="box-content flex h-(--dc-page-header-height) items-center bg-(--dc-surface) px-4 pt-safe"
     >
-      <NPageHeader class="w-full" title="排行榜" @back="$router.back()">
+      <NPageHeader class="w-full" :title="t('home.ranking')" @back="$router.back()">
         <template #extra>
           <NPopselect
             :options="

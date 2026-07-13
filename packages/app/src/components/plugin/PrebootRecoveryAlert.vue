@@ -1,22 +1,28 @@
 <script setup lang="ts">
 import type { PrebootRecovery } from '@delta-comic/plugin'
+import { useI18n } from 'vue-i18n'
 
 defineProps<{ recovery: PrebootRecovery }>()
 defineEmits<{ dismiss: []; manage: [] }>()
+const { t } = useI18n()
 </script>
 
 <template>
   <NAlert
     class="preboot-alert"
-    title="预启动插件已自动停用"
+    :title="t('plugin.recovery.title')"
     type="error"
     closable
     @close="$emit('dismiss')"
   >
     <p class="preboot-alert__message">{{ recovery.reason }}</p>
-    <p class="preboot-alert__plugins">受影响插件：{{ recovery.plugins.join('、') }}</p>
+    <p class="preboot-alert__plugins">
+      {{ t('plugin.recovery.affected', { plugins: recovery.plugins.join(', ') }) }}
+    </p>
     <div class="preboot-alert__actions">
-      <NButton size="small" type="primary" @click="$emit('manage')">调整插件</NButton>
+      <NButton size="small" type="primary" @click="$emit('manage')">
+        {{ t('plugin.recovery.manage') }}
+      </NButton>
     </div>
   </NAlert>
 </template>

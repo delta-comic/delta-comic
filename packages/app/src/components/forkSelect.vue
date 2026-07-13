@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { uni } from '@delta-comic/model'
 import { NSelect } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 
 const show = defineModel<boolean>('show', { required: true })
 const $emit = defineEmits<{ change: [] }>()
+const { t } = useI18n()
 </script>
 
 <template>
   <NDrawer v-model:show="show" placement="bottom">
     <div class="min-h-60 w-full px-2">
-      <div class="mb-2 pt-3 pl-5 text-2xl">数据源更改</div>
+      <div class="mb-2 pt-3 pl-5 text-2xl">{{ t('source.changeTitle') }}</div>
       <div
         v-for="[plugin, value] in Object.entries(
           Object.groupBy(

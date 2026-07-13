@@ -3,10 +3,12 @@ import { DBUtils, PluginArchiveDB } from '@delta-comic/db'
 import { NIcon } from 'naive-ui'
 import type { Component } from 'vue'
 import { shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
 
 const props = defineProps<{ actions: { title: string; icon: Component; onClick: () => any }[] }>()
+const { t } = useI18n()
 
 const isShowMenu = shallowRef(false)
 
@@ -33,7 +35,9 @@ const runPrimaryAction = () => {
     shape="circle"
     menu-trigger="click"
     v-model:show-menu="isShowMenu"
-    :aria-label="totalCount ? '选择启动方式' : '启动'"
+    :aria-label="
+      totalCount ? t('plugin.startup.actions.chooseMode') : t('plugin.startup.actions.start')
+    "
     @click="runPrimaryAction"
   >
     <NIcon :size="25">

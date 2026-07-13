@@ -9,12 +9,14 @@ import { isEmpty } from 'es-toolkit/compat'
 import { motion } from 'motion-v'
 import { NIcon } from 'naive-ui'
 import { useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
 import { pluginName } from '@/symbol'
 import { getBarcodeList, type ThinkList } from '@/utils/search'
 
 const isSearching = defineModel<boolean>('isSearching', { default: false })
+const { t } = useI18n()
 usePreventBack(isSearching)
 
 const text = defineModel<string>('text', { default: '' })
@@ -60,7 +62,7 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
       <button
         type="button"
         class="inline-flex items-center border-0 bg-transparent p-0 text-gray-400"
-        aria-label="搜索"
+        :aria-label="t('search.actions.search')"
         @click="handleSearch(text)"
       >
         <NIcon size="1.5rem"><Icons.material.SearchFilled /></NIcon>
@@ -73,7 +75,7 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
           class="h-full w-full border-none bg-transparent text-(--dc-text-color)!"
           spellcheck="false"
           @focus="isSearching = true"
-          placeholder="搜索"
+          :placeholder="t('search.placeholder.short')"
         />
         <Motion
           :initial="{ opacity: 0 }"
@@ -82,7 +84,7 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
         >
           <button
             type="button"
-            aria-label="清空搜索"
+            :aria-label="t('search.actions.clear')"
             class="absolute! top-0 right-2 z-10 flex! h-full items-center border-0 bg-transparent p-0 text-gray-400 transition-[transform,opacity]"
             :disabled="isEmpty(text)"
             @click="clearSearch"

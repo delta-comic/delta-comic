@@ -5,6 +5,7 @@ import { SharedFunction } from '@delta-comic/utils'
 import { useInfiniteQuery } from '@pinia/colada'
 import { isEmpty } from 'es-toolkit/compat'
 import { computed, shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import noneSearchTextIcon from '@/assets/images/none-search-text-icon.webp'
@@ -14,6 +15,7 @@ import { Icons } from '@/icons'
 const route = useRoute<'/search/[keyword]/[sort]/[method]'>()
 const pluginStore = usePluginStore()
 const config = useConfig().$loadApp()
+const { t } = useI18n()
 
 const allSearchSource = computed(() =>
   Array.from(pluginStore.plugins.values())
@@ -91,7 +93,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
           size="large"
         >
           <NButton quaternary>
-            搜索源:<span class="text-xs text-(--nui-primary-color)">
+            {{ t('search.source') }}:<span class="text-xs text-(--nui-primary-color)">
               {{ pluginStore.$getI18nName(searchSourceKey.toJSON(route.params.method)[0]) }}:{{
                 method.name
               }}
@@ -127,19 +129,22 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
                 </svg>
               </NIcon>
             </template>
-            排序
+            {{ t('search.sort') }}
             <span class="text-xs text-(--nui-primary-color)">
-              -{{ method.sorts.find(v => v.value == route.params.sort)?.text ?? '<不存在>' }}
+              -{{
+                method.sorts.find(v => v.value == route.params.sort)?.text ??
+                t('common.status.missing')
+              }}
             </span>
           </NButton>
         </NPopselect>
         <div class="dc-interactive flex h-full items-center justify-start gap-1 text-sm">
-          <NSwitch v-model:value="config.data.value.showAIProject" />展示AI作品
+          <NSwitch v-model:value="config.data.value.showAIProject" />{{ t('search.showAiWorks') }}
         </div>
       </div>
       <button
         type="button"
-        aria-label="重新搜索"
+        :aria-label="t('search.actions.searchAgain')"
         @click="
           () =>
             SharedFunction.call(
@@ -160,9 +165,9 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
 
   <NResult
     status="info"
-    title="无搜索"
+    :title="t('search.empty.title')"
     class="flex h-[80vh] flex-col items-center justify-center"
-    description="请输入"
+    :description="t('search.empty.description')"
     v-if="isEmpty(route.params.keyword)"
   >
     <template #icon>

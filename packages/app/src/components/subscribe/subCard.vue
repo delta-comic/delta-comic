@@ -2,15 +2,19 @@
 import type { uni } from '@delta-comic/model'
 import { SharedFunction } from '@delta-comic/utils'
 import { NButton, NDropdown, NIcon, type DropdownOption } from 'naive-ui'
-import { h } from 'vue'
+import { computed, h } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
 import { createDateString } from '@/utils/date'
 
 defineProps<{ item: uni.item.Item }>()
 const emit = defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
+const { t } = useI18n()
 
-const menuOptions: DropdownOption[] = [{ label: '取消关注', key: 'unsubscribe' }]
+const menuOptions = computed<DropdownOption[]>(() => [
+  { label: t('subscription.actions.unsubscribe'), key: 'unsubscribe' },
+])
 const shareActions = ['forward', 'comment', 'share'] as const
 
 const ShareIcon = () =>
@@ -40,7 +44,7 @@ const handleMenuSelect = (key: string | number, item: uni.item.Item) => {
             {{ item.author[0].label }}
           </div>
           <div class="-mt-0.5 flex items-center text-[11px] text-(--dc-text-color-2)">
-            {{ createDateString(item.updateTime) }}·投稿了内容
+            {{ t('subscription.publishedAt', { date: createDateString(item.updateTime) }) }}
           </div>
         </div>
       </div>
@@ -55,7 +59,7 @@ const handleMenuSelect = (key: string | number, item: uni.item.Item) => {
           type="tertiary"
           text
           circle
-          aria-label="订阅操作"
+          :aria-label="t('subscription.actions.menu')"
           @click.stop
         >
           <template #icon>
@@ -85,7 +89,7 @@ const handleMenuSelect = (key: string | number, item: uni.item.Item) => {
         <template #icon>
           <NIcon><ShareIcon /></NIcon>
         </template>
-        转发
+        {{ t('subscription.actions.forward') }}
       </NButton>
     </div>
   </div>

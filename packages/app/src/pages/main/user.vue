@@ -7,6 +7,7 @@ import { isEmpty } from 'es-toolkit/compat'
 import { motion } from 'motion-v'
 import { NCollapseTransition } from 'naive-ui'
 import { computed, shallowRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { Icons } from '@/icons'
@@ -15,6 +16,7 @@ const $router = useRouter()
 const config = useConfig()
 const $window = window
 const pluginStore = usePluginStore()
+const { t } = useI18n()
 
 const { data: favouriteCount } = FavouriteDB.useQueryItem(
   db => DBUtils.countDb(db),
@@ -148,22 +150,22 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
     v-if="isEmpty(uni.user.User.userBase)"
     class="flex h-20 w-full items-center justify-center bg-(--dc-surface)"
   >
-    <span class="text-(--dc-text-secondary) italic">没有已注册的用户信息</span>
+    <span class="text-(--dc-text-secondary) italic">{{ t('user.noRegisteredUsers') }}</span>
   </div>
   <div
     class="grid h-16 w-full grid-cols-3 bg-(--dc-surface) py-2 *:flex *:flex-col *:items-center *:justify-center *:*:first:text-lg *:*:last:text-xs *:*:last:text-(--dc-text-secondary)"
   >
     <div class="dc-hairline-right">
       <span>{{ favouriteCount }}</span>
-      <span>收藏</span>
+      <span>{{ t('user.stats.favourites') }}</span>
     </div>
     <div>
       <span>{{ subscribesCount }}</span>
-      <span>关注</span>
+      <span>{{ t('user.stats.subscriptions') }}</span>
     </div>
     <div class="dc-hairline-left">
       <span>{{ recentCount }}</span>
-      <span>待看</span>
+      <span>{{ t('user.stats.watchLater') }}</span>
     </div>
   </div>
   <div class="h-[calc(100%-2.5rem-5rem-4rem)] w-full overflow-y-auto bg-(--dc-surface) text-xs!">
@@ -176,7 +178,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
         <NIcon size="2rem" color="var(--bili-blue)">
           <Icons.antd.FolderOutlined />
         </NIcon>
-        <span class="mt-1 text-(--dc-text)">本地缓存</span>
+        <span class="mt-1 text-(--dc-text)">{{ t('user.sections.localCache') }}</span>
       </button>
       <button
         type="button"
@@ -186,7 +188,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
         <NIcon size="2rem" color="var(--bili-blue)">
           <Icons.material.TimerRound />
         </NIcon>
-        <span class="mt-1 text-(--dc-text)">历史记录</span>
+        <span class="mt-1 text-(--dc-text)">{{ t('user.sections.history') }}</span>
       </button>
       <button
         type="button"
@@ -196,7 +198,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
         <NIcon size="2rem" color="var(--bili-blue)">
           <Icons.material.StarOutlineRound />
         </NIcon>
-        <span class="mt-1 text-(--dc-text)">我的收藏</span>
+        <span class="mt-1 text-(--dc-text)">{{ t('user.sections.favourites') }}</span>
       </button>
       <button
         type="button"
@@ -216,7 +218,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
             ></path>
           </svg>
         </NIcon>
-        <span class="mt-1 text-(--dc-text)">稍后再看</span>
+        <span class="mt-1 text-(--dc-text)">{{ t('user.sections.watchLater') }}</span>
       </button>
     </div>
     <template v-for="[pluginName, plugin] of pluginStore.plugins.entries()" :key="pluginName">
@@ -227,8 +229,12 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
         :card
       />
     </template>
-    <DcCell title="设置" is-link @click="$router.force.push({ name: '/setting' })" />
-    <DcCell title="青少年模式" @click="$window.close()" is-link />
+    <DcCell
+      :title="t('settings.title')"
+      is-link
+      @click="$router.force.push({ name: '/setting' })"
+    />
+    <DcCell :title="t('user.sections.teenMode')" @click="$window.close()" is-link />
   </div>
 </template>
 <style scoped lang="css">

@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { usePluginStore, type PluginLoadingInfo } from '@delta-comic/plugin'
+import { translatePluginText, usePluginStore, type PluginLoadingInfo } from '@delta-comic/plugin'
 import { createLoadingMessage, DcCell } from '@delta-comic/ui'
 import { motion } from 'motion-v'
 import { NButton, NSpin } from 'naive-ui'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const $props = defineProps<{ bootingSteps: Record<string, PluginLoadingInfo> }>()
 
 const pluginStore = usePluginStore()
+const { t } = useI18n()
 
 const rebootApp = () => {
-  createLoadingMessage('重启中')
+  createLoadingMessage(t('plugin.loading.restarting'))
   location.reload()
 }
 
@@ -24,7 +26,9 @@ const visibleSteps = computed(() =>
 
 const getProgressLabel = ({ steps, progress }: PluginLoadingInfo) => {
   const step = steps[progress.stepsIndex]
-  const description = step ? `${step.name}: ${step.description}` : '处理中'
+  const description = step
+    ? `${translatePluginText(step.name)}: ${translatePluginText(step.description)}`
+    : t('common.status.processing')
   if (progress.status !== 'error' || !progress.errorReason) return description
   return `${description}\n${progress.errorReason}`
 }
@@ -41,7 +45,7 @@ const getProgressLabel = ({ steps, progress }: PluginLoadingInfo) => {
       <DcCellGroup class="h-80 w-[80vw] shadow-2xl" inset>
         <TransitionGroup name="list" tag="div" class="size-full!">
           <!-- display toy item -->
-          <DcCell title="core" label="载入应用内容..." center key="core">
+          <DcCell title="core" :label="t('plugin.loading.appContent')" center key="core">
             <template #right-icon>
               <NSpin :size="25" />
             </template>
@@ -66,7 +70,9 @@ const getProgressLabel = ({ steps, progress }: PluginLoadingInfo) => {
       :animate="{ opacity: 1, scale: '100%', translateY: '0px' }"
       v-if="isHaveError"
     >
-      <NButton type="primary" class="absolute! right-10!" @click="rebootApp">重新加载</NButton>
+      <NButton type="primary" class="absolute! right-10!" @click="rebootApp">
+        {{ t('common.actions.reload') }}
+      </NButton>
     </motion.div>
   </div>
 </template>

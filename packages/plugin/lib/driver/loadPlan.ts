@@ -1,5 +1,7 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 
+import { pluginI18n } from '@/i18n'
+
 export interface PluginDependencyMissing {
   pluginName: string
   dependencyName: string
@@ -122,19 +124,24 @@ export const planPluginLoadOrder = (plugins: PluginArchiveDB.Archive[]): PluginL
   return { levels, missing, cycles }
 }
 
-export const formatPluginLoadPlanError = (plan: Pick<PluginLoadPlan, 'missing' | 'cycles'>) => {
+type PluginMessageTranslator = (key: string, params: Record<string, number | string>) => string
+
+export const formatPluginLoadPlanError = (
+  plan: Pick<PluginLoadPlan, 'missing' | 'cycles'>,
+  translate: PluginMessageTranslator = (key, params) => pluginI18n.translate(key, params),
+) => {
   const sections: string[] = []
 
   if (plan.missing.length > 0) {
     const missing = plan.missing
       .map(({ pluginName, dependencyName }) => `${pluginName} -> ${dependencyName}`)
       .join('\n')
-    sections.push(`插件依赖缺失:\n${missing}`)
+    sections.push(translate('plugin.runtime.errors.missingDependencies', { missing }))
   }
 
   if (plan.cycles.length > 0) {
     const paths = plan.cycles.map(path => path.join(' -> ')).join('\n')
-    sections.push(`插件循环引用:\n${paths}`)
+    sections.push(translate('plugin.runtime.errors.dependencyCycles', { paths }))
   }
 
   return sections.join('\n\n')

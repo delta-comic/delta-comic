@@ -2,6 +2,7 @@ import { db, type PluginArchiveDB } from '@delta-comic/db'
 import type { Raw } from 'vue'
 import { shallowReactive, shallowRef } from 'vue'
 
+import { translatePluginText } from '@/i18n'
 import type { PluginConfig } from '@/plugin'
 
 export class PluginStore {
@@ -16,7 +17,7 @@ export class PluginStore {
   }
 
   public $getI18nName(key: string) {
-    return this.pluginNames.get(key) || key
+    return translatePluginText(this.pluginNames.get(key) || key)
   }
 
   public async $upsertArchives(archives: PluginArchiveDB.Archive[]) {

@@ -3,11 +3,12 @@ import ky from 'ky'
 
 import { PluginInstaller, type PluginInstallerDescription } from '../../../driver/extensionTypes'
 import { prepareDevScript } from '../../../driver/init/native'
+import { pluginMessageKey } from '../../../i18n'
 
 export class _PluginInstallByDev extends PluginInstaller {
   public override description: PluginInstallerDescription = {
-    title: '安装Develop Userscript插件',
-    description: '输入形如: "localhost"或者一个可以不含port的ip',
+    title: pluginMessageKey('plugin.install.methods.development.title'),
+    description: pluginMessageKey('plugin.install.methods.development.description'),
   }
   public override name = 'devUrl'
   private async installer(input: string): Promise<File> {

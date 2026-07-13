@@ -3,11 +3,13 @@ import { FavouriteDB } from '@delta-comic/db'
 import { uni } from '@delta-comic/model'
 import { DcState } from '@delta-comic/ui'
 import { isEmpty } from 'es-toolkit/compat'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { Icons } from '@/icons'
 import { useContentStore } from '@/stores/content'
 const $props = defineProps<{ isCardMode?: boolean; card: FavouriteDB.Card }>()
+const { t } = useI18n()
 
 const { state: favouriteItems } = FavouriteDB.useQueryItem(
   db =>
@@ -50,7 +52,7 @@ const handleClick = (rawItem: uni.item.RawItem) => {
             </NIcon>
             <span class="mx-1">·</span>
           </template>
-          {{ fItems.length }}个内容
+          {{ t('common.units.contentCount', { count: fItems.length }) }}
           <NIcon size="15px">
             <Icons.material.ArrowForwardIosRound />
           </NIcon>
@@ -58,7 +60,7 @@ const handleClick = (rawItem: uni.item.RawItem) => {
       </div>
       <div class="mt-3 flex justify-around">
         <template v-if="isEmpty(fItems)">
-          <NEmpty description="无结果" class="w-full justify-center!" />
+          <NEmpty :description="t('common.status.noResults')" class="w-full justify-center!" />
         </template>
         <template v-else>
           <div
@@ -104,7 +106,7 @@ const handleClick = (rawItem: uni.item.RawItem) => {
               </NIcon>
               <span class="mx-0.5">·</span>
             </template>
-            {{ fItems.length }}个内容
+            {{ t('common.units.contentCount', { count: fItems.length }) }}
           </div>
         </div>
       </DcVar>

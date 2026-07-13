@@ -19,6 +19,7 @@ import DcWaterfall from './components/DcWaterfall.vue'
 import DcEnvironment from './environment/DcEnvironment.vue'
 export * from './components/form'
 export * from './environment'
+export * from './i18n'
 
 export {
   DcAuthorIcon,

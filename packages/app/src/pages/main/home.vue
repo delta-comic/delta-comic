@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Global } from '@delta-comic/plugin'
 import { shallowRef, provide, nextTick, useTemplateRef, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import userIcon from '@/assets/images/userIcon.webp'
@@ -9,6 +10,7 @@ import { Icons } from '@/icons'
 import { useAppStore } from '@/stores/app'
 import { isShowMainHomeNavBar } from '@/symbol'
 const $router = useRouter()
+const { t } = useI18n()
 const isShowNavBar = shallowRef(true)
 provide(isShowMainHomeNavBar, isShowNavBar)
 
@@ -29,6 +31,21 @@ const tabItem = computed(() =>
     pair[1].map(val => ({ title: val.title, name: val.id, queries: { plugin: pair[0] } })),
   ),
 )
+const tabs = computed(() => [
+  {
+    title: t('home.tabs.recommended'),
+    name: 'random',
+    route: { name: '/main/home/random' as const },
+  },
+  { title: t('home.tabs.hot'), name: 'hot', route: { name: '/main/home/hot' as const } },
+  ...tabItem.value.map(
+    v =>
+      ({
+        ...v,
+        route: { name: '/main/home/[id]', params: { id: v.name }, query: v.queries },
+      }) as const,
+  ),
+])
 </script>
 
 <template>
@@ -59,14 +76,14 @@ const tabItem = computed(() =>
       <button
         type="button"
         class="dc-interactive rounded-full p-1"
-        aria-label="打开游戏页"
+        :aria-label="t('home.actions.openGame')"
         @click="$router.force.push({ name: '/' })"
       >
         <NIcon color="rgb(156 163 175)" size="1.8rem">
           <Icons.material.VideogameAssetFilled />
         </NIcon>
       </button>
-      <NIcon color="rgb(156 163 175)" size="1.8rem" aria-label="公告">
+      <NIcon color="rgb(156 163 175)" size="1.8rem" :aria-label="t('home.announcement')">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="currentColor"
@@ -84,22 +101,10 @@ const tabItem = computed(() =>
         : '-translate-y-[calc(var(--dc-tabs-height)+var(--dc-tabs-padding-bottom))]',
     ]"
   >
-    <DcTab
-      :items="[
-        { title: '推荐', name: 'random', route: { name: '/main/home/random' } },
-        { title: '热门', name: 'hot', route: { name: '/main/home/hot' } },
-        ...tabItem.map(
-          v =>
-            ({
-              ...v,
-              route: { name: '/main/home/[id]', params: { id: v.name }, query: v.queries },
-            }) as const,
-        ),
-      ]"
-    />
+    <DcTab :items="tabs" />
     <button
       type="button"
-      aria-label="展开搜索"
+      :aria-label="t('search.actions.expand')"
       @click="toSearchInHideMode"
       class="dc-interactive absolute! top-1/2 right-0 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-(--dc-surface) p-1 text-(--dc-text-secondary) shadow transition-transform duration-200"
       :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']"
@@ -110,7 +115,7 @@ const tabItem = computed(() =>
     </button>
     <button
       type="button"
-      aria-label="打开全部分类"
+      :aria-label="t('category.openAll')"
       :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']"
       class="dc-interactive absolute! top-1/2 right-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-(--dc-surface) p-1 text-(--dc-text-secondary) shadow transition-transform duration-200"
       @click="$router.force.push({ name: '/cate' })"

@@ -3,6 +3,7 @@ import { RecentDB, useNativeStore } from '@delta-comic/db'
 import { DcState } from '@delta-comic/ui'
 import { useDialog } from 'naive-ui'
 import { useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import Action from '@/components/listAction.vue'
 import Searcher from '@/components/listSearcher.vue'
@@ -35,6 +36,7 @@ const removeItems = async (item: RecentDB.Item[]) => {
 const filters = useNativeStore(pluginName, 'recentView.filter', new Array<string>())
 
 const $dialog = useDialog()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -43,15 +45,15 @@ const $dialog = useDialog()
       ref="actionController"
       :action="[
         {
-          text: '删除',
+          text: t('common.actions.delete'),
           color: 'var(--dc-error)',
           onTrigger(sel) {
             $dialog.create({
               type: 'warning',
-              title: '警告',
-              content: `你确认删除${sel.length}项?`,
-              positiveText: '确定',
-              negativeText: '取消',
+              title: t('common.dialog.warning'),
+              content: t('common.dialog.confirmDeleteItems', { count: sel.length }),
+              positiveText: t('common.actions.confirm'),
+              negativeText: t('common.actions.cancel'),
               onPositiveClick: () => removeItems(sel),
             })
           },
@@ -60,7 +62,7 @@ const $dialog = useDialog()
       :values="recent"
       v-slot="{ ActionBar, SelectPacker }"
     >
-      <Layout title="稍后再看">
+      <Layout :title="t('recent.title')">
         <template #rightNav>
           <NIcon
             size="calc(var(--spacing) * 6.5)"
@@ -115,14 +117,16 @@ const $dialog = useDialog()
             </div>
             <div class="flex w-18 shrink-0 items-center justify-center px-2 sm:w-24">
               <NPopconfirm
-                positive-text="删除"
-                negative-text="取消"
+                :positive-text="t('common.actions.delete')"
+                :negative-text="t('common.actions.cancel')"
                 @positive-click="removeItems([item])"
               >
                 <template #trigger>
-                  <NButton type="error" secondary class="w-full">删除</NButton>
+                  <NButton type="error" secondary class="w-full">
+                    {{ t('common.actions.delete') }}
+                  </NButton>
                 </template>
-                确认从稍后再看中移除？
+                {{ t('recent.confirmRemove') }}
               </NPopconfirm>
             </div>
           </div>

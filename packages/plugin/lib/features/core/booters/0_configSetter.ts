@@ -2,15 +2,16 @@ import { uni } from '@delta-comic/model'
 
 import { useConfig } from '@/config'
 import { Global } from '@/global'
+import { pluginMessageKey } from '@/i18n'
 import type { PluginConfig } from '@/plugin'
 
 import { PluginBooter, type PluginBooterSetMeta } from '../../../driver/extensionTypes'
 
 class _ConfigSetter extends PluginBooter {
-  public override name = '预设值'
+  public override name = pluginMessageKey('plugin.runtime.steps.presets.title')
   public override async call(cfg: PluginConfig, setMeta: PluginBooterSetMeta): Promise<any> {
     console.log('[PluginBooter->_ConfigSetter] new plugin defining...', cfg)
-    setMeta('预设值设定中')
+    setMeta(pluginMessageKey('plugin.runtime.steps.presets.applying'))
     const { name: plugin, content, resource, search, user, subscribe, share } = cfg
     if (content)
       for (const [

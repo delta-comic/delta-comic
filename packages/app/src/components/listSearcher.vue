@@ -4,10 +4,12 @@ import { isEmpty, uniq } from 'es-toolkit/compat'
 import { motion } from 'motion-v'
 import { NIcon } from 'naive-ui'
 import { shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
 
 const filtersHistory = defineModel<string[]>('filtersHistory', { required: true })
+const { t } = useI18n()
 
 const isSearching = shallowRef(false)
 usePreventBack(isSearching)
@@ -59,7 +61,7 @@ defineExpose({ isSearching, searchText })
         >
           <button
             type="button"
-            aria-label="清空搜索"
+            :aria-label="t('search.actions.clear')"
             class="absolute! top-0 right-2 z-10 flex! h-full items-center border-0 bg-transparent p-0 text-gray-400 transition-[transform,opacity]"
             :disabled="isEmpty(searchText)"
             @click="clearSearch"

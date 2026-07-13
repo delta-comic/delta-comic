@@ -1,6 +1,7 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import JSZip from 'jszip'
 
+import { pluginI18n } from '@/i18n'
 import type { PluginConfigFactory } from '@/plugin'
 
 import { PluginLoader, type PluginLoaderInstallContext } from '../../../driver/extensionTypes'
@@ -43,7 +44,9 @@ export default new (class extends PluginLoader {
     return await installZipFile(file, progress => {
       const percent = progress.total > 0 ? (progress.current / progress.total) * 90 : 0
       context?.report({
-        description: progress.path ? `解压: ${progress.path}` : '解压插件',
+        description: progress.path
+          ? pluginI18n.translate('plugin.progress.extractingPath', { path: progress.path })
+          : pluginI18n.translate('plugin.progress.extracting'),
         progress: percent,
       })
     })
@@ -60,7 +63,9 @@ export default new (class extends PluginLoader {
     const javascriptFiles = files.filter(path => /\.(?:js|mjs)$/i.test(path))
     if (!isTauriRuntime() && javascriptFiles.length > 1) {
       throw new Error(
-        `Web 端插件必须构建为单一 JavaScript 文件；发现: ${javascriptFiles.join(', ')}`,
+        pluginI18n.translate('plugin.install.errors.webSingleFile', {
+          files: javascriptFiles.join(', '),
+        }),
       )
     }
     const src = await createPluginModuleUrl(pluginMeta.pluginName, pluginMeta.meta.entry.jsPath)

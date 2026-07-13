@@ -3,6 +3,7 @@ import { ref, type App, type Ref } from 'vue'
 
 import { useConfig } from '@/config'
 import { Global } from '@/global'
+import { pluginI18n, pluginMessageKey } from '@/i18n'
 import type { PluginConfig } from '@/plugin'
 
 import { isBuiltInPlugin, synchronizeBuiltInPlugins } from './builtIn'
@@ -42,7 +43,12 @@ const reasonText = (error: unknown) => (error instanceof Error ? error.message :
 
 const createLoadingInfo = (): PluginLoadingInfo => ({
   progress: { status: 'wait', stepsIndex: 0 },
-  steps: [{ name: '等待', description: '插件载入中' }],
+  steps: [
+    {
+      name: pluginMessageKey('plugin.runtime.steps.waiting.title'),
+      description: pluginMessageKey('plugin.runtime.steps.waiting.description'),
+    },
+  ],
 })
 
 class PluginRuntime {
@@ -281,7 +287,9 @@ class PluginRuntime {
         if (blockedBy.length > 0) {
           failed.add(name)
           progress.value[name].progress = {
-            errorReason: `依赖插件加载失败: ${blockedBy.join(', ')}`,
+            errorReason: pluginI18n.translate('plugin.runtime.errors.blockedDependencies', {
+              plugins: blockedBy.join(', '),
+            }),
             status: 'error',
             stepsIndex: 0,
           }

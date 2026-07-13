@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { Install } from '@delta-comic/plugin'
+import { Install, translatePluginText } from '@delta-comic/plugin'
 import { toReactive, useFileDialog } from '@vueuse/core'
 import { useDialog, useMessage } from 'naive-ui'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 const { installFilePlugin, installPlugin, installers } = Install
+const { t } = useI18n()
 
 const inputUrl = ref('')
 const isAdding = ref(false)
@@ -13,7 +15,7 @@ const $dialog = useDialog()
 
 const confirmAdd = async (url: string) => {
   if (isAdding.value) {
-    $message.warning('正在添加插件')
+    $message.warning(t('plugin.install.feedback.installing'))
     return
   }
   isAdding.value = true
@@ -21,8 +23,8 @@ const confirmAdd = async (url: string) => {
   try {
     await $dialog.create({
       type: 'info',
-      title: '确认添加插件？',
-      content: `添加来自"${url}"的插件`,
+      title: t('plugin.install.confirm.title'),
+      content: t('plugin.install.confirm.content', { source: url }),
       onPositiveClick: () => {
         return
       },
@@ -40,7 +42,7 @@ const confirmAdd = async (url: string) => {
 const upload = toReactive(useFileDialog({ accept: '', multiple: false }))
 const useUploadPlugin = () => {
   if (isAdding.value) {
-    $message.warning('正在添加插件')
+    $message.warning(t('plugin.install.feedback.installing'))
     return
   }
   isAdding.value = true
@@ -51,7 +53,7 @@ const useUploadPlugin = () => {
     cel.off()
     try {
       const file = files?.item(0)
-      if (!file) throw new Error('未上传文件')
+      if (!file) throw new Error(t('plugin.install.errors.noFile'))
 
       await installFilePlugin(file)
     } finally {
@@ -70,12 +72,12 @@ const useUploadPlugin = () => {
 
 <template>
   <NScrollbar class="size-full">
-    <div class="mb-2 pt-3 pl-5 text-2xl">插件安装</div>
+    <div class="mb-2 pt-3 pl-5 text-2xl">{{ t('plugin.install.title') }}</div>
     <NInput
       v-model:value="inputUrl"
       class="m-1.25 w-[calc(100%-10px)]!"
       clearable
-      placeholder="输入内容以安装插件"
+      :placeholder="t('plugin.install.placeholder')"
       :disabled="isAdding"
       :loading="isAdding"
     />
@@ -87,7 +89,7 @@ const useUploadPlugin = () => {
         :loading="isAdding"
         :disabled="isAdding"
         @click="confirmAdd(inputUrl)"
-        >确认
+        >{{ t('common.actions.confirm') }}
       </NButton>
       <NButton
         type="primary"
@@ -97,7 +99,7 @@ const useUploadPlugin = () => {
         :loading="isAdding"
         :disabled="isAdding"
         @click="useUploadPlugin"
-        >使用本地文件
+        >{{ t('plugin.install.useLocalFile') }}
       </NButton>
     </div>
     <TransitionGroup name="list" tag="ul" class="ml-10 h-1/2 w-full overflow-auto *:my-1">
@@ -117,9 +119,9 @@ const useUploadPlugin = () => {
         ></span>
         <div>
           <div class="dc-hairline--bottom text-base font-semibold">
-            {{ desc.description.title }}
+            {{ translatePluginText(desc.description.title) }}
           </div>
-          <div>{{ desc.description.description }}</div>
+          <div>{{ translatePluginText(desc.description.description) }}</div>
         </div>
       </li>
     </TransitionGroup>

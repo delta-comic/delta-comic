@@ -6,6 +6,7 @@ import { createDownloadMessage, DcState } from '@delta-comic/ui'
 import { useTemp } from '@delta-comic/utils'
 import { isNumber, uniqBy } from 'es-toolkit/compat'
 import { computed, shallowRef, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import CreateFavouriteCard from '@/components/createFavouriteCard.vue'
 import Searcher from '@/components/listSearcher.vue'
@@ -15,6 +16,7 @@ import { Icons } from '@/icons'
 import { pluginName } from '@/symbol'
 
 const isCardMode = shallowRef(true)
+const { t } = useI18n()
 const temp = useTemp().$apply('favourite', () => ({ selectMode: 'pack' }))
 
 const searcher = useTemplateRef<InstanceType<typeof Searcher>>('searcher')
@@ -34,7 +36,7 @@ const { createCard } = FavouriteDB.useCreateCard()
 
 const pluginStore = usePluginStore()
 const syncFromCloud = () =>
-  createDownloadMessage('同步收藏数据中', async ({ createLoading }) => {
+  createDownloadMessage(t('favourite.sync.start'), async ({ createLoading }) => {
     if (isSyncing.value) return
     isSyncing.value = true
     await Promise.all(
@@ -43,7 +45,7 @@ const syncFromCloud = () =>
 
         const { download, upload } = user.syncFavourite
         const downloadItems = await createLoading(
-          `同步<${pluginStore.$getI18nName(plugin)}>-下载`,
+          t('favourite.sync.download', { plugin: pluginStore.$getI18nName(plugin) }),
           async c => {
             c.retryable = true
             const downloadItems = await download()
@@ -52,15 +54,15 @@ const syncFromCloud = () =>
         )
 
         const diff = await createLoading(
-          `同步<${pluginStore.$getI18nName(plugin)}>-写入数据库`,
+          t('favourite.sync.persist', { plugin: pluginStore.$getI18nName(plugin) }),
           c =>
             DBUtils.withTransition(async trx => {
               c.retryable = true
               let diff: uni.item.RawItem[] = []
-              c.description = '写入中'
+              c.description = t('favourite.sync.writing')
               await createCard({
                 card: {
-                  title: `同步文件夹-${plugin}`,
+                  title: t('favourite.sync.folderName', { plugin }),
                   description: '',
                   createAt: index,
                   private: true,
@@ -71,7 +73,7 @@ const syncFromCloud = () =>
                 await upsertFavouriteItem({ item: v, belongTos: [index], trx })
               }
 
-              c.description = '对比差异中'
+              c.description = t('favourite.sync.comparing')
               const all = await trx
                 .selectFrom('favouriteItem')
                 .innerJoin('itemStore', 'favouriteItem.itemKey', 'itemStore.key')
@@ -87,10 +89,13 @@ const syncFromCloud = () =>
             }),
         )
 
-        await createLoading(`同步<${pluginStore.$getI18nName(plugin)}>-上传`, async c => {
-          c.retryable = true
-          await upload(diff)
-        })
+        await createLoading(
+          t('favourite.sync.upload', { plugin: pluginStore.$getI18nName(plugin) }),
+          async c => {
+            c.retryable = true
+            await upload(diff)
+          },
+        )
       }),
     )
     isSyncing.value = false
@@ -103,7 +108,7 @@ const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Arra
 </script>
 
 <template>
-  <Layout title="我的收藏" :isLoading="isSyncing">
+  <Layout :title="t('favourite.title')" :isLoading="isSyncing">
     <template #rightNav>
       <NIcon
         size="calc(var(--spacing) * 6.5)"
@@ -122,7 +127,7 @@ const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Arra
       >
         <div class="w-full pl-4">
           <NButton
-            v-for="item of [{ type: 'pack', name: '收藏夹' }]"
+            v-for="item of [{ type: 'pack', name: t('favourite.folder') }]"
             class="text-[0.9rem]!"
             size="small"
             :="
@@ -198,7 +203,7 @@ const mainFilters = useNativeStore(pluginName, 'favourite.mainFilters', new Arra
             size="small"
             @click="createFavouriteCard?.create()"
           >
-            新建收藏夹
+            {{ t('favourite.actions.newFolder') }}
             <template #icon>
               <NIcon>
                 <Icons.material.PlusFilled />

@@ -6,7 +6,10 @@ export type PluginLocaleMessages = Record<string, PluginLocaleMessage>
 
 export interface PluginI18nAdapter {
   setLocaleMessage(locale: string, message: PluginLocaleMessage): void
+  translate?(key: string, params?: Record<string, number | string>): string
 }
+
+const messageKeyPrefix = 'i18n:'
 
 const unsafeKeys = new Set(['__proto__', 'constructor', 'prototype'])
 
@@ -52,6 +55,10 @@ export class PluginI18nRegistry {
     this.refresh(new Set(Object.keys(messages)))
   }
 
+  public translate(key: string, params?: Record<string, number | string>) {
+    return this.adapter?.translate?.(key, params) ?? key
+  }
+
   private compose(locale: string) {
     const message = mergeMessages({}, this.baseMessages[locale])
     for (const messages of this.pluginMessages.values()) mergeMessages(message, messages[locale])
@@ -73,3 +80,10 @@ export class PluginI18nRegistry {
 }
 
 export const pluginI18n = new PluginI18nRegistry()
+
+export const pluginMessageKey = (key: string) => `${messageKeyPrefix}${key}`
+
+export const translatePluginText = (value: string) =>
+  value.startsWith(messageKeyPrefix)
+    ? pluginI18n.translate(value.slice(messageKeyPrefix.length))
+    : value

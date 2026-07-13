@@ -4,6 +4,7 @@ import { createReusableTemplate } from '@vueuse/core'
 import { motion } from 'motion-v'
 import { NButton, NCheckbox, NDropdown, type DropdownOption } from 'naive-ui'
 import { computed, shallowRef, shallowReactive } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 export interface ListActionOption<T> {
   text: string
@@ -49,6 +50,7 @@ defineSlots<{
 defineExpose({ showSelect, selectList })
 
 const config = useConfig()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -105,20 +107,27 @@ const config = useConfig()
             class="rounded bg-(--dc-gray-1) px-1.5 text-[16px]"
             :class="[config.isDark && 'bg-white/10!']"
           >
-            已选<span class="px-0.5 text-(--p-color)">{{ selectList.size }}</span
-            >项
+            {{ t('common.selection.selectedPrefix')
+            }}<span class="px-0.5 text-(--p-color)">{{ selectList.size }}</span
+            >{{ t('common.selection.selectedSuffix') }}
           </span>
         </div>
         <div class="flex items-center text-nowrap">
-          <NButton class="h-11!" quaternary @click="selectAll()">全选</NButton>
-          <NButton class="h-11! rounded-none!" type="warning" @click="cancel()">取消</NButton>
+          <NButton class="h-11!" quaternary @click="selectAll()">
+            {{ t('common.actions.selectAll') }}
+          </NButton>
+          <NButton class="h-11! rounded-none!" type="warning" @click="cancel()">
+            {{ t('common.actions.cancel') }}
+          </NButton>
           <NDropdown
             trigger="click"
             :options="actionOptions"
             @select="triggerAction"
             placement="bottom-end"
           >
-            <NButton class="h-11! rounded-none!" type="primary">操作</NButton>
+            <NButton class="h-11! rounded-none!" type="primary">
+              {{ t('common.actions.actions') }}
+            </NButton>
           </NDropdown>
         </div>
       </motion.div>

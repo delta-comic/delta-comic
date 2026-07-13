@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { PluginArchiveDB } from '@delta-comic/db'
-import { Install, usePluginStore } from '@delta-comic/plugin'
+import { Install, translatePluginText, usePluginStore } from '@delta-comic/plugin'
 import { memoize } from 'es-toolkit'
 import type { DropdownOption } from 'naive-ui'
 import semver from 'semver'
 import { shallowReactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
 
 import pkg from '../../../../package.json'
 
 const updating = shallowReactive(new Set<string>())
+const { t } = useI18n()
 const updatePlugin = async (plugin: PluginArchiveDB.Archive) => {
-  if (updating.has(plugin.pluginName)) throw new Error('已经在更新')
+  if (updating.has(plugin.pluginName)) throw new Error(t('plugin.list.feedback.alreadyUpdating'))
   updating.add(plugin.pluginName)
   try {
     await Install.updatePlugin(plugin)
@@ -43,17 +45,30 @@ const pluginStore = usePluginStore()
 watch(pluginStore.revision, () => codeArchives.refetch())
 const isBuiltIn = (plugin: PluginArchiveDB.Archive) => plugin.loaderName === 'builtin'
 const actionsFor = (plugin: PluginArchiveDB.Archive): DropdownOption[] => {
-  const actions: DropdownOption[] = [{ key: 'toggle', label: plugin.enable ? '禁用' : '启用' }]
+  const actions: DropdownOption[] = [
+    {
+      key: 'toggle',
+      label: plugin.enable ? t('plugin.list.actions.disable') : t('plugin.list.actions.enable'),
+    },
+  ]
   if (isBuiltIn(plugin)) return actions
   return actions.concat(
     {
       key: 'kind-normal',
-      label: '设为普通插件',
+      label: t('plugin.list.actions.setNormal'),
       disabled: (plugin.meta.kind ?? 'normal') === 'normal',
     },
-    { key: 'kind-preboot', label: '设为预启动插件', disabled: plugin.meta.kind === 'preboot' },
-    { key: 'update', label: '从下载源更新', disabled: updating.has(plugin.pluginName) },
-    { key: 'remove', label: '删除' },
+    {
+      key: 'kind-preboot',
+      label: t('plugin.list.actions.setPreboot'),
+      disabled: plugin.meta.kind === 'preboot',
+    },
+    {
+      key: 'update',
+      label: t('plugin.list.actions.updateFromSource'),
+      disabled: updating.has(plugin.pluginName),
+    },
+    { key: 'remove', label: t('common.actions.delete') },
   )
 }
 
@@ -89,7 +104,7 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
         <NCard
           v-for="plugin of query"
           :key="plugin.pluginName"
-          :title="plugin.meta.name.display ?? plugin.pluginName"
+          :title="translatePluginText(plugin.meta.name.display ?? plugin.pluginName)"
           header-class="pt-1! pb-0! px-3!"
           content-class="pb-1! px-3!"
           :class="[getCardClass(plugin)]"
@@ -102,18 +117,24 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
               size="small"
               :type="plugin.meta.kind === 'preboot' ? 'warning' : 'default'"
             >
-              {{ isBuiltIn(plugin) ? '内置 · ' : ''
-              }}{{ plugin.meta.kind === 'preboot' ? '预启动' : '普通' }}
+              {{ isBuiltIn(plugin) ? t('plugin.list.kind.builtInPrefix') : ''
+              }}{{
+                plugin.meta.kind === 'preboot'
+                  ? t('plugin.list.kind.preboot')
+                  : t('plugin.list.kind.normal')
+              }}
             </NTag>
             <span class="ml-2 font-light text-(--nui-text-color-3) italic">
-              {{ plugin.enable ? '已启用' : '未启用' }}
+              {{
+                plugin.enable ? t('plugin.list.status.enabled') : t('plugin.list.status.disabled')
+              }}
             </span>
             <NDropdown
               :options="actionsFor(plugin)"
               placement="bottom-end"
               @select="(key: string | number) => handleAction(plugin, String(key))"
             >
-              <NButton circle quaternary class="ml-3!" aria-label="插件操作">
+              <NButton circle quaternary class="ml-3!" :aria-label="t('plugin.list.actions.menu')">
                 <template #icon>
                   <NIcon><Icons.material.MenuRound /></NIcon>
                 </template>
@@ -126,15 +147,17 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
           >
             {{ semver.valid(semver.coerce(plugin.meta.version.plugin ?? 'v0')) }}
           </span>
-          <span class="text-(--nui-text-color-3)">{{ plugin.meta.description }}</span>
+          <span class="text-(--nui-text-color-3)">
+            {{ translatePluginText(plugin.meta.description) }}
+          </span>
           <div class="w-full text-xs text-(--nui-text-color-disabled)">
-            适应核心版本: {{ plugin.meta.version.supportCore }}
+            {{ t('plugin.list.supportCore', { version: plugin.meta.version.supportCore }) }}
           </div>
           <div
             v-if="plugin.meta.kind === 'preboot'"
             class="mt-1 text-xs text-(--nui-warning-color)"
           >
-            预启动类型和启用状态将在下次重启时应用
+            {{ t('plugin.list.prebootRestartNotice') }}
           </div>
           <div
             class="mt-1 flex w-full items-center gap-1 text-sm! font-bold"
@@ -143,7 +166,7 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
             <NIcon color="var(--nui-warning-color)" size="1.2rem">
               <Icons.material.WarningRound />
             </NIcon>
-            插件不支持当前核心版本
+            {{ t('plugin.list.incompatible') }}
           </div>
         </NCard>
       </TransitionGroup>

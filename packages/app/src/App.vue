@@ -4,12 +4,14 @@ import { SharedFunction } from '@delta-comic/utils'
 import { useIntervalFn } from '@vueuse/core'
 import { Mutex } from 'es-toolkit'
 import { onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 
 import { readClipboardText, writeClipboardText } from './platform'
 import { pluginName } from './symbol'
 const $router = useRouter()
 const $route = useRoute()
+const { t } = useI18n()
 
 await $router.push($route.fullPath)
 
@@ -18,7 +20,7 @@ SharedFunction.define(
   async token => {
     await writeClipboardText(token)
     scanned.add(token)
-    window.$message.success('复制成功')
+    window.$message.success(t('common.feedback.copied'))
   },
   pluginName,
   'pushShareToken',
@@ -36,13 +38,13 @@ const handleShareTokenCheck = async () => {
       await lock.acquire()
       const detail = await handler.show(chipText)
       window.$dialog.info({
-        title: `口令探测：${detail.title}`,
+        title: t('share.tokenDetected', { title: detail.title }),
         content: detail.detail,
         closeOnEsc: false,
         maskClosable: false,
         closable: false,
-        positiveText: '查看',
-        negativeText: '取消',
+        positiveText: t('common.actions.view'),
+        negativeText: t('common.actions.cancel'),
         onPositiveClick() {
           detail.onPositive()
           lock.release()

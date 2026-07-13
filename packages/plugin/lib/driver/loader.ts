@@ -3,6 +3,7 @@ import { Mutex } from 'es-toolkit'
 import type { Ref } from 'vue'
 
 import { builtInPluginRegistry } from '@/features/registry'
+import { pluginI18n, pluginMessageKey } from '@/i18n'
 import type { PluginConfig, PluginConfigFactory } from '@/plugin'
 
 import { bootPlugin } from './booter'
@@ -28,7 +29,12 @@ export interface BootConfigOptions {
 
 export const createPluginLoadingInfo = (): PluginLoadingInfo => ({
   progress: { status: 'wait', stepsIndex: 0 },
-  steps: [{ name: '等待', description: '插件载入中' }],
+  steps: [
+    {
+      name: pluginMessageKey('plugin.runtime.steps.waiting.title'),
+      description: pluginMessageKey('plugin.runtime.steps.waiting.description'),
+    },
+  ],
 })
 
 export const ensurePluginLoadingInfo = (
@@ -94,7 +100,14 @@ export const loadPluginConfig = async (meta: PluginArchiveDB.Archive) => {
     await lock.acquire()
     if (isBuiltInPlugin(meta)) return builtInPluginRegistry.get(meta.pluginName)?.config
     const loader = loaders.find(value => value.name === meta.loaderName)
-    if (!loader) throw new Error(`未找到加载器 "${meta.loaderName}"，插件: ${meta.pluginName}`)
+    if (!loader) {
+      throw new Error(
+        pluginI18n.translate('plugin.runtime.errors.loaderMissing', {
+          loader: meta.loaderName,
+          plugin: meta.pluginName,
+        }),
+      )
+    }
     return await loader.load(meta)
   } finally {
     lock.release()
@@ -109,7 +122,13 @@ export const loadPlugin = async (
   ensurePluginLoadingInfo(info, meta.pluginName)
   try {
     const configFactory = await loadPluginConfig(meta)
-    if (!configFactory) throw new Error(`插件 "${meta.pluginName}" 未导出默认配置`)
+    if (!configFactory) {
+      throw new Error(
+        pluginI18n.translate('plugin.runtime.errors.defaultExportMissing', {
+          plugin: meta.pluginName,
+        }),
+      )
+    }
     await bootConfig(configFactory, info, {
       expectedName: meta.pluginName,
       rollback: config => cleanupPlugin(config ?? ({ name: meta.pluginName } as PluginConfig)),
