@@ -12,6 +12,7 @@ dist
 dev-dist
 dist-ssr
 coverage
+.vitest
 *.local
 *.local.*
 debug
