@@ -21,6 +21,7 @@ type DeltaComicPlugin = {
   name: string
   enforce?: 'post' | 'pre'
   config?(config: unknown): unknown
+  resolveId?(source: string): void
   generateBundle?(
     this: DeltaComicPluginContext,
     options: unknown,
@@ -36,6 +37,19 @@ export const deltaComic = (
 ): DeltaComicPluginOption[] => {
   const externalGlobals = extendsDepends as Record<string, string>
   const isServer = command == 'serve'
+  const sharedRuntimeGuard: DeltaComicPlugin = {
+    name: 'delta-comic-shared-runtime-guard',
+    enforce: 'pre',
+    resolveId(source) {
+      const externalRoot = Object.keys(externalGlobals).find(root => source.startsWith(`${root}/`))
+      if (!externalRoot && !source.startsWith('@vue/')) return
+
+      const publicEntry = externalRoot ?? 'vue'
+      throw new Error(
+        `[delta-comic] Shared runtime subpath "${source}" is not supported. Import "${publicEntry}" so the plugin reuses the host instance.`,
+      )
+    },
+  }
   const plugin: DeltaComicPlugin = {
     name: 'delta-comic-helper',
     enforce: 'post',
@@ -84,6 +98,7 @@ export const deltaComic = (
   ) as DeltaComicPluginOption
 
   return [
+    sharedRuntimeGuard,
     externals,
     ...(isServer
       ? [

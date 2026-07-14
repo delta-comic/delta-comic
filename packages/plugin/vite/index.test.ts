@@ -34,6 +34,7 @@ type TestDeltaComicPlugin = {
   name: string
   enforce?: 'post' | 'pre'
   config?(config: unknown): any
+  resolveId?(source: string): void
   generateBundle?(
     this: TestPluginContext,
     options: unknown,
@@ -53,7 +54,34 @@ const getBuildPlugin = (): TestDeltaComicPlugin => {
   return buildPlugin
 }
 
+const getSharedRuntimeGuard = (): TestDeltaComicPlugin => {
+  const plugins = deltaComic(meta, 'build').flat() as unknown[]
+  const guard = plugins.find(
+    plugin =>
+      Boolean(plugin) &&
+      typeof plugin == 'object' &&
+      (plugin as { name?: unknown }).name == 'delta-comic-shared-runtime-guard',
+  ) as TestDeltaComicPlugin | undefined
+  if (!guard) throw new Error('delta-comic-shared-runtime-guard not found')
+  return guard
+}
+
 describe('deltaComic vite plugin', () => {
+  it('rejects shared runtime subpaths that would bypass host externals', () => {
+    const guard = getSharedRuntimeGuard()
+
+    expect(guard.resolveId?.('vue')).toBeUndefined()
+    expect(() => guard.resolveId?.('vue/dist/vue.esm-bundler.js')).toThrow(
+      'Import "vue" so the plugin reuses the host instance',
+    )
+    expect(() => guard.resolveId?.('vue-router/experimental')).toThrow(
+      'Import "vue-router" so the plugin reuses the host instance',
+    )
+    expect(() => guard.resolveId?.('@vue/runtime-core')).toThrow(
+      'Import "vue" so the plugin reuses the host instance',
+    )
+  })
+
   it('forces a browser-safe single-file bundle with inlined assets', () => {
     const config = getBuildPlugin().config?.({})
 
