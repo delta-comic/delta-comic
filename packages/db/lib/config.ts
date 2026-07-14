@@ -91,7 +91,7 @@ export const useConfig = <T extends ConfigDescription>(
       if (!hydrated) return
       persist()
     },
-    { deep: true },
+    { deep: true, flush: 'sync' },
   )
 
   return Object.assign(data, { ready })
