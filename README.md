@@ -20,6 +20,9 @@ _____   _________________ ____        __________________ _____   ______
     <a href="https://github.com/delta-comic/delta-comic/releases/latest">
       <img src="https://img.shields.io/github/downloads/delta-comic/delta-comic/total" alt="GitHub Downloads (all assets, all releases)" />
     </a>
+    <a href="https://github.com/delta-comic/delta-comic/actions/workflows/coverage.yaml">
+      <img src="https://github.com/delta-comic/delta-comic/actions/workflows/coverage.yaml/badge.svg?branch=main" alt="测试覆盖率" />
+    </a>
     <a href="https://wakatime.com/projects/delta-comic">
       <img src="https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg" alt="Wakatime" />
     </a>
