@@ -95,9 +95,9 @@ ap:cosav
 
 <a href="https://www.star-history.com/?repos=delta-comic%2Fdelta-comic&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&theme=dark&legend=top-left&sealed_token=x-IHSjGD7vCOI9zzr2qloazU_LXrCugkN_4gJvQMKSjgDg9FE3eaFI66SFACqWZvchb8br4BQj6RXH4HZXDxiu_oWeeqbNwpUnL83Jp8qP8y_vk2QKUbTQM3Bgo4rLb6mbpRA7FxollQvaEHV_VdB-xz-w_5fjheC9mWDjtFuAKSTznoiHkF91GSia01" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left&sealed_token=x-IHSjGD7vCOI9zzr2qloazU_LXrCugkN_4gJvQMKSjgDg9FE3eaFI66SFACqWZvchb8br4BQj6RXH4HZXDxiu_oWeeqbNwpUnL83Jp8qP8y_vk2QKUbTQM3Bgo4rLb6mbpRA7FxollQvaEHV_VdB-xz-w_5fjheC9mWDjtFuAKSTznoiHkF91GSia01" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left&sealed_token=x-IHSjGD7vCOI9zzr2qloazU_LXrCugkN_4gJvQMKSjgDg9FE3eaFI66SFACqWZvchb8br4BQj6RXH4HZXDxiu_oWeeqbNwpUnL83Jp8qP8y_vk2QKUbTQM3Bgo4rLb6mbpRA7FxollQvaEHV_VdB-xz-w_5fjheC9mWDjtFuAKSTznoiHkF91GSia01" />
  </picture>
 </a>
 
