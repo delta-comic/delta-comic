@@ -22,7 +22,7 @@ const { t } = useI18n()
 const cardKey = computed(() => Number($route.params.id))
 const { state: cardState } = FavouriteDB.useQueryCard(
   db => db.where('createAt', '=', cardKey.value).selectAll().executeTakeFirst(),
-  [cardKey],
+  [() => cardKey.value],
 )
 const { state: itemsState } = FavouriteDB.useQueryItem(
   db =>
@@ -32,7 +32,7 @@ const { state: itemsState } = FavouriteDB.useQueryItem(
       .selectAll()
       .orderBy('addTime', 'desc')
       .execute(),
-  [cardKey],
+  [() => cardKey.value],
   () => [],
 )
 

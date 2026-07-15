@@ -35,7 +35,7 @@ const { state: allFavouriteCardsState } = FavouriteDB.useQueryCard(
       .where('title', 'like', `%${searchText.value}%`)
       .orderBy('createAt', 'desc')
       .execute(),
-  [searchText],
+  [() => searchText.value],
   () => [],
 )
 

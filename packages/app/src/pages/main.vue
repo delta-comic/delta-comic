@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 
 import AppNavigation from '@/components/navigation/AppNavigation.vue'
 const route = useRoute<'/main'>()
+const isStandalonePage = computed(() => route.name === '/main/search')
 const name = computed(() => {
   switch (route.name) {
     case '/main/home':
@@ -29,8 +30,8 @@ const showForkSelect = shallowRef(false)
 </script>
 
 <template>
-  <div class="main-layout">
-    <AppNavigation :active="name" @create="showForkSelect = true" />
+  <div class="main-layout" :class="{ 'main-layout--standalone': isStandalonePage }">
+    <AppNavigation v-if="!isStandalonePage" :active="name" @create="showForkSelect = true" />
     <main class="main-layout__content">
       <RouterView />
     </main>
@@ -50,10 +51,18 @@ const showForkSelect = shallowRef(false)
   overflow: hidden;
 }
 
+.main-layout--standalone .main-layout__content {
+  height: 100%;
+}
+
 @media (min-width: 960px) {
   .main-layout {
     display: grid;
     grid-template-columns: var(--dc-desktop-navigation-width) minmax(0, 1fr);
+  }
+
+  .main-layout--standalone {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .main-layout__content {

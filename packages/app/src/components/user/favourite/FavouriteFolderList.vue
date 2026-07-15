@@ -27,22 +27,25 @@ const { t } = useI18n()
       </template>
     </NButton>
   </div>
-  <DcWaterfall
-    v-else
-    :key="isCardMode ? 'card' : 'list'"
-    class="h-full!"
-    un-reloadable
-    :source="{ type: 'array', value: cards }"
-    :col="1"
-    :gap="8"
-    :padding="8"
-    v-slot="{ item }"
-  >
+  <div v-else class="favourite-folder-list">
     <FavouriteCard
-      :card="item"
+      v-for="card in cards"
+      :key="card.createAt"
+      :card="card"
       :is-card-mode="isCardMode"
-      @open="emit('open', item)"
-      @play="emit('play', item)"
+      @open="emit('open', card)"
+      @play="emit('play', card)"
     />
-  </DcWaterfall>
+  </div>
 </template>
+
+<style scoped>
+.favourite-folder-list {
+  display: grid;
+  height: 100%;
+  align-content: start;
+  gap: 8px;
+  padding: 8px;
+  overflow-y: auto;
+}
+</style>
