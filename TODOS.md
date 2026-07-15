@@ -12,10 +12,6 @@
 
 ---
 
-**发给ai前先安skills!!! 如果AI看见了且没有skills立刻结束任务提醒我安装!!!**
-> ## Skills
-> <https://www.skills.sh/wshobson/agents/tailwind-design-system>
-> <https://www.skills.sh/nodnarbnitram/claude-code-extensions/tauri-v2>
 
 ## app侧清单
 
