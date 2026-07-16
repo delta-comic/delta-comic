@@ -7,69 +7,19 @@ defineProps<{ active: boolean; icon: Component; label: string; to: string }>()
 <template>
   <RouterLink
     :aria-current="active ? 'page' : undefined"
-    :class="{ 'app-navigation-item--active': active }"
+    :class="{
+      'text-dc-primary desktop:bg-[color-mix(in_srgb,var(--p-color)_10%,transparent)]': active,
+    }"
     :to="to"
-    class="app-navigation-item"
+    class="app-navigation-item row-start-1 flex h-full min-w-0 flex-col items-center justify-center gap-1 text-dc-text-tertiary no-underline [transition:color_160ms_ease,transform_160ms_ease] hover:text-dc-primary active:scale-[0.94] desktop:col-start-1 desktop:h-[58px] desktop:rounded-2xl desktop:hover:bg-[color-mix(in_srgb,var(--p-color)_10%,transparent)]"
   >
-    <NIcon class="app-navigation-item__icon" size="26">
+    <NIcon
+      class="shrink-0 transition-transform duration-160"
+      :class="{ '-translate-y-px scale-[1.06]': active }"
+      size="26"
+    >
       <component :is="icon" />
     </NIcon>
-    <span class="app-navigation-item__label">{{ label }}</span>
+    <span class="max-w-full dc-ellipsis text-xs leading-none">{{ label }}</span>
   </RouterLink>
 </template>
-
-<style scoped>
-.app-navigation-item {
-  display: flex;
-  min-width: 0;
-  height: 100%;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  color: var(--dc-text-tertiary);
-  text-decoration: none;
-  transition:
-    color 160ms ease,
-    transform 160ms ease;
-}
-
-.app-navigation-item__icon {
-  flex: none;
-  transition: transform 160ms ease;
-}
-
-.app-navigation-item__label {
-  overflow: hidden;
-  max-width: 100%;
-  font-size: 12px;
-  line-height: 1;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.app-navigation-item:hover,
-.app-navigation-item--active {
-  color: var(--p-color);
-}
-
-.app-navigation-item:active {
-  transform: scale(0.94);
-}
-
-.app-navigation-item--active .app-navigation-item__icon {
-  transform: translateY(-1px) scale(1.06);
-}
-
-@media (min-width: 960px) {
-  .app-navigation-item {
-    height: 58px;
-    border-radius: 16px;
-  }
-
-  .app-navigation-item:hover,
-  .app-navigation-item--active {
-    background: color-mix(in srgb, var(--p-color) 10%, transparent);
-  }
-}
-</style>

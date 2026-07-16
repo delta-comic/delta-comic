@@ -56,7 +56,7 @@ usePreventBack(isShow)
             :initial="{ scale: '80%', translateX: '-50%', opacity: 0 }"
             :exit="{ scale: '80%', translateX: '-50%', opacity: 0 }"
             :animate="{ scale: '100%', translateX: '0%', opacity: 1 }"
-            class="dc-ellipsis absolute top-1 left-1 flex h-[calc(60px-(var(--spacing)*2))] w-fit max-w-[calc(100%-8px)] items-center gap-2 rounded-2xl bg-(--dc-background-2) px-3 text-nowrap"
+            class="absolute top-1 left-1 flex h-[calc(60px-(var(--spacing)*2))] w-fit max-w-[calc(100%-8px)] items-center gap-2 dc-ellipsis rounded-2xl bg-(--dc-background-2) px-3 text-nowrap"
           >
             <DcAuthorIcon :size-spacing="10" :author="selectItem.author" />
             <div class="text-lg font-semibold text-(--p-color)">{{ selectItem.author.label }}</div>
@@ -76,7 +76,11 @@ usePreventBack(isShow)
       @drag-end="(_, info) => info.offset.y > 100 && (select = undefined)"
     >
       <DcState :state="subscribe" v-slot="{ data: subs }">
-        <NTabs v-model:value="activeAuthorKey" animated class="sub-author-tabs size-full!">
+        <NTabs
+          v-model:value="activeAuthorKey"
+          animated
+          class="size-full! [&_.n-tab-pane]:h-full! [&_.n-tab-pane]:p-0! [&_.n-tabs-nav]:hidden! [&_.n-tabs-pane-wrapper]:h-full!"
+        >
           <NTabPane
             v-for="author of getAuthors(subs)"
             :key="author.key"
@@ -86,7 +90,7 @@ usePreventBack(isShow)
             class="size-full!"
           >
             <div
-              class="dc-hairline--bottom relative flex h-10 w-full items-center rounded-t-2xl bg-(--dc-background-2) pl-3 text-base font-semibold"
+              class="dc-hairline-bottom flex h-10 w-full items-center rounded-t-2xl bg-(--dc-background-2) pl-3 text-base font-semibold"
             >
               {{ t('subscription.authorActivity', { author: author.author.label }) }}
               <NButton
@@ -112,18 +116,3 @@ usePreventBack(isShow)
     </motion.div>
   </AnimatePresence>
 </template>
-
-<style scoped>
-.sub-author-tabs :deep(.n-tabs-nav) {
-  display: none;
-}
-
-.sub-author-tabs :deep(.n-tabs-pane-wrapper),
-.sub-author-tabs :deep(.n-tab-pane) {
-  height: 100%;
-}
-
-.sub-author-tabs :deep(.n-tab-pane) {
-  padding: 0;
-}
-</style>

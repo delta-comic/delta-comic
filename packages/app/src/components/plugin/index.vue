@@ -141,7 +141,11 @@ watch(
           class="shrink-0"
         />
         <!-- content pages -->
-        <NTabs v-model:value="pageSelect" animated class="plugin-tabs min-h-0 flex-1">
+        <NTabs
+          v-model:value="pageSelect"
+          animated
+          class="min-h-0 flex-1 [&_.n-tab-pane]:h-full! [&_.n-tab-pane]:p-0! [&_.n-tabs-nav]:hidden! [&_.n-tabs-pane-wrapper]:h-full!"
+        >
           <NTabPane
             v-for="page in pluginPages"
             :key="page.key"
@@ -177,18 +181,3 @@ watch(
     </NSpin>
   </NDrawer>
 </template>
-
-<style scoped>
-.plugin-tabs :deep(.n-tabs-nav) {
-  display: none;
-}
-
-.plugin-tabs :deep(.n-tabs-pane-wrapper),
-.plugin-tabs :deep(.n-tab-pane) {
-  height: 100%;
-}
-
-.plugin-tabs :deep(.n-tab-pane) {
-  padding: 0;
-}
-</style>

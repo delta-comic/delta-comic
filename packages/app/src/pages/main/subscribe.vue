@@ -28,7 +28,7 @@ const isShowAllList = shallowRef(false)
     >
       <!-- nav -->
       <div
-        class="dc-hairline--bottom relative flex h-12 w-full items-end justify-center bg-(--dc-surface) pt-safe text-lg font-semibold"
+        class="dc-hairline-bottom flex h-12 w-full items-end justify-center bg-(--dc-surface) pt-safe text-lg font-semibold"
       >
         <span class="pb-1">{{ t('subscription.title') }}</span>
       </div>
@@ -70,7 +70,7 @@ const isShowAllList = shallowRef(false)
       </div>
       <!-- authors -->
       <div
-        class="scrollbar flex h-fit w-full gap-1 overflow-x-auto overflow-y-hidden bg-(--dc-surface) px-1 py-1"
+        class="dc-scrollbar-hidden flex h-fit w-full gap-1 overflow-x-auto overflow-y-hidden bg-(--dc-surface) px-1 py-1"
       >
         <DcState
           :state="subscribeQuery.state.value"
@@ -86,7 +86,7 @@ const isShowAllList = shallowRef(false)
             <template v-if="sub.type == 'author'">
               <DcAuthorIcon :size-spacing="12" :author="sub.author" />
               <div
-                class="dc-clamp-2 mt-1 w-18 text-center text-xs text-wrap text-(--dc-text-secondary)"
+                class="mt-1 dc-clamp-2 w-18 text-center text-xs text-wrap text-(--dc-text-secondary)"
               >
                 {{ sub.author.label }}
               </div>
@@ -110,7 +110,7 @@ const isShowAllList = shallowRef(false)
     >
       <div
         v-for="sub of <SubscribeDB.Item[]>data"
-        class="dc-hairline--bottom relative w-full py-2"
+        class="dc-hairline-bottom w-full py-2"
         @click="
           () => {
             isShowAllList = false
@@ -119,7 +119,7 @@ const isShowAllList = shallowRef(false)
         "
       >
         <DcVar :value="sub.author" v-if="sub.type == 'author'" v-slot="{ value: author }">
-          <div class="dc-ellipsis flex w-fit items-center pl-2 text-[16px] text-(--p-color)">
+          <div class="flex w-fit items-center dc-ellipsis pl-2 text-[16px] text-(--p-color)">
             <DcAuthorIcon :size-spacing="8.5" :author class="mx-2" />
             <div class="flex w-full flex-col text-nowrap">
               <div class="flex items-center text-(--nui-primary-color)">
@@ -137,13 +137,3 @@ const isShowAllList = shallowRef(false)
     </DcState>
   </NDrawer>
 </template>
-<style scoped lang="css">
-.scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-</style>

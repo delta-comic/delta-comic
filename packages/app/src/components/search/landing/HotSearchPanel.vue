@@ -12,31 +12,34 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <section class="hot-search" :aria-busy="loading">
-    <div v-if="loading && sections.length === 0" class="hot-search__loading">
+  <section class="grid gap-6" :aria-busy="loading">
+    <div
+      v-if="loading && sections.length === 0"
+      class="grid grid-cols-2 gap-x-3.5 gap-y-2 min-[720px]:grid-cols-3"
+    >
       <NSkeleton v-for="index in 6" :key="index" height="44px" :sharp="false" />
     </div>
     <NEmpty
       v-else-if="sections.length === 0"
-      class="hot-search__empty"
+      class="pt-9 pb-3"
       :description="t('search.hot.empty')"
     />
     <template v-else>
-      <section v-for="section in sections" :key="section.id" class="hot-search__section">
-        <h2 class="hot-search__title">{{ section.title }}</h2>
-        <div class="hot-search__grid">
+      <section v-for="section in sections" :key="section.id" class="grid gap-2.5">
+        <h2 class="m-0 text-xl font-bold text-dc-text">{{ section.title }}</h2>
+        <div class="grid grid-cols-2 gap-x-3.5 gap-y-2 min-[720px]:grid-cols-3">
           <button
             v-for="item in section.items"
             :key="`${item.value ?? item.text}:${item.text}`"
             type="button"
-            class="dc-interactive hot-search__item"
+            class="flex h-11 min-w-0 dc-interactive items-center gap-2 border-0 bg-transparent px-1 text-left font-[inherit] text-base text-dc-text"
             @click="emit('select', section, item)"
           >
             <span class="dc-ellipsis">{{ item.text }}</span>
             <span
               v-if="item.badge"
-              class="hot-search__badge"
-              :class="`hot-search__badge--${item.badge.tone ?? 'accent'}`"
+              class="shrink-0 rounded-[5px] px-[5px] py-px text-[11px] text-white"
+              :class="item.badge.tone === 'warning' ? 'bg-[#f0a020]' : 'bg-dc-primary'"
             >
               {{ item.badge.text }}
             </span>
@@ -46,71 +49,3 @@ const { t } = useI18n()
     </template>
   </section>
 </template>
-
-<style scoped>
-.hot-search {
-  display: grid;
-  gap: 24px;
-}
-
-.hot-search__section {
-  display: grid;
-  gap: 10px;
-}
-
-.hot-search__title {
-  margin: 0;
-  color: var(--dc-text);
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.hot-search__grid,
-.hot-search__loading {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 14px;
-}
-
-.hot-search__item {
-  display: flex;
-  min-width: 0;
-  height: 44px;
-  align-items: center;
-  gap: 8px;
-  padding: 0 4px;
-  border: 0;
-  background: transparent;
-  color: var(--dc-text);
-  font: inherit;
-  font-size: 16px;
-  text-align: left;
-}
-
-.hot-search__badge {
-  flex: none;
-  padding: 1px 5px;
-  border-radius: 5px;
-  color: white;
-  font-size: 11px;
-}
-
-.hot-search__badge--accent {
-  background: var(--p-color);
-}
-
-.hot-search__badge--warning {
-  background: #f0a020;
-}
-
-.hot-search__empty {
-  padding-block: 36px 12px;
-}
-
-@media (min-width: 720px) {
-  .hot-search__grid,
-  .hot-search__loading {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-</style>

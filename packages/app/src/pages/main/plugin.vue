@@ -45,7 +45,9 @@ const reloadPlugins = async () => {
 
 <template>
   <div class="w-full bg-(--dc-surface) pt-safe"></div>
-  <div class="plugin-toolbar">
+  <div
+    class="dc-hairline-bottom flex min-h-13 items-center bg-dc-surface [&_.n-menu-item-content-header]:max-[640px]:text-[0]!"
+  >
     <NMenu
       class="min-w-0 flex-1"
       :value="$route.path.split('/').at(-1)!"
@@ -54,7 +56,13 @@ const reloadPlugins = async () => {
       :options="menuOptions"
       responsive
     />
-    <NButton class="mr-2" secondary type="primary" :loading="reloading" @click="reloadPlugins">
+    <NButton
+      class="mr-2 max-[640px]:px-2.5!"
+      secondary
+      type="primary"
+      :loading="reloading"
+      @click="reloadPlugins"
+    >
       {{ t('plugin.reload.action') }}
     </NButton>
   </div>
@@ -62,23 +70,3 @@ const reloadPlugins = async () => {
     <RouterView />
   </div>
 </template>
-
-<style scoped>
-.plugin-toolbar {
-  display: flex;
-  align-items: center;
-  min-height: 52px;
-  border-bottom: 1px solid var(--dc-border);
-  background: var(--dc-surface);
-}
-
-@media (max-width: 640px) {
-  .plugin-toolbar :deep(.n-menu-item-content-header) {
-    font-size: 0;
-  }
-
-  .plugin-toolbar .n-button {
-    padding-inline: 10px;
-  }
-}
-</style>

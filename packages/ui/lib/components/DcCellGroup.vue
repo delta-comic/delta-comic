@@ -14,7 +14,7 @@ defineSlots<{ title(): any; default(): any }>()
       </div>
     </template>
     <div
-      :class="{ 'dc-cell-group--inset': inset, 'dc-hairline--top-bottom': border && !inset }"
+      :class="{ 'dc-cell-group--inset': inset, 'dc-hairline-top-bottom': border && !inset }"
       class="dc-cell-group"
     >
       <slot />

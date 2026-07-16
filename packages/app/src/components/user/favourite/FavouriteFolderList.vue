@@ -27,7 +27,7 @@ const { t } = useI18n()
       </template>
     </NButton>
   </div>
-  <div v-else class="favourite-folder-list">
+  <div v-else class="grid h-full content-start gap-2 overflow-y-auto p-2">
     <FavouriteCard
       v-for="card in cards"
       :key="card.createAt"
@@ -38,14 +38,3 @@ const { t } = useI18n()
     />
   </div>
 </template>
-
-<style scoped>
-.favourite-folder-list {
-  display: grid;
-  height: 100%;
-  align-content: start;
-  gap: 8px;
-  padding: 8px;
-  overflow-y: auto;
-}
-</style>

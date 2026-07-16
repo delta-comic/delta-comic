@@ -137,7 +137,7 @@ export const createDownloadMessage = async <T,>(
               {/* @ts-ignore class应当存在 */}
               <TransitionGroup name='list' tag='ul' class='ml-1! h-fit w-full!'>
                 {messageList.map((v, index) => (
-                  <div class='dc-hairline--bottom w-full py-1' key={index}>
+                  <div class='dc-hairline-bottom w-full py-1' key={index}>
                     <span class='text-sm font-semibold'>{v.title}</span>
                     <div class='relative h-fit w-full'>
                       <NProgress

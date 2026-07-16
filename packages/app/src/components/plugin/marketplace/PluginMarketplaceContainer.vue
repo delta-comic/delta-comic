@@ -67,7 +67,9 @@ onMounted(() => void marketplace.refresh())
 </script>
 
 <template>
-  <div class="marketplace-container">
+  <div
+    class="flex size-full min-h-0 flex-col overflow-hidden bg-[color-mix(in_srgb,var(--dc-surface)_96%,var(--nui-primary-color))]"
+  >
     <PluginMarketplaceFilters
       v-model:filter="filterModel"
       v-model:query="queryModel"
@@ -76,7 +78,7 @@ onMounted(() => void marketplace.refresh())
       :total="marketplace.items.value.length"
       @refresh="marketplace.refresh"
     />
-    <NScrollbar class="marketplace-container__scroll">
+    <NScrollbar class="min-h-0! flex-1">
       <PluginMarketplaceList
         :error="marketplace.error.value"
         :has-more="marketplace.hasMore.value"
@@ -98,20 +100,3 @@ onMounted(() => void marketplace.refresh())
     />
   </div>
 </template>
-
-<style scoped>
-.marketplace-container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  flex-direction: column;
-  overflow: hidden;
-  background: color-mix(in srgb, var(--dc-surface) 96%, var(--nui-primary-color));
-}
-
-.marketplace-container__scroll {
-  min-height: 0;
-  flex: 1;
-}
-</style>

@@ -9,6 +9,20 @@
 
 @import '@delta-comic/ui/style.css';
 
+@theme inline {
+  --breakpoint-desktop: 60rem;
+
+  --color-dc-page: var(--dc-background);
+  --color-dc-surface: var(--dc-surface);
+  --color-dc-text: var(--dc-text);
+  --color-dc-text-secondary: var(--dc-text-secondary);
+  --color-dc-text-tertiary: var(--dc-text-tertiary);
+  --color-dc-border: var(--dc-border);
+  --color-dc-overlay: var(--dc-overlay);
+  --color-dc-danger: var(--dc-error);
+  --color-dc-primary: var(--p-color);
+}
+
 :root {
   --safe-area-inset-top: 0px;
   --safe-area-inset-right: 0px;
@@ -69,120 +83,112 @@
   --dc-gray-7: #c2c5ca;
 }
 
-* {
-  user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-user-select: none;
-  box-sizing: border-box;
-}
-
-.v-binder-follower-container {
-  z-index: 1000000 !important;
-}
-
-#messages {
-  position: fixed;
-  pointer-events: none;
-  width: 100vw;
-  height: 100vh;
-  top: 0px;
-  left: 0px;
-  z-index: 2147483647;
-
+@layer base {
   * {
-    pointer-events: all;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  html,
+  body {
+    overflow: hidden !important;
+  }
+
+  body {
+    margin: 0;
+    background: var(--dc-background);
+    color: var(--dc-text);
+    font-family: var(--nui-font-family, system-ui, sans-serif);
+  }
+
+  input::-webkit-search-cancel-button {
+    display: none;
   }
 }
 
-body {
-  margin: 0;
-  background: var(--dc-background);
-  color: var(--dc-text);
-  font-family: var(--nui-font-family, system-ui, sans-serif);
-}
-
-html,
-body {
-  overflow: hidden !important;
-}
-
-input::-webkit-search-cancel-button {
-  display: none;
-}
-
-.use-backdrop-blur-md {
-  backdrop-filter: blur(12px);
-}
-
-* .n-progress-graph-line-indicator {
-  display: none !important;
-}
-
-.list-move,
-.list-enter-active,
-.list-leave-active {
-  transition:
-    transform 420ms cubic-bezier(0.22, 1.5, 0.5, 1),
-    opacity 240ms ease-out;
-  will-change: transform, opacity;
-}
-
-.list-enter-from,
-.list-leave-to {
-  opacity: 0;
-  transform: translateY(30px);
-}
-.list-leave-active {
-  position: absolute;
-}
-
-.dc-interactive,
-.dc-haptics-feedback {
+@utility dc-interactive {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    opacity: 0.72;
+  }
 }
 
-.dc-interactive:active,
-.dc-haptics-feedback:active {
-  opacity: 0.72;
+@utility dc-haptics-feedback {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    opacity: 0.72;
+  }
 }
 
-.dc-ellipsis {
+@utility dc-ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.dc-clamp-2,
-.dc-multi-ellipsis--l2 {
+@utility dc-clamp-2 {
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
-.dc-hairline-bottom,
-.dc-hairline--bottom {
-  border-bottom: 1px solid var(--dc-border);
+@utility dc-scrollbar-hidden {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-.dc-hairline-left,
-.dc-hairline--left {
-  border-left: 1px solid var(--dc-border);
+@layer components {
+  .v-binder-follower-container {
+    z-index: 1000000 !important;
+  }
+
+  #messages {
+    position: fixed;
+    z-index: 2147483647;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+
+    * {
+      pointer-events: all;
+    }
+  }
+
+  * .n-progress-graph-line-indicator {
+    display: none !important;
+  }
+
+  .list-move,
+  .list-enter-active,
+  .list-leave-active {
+    transition:
+      transform 420ms cubic-bezier(0.22, 1.5, 0.5, 1),
+      opacity 240ms ease-out;
+    will-change: transform, opacity;
+  }
+
+  .list-enter-from,
+  .list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .list-leave-active {
+    position: absolute;
+  }
 }
 
-.dc-hairline-right,
-.dc-hairline--right {
-  border-right: 1px solid var(--dc-border);
-}
-
-.dc-hairline-top-bottom,
-.dc-hairline--top-bottom {
-  border-block: 1px solid var(--dc-border);
-}
-
-@media (min-width: 960px) {
+@media (min-width: 60rem) {
   :root {
     --dc-content-padding: 24px;
   }

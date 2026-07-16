@@ -34,7 +34,7 @@ const topButtons = computed(() => {
 <template>
   <NScrollbar class="size-full">
     <div
-      class="scrollbar flex h-fit w-full gap-8 overflow-x-auto overflow-y-hidden bg-(--dc-surface) px-4 py-1"
+      class="dc-scrollbar-hidden flex h-fit w-full gap-8 overflow-x-auto overflow-y-hidden bg-(--dc-surface) px-4 py-1"
     >
       <div
         class="flex h-full w-fit flex-col items-center justify-around"
@@ -43,7 +43,7 @@ const topButtons = computed(() => {
       >
         <button
           type="button"
-          class="dc-interactive flex size-12 items-center justify-center rounded-full"
+          class="flex size-12 dc-interactive items-center justify-center rounded-full"
           :aria-label="btn.name"
           :style="{ backgroundColor: btn.bgColor }"
           @click="btn.onClick?.()"
@@ -64,13 +64,3 @@ const topButtons = computed(() => {
     </HotMainListBlock>
   </NScrollbar>
 </template>
-<style scoped lang="css">
-.scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-</style>

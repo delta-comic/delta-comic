@@ -118,7 +118,7 @@ const useUploadPlugin = () => {
           aria-hidden="true"
         ></span>
         <div>
-          <div class="dc-hairline--bottom text-base font-semibold">
+          <div class="dc-hairline-bottom text-base font-semibold">
             {{ translatePluginText(desc.description.title) }}
           </div>
           <div>{{ translatePluginText(desc.description.description) }}</div>

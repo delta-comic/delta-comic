@@ -32,12 +32,12 @@ const handleMenuSelect = (key: string | number, item: uni.item.Item) => {
 
 <template>
   <div
-    class="dc-hairline--bottom w-full bg-(--dc-background-2)"
+    class="dc-hairline-bottom w-full bg-(--dc-background-2)"
     @click="SharedFunction.call('routeToContent', item.contentType, item.id, item.thisEp.id, item)"
   >
     <!-- user -->
     <div class="relative flex w-full py-2">
-      <div class="dc-ellipsis flex w-fit items-center pl-2 text-[16px] text-(--p-color)">
+      <div class="flex w-fit items-center dc-ellipsis pl-2 text-[16px] text-(--p-color)">
         <DcAuthorIcon :size-spacing="10" :author="item.author[0]" />
         <div class="ml-1 flex w-full flex-col text-nowrap">
           <div class="flex items-center text-(--nui-primary-color)">
@@ -73,7 +73,7 @@ const handleMenuSelect = (key: string | number, item: uni.item.Item) => {
       <DcImage :src="item.$cover" class="aspect-video w-full rounded-lg bg-black" fit="contain" />
     </div>
     <!-- title -->
-    <div class="dc-multi-ellipsis--l2 w-full px-2 text-base font-semibold">
+    <div class="dc-clamp-2 w-full px-2 text-base font-semibold">
       {{ item.title }}
     </div>
     <!-- action -->

@@ -191,7 +191,7 @@ describe('DcCellGroup', () => {
     })
     expect(wrapper.attributes('id')).toBe('settings-group')
     expect(wrapper.get('.dc-cell-group__title').text()).toBe('Settings')
-    expect(wrapper.get('.dc-cell-group').classes()).toContain('dc-hairline--top-bottom')
+    expect(wrapper.get('.dc-cell-group').classes()).toContain('dc-hairline-top-bottom')
   })
 
   it('uses the named title slot and inset layout', () => {
@@ -202,7 +202,7 @@ describe('DcCellGroup', () => {
     expect(wrapper.get('.dc-cell-group__title').text()).toBe('Slot title')
     expect(wrapper.get('.dc-cell-group__title').classes()).toContain('dc-cell-group__title--inset')
     expect(wrapper.get('.dc-cell-group').classes()).toContain('dc-cell-group--inset')
-    expect(wrapper.get('.dc-cell-group').classes()).not.toContain('dc-hairline--top-bottom')
+    expect(wrapper.get('.dc-cell-group').classes()).not.toContain('dc-hairline-top-bottom')
   })
 })
 

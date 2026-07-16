@@ -40,26 +40,35 @@ const compatibility = computed(() => ({
 </script>
 
 <template>
-  <NCard class="marketplace-card" content-class="marketplace-card__content">
+  <NCard
+    class="h-full! border! border-[color-mix(in_srgb,var(--nui-primary-color)_14%,var(--dc-border))]! bg-[color-mix(in_srgb,var(--dc-surface)_96%,var(--nui-primary-color))]!"
+  >
     <template #header>
-      <div class="marketplace-card__header">
-        <div class="marketplace-card__identity">
-          <span class="marketplace-card__monogram" aria-hidden="true">
+      <div class="flex items-center justify-between gap-2.5">
+        <div class="flex min-w-0 items-center gap-2.5">
+          <span
+            class="grid size-[38px] shrink-0 place-items-center rounded-xl bg-[color-mix(in_srgb,var(--nui-primary-color)_16%,transparent)] font-extrabold text-(--nui-primary-color)"
+            aria-hidden="true"
+          >
             {{ displayName.slice(0, 1).toLocaleUpperCase() }}
           </span>
-          <div class="marketplace-card__name-block">
-            <strong class="marketplace-card__name">{{ displayName }}</strong>
-            <span class="marketplace-card__id">ap:{{ item.listing.id }}</span>
+          <div class="grid min-w-0">
+            <strong class="dc-ellipsis">{{ displayName }}</strong>
+            <span class="dc-ellipsis text-xs text-(--nui-text-color-3)">
+              ap:{{ item.listing.id }}
+            </span>
           </div>
         </div>
         <NTag size="small" :type="compatibility.type" round>{{ compatibility.label }}</NTag>
       </div>
     </template>
 
-    <p class="marketplace-card__description">
+    <p class="m-0 dc-clamp-2 min-h-[3em] text-(--nui-text-color-2)">
       {{ item.manifest?.description ?? t('plugin.market.noDescription') }}
     </p>
-    <div class="marketplace-card__meta">
+    <div
+      class="my-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-(--nui-text-color-3)"
+    >
       <span>{{ t('plugin.market.authors', { authors: item.listing.authors.join(', ') }) }}</span>
       <span v-if="version">{{ t('plugin.market.version', { version }) }}</span>
     </div>
@@ -68,7 +77,7 @@ const compatibility = computed(() => ({
     </NTag>
 
     <template #action>
-      <div class="marketplace-card__actions">
+      <div class="flex items-center justify-between gap-2.5">
         <NButton secondary @click="emit('details')">
           {{ t('plugin.market.actions.details') }}
         </NButton>
@@ -84,76 +93,3 @@ const compatibility = computed(() => ({
     </template>
   </NCard>
 </template>
-
-<style scoped>
-.marketplace-card {
-  height: 100%;
-  border: 1px solid color-mix(in srgb, var(--nui-primary-color) 14%, var(--dc-border));
-  background: color-mix(in srgb, var(--dc-surface) 96%, var(--nui-primary-color));
-}
-
-.marketplace-card__header,
-.marketplace-card__identity,
-.marketplace-card__actions,
-.marketplace-card__meta {
-  display: flex;
-  align-items: center;
-}
-
-.marketplace-card__header,
-.marketplace-card__actions {
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.marketplace-card__identity {
-  min-width: 0;
-  gap: 10px;
-}
-
-.marketplace-card__monogram {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-  place-items: center;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--nui-primary-color) 16%, transparent);
-  color: var(--nui-primary-color);
-  font-weight: 800;
-}
-
-.marketplace-card__name-block {
-  display: grid;
-  min-width: 0;
-}
-
-.marketplace-card__name,
-.marketplace-card__id {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.marketplace-card__id,
-.marketplace-card__meta {
-  color: var(--nui-text-color-3);
-  font-size: 0.75rem;
-}
-
-.marketplace-card__description {
-  display: -webkit-box;
-  min-height: 3em;
-  margin: 0;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  color: var(--nui-text-color-2);
-}
-
-.marketplace-card__meta {
-  flex-wrap: wrap;
-  gap: 4px 12px;
-  margin: 10px 0;
-}
-</style>

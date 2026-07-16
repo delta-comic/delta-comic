@@ -32,14 +32,78 @@ body {
 }
 
 @layer components {
-  .dc-hairline--bottom {
-    box-shadow: inset 0 -0.5px var(--dc-color-border);
+  /* Vant-style high-DPR hairlines: draw 1px on a pseudo-element, then scale it. */
+  .dc-hairline,
+  .dc-hairline-surround,
+  .dc-hairline-top,
+  .dc-hairline-bottom,
+  .dc-hairline-left,
+  .dc-hairline-right,
+  .dc-hairline-top-bottom {
+    position: relative;
+
+    &::after {
+      position: absolute;
+      box-sizing: border-box;
+      content: '';
+      pointer-events: none;
+    }
   }
 
-  .dc-hairline--top-bottom {
-    box-shadow:
-      inset 0 0.5px var(--dc-color-border),
-      inset 0 -0.5px var(--dc-color-border);
+  .dc-hairline::after,
+  .dc-hairline-surround::after {
+    inset: -50%;
+    border: 1px solid var(--dc-color-border);
+    transform: scale(0.5);
+  }
+
+  .dc-hairline-top::after,
+  .dc-hairline-bottom::after {
+    right: 0;
+    left: 0;
+    border-block: 0 solid var(--dc-color-border);
+    transform: scaleY(0.5);
+  }
+
+  .dc-hairline-top::after {
+    top: 0;
+    border-top-width: 1px;
+    transform-origin: 50% 0;
+  }
+
+  .dc-hairline-bottom::after {
+    bottom: 0;
+    border-bottom-width: 1px;
+    transform-origin: 50% 100%;
+  }
+
+  .dc-hairline-left::after,
+  .dc-hairline-right::after {
+    top: 0;
+    bottom: 0;
+    border-inline: 0 solid var(--dc-color-border);
+    transform: scaleX(0.5);
+  }
+
+  .dc-hairline-left::after {
+    left: 0;
+    border-left-width: 1px;
+    transform-origin: 0 50%;
+  }
+
+  .dc-hairline-right::after {
+    right: 0;
+    border-right-width: 1px;
+    transform-origin: 100% 50%;
+  }
+
+  .dc-hairline-top-bottom::after {
+    top: -50%;
+    right: 0;
+    bottom: -50%;
+    left: 0;
+    border-block: 1px solid var(--dc-color-border);
+    transform: scaleY(0.5);
   }
 
   .dc-fade-enter-active,

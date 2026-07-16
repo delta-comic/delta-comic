@@ -36,14 +36,16 @@ const canInstall = computed(
     v-model:show="show"
     preset="card"
     :title="title"
-    class="marketplace-details"
+    class="w-[min(92vw,620px)]!"
     :bordered="false"
   >
-    <div v-if="item" class="marketplace-details__content">
-      <p class="marketplace-details__description">
+    <div v-if="item" class="grid gap-4">
+      <p class="m-0 text-(--nui-text-color-2)">
         {{ item.manifest?.description ?? t('plugin.market.noDescription') }}
       </p>
-      <dl class="marketplace-details__facts">
+      <dl
+        class="m-0 grid grid-cols-2 gap-3 *:min-w-0 *:rounded-[10px] *:bg-[color-mix(in_srgb,var(--dc-surface)_88%,var(--nui-primary-color))] *:p-2.5 max-[520px]:grid-cols-1 [&_dd]:mt-1 [&_dd]:mb-0 [&_dd]:[overflow-wrap:anywhere] [&_dt]:text-xs [&_dt]:text-(--nui-text-color-3)"
+      >
         <div>
           <dt>{{ t('plugin.market.details.installId') }}</dt>
           <dd>
@@ -85,7 +87,7 @@ const canInstall = computed(
       <NAlert type="info" :title="t('plugin.market.security.title')">
         {{ t('plugin.market.security.notice') }}
       </NAlert>
-      <div class="marketplace-details__actions">
+      <div class="flex justify-end gap-2.5">
         <NButton secondary @click="emit('openSource', source)">
           {{ t('plugin.market.actions.source') }}
         </NButton>
@@ -100,55 +102,3 @@ const canInstall = computed(
     </div>
   </NModal>
 </template>
-
-<style scoped>
-.marketplace-details {
-  width: min(92vw, 620px);
-}
-
-.marketplace-details__content {
-  display: grid;
-  gap: 16px;
-}
-
-.marketplace-details__description {
-  margin: 0;
-  color: var(--nui-text-color-2);
-}
-
-.marketplace-details__facts {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin: 0;
-}
-
-.marketplace-details__facts > div {
-  min-width: 0;
-  padding: 10px;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--dc-surface) 88%, var(--nui-primary-color));
-}
-
-.marketplace-details__facts dt {
-  color: var(--nui-text-color-3);
-  font-size: 0.75rem;
-}
-
-.marketplace-details__facts dd {
-  margin: 4px 0 0;
-  overflow-wrap: anywhere;
-}
-
-.marketplace-details__actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-@media (max-width: 520px) {
-  .marketplace-details__facts {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

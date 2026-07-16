@@ -21,9 +21,9 @@ const {
 </script>
 
 <template>
-  <div class="search-page">
+  <div class="h-full overflow-y-auto bg-dc-page">
     <SearchLandingForm v-model="query" @back="router.back()" @submit="submit()" />
-    <main class="search-page__content">
+    <main class="mx-auto grid w-[min(100%,960px)] gap-8 px-(--dc-content-padding) pt-6 pb-12">
       <HotSearchPanel
         :loading="isLoadingHotSearch"
         :sections="hotSearchSections"
@@ -33,19 +33,3 @@ const {
     </main>
   </div>
 </template>
-
-<style scoped>
-.search-page {
-  height: 100%;
-  overflow-y: auto;
-  background: var(--dc-background);
-}
-
-.search-page__content {
-  display: grid;
-  width: min(100%, 960px);
-  gap: 32px;
-  margin-inline: auto;
-  padding: 24px var(--dc-content-padding) 48px;
-}
-</style>
