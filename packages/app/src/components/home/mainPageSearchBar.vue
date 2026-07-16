@@ -12,7 +12,7 @@ const { t } = useI18n()
   <div class="ml-3 h-9 min-w-0 flex-1">
     <button
       type="button"
-      class="dc-interactive flex h-full w-full items-center gap-2 rounded-full border border-solid border-gray-400 bg-transparent px-3 text-left text-gray-400"
+      class="flex h-full w-full dc-interactive items-center gap-2 rounded-full border border-solid border-gray-400 bg-transparent px-3 text-left text-gray-400"
       :aria-label="t('search.actions.open')"
       @click="emit('activate')"
     >

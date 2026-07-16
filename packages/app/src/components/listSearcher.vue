@@ -98,7 +98,7 @@ defineExpose({ isSearching, searchText })
             :key="filter"
             :title="filter"
             @click="searchText = filter"
-            class="dc-haptics-feedback w-full"
+            class="w-full dc-haptics-feedback"
           />
         </template>
       </div>

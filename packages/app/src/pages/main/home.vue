@@ -96,7 +96,7 @@ const tabs = computed(() => [
       type="button"
       :aria-label="t('search.actions.expand')"
       @click="openSearch"
-      class="dc-interactive absolute! top-1/2 right-0 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-(--dc-surface) p-1 text-(--dc-text-secondary) shadow transition-transform duration-200"
+      class="absolute! top-1/2 right-0 flex size-8 -translate-y-1/2 dc-interactive items-center justify-center rounded-full bg-(--dc-surface) p-1 text-(--dc-text-secondary) shadow transition-transform duration-200"
       :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']"
     >
       <NIcon size="25">
@@ -107,7 +107,7 @@ const tabs = computed(() => [
       type="button"
       :aria-label="t('category.openAll')"
       :class="[isShowNavBar ? 'translate-x-full' : '-translate-x-2']"
-      class="dc-interactive absolute! top-1/2 right-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-(--dc-surface) p-1 text-(--dc-text-secondary) shadow transition-transform duration-200"
+      class="absolute! top-1/2 right-10 flex size-8 -translate-y-1/2 dc-interactive items-center justify-center rounded-full bg-(--dc-surface) p-1 text-(--dc-text-secondary) shadow transition-transform duration-200"
       @click="$router.force.push({ name: '/cate' })"
     >
       <NIcon size="25">

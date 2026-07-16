@@ -28,7 +28,7 @@ const { t } = useI18n()
       <div class="relative flex h-13 w-full items-center justify-center text-lg! font-bold">
         <NIcon
           size="calc(var(--spacing) * 6)"
-          class="dc-interactive absolute! left-3 rotate-180"
+          class="absolute! left-3 rotate-180 dc-interactive"
           @click="$router.back()"
           color="var(--dc-text-secondary)"
           :aria-label="t('common.actions.back')"

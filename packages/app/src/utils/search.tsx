@@ -22,7 +22,7 @@ export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise
           }}
           label={i18n.global.t('search.sourceLabel', { source: store.$getI18nName(r[0]) })}
           value={searchText}
-          class='dc-interactive w-full'
+          class='w-full dc-interactive'
         />
       )),
     ),

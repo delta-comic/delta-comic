@@ -118,7 +118,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
               )
           "
         >
-          <NButton quaternary class="dc-interactive flex h-full items-center justify-start text-sm">
+          <NButton quaternary class="flex h-full dc-interactive items-center justify-start text-sm">
             <template #icon>
               <NIcon size="1.5rem" class="sort-icon">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -138,7 +138,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
             </span>
           </NButton>
         </NPopselect>
-        <div class="dc-interactive flex h-full items-center justify-start gap-1 text-sm">
+        <div class="flex h-full dc-interactive items-center justify-start gap-1 text-sm">
           <NSwitch v-model:value="config.data.value.showAIProject" />{{ t('search.showAiWorks') }}
         </div>
       </div>
@@ -154,7 +154,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
             )
         "
         :class="[showSearch ? 'translate-x-full' : '-translate-x-2']"
-        class="dc-interactive absolute! top-1/2 right-0 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-(--dc-surface) p-1 text-(--dc-text-secondary) shadow transition-transform duration-200"
+        class="absolute! top-1/2 right-0 flex size-8 -translate-y-1/2 dc-interactive items-center justify-center rounded-full bg-(--dc-surface) p-1 text-(--dc-text-secondary) shadow transition-transform duration-200"
       >
         <NIcon size="25">
           <Icons.material.SearchFilled />

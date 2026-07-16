@@ -10,11 +10,11 @@ const item = computed(() => uni.item.Item.create($props.item))
 
 <template>
   <component :is="uni.item.Item.itemCards.get(item.contentType)" :item>
-    <div class="dc-ellipsis flex flex-nowrap items-center *:text-nowrap">
+    <div class="flex flex-nowrap items-center dc-ellipsis *:text-nowrap">
       <NIcon color="var(--dc-text-secondary)" size="14px">
         <Icons.antd.UserOutlined />
       </NIcon>
-      <span v-for="author of item.author" class="dc-interactive mr-2">{{ author.label }}</span>
+      <span v-for="author of item.author" class="mr-2 dc-interactive">{{ author.label }}</span>
     </div>
   </component>
 </template>

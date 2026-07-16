@@ -31,7 +31,7 @@ const { state: favouriteItems } = FavouriteDB.useQueryItem(
     <button
       v-if="isCardMode"
       type="button"
-      class="active:bg-gray dc-interactive relative flex w-full flex-col items-center overflow-hidden rounded-xl border-none bg-(--dc-surface) bg-center p-3 text-left text-(--dc-text)"
+      class="active:bg-gray relative flex w-full dc-interactive flex-col items-center overflow-hidden rounded-xl border-none bg-(--dc-surface) bg-center p-3 text-left text-(--dc-text)"
       :aria-label="t('favourite.actions.openFolder', { title: card.title })"
       @click="emit('open')"
     >
@@ -79,7 +79,7 @@ const { state: favouriteItems } = FavouriteDB.useQueryItem(
     >
       <button
         type="button"
-        class="dc-interactive absolute inset-0 z-0 border-0 bg-transparent"
+        class="absolute inset-0 z-0 dc-interactive border-0 bg-transparent"
         :aria-label="t('favourite.actions.openFolder', { title: card.title })"
         @click="emit('open')"
       />

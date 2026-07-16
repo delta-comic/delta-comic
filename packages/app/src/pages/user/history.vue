@@ -82,7 +82,7 @@ const { t } = useI18n()
           </NIcon>
           <NIcon
             size="calc(var(--spacing) * 6.5)"
-            class="dc-interactive rotate-90"
+            class="rotate-90 dc-interactive"
             @click="showConfig = true"
             color="var(--dc-text-secondary)"
           >

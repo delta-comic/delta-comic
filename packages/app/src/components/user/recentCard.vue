@@ -14,17 +14,17 @@ const instance = computed(() => uni.item.Item.create($props.item.item))
 <template>
   <DcVar v-if="item" :value="item?.item" v-slot="{ value }">
     <component :item="instance" :is="uni.item.Item.itemCards.get(instance.contentType)">
-      <div class="dc-ellipsis flex flex-nowrap items-center *:text-nowrap">
+      <div class="flex flex-nowrap items-center dc-ellipsis *:text-nowrap">
         <NIcon color="var(--dc-text-secondary)" size="14px">
           <Icons.antd.UserOutlined />
         </NIcon>
-        <span v-for="author of value.author" class="dc-interactive mr-2">{{ author.label }}</span>
+        <span v-for="author of value.author" class="mr-2 dc-interactive">{{ author.label }}</span>
       </div>
-      <div class="dc-ellipsis flex flex-nowrap items-center *:text-nowrap">
+      <div class="flex flex-nowrap items-center dc-ellipsis *:text-nowrap">
         <NIcon color="var(--dc-text-secondary)" size="14px">
           <Icons.material.TimerRound />
         </NIcon>
-        <span class="dc-interactive mr-2">{{ createDateString(dayjs(item.timestamp)) }}</span>
+        <span class="mr-2 dc-interactive">{{ createDateString(dayjs(item.timestamp)) }}</span>
       </div>
     </component>
   </DcVar>

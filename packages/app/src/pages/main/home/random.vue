@@ -84,7 +84,7 @@ watch(
       <NIcon color="var(--dc-text-secondary)" size="14px">
         <Icons.material.DrawOutlined />
       </NIcon>
-      <span class="dc-ellipsis ml-0.5 max-w-2/3 text-xs text-(--dc-text-secondary)">{{
+      <span class="ml-0.5 max-w-2/3 dc-ellipsis text-xs text-(--dc-text-secondary)">{{
         item.author.join(',')
       }}</span>
       <template #smallTopInfo>

@@ -20,7 +20,7 @@ const router = useRouter()
     <NGrid class="w-full" :cols="4" :y-gap="10">
       <template v-for="item of card.items">
         <NGi
-          class="dc-interactive flex flex-col items-center justify-center"
+          class="flex dc-interactive flex-col items-center justify-center"
           v-if="item.type == 'button'"
           @click="
             router.force.push({
@@ -36,7 +36,7 @@ const router = useRouter()
           <span class="mt-1 text-(--dc-text)">{{ item.name }}</span>
         </NGi>
         <NGi
-          class="dc-interactive flex flex-col items-center justify-center"
+          class="flex dc-interactive flex-col items-center justify-center"
           v-else-if="item.type == 'statistic'"
           span="1"
         >

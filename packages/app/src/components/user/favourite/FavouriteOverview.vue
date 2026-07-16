@@ -181,7 +181,7 @@ const showPlayUnavailable = () => {
         </NIcon>
         <button
           type="button"
-          class="dc-interactive flex size-7 items-center justify-center text-(--dc-text-secondary)"
+          class="flex size-7 dc-interactive items-center justify-center text-(--dc-text-secondary)"
           :aria-label="
             t(
               isCardMode

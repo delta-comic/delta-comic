@@ -156,7 +156,7 @@ const $dialog = useDialog()
             </NIcon>
             <NIcon
               size="calc(var(--spacing) * 6.5)"
-              class="dc-interactive rotate-90"
+              class="rotate-90 dc-interactive"
               color="var(--dc-text-secondary)"
               @click="isShowMore = true"
             >

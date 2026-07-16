@@ -116,7 +116,7 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
               v-if="'text' in think"
               :title="think.text"
               @click="searchText = think.value"
-              class="dc-haptics-feedback w-full"
+              class="w-full dc-haptics-feedback"
             />
             <component v-else :is="think" />
           </template>

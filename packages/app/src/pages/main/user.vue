@@ -173,7 +173,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
       <button
         type="button"
         @click="$router.push('/user/download')"
-        class="dc-interactive flex h-20 flex-col items-center justify-center"
+        class="flex h-20 dc-interactive flex-col items-center justify-center"
       >
         <NIcon size="2rem" color="var(--bili-blue)">
           <Icons.antd.FolderOutlined />
@@ -183,7 +183,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
       <button
         type="button"
         @click="$router.push('/user/history')"
-        class="dc-interactive flex h-20 flex-col items-center justify-center"
+        class="flex h-20 dc-interactive flex-col items-center justify-center"
       >
         <NIcon size="2rem" color="var(--bili-blue)">
           <Icons.material.TimerRound />
@@ -193,7 +193,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
       <button
         type="button"
         @click="$router.push('/user/favourite')"
-        class="dc-interactive flex h-20 flex-col items-center justify-center"
+        class="flex h-20 dc-interactive flex-col items-center justify-center"
       >
         <NIcon size="2rem" color="var(--bili-blue)">
           <Icons.material.StarOutlineRound />
@@ -203,7 +203,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
       <button
         type="button"
         @click="$router.push('/user/recent')"
-        class="dc-interactive flex h-20 flex-col items-center justify-center"
+        class="flex h-20 dc-interactive flex-col items-center justify-center"
       >
         <NIcon size="1.9rem" color="var(--bili-blue)">
           <svg

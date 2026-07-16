@@ -23,7 +23,7 @@ const splitItems = (value: unknown) => {
 <template>
   <div class="sticky top-0 z-10 bg-(--dc-background) py-px">
     <div
-      class="dc-interactive relative mx-auto my-1 flex h-10 w-[calc(100%-8px)] items-center rounded bg-(--dc-surface)"
+      class="relative mx-auto my-1 flex h-10 w-[calc(100%-8px)] dc-interactive items-center rounded bg-(--dc-surface)"
       @click="block.onClick?.()"
     >
       <span class="ml-3 text-xl font-bold text-(--nui-primary-color)">{{ block.name }}</span>
