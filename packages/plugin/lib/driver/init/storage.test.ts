@@ -8,6 +8,7 @@ const nativeMocks = vi.hoisted(() => ({
   exists: vi.fn(async () => true),
   installZip: vi.fn(),
   invoke: vi.fn(),
+  isTauri: vi.fn(() => false),
   join: vi.fn(async (...parts: string[]) => parts.join('/')),
   readDir: vi.fn(),
   readFile: vi.fn(),
@@ -18,6 +19,7 @@ const nativeMocks = vi.hoisted(() => ({
 vi.mock('@tauri-apps/api/core', () => ({
   convertFileSrc: nativeMocks.convertFileSrc,
   invoke: nativeMocks.invoke,
+  isTauri: nativeMocks.isTauri,
 }))
 vi.mock('@tauri-apps/api/path', () => ({
   appLocalDataDir: nativeMocks.appLocalDataDir,
@@ -141,6 +143,7 @@ const createControlledIndexedDb = (storedKeys: IDBValidKey[] = []) => {
 }
 
 afterEach(() => {
+  nativeMocks.isTauri.mockReset().mockReturnValue(false)
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
@@ -320,7 +323,7 @@ describe('browser plugin storage', () => {
 })
 
 describe('native plugin storage bridges', () => {
-  const enableTauri = () => vi.stubGlobal('window', { __TAURI_INTERNALS__: {} })
+  const enableTauri = () => nativeMocks.isTauri.mockReturnValue(true)
 
   it('reads, lists, resolves and removes files through Tauri APIs', async () => {
     enableTauri()

@@ -22,6 +22,7 @@
     "@delta-comic/utils": "workspace:",
     "@octokit/rest": "catalog:",
     "@pinia/colada": "catalog:",
+    "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-clipboard-manager": "catalog:",
     "@tauri-apps/plugin-shell": "catalog:",
     "@vueuse/core": "catalog:",

@@ -1,0 +1,7 @@
+{
+  "app": {
+    "windows": [
+      { "label": "main", "url": "index.html", "title": "Delta Comic", "fullscreen": false }
+    ]
+  }
+}

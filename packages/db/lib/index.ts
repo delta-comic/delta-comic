@@ -1,3 +1,4 @@
+import { isTauri } from '@tauri-apps/api/core'
 import { CamelCasePlugin, type Dialect, Kysely } from 'kysely'
 import { SerializePlugin } from 'kysely-plugin-serialize'
 
@@ -31,7 +32,7 @@ export interface DB {
 
 console.log('[db] loading')
 
-export const isTauriRuntime = () => typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
+export const isTauriRuntime = isTauri
 
 const createDialect = async (): Promise<Dialect> => {
   if (isTauriRuntime()) {

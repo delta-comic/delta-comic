@@ -12,6 +12,7 @@
     "capabilities",
     "light.css",
     "dark.css",
+    "pnpm-lock.yaml",
     "skills-lock.json",
     ".agents",
     "target",

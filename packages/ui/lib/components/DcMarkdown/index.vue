@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { isTauri } from '@tauri-apps/api/core'
 import { useCssVar, useEventListener } from '@vueuse/core'
 import MarkdownIt, { type Options } from 'markdown-it'
 import { computed } from 'vue'
@@ -30,16 +31,13 @@ const md = computed(() => {
 const messageKey = `markdown-router-${Math.random()}`
 
 const pColor = useCssVar('--p-color')
-const isTauriRuntime = () =>
-  typeof window !== 'undefined' && ('__TAURI_INTERNALS__' in window || '__TAURI__' in window)
-
 const htmlTemplateUrl = computed(() =>
   createTemplate({
     color: pColor.value ?? '',
     isDark: $props.isDarkMode,
     content: md.value.render($props.markdown, $props.env),
     messageKey,
-    delegateLinkOpen: isTauriRuntime(),
+    delegateLinkOpen: isTauri(),
   }),
 )
 
@@ -48,7 +46,7 @@ const openInBrowser = (href: string) => {
 }
 
 const openExternalLink = (href: string) => {
-  if (!isTauriRuntime()) {
+  if (!isTauri()) {
     openInBrowser(href)
     return
   }

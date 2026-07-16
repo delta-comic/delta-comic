@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 import browserslist from 'browserslist'
@@ -70,6 +71,12 @@ export default defineConfig(
         minify: !process.env.TAURI_ENV_DEBUG ? 'oxc' : false,
         // produce sourcemaps for debug builds
         sourcemap: !!process.env.TAURI_ENV_DEBUG,
+        rolldownOptions: {
+          input: {
+            main: resolve(import.meta.dirname, 'main.html'),
+            splash: resolve(import.meta.dirname, 'index.html'),
+          },
+        },
       },
       worker: { format: 'es' },
       base: '/',

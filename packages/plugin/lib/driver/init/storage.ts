@@ -1,4 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
+import { isTauri } from '@tauri-apps/api/core'
 import JSZip from 'jszip'
 
 import type { NativeInstallProgress } from './native'
@@ -8,7 +9,7 @@ const storeName = 'files'
 const memoryFiles = new Map<string, Uint8Array>()
 const pluginObjectUrls = new Map<string, Set<string>>()
 
-export const isTauriRuntime = () => typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
+export const isTauriRuntime = isTauri
 
 const fileKey = (pluginId: string, path: string) => `${pluginId}/${path.replace(/^\/+/, '')}`
 

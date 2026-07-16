@@ -1,4 +1,6 @@
-export const isTauriRuntime = () => '__TAURI_INTERNALS__' in window
+import { isTauri } from '@tauri-apps/api/core'
+
+export const isTauriRuntime = isTauri
 
 export interface SafeAreaInsets {
   adjustedInsetBottom?: number

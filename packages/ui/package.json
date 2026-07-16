@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@lhlyu/vue-virtual-waterfall": "catalog:",
+    "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-shell": "catalog:",
     "@vueuse/core": "catalog:",
     "dayjs": "catalog:",

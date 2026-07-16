@@ -34,8 +34,10 @@ lhlyu
 lightningcss
 linkify
 localdata
+maximizable
 Metadatable
 minidump
+minimizable
 miui
 msvc
 nvim
@@ -61,6 +63,7 @@ retriable
 retryable
 rlib
 rolldown
+Roundhand
 rustflags
 rustls
 serde

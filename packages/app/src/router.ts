@@ -5,7 +5,7 @@ import type { DeltaRouter } from '@delta-comic/utils'
 import { toValue } from 'vue'
 import {
   createRouter,
-  createWebHistory,
+  createWebHashHistory,
   isNavigationFailure,
   NavigationFailureType,
   type _RouterClassic,
@@ -22,7 +22,8 @@ import { pluginName } from '@/symbol'
 type RouteAim = string | RouteLocationAsRelativeGeneric | RouteLocationAsPathGeneric
 
 export const router = (window.$router = Object.assign(
-  createRouter({ history: createWebHistory(), routes }),
+  // The main app is hosted by main.html in both native windows and the web iframe.
+  createRouter({ history: createWebHashHistory(), routes }),
   {
     force: { push: to => $routerForceDo('push', to), replace: to => $routerForceDo('replace', to) },
   } as Pick<DeltaRouter, 'force'>,

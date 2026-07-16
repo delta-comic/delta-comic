@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "splash",
+  "description": "Allows the lightweight splash entry to choose its native startup strategy.",
+  "windows": ["splash"],
+  "platforms": ["linux", "macOS", "windows"],
+  "permissions": ["core:app:allow-supports-multiple-windows"]
+}

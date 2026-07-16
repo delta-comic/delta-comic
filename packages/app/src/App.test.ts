@@ -12,6 +12,7 @@ const {
   intervalCallbacks,
   message,
   pluginRuntime,
+  revealMainEntry,
   router,
   shareToken,
   styleRefs,
@@ -22,6 +23,7 @@ const {
   intervalCallbacks: [] as Array<() => Promise<void>>,
   message: { success: vi.fn() },
   pluginRuntime: { activatePreboot: vi.fn(), clearRecovery: vi.fn(), readRecovery: vi.fn() },
+  revealMainEntry: vi.fn(),
   router: { push: vi.fn() },
   shareToken: new Map<
     string,
@@ -121,6 +123,7 @@ vi.mock('./platform', () => ({
   readClipboardText: clipboard.read,
   writeClipboardText: clipboard.write,
 }))
+vi.mock('./startup/entry', () => ({ revealMainEntry }))
 
 vi.mock('./components/plugin/index.vue', () => ({
   default: window.$$lib$$.Vue.defineComponent({
@@ -263,13 +266,13 @@ describe('App share-token orchestration', () => {
 
 describe('AppSetup startup shell', () => {
   beforeEach(() => {
-    document.querySelector('#setup')?.remove()
     pluginRuntime.activatePreboot.mockReset().mockResolvedValue({ reloadRequired: false })
     pluginRuntime.clearRecovery.mockClear()
     pluginRuntime.readRecovery
       .mockReset()
       .mockReturnValue({ plugins: ['reader'], reason: 'previous startup failed' })
     styleRefs.length = 0
+    revealMainEntry.mockReset().mockResolvedValue(undefined)
   })
 
   it('exposes theme variables, activates preboot and delegates recovery actions', async () => {
@@ -306,17 +309,13 @@ describe('AppSetup startup shell', () => {
     wrapper.unmount()
   })
 
-  it('keeps the startup splash visible until preboot activation is ready', async () => {
+  it('reveals the main entry only after preboot activation is ready', async () => {
     let finishPreboot!: (result: { reloadRequired: boolean }) => void
     pluginRuntime.activatePreboot.mockReturnValueOnce(
       new Promise(resolve => {
         finishPreboot = resolve
       }),
     )
-    const splash = document.createElement('div')
-    splash.id = 'setup'
-    document.body.append(splash)
-
     const wrapper = mount(AppSetup, {
       global: {
         stubs: {
@@ -327,14 +326,14 @@ describe('AppSetup startup shell', () => {
     })
     const plugin = wrapper.getComponent({ name: 'Plugin' })
 
-    expect(document.querySelector('#setup')).toBe(splash)
     expect(plugin.props('startupReady')).toBe(false)
+    expect(revealMainEntry).not.toHaveBeenCalled()
 
     finishPreboot({ reloadRequired: false })
     await flushPromises()
     await nextTick()
 
-    expect(document.querySelector('#setup')).toBeNull()
+    expect(revealMainEntry).toHaveBeenCalledOnce()
     wrapper.unmount()
   })
 })

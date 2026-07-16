@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-cn" class="static size-full">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <title>Delta Comic</title>
@@ -7,40 +7,146 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src * chrome-extension: blob: tauri: local: ipc: ws: wss: 'unsafe-inline' 'unsafe-eval' data: chrome-extension: blob: tauri:; script-src * chrome-extension: blob: tauri: local: ipc: ws: wss: 'unsafe-inline' 'unsafe-eval'; connect-src * chrome-extension: blob: tauri: local: ipc: ws: wss: 'unsafe-inline'; img-src * chrome-extension: blob: tauri: local: ipc: ws: wss: data: chrome-extension: blob: tauri:; frame-src * chrome-extension: blob: tauri: local: ipc: ws: wss:; style-src * chrome-extension: blob: tauri: local: ipc: ws: wss: 'unsafe-inline';"
-    />
-    <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"
     />
     <link rel="shortcut icon" href="/favicon.png" type="image/x-icon" />
     <link rel="apple-touch-icon" href="/favicon.png" type="image/x-icon" />
-    <link rel="stylesheet" href="/setup.css" />
+    <style>
+      /* The splash entry intentionally keeps its critical CSS inline. */
+      :root {
+        color-scheme: light dark;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'Segoe UI', Arial, Roboto,
+          sans-serif;
+        background: #fff;
+        color: #111;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body,
+      #splash {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      #splash {
+        position: fixed;
+        inset: 0;
+        background: inherit;
+      }
+
+      .splash-portrait,
+      .splash-desktop {
+        position: absolute;
+        inset: 0;
+      }
+
+      .splash-portrait {
+        display: none;
+      }
+
+      .splash-desktop {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10%;
+      }
+
+      .splash-desktop-title {
+        width: 100%;
+        font-family:
+          'Snell Roundhand', 'Brush Script MT', 'Segoe Script', 'URW Chancery L', cursive;
+        font-size: clamp(4rem, 13vw, 13rem);
+        font-style: italic;
+        font-weight: 800;
+        line-height: 0.9;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .splash-portrait-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 100%;
+        height: 66.6667%;
+        object-fit: contain;
+      }
+
+      .splash-portrait-title {
+        position: absolute;
+        right: 1rem;
+        bottom: max(3rem, calc(env(safe-area-inset-bottom) + 2rem));
+        left: 1rem;
+        color: #fb7299;
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1rem;
+        text-align: center;
+      }
+
+      #main-entry {
+        position: fixed;
+        z-index: 1;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 160ms ease-out;
+      }
+
+      #main-entry[data-ready='true'] {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      @media (orientation: portrait) {
+        .splash-portrait {
+          display: block;
+        }
+
+        .splash-desktop {
+          display: none;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          background: #000;
+          color: #fff;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #main-entry {
+          transition: none;
+        }
+      }
+    </style>
   </head>
 
-  <body class="static size-full">
-    <div id="popups"></div>
-    <div id="setup" role="status" aria-label="Delta Comic" aria-busy="true">
-      <div class="setup__portrait" aria-hidden="true">
-        <img class="setup__portrait-image" src="/setup.avif" alt="" fetchpriority="high" />
-        <div class="setup__portrait-title">Delta Comic</div>
+  <body>
+    <main id="splash" role="status" aria-label="Delta Comic" aria-busy="true">
+      <div class="splash-portrait" aria-hidden="true">
+        <img class="splash-portrait-image" src="/setup.avif" alt="" fetchpriority="high" />
+        <div class="splash-portrait-title">Delta Comic</div>
       </div>
-      <div class="setup__desktop" aria-hidden="true">
-        <div class="setup__desktop-title">Delta Comic</div>
+      <div class="splash-desktop" aria-hidden="true">
+        <div class="splash-desktop-title">Delta Comic</div>
       </div>
-    </div>
-    <div id="app" class="static size-full overflow-auto bg-(--dc-background) **:select-none"></div>
-
-    <script>
-      window.process = { env: {} }
-
-      window.$api = {}
-      window.$layout = {}
-      window.$$safe$$ = false
-      window.$$lib$$ ??= {}
-    </script>
-    <script src="/runtime/host-libraries.umd.js"></script>
-    <script type="module" src="./src/main.tsx"></script>
+    </main>
+    <iframe id="main-entry" title="Delta Comic" hidden></iframe>
+    <script type="module" src="./src/entries/splash.ts"></script>
   </body>
 </html>

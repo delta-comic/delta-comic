@@ -1,10 +1,13 @@
 import { mockIPC } from '@tauri-apps/api/mocks'
-import { describe, expect, it } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import './test/setup'
 
+afterEach(() => vi.unstubAllGlobals())
+
 describe('db entry', () => {
   it('loads the application sqlite database through the Tauri SQL plugin', async () => {
+    vi.stubGlobal('isTauri', true)
     const calls: Array<{ command: string; payload: unknown }> = []
 
     mockIPC((command, payload) => {

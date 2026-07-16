@@ -1,15 +1,17 @@
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
-const { corsInit, getInsets, m3SetBarColor, nativeOpen, nativeReadText, nativeWriteText } =
+const { corsInit, getInsets, isTauri, m3SetBarColor, nativeOpen, nativeReadText, nativeWriteText } =
   vi.hoisted(() => ({
     corsInit: vi.fn(),
     getInsets: vi.fn(),
+    isTauri: vi.fn(),
     m3SetBarColor: vi.fn(),
     nativeOpen: vi.fn(),
     nativeReadText: vi.fn(),
     nativeWriteText: vi.fn(),
   }))
 
+vi.mock('@tauri-apps/api/core', () => ({ isTauri }))
 vi.mock('tauri-plugin-better-cors-fetch', () => ({ CORSFetch: { init: corsInit } }))
 vi.mock('tauri-plugin-m3', () => ({ M3: { getInsets, setBarColor: m3SetBarColor } }))
 vi.mock('@tauri-apps/plugin-clipboard-manager', () => ({
@@ -28,11 +30,13 @@ import {
 } from './platform'
 
 describe('web platform fallback', () => {
+  beforeEach(() => isTauri.mockReset().mockReturnValue(false))
   afterEach(() => vi.unstubAllGlobals())
 
-  it('detects a normal browser without Tauri internals', () => {
+  it('uses the official Tauri runtime detector', () => {
     vi.stubGlobal('window', { $api: {} })
     expect(isTauriRuntime()).toBe(false)
+    expect(isTauri).toHaveBeenCalledOnce()
   })
 
   it('installs a no-op native UI facade in the browser', async () => {
@@ -73,13 +77,11 @@ describe('web platform fallback', () => {
   })
 
   it('initializes and delegates all native operations in a Tauri runtime', async () => {
+    isTauri.mockReturnValue(true)
     const insets = { adjustedInsetBottom: 12, adjustedInsetTop: 8 }
     getInsets.mockResolvedValueOnce(insets)
     nativeReadText.mockResolvedValueOnce('native clipboard')
-    const nativeWindow: { $api: { M3?: unknown }; __TAURI_INTERNALS__: object } = {
-      $api: {},
-      __TAURI_INTERNALS__: {},
-    }
+    const nativeWindow: { $api: { M3?: unknown } } = { $api: {} }
     vi.stubGlobal('window', nativeWindow)
 
     expect(isTauriRuntime()).toBe(true)

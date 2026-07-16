@@ -4,16 +4,16 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { createTemplate } from './helper'
 import DcMarkdown from './index.vue'
 
-const shellOpen = vi.hoisted(() => vi.fn())
+const { isTauri, shellOpen } = vi.hoisted(() => ({ isTauri: vi.fn(), shellOpen: vi.fn() }))
+vi.mock('@tauri-apps/api/core', () => ({ isTauri }))
 vi.mock('@tauri-apps/plugin-shell', () => ({ open: shellOpen }))
 vi.mock('./dark.css?inline', () => ({ default: '/* dark-theme */' }))
 vi.mock('./light.css?inline', () => ({ default: '/* light-theme */' }))
 
 afterEach(() => {
   vi.restoreAllMocks()
+  isTauri.mockReset().mockReturnValue(false)
   shellOpen.mockReset()
-  delete (window as any).__TAURI__
-  delete (window as any).__TAURI_INTERNALS__
 })
 
 describe('markdown HTML template', () => {
@@ -106,7 +106,7 @@ describe('DcMarkdown', () => {
   it('uses the Tauri shell and falls back to the browser if shell opening fails', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.75)
     const browserOpen = vi.spyOn(window, 'open').mockImplementation(() => null)
-    Object.assign(window, { __TAURI__: {} })
+    isTauri.mockReturnValue(true)
     shellOpen.mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('shell failed'))
     mount(DcMarkdown, { props: { markdown: 'content' } })
 

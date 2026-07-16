@@ -3,9 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import type { WebviewAuthResult } from './webviewAuth'
 import './test/setup'
 
-const mocks = vi.hoisted(() => ({ invoke: vi.fn() }))
+const mocks = vi.hoisted(() => ({ invoke: vi.fn(), isTauri: vi.fn() }))
 
-vi.mock('@tauri-apps/api/core', () => ({ invoke: mocks.invoke }))
+vi.mock('@tauri-apps/api/core', () => ({ invoke: mocks.invoke, isTauri: mocks.isTauri }))
 
 const storage = (entries: Record<string, string>) =>
   Object.entries(entries).map(([key, value]) => ({ key, value }))
@@ -28,6 +28,7 @@ const snapshot = (callback: unknown = null) => ({
 describe('webviewAuth', () => {
   beforeEach(() => {
     mocks.invoke.mockReset()
+    mocks.isTauri.mockReset().mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -152,7 +153,7 @@ describe('webviewAuth', () => {
   })
 
   it('opens a page, waits for callback data, normalizes storage, and closes the page', async () => {
-    Object.defineProperty(window, '__TAURI_INTERNALS__', { configurable: true, value: {} })
+    mocks.isTauri.mockReturnValue(true)
     let reads = 0
     mocks.invoke.mockImplementation(async (command: string) => {
       if (command === 'plugin:utils|webview_open_page') {
@@ -218,7 +219,7 @@ describe('webviewAuth', () => {
   })
 
   it('uses the page snapshot when callback storage is incomplete and tolerates close failure', async () => {
-    Object.defineProperty(window, '__TAURI_INTERNALS__', { configurable: true, value: {} })
+    mocks.isTauri.mockReturnValue(true)
     const closeError = new Error('native close failed')
     mocks.invoke.mockImplementation(async (command: string) => {
       if (command === 'plugin:utils|webview_open_page') {
@@ -270,7 +271,7 @@ describe('webviewAuth', () => {
   })
 
   it('rejects and emits an error when a native auth page is cancelled while polling', async () => {
-    Object.defineProperty(window, '__TAURI_INTERNALS__', { configurable: true, value: {} })
+    mocks.isTauri.mockReturnValue(true)
     let resolveRead: ((value: unknown) => void) | undefined
     const read = new Promise<unknown>(resolve => {
       resolveRead = resolve

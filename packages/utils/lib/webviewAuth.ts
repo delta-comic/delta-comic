@@ -1,3 +1,5 @@
+import { isTauri } from '@tauri-apps/api/core'
+
 const CALLBACK_NAME = 'authCallback'
 const DEFAULT_POLL_INTERVAL = 300
 
@@ -259,7 +261,7 @@ export class PageWebviewAuth<T = unknown> extends WebviewAuth<T> {
 
   private async openAndWait() {
     try {
-      if (typeof window !== 'undefined' && !('__TAURI_INTERNALS__' in window)) {
+      if (!isTauri()) {
         return await this.openBrowserPopup()
       }
       this.page = await openWebviewPage({
