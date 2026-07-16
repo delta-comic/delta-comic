@@ -21,12 +21,12 @@
   **这些都需要重构app为多入口应用，这也利于以后扩展**
   为什么我说现在是糊弄的实现：现在直接加载这个很重的html会导致明显的延迟卡顿，所以宁可增加切页时间也要实现流畅的用户体验
 - [ ] 通过安装`@tauri-apps/api`npm包实现更好的判断环境，而不是使用自制的检测逻辑
-- [ ] 关于app的hairline的实现重构为参照<https://github.com/youzan/vant/blob/main/packages/vant/src/style/mixins/hairline.less>的实现，但仍使用css而不是less，利用tailwindcss的高可扩展机制将其重构为它的组件类
-- [ ] 利用tailwindcss的机制，将现有的css和旧工具类全部重构
+- [ ] 关于app的hairline的实现重构为参照<http://raw.githubusercontent.com/youzan/vant/refs/heads/main/packages/vant/src/style/mixins/hairline.less>的实现，但仍使用css而不是less，利用tailwindcss的高可扩展机制将其重构为它的组件类
+- [ ] 利用tailwindcss的机制，将现有的css和旧工具类全部重构，具体参照[AGENTS.md](AGENTS.md)中格式的要求
 
 ## server侧清单
 
-- [ ] 利用tailwindcss的机制，将现有的css和旧工具类全部重构
+- [ ] 利用tailwindcss的机制，将现有的css和旧工具类全部重构，具体参照[AGENTS.md](AGENTS.md)中格式的要求
 
 ## 项目工程清单
 

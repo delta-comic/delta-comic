@@ -32,6 +32,7 @@ In cloud environments, use `pnpm exec vp`.
 
 ### 格式
 
+- css**一定**要使用tailwindcss(包含`不可枚举的动态值属性`除外和使用`@apply`除外)，如果你使用了纯css则你的设计是失败的，应当重做。如果是在`开屏页面`这种地方也除外，因为场景太轻量且加载性能敏感。
 - 提交遵循Angular规则，但描述内容使用中文，如`feat(ui): 实现了列表组件`
 - 组件样式必须使用PascalCase，例如: `<NButton></NButton>`、`<DcList></DcList>`
 - 格式化请使用`vp fmt`和`vp lint`，最好不要手动修复格式问题
