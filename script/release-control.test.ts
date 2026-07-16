@@ -9,7 +9,11 @@ import {
   ReleaseHistoryBootstrap,
   type GitRunner,
 } from './bootstrap-release-history.mts'
-import { createReleasePlugin, type CommandRunner } from './semantic-release-plugin.mts'
+import {
+  createReleasePlugin,
+  resolveDistTag,
+  type CommandRunner,
+} from './semantic-release-plugin.mts'
 import {
   cargoLockPackageNames,
   cargoTomlVersionPaths,
@@ -115,6 +119,12 @@ describe('ReleaseHistoryBootstrap', () => {
 })
 
 describe('semantic-release monorepo plugin', () => {
+  it('maps stable and preview channels to safe npm dist-tags', () => {
+    expect(resolveDistTag()).toBe('latest')
+    expect(resolveDistTag('next')).toBe('next')
+    expect(() => resolveDistTag('../next')).toThrow('Invalid npm dist-tag')
+  })
+
   it('reports and prepares the version calculated by semantic-release', async () => {
     const synchronizeVersion = vi.fn<(version: string) => Promise<void>>().mockResolvedValue()
     const writeOutput = vi
@@ -130,18 +140,37 @@ describe('semantic-release monorepo plugin', () => {
     await plugin.verifyRelease({}, context)
     await plugin.prepare({}, context)
 
-    expect(writeOutput).toHaveBeenCalledWith('/tmp/output', 'has-release=true\nversion=3.0.0\n')
+    expect(writeOutput).toHaveBeenCalledWith(
+      '/tmp/output',
+      'has-release=true\nversion=3.0.0\nchannel=latest\n',
+    )
     expect(synchronizeVersion).toHaveBeenCalledWith('3.0.0')
   })
 
   it('builds libraries before recursively publishing the fixed workspace', async () => {
     const publishCommand = vi.fn<CommandRunner>().mockResolvedValue()
     const plugin = createReleasePlugin({ publishCommand })
-    await plugin.publish()
+    await plugin.publish({}, { env: {}, nextRelease: { version: '3.0.0' } })
 
     expect(publishCommand.mock.calls).toEqual([
       ['vp', ['run', 'lib-build']],
-      ['vp', ['pm', 'publish', '-r', '--no-git-checks', '--provenance']],
+      ['vp', ['pm', 'publish', '-r', '--no-git-checks', '--provenance', '--tag', 'latest']],
+    ])
+  })
+
+  it('publishes preview packages under the next dist-tag', async () => {
+    const publishCommand = vi.fn<CommandRunner>().mockResolvedValue()
+    const plugin = createReleasePlugin({ publishCommand })
+    await plugin.publish({}, { env: {}, nextRelease: { channel: 'next', version: '3.1.0-next.1' } })
+
+    expect(publishCommand).toHaveBeenLastCalledWith('vp', [
+      'pm',
+      'publish',
+      '-r',
+      '--no-git-checks',
+      '--provenance',
+      '--tag',
+      'next',
     ])
   })
 
@@ -168,7 +197,9 @@ describe('semantic-release monorepo plugin', () => {
     const publishCommand = vi.fn<CommandRunner>().mockRejectedValueOnce(new Error('build failed'))
     const plugin = createReleasePlugin({ publishCommand })
 
-    await expect(plugin.publish()).rejects.toThrow('build failed')
+    await expect(
+      plugin.publish({}, { env: {}, nextRelease: { version: '3.0.0' } }),
+    ).rejects.toThrow('build failed')
     expect(publishCommand).toHaveBeenCalledExactlyOnceWith('vp', ['run', 'lib-build'])
   })
 })

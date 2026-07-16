@@ -9,7 +9,7 @@ export default defineConfig({
   staged: { '*': 'vp check --fix', '*.*': 'vp exec cspell --no-must-find-files' },
   fmt: fmt as OxfmtConfig,
   lint: lint as OxlintConfig,
-  run: { cache: { tasks: true, scripts: true } },
+  run: { cache: { tasks: true, scripts: false } },
   test: {
     clearMocks: true,
     restoreMocks: true,

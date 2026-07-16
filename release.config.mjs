@@ -1,9 +1,11 @@
 import pkg from './package.json' with { type: 'json' }
 import { versionAssetPaths } from './script/set-version.mts'
 
+export const releaseBranches = ['main', { name: 'next', channel: 'next', prerelease: 'next' }]
+
 /** @type {import('semantic-release').GlobalConfig} */
 export default {
-  branches: ['main'],
+  branches: releaseBranches,
   repositoryUrl: pkg.repository.url,
   tagFormat: '${version}',
   plugins: [

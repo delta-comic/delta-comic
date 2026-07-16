@@ -116,3 +116,5 @@ ap:cosav
 ## 技术细节
 
 tauri + vue3 + tailwindcss4
+
+维护者请参阅[分支与发布流程](docs/release-workflow.md)。

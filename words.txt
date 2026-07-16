@@ -24,6 +24,7 @@ favourites
 favselect
 Gmailerrorred
 gradlew
+Hanime
 Hentai
 hoverable
 iarna
@@ -31,6 +32,9 @@ jmcomic
 kysely
 Levelboard
 lhlyu
+libappindicator
+librsvg
+libwebkit
 lightningcss
 linkify
 localdata
@@ -41,6 +45,7 @@ minimizable
 miui
 msvc
 nvim
+nttld
 noopener
 noreferrer
 OPFS
@@ -48,6 +53,7 @@ oxfmt
 oxfmtrc
 oxlint
 oxlintrc
+patchelf
 pinia
 pipefail
 Popconfirm
@@ -96,6 +102,7 @@ wasqlite
 webp
 wenxig
 workerd
+worktree
 wrangler
 xgbuugti
 Yahei

@@ -127,7 +127,7 @@ describe('semantic-release default output writer', () => {
     )
 
     await expect(readFile(outputPath, { encoding: 'utf-8' })).resolves.toBe(
-      'previous=true\nhas-release=true\nversion=4.0.0\n',
+      'previous=true\nhas-release=true\nversion=4.0.0\nchannel=latest\n',
     )
     expect(synchronizeVersion).not.toHaveBeenCalled()
   })

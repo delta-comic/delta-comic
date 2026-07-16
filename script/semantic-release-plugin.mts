@@ -5,7 +5,7 @@ import { assertVersion, rootDir, setVersion } from './set-version.mts'
 
 interface ReleaseContext {
   env: NodeJS.ProcessEnv
-  nextRelease: { version: string }
+  nextRelease: { channel?: string | null; version: string }
 }
 
 export type CommandRunner = (command: string, args: string[]) => Promise<void>
@@ -27,6 +27,14 @@ interface ReleasePluginDependencies {
   writeOutput?: (path: string, contents: string) => Promise<void>
 }
 
+export function resolveDistTag(channel?: string | null) {
+  const distTag = channel || 'latest'
+  if (!/^[a-z][a-z0-9._-]*$/i.test(distTag)) {
+    throw new Error(`Invalid npm dist-tag: ${distTag}`)
+  }
+  return distTag
+}
+
 export function createReleasePlugin({
   publishCommand = runCommand,
   synchronizeVersion = setVersion,
@@ -39,8 +47,12 @@ export function createReleasePlugin({
 
     async verifyRelease(_pluginConfig: unknown, { env, nextRelease }: ReleaseContext) {
       assertVersion(nextRelease.version)
+      const channel = resolveDistTag(nextRelease.channel)
       if (env.GITHUB_OUTPUT) {
-        await writeOutput(env.GITHUB_OUTPUT, `has-release=true\nversion=${nextRelease.version}\n`)
+        await writeOutput(
+          env.GITHUB_OUTPUT,
+          `has-release=true\nversion=${nextRelease.version}\nchannel=${channel}\n`,
+        )
       }
     },
 
@@ -48,9 +60,18 @@ export function createReleasePlugin({
       await synchronizeVersion(nextRelease.version)
     },
 
-    async publish() {
+    async publish(_pluginConfig: unknown, { nextRelease }: ReleaseContext) {
+      const distTag = resolveDistTag(nextRelease.channel)
       await publishCommand('vp', ['run', 'lib-build'])
-      await publishCommand('vp', ['pm', 'publish', '-r', '--no-git-checks', '--provenance'])
+      await publishCommand('vp', [
+        'pm',
+        'publish',
+        '-r',
+        '--no-git-checks',
+        '--provenance',
+        '--tag',
+        distTag,
+      ])
     },
   }
 }

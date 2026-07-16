@@ -35,7 +35,7 @@ describe('semantic-release command runner', () => {
     mocks.statuses = [0, 0]
     const { publish } = await import('./semantic-release-plugin.mts')
 
-    await publish()
+    await publish({}, { env: {}, nextRelease: { version: '3.0.0' } })
 
     expect(mocks.spawn).toHaveBeenNthCalledWith(
       1,
@@ -46,7 +46,7 @@ describe('semantic-release command runner', () => {
     expect(mocks.spawn).toHaveBeenNthCalledWith(
       2,
       'vp',
-      ['pm', 'publish', '-r', '--no-git-checks', '--provenance'],
+      ['pm', 'publish', '-r', '--no-git-checks', '--provenance', '--tag', 'latest'],
       expect.objectContaining({ stdio: 'inherit' }),
     )
   })
@@ -58,7 +58,9 @@ describe('semantic-release command runner', () => {
     mocks.statuses = [status]
     const { publish } = await import('./semantic-release-plugin.mts')
 
-    await expect(publish()).rejects.toThrow(message)
+    await expect(publish({}, { env: {}, nextRelease: { version: '3.0.0' } })).rejects.toThrow(
+      message,
+    )
     expect(mocks.spawn).toHaveBeenCalledOnce()
   })
 
@@ -66,6 +68,8 @@ describe('semantic-release command runner', () => {
     mocks.error = new Error('vp not found')
     const { publish } = await import('./semantic-release-plugin.mts')
 
-    await expect(publish()).rejects.toThrow('vp not found')
+    await expect(publish({}, { env: {}, nextRelease: { version: '3.0.0' } })).rejects.toThrow(
+      'vp not found',
+    )
   })
 })
