@@ -6,7 +6,10 @@ import fmt from './.oxfmtrc.json' with { type: 'json' }
 import lint from './.oxlintrc.json' with { type: 'json' }
 
 export default defineConfig({
-  staged: { '*': 'vp check --fix', '*.*': 'vp exec cspell --no-must-find-files' },
+  staged: {
+    '*': 'vp check --fix',
+    '*.{ts,tsx,mts,js,jsx,mjs,vue,html,md,json,yaml,toml}': 'vp exec cspell --no-must-find-files',
+  },
   fmt: fmt as OxfmtConfig,
   lint: lint as OxlintConfig,
   run: { cache: { tasks: true, scripts: false } },

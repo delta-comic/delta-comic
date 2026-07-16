@@ -15,3 +15,5 @@
 ## app侧清单
 
 - [ ] 重构且重新设计`packages/ui/src`这个组件展示页面，样式参照<https://www.naiveui.com>，可以适当阉割功能（如i18n）
+- [ ] 分析当前发布管理脚本是否会在发布时发布monorepo依赖，如`@delta-comic/ui`;不会就请补齐相关功能
+- [ ] 丰富化changelog内容，如预发布就插入粗体谨慎更新提示等
