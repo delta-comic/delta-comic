@@ -1,9 +1,10 @@
+import type { GlobalConfig } from 'semantic-release'
+
 import pkg from './package.json' with { type: 'json' }
 import { versionAssetPaths } from './script/set-version.mts'
 
 export const releaseBranches = ['main', { name: 'next', channel: 'next', prerelease: 'next' }]
 
-/** @type {import('semantic-release').GlobalConfig} */
 export default {
   branches: releaseBranches,
   repositoryUrl: pkg.repository.url,
@@ -22,4 +23,4 @@ export default {
     ],
     ['@semantic-release/github', { assets: ['dist/release/**/*'] }],
   ],
-}
+} satisfies GlobalConfig

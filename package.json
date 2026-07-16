@@ -32,7 +32,6 @@
     "release:stable": "node ./script/release-branches.mts stable",
     "release:stable:dry-run": "node ./script/release-branches.mts stable --dry-run",
     "set-ver": "node ./script/set-version.mts",
-    "tauri": "vp run --filter app tauri",
     "test": "vp test",
     "test:coverage": "vp test run --coverage",
     "typecheck": "vp run -r typecheck",
@@ -76,6 +75,6 @@
       "url": "https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg"
     }
   ],
-  "packageManager": "pnpm@11.10.0",
+  "packageManager": "pnpm@11.13.0",
   "readme": "./README.md"
 }

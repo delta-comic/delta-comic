@@ -7,12 +7,12 @@ import { DcList, DcWaterfall } from '@/index'
 
 const source = useInfiniteQuery({
   key: ['list'],
-  initialPageParam: null as any,
+  initialPageParam: null,
   getNextPageParam: () => null,
   async query() {
     await delay(20000)
 
-    return Array.from<any>({ length: 20 }).fill({})
+    return Array.from<object>({ length: 20 }).fill({ a: 1 })
   },
 })
 </script>
