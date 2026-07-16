@@ -30,10 +30,12 @@ const save = async () => {
 </script>
 
 <template>
-  <div class="dc-page settings-page">
+  <div class="admin-page settings-page max-w-[1180px]">
     <PageHeader title="设置" description="管理 Server API 连接与当前浏览器会话" />
 
-    <section class="settings-page__layout">
+    <section
+      class="settings-page__layout grid grid-cols-[minmax(0,1.25fr)_minmax(300px,0.75fr)] gap-[22px] max-[840px]:grid-cols-1"
+    >
       <NCard title="服务器连接" :bordered="true">
         <NForm label-placement="top" @submit.prevent="save">
           <NFormItem label="Server API 地址">
@@ -51,11 +53,13 @@ const save = async () => {
               autocomplete="current-password"
             />
           </NFormItem>
-          <NAlert type="info" :show-icon="false" style="margin-bottom: 1rem">
+          <NAlert class="mb-4" type="info" :show-icon="false">
             API 地址保存在 localStorage；管理员令牌只保存在当前标签页域的
             sessionStorage，关闭会话后不会长期保留。
           </NAlert>
-          <div v-if="formError" class="dc-error-banner settings-page__error">{{ formError }}</div>
+          <div v-if="formError" class="admin-error settings-page__error my-4">
+            {{ formError }}
+          </div>
           <NSpace justify="end">
             <NButton v-if="connection.adminToken" @click="connection.clearToken">
               清除会话令牌
@@ -66,7 +70,7 @@ const save = async () => {
       </NCard>
 
       <NCard title="运行时能力" :bordered="true">
-        <div class="settings-page__status">
+        <div class="settings-page__status mb-[18px]">
           <StatusMark
             :label="connection.isConnected ? '已认证' : '未认证'"
             :tone="
@@ -99,30 +103,3 @@ const save = async () => {
     </section>
   </div>
 </template>
-
-<style scoped>
-.settings-page {
-  @apply [max-width:1180px];
-  @apply [margin:0_auto];
-}
-
-.settings-page__layout {
-  @apply [display:grid];
-  @apply [grid-template-columns:minmax(0,_1.25fr)_minmax(300px,_0.75fr)];
-  @apply [gap:22px];
-}
-
-.settings-page__error {
-  @apply [margin:16px_0];
-}
-
-.settings-page__status {
-  @apply [margin-bottom:18px];
-}
-
-@media (max-width: 840px) {
-  .settings-page__layout {
-    @apply [grid-template-columns:1fr];
-  }
-}
-</style>

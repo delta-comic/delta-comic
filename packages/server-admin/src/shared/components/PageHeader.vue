@@ -3,60 +3,24 @@ defineProps<{ title: string; description?: string }>()
 </script>
 
 <template>
-  <header class="page-header">
+  <header
+    class="page-header flex min-h-[86px] items-start justify-between gap-6 max-sm:mb-[22px] max-sm:min-h-0"
+  >
     <div class="page-header__copy">
-      <h1>{{ title }}</h1>
-      <p v-if="description">{{ description }}</p>
+      <h1
+        class="text-foreground m-0 text-[clamp(26px,2.4vw,34px)] leading-[1.2] font-[720] tracking-[-0.025em] max-sm:text-[27px]"
+      >
+        {{ title }}
+      </h1>
+      <p
+        v-if="description"
+        class="text-foreground-secondary mt-2 mb-0 text-[15px] leading-[1.6] max-sm:text-sm"
+      >
+        {{ description }}
+      </p>
     </div>
-    <div v-if="$slots.actions" class="page-header__actions">
+    <div v-if="$slots.actions" class="page-header__actions flex items-center gap-2.5">
       <slot name="actions" />
     </div>
   </header>
 </template>
-
-<style scoped>
-.page-header {
-  @apply [display:flex];
-  @apply [gap:24px];
-  @apply [align-items:flex-start];
-  @apply [justify-content:space-between];
-  @apply [min-height:86px];
-}
-
-.page-header__copy h1 {
-  @apply [margin:0];
-  @apply [color:var(--dc-text)];
-  @apply [font-size:clamp(26px,_2.4vw,_34px)];
-  @apply [font-weight:720];
-  @apply [line-height:1.2];
-  @apply [letter-spacing:-0.025em];
-}
-
-.page-header__copy p {
-  @apply [margin:8px_0_0];
-  @apply [color:var(--dc-text-secondary)];
-  @apply [font-size:15px];
-  @apply [line-height:1.6];
-}
-
-.page-header__actions {
-  @apply [display:flex];
-  @apply [gap:10px];
-  @apply [align-items:center];
-}
-
-@media (max-width: 640px) {
-  .page-header {
-    @apply [min-height:0];
-    @apply [margin-bottom:22px];
-  }
-
-  .page-header__copy h1 {
-    @apply [font-size:27px];
-  }
-
-  .page-header__copy p {
-    @apply [font-size:14px];
-  }
-}
-</style>

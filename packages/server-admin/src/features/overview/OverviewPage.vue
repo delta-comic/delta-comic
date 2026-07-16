@@ -22,7 +22,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="dc-page overview-page">
+  <div class="admin-page overview-page max-w-[1600px]">
     <PageHeader title="服务总览" description="Worker、D1 与插件运行状态">
       <template #actions>
         <NButton :loading="loading" secondary @click="load">
@@ -32,7 +32,7 @@ onMounted(() => {
       </template>
     </PageHeader>
 
-    <div v-if="error" class="dc-error-banner">{{ error }}</div>
+    <div v-if="error" class="admin-error">{{ error }}</div>
     <NResult
       v-if="!connection.hasCredentials"
       status="info"
@@ -45,7 +45,9 @@ onMounted(() => {
     </NResult>
     <template v-else-if="data">
       <OverviewMetricBand :overview="data" />
-      <section class="overview-page__body dc-panel">
+      <section
+        class="overview-page__body admin-panel mt-6 grid grid-cols-[minmax(0,1fr)_360px] max-[960px]:grid-cols-1"
+      >
         <RecentActivityTable :items="data.recentActivity.items" />
         <RuntimeSummary :capabilities="connection.capabilities" :overview="data" />
       </section>
@@ -53,22 +55,3 @@ onMounted(() => {
     <NSkeleton v-else :repeat="8" text />
   </div>
 </template>
-
-<style scoped>
-.overview-page {
-  @apply [max-width:1600px];
-  @apply [margin:0_auto];
-}
-
-.overview-page__body {
-  @apply [display:grid];
-  @apply [grid-template-columns:minmax(0,_1fr)_360px];
-  @apply [margin-top:24px];
-}
-
-@media (max-width: 960px) {
-  .overview-page__body {
-    @apply [grid-template-columns:1fr];
-  }
-}
-</style>

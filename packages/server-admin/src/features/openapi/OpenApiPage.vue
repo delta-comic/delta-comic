@@ -14,13 +14,13 @@ const jsonUrl = computed(() =>
 </script>
 
 <template>
-  <div class="dc-page openapi-page">
+  <div class="admin-page openapi-page max-w-[960px]">
     <PageHeader title="OpenAPI" description="查看 Worker 当前部署版本公开的接口说明与 schema" />
     <NCard title="接口文档" :bordered="true">
       <NAlert type="info" :show-icon="false">
         文档链接不会携带管理员令牌；受保护接口仍需在请求中显式填写 Bearer token。
       </NAlert>
-      <NSpace class="openapi-page__actions">
+      <NSpace class="openapi-page__actions mt-5">
         <NButton
           tag="a"
           :href="docsUrl || undefined"
@@ -42,14 +42,3 @@ const jsonUrl = computed(() =>
     </NCard>
   </div>
 </template>
-
-<style scoped>
-.openapi-page {
-  @apply [max-width:960px];
-  @apply [margin:0_auto];
-}
-
-.openapi-page__actions {
-  @apply [margin-top:20px];
-}
-</style>

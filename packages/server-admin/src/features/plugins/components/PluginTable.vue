@@ -45,8 +45,11 @@ const actionLabel: Partial<Record<ServerPluginAction, string>> = {
 </script>
 
 <template>
-  <div class="plugin-table-wrap">
-    <table v-if="entries.length" class="plugin-table">
+  <div class="plugin-table-wrap overflow-x-auto">
+    <table
+      v-if="entries.length"
+      class="plugin-table admin-data-table [&_th]:text-foreground-secondary min-w-[980px] [&_td]:px-3.5 [&_td]:py-3 [&_th]:px-3.5 [&_th]:py-3 [&_th]:font-semibold"
+    >
       <thead>
         <tr>
           <th>插件名称</th>
@@ -62,16 +65,19 @@ const actionLabel: Partial<Record<ServerPluginAction, string>> = {
         <tr
           v-for="plugin in entries"
           :key="plugin.manifest.id"
-          :class="{ 'plugin-table__row--selected': selectedId === plugin.manifest.id }"
+          class="hover:bg-brand-soft cursor-pointer"
+          :class="[
+            selectedId === plugin.manifest.id && 'plugin-table__row--selected bg-brand-soft',
+          ]"
           @click="emit('select', plugin.manifest.id)"
         >
-          <td>
-            <strong>{{ plugin.manifest.name }}</strong>
-            <code>{{ plugin.manifest.id }}</code>
+          <td class="grid min-w-[190px] gap-1">
+            <strong class="text-foreground text-xs">{{ plugin.manifest.name }}</strong>
+            <code class="text-muted-foreground text-[10px]">{{ plugin.manifest.id }}</code>
           </td>
           <td>{{ plugin.installedVersion ?? plugin.manifest.version }}</td>
           <td>
-            <div class="plugin-table__capabilities">
+            <div class="plugin-table__capabilities flex max-w-[260px] flex-wrap gap-1">
               <NTag
                 v-for="capability in plugin.manifest.capabilities.slice(0, 3)"
                 :key="capability"
@@ -115,7 +121,7 @@ const actionLabel: Partial<Record<ServerPluginAction, string>> = {
                     : 'danger'
               "
             />
-            <span v-else class="plugin-table__muted">—</span>
+            <span v-else class="plugin-table__muted text-muted-foreground text-[10px]">—</span>
           </td>
           <td @click.stop>
             <NSpace :wrap="false" size="small">
@@ -135,66 +141,6 @@ const actionLabel: Partial<Record<ServerPluginAction, string>> = {
         </tr>
       </tbody>
     </table>
-    <div v-else class="dc-empty">没有符合当前条件的插件</div>
+    <div v-else class="admin-empty">没有符合当前条件的插件</div>
   </div>
 </template>
-
-<style scoped>
-.plugin-table-wrap {
-  @apply [overflow-x:auto];
-}
-
-.plugin-table {
-  @apply [width:100%];
-  @apply [min-width:980px];
-  @apply [border-collapse:collapse];
-  @apply [font-size:12px];
-}
-
-.plugin-table th,
-.plugin-table td {
-  @apply [padding:12px_14px];
-  @apply [text-align:left];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-.plugin-table th {
-  @apply [color:var(--dc-text-secondary)];
-  @apply [font-size:11px];
-  @apply [font-weight:600];
-  @apply [background:var(--dc-surface-soft)];
-}
-
-.plugin-table tbody tr {
-  @apply [cursor:pointer];
-}
-
-.plugin-table tbody tr:hover,
-.plugin-table__row--selected {
-  @apply [background:var(--dc-blue-soft)];
-}
-
-.plugin-table td:first-child {
-  @apply [display:grid];
-  @apply [min-width:190px];
-  @apply [gap:4px];
-}
-
-.plugin-table strong {
-  @apply [color:var(--dc-text)];
-  @apply [font-size:12px];
-}
-
-.plugin-table code,
-.plugin-table__muted {
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-size:10px];
-}
-
-.plugin-table__capabilities {
-  @apply [display:flex];
-  @apply [max-width:260px];
-  @apply [gap:4px];
-  @apply [flex-wrap:wrap];
-}
-</style>

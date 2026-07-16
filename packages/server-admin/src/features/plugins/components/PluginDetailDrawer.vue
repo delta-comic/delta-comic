@@ -98,25 +98,27 @@ const runCode = () => {
   <NDrawer v-model:show="show" :width="520" placement="right" :trap-focus="true">
     <NDrawerContent v-if="plugin" closable>
       <template #header>
-        <div class="plugin-detail__title">
+        <div class="plugin-detail__title grid gap-1">
           <strong>{{ plugin.manifest.name }}</strong>
-          <code
+          <code class="text-muted-foreground text-[10px] font-normal"
             >{{ plugin.manifest.id }} ·
             {{ plugin.installedVersion ?? plugin.manifest.version }}</code
           >
         </div>
       </template>
 
-      <section class="plugin-detail__state">
-        <div>
-          <span>期望状态</span
+      <section
+        class="plugin-detail__state border-border bg-surface-muted grid grid-cols-2 gap-4 border p-4"
+      >
+        <div class="grid gap-2">
+          <span class="text-muted-foreground text-[11px]">期望状态</span
           ><StatusMark
             :label="plugin.desiredState"
             :tone="plugin.desiredState === 'enabled' ? 'success' : 'muted'"
           />
         </div>
-        <div>
-          <span>运行状态</span
+        <div class="grid gap-2">
+          <span class="text-muted-foreground text-[11px]">运行状态</span
           ><StatusMark
             :label="plugin.observedState"
             :tone="
@@ -130,12 +132,18 @@ const runCode = () => {
         </div>
       </section>
 
-      <div class="plugin-detail__tabs">
-        <button :class="{ active: tab === 'details' }" type="button" @click="tab = 'details'">
+      <div class="plugin-detail__tabs border-border mt-[22px] flex gap-6 border-b">
+        <button
+          class="text-foreground-secondary cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-2.5 text-xs"
+          :class="[tab === 'details' && 'active border-brand text-brand']"
+          type="button"
+          @click="tab = 'details'"
+        >
           详情
         </button>
         <button
-          :class="{ active: tab === 'config' }"
+          class="text-foreground-secondary cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-2.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+          :class="[tab === 'config' && 'active border-brand text-brand']"
           type="button"
           :disabled="!plugin.installedVersion"
           @click="tab = 'config'"
@@ -143,7 +151,8 @@ const runCode = () => {
           配置
         </button>
         <button
-          :class="{ active: tab === 'code' }"
+          class="text-foreground-secondary cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-2.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+          :class="[tab === 'code' && 'active border-brand text-brand']"
           type="button"
           :disabled="!plugin.installedVersion"
           @click="tab = 'code'"
@@ -152,13 +161,15 @@ const runCode = () => {
         </button>
       </div>
 
-      <div v-if="tab === 'details'" class="plugin-detail__content">
+      <div v-if="tab === 'details'" class="plugin-detail__content grid gap-6 py-[22px]">
         <section>
-          <h3>描述</h3>
-          <p>{{ plugin.manifest.description }}</p>
+          <h3 class="mt-0 mb-2.5 text-xs">描述</h3>
+          <p class="text-foreground-secondary m-0 text-xs leading-[1.7]">
+            {{ plugin.manifest.description }}
+          </p>
         </section>
         <section>
-          <h3>能力</h3>
+          <h3 class="mt-0 mb-2.5 text-xs">能力</h3>
           <NSpace
             ><NTag
               v-for="capability in plugin.manifest.capabilities"
@@ -169,17 +180,26 @@ const runCode = () => {
           >
         </section>
         <section>
-          <h3>依赖</h3>
-          <div v-if="plugin.manifest.dependencies.length" class="plugin-detail__dependencies">
-            <div v-for="dependency in plugin.manifest.dependencies" :key="dependency.id">
-              <code>{{ dependency.id }}</code
-              ><span>{{ dependency.versionRange ?? '任意版本' }}</span>
+          <h3 class="mt-0 mb-2.5 text-xs">依赖</h3>
+          <div
+            v-if="plugin.manifest.dependencies.length"
+            class="plugin-detail__dependencies border-border border"
+          >
+            <div
+              v-for="dependency in plugin.manifest.dependencies"
+              :key="dependency.id"
+              class="border-border flex items-center justify-between border-b px-3 py-2.5 last:border-b-0"
+            >
+              <code class="text-muted-foreground text-[10px]">{{ dependency.id }}</code
+              ><span class="text-muted-foreground text-[10px]">{{
+                dependency.versionRange ?? '任意版本'
+              }}</span>
             </div>
           </div>
           <NEmpty v-else description="无插件依赖" size="small" />
         </section>
         <section>
-          <h3>最近健康</h3>
+          <h3 class="mt-0 mb-2.5 text-xs">最近健康</h3>
           <template v-if="plugin.lastHealth">
             <StatusMark
               :label="plugin.lastHealth.message"
@@ -192,14 +212,20 @@ const runCode = () => {
               "
             />
           </template>
-          <span v-else class="plugin-detail__muted">尚未执行健康检查</span>
+          <span v-else class="plugin-detail__muted text-muted-foreground text-[10px]"
+            >尚未执行健康检查</span
+          >
         </section>
         <NAlert v-if="plugin.lastError" type="error" title="最近错误">{{
           plugin.lastError
         }}</NAlert>
       </div>
 
-      <NForm v-else-if="tab === 'config'" class="plugin-detail__content" label-placement="top">
+      <NForm
+        v-else-if="tab === 'config'"
+        class="plugin-detail__content grid gap-6 py-[22px]"
+        label-placement="top"
+      >
         <NFormItem
           v-for="(field, key) in plugin.manifest.configSchema.properties"
           :key="key"
@@ -239,7 +265,7 @@ const runCode = () => {
         >
       </NForm>
 
-      <div v-else class="plugin-detail__content">
+      <div v-else class="plugin-detail__content grid gap-6 py-[22px]">
         <NAlert type="warning" title="隔离执行">
           代码在 Dynamic Worker 中运行，无网络访问，CPU 上限 50ms；计划任务最小粒度为一小时。
         </NAlert>
@@ -252,7 +278,7 @@ const runCode = () => {
               placeholder="使用 input 和只读 context，并通过 return 返回 JSON 值"
             />
           </NFormItem>
-          <div class="plugin-detail__script-grid">
+          <div class="plugin-detail__script-grid grid grid-cols-2 gap-4">
             <NFormItem label="启用计划任务">
               <NSwitch v-model:value="scriptDraft.enabled" />
             </NFormItem>
@@ -275,21 +301,22 @@ const runCode = () => {
               保存代码
             </NButton>
           </NSpace>
-          <NFormItem class="plugin-detail__run-input" label="手动运行输入（JSON）">
+          <NFormItem class="plugin-detail__run-input mt-[18px]" label="手动运行输入（JSON）">
             <NInput v-model:value="scriptDraft.input" type="textarea" :autosize="{ minRows: 3 }" />
           </NFormItem>
           <NButton :loading="scriptPending" :disabled="!script" @click="runCode">立即运行</NButton>
         </NForm>
 
         <section>
-          <h3>最近运行</h3>
+          <h3 class="mt-0 mb-2.5 text-xs">最近运行</h3>
           <NList v-if="scriptRuns?.length" bordered>
             <NListItem v-for="run in scriptRuns" :key="run.id">
               <NThing :title="`${run.trigger} · ${run.status}`">
                 <template #description>{{ new Date(run.startedAt).toLocaleString() }}</template>
-                <pre class="plugin-detail__run-result">{{
-                  run.errorMessage ?? JSON.stringify(run.result, null, 2)
-                }}</pre>
+                <pre
+                  class="plugin-detail__run-result bg-surface-muted mt-2 mb-0 overflow-auto p-2.5 text-[10px] whitespace-pre-wrap"
+                  >{{ run.errorMessage ?? JSON.stringify(run.result, null, 2) }}</pre
+                >
               </NThing>
             </NListItem>
           </NList>
@@ -333,117 +360,3 @@ const runCode = () => {
     </NDrawerContent>
   </NDrawer>
 </template>
-
-<style scoped>
-.plugin-detail__title {
-  @apply [display:grid];
-  @apply [gap:4px];
-}
-
-.plugin-detail__title code {
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-size:10px];
-  @apply [font-weight:400];
-}
-
-.plugin-detail__state {
-  @apply [display:grid];
-  @apply [grid-template-columns:1fr_1fr];
-  @apply [gap:16px];
-  @apply [padding:16px];
-  @apply [background:var(--dc-surface-soft)];
-  @apply [border:1px_solid_var(--dc-border)];
-}
-
-.plugin-detail__state > div {
-  @apply [display:grid];
-  @apply [gap:8px];
-}
-
-.plugin-detail__state > div > span {
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-size:11px];
-}
-
-.plugin-detail__tabs {
-  @apply [display:flex];
-  @apply [gap:24px];
-  @apply [margin-top:22px];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-.plugin-detail__tabs button {
-  @apply [padding:10px_2px];
-  @apply [color:var(--dc-text-secondary)];
-  @apply [font-size:12px];
-  @apply [background:transparent];
-  @apply [border:0];
-  @apply [border-bottom:2px_solid_transparent];
-  @apply [cursor:pointer];
-}
-
-.plugin-detail__tabs button.active {
-  @apply [color:var(--dc-blue)];
-  @apply [border-color:var(--dc-blue)];
-}
-
-.plugin-detail__content {
-  @apply [display:grid];
-  @apply [gap:24px];
-  @apply [padding:22px_0];
-}
-
-.plugin-detail__content h3 {
-  @apply [margin:0_0_10px];
-  @apply [font-size:12px];
-}
-
-.plugin-detail__content p {
-  @apply [margin:0];
-  @apply [color:var(--dc-text-secondary)];
-  @apply [font-size:12px];
-  @apply [line-height:1.7];
-}
-
-.plugin-detail__dependencies {
-  @apply [border:1px_solid_var(--dc-border)];
-}
-
-.plugin-detail__dependencies > div {
-  @apply [display:flex];
-  @apply [align-items:center];
-  @apply [justify-content:space-between];
-  @apply [padding:10px_12px];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-.plugin-detail__dependencies > div:last-child {
-  @apply [border-bottom:0];
-}
-
-.plugin-detail__dependencies code,
-.plugin-detail__dependencies span,
-.plugin-detail__muted {
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-size:10px];
-}
-
-.plugin-detail__script-grid {
-  @apply [display:grid];
-  @apply [grid-template-columns:1fr_1fr];
-  @apply [gap:16px];
-}
-
-.plugin-detail__run-input {
-  @apply [margin-top:18px];
-}
-
-.plugin-detail__run-result {
-  @apply [overflow:auto];
-  @apply [margin:8px_0_0];
-  @apply [padding:10px];
-  @apply [background:var(--dc-surface-soft)];
-  @apply [font-size:10px];
-  @apply [white-space:pre-wrap];
-}
-</style>

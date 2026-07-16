@@ -12,13 +12,16 @@ const formatTime = (value: number): string =>
 </script>
 
 <template>
-  <div class="plugin-activity">
-    <section class="dc-panel">
-      <header>
-        <h2>最近任务</h2>
-        <span>{{ jobs.length }} 条</span>
+  <div class="plugin-activity grid gap-5">
+    <section class="admin-panel overflow-x-auto">
+      <header class="border-border flex items-center justify-between border-b px-[18px] py-4">
+        <h2 class="m-0 text-sm">最近任务</h2>
+        <span class="text-muted-foreground text-[11px]">{{ jobs.length }} 条</span>
       </header>
-      <table v-if="jobs.length">
+      <table
+        v-if="jobs.length"
+        class="admin-data-table text-[11px] [&_code]:text-[10px] [&_td]:px-3.5 [&_td]:py-[11px] [&_th]:px-3.5 [&_th]:py-[11px]"
+      >
         <thead>
           <tr>
             <th>时间</th>
@@ -51,14 +54,17 @@ const formatTime = (value: number): string =>
           </tr>
         </tbody>
       </table>
-      <div v-else class="dc-empty">暂无插件任务</div>
+      <div v-else class="admin-empty">暂无插件任务</div>
     </section>
-    <section class="dc-panel">
-      <header>
-        <h2>审计记录</h2>
-        <span>{{ audit.length }} 条</span>
+    <section class="admin-panel overflow-x-auto">
+      <header class="border-border flex items-center justify-between border-b px-[18px] py-4">
+        <h2 class="m-0 text-sm">审计记录</h2>
+        <span class="text-muted-foreground text-[11px]">{{ audit.length }} 条</span>
       </header>
-      <table v-if="audit.length">
+      <table
+        v-if="audit.length"
+        class="admin-data-table text-[11px] [&_code]:text-[10px] [&_td]:px-3.5 [&_td]:py-[11px] [&_th]:px-3.5 [&_th]:py-[11px]"
+      >
         <thead>
           <tr>
             <th>时间</th>
@@ -85,55 +91,7 @@ const formatTime = (value: number): string =>
           </tr>
         </tbody>
       </table>
-      <div v-else class="dc-empty">暂无审计记录</div>
+      <div v-else class="admin-empty">暂无审计记录</div>
     </section>
   </div>
 </template>
-
-<style scoped>
-.plugin-activity {
-  @apply [display:grid];
-  @apply [gap:20px];
-}
-
-.plugin-activity header {
-  @apply [display:flex];
-  @apply [align-items:center];
-  @apply [justify-content:space-between];
-  @apply [padding:16px_18px];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-.plugin-activity h2 {
-  @apply [margin:0];
-  @apply [font-size:14px];
-}
-
-.plugin-activity header span {
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-size:11px];
-}
-
-.plugin-activity table {
-  @apply [width:100%];
-  @apply [border-collapse:collapse];
-  @apply [font-size:11px];
-}
-
-.plugin-activity th,
-.plugin-activity td {
-  @apply [padding:11px_14px];
-  @apply [text-align:left];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-.plugin-activity th {
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-weight:550];
-  @apply [background:var(--dc-surface-soft)];
-}
-
-.plugin-activity code {
-  @apply [font-size:10px];
-}
-</style>

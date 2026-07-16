@@ -15,28 +15,35 @@ const selected = computed(() =>
 </script>
 
 <template>
-  <div class="dc-page modules-page">
+  <div class="admin-page modules-page max-w-[1380px]">
     <PageHeader
       title="服务模块"
       description="以 Worker 运行时能力为准，不依赖 Pages 编译期静态列表"
     />
-    <div v-if="!connection.capabilities" class="dc-empty dc-panel">
+    <div v-if="!connection.capabilities" class="admin-empty admin-panel">
       <NResult status="info" title="尚未取得运行时能力" description="请先连接服务器。">
         <template #footer><NButton @click="$router.push('/settings')">打开设置</NButton></template>
       </NResult>
     </div>
-    <section v-else class="modules-page__layout dc-panel">
-      <div class="modules-page__list">
+    <section
+      v-else
+      class="modules-page__layout admin-panel grid min-h-[520px] grid-cols-[minmax(280px,0.42fr)_minmax(0,0.58fr)] max-[760px]:grid-cols-1"
+    >
+      <div
+        class="modules-page__list border-border border-r max-[760px]:border-r-0 max-[760px]:border-b"
+      >
         <RouterLink
           v-for="module in modules"
           :key="module.key"
           :to="`/modules/${module.key}`"
-          class="modules-page__row"
-          :class="{ 'modules-page__row--selected': selected?.key === module.key }"
+          class="modules-page__row border-border hover:bg-brand-soft flex items-center justify-between gap-5 border-b px-[18px] py-4"
+          :class="[selected?.key === module.key && 'modules-page__row--selected bg-brand-soft']"
         >
-          <div>
-            <strong>{{ module.name }}</strong
-            ><small>{{ module.apiPrefix }}</small>
+          <div class="grid gap-[5px]">
+            <strong class="text-[13px]">{{ module.name }}</strong
+            ><small class="text-muted-foreground font-mono text-[10px]">{{
+              module.apiPrefix
+            }}</small>
           </div>
           <StatusMark
             :label="module.runtime.available ? '可用' : '配置不完整'"
@@ -44,9 +51,11 @@ const selected = computed(() =>
           />
         </RouterLink>
       </div>
-      <article v-if="selected" class="modules-page__detail">
-        <h2>{{ selected.name }}</h2>
-        <p>{{ selected.description }}</p>
+      <article v-if="selected" class="modules-page__detail p-7">
+        <h2 class="m-0 text-[21px]">{{ selected.name }}</h2>
+        <p class="text-foreground-secondary mt-2.5 mb-6 leading-[1.7]">
+          {{ selected.description }}
+        </p>
         <NDescriptions label-placement="left" :column="1" bordered size="small">
           <NDescriptionsItem label="API Prefix"
             ><code>{{ selected.apiPrefix }}</code></NDescriptionsItem
@@ -59,79 +68,7 @@ const selected = computed(() =>
           </NDescriptionsItem>
         </NDescriptions>
       </article>
-      <div v-else class="dc-empty">选择一个模块查看运行配置</div>
+      <div v-else class="admin-empty">选择一个模块查看运行配置</div>
     </section>
   </div>
 </template>
-
-<style scoped>
-.modules-page {
-  @apply [max-width:1380px];
-  @apply [margin:0_auto];
-}
-
-.modules-page__layout {
-  @apply [display:grid];
-  @apply [grid-template-columns:minmax(280px,_0.42fr)_minmax(0,_0.58fr)];
-  @apply [min-height:520px];
-}
-
-.modules-page__list {
-  @apply [border-right:1px_solid_var(--dc-border)];
-}
-
-.modules-page__row {
-  @apply [display:flex];
-  @apply [gap:20px];
-  @apply [align-items:center];
-  @apply [justify-content:space-between];
-  @apply [padding:16px_18px];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-.modules-page__row:hover,
-.modules-page__row--selected {
-  @apply [background:var(--dc-blue-soft)];
-}
-
-.modules-page__row div {
-  @apply [display:grid];
-  @apply [gap:5px];
-}
-
-.modules-page__row strong {
-  @apply [font-size:13px];
-}
-
-.modules-page__row small {
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-family:ui-monospace,_SFMono-Regular,_Menlo,_monospace];
-  @apply [font-size:10px];
-}
-
-.modules-page__detail {
-  @apply [padding:28px];
-}
-
-.modules-page__detail h2 {
-  @apply [margin:0];
-  @apply [font-size:21px];
-}
-
-.modules-page__detail p {
-  @apply [margin:10px_0_24px];
-  @apply [color:var(--dc-text-secondary)];
-  @apply [line-height:1.7];
-}
-
-@media (max-width: 760px) {
-  .modules-page__layout {
-    @apply [grid-template-columns:1fr];
-  }
-
-  .modules-page__list {
-    @apply [border-right:0];
-    @apply [border-bottom:1px_solid_var(--dc-border)];
-  }
-}
-</style>

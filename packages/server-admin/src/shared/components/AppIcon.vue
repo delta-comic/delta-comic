@@ -6,7 +6,7 @@ defineProps<{ name: AppIconName; size?: number }>()
 
 <template>
   <svg
-    class="app-icon"
+    class="app-icon block flex-none"
     :width="size ?? 20"
     :height="size ?? 20"
     viewBox="0 0 24 24"
@@ -67,10 +67,3 @@ defineProps<{ name: AppIconName; size?: number }>()
     </template>
   </svg>
 </template>
-
-<style scoped>
-.app-icon {
-  @apply [display:block];
-  @apply [flex:none];
-}
-</style>

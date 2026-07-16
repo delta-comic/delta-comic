@@ -21,7 +21,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="dc-page observability-page">
+  <div class="admin-page observability-page max-w-[1440px]">
     <PageHeader
       title="运行指标"
       description="来自 D1 固定低基数查询的实时快照；不伪造 Worker uptime 或内存指标"
@@ -32,52 +32,72 @@ onMounted(() => {
         </NButton>
       </template>
     </PageHeader>
-    <div v-if="error" class="dc-error-banner">{{ error }}</div>
-    <section v-if="data" class="observability-page__layout">
-      <div class="dc-panel observability-page__metrics">
-        <header>
-          <h2>数据规模</h2>
-          <span>单位：count</span>
+    <div v-if="error" class="admin-error">{{ error }}</div>
+    <section
+      v-if="data"
+      class="observability-page__layout grid grid-cols-[minmax(0,1fr)_330px] gap-[22px] max-[1040px]:grid-cols-1"
+    >
+      <div class="admin-panel observability-page__metrics">
+        <header class="border-border flex items-center justify-between border-b px-5 py-[18px]">
+          <h2 class="m-0 text-[15px]">数据规模</h2>
+          <span class="text-muted-foreground text-[11px]">单位：count</span>
         </header>
-        <div class="observability-page__metric-grid">
-          <article v-for="metric in data.metrics" :key="metric.key">
-            <div>
+        <div class="observability-page__metric-grid grid grid-cols-3 max-[680px]:grid-cols-2">
+          <article
+            v-for="metric in data.metrics"
+            :key="metric.key"
+            class="border-border grid min-h-[150px] content-center border-r border-b p-5"
+          >
+            <div class="text-foreground-secondary flex items-center justify-between gap-2 text-xs">
               <span>{{ metric.label }}</span>
               <StatusMark
                 :label="metric.status === 'ok' ? '可用' : '降级'"
                 :tone="metric.status === 'ok' ? 'success' : 'warning'"
               />
             </div>
-            <strong>{{ formatNumber(metric.value) }}</strong>
-            <code>{{ metric.source.table }}</code>
+            <strong class="mt-3.5 mb-2 text-3xl font-[640]">{{
+              formatNumber(metric.value)
+            }}</strong>
+            <code class="text-muted-foreground text-[10px]">{{ metric.source.table }}</code>
           </article>
         </div>
       </div>
-      <div class="dc-panel observability-page__readiness">
-        <header><h2>就绪检查</h2></header>
-        <StatusMark
-          :label="
-            data.health.ready
-              ? '服务就绪'
-              : data.health.status === 'unhealthy'
-                ? '服务不可用'
-                : '服务降级'
-          "
-          :tone="
-            data.health.ready
-              ? 'success'
-              : data.health.status === 'unhealthy'
-                ? 'danger'
-                : 'warning'
-          "
-        />
-        <dl>
+      <div class="admin-panel observability-page__readiness self-start pb-5">
+        <header class="border-border flex items-center justify-between border-b px-5 py-[18px]">
+          <h2 class="m-0 text-[15px]">就绪检查</h2>
+        </header>
+        <div class="mx-5 mt-[18px]">
+          <StatusMark
+            :label="
+              data.health.ready
+                ? '服务就绪'
+                : data.health.status === 'unhealthy'
+                  ? '服务不可用'
+                  : '服务降级'
+            "
+            :tone="
+              data.health.ready
+                ? 'success'
+                : data.health.status === 'unhealthy'
+                  ? 'danger'
+                  : 'warning'
+            "
+          />
+        </div>
+        <dl
+          class="text-foreground-secondary mx-5 mt-[18px] grid grid-cols-[1fr_auto] gap-[11px] text-[11px]"
+        >
           <template v-for="(configured, key) in data.health.requiredSecrets" :key="key">
             <dt>{{ key }}</dt>
-            <dd>{{ configured ? '已配置' : '缺失' }}</dd>
+            <dd class="m-0">{{ configured ? '已配置' : '缺失' }}</dd>
           </template>
         </dl>
-        <NAlert v-if="data.health.issues.length" type="warning" title="需要处理">
+        <NAlert
+          v-if="data.health.issues.length"
+          class="mx-5 mt-[18px]"
+          type="warning"
+          title="需要处理"
+        >
           {{ data.health.issues.join(' · ') }}
         </NAlert>
       </div>
@@ -85,101 +105,3 @@ onMounted(() => {
     <NSkeleton v-else :repeat="10" text />
   </div>
 </template>
-
-<style scoped>
-.observability-page {
-  @apply [max-width:1440px];
-  @apply [margin:0_auto];
-}
-
-.observability-page__layout {
-  @apply [display:grid];
-  @apply [grid-template-columns:minmax(0,_1fr)_330px];
-  @apply [gap:22px];
-}
-
-.observability-page header {
-  @apply [display:flex];
-  @apply [align-items:center];
-  @apply [justify-content:space-between];
-  @apply [padding:18px_20px];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-.observability-page h2 {
-  @apply [margin:0];
-  @apply [font-size:15px];
-}
-
-.observability-page header span {
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-size:11px];
-}
-
-.observability-page__metric-grid {
-  @apply [display:grid];
-  @apply [grid-template-columns:repeat(3,_minmax(0,_1fr))];
-}
-
-.observability-page__metric-grid article {
-  @apply [display:grid];
-  @apply [min-height:150px];
-  @apply [align-content:center];
-  @apply [padding:20px];
-  @apply [border-right:1px_solid_var(--dc-border)];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-.observability-page__metric-grid article > div {
-  @apply [display:flex];
-  @apply [gap:8px];
-  @apply [align-items:center];
-  @apply [justify-content:space-between];
-  @apply [color:var(--dc-text-secondary)];
-  @apply [font-size:12px];
-}
-
-.observability-page__metric-grid strong {
-  @apply [margin:14px_0_8px];
-  @apply [font-size:30px];
-  @apply [font-weight:640];
-}
-
-.observability-page__metric-grid code {
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-size:10px];
-}
-
-.observability-page__readiness {
-  @apply [align-self:start];
-  @apply [padding-bottom:20px];
-}
-
-.observability-page__readiness > :not(header) {
-  @apply [margin:18px_20px_0];
-}
-
-.observability-page__readiness dl {
-  @apply [display:grid];
-  @apply [grid-template-columns:1fr_auto];
-  @apply [gap:11px];
-  @apply [color:var(--dc-text-secondary)];
-  @apply [font-size:11px];
-}
-
-.observability-page__readiness dd {
-  @apply [margin:0];
-}
-
-@media (max-width: 1040px) {
-  .observability-page__layout {
-    @apply [grid-template-columns:1fr];
-  }
-}
-
-@media (max-width: 680px) {
-  .observability-page__metric-grid {
-    @apply [grid-template-columns:1fr_1fr];
-  }
-}
-</style>

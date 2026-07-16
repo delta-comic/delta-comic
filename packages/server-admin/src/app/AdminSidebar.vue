@@ -9,18 +9,34 @@ const emit = defineEmits<{ close: []; navigate: [path: string] }>()
 </script>
 
 <template>
-  <aside class="admin-sidebar" :class="{ 'admin-sidebar--open': open }">
-    <button class="admin-sidebar__brand" type="button" @click="emit('navigate', '/')">
-      <span class="admin-sidebar__mark" aria-hidden="true">Δ</span>
+  <aside
+    class="admin-sidebar w-sidebar border-border bg-navigation fixed inset-y-0 left-0 z-30 flex flex-col border-r transition-transform duration-180 ease-out max-[860px]:transition-transform"
+    :class="[
+      open ? 'admin-sidebar--open max-[860px]:translate-x-0' : 'max-[860px]:-translate-x-full',
+    ]"
+  >
+    <button
+      class="admin-sidebar__brand h-header text-foreground flex cursor-pointer items-center gap-2.5 border-0 bg-transparent px-5 text-[15px] font-[680]"
+      type="button"
+      @click="emit('navigate', '/')"
+    >
+      <span
+        class="admin-sidebar__mark rounded-panel bg-brand grid size-7 place-items-center text-[17px] text-white"
+        aria-hidden="true"
+        >Δ</span
+      >
       <span>Delta Comic Server</span>
     </button>
 
-    <nav class="admin-sidebar__nav" aria-label="管理功能">
+    <nav class="admin-sidebar__nav grid gap-1 px-2.5 py-5" aria-label="管理功能">
       <button
         v-for="item in items"
         :key="item.path"
-        class="admin-sidebar__item"
-        :class="{ 'admin-sidebar__item--selected': selectedPath === item.path }"
+        class="admin-sidebar__item rounded-panel text-foreground-secondary hover:bg-surface-muted hover:text-brand relative flex min-h-11 cursor-pointer items-center gap-3.5 border-0 bg-transparent px-3.5 text-left text-sm before:absolute before:inset-y-2 before:-left-2.5 before:w-[3px] before:content-['']"
+        :class="[
+          selectedPath === item.path &&
+            'admin-sidebar__item--selected bg-brand-soft text-brand before:bg-brand font-[630]',
+        ]"
         type="button"
         @click="emit('navigate', item.path)"
       >
@@ -29,141 +45,21 @@ const emit = defineEmits<{ close: []; navigate: [path: string] }>()
       </button>
     </nav>
 
-    <div class="admin-sidebar__footer">
-      <span class="admin-sidebar__status-dot" aria-hidden="true"></span>
+    <div
+      class="admin-sidebar__footer border-border text-muted-foreground mt-auto flex items-center gap-2.5 border-t px-[22px] py-[18px] text-xs"
+    >
+      <span
+        class="admin-sidebar__status-dot bg-success size-2 rounded-[1px]"
+        aria-hidden="true"
+      ></span>
       <span>Worker 控制面</span>
     </div>
   </aside>
   <button
     v-if="open"
-    class="admin-sidebar__scrim"
+    class="admin-sidebar__scrim fixed inset-0 z-20 hidden border-0 bg-[rgb(20_29_43/35%)] max-[860px]:block"
     type="button"
     aria-label="关闭导航"
     @click="emit('close')"
   ></button>
 </template>
-
-<style scoped>
-.admin-sidebar {
-  @apply [position:fixed];
-  @apply [z-index:30];
-  @apply [top:0];
-  @apply [bottom:0];
-  @apply [left:0];
-  @apply [display:flex];
-  @apply [width:var(--dc-sidebar-width)];
-  @apply [flex-direction:column];
-  @apply [background:var(--dc-sidebar)];
-  @apply [border-right:1px_solid_var(--dc-border)];
-}
-
-.admin-sidebar__brand {
-  @apply [display:flex];
-  @apply [height:var(--dc-header-height)];
-  @apply [gap:10px];
-  @apply [align-items:center];
-  @apply [padding:0_20px];
-  @apply [color:var(--dc-text)];
-  @apply [font-size:15px];
-  @apply [font-weight:680];
-  @apply [background:transparent];
-  @apply [border:0];
-  @apply [cursor:pointer];
-}
-
-.admin-sidebar__mark {
-  @apply [display:grid];
-  @apply [width:28px];
-  @apply [height:28px];
-  @apply [color:#fff];
-  @apply [font-size:17px];
-  @apply [background:var(--dc-blue)];
-  @apply [border-radius:5px];
-  @apply [place-items:center];
-}
-
-.admin-sidebar__nav {
-  @apply [display:grid];
-  @apply [gap:4px];
-  @apply [padding:20px_10px];
-}
-
-.admin-sidebar__item {
-  @apply [position:relative];
-  @apply [display:flex];
-  @apply [min-height:44px];
-  @apply [gap:14px];
-  @apply [align-items:center];
-  @apply [padding:0_14px];
-  @apply [color:var(--dc-text-secondary)];
-  @apply [font-size:14px];
-  @apply [text-align:left];
-  @apply [background:transparent];
-  @apply [border:0];
-  @apply [border-radius:5px];
-  @apply [cursor:pointer];
-}
-
-.admin-sidebar__item:hover {
-  @apply [color:var(--dc-blue)];
-  @apply [background:var(--dc-surface-soft)];
-}
-
-.admin-sidebar__item--selected {
-  @apply [color:var(--dc-blue)];
-  @apply [font-weight:630];
-  @apply [background:var(--dc-blue-soft)];
-}
-
-.admin-sidebar__item--selected::before {
-  @apply [position:absolute];
-  @apply [top:8px];
-  @apply [bottom:8px];
-  @apply [left:-10px];
-  @apply [width:3px];
-  @apply [background:var(--dc-blue)];
-  content: '';
-}
-
-.admin-sidebar__footer {
-  @apply [display:flex];
-  @apply [gap:9px];
-  @apply [align-items:center];
-  @apply [margin-top:auto];
-  @apply [padding:18px_22px];
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-size:12px];
-  @apply [border-top:1px_solid_var(--dc-border)];
-}
-
-.admin-sidebar__status-dot {
-  @apply [width:8px];
-  @apply [height:8px];
-  @apply [background:var(--dc-green)];
-  @apply [border-radius:1px];
-}
-
-.admin-sidebar__scrim {
-  @apply [display:none];
-}
-
-@media (max-width: 860px) {
-  .admin-sidebar {
-    @apply [transform:translateX(-100%)];
-    @apply [transition:transform_180ms_ease];
-  }
-
-  .admin-sidebar--open {
-    @apply [transform:translateX(0)];
-  }
-
-  .admin-sidebar__scrim {
-    @apply [position:fixed];
-    @apply [z-index:20];
-    @apply [inset:0];
-    @apply [display:block];
-    @apply [background:rgb(20_29_43_/_35%)];
-    @apply [border:0];
-  }
-}
-</style>

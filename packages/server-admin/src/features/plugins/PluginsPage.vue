@@ -116,7 +116,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="dc-page plugins-page">
+  <div class="admin-page plugins-page max-w-[1600px]">
     <PageHeader title="插件中心" description="统一管理注册、安装、配置与运行状态">
       <template #actions>
         <NButton :loading="loading" secondary @click="load">
@@ -125,19 +125,34 @@ onMounted(() => {
       </template>
     </PageHeader>
 
-    <div class="plugins-page__tabs" role="tablist">
-      <button type="button" :class="{ active: tab === 'available' }" @click="tab = 'available'">
+    <div class="plugins-page__tabs border-border mb-5 flex gap-[26px] border-b" role="tablist">
+      <button
+        class="text-foreground-secondary cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-[11px] text-[13px]"
+        type="button"
+        :class="[tab === 'available' && 'active border-brand text-brand font-[620]']"
+        @click="tab = 'available'"
+      >
         可注册
       </button>
-      <button type="button" :class="{ active: tab === 'installed' }" @click="tab = 'installed'">
+      <button
+        class="text-foreground-secondary cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-[11px] text-[13px]"
+        type="button"
+        :class="[tab === 'installed' && 'active border-brand text-brand font-[620]']"
+        @click="tab = 'installed'"
+      >
         已安装
       </button>
-      <button type="button" :class="{ active: tab === 'activity' }" @click="tab = 'activity'">
+      <button
+        class="text-foreground-secondary cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-[11px] text-[13px]"
+        type="button"
+        :class="[tab === 'activity' && 'active border-brand text-brand font-[620]']"
+        @click="tab = 'activity'"
+      >
         任务与审计
       </button>
     </div>
 
-    <div v-if="error" class="dc-error-banner plugins-page__error">{{ error }}</div>
+    <div v-if="error" class="admin-error plugins-page__error mb-4">{{ error }}</div>
     <NResult
       v-if="!connection.hasCredentials"
       status="info"
@@ -154,8 +169,10 @@ onMounted(() => {
       :audit="snapshot?.recentAudit ?? []"
       :jobs="snapshot?.recentJobs ?? []"
     />
-    <section v-else class="dc-panel plugins-page__panel">
-      <div class="plugins-page__filters">
+    <section v-else class="admin-panel plugins-page__panel">
+      <div
+        class="plugins-page__filters border-border grid grid-cols-[minmax(240px,360px)_160px] gap-3 border-b p-4 max-sm:grid-cols-1"
+      >
         <NInput v-model:value="search" clearable placeholder="搜索插件">
           <template #prefix><AppIcon name="search" :size="16" /></template>
         </NInput>
@@ -199,51 +216,3 @@ onMounted(() => {
     />
   </div>
 </template>
-
-<style scoped>
-.plugins-page {
-  @apply [max-width:1600px];
-  @apply [margin:0_auto];
-}
-
-.plugins-page__tabs {
-  @apply [display:flex];
-  @apply [gap:26px];
-  @apply [margin-bottom:20px];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-.plugins-page__tabs button {
-  @apply [padding:11px_2px];
-  @apply [color:var(--dc-text-secondary)];
-  @apply [font-size:13px];
-  @apply [background:transparent];
-  @apply [border:0];
-  @apply [border-bottom:2px_solid_transparent];
-  @apply [cursor:pointer];
-}
-
-.plugins-page__tabs button.active {
-  @apply [color:var(--dc-blue)];
-  @apply [font-weight:620];
-  @apply [border-color:var(--dc-blue)];
-}
-
-.plugins-page__error {
-  @apply [margin-bottom:16px];
-}
-
-.plugins-page__filters {
-  @apply [display:grid];
-  @apply [grid-template-columns:minmax(240px,_360px)_160px];
-  @apply [gap:12px];
-  @apply [padding:16px];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-@media (max-width: 640px) {
-  .plugins-page__filters {
-    @apply [grid-template-columns:1fr];
-  }
-}
-</style>

@@ -31,7 +31,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="admin-shell">
+  <div class="admin-shell bg-surface text-foreground relative h-full">
     <AdminSidebar
       :items="featureNavigation"
       :open="navigationOpen"
@@ -39,42 +39,18 @@ onMounted(() => {
       @close="navigationOpen = false"
       @navigate="navigate"
     />
-    <div class="admin-shell__workspace">
+    <div
+      class="admin-shell__workspace ml-sidebar max-h-full min-w-0 overflow-y-auto max-[860px]:ml-0"
+    >
       <AdminTopbar
         :api-base-url="connection.apiBaseUrl"
         :connection-status="connection.status"
         @menu="navigationOpen = true"
         @open-settings="navigate('/settings')"
       />
-      <main class="admin-shell__main">
+      <main class="admin-shell__main min-w-0">
         <RouterView />
       </main>
     </div>
   </div>
 </template>
-
-<style scoped>
-.admin-shell {
-  @apply [height:100%];
-  @apply [color:var(--dc-text)];
-  @apply [background:var(--dc-surface)];
-  @apply [position:relative];
-}
-
-.admin-shell__workspace {
-  @apply [min-width:0];
-  @apply [max-height:100%];
-  @apply [margin-left:var(--dc-sidebar-width)];
-  @apply [overflow-y:auto];
-}
-
-.admin-shell__main {
-  @apply [min-width:0];
-}
-
-@media (max-width: 860px) {
-  .admin-shell__workspace {
-    @apply [margin-left:0];
-  }
-}
-</style>

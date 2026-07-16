@@ -1,54 +1,26 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import type { StatusTone } from './types'
 
-withDefaults(defineProps<{ label: string; tone?: StatusTone }>(), { tone: 'muted' })
+const props = withDefaults(defineProps<{ label: string; tone?: StatusTone }>(), { tone: 'muted' })
+
+const toneClasses: Record<StatusTone, { dot: string; text: string }> = {
+  danger: { dot: 'bg-danger', text: 'text-danger-foreground' },
+  muted: { dot: 'bg-status-muted', text: 'text-foreground-secondary' },
+  success: { dot: 'bg-success', text: 'text-success-foreground' },
+  warning: { dot: 'bg-warning', text: 'text-warning-foreground' },
+}
+
+const classes = computed(() => toneClasses[props.tone])
 </script>
 
 <template>
-  <span class="status-mark" :class="`status-mark--${tone}`">
-    <span class="status-mark__dot" aria-hidden="true"></span>
+  <span
+    class="status-mark inline-flex items-center gap-2 text-[13px] whitespace-nowrap"
+    :class="[`status-mark--${tone}`, classes.text]"
+  >
+    <span class="status-mark__dot size-2 rounded-[1px]" :class="classes.dot" aria-hidden="true" />
     <span>{{ label }}</span>
   </span>
 </template>
-
-<style scoped>
-.status-mark {
-  @apply [display:inline-flex];
-  @apply [gap:8px];
-  @apply [align-items:center];
-  @apply [color:var(--dc-text-secondary)];
-  @apply [font-size:13px];
-  @apply [white-space:nowrap];
-}
-
-.status-mark__dot {
-  @apply [width:8px];
-  @apply [height:8px];
-  @apply [background:var(--dc-status-muted)];
-  @apply [border-radius:1px];
-}
-
-.status-mark--success .status-mark__dot {
-  @apply [background:var(--dc-green)];
-}
-
-.status-mark--warning .status-mark__dot {
-  @apply [background:var(--dc-amber)];
-}
-
-.status-mark--danger .status-mark__dot {
-  @apply [background:var(--dc-red)];
-}
-
-.status-mark--success {
-  @apply [color:var(--dc-green-text)];
-}
-
-.status-mark--warning {
-  @apply [color:var(--dc-amber-text)];
-}
-
-.status-mark--danger {
-  @apply [color:var(--dc-red-text)];
-}
-</style>

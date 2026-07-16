@@ -22,98 +22,35 @@ const formatValue = (value: number): string => new Intl.NumberFormat('zh-CN').fo
 </script>
 
 <template>
-  <section class="metric-band" aria-label="服务关键指标">
-    <div class="metric-band__item metric-band__health">
-      <span class="metric-band__label">服务状态</span>
-      <strong>{{ healthLabel }}</strong>
+  <section
+    class="metric-band border-border grid grid-cols-6 border-y max-[1180px]:grid-cols-3 max-sm:grid-cols-2"
+    aria-label="服务关键指标"
+  >
+    <div
+      class="metric-band__item metric-band__health border-border grid min-h-[116px] content-center border-r px-6 py-[18px] max-[1180px]:border-b max-sm:min-h-[104px] max-sm:border-b max-sm:px-4 max-sm:py-4 max-sm:odd:border-r max-sm:even:border-r-0"
+    >
+      <span class="metric-band__label text-foreground-secondary text-xs">服务状态</span>
+      <strong class="text-success my-2 text-[25px] leading-none font-[650]">{{
+        healthLabel
+      }}</strong>
       <StatusMark
         :label="overview.health.database.status === 'healthy' ? 'D1 可用' : 'D1 异常'"
         :tone="healthTone"
       />
     </div>
-    <div v-for="metric in visibleMetrics" :key="metric.key" class="metric-band__item">
-      <span class="metric-band__label">{{ metric.label }}</span>
-      <strong>{{ formatValue(metric.value) }}</strong>
-      <span class="metric-band__source">{{ metric.source.table }}</span>
+    <div
+      v-for="metric in visibleMetrics"
+      :key="metric.key"
+      class="metric-band__item border-border grid min-h-[116px] content-center border-r px-6 py-[18px] last:border-r-0 max-sm:min-h-[104px] max-sm:border-r max-sm:border-b max-sm:px-4 max-sm:py-4 max-sm:odd:border-r max-sm:even:border-r-0 max-[1180px]:[&:nth-child(-n+3)]:border-b max-[1180px]:[&:nth-child(3n)]:border-r-0"
+    >
+      <span class="metric-band__label text-foreground-secondary text-xs">{{ metric.label }}</span>
+      <strong class="text-foreground my-2 text-[25px] leading-none font-[650]">{{
+        formatValue(metric.value)
+      }}</strong>
+      <span
+        class="metric-band__source text-muted-foreground overflow-hidden font-mono text-[10px] text-ellipsis whitespace-nowrap"
+        >{{ metric.source.table }}</span
+      >
     </div>
   </section>
 </template>
-
-<style scoped>
-.metric-band {
-  @apply [display:grid];
-  @apply [grid-template-columns:repeat(6,_minmax(135px,_1fr))];
-  @apply [border-top:1px_solid_var(--dc-border)];
-  @apply [border-bottom:1px_solid_var(--dc-border)];
-}
-
-.metric-band__item {
-  @apply [display:grid];
-  @apply [min-height:116px];
-  @apply [align-content:center];
-  @apply [padding:18px_24px];
-  @apply [border-right:1px_solid_var(--dc-border)];
-}
-
-.metric-band__item:last-child {
-  @apply [border-right:0];
-}
-
-.metric-band__label {
-  @apply [color:var(--dc-text-secondary)];
-  @apply [font-size:12px];
-}
-
-.metric-band strong {
-  @apply [margin:8px_0_5px];
-  @apply [color:var(--dc-text)];
-  @apply [font-size:25px];
-  @apply [font-weight:650];
-  @apply [line-height:1];
-}
-
-.metric-band__health strong {
-  @apply [color:var(--dc-green)];
-}
-
-.metric-band__source {
-  @apply [overflow:hidden];
-  @apply [color:var(--dc-text-muted)];
-  @apply [font-family:ui-monospace,_SFMono-Regular,_Menlo,_monospace];
-  @apply [font-size:10px];
-  @apply [text-overflow:ellipsis];
-  @apply [white-space:nowrap];
-}
-
-@media (max-width: 1180px) {
-  .metric-band {
-    @apply [grid-template-columns:repeat(3,_minmax(150px,_1fr))];
-  }
-
-  .metric-band__item:nth-child(3n) {
-    @apply [border-right:0];
-  }
-
-  .metric-band__item:nth-child(-n + 3) {
-    @apply [border-bottom:1px_solid_var(--dc-border)];
-  }
-}
-
-@media (max-width: 640px) {
-  .metric-band {
-    @apply [grid-template-columns:repeat(2,_minmax(0,_1fr))];
-  }
-
-  .metric-band__item,
-  .metric-band__item:nth-child(3n) {
-    @apply [min-height:104px];
-    @apply [padding:16px];
-    @apply [border-right:1px_solid_var(--dc-border)];
-    @apply [border-bottom:1px_solid_var(--dc-border)];
-  }
-
-  .metric-band__item:nth-child(even) {
-    @apply [border-right:0];
-  }
-}
-</style>
