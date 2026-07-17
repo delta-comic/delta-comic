@@ -33,7 +33,7 @@ workspace = true
 
 [dependencies.tauri]
 workspace = true
-features = ["protocol-asset", "custom-protocol"]
+features = ["protocol-asset"]
 
 [dependencies.tauri-plugin-aptabase]
 workspace = true
