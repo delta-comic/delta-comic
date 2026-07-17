@@ -29,7 +29,14 @@ const archive = {
   installInput: '',
   installerName: '',
   loaderName: 'test',
-  meta: { name: { id: 'fixture' } },
+  meta: {
+    author: 'Delta Comic',
+    description: 'Fixture plugin',
+    icon: 'assets/icon.png',
+    name: { display: 'Fixture', id: 'fixture' },
+    require: [],
+    version: { plugin: '1.0.0', supportCore: '*' },
+  },
   pluginName: 'fixture',
 } as PluginArchiveDB.Archive
 

@@ -65,6 +65,7 @@ const meta = (
   ({
     author: 'test',
     description: 'installer fixture',
+    icon: 'assets/icon.png',
     name: { display: `Display ${id}`, id },
     require,
     version: { plugin: '1.0.0', supportCore: '*' },
@@ -135,6 +136,7 @@ describe('plugin installation orchestration', () => {
         installInput: 'gh:owner/repo',
         installerName: 'direct',
         loaderName: 'zip',
+        meta: expect.objectContaining({ icon: 'assets/icon.png' }),
         pluginName: 'fixture',
       }),
     ])

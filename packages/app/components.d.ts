@@ -74,6 +74,7 @@ declare module 'vue' {
     NTag: typeof import('naive-ui')['NTag']
     NText: typeof import('naive-ui')['NText']
     Plugin: typeof import('./src/components/plugin/index.vue')['default']
+    PluginIcon: typeof import('./src/components/plugin/PluginIcon.vue')['default']
     PluginMarketplaceCard: typeof import('./src/components/plugin/marketplace/PluginMarketplaceCard.vue')['default']
     PluginMarketplaceContainer: typeof import('./src/components/plugin/marketplace/PluginMarketplaceContainer.vue')['default']
     PluginMarketplaceDetails: typeof import('./src/components/plugin/marketplace/PluginMarketplaceDetails.vue')['default']

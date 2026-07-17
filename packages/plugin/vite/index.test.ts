@@ -11,6 +11,7 @@ const meta: PluginArchiveDB.Meta = {
   version: { plugin: '1.0.0', supportCore: '1.0.0' },
   author: 'delta',
   description: 'test plugin',
+  icon: 'assets/icon.svg',
   require: [],
   entry: { jsPath: 'index.mjs', cssPath: 'index.css' },
 }
@@ -129,6 +130,7 @@ describe('deltaComic vite plugin', () => {
     const bundle = {
       'index.mjs': { type: 'chunk', fileName: 'index.mjs', code: 'export default 1' },
       'index.css': { type: 'asset', fileName: 'index.css', source: 'body{}' },
+      'assets/icon.svg': { type: 'asset', fileName: 'assets/icon.svg', source: '<svg></svg>' },
     } satisfies TestOutputBundle
     const context: TestPluginContext = {
       emitFile(file) {
@@ -151,5 +153,6 @@ describe('deltaComic vite plugin', () => {
     await expect(zip.file('manifest.json')?.async('string')).resolves.toBe(manifest)
     await expect(zip.file('index.mjs')?.async('string')).resolves.toBe('export default 1')
     await expect(zip.file('index.css')?.async('string')).resolves.toBe('body{}')
+    await expect(zip.file('assets/icon.svg')?.async('string')).resolves.toBe('<svg></svg>')
   })
 })

@@ -4,6 +4,7 @@ import { NAlert, NButton, NModal, NTag } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import type { PluginMarketplaceItem } from '@/features/pluginMarketplace/model'
 
 const props = defineProps<{ item?: PluginMarketplaceItem }>()
@@ -40,9 +41,17 @@ const canInstall = computed(
     :bordered="false"
   >
     <div v-if="item" class="grid gap-4">
-      <p class="m-0 text-(--nui-text-color-2)">
-        {{ item.manifest?.description ?? t('plugin.market.noDescription') }}
-      </p>
+      <div class="flex items-center gap-4">
+        <PluginIcon
+          :icon="item.installed?.meta.icon ?? item.manifest?.icon"
+          :name="title ?? item.listing.id"
+          :plugin-id="item.installed?.pluginName"
+          size="large"
+        />
+        <p class="m-0 text-(--nui-text-color-2)">
+          {{ item.manifest?.description ?? t('plugin.market.noDescription') }}
+        </p>
+      </div>
       <dl
         class="m-0 grid grid-cols-2 gap-3 *:min-w-0 *:rounded-[10px] *:bg-[color-mix(in_srgb,var(--dc-surface)_88%,var(--nui-primary-color))] *:p-2.5 max-[520px]:grid-cols-1 [&_dd]:mt-1 [&_dd]:mb-0 [&_dd]:[overflow-wrap:anywhere] [&_dt]:text-xs [&_dt]:text-(--nui-text-color-3)"
       >

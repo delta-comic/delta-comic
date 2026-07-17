@@ -6,6 +6,7 @@ const manifest = {
   author: 'delta-comic',
   description: 'A plugin bundled by the Delta Comic Vite plugin',
   entry: { cssPath: 'index.css', jsPath: 'index.mjs' },
+  icon: 'assets/icon.png',
   name: { display: 'Marketplace Test', id: 'marketplace-test' },
   require: [{ download: 'ap:layout', id: 'layout' }],
   version: { plugin: '1.2.3', supportCore: '^2.3.0' },
@@ -49,6 +50,14 @@ describe('Delta Comic plugin manifest', () => {
   })
 
   it.each([
+    ['local archive path', 'images/icon.svg?theme=dark'],
+    ['remote HTTPS URL', 'https://cdn.example.test/plugin/icon.webp'],
+    ['remote HTTP URL', 'http://localhost:4173/icon.png'],
+  ])('preserves a valid %s icon', (_case, icon) => {
+    expect(parsePluginManifest({ ...manifest, icon })).toMatchObject({ icon })
+  })
+
+  it.each([
     ['array manifest', [], 'manifest must be an object'],
     ['unsafe dot id', { ...manifest, name: { ...manifest.name, id: '..' } }, 'unsafe path segment'],
     [
@@ -82,6 +91,29 @@ describe('Delta Comic plugin manifest', () => {
       { ...manifest, entry: { cssPath: '..\\index.css', jsPath: 'index.mjs' } },
       'manifest.entry.cssPath must be a safe relative path',
     ],
+    ['empty icon', { ...manifest, icon: '   ' }, 'manifest.icon must be a non-empty string'],
+    ['non-string icon', { ...manifest, icon: 42 }, 'manifest.icon must be a non-empty string'],
+    [
+      'icon traversal',
+      { ...manifest, icon: 'images/%2e%2e/private.png' },
+      'manifest.icon must be a safe relative path',
+    ],
+    [
+      'encoded Windows traversal',
+      { ...manifest, icon: 'images/%2e%2e%5c' + 'private.png' },
+      'manifest.icon must be a safe relative path',
+    ],
+    [
+      'encoded Windows drive path',
+      { ...manifest, icon: 'C%3A%5c' + 'private.png' },
+      'manifest.icon must be a safe relative path',
+    ],
+    [
+      'credentialed icon',
+      { ...manifest, icon: 'https://token@example.com/icon.png' },
+      'credential-free HTTP(S)',
+    ],
+    ['local file icon', { ...manifest, icon: 'file:///tmp/icon.png' }, 'credential-free HTTP(S)'],
     [
       'invalid kind',
       { ...manifest, kind: 'system' },

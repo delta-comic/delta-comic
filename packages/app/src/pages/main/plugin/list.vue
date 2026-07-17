@@ -7,6 +7,7 @@ import semver from 'semver'
 import { shallowReactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import { Icons } from '@/icons'
 
 import pkg from '../../../../package.json'
@@ -104,12 +105,24 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
         <NCard
           v-for="plugin of query"
           :key="plugin.pluginName"
-          :title="translatePluginText(plugin.meta.name.display ?? plugin.pluginName)"
           header-class="pt-1! pb-0! px-3!"
           content-class="pb-1! px-3!"
           :class="[getCardClass(plugin)]"
           class="mx-auto mt-1 w-[calc(100%-6px)]! duration-100!"
         >
+          <template #header>
+            <div class="flex min-w-0 items-center gap-2.5">
+              <PluginIcon
+                :icon="plugin.meta.icon"
+                :name="translatePluginText(plugin.meta.name.display ?? plugin.pluginName)"
+                :plugin-id="plugin.pluginName"
+                size="small"
+              />
+              <span class="dc-ellipsis">
+                {{ translatePluginText(plugin.meta.name.display ?? plugin.pluginName) }}
+              </span>
+            </div>
+          </template>
           <template #header-extra>
             <!-- n-base-select-menu__empty -->
             <NTag

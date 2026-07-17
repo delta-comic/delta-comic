@@ -1,7 +1,17 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import type { AwesomeMarketplaceEntry, PrebootRecovery } from '@delta-comic/plugin'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vite-plus/test'
+
+const pluginMocks = vi.hoisted(() => ({
+  resolvePluginIconUrl: vi.fn(async (pluginId: string | undefined, icon: string | undefined) => {
+    if (!icon || /^https?:/i.test(icon)) return icon
+    if (!pluginId) throw new Error('missing plugin id')
+    return `blob:${pluginId}/${icon}`
+  }),
+}))
+
+vi.mock('@delta-comic/plugin', () => ({ resolvePluginIconUrl: pluginMocks.resolvePluginIconUrl }))
 
 await vi.hoisted(async () => {
   const vueRuntimePath = '../../../../node_modules/vue/dist/vue.esm-bundler.js'
@@ -132,6 +142,7 @@ const marketplaceItem = (overrides: Partial<PluginMarketplaceItem> = {}): Plugin
     manifest: {
       author: 'Delta Comic',
       description: 'Reads comics',
+      icon: 'https://cdn.example.test/reader.png',
       name: { display: 'Reader', id: 'reader' },
       require: [],
       version: { plugin: '2.0.0', supportCore: '^2.3.0' },
@@ -176,12 +187,37 @@ describe('PluginMarketplaceCard', () => {
     expect(wrapper.text()).toContain('Reader')
     expect(wrapper.text()).toContain('Reads comics')
     expect(wrapper.text()).toContain('plugin.market.compatibility.compatible')
+    await flushPromises()
+    expect(wrapper.get('img').attributes('src')).toBe('https://cdn.example.test/reader.png')
     expect(buttons[1].attributes('disabled')).toBeUndefined()
     await buttons[0].trigger('click')
     await buttons[1].trigger('click')
 
     expect(wrapper.emitted('details')).toEqual([[]])
     expect(wrapper.emitted('install')).toEqual([[]])
+  })
+
+  it('falls back to the plugin initial when its icon cannot load', async () => {
+    const wrapper = mount(PluginMarketplaceCard, {
+      props: { installing: false, item: marketplaceItem() },
+    })
+    await flushPromises()
+
+    await wrapper.get('img').trigger('error')
+
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.get('.plugin-icon').text()).toBe('R')
+  })
+
+  it('resolves an installed plugin icon from its local archive path', async () => {
+    const item = marketplaceItem()
+    item.manifest!.icon = 'assets/icon.png'
+    item.installed = { meta: item.manifest, pluginName: 'reader' } as PluginArchiveDB.Archive
+    const wrapper = mount(PluginMarketplaceCard, { props: { installing: false, item } })
+    await flushPromises()
+
+    expect(wrapper.get('img').attributes('src')).toBe('blob:reader/assets/icon.png')
+    expect(pluginMocks.resolvePluginIconUrl).toHaveBeenCalledWith('reader', 'assets/icon.png')
   })
 
   it('disables current or incompatible installs and exposes update progress', () => {

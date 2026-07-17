@@ -25,6 +25,75 @@ const optionalPath = (value: unknown, path: string) => {
   return text
 }
 
+export type PluginIconReference =
+  | { type: 'local'; path: string; fragment: string }
+  | { type: 'remote'; url: string }
+
+const decodeLocalIconPath = (value: string, path: string) => {
+  let decoded = value
+  for (let index = 0; index < 5; index += 1) {
+    let next: string
+    try {
+      next = decodeURIComponent(decoded)
+    } catch {
+      throw new PluginManifestError(`${path} must be a valid URL path`)
+    }
+    if (next === decoded) break
+    decoded = next
+  }
+
+  const normalized = decoded.replaceAll('\\', '/')
+  const segments = normalized.split('/')
+  if (
+    !normalized ||
+    normalized.startsWith('/') ||
+    /^[a-z]:($|\/)/i.test(normalized) ||
+    normalized.includes('\0') ||
+    segments.some(segment => segment === '..')
+  ) {
+    throw new PluginManifestError(`${path} must be a safe relative path`)
+  }
+  return segments.filter(segment => segment && segment !== '.').join('/')
+}
+
+/**
+ * Accepts a credential-free HTTP(S) URL or a safe path inside the plugin archive.
+ * Query strings and fragments are kept for both forms.
+ */
+export const parsePluginIconReference = (
+  value: unknown,
+  path = 'manifest.icon',
+): PluginIconReference => {
+  const text = requiredString(value, path).trim()
+  if (!text) throw new PluginManifestError(`${path} must be a non-empty string`)
+
+  if (/^[a-z][a-z\d+.-]*:/i.test(text) || text.startsWith('//')) {
+    let url: URL
+    try {
+      url = new URL(text)
+    } catch {
+      throw new PluginManifestError(`${path} must be an HTTP(S) URL or a safe relative path`)
+    }
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
+      throw new PluginManifestError(
+        `${path} must be a credential-free HTTP(S) URL or a safe relative path`,
+      )
+    }
+    return { type: 'remote', url: text }
+  }
+
+  const rawPath = text.split(/[?#]/, 1)[0] ?? ''
+  const resolvedPath = decodeLocalIconPath(rawPath, path)
+  if (!resolvedPath) throw new PluginManifestError(`${path} must be a safe relative path`)
+
+  const fragmentIndex = text.indexOf('#')
+  return {
+    fragment: fragmentIndex < 0 ? '' : text.slice(fragmentIndex),
+    path: resolvedPath,
+    type: 'local',
+  }
+}
+
 export class PluginManifestError extends Error {
   public constructor(message: string) {
     super(`Invalid Delta Comic manifest: ${message}`)
@@ -70,6 +139,12 @@ export const parsePluginManifest = (value: unknown): PluginArchiveDB.Meta => {
       plugin: requiredString(version.plugin, 'manifest.version.plugin'),
       supportCore: requiredString(version.supportCore, 'manifest.version.supportCore'),
     },
+  }
+
+  if (manifest.icon !== undefined) {
+    const icon = parsePluginIconReference(manifest.icon)
+    result.icon =
+      icon.type === 'remote' ? icon.url : requiredString(manifest.icon, 'manifest.icon').trim()
   }
 
   if (manifest.entry !== undefined) {

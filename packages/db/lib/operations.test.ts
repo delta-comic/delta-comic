@@ -275,6 +275,7 @@ describe('plugin archive mutations', () => {
     meta: {
       author: 'test',
       description: 'test',
+      icon: 'assets/icon.png',
       name: { display: 'Fixture', id: 'fixture' },
       require: [],
       version: { plugin: '1.0.0', supportCore: '*' },

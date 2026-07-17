@@ -38,7 +38,10 @@
         "fullscreen": false
       }
     ],
-    "security": { "csp": null, "assetProtocol": { "enable": false, "scope": [] } },
+    "security": {
+      "csp": null,
+      "assetProtocol": { "enable": true, "scope": ["$APPLOCALDATA/plugin/**"] }
+    },
     "withGlobalTauri": false
   },
   "plugins": { "sql": { "preload": ["sqlite:app.db"] } },

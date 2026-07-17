@@ -1,4 +1,5 @@
 androideabi
+APPLOCALDATA
 androidx
 antd
 apksigner

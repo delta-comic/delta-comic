@@ -15,6 +15,8 @@ export interface Meta {
   version: { plugin: string; supportCore: string }
   author: string
   description: string
+  /** An HTTP(S) URL or a path relative to the installed plugin root. */
+  icon?: string
   require: { id: string; download?: string | undefined }[]
   entry?: { jsPath: string; cssPath?: string }
   kind?: 'normal' | 'preboot'

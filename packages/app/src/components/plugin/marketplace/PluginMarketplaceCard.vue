@@ -3,6 +3,7 @@ import { NButton, NCard, NTag } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import type { PluginMarketplaceItem } from '@/features/pluginMarketplace/model'
 
 const props = defineProps<{ installing: boolean; item: PluginMarketplaceItem }>()
@@ -46,12 +47,11 @@ const compatibility = computed(() => ({
     <template #header>
       <div class="flex items-center justify-between gap-2.5">
         <div class="flex min-w-0 items-center gap-2.5">
-          <span
-            class="grid size-[38px] shrink-0 place-items-center rounded-xl bg-[color-mix(in_srgb,var(--nui-primary-color)_16%,transparent)] font-extrabold text-(--nui-primary-color)"
-            aria-hidden="true"
-          >
-            {{ displayName.slice(0, 1).toLocaleUpperCase() }}
-          </span>
+          <PluginIcon
+            :icon="item.installed?.meta.icon ?? item.manifest?.icon"
+            :name="displayName"
+            :plugin-id="item.installed?.pluginName"
+          />
           <div class="grid min-w-0">
             <strong class="dc-ellipsis">{{ displayName }}</strong>
             <span class="dc-ellipsis text-xs text-(--nui-text-color-3)">
