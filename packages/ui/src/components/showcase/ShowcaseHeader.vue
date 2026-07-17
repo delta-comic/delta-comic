@@ -58,7 +58,7 @@ const emit = defineEmits<{ openNavigation: [] }>()
         clearable
         placeholder="搜索组件"
         aria-label="搜索组件"
-        class="ml-4 hidden max-w-xs flex-1 md:flex!"
+        class="ml-4 hidden! max-w-xs flex-1 md:flex!"
       />
 
       <div class="ml-auto flex items-center gap-2 sm:gap-4">

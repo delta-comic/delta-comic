@@ -4,18 +4,25 @@ import { computed } from 'vue'
 
 import type { ShowcaseNavItem } from './types'
 
-const props = defineProps<{ items: readonly ShowcaseNavItem[]; activeName?: string }>()
+const props = defineProps<{ items: readonly ShowcaseNavItem[]; activePath?: string }>()
 const keyword = defineModel<string>('keyword', { default: '' })
 
 const emit = defineEmits<{ select: [item: ShowcaseNavItem] }>()
 
-const visibleItems = computed(() => {
+const visibleGroups = computed(() => {
   const normalizedKeyword = keyword.value.trim().toLocaleLowerCase()
-  if (!normalizedKeyword) return props.items
+  const items = normalizedKeyword
+    ? props.items.filter(item =>
+        `${item.label} ${item.name} ${item.group} ${item.description}`
+          .toLocaleLowerCase()
+          .includes(normalizedKeyword),
+      )
+    : props.items
 
-  return props.items.filter(item =>
-    `${item.label} ${item.description}`.toLocaleLowerCase().includes(normalizedKeyword),
-  )
+  return Array.from(new Set(items.map(item => item.group))).map(group => ({
+    group,
+    items: items.filter(item => item.group === group),
+  }))
 })
 </script>
 
@@ -26,38 +33,42 @@ const visibleItems = computed(() => {
     </div>
 
     <div class="mt-6 flex min-h-0 flex-1 flex-col lg:mt-1">
-      <p
-        class="mb-2 px-3 text-xs font-semibold tracking-[0.14em] text-[var(--nui-text-color-3)] uppercase"
-      >
-        Components
-      </p>
-      <nav aria-label="组件导航" class="min-h-0 flex-1 space-y-1 overflow-y-auto px-1">
-        <button
-          v-for="item in visibleItems"
-          :key="item.name"
-          type="button"
-          class="group relative flex w-full items-center rounded-lg px-3 py-2.5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nui-primary-color)]"
-          :class="
-            item.name === activeName
-              ? 'bg-[color-mix(in_srgb,var(--nui-primary-color)_12%,transparent)] text-[var(--nui-primary-color)]'
-              : 'text-[var(--nui-text-color-2)] hover:bg-[var(--nui-action-color)] hover:text-[var(--nui-text-color-1)]'
-          "
-          :aria-current="item.name === activeName ? 'page' : undefined"
-          @click="emit('select', item)"
-        >
-          <span
-            class="absolute inset-y-2 left-0 w-0.5 rounded-full bg-[var(--nui-primary-color)] transition-opacity"
-            :class="item.name === activeName ? 'opacity-100' : 'opacity-0'"
-          />
-          <span>
-            <strong class="block text-sm font-medium">{{ item.label }}</strong>
-            <span class="mt-0.5 block text-xs opacity-70">{{ item.description }}</span>
-          </span>
-        </button>
+      <nav aria-label="组件导航" class="min-h-0 flex-1 space-y-6 overflow-y-auto px-1">
+        <section v-for="entryGroup in visibleGroups" :key="entryGroup.group">
+          <h2
+            class="mb-2 px-3 text-xs font-semibold tracking-[0.12em] text-[var(--nui-text-color-3)] uppercase"
+          >
+            {{ entryGroup.group }} ({{ entryGroup.items.length }})
+          </h2>
+          <div class="space-y-1">
+            <button
+              v-for="item in entryGroup.items"
+              :key="item.name"
+              type="button"
+              class="group relative flex w-full items-center rounded-lg px-3 py-2.5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nui-primary-color)]"
+              :class="
+                item.path === activePath
+                  ? 'bg-[color-mix(in_srgb,var(--nui-primary-color)_12%,transparent)] text-[var(--nui-primary-color)]'
+                  : 'text-[var(--nui-text-color-2)] hover:bg-[var(--nui-action-color)] hover:text-[var(--nui-text-color-1)]'
+              "
+              :aria-current="item.path === activePath ? 'page' : undefined"
+              @click="emit('select', item)"
+            >
+              <span
+                class="absolute inset-y-2 left-0 w-0.5 rounded-full bg-[var(--nui-primary-color)] transition-opacity"
+                :class="item.path === activePath ? 'opacity-100' : 'opacity-0'"
+              />
+              <span class="min-w-0">
+                <strong class="block truncate text-sm font-medium">{{ item.label }}</strong>
+                <span class="mt-0.5 block truncate text-xs opacity-70">{{ item.description }}</span>
+              </span>
+            </button>
+          </div>
+        </section>
       </nav>
 
       <NEmpty
-        v-if="visibleItems.length === 0"
+        v-if="visibleGroups.length === 0"
         size="small"
         description="没有匹配的组件"
         class="py-10"

@@ -84,5 +84,8 @@ export default defineConfig(({ command }) => ({
     sourcemap: true,
     deps: { neverBundle: ['unplugin-vue-components'] },
   },
-  test: { environment: 'happy-dom', include: ['lib/**/*.test.ts', 'vite/**/*.test.ts'] },
+  test: {
+    environment: 'happy-dom',
+    include: ['lib/**/*.test.ts', 'src/**/*.test.ts', 'vite/**/*.test.ts'],
+  },
 })) as UserConfig

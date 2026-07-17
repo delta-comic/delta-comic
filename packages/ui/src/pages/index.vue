@@ -4,6 +4,7 @@ import { computed, shallowRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { name, version } from '../../package.json'
+import { showcaseEntries } from '../components/showcase/catalog'
 import ShowcaseHeader from '../components/showcase/ShowcaseHeader.vue'
 import ShowcaseSidebar from '../components/showcase/ShowcaseSidebar.vue'
 import type { ShowcaseNavItem } from '../components/showcase/types'
@@ -13,29 +14,8 @@ const router = useRouter()
 const navigationOpen = shallowRef(false)
 const searchKeyword = shallowRef('')
 
-const navigationDefinitions: Record<string, Pick<ShowcaseNavItem, 'label' | 'description'>> = {
-  '//component/list': { label: 'List 列表', description: '高性能虚拟滚动' },
-  '//component/message': { label: 'Message 消息', description: '异步任务状态反馈' },
-}
-
-const componentNavigation = computed<ShowcaseNavItem[]>(() =>
-  router
-    .getRoutes()
-    .filter(item => typeof item.name === 'string' && item.name.startsWith('//component/'))
-    .map(item => ({
-      name: String(item.name),
-      path: item.path,
-      label: navigationDefinitions[String(item.name)]?.label ?? String(item.name),
-      description: navigationDefinitions[String(item.name)]?.description ?? 'Delta UI 组件',
-    }))
-    .sort(
-      (left, right) =>
-        Object.keys(navigationDefinitions).indexOf(left.name) -
-        Object.keys(navigationDefinitions).indexOf(right.name),
-    ),
-)
-
-const activeName = computed(() => String(route.name ?? ''))
+const componentNavigation = computed<ShowcaseNavItem[]>(() => [...showcaseEntries])
+const activePath = computed(() => route.path)
 
 async function handleNavigate(item: ShowcaseNavItem) {
   navigationOpen.value = false
@@ -62,7 +42,7 @@ async function handleNavigate(item: ShowcaseNavItem) {
         <ShowcaseSidebar
           v-model:keyword="searchKeyword"
           :items="componentNavigation"
-          :active-name="activeName"
+          :active-path="activePath"
           @select="handleNavigate"
         />
       </aside>
@@ -77,7 +57,7 @@ async function handleNavigate(item: ShowcaseNavItem) {
         <ShowcaseSidebar
           v-model:keyword="searchKeyword"
           :items="componentNavigation"
-          :active-name="activeName"
+          :active-path="activePath"
           @select="handleNavigate"
         />
       </NDrawerContent>

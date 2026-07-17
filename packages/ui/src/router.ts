@@ -20,7 +20,9 @@ export const router = (window.$router = Object.assign(
 ) as DeltaRouter & _RouterClassic)
 
 router.beforeEach(to => {
-  if (to.name === '/' || to.name === '//component') return { name: '//component/list' }
+  if (to.name === '/' || to.name === '//component' || to.path === '/component/list') {
+    return '/component/dc-cell'
+  }
 })
 
 const $routerForceDo = async (mode: keyof typeof router.force, to: RouteAim) => {
