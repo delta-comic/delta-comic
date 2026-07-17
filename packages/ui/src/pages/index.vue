@@ -25,8 +25,7 @@ async function handleNavigate(item: ShowcaseNavItem) {
 
 <template>
   <div
-    class="flex h-dvh min-w-80 flex-col bg-[var(--nui-body-color)]"
-    style="--p-color: var(--nui-primary-color)"
+    class="flex h-dvh min-w-80 flex-col bg-[var(--nui-body-color)] [--p-color:var(--nui-primary-color)]"
   >
     <ShowcaseHeader
       v-model:keyword="searchKeyword"

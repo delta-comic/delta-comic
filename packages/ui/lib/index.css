@@ -3,6 +3,7 @@
 @import 'tailwindcss/preflight.css' layer(base);
 @import 'tailwindcss/utilities.css' layer(utilities);
 @plugin 'tailwindcss-safe-area-capacitor';
+@source inline("dc-hairline dc-hairline-surround dc-hairline-top dc-hairline-bottom dc-hairline-left dc-hairline-right dc-hairline-top-bottom");
 
 :root,
 :host,
@@ -31,98 +32,59 @@ body {
   --dc-duration-base: 300ms;
 }
 
-@layer components {
-  /* Vant-style high-DPR hairlines: draw 1px on a pseudo-element, then scale it. */
-  .dc-hairline,
-  .dc-hairline-surround,
-  .dc-hairline-top,
-  .dc-hairline-bottom,
-  .dc-hairline-left,
-  .dc-hairline-right,
-  .dc-hairline-top-bottom {
-    position: relative;
+/* Vant-style high-DPR hairlines: draw 1px on a pseudo-element, then scale it. */
+@utility dc-hairline {
+  @apply relative;
 
-    &::after {
-      position: absolute;
-      box-sizing: border-box;
-      content: '';
-      pointer-events: none;
-    }
+  &::after {
+    @apply pointer-events-none absolute inset-[-50%] box-border scale-50 border border-solid border-[var(--dc-color-border)] content-[''];
   }
+}
 
-  .dc-hairline::after,
-  .dc-hairline-surround::after {
-    inset: -50%;
-    border: 1px solid var(--dc-color-border);
-    transform: scale(0.5);
+@utility dc-hairline-surround {
+  @apply relative;
+
+  &::after {
+    @apply pointer-events-none absolute inset-[-50%] box-border scale-50 border border-solid border-[var(--dc-color-border)] content-[''];
   }
+}
 
-  .dc-hairline-top::after,
-  .dc-hairline-bottom::after {
-    right: 0;
-    left: 0;
-    border-block: 0 solid var(--dc-color-border);
-    transform: scaleY(0.5);
+@utility dc-hairline-top {
+  @apply relative;
+
+  &::after {
+    @apply pointer-events-none absolute top-0 right-0 left-0 box-border origin-top scale-y-50 border-0 border-t border-solid border-[var(--dc-color-border)] content-[''];
   }
+}
 
-  .dc-hairline-top::after {
-    top: 0;
-    border-top-width: 1px;
-    transform-origin: 50% 0;
+@utility dc-hairline-bottom {
+  @apply relative;
+
+  &::after {
+    @apply pointer-events-none absolute right-0 bottom-0 left-0 box-border origin-bottom scale-y-50 border-0 border-b border-solid border-[var(--dc-color-border)] content-[''];
   }
+}
 
-  .dc-hairline-bottom::after {
-    bottom: 0;
-    border-bottom-width: 1px;
-    transform-origin: 50% 100%;
+@utility dc-hairline-left {
+  @apply relative;
+
+  &::after {
+    @apply pointer-events-none absolute top-0 bottom-0 left-0 box-border origin-left scale-x-50 border-0 border-l border-solid border-[var(--dc-color-border)] content-[''];
   }
+}
 
-  .dc-hairline-left::after,
-  .dc-hairline-right::after {
-    top: 0;
-    bottom: 0;
-    border-inline: 0 solid var(--dc-color-border);
-    transform: scaleX(0.5);
+@utility dc-hairline-right {
+  @apply relative;
+
+  &::after {
+    @apply pointer-events-none absolute top-0 right-0 bottom-0 box-border origin-right scale-x-50 border-0 border-r border-solid border-[var(--dc-color-border)] content-[''];
   }
+}
 
-  .dc-hairline-left::after {
-    left: 0;
-    border-left-width: 1px;
-    transform-origin: 0 50%;
-  }
+@utility dc-hairline-top-bottom {
+  @apply relative;
 
-  .dc-hairline-right::after {
-    right: 0;
-    border-right-width: 1px;
-    transform-origin: 100% 50%;
-  }
-
-  .dc-hairline-top-bottom::after {
-    top: -50%;
-    right: 0;
-    bottom: -50%;
-    left: 0;
-    border-block: 1px solid var(--dc-color-border);
-    transform: scaleY(0.5);
-  }
-
-  .dc-fade-enter-active,
-  .dc-fade-leave-active {
-    transition: opacity var(--dc-duration-fast) ease;
-  }
-
-  .dc-fade-enter-from,
-  .dc-fade-leave-to {
-    opacity: 0;
-  }
-
-  .dc-slide-right-enter-active,
-  .dc-slide-right-leave-active {
-    transition: transform var(--dc-duration-base) ease;
-  }
-
-  .dc-slide-right-enter-from,
-  .dc-slide-right-leave-to {
-    transform: translate3d(100%, 0, 0);
+  &::after {
+    @apply pointer-events-none absolute top-[-50%] right-0 bottom-[-50%] left-0 box-border scale-y-50 border-0 border-y border-solid border-[var(--dc-color-border)] content-[''];
   }
 }

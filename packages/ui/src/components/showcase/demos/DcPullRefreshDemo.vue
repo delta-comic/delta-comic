@@ -66,8 +66,7 @@ const previewRefresh = async () => {
           :refresher="refresh"
           :pull-distance="36"
           class="h-44 rounded-lg border border-emerald-500/25 bg-emerald-500/8"
-          content-class="min-h-56 p-4"
-          content-style="color: var(--nui-text-color-2)"
+          content-class="min-h-56 p-4 text-[var(--nui-text-color-2)]"
         >
           <strong class="text-sm">36px 灵敏阈值</strong>
           <p class="mt-2 text-xs opacity-70">短距离下拉即可触发。</p>

@@ -183,7 +183,12 @@ defineSlots<{ default(data: { data?: T }): any }>()
         "
         :style="isLoadingState ? styleLoading : undefined"
       >
-        <Transition name="dc-fade">
+        <Transition
+          enter-active-class="transition-opacity duration-[var(--dc-duration-fast,200ms)] ease-[ease]"
+          enter-from-class="opacity-0"
+          leave-active-class="transition-opacity duration-[var(--dc-duration-fast,200ms)] ease-[ease]"
+          leave-to-class="opacity-0"
+        >
           <DcLoading size="25px" color="var(--p-color)" v-if="animateOn === 'isLoadingNoData'" />
           <DcLoading size="10px" color="white" v-else-if="animateOn === 'isLoadingData'">
             {{ translateUi('status.loading') }}

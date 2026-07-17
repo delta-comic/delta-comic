@@ -160,11 +160,13 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
 
 <template>
   <div :class="cn('dc-tabs w-full', $props.class)" :style="style">
-    <div class="dc-tabs__nav">
+    <div
+      class="dc-tabs__nav flex h-[var(--dc-tabs-height,44px)] items-center bg-(--dc-color-surface) pb-[var(--dc-tabs-indicator-offset,10px)]"
+    >
       <slot name="left" />
-      <div ref="swiperContainerRef" class="dc-tabs__swiper">
+      <div ref="swiperContainerRef" class="dc-tabs__swiper relative h-full min-w-0 flex-1">
         <Swiper
-          class="dc-tabs__swiper-core"
+          class="dc-tabs__swiper-core h-full"
           :modules="swiperModules"
           :slides-per-view="shrink ? 'auto' : items.length || 1"
           :free-mode="true"
@@ -178,21 +180,37 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
           <SwiperSlide
             v-for="item of items"
             :key="item.name"
-            :class="cn('dc-tabs__slide', shrink && 'dc-tabs__slide--shrink')"
+            :class="
+              cn('dc-tabs__slide flex! h-full min-w-0', shrink && 'dc-tabs__slide--shrink w-auto!')
+            "
           >
             <div
               :ref="setTabRef(item.name)"
-              class="dc-tabs__tab"
-              :class="{ 'dc-tabs__tab--active': selecting === item.name }"
+              :class="
+                cn(
+                  'dc-tabs__tab relative flex h-full flex-1 cursor-pointer touch-manipulation items-center justify-center px-3 select-none',
+                  shrink && 'min-w-0 flex-none',
+                  selecting === item.name && 'dc-tabs__tab--active',
+                )
+              "
               @click="handleRoute(item.name)"
             >
-              <span class="dc-tabs__tab-text">{{ item.title }}</span>
+              <span
+                :class="
+                  cn(
+                    'dc-tabs__tab-text text-sm whitespace-nowrap text-(--dc-color-text-secondary) transition-[color,font-weight] duration-200 ease-[ease]',
+                    selecting === item.name && 'font-medium text-(--dc-color-text)',
+                  )
+                "
+              >
+                {{ item.title }}
+              </span>
             </div>
           </SwiperSlide>
         </Swiper>
         <div
           v-show="indicatorReady"
-          class="dc-tabs__indicator"
+          class="dc-tabs__indicator pointer-events-none absolute bottom-[var(--dc-tabs-indicator-offset,10px)] left-0 h-[3px] rounded-[3px] bg-[var(--dc-tabs-indicator-color,var(--dc-color-primary))] transition-[transform,width] duration-[250ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
           :style="{ transform: `translate3d(${indicatorX}px, 0, 0)`, width: `${indicatorWidth}px` }"
         />
       </div>
@@ -201,80 +219,3 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
     <slot name="bottom" />
   </div>
 </template>
-
-<style scoped>
-.dc-tabs__nav {
-  display: flex;
-  align-items: center;
-  height: var(--dc-tabs-height, 44px);
-  padding-bottom: var(--dc-tabs-indicator-offset, 10px);
-  background: var(--dc-color-surface);
-}
-
-.dc-tabs__swiper {
-  flex: 1;
-  position: relative;
-  height: 100%;
-  min-width: 0;
-}
-
-.dc-tabs__swiper-core {
-  height: 100%;
-}
-
-.dc-tabs__slide {
-  display: flex;
-  height: 100%;
-  min-width: 0;
-}
-
-.dc-tabs__slide--shrink {
-  width: auto;
-}
-
-.dc-tabs__tab {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  height: 100%;
-  padding: 0 12px;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-}
-
-.dc-tabs__slide--shrink .dc-tabs__tab {
-  flex: none;
-  min-width: 0;
-}
-
-.dc-tabs__tab-text {
-  font-size: 14px;
-  color: var(--dc-color-text-secondary);
-  white-space: nowrap;
-  transition:
-    color 0.2s,
-    font-weight 0.2s;
-}
-
-.dc-tabs__tab--active .dc-tabs__tab-text {
-  color: var(--dc-color-text);
-  font-weight: 500;
-}
-
-.dc-tabs__indicator {
-  position: absolute;
-  bottom: var(--dc-tabs-indicator-offset, 10px);
-  left: 0;
-  height: 3px;
-  border-radius: 3px;
-  background: var(--dc-tabs-indicator-color, var(--dc-color-primary));
-  pointer-events: none;
-  transition:
-    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-</style>

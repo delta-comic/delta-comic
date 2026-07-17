@@ -87,6 +87,14 @@ const renderArrowIcon = computed(() => {
           borderless: !border,
           [size || '']: !!size,
         }),
+        `relative box-border flex w-full overflow-hidden px-[var(--dc-cell-horizontal-padding,var(--dc-space-4))] py-[var(--dc-cell-vertical-padding,10px)] text-[length:var(--dc-cell-font-size,var(--dc-font-size-md))] leading-[var(--dc-cell-line-height,var(--dc-line-height-md))] text-[color:var(--dc-cell-text-color,var(--dc-color-text))] [background:var(--dc-cell-background,var(--dc-color-surface))] after:pointer-events-none after:absolute after:right-[var(--dc-space-4)] after:bottom-0 after:left-[var(--dc-space-4)] after:box-border after:scale-y-50 after:border-b after:border-[var(--dc-cell-border-color,var(--dc-color-border))] after:content-[''] last:after:hidden`,
+        center && 'items-center',
+        isClickable &&
+          'cursor-pointer active:bg-[var(--dc-cell-active-color,var(--dc-color-active))]',
+        !border && 'after:hidden',
+        required &&
+          `overflow-visible before:absolute before:left-[var(--dc-space-2)] before:text-[length:var(--dc-cell-font-size,var(--dc-font-size-md))] before:text-[color:var(--dc-cell-required-color,var(--dc-color-danger))] before:content-['*']`,
+        size === 'large' && 'py-[var(--dc-cell-large-vertical-padding,var(--dc-space-3))]',
         $props.class,
       )
     "
@@ -96,11 +104,14 @@ const renderArrowIcon = computed(() => {
     @click="handleClick"
   >
     <!-- left icon -->
-    <div v-if="slots.icon || icon" class="dc-cell__left-icon">
+    <div
+      v-if="slots.icon || icon"
+      class="dc-cell__left-icon mr-[var(--dc-space-1)] h-[var(--dc-cell-line-height,var(--dc-line-height-md))] text-[length:var(--dc-cell-icon-size,16px)] leading-[var(--dc-cell-line-height,var(--dc-line-height-md))]"
+    >
       <slot v-if="slots.icon" name="icon" />
       <span
         v-else
-        class="dc-cell__icon"
+        class="dc-cell__icon inline-flex size-[1em] items-center justify-center not-italic"
         :class="[iconPrefix, icon]"
         :aria-label="icon"
         role="img"
@@ -108,10 +119,30 @@ const renderArrowIcon = computed(() => {
     </div>
 
     <!-- title area -->
-    <div :class="cn('dc-cell__title', titleClass)" :style="titleStyle">
+    <div
+      :class="
+        cn(
+          'dc-cell__title flex-1',
+          size === 'large' &&
+            'text-[length:var(--dc-cell-large-title-font-size,var(--dc-font-size-lg))]',
+          titleClass,
+        )
+      "
+      :style="titleStyle"
+    >
       <slot v-if="slots.title" name="title" />
       <span v-else-if="title != null">{{ title }}</span>
-      <div v-if="slots.label || label != null" :class="cn('dc-cell__label', labelClass)">
+      <div
+        v-if="slots.label || label != null"
+        :class="
+          cn(
+            'dc-cell__label mt-[var(--dc-cell-label-margin-top,var(--dc-space-1))] text-[length:var(--dc-cell-label-font-size,var(--dc-font-size-sm))] leading-[var(--dc-cell-label-line-height,var(--dc-line-height-sm))] text-[color:var(--dc-cell-label-color,var(--dc-color-text-secondary))]',
+            size === 'large' &&
+              'text-[length:var(--dc-cell-large-label-font-size,var(--dc-font-size-md))]',
+            labelClass,
+          )
+        "
+      >
         <slot v-if="slots.label" name="label" />
         <template v-else>{{ label }}</template>
       </div>
@@ -120,7 +151,13 @@ const renderArrowIcon = computed(() => {
     <!-- value area -->
     <div
       v-if="slots.value || slots.default || value != null"
-      :class="cn('dc-cell__value', valueClass)"
+      :class="
+        cn(
+          'dc-cell__value relative flex-1 overflow-hidden text-right align-middle text-[length:var(--dc-cell-value-font-size,inherit)] break-words text-[color:var(--dc-cell-value-color,var(--dc-color-text-secondary))]',
+          size === 'large' && 'text-[length:var(--dc-cell-large-value-font-size,inherit)]',
+          valueClass,
+        )
+      "
     >
       <slot v-if="slots.value" name="value" />
       <slot v-else-if="slots.default" />
@@ -128,162 +165,15 @@ const renderArrowIcon = computed(() => {
     </div>
 
     <!-- right icon -->
-    <div v-if="slots['right-icon'] || isLink" class="dc-cell__right-icon">
+    <div
+      v-if="slots['right-icon'] || isLink"
+      class="dc-cell__right-icon ml-[var(--dc-space-1)] h-[var(--dc-cell-line-height,var(--dc-line-height-md))] text-[length:var(--dc-cell-icon-size,16px)] leading-[var(--dc-cell-line-height,var(--dc-line-height-md))] text-[color:var(--dc-cell-right-icon-color,var(--dc-color-icon))]"
+    >
       <slot v-if="slots['right-icon']" name="right-icon" />
-      <span v-else class="dc-cell__arrow">{{ renderArrowIcon }}</span>
+      <span v-else class="dc-cell__arrow text-[18px] font-[200]">{{ renderArrowIcon }}</span>
     </div>
 
     <!-- extra slot -->
     <slot v-if="slots.extra" name="extra" />
   </component>
 </template>
-
-<style>
-:root,
-:host {
-  --dc-cell-font-size: var(--dc-font-size-md);
-  --dc-cell-line-height: var(--dc-line-height-md);
-  --dc-cell-vertical-padding: 10px;
-  --dc-cell-horizontal-padding: var(--dc-space-4);
-  --dc-cell-text-color: var(--dc-color-text);
-  --dc-cell-background: var(--dc-color-surface);
-  --dc-cell-border-color: var(--dc-color-border);
-  --dc-cell-active-color: var(--dc-color-active);
-  --dc-cell-required-color: var(--dc-color-danger);
-  --dc-cell-label-color: var(--dc-color-text-secondary);
-  --dc-cell-label-font-size: var(--dc-font-size-sm);
-  --dc-cell-label-line-height: var(--dc-line-height-sm);
-  --dc-cell-label-margin-top: var(--dc-space-1);
-  --dc-cell-value-color: var(--dc-color-text-secondary);
-  --dc-cell-value-font-size: inherit;
-  --dc-cell-icon-size: 16px;
-  --dc-cell-right-icon-color: var(--dc-color-icon);
-  --dc-cell-large-vertical-padding: var(--dc-space-3);
-  --dc-cell-large-title-font-size: var(--dc-font-size-lg);
-  --dc-cell-large-label-font-size: var(--dc-font-size-md);
-  --dc-cell-large-value-font-size: inherit;
-}
-
-.dc-cell {
-  position: relative;
-  display: flex;
-  box-sizing: border-box;
-  width: 100%;
-  padding: var(--dc-cell-vertical-padding) var(--dc-cell-horizontal-padding);
-  overflow: hidden;
-  color: var(--dc-cell-text-color);
-  font-size: var(--dc-cell-font-size);
-  line-height: var(--dc-cell-line-height);
-  background: var(--dc-cell-background);
-}
-
-.dc-cell::after {
-  position: absolute;
-  box-sizing: border-box;
-  content: ' ';
-  pointer-events: none;
-  right: var(--dc-space-4);
-  bottom: 0;
-  left: var(--dc-space-4);
-  border-bottom: 1px solid var(--dc-cell-border-color);
-  transform: scaleY(0.5);
-}
-
-.dc-cell:last-child::after,
-.dc-cell--borderless::after {
-  display: none;
-}
-
-.dc-cell__label {
-  margin-top: var(--dc-cell-label-margin-top);
-  color: var(--dc-cell-label-color);
-  font-size: var(--dc-cell-label-font-size);
-  line-height: var(--dc-cell-label-line-height);
-}
-
-.dc-cell__title,
-.dc-cell__value {
-  flex: 1;
-}
-
-.dc-cell__value {
-  position: relative;
-  overflow: hidden;
-  color: var(--dc-cell-value-color);
-  font-size: var(--dc-cell-value-font-size);
-  text-align: right;
-  vertical-align: middle;
-  word-wrap: break-word;
-}
-
-.dc-cell__left-icon,
-.dc-cell__right-icon {
-  height: var(--dc-cell-line-height);
-  font-size: var(--dc-cell-icon-size);
-  line-height: var(--dc-cell-line-height);
-}
-
-.dc-cell__left-icon {
-  margin-right: var(--dc-space-1);
-}
-
-.dc-cell__right-icon {
-  margin-left: var(--dc-space-1);
-  color: var(--dc-cell-right-icon-color);
-}
-
-.dc-cell__icon {
-  display: inline-flex;
-  width: 1em;
-  height: 1em;
-  align-items: center;
-  justify-content: center;
-  font-style: normal;
-}
-
-.dc-cell--clickable {
-  cursor: pointer;
-}
-
-.dc-cell--clickable:active {
-  background-color: var(--dc-cell-active-color);
-}
-
-.dc-cell--required {
-  overflow: visible;
-}
-
-.dc-cell--required::before {
-  position: absolute;
-  left: var(--dc-space-2);
-  color: var(--dc-cell-required-color);
-  font-size: var(--dc-cell-font-size);
-  content: '*';
-}
-
-.dc-cell--center {
-  align-items: center;
-}
-
-.dc-cell--large {
-  padding-top: var(--dc-cell-large-vertical-padding);
-  padding-bottom: var(--dc-cell-large-vertical-padding);
-}
-
-.dc-cell--large .dc-cell__title {
-  font-size: var(--dc-cell-large-title-font-size);
-}
-
-.dc-cell--large .dc-cell__label {
-  font-size: var(--dc-cell-large-label-font-size);
-}
-
-.dc-cell--large .dc-cell__value {
-  font-size: var(--dc-cell-large-value-font-size);
-}
-
-.dc-cell__arrow {
-  font-size: 18px;
-  font-weight: 200;
-}
-</style>

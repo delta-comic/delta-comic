@@ -100,10 +100,14 @@ export const createDownloadMessage = async <T,>(
         }}
         onDragEnd={(_, { offset }) => offset.y < -30 && (minsize.value = true)}
         animate={minsize.value ? 'minsize' : 'maxsize'}
-        class='overflow-hidden bg-(--n-color)'
-        style={{ boxShadow: 'var(--n-box-shadow)' }}
+        class='overflow-hidden bg-(--n-color) shadow-[var(--n-box-shadow)]'
       >
-        <Transition name='dc-fade'>
+        <Transition
+          enterActiveClass='transition-opacity duration-[var(--dc-duration-fast,200ms)] ease-[ease]'
+          enterFromClass='opacity-0'
+          leaveActiveClass='transition-opacity duration-[var(--dc-duration-fast,200ms)] ease-[ease]'
+          leaveToClass='opacity-0'
+        >
           {minsize.value ? (
             <div class='relative size-full' onClick={() => (minsize.value = false)}>
               <DcLoading class='absolute top-0 left-0 size-full' color='var(--p-color)' />
@@ -134,69 +138,81 @@ export const createDownloadMessage = async <T,>(
                 )}
               </div>
               {/* content */}
-              {/* @ts-ignore class应当存在 */}
-              <TransitionGroup name='list' tag='ul' class='ml-1! h-fit w-full!'>
-                {messageList.map((v, index) => (
-                  <div class='dc-hairline-bottom w-full py-1' key={index}>
-                    <span class='text-sm font-semibold'>{v.title}</span>
-                    <div class='relative h-fit w-full'>
-                      <NProgress
-                        percentage={isNumber(v.progress) ? v.progress : 100}
-                        indicatorPlacement='inside'
-                        processing={isUndefined(v.state)}
-                        type='line'
-                        showIndicator={false}
-                        show-indicator={false}
-                        class={[
-                          'transition-all **:in-[.n-progress-graph-line-fill]:hidden!',
-                          v.state == 'error' && v.retry ? 'w-[60%]!' : 'w-[95%]!',
-                        ]}
-                        height={7}
-                        status={v.state}
-                      />
-                      <Transition name='dc-slide-right'>
-                        {withDirectives(
-                          <div class='absolute! top-1/2 right-[4%] flex -translate-y-1/2 gap-3 ease-in-out!'>
-                            <NButton
-                              tertiary
-                              circle
-                              onClick={() => {
-                                if (v.state != 'error') return
-                                v.retry = undefined
-                                v.pc.reject(v.error)
-                              }}
-                              class='size-10!'
-                            >
-                              {{
-                                icon: () => (
-                                  <NIcon>
-                                    <CloseRound />
-                                  </NIcon>
-                                ),
-                              }}
-                            </NButton>
-                            <NButton tertiary circle onClick={v.retry} class='size-10!'>
-                              {{
-                                icon: () => (
-                                  <NIcon>
-                                    <ReloadOutlined />
-                                  </NIcon>
-                                ),
-                              }}
-                            </NButton>
-                          </div>,
-                          [[vShow, v.state == 'error' && v.retry]],
-                        )}
-                      </Transition>
-                    </div>
-                    <div class='h-4! text-xs text-(--dc-color-text-secondary)'>
-                      {(v.state == 'error' && `${v.error.name}: ${v.error.message}`) ||
-                        v.description ||
-                        '...'}
-                    </div>
-                  </div>
-                ))}
-              </TransitionGroup>
+              <ul class='ml-1! h-fit w-full!'>
+                <TransitionGroup
+                  moveClass='transition-[transform,opacity] duration-[420ms] ease-[cubic-bezier(0.22,1.5,0.5,1)] [will-change:transform,opacity]'
+                  enterActiveClass='transition-[transform,opacity] duration-[420ms] ease-[cubic-bezier(0.22,1.5,0.5,1)] [will-change:transform,opacity]'
+                  enterFromClass='translate-y-[30px] opacity-0'
+                  leaveActiveClass='absolute transition-[transform,opacity] duration-[420ms] ease-[cubic-bezier(0.22,1.5,0.5,1)] [will-change:transform,opacity]'
+                  leaveToClass='translate-y-[30px] opacity-0'
+                >
+                  {messageList.map((v, index) => (
+                    <li class='dc-hairline-bottom w-full py-1' key={index}>
+                      <span class='text-sm font-semibold'>{v.title}</span>
+                      <div class='relative h-fit w-full'>
+                        <NProgress
+                          percentage={isNumber(v.progress) ? v.progress : 100}
+                          indicatorPlacement='inside'
+                          processing={isUndefined(v.state)}
+                          type='line'
+                          showIndicator={false}
+                          show-indicator={false}
+                          class={[
+                            'transition-all **:in-[.n-progress-graph-line-fill]:hidden!',
+                            v.state == 'error' && v.retry ? 'w-[60%]!' : 'w-[95%]!',
+                          ]}
+                          height={7}
+                          status={v.state}
+                        />
+                        <Transition
+                          enterActiveClass='transition-transform duration-[var(--dc-duration-base,300ms)] ease-[ease]'
+                          enterFromClass='translate-x-full'
+                          leaveActiveClass='transition-transform duration-[var(--dc-duration-base,300ms)] ease-[ease]'
+                          leaveToClass='translate-x-full'
+                        >
+                          {withDirectives(
+                            <div class='absolute! top-1/2 right-[4%] flex -translate-y-1/2 gap-3 ease-in-out!'>
+                              <NButton
+                                tertiary
+                                circle
+                                onClick={() => {
+                                  if (v.state != 'error') return
+                                  v.retry = undefined
+                                  v.pc.reject(v.error)
+                                }}
+                                class='size-10!'
+                              >
+                                {{
+                                  icon: () => (
+                                    <NIcon>
+                                      <CloseRound />
+                                    </NIcon>
+                                  ),
+                                }}
+                              </NButton>
+                              <NButton tertiary circle onClick={v.retry} class='size-10!'>
+                                {{
+                                  icon: () => (
+                                    <NIcon>
+                                      <ReloadOutlined />
+                                    </NIcon>
+                                  ),
+                                }}
+                              </NButton>
+                            </div>,
+                            [[vShow, v.state == 'error' && v.retry]],
+                          )}
+                        </Transition>
+                      </div>
+                      <div class='h-4! text-xs text-(--dc-color-text-secondary)'>
+                        {(v.state == 'error' && `${v.error.name}: ${v.error.message}`) ||
+                          v.description ||
+                          '...'}
+                      </div>
+                    </li>
+                  ))}
+                </TransitionGroup>
+              </ul>
               <div class='absolute -bottom-2 left-1/2 h-1 w-10 -translate-x-1/2 rounded-lg bg-(--nui-divider-color)'></div>
             </div>
           )}

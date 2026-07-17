@@ -145,11 +145,16 @@ describe('DcCell', () => {
 
     expect(wrapper.classes()).toEqual(
       expect.arrayContaining([
+        'relative',
+        'flex',
+        "after:content-['']",
+        'active:bg-[var(--dc-cell-active-color,var(--dc-color-active))]',
         'dc-cell--borderless',
         'dc-cell--center',
         'dc-cell--clickable',
         'dc-cell--large',
         'dc-cell--required',
+        'py-[var(--dc-cell-large-vertical-padding,var(--dc-space-3))]',
       ]),
     )
     expect(wrapper.attributes()).toMatchObject({ role: 'button', tabindex: '0' })
@@ -196,7 +201,12 @@ describe('DcCellGroup', () => {
     })
     expect(wrapper.attributes('id')).toBe('settings-group')
     expect(wrapper.get('.dc-cell-group__title').text()).toBe('Settings')
-    expect(wrapper.get('.dc-cell-group').classes()).toContain('dc-hairline-top-bottom')
+    expect(wrapper.get('.dc-cell-group').classes()).toEqual(
+      expect.arrayContaining([
+        '[background:var(--dc-cell-group-background,var(--dc-color-surface))]',
+        'dc-hairline-top-bottom',
+      ]),
+    )
   })
 
   it('uses the named title slot and inset layout', () => {
@@ -206,7 +216,13 @@ describe('DcCellGroup', () => {
     })
     expect(wrapper.get('.dc-cell-group__title').text()).toBe('Slot title')
     expect(wrapper.get('.dc-cell-group__title').classes()).toContain('dc-cell-group__title--inset')
-    expect(wrapper.get('.dc-cell-group').classes()).toContain('dc-cell-group--inset')
+    expect(wrapper.get('.dc-cell-group').classes()).toEqual(
+      expect.arrayContaining([
+        'dc-cell-group--inset',
+        '[margin:var(--dc-cell-group-inset-padding,0_var(--dc-space-4))]',
+        'rounded-[var(--dc-cell-group-inset-radius,var(--dc-radius-lg))]',
+      ]),
+    )
     expect(wrapper.get('.dc-cell-group').classes()).not.toContain('dc-hairline-top-bottom')
   })
 })
