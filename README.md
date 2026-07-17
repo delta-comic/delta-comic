@@ -82,7 +82,7 @@ ap:jmcomic
 ap:bika
 ```
 
-- [x] 「众生之相」 [CosAv](https://github.com/delta-comic/delta-comic-plugin-cosav)
+- [x] 「众生相」 [CosAv](https://github.com/delta-comic/delta-comic-plugin-cosav)
 
 ```txt
 ap:cosav
@@ -102,7 +102,7 @@ ap:cosav
  </picture>
 </a>
 
-![Alt](https://repobeats.axiom.co/api/embed/d29bef6ede7cc9fcfabb0d1499a656e06f5462bf.svg 'Repobeats analytics image')
+![Alt](https://repobeats.axiom.co/api/embed/a878d5bd4b98d32935487a41f6087356c1e60a58.svg "Repobeats analytics image")
 
 ## 声明
 

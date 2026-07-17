@@ -61,7 +61,7 @@ SharedFunction.define(
 )
 
 const $routerForceDo = async (mode: keyof typeof router.force, to: RouteAim) => {
-  const aim = router.resolve(to as any)
+  const aim = router.resolve(to)
   aim.query.force = 'true'
   let attempts = 0
   let r

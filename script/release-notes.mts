@@ -4,7 +4,7 @@ import createPreset, {
 } from 'conventional-changelog-conventionalcommits'
 
 export const prereleaseWarning =
-  '**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请在更新前备份数据。**'
+  '**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**'
 
 export const releaseNoteTypes = [
   { type: 'feat', section: '新功能', effect: 'bump' },
@@ -19,10 +19,10 @@ export const releaseNoteTypes = [
   { type: 'style', section: '代码样式', effect: 'changelog' },
   { type: 'revert', section: '变更回退', effect: 'bump' },
   { type: 'chore', section: '其他变更', effect: 'changelog' },
-] as const satisfies readonly CommitType[]
+] as const satisfies CommitType[]
 
 export const releaseNotePresetConfig = {
-  types: releaseNoteTypes as unknown as CommitType[],
+  types: releaseNoteTypes as CommitType[],
 } satisfies PresetConfig
 
 interface ReleaseNote {
