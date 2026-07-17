@@ -48,6 +48,7 @@
     "commitlint-plugin-cspell": "catalog:",
     "conventional-changelog-conventionalcommits": "catalog:",
     "cspell": "catalog:",
+    "eslint-plugin-tailwindcss": "^4.2.0",
     "happy-dom": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "semantic-release": "^25.0.7",

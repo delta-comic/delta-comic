@@ -40,12 +40,12 @@ const filterOptions = computed(() => [
         v-model:value="query"
         clearable
         :placeholder="t('plugin.market.searchPlaceholder')"
-        class="min-w-[180px] flex-1 max-[640px]:basis-full"
+        class="w-37.5 max-[640px]:basis-full "
       />
       <NSelect
         v-model:value="filter"
         :options="filterOptions"
-        class="w-[150px] max-[640px]:min-w-0 max-[640px]:flex-1"
+        class="min-w-45 flex-1 max-[640px]:min-w-0 max-[640px]:flex-1"
       />
       <NButton secondary type="primary" :loading="loading" @click="emit('refresh')">
         {{ t('plugin.market.actions.refresh') }}
