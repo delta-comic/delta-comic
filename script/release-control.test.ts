@@ -2,13 +2,14 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   readCurrentVersion,
   ReleaseHistoryBootstrap,
   type GitRunner,
 } from './bootstrap-release-history.mts'
+import type { PublishableWorkspacePackage } from './release-workspace.mts'
 import {
   createReleasePlugin,
   resolveDistTag,
@@ -22,6 +23,27 @@ import {
 } from './set-version.mts'
 
 const fixtures: string[] = []
+
+const publishablePackages: PublishableWorkspacePackage[] = [
+  {
+    dependencies: [],
+    name: '@delta-comic/model',
+    path: 'packages/model/package.json',
+    version: '3.0.0',
+  },
+  {
+    dependencies: ['@delta-comic/model'],
+    name: '@delta-comic/ui',
+    path: 'packages/ui/package.json',
+    version: '3.0.0',
+  },
+]
+
+const resolvePublishablePackages = vi.fn(async () => publishablePackages)
+
+beforeEach(() => {
+  resolvePublishablePackages.mockClear()
+})
 
 afterEach(async () => {
   await Promise.all(fixtures.splice(0).map(path => rm(path, { force: true, recursive: true })))
@@ -80,6 +102,20 @@ describe('VersionSynchronizer', () => {
       'Invalid semantic version',
     )
   })
+
+  it('automatically synchronizes a newly added public workspace package', async () => {
+    const cwd = await createVersionFixture()
+    const manifestPath = join(cwd, 'packages/new-library/package.json')
+    await mkdir(join(manifestPath, '..'), { recursive: true })
+    await writeFile(
+      manifestPath,
+      '{\n  "name": "@delta-comic/new-library",\n  "version": "1.0.0"\n}\n',
+    )
+
+    await new VersionSynchronizer(cwd).setVersion('3.2.0')
+
+    await expect(readFile(manifestPath, 'utf-8')).resolves.toContain('"version": "3.2.0"')
+  })
 })
 
 describe('ReleaseHistoryBootstrap', () => {
@@ -130,7 +166,11 @@ describe('semantic-release monorepo plugin', () => {
     const writeOutput = vi
       .fn<(path: string, contents: string) => Promise<void>>()
       .mockResolvedValue()
-    const plugin = createReleasePlugin({ synchronizeVersion, writeOutput })
+    const plugin = createReleasePlugin({
+      resolvePublishablePackages,
+      synchronizeVersion,
+      writeOutput,
+    })
     const context = {
       env: { GITHUB_OUTPUT: '/tmp/output', NPM_TOKEN: 'secret' },
       nextRelease: { version: '3.0.0' },
@@ -147,20 +187,25 @@ describe('semantic-release monorepo plugin', () => {
     expect(synchronizeVersion).toHaveBeenCalledWith('3.0.0')
   })
 
-  it('builds libraries before recursively publishing the fixed workspace', async () => {
+  it('builds every publishable package in dependency order before recursively publishing', async () => {
     const publishCommand = vi.fn<CommandRunner>().mockResolvedValue()
-    const plugin = createReleasePlugin({ publishCommand })
+    const plugin = createReleasePlugin({ publishCommand, resolvePublishablePackages })
     await plugin.publish({}, { env: {}, nextRelease: { version: '3.0.0' } })
 
     expect(publishCommand.mock.calls).toEqual([
-      ['vp', ['run', 'lib-build']],
+      ['vp', ['run', '--filter', '@delta-comic/model', '--fail-if-no-match', 'build']],
+      ['vp', ['run', '--filter', '@delta-comic/ui', '--fail-if-no-match', 'build']],
       ['vp', ['pm', 'publish', '-r', '--no-git-checks', '--provenance', '--tag', 'latest']],
     ])
   })
 
   it('publishes preview packages under the next dist-tag', async () => {
     const publishCommand = vi.fn<CommandRunner>().mockResolvedValue()
-    const plugin = createReleasePlugin({ publishCommand })
+    const plugin = createReleasePlugin({
+      publishCommand,
+      resolvePublishablePackages: async () =>
+        publishablePackages.map(pkg => ({ ...pkg, version: '3.1.0-next.1' })),
+    })
     await plugin.publish({}, { env: {}, nextRelease: { channel: 'next', version: '3.1.0-next.1' } })
 
     expect(publishCommand).toHaveBeenLastCalledWith('vp', [
@@ -175,11 +220,12 @@ describe('semantic-release monorepo plugin', () => {
   })
 
   it('requires an npm token before publishing', async () => {
-    const plugin = createReleasePlugin()
+    const plugin = createReleasePlugin({ resolvePublishablePackages })
 
     await expect(
       plugin.verifyConditions({}, { env: {}, nextRelease: { version: '3.0.0' } }),
     ).rejects.toThrow('NPM_TOKEN is required')
+    expect(resolvePublishablePackages).not.toHaveBeenCalled()
   })
 
   it('validates release versions and skips GitHub output outside Actions', async () => {
@@ -195,11 +241,44 @@ describe('semantic-release monorepo plugin', () => {
 
   it('does not publish packages when the library build fails', async () => {
     const publishCommand = vi.fn<CommandRunner>().mockRejectedValueOnce(new Error('build failed'))
-    const plugin = createReleasePlugin({ publishCommand })
+    const plugin = createReleasePlugin({ publishCommand, resolvePublishablePackages })
 
     await expect(
       plugin.publish({}, { env: {}, nextRelease: { version: '3.0.0' } }),
     ).rejects.toThrow('build failed')
-    expect(publishCommand).toHaveBeenCalledExactlyOnceWith('vp', ['run', 'lib-build'])
+    expect(publishCommand).toHaveBeenCalledExactlyOnceWith('vp', [
+      'run',
+      '--filter',
+      '@delta-comic/model',
+      '--fail-if-no-match',
+      'build',
+    ])
+  })
+
+  it('refuses to publish a workspace with unsynchronized package versions', async () => {
+    const publishCommand = vi.fn<CommandRunner>().mockResolvedValue()
+    const plugin = createReleasePlugin({
+      publishCommand,
+      resolvePublishablePackages: async () => [{ ...publishablePackages[0], version: '2.9.0' }],
+    })
+
+    await expect(
+      plugin.publish({}, { env: {}, nextRelease: { version: '3.0.0' } }),
+    ).rejects.toThrow('@delta-comic/model@2.9.0')
+    expect(publishCommand).not.toHaveBeenCalled()
+  })
+
+  it('adds a bold safety warning only to prerelease notes', async () => {
+    const plugin = createReleasePlugin({ resolvePublishablePackages })
+
+    await expect(
+      plugin.generateNotes(
+        {},
+        { env: {}, nextRelease: { channel: 'next', version: '3.1.0-next.1' } },
+      ),
+    ).resolves.toMatch(/^\*\*谨慎更新：.*\*\*$/)
+    await expect(
+      plugin.generateNotes({}, { env: {}, nextRelease: { version: '3.1.0' } }),
+    ).resolves.toBe('')
   })
 })

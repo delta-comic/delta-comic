@@ -111,6 +111,9 @@ catalogs:
     commitlint-plugin-cspell:
       specifier: ^0.9.3
       version: 0.9.3
+    conventional-changelog-conventionalcommits:
+      specifier: ^10.2.1
+      version: 10.2.1
     core-js:
       specifier: ^3.48.0
       version: 3.49.0
@@ -276,6 +279,9 @@ importers:
       commitlint-plugin-cspell:
         specifier: 'catalog:'
         version: 0.9.3(@commitlint/lint@21.2.0)
+      conventional-changelog-conventionalcommits:
+        specifier: 'catalog:'
+        version: 10.2.1
       cspell:
         specifier: 'catalog:'
         version: 10.0.1

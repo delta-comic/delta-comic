@@ -1,6 +1,12 @@
 import { spawn } from 'node:child_process'
 import { appendFile } from 'node:fs/promises'
 
+import { prereleaseWarning } from './release-notes.mts'
+import {
+  assertWorkspaceVersion,
+  type PublishableWorkspacePackage,
+  ReleaseWorkspace,
+} from './release-workspace.mts'
 import { assertVersion, rootDir, setVersion } from './set-version.mts'
 
 interface ReleaseContext {
@@ -22,6 +28,7 @@ async function runCommand(command: string, args: string[]) {
 }
 
 interface ReleasePluginDependencies {
+  resolvePublishablePackages?: () => Promise<PublishableWorkspacePackage[]>
   publishCommand?: CommandRunner
   synchronizeVersion?: (version: string) => Promise<void>
   writeOutput?: (path: string, contents: string) => Promise<void>
@@ -36,6 +43,7 @@ export function resolveDistTag(channel?: string | null) {
 }
 
 export function createReleasePlugin({
+  resolvePublishablePackages = () => new ReleaseWorkspace().publishablePackages(),
   publishCommand = runCommand,
   synchronizeVersion = setVersion,
   writeOutput = async (path, contents) => appendFile(path, contents, { encoding: 'utf-8' }),
@@ -43,6 +51,7 @@ export function createReleasePlugin({
   return {
     async verifyConditions(_pluginConfig: unknown, { env }: ReleaseContext) {
       if (!env.NPM_TOKEN) throw new Error('NPM_TOKEN is required to publish workspace packages')
+      await resolvePublishablePackages()
     },
 
     async verifyRelease(_pluginConfig: unknown, { env, nextRelease }: ReleaseContext) {
@@ -60,9 +69,17 @@ export function createReleasePlugin({
       await synchronizeVersion(nextRelease.version)
     },
 
+    async generateNotes(_pluginConfig: unknown, { nextRelease }: ReleaseContext) {
+      return nextRelease.channel ? prereleaseWarning : ''
+    },
+
     async publish(_pluginConfig: unknown, { nextRelease }: ReleaseContext) {
       const distTag = resolveDistTag(nextRelease.channel)
-      await publishCommand('vp', ['run', 'lib-build'])
+      const packages = await resolvePublishablePackages()
+      assertWorkspaceVersion(packages, nextRelease.version)
+      for (const pkg of packages) {
+        await publishCommand('vp', ['run', '--filter', pkg.name, '--fail-if-no-match', 'build'])
+      }
       await publishCommand('vp', [
         'pm',
         'publish',
@@ -77,4 +94,4 @@ export function createReleasePlugin({
 }
 
 const plugin = createReleasePlugin()
-export const { prepare, publish, verifyConditions, verifyRelease } = plugin
+export const { generateNotes, prepare, publish, verifyConditions, verifyRelease } = plugin

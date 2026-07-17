@@ -3,9 +3,10 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import releaseConfig, { releaseBranches } from '../release.config.mjs'
+import releaseConfig, { releaseBranches } from '../release.config.ts'
 
-import { rootDir } from './set-version.mts'
+import { releaseNoteTypes } from './release-notes.mts'
+import { rootDir, versionAssetPaths } from './set-version.mts'
 
 describe('release channel configuration', () => {
   it('maps main to stable releases and next to next prereleases', () => {
@@ -27,5 +28,41 @@ describe('release channel configuration', () => {
   it('does not cache package scripts with external side effects', async () => {
     const viteConfig = await readFile(join(rootDir, 'vite.config.ts'), 'utf-8')
     expect(viteConfig).toContain('run: { cache: { tasks: true, scripts: false } }')
+  })
+
+  it('commits version changes for newly added workspace manifests', () => {
+    expect(versionAssetPaths).toContain('packages/*/package.json')
+  })
+
+  it('uses Chinese release names and complete Chinese changelog sections', () => {
+    expect(releaseNoteTypes.map(type => type.section)).toEqual([
+      '新功能',
+      '新功能',
+      '问题修复',
+      '性能优化',
+      '代码重构',
+      '文档更新',
+      '构建系统',
+      '持续集成',
+      '测试',
+      '代码样式',
+      '变更回退',
+      '其他变更',
+    ])
+    expect(JSON.stringify(releaseConfig.plugins)).toContain('releaseNameTemplate')
+    expect(JSON.stringify(releaseConfig.plugins)).toContain('预览版')
+    expect(JSON.stringify(releaseConfig.plugins)).toContain('正式版')
+  })
+
+  it('places the prerelease warning before generated changelog sections', () => {
+    const pluginNames = releaseConfig.plugins.map(plugin =>
+      Array.isArray(plugin) ? plugin[0] : plugin,
+    )
+    expect(pluginNames.indexOf('./script/semantic-release-plugin.mts')).toBeLessThan(
+      pluginNames.indexOf('@semantic-release/release-notes-generator'),
+    )
+    expect(pluginNames.indexOf('@semantic-release/release-notes-generator')).toBeLessThan(
+      pluginNames.indexOf('@semantic-release/changelog'),
+    )
   })
 })

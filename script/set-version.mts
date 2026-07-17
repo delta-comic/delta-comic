@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises'
+import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -27,6 +27,7 @@ export const cargoLockPackageNames = [
 
 export const versionAssetPaths = [
   ...jsonVersionPaths,
+  'packages/*/package.json',
   ...cargoTomlVersionPaths.map(([path]) => path),
   'Cargo.lock',
 ] as const
@@ -51,6 +52,23 @@ export class VersionSynchronizer {
 
   constructor(cwd = rootDir) {
     this.cwd = cwd
+  }
+
+  private async versionedJsonPaths() {
+    const paths = new Set<string>(jsonVersionPaths)
+    const packagesDir = join(this.cwd, 'packages')
+    const entries = await readdir(packagesDir, { withFileTypes: true })
+
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+      const path = join('packages', entry.name, 'package.json')
+      const manifest = JSON.parse(await readFile(join(this.cwd, path), 'utf-8')) as {
+        private?: boolean
+      }
+      if (manifest.private !== true) paths.add(path)
+    }
+
+    return [...paths]
   }
 
   private async setJsonVersion(path: string, version: string) {
@@ -97,7 +115,7 @@ export class VersionSynchronizer {
   async setVersion(version: string) {
     assertVersion(version)
 
-    for (const path of jsonVersionPaths) {
+    for (const path of await this.versionedJsonPaths()) {
       await this.setJsonVersion(join(this.cwd, path), version)
     }
 

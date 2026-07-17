@@ -1,6 +1,11 @@
 import type { GlobalConfig } from 'semantic-release'
 
 import pkg from './package.json' with { type: 'json' }
+import {
+  createReleaseNameTemplate,
+  releaseNotePresetConfig,
+  releaseNoteWriterOptions,
+} from './script/release-notes.mts'
 import { versionAssetPaths } from './script/set-version.mts'
 
 export const releaseBranches = ['main', { name: 'next', channel: 'next', prerelease: 'next' }]
@@ -11,9 +16,16 @@ export default {
   tagFormat: '${version}',
   plugins: [
     ['@semantic-release/commit-analyzer', { preset: 'angular' }],
-    ['@semantic-release/release-notes-generator', { preset: 'angular' }],
-    ['@semantic-release/changelog', { changelogFile: 'CHANGELOG.md' }],
     './script/semantic-release-plugin.mts',
+    [
+      '@semantic-release/release-notes-generator',
+      {
+        preset: 'conventionalcommits',
+        presetConfig: releaseNotePresetConfig,
+        writerOpts: releaseNoteWriterOptions,
+      },
+    ],
+    ['@semantic-release/changelog', { changelogFile: 'CHANGELOG.md' }],
     [
       '@semantic-release/git',
       {
@@ -21,6 +33,9 @@ export default {
         message: 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
       },
     ],
-    ['@semantic-release/github', { assets: ['dist/release/**/*'] }],
+    [
+      '@semantic-release/github',
+      { assets: ['dist/release/**/*'], releaseNameTemplate: createReleaseNameTemplate() },
+    ],
   ],
 } satisfies GlobalConfig

@@ -10,6 +10,10 @@
 
 `fix:` 触发补丁版本，`feat:` 触发次版本，`!` 或 `BREAKING CHANGE` 触发主版本。只有 semantic-release 判定存在可发布提交时，CI 才会构建所有安装包并发布。
 
+release note 与 changelog 使用中文分类，除功能、修复和性能变更外，也会记录重构、文档、构建、CI、测试与其他维护性提交。预览版开头会显示加粗的谨慎更新提示，GitHub Release 标题也会明确标记“预览版”或“正式版”。
+
+发布 npm workspace 时，脚本会从 `packages/*/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。因此 `@delta-comic/db`、`@delta-comic/model`、`@delta-comic/plugin`、`@delta-comic/ui` 和 `@delta-comic/utils` 会随每次版本一起发布；新增公共 workspace 包也会自动纳入，配置不完整时发布会提前失败。
+
 ## 首次建立分支
 
 仓库只有 `main` 时，在干净工作区执行：

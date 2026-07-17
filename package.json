@@ -46,6 +46,7 @@
     "@vitest/coverage-v8": "catalog:",
     "@vue/test-utils": "catalog:",
     "commitlint-plugin-cspell": "catalog:",
+    "conventional-changelog-conventionalcommits": "catalog:",
     "cspell": "catalog:",
     "happy-dom": "catalog:",
     "oxlint-tsgolint": "catalog:",

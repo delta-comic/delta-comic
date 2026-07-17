@@ -31,20 +31,20 @@ beforeEach(() => {
 })
 
 describe('semantic-release command runner', () => {
-  it('runs the build and recursive publish commands through inherited stdio', async () => {
-    mocks.statuses = [0, 0]
+  it('runs ordered package builds and recursive publish through inherited stdio', async () => {
+    mocks.statuses = [0, 0, 0, 0, 0, 0]
     const { publish } = await import('./semantic-release-plugin.mts')
 
-    await publish({}, { env: {}, nextRelease: { version: '3.0.0' } })
+    await publish({}, { env: {}, nextRelease: { version: '2.3.0' } })
 
     expect(mocks.spawn).toHaveBeenNthCalledWith(
       1,
       'vp',
-      ['run', 'lib-build'],
+      ['run', '--filter', '@delta-comic/model', '--fail-if-no-match', 'build'],
       expect.objectContaining({ stdio: 'inherit' }),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      2,
+      6,
       'vp',
       ['pm', 'publish', '-r', '--no-git-checks', '--provenance', '--tag', 'latest'],
       expect.objectContaining({ stdio: 'inherit' }),
@@ -52,13 +52,13 @@ describe('semantic-release command runner', () => {
   })
 
   it.each([
-    [1, 'Command failed (1): vp run lib-build'],
-    [null, 'Command failed (1): vp run lib-build'],
+    [1, 'Command failed (1): vp run --filter @delta-comic/model --fail-if-no-match build'],
+    [null, 'Command failed (1): vp run --filter @delta-comic/model --fail-if-no-match build'],
   ] as const)('reports non-zero command status %s', async (status, message) => {
     mocks.statuses = [status]
     const { publish } = await import('./semantic-release-plugin.mts')
 
-    await expect(publish({}, { env: {}, nextRelease: { version: '3.0.0' } })).rejects.toThrow(
+    await expect(publish({}, { env: {}, nextRelease: { version: '2.3.0' } })).rejects.toThrow(
       message,
     )
     expect(mocks.spawn).toHaveBeenCalledOnce()
@@ -68,7 +68,7 @@ describe('semantic-release command runner', () => {
     mocks.error = new Error('vp not found')
     const { publish } = await import('./semantic-release-plugin.mts')
 
-    await expect(publish({}, { env: {}, nextRelease: { version: '3.0.0' } })).rejects.toThrow(
+    await expect(publish({}, { env: {}, nextRelease: { version: '2.3.0' } })).rejects.toThrow(
       'vp not found',
     )
   })
