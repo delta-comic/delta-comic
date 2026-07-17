@@ -175,7 +175,7 @@ defineSlots<{
     :class="cn('relative h-full', $props.class)"
     :style
     contentClass="h-full"
-    :disabled="false"
+    :disabled="unReloadable"
   >
     <DcContent
       :source="{

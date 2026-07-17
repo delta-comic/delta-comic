@@ -45,7 +45,6 @@
     "@tauri-apps/plugin-shell": "catalog:",
     "@vueuse/core": "catalog:",
     "dayjs": "catalog:",
-    "dompurify": "catalog:",
     "es-toolkit": "catalog:",
     "linkify-it": "catalog:",
     "markdown-it": "catalog:",

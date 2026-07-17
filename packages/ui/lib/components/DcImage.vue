@@ -145,7 +145,7 @@ defineExpose({ isLoaded, imageEl: computed(() => img.value?.imageRef), imageIns:
         "
         class="size-full flex-col items-center justify-center"
       >
-        <slot name="loading" v-if="$slots.loading"></slot>
+        <slot name="fail" v-if="$slots.fail"></slot>
         <template v-else>
           <NIcon size="2.5rem" color="var(--dc-color-text-secondary)">
             <WarningRound />

@@ -50,7 +50,6 @@ catalog:
   core-js: ^3.48.0
   cspell: ^10.0.1
   dayjs: ^1.11.21
-  dompurify: ^3.4.8
   elysia: ^1.4.29
   es-toolkit: ^1.47.0
   jszip: ^3.10.1

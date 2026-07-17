@@ -7,19 +7,27 @@ import { translateUi } from '../../../i18n'
 
 const $props = defineProps<{ config: FormPairs }>()
 
-const createItem = () => ($props.config.defaultValue ?? [{ key: '', value: '' }])[0]
+const createItem = () => ({ ...($props.config.defaultValue?.[0] ?? { key: '', value: '' }) })
 
 const store = defineModel<FormSingleResult<FormPairs>>({ required: true })
-watch(store, store => {
-  if (!$props.config.noMultiple) return
-  if (store.length == 1) return
-  if (store.length > 0) return store.push(createItem())
-  store.pop()
-})
+watch(
+  [store, () => $props.config.noMultiple],
+  ([value, noMultiple]) => {
+    if (!noMultiple || value.length === 1) return
+    store.value = value.length > 0 ? [value[0]!] : [createItem()]
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <template>
-  <NDynamicInput v-model:value="store" :on-create="() => createItem()" show-sort-button>
+  <NDynamicInput
+    v-model:value="store"
+    :on-create="() => createItem()"
+    :min="config.noMultiple ? 1 : undefined"
+    :max="config.noMultiple ? 1 : undefined"
+    :show-sort-button="!config.noMultiple"
+  >
     <template #default="{ value }">
       <div class="w-full items-center">
         <NInput

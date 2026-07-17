@@ -101,6 +101,11 @@ describe('small UI contracts', () => {
     await wrapper.setProps({ text: 'https://example.com/path' })
     const link = wrapper.get('a')
     expect(link.attributes('href')).toBe('https://example.com/path')
+    expect(link.text()).toBe('https://example.com/path')
+
+    await wrapper.setProps({ text: '项目主页：https://example.com/docs 欢迎访问。' })
+    expect(wrapper.get('a').text()).toBe('https://example.com/docs')
+    expect(wrapper.text()).toContain('项目主页：')
   })
 })
 

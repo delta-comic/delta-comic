@@ -117,11 +117,15 @@ describe('DcImage', () => {
     const wrapper = mount(DcImage, {
       global: { stubs: { Image: ImageStub } },
       props: { cacheList, src: 'https://cdn.example/retry.jpg' },
-      slots: { loading: () => h('span', { class: 'custom-loading' }, 'Waiting') },
+      slots: {
+        fail: () => h('span', { class: 'custom-fail' }, 'Retry'),
+        loading: () => h('span', { class: 'custom-loading' }, 'Waiting'),
+      },
     })
     await flushPromises()
 
-    expect(wrapper.findAll('.custom-loading')).toHaveLength(2)
+    expect(wrapper.findAll('.custom-loading')).toHaveLength(1)
+    expect(wrapper.findAll('.custom-fail')).toHaveLength(1)
     await wrapper.get('.error-content > div').trigger('click')
     await nextTick()
     expect(cacheList.error).not.toContain('https://cdn.example/retry.jpg')

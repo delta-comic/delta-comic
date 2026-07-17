@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import DOMPurify from 'dompurify'
 import { escape } from 'es-toolkit'
 import Link from 'linkify-it'
 import tlds from 'tlds'
@@ -12,19 +11,21 @@ const $props = withDefaults(defineProps<{ text?: string } & StyleProps>(), { tex
 const linker = new Link().tlds(tlds).tlds('onion', true).set({ fuzzyIP: true })
 
 const texts = computed(() => {
-  const raw = escape($props.text)
-  var linked = raw
-  while (true) {
-    const matched = linker.matchAtStart(linked)
-    if (!matched) break
+  const matches = linker.match($props.text)
+  if (!matches) return escape($props.text)
 
-    const pre = linked.slice(0, matched.index)
-    const link = `<a href="${matched.url}" />`
-    const post = linked.slice(matched.lastIndex)
-
-    return pre + link + post
+  let cursor = 0
+  const linked: string[] = []
+  for (const matched of matches) {
+    linked.push(escape($props.text.slice(cursor, matched.index)))
+    const href = /^(?:https?|mailto|ftp):/i.test(matched.url) ? matched.url : '#'
+    linked.push(
+      `<a href="${escape(href)}" rel="noopener noreferrer" target="_blank">${escape(matched.raw)}</a>`,
+    )
+    cursor = matched.lastIndex
   }
-  return DOMPurify.sanitize(raw)
+  linked.push(escape($props.text.slice(cursor)))
+  return linked.join('')
 })
 </script>
 

@@ -119,6 +119,16 @@ describe('DcWaterfall', () => {
     expect(resizeObserve).toHaveBeenCalledTimes(2)
   })
 
+  it('forwards the reload gesture preference to the pull-refresh container', async () => {
+    const wrapper = mount(DcWaterfall, {
+      global,
+      props: { source: { type: 'array', value: [{ id: 1 }] }, unReloadable: true },
+    })
+    await nextTick()
+
+    expect(wrapper.getComponent(PullRefreshStub).props('disabled')).toBe(true)
+  })
+
   it('records observed item heights and clears them on reload', async () => {
     const item = { id: 1 }
     const wrapper = mount(DcWaterfall, {

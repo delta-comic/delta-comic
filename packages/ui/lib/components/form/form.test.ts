@@ -160,6 +160,34 @@ describe('individual form controls', () => {
       'Download command',
     ])
   })
+
+  it('keeps exactly one independent row when multiple pairs are disabled', async () => {
+    const wrapper = shallowMount(DcFormPairs, {
+      props: {
+        config: {
+          defaultValue: [{ key: 'token', value: 'secret' }],
+          noMultiple: true,
+          type: 'pairs',
+        } as any,
+        modelValue: [
+          { key: 'first', value: '1' },
+          { key: 'second', value: '2' },
+        ],
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([[{ key: 'first', value: '1' }]])
+    const dynamic = wrapper.getComponent({ name: 'DynamicInput' })
+    expect(dynamic.props()).toMatchObject({ max: 1, min: 1, showSortButton: false })
+    expect((dynamic.props('onCreate') as () => unknown)()).toEqual({
+      key: 'token',
+      value: 'secret',
+    })
+    expect((dynamic.props('onCreate') as () => unknown)()).not.toBe(
+      (dynamic.props('onCreate') as () => unknown)(),
+    )
+  })
 })
 
 describe('form composition', () => {
