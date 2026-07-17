@@ -9,48 +9,21 @@
 
 @import '@/index.css';
 
-* {
-  user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-user-select: none;
+@layer base {
+  html,
+  body {
+    @apply overflow-hidden!;
+  }
 
-  --safe-area-inset-bottom: 0px;
-  --safe-area-inset-left: 0px;
-  --safe-area-inset-right: 0px;
-  --safe-area-inset-top: 0px;
+  body {
+    @apply m-0 min-w-80 antialiased;
+  }
 
-  --bili-blue: #00aeec;
-  --p-color: var(--nui-primary-color);
-}
+  #app {
+    @apply h-dvh;
+  }
 
-html,
-body {
-  overflow: hidden !important;
-}
-
-input::-webkit-search-cancel-button {
-  display: none;
-}
-
-* .n-progress-graph-line-indicator {
-  display: none !important;
-}
-
-.list-move,
-.list-enter-active,
-.list-leave-active {
-  transition:
-    transform 420ms cubic-bezier(0.22, 1.5, 0.5, 1),
-    opacity 240ms ease-out;
-  will-change: transform, opacity;
-}
-
-.list-enter-from,
-.list-leave-to {
-  opacity: 0;
-  transform: translateY(30px);
-}
-.list-leave-active {
-  position: absolute;
+  input::-webkit-search-cancel-button {
+    @apply hidden;
+  }
 }

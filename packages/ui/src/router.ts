@@ -19,6 +19,10 @@ export const router = (window.$router = Object.assign(
   } as Pick<DeltaRouter, 'force'>,
 ) as DeltaRouter & _RouterClassic)
 
+router.beforeEach(to => {
+  if (to.name === '/' || to.name === '//component') return { name: '//component/list' }
+})
+
 const $routerForceDo = async (mode: keyof typeof router.force, to: RouteAim) => {
   const aim = router.resolve(to as any)
   aim.query.force = 'true'

@@ -71,7 +71,6 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     left: '50%',
     top: '8px',
     translateX: '-50%',
-    backgroundColor: 'var(--dc-color-surface)',
     borderRadius: '100%',
   },
   isErrorNoData: {
@@ -84,7 +83,6 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     left: '50%',
     top: '50%',
     translateX: '-50%',
-    backgroundColor: 'var(--dc-color-surface)',
     borderRadius: '4px',
   },
   isLoadingData: {
@@ -97,7 +95,6 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     left: '4px',
     top: 'calc(100% - 8px - 1rem)',
     translateX: '0%',
-    backgroundColor: 'var(--p-color)',
     borderRadius: '1.3rem',
   },
   isErrorData: {
@@ -110,7 +107,6 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     left: '4px',
     top: 'calc(100% - 8px - 4rem)',
     translateX: '0%',
-    backgroundColor: 'var(--p-color)',
     borderRadius: '4px',
   },
   isEmpty: {
@@ -123,7 +119,6 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     left: '50%',
     top: '50%',
     translateX: '-50%',
-    backgroundColor: 'var(--dc-color-surface)',
     borderRadius: '4px',
   },
   done: {
@@ -136,7 +131,6 @@ const loadingVariants = computed<Record<AllVariant, VariantType>>(() => ({
     left: '4px',
     top: 'calc(100% - 8px - 1rem)',
     translateX: '0%',
-    backgroundColor: 'var(--p-color)',
     borderRadius: '4px',
   },
 }))
@@ -155,6 +149,13 @@ const animateOn = computed<AllVariant>(() => {
 const isLoadingState = computed(
   () => animateOn.value === 'isLoadingNoData' || animateOn.value === 'isLoadingData',
 )
+const indicatorBackgroundColor = computed(() =>
+  animateOn.value === 'isLoadingData' ||
+  animateOn.value === 'isErrorData' ||
+  animateOn.value === 'done'
+    ? 'var(--p-color)'
+    : 'var(--dc-color-surface)',
+)
 
 const conation = useTemplateRef('conation')
 defineExpose({ cont: conation })
@@ -162,7 +163,10 @@ defineSlots<{ default(data: { data?: T }): any }>()
 </script>
 
 <template>
-  <div class="relative size-full overflow-hidden">
+  <div
+    class="relative size-full overflow-hidden"
+    :style="{ '--dc-content-indicator-background': indicatorBackgroundColor }"
+  >
     <div :class="cn('relative size-full', $props.class)" ref="conation">
       <slot v-if="!isEmpty(source.data)" :data="source.data" />
     </div>
@@ -173,7 +177,7 @@ defineSlots<{ default(data: { data?: T }): any }>()
         :animate="animateOn"
         :class="
           cn(
-            'absolute flex scale-100 items-center justify-center whitespace-nowrap shadow',
+            'absolute flex scale-100 items-center justify-center bg-[var(--dc-content-indicator-background)] whitespace-nowrap shadow',
             isLoadingState && classLoading,
           )
         "

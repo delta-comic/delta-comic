@@ -18,13 +18,11 @@ import { DataLoaderPlugin } from 'vue-router/experimental'
 import App from './App.vue'
 import { router } from './router'
 
-document.addEventListener('contextmenu', e => e.preventDefault())
-
 const app = createApp(
   defineComponent(() => {
     const isDark = usePreferredDark()
 
-    const themeColor = '#fb7299'
+    const themeColor = '#18a058'
     const themeColorDark = `color-mix(in oklch, ${themeColor}, black 20%)`
 
     const isUseDarkMode = useDark({ listenToStorageChanges: false })
@@ -43,7 +41,7 @@ const app = createApp(
             primaryColorHover: `color-mix(in oklch, ${themeColor}, white 20%)`,
             primaryColorPressed: themeColorDark,
             primaryColorSuppl: themeColorDark,
-            cardColor: isDark.value ? '#17181a' : undefined,
+            cardColor: isDark.value ? '#18181c' : undefined,
           },
         }}
       >
