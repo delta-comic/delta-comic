@@ -2,7 +2,6 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "delta-comic-server",
   "main": "./app/index.ts",
-  "tsconfig": "./tsconfig.app.json",
   "compatibility_date": "2026-07-02",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
