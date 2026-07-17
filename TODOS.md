@@ -14,9 +14,12 @@
 
 ## app侧清单
 
-- [ ] 重构且重新设计`packages/ui/src`这个组件展示页面，样式参照<https://www.naiveui.com>，可以适当阉割功能（如i18n）
+- [x] 重构且重新设计`packages/ui/src`这个组件展示页面，样式参照<https://www.naiveui.com>，可以适当阉割功能（如i18n）
+- [x] 为插件增添一个可选的icon的meta字段，内容是字符串的url链接，可以是本地路径也可以是网络链接
+  - [x] 在你认为需要icon的地方添加显示
 
 ## 工程侧清单
 
-- [ ] 分析当前发布管理脚本是否会在发布时发布monorepo依赖，如`@delta-comic/ui`;不会就请补齐相关功能
-- [ ] 丰富化changelog内容，如预发布就插入粗体谨慎更新提示等
+- [x] 分析当前发布管理脚本是否会在发布时发布monorepo依赖，如`@delta-comic/ui`;不会就请补齐相关功能
+- [x] 丰富化changelog内容，如预发布就插入粗体谨慎更新提示等
+- [x] release-note使用中文标题/分类描述
