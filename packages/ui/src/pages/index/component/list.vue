@@ -25,8 +25,12 @@ const waterfallSource = { type: 'array' as const, value: waterfallItems }
 </script>
 
 <template>
-  <div class="space-y-6">
-    <DemoSection title="基础列表" description="单列虚拟化渲染，适合章节、历史记录等纵向数据。">
+  <div class="grid gap-6 2xl:grid-cols-2">
+    <DemoSection
+      section-id="basic-list"
+      title="基础列表"
+      description="单列虚拟化渲染，适合章节、历史记录等纵向数据。"
+    >
       <div
         class="h-[420px] overflow-hidden rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
       >
@@ -67,6 +71,7 @@ const waterfallSource = { type: 'array' as const, value: waterfallItems }
     </DemoSection>
 
     <DemoSection
+      section-id="responsive-waterfall"
       title="响应式瀑布流"
       description="列数会在 1 到 3 之间自适应，组件自动测量不同高度的内容卡片。"
     >

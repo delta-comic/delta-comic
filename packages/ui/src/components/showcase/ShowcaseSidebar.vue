@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { NEmpty, NInput } from 'naive-ui'
-import { computed, shallowRef } from 'vue'
+import { computed } from 'vue'
 
 import type { ShowcaseNavItem } from './types'
 
 const props = defineProps<{ items: readonly ShowcaseNavItem[]; activeName?: string }>()
+const keyword = defineModel<string>('keyword', { default: '' })
 
 const emit = defineEmits<{ select: [item: ShowcaseNavItem] }>()
 
-const keyword = shallowRef('')
 const visibleItems = computed(() => {
   const normalizedKeyword = keyword.value.trim().toLocaleLowerCase()
   if (!normalizedKeyword) return props.items
@@ -21,11 +21,11 @@ const visibleItems = computed(() => {
 
 <template>
   <div class="flex h-full min-h-0 flex-col bg-[var(--nui-card-color)] px-3 py-5">
-    <div class="px-2">
+    <div class="px-2 lg:hidden">
       <NInput v-model:value="keyword" clearable placeholder="搜索组件" aria-label="搜索组件" />
     </div>
 
-    <div class="mt-6 flex min-h-0 flex-1 flex-col">
+    <div class="mt-6 flex min-h-0 flex-1 flex-col lg:mt-1">
       <p
         class="mb-2 px-3 text-xs font-semibold tracking-[0.14em] text-[var(--nui-text-color-3)] uppercase"
       >

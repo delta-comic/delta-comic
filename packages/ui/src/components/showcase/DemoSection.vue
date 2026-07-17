@@ -1,11 +1,12 @@
 <script setup lang="ts">
-defineProps<{ title: string; description: string }>()
+defineProps<{ title: string; description: string; sectionId?: string }>()
 
 defineSlots<{ default(): unknown; actions(): unknown; note(): unknown }>()
 </script>
 
 <template>
   <section
+    :id="sectionId"
     class="overflow-hidden rounded-xl border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)] shadow-[0_8px_30px_rgb(0_0_0/0.03)]"
   >
     <header

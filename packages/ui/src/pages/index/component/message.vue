@@ -60,8 +60,9 @@ onScopeDispose(destroyMessage)
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="grid gap-6 2xl:grid-cols-2">
     <DemoSection
+      section-id="controlled-message"
       title="可控状态消息"
       description="创建一个持续展示的 loading，再将同一个实例更新为成功或失败状态。"
     >
@@ -98,6 +99,7 @@ onScopeDispose(destroyMessage)
     </DemoSection>
 
     <DemoSection
+      section-id="bound-task"
       title="绑定异步任务"
       description="bind 会跟随 Promise 的最终状态更新反馈，并保留标准的错误传播行为。"
     >

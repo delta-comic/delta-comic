@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { NButton, NTag } from 'naive-ui'
+import { NButton, NInput, NTag } from 'naive-ui'
 
 defineProps<{ packageName: string; version: string }>()
+const keyword = defineModel<string>('keyword', { default: '' })
 
 const emit = defineEmits<{ openNavigation: [] }>()
 </script>
@@ -41,6 +42,24 @@ const emit = defineEmits<{ openNavigation: [] }>()
           </span>
         </span>
       </a>
+
+      <nav class="ml-8 hidden items-center gap-6 md:flex" aria-label="顶部导航">
+        <a
+          href="/"
+          class="text-sm font-medium text-[var(--nui-text-color-2)] no-underline transition-colors hover:text-[var(--nui-primary-color)]"
+        >
+          首页
+        </a>
+        <span class="text-sm font-medium text-[var(--nui-primary-color)]">组件</span>
+      </nav>
+
+      <NInput
+        v-model:value="keyword"
+        clearable
+        placeholder="搜索组件"
+        aria-label="搜索组件"
+        class="ml-4 hidden max-w-xs flex-1 md:flex!"
+      />
 
       <div class="ml-auto flex items-center gap-2 sm:gap-4">
         <NTag size="small" :bordered="false" round type="success">v{{ version }}</NTag>
