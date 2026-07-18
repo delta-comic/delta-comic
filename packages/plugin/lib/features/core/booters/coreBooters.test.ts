@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => {
     createForm: vi.fn(),
     dependencyProvide: vi.fn(),
     dialogCreate: vi.fn(),
+    downloadProviders: registry(),
     fork: registry(),
     i18nRegister: vi.fn(),
     itemCards: registry(),
@@ -41,7 +42,13 @@ const mocks = vi.hoisted(() => {
 vi.mock('@delta-comic/model', () => ({
   uni: {
     comment: { Comment: { commentRow: mocks.commentRow } },
-    content: { ContentPage: { contentPages: mocks.contentPages, layouts: mocks.layouts } },
+    content: {
+      ContentPage: {
+        contentPages: mocks.contentPages,
+        downloadProviders: mocks.downloadProviders,
+        layouts: mocks.layouts,
+      },
+    },
     item: {
       Item: {
         authorIcon: mocks.authorIcon,
@@ -130,6 +137,7 @@ describe('core registration booters', () => {
       commentRow: {},
       config: { key: Symbol('config') },
       contentPage: {},
+      downloadProvider: { resolve: vi.fn() },
       itemCard: {},
       itemTranslator: vi.fn(),
       hotSearch: { title: 'hot search' },
@@ -156,6 +164,7 @@ describe('core registration booters', () => {
           manga: {
             commentRow: values.commentRow,
             contentPage: values.contentPage,
+            downloadProvider: values.downloadProvider,
             itemCard: values.itemCard,
             itemTranslator: values.itemTranslator,
             layout: values.layout,
@@ -190,6 +199,7 @@ describe('core registration booters', () => {
     expect(mocks.layouts.set).toHaveBeenCalledWith('manga', values.layout)
     expect(mocks.itemCards.set).toHaveBeenCalledWith('manga', values.itemCard)
     expect(mocks.contentPages.set).toHaveBeenCalledWith('manga', values.contentPage)
+    expect(mocks.downloadProviders.set).toHaveBeenCalledWith('manga', values.downloadProvider)
     expect(mocks.commentRow.set).toHaveBeenCalledWith('manga', values.commentRow)
     expect(mocks.itemTranslator.set).toHaveBeenCalledWith('manga', values.itemTranslator)
     expect(mocks.fork.set).toHaveBeenCalledWith(['fixture', 'image'], values.resourceType)

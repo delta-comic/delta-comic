@@ -47,6 +47,8 @@ export const cleanupPlugin = (config: PluginConfig) => {
     if (value.layout) attempt(() => uni.content.ContentPage.layouts.delete(contentType))
     if (value.itemCard) attempt(() => uni.item.Item.itemCards.delete(contentType))
     if (value.contentPage) attempt(() => uni.content.ContentPage.contentPages.delete(contentType))
+    if (value.downloadProvider)
+      attempt(() => uni.content.ContentPage.downloadProviders.delete(contentType))
     if (value.commentRow) attempt(() => uni.comment.Comment.commentRow.delete(contentType))
     if (value.itemTranslator) attempt(() => uni.item.Item.itemTranslator.delete(contentType))
   }

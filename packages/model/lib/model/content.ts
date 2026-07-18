@@ -3,6 +3,7 @@ import { type Component } from 'vue'
 import { SourcedKeyMap, type StreamQuery, type SourcedKeyType } from '../struct'
 
 import * as comment from './comment'
+import type { ContentDownloadProvider } from './download'
 import * as ep from './ep'
 import * as item from './item'
 
@@ -31,6 +32,10 @@ export abstract class ContentPage {
   public static contentPages = SourcedKeyMap.createReactive<
     [plugin: string, name: string],
     ContentPageLike
+  >()
+  public static downloadProviders = SourcedKeyMap.createReactive<
+    ContentType,
+    ContentDownloadProvider
   >()
 
   constructor(

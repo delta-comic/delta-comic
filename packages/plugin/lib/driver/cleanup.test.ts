@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => {
     configUnregister: vi.fn(),
     contentPages: registry(),
     defaultDependencyDelete: vi.fn(),
+    downloadProviders: registry(),
     fork: registry(),
     globalRemoveOwned: vi.fn(),
     hotSearch: registry(),
@@ -37,7 +38,13 @@ const mocks = vi.hoisted(() => {
 vi.mock('@delta-comic/model', () => ({
   uni: {
     comment: { Comment: { commentRow: mocks.commentRow } },
-    content: { ContentPage: { contentPages: mocks.contentPages, layouts: mocks.layouts } },
+    content: {
+      ContentPage: {
+        contentPages: mocks.contentPages,
+        downloadProviders: mocks.downloadProviders,
+        layouts: mocks.layouts,
+      },
+    },
     item: {
       Item: {
         authorIcon: mocks.authorIcon,
@@ -101,7 +108,14 @@ describe('plugin cleanup', () => {
     cleanupPlugin({
       config: [configPointer],
       content: {
-        manga: { commentRow: {}, contentPage: {}, itemCard: {}, itemTranslator: {}, layout: {} },
+        manga: {
+          commentRow: {},
+          contentPage: {},
+          downloadProvider: {},
+          itemCard: {},
+          itemTranslator: {},
+          layout: {},
+        },
       },
       name: 'fixture',
       resource: { process: { resize: {} }, types: [{ type: 'image' }] },
@@ -116,6 +130,7 @@ describe('plugin cleanup', () => {
     expect(mocks.layouts.delete).toHaveBeenCalledWith('manga')
     expect(mocks.itemCards.delete).toHaveBeenCalledWith('manga')
     expect(mocks.contentPages.delete).toHaveBeenCalledWith('manga')
+    expect(mocks.downloadProviders.delete).toHaveBeenCalledWith('manga')
     expect(mocks.commentRow.delete).toHaveBeenCalledWith('manga')
     expect(mocks.itemTranslator.delete).toHaveBeenCalledWith('manga')
     expect(mocks.fork.delete).toHaveBeenCalledWith(['fixture', 'image'])

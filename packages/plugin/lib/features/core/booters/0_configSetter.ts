@@ -16,11 +16,12 @@ class _ConfigSetter extends PluginBooter {
     if (content)
       for (const [
         ct,
-        { commentRow, contentPage, itemCard, layout, itemTranslator },
+        { commentRow, contentPage, downloadProvider, itemCard, layout, itemTranslator },
       ] of Object.entries(content)) {
         if (layout) uni.content.ContentPage.layouts.set(ct, layout)
         if (itemCard) uni.item.Item.itemCards.set(ct, itemCard)
         if (contentPage) uni.content.ContentPage.contentPages.set(ct, contentPage)
+        if (downloadProvider) uni.content.ContentPage.downloadProviders.set(ct, downloadProvider)
         if (commentRow) uni.comment.Comment.commentRow.set(ct, commentRow)
         if (itemTranslator) uni.item.Item.itemTranslator.set(ct, itemTranslator)
       }

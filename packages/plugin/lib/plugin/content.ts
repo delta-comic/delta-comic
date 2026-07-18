@@ -7,6 +7,7 @@ export type Config = Record<
     commentRow?: uni.comment.CommentRow
     layout?: uni.content.LayoutComponent
     contentPage?: uni.content.ContentPageLike
+    downloadProvider?: uni.download.ContentDownloadProvider
     itemTranslator?: uni.item.ItemTranslator
   }
 >
