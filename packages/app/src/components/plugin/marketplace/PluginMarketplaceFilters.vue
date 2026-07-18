@@ -40,7 +40,7 @@ const filterOptions = computed(() => [
         v-model:value="query"
         clearable
         :placeholder="t('plugin.market.searchPlaceholder')"
-        class="w-37.5 max-[640px]:basis-full "
+        class="w-37.5 max-[640px]:basis-full"
       />
       <NSelect
         v-model:value="filter"
