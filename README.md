@@ -77,19 +77,19 @@ _____   _________________ ____        __________________ _____   ______
 - [x] 「天堂支点」 [禁漫天堂](https://github.com/delta-comic/jmcomic-sdk)
 
 ```txt
-ap:jmcomic
+gh:delta-comic/jmcomic-sdk
 ```
 
 - [x] 「三花聚顶」 [哔咔漫画](https://github.com/delta-comic/delta-comic-plugin-bika)
 
 ```txt
-ap:bika
+gh:delta-comic/delta-comic-plugin-bika
 ```
 
 - [x] 「众生相」 [CosAv](https://github.com/delta-comic/delta-comic-plugin-cosav)
 
 ```txt
-ap:cosav
+gh:delta-comic/delta-comic-plugin-cosav
 ```
 
 - [ ] 「应许之地」 [E-Hentai](https://github.com/delta-comic/delta-comic-plugin-ehentai)
