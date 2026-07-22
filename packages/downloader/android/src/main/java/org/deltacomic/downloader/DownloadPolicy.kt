@@ -1,42 +1,38 @@
-package org.delta_comic.downloader
+package org.deltacomic.downloader
 
 internal enum class BackgroundBackend {
     UIDT,
-    WORK_MANAGER,
+    WORK_MANAGER
 }
 
 internal enum class ExecutionResult {
     COMPLETED,
     RETRY,
-    STOPPED,
+    STOPPED
 }
 
 internal enum class NetworkRequirement {
     CONNECTED,
-    UNMETERED,
+    UNMETERED
 }
 
 internal enum class ControlAction {
     PAUSE,
     CANCEL,
-    SYSTEM_STOP,
+    SYSTEM_STOP
 }
 
 internal enum class NotificationPermissionStatus(val wireValue: String) {
     GRANTED("granted"),
     DENIED("denied"),
-    NOT_REQUIRED("notRequired"),
+    NOT_REQUIRED("notRequired")
 }
 
-internal const val ACTION_PAUSE = "org.delta_comic.downloader.PAUSE"
-internal const val ACTION_CANCEL = "org.delta_comic.downloader.CANCEL"
+internal const val ACTION_PAUSE = "org.deltacomic.downloader.PAUSE"
+internal const val ACTION_CANCEL = "org.deltacomic.downloader.CANCEL"
 internal const val ENGINE_CONFIG_VERSION = 1
 
-internal data class HeadlessEngineConfig(
-    val version: Int,
-    val databasePath: String,
-    val downloadDir: String,
-)
+internal data class HeadlessEngineConfig(val version: Int, val databasePath: String, val downloadDir: String)
 
 internal fun backendForApi(apiLevel: Int): BackgroundBackend =
     if (apiLevel >= 34) BackgroundBackend.UIDT else BackgroundBackend.WORK_MANAGER
@@ -48,14 +44,12 @@ internal fun networkRequirement(allowMetered: Boolean): NetworkRequirement =
 internal fun shouldRequestNotificationPermission(apiLevel: Int, permissionState: String?): Boolean =
     apiLevel >= 33 && permissionState == "prompt"
 
-internal fun notificationPermissionStatus(
-    apiLevel: Int,
-    permissionState: String?,
-): NotificationPermissionStatus = when {
-    apiLevel < 33 -> NotificationPermissionStatus.NOT_REQUIRED
-    permissionState == "granted" -> NotificationPermissionStatus.GRANTED
-    else -> NotificationPermissionStatus.DENIED
-}
+internal fun notificationPermissionStatus(apiLevel: Int, permissionState: String?): NotificationPermissionStatus =
+    when {
+        apiLevel < 33 -> NotificationPermissionStatus.NOT_REQUIRED
+        permissionState == "granted" -> NotificationPermissionStatus.GRANTED
+        else -> NotificationPermissionStatus.DENIED
+    }
 
 internal fun executionResult(code: Int): ExecutionResult = when (code) {
     0 -> ExecutionResult.COMPLETED
@@ -74,11 +68,7 @@ internal fun stablePlatformId(taskId: String, salt: Int = 0): Int {
     return candidate.takeUnless { it == 0 } ?: 1
 }
 
-internal fun nextAvailablePlatformId(
-    taskId: String,
-    occupiedIds: Set<Int>,
-    salt: Int = 0,
-): Int {
+internal fun nextAvailablePlatformId(taskId: String, occupiedIds: Set<Int>, salt: Int = 0): Int {
     var candidate = stablePlatformId(taskId, salt)
     repeat(occupiedIds.size + 1) {
         if (candidate !in occupiedIds) return candidate
@@ -87,8 +77,7 @@ internal fun nextAvailablePlatformId(
     error("No platform ID is available")
 }
 
-internal fun shouldRescheduleUidtJob(stoppedByUserOrApp: Boolean): Boolean =
-    !stoppedByUserOrApp
+internal fun shouldRescheduleUidtJob(stoppedByUserOrApp: Boolean): Boolean = !stoppedByUserOrApp
 
 internal fun validHeadlessEngineConfig(config: HeadlessEngineConfig): Boolean =
     config.version == ENGINE_CONFIG_VERSION &&
@@ -96,10 +85,7 @@ internal fun validHeadlessEngineConfig(config: HeadlessEngineConfig): Boolean =
         java.io.File(config.downloadDir).isAbsolute &&
         config.databasePath != config.downloadDir
 
-internal fun rustBridgeClassCandidates(
-    applicationPackage: String,
-    launchActivityClass: String?,
-): List<String> {
+internal fun rustBridgeClassCandidates(applicationPackage: String, launchActivityClass: String?): List<String> {
     val launchPackage = launchActivityClass
         ?.substringBeforeLast('.', missingDelimiterValue = "")
         ?.takeIf(String::isNotBlank)

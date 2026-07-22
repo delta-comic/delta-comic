@@ -1,1 +1,1 @@
--keep class org.delta_comic.downloader.** { *; }
+-keep class org.deltacomic.downloader.** { *; }

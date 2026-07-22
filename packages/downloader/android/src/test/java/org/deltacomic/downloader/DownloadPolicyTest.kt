@@ -1,4 +1,4 @@
-package org.delta_comic.downloader
+package org.deltacomic.downloader
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Assert.assertEquals
@@ -41,23 +41,23 @@ class DownloadPolicyTest {
         assertEquals("notRequired", NotificationPermissionStatus.NOT_REQUIRED.wireValue)
         assertEquals(
             NotificationPermissionStatus.NOT_REQUIRED,
-            notificationPermissionStatus(32, "denied"),
+            notificationPermissionStatus(32, "denied")
         )
         assertEquals(
             NotificationPermissionStatus.GRANTED,
-            notificationPermissionStatus(33, "granted"),
+            notificationPermissionStatus(33, "granted")
         )
         assertEquals(
             NotificationPermissionStatus.DENIED,
-            notificationPermissionStatus(33, "denied"),
+            notificationPermissionStatus(33, "denied")
         )
         assertEquals(
             NotificationPermissionStatus.DENIED,
-            notificationPermissionStatus(33, "prompt-with-rationale"),
+            notificationPermissionStatus(33, "prompt-with-rationale")
         )
         assertEquals(
             NotificationPermissionStatus.DENIED,
-            notificationPermissionStatus(36, null),
+            notificationPermissionStatus(36, null)
         )
     }
 
@@ -66,17 +66,17 @@ class DownloadPolicyTest {
         val mapper = ObjectMapper()
         assertEquals(
             """{"notificationPermission":"granted"}""",
-            mapper.writeValueAsString(ScheduleResult(NotificationPermissionStatus.GRANTED.wireValue)),
+            mapper.writeValueAsString(ScheduleResult(NotificationPermissionStatus.GRANTED.wireValue))
         )
         assertEquals(
             """{"notificationPermission":"denied"}""",
-            mapper.writeValueAsString(ScheduleResult(NotificationPermissionStatus.DENIED.wireValue)),
+            mapper.writeValueAsString(ScheduleResult(NotificationPermissionStatus.DENIED.wireValue))
         )
         assertEquals(
             """{"notificationPermission":"notRequired"}""",
             mapper.writeValueAsString(
                 ScheduleResult(NotificationPermissionStatus.NOT_REQUIRED.wireValue)
-            ),
+            )
         )
     }
 
@@ -108,7 +108,7 @@ class DownloadPolicyTest {
         assertNotEquals(stablePlatformId("task-1"), stablePlatformId("task-1", 0x13579bdf))
         assertNotEquals(
             stablePlatformId("task-1", 0x13579bdf),
-            stablePlatformId("task-1", 0x2468ace),
+            stablePlatformId("task-1", 0x2468ace)
         )
     }
 
@@ -119,7 +119,7 @@ class DownloadPolicyTest {
         assertEquals(first + 1, nextAvailablePlatformId("task-1", setOf(first)))
         assertEquals(
             2,
-            nextAvailablePlatformId("", setOf(Int.MAX_VALUE, 1), Int.MAX_VALUE),
+            nextAvailablePlatformId("", setOf(Int.MAX_VALUE, 1), Int.MAX_VALUE)
         )
     }
 
@@ -136,7 +136,7 @@ class DownloadPolicyTest {
                 HeadlessEngineConfig(
                     ENGINE_CONFIG_VERSION,
                     "/data/user/0/org.delta/files/downloader.sqlite",
-                    "/data/user/0/org.delta/files/downloads",
+                    "/data/user/0/org.delta/files/downloads"
                 )
             )
         )
@@ -146,15 +146,15 @@ class DownloadPolicyTest {
                 HeadlessEngineConfig(
                     ENGINE_CONFIG_VERSION + 1,
                     "/data/user/0/org.delta/files/downloader.sqlite",
-                    "/data/user/0/org.delta/files/downloads",
+                    "/data/user/0/org.delta/files/downloads"
                 )
-            ),
+            )
         )
         assertEquals(
             false,
             validHeadlessEngineConfig(
                 HeadlessEngineConfig(ENGINE_CONFIG_VERSION, "relative.sqlite", "/downloads")
-            ),
+            )
         )
     }
 
@@ -164,12 +164,12 @@ class DownloadPolicyTest {
             listOf("org.delta.app.Rust", "org.delta.app.debug.Rust"),
             rustBridgeClassCandidates(
                 "org.delta.app.debug",
-                "org.delta.app.MainActivity",
-            ),
+                "org.delta.app.MainActivity"
+            )
         )
         assertEquals(
             listOf("org.delta.app.Rust"),
-            rustBridgeClassCandidates("org.delta.app", null),
+            rustBridgeClassCandidates("org.delta.app", null)
         )
     }
 
@@ -197,7 +197,7 @@ class DownloadPolicyTest {
         assertTrue(
             validSafDocumentBinding(
                 tree,
-                "content://provider/tree/primary%3ADownloads/document/primary%3ADownloads%2Fcomic.cbz",
+                "content://provider/tree/primary%3ADownloads/document/primary%3ADownloads%2Fcomic.cbz"
             )
         )
         assertEquals(false, validSafDocumentBinding(tree, tree))
@@ -205,15 +205,15 @@ class DownloadPolicyTest {
             false,
             validSafDocumentBinding(
                 tree,
-                "content://provider/tree/primary%3AOther/document/primary%3AOther%2Fcomic.cbz",
-            ),
+                "content://provider/tree/primary%3AOther/document/primary%3AOther%2Fcomic.cbz"
+            )
         )
         assertEquals(
             false,
             validSafDocumentBinding(
                 tree,
-                "content://other/tree/primary%3ADownloads/document/primary%3ADownloads%2Fcomic.cbz",
-            ),
+                "content://other/tree/primary%3ADownloads/document/primary%3ADownloads%2Fcomic.cbz"
+            )
         )
     }
 }

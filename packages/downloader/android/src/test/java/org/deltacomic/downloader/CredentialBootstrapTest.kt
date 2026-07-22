@@ -1,4 +1,4 @@
-package org.delta_comic.downloader
+package org.deltacomic.downloader
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -18,7 +18,7 @@ class CredentialBootstrapTest {
             bootstrap = {
                 calls += "engine"
                 0
-            },
+            }
         )
 
         assertTrue(initialized)
@@ -34,7 +34,7 @@ class CredentialBootstrapTest {
             bootstrap = {
                 bootstrapCalls += 1
                 0
-            },
+            }
         )
 
         assertFalse(initialized)

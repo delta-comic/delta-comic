@@ -1,4 +1,4 @@
-package org.delta_comic.downloader
+package org.deltacomic.downloader
 
 import android.annotation.SuppressLint
 import android.app.job.JobParameters
@@ -6,9 +6,9 @@ import android.app.job.JobService
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+import java.util.concurrent.RejectedExecutionException
 
 // UIDT jobs use a JobScheduler namespace, so their IDs cannot collide with WorkManager.
 @SuppressLint("SpecifyJobSchedulerIdRange")
@@ -29,7 +29,7 @@ class DownloadJobService : JobService() {
             params,
             params.jobId,
             DownloadRuntime.createNotification(this, taskId),
-            JOB_END_NOTIFICATION_POLICY_REMOVE,
+            JOB_END_NOTIFICATION_POLICY_REMOVE
         )
         val activeJob = ActiveJob(taskId)
         activeJobs[params.jobId] = activeJob
@@ -58,8 +58,10 @@ class DownloadJobService : JobService() {
             DownloadRuntime.dispatchControl(this, taskId, ControlAction.SYSTEM_STOP)
         }
         val stoppedByUserOrApp = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            (params.stopReason == JobParameters.STOP_REASON_USER ||
-                params.stopReason == JobParameters.STOP_REASON_CANCELLED_BY_APP)
+            (
+                params.stopReason == JobParameters.STOP_REASON_USER ||
+                    params.stopReason == JobParameters.STOP_REASON_CANCELLED_BY_APP
+                )
         return shouldRescheduleUidtJob(stoppedByUserOrApp)
     }
 

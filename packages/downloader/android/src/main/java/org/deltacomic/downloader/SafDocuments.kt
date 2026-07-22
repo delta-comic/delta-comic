@@ -1,4 +1,4 @@
-package org.delta_comic.downloader
+package org.deltacomic.downloader
 
 import android.content.Context
 import android.net.Uri
@@ -10,8 +10,8 @@ import android.system.OsConstants
 import androidx.documentfile.provider.DocumentFile
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.File
-import java.net.URLConnection
 import java.net.URI
+import java.net.URLConnection
 import java.nio.file.Files
 import java.security.MessageDigest
 
@@ -19,7 +19,7 @@ internal data class SafExportInstruction(
     val treeUri: String = "",
     val relativePath: String = "",
     val stagingPath: String = "",
-    val isDirectory: Boolean = false,
+    val isDirectory: Boolean = false
 )
 
 internal data class SafDirectInstruction(
@@ -28,7 +28,7 @@ internal data class SafDirectInstruction(
     val expectedLength: Long? = null,
     val temporaryName: String = "",
     val temporaryDocumentUri: String? = null,
-    val readyToCommit: Boolean = false,
+    val readyToCommit: Boolean = false
 )
 
 internal sealed interface SafDirectOpenResult {
@@ -36,10 +36,7 @@ internal sealed interface SafDirectOpenResult {
     data class Fallback(val documentUri: String?) : SafDirectOpenResult
 }
 
-internal data class SafOperationResult(
-    val value: String? = null,
-    val error: String? = null,
-) {
+internal data class SafOperationResult(val value: String? = null, val error: String? = null) {
     val succeeded: Boolean get() = error == null
 }
 
@@ -228,7 +225,7 @@ internal object SafDocuments {
                     ?: parent.createFile(
                         URLConnection.guessContentTypeFromName(finalName)
                             ?: "application/octet-stream",
-                        finalName,
+                        finalName
                     )
                     ?: error("Could not create the final SAF document")
                 if (destination.uri == temporary.uri) {
@@ -246,11 +243,7 @@ internal object SafDocuments {
         SafOperationResult(error = error.message ?: error.javaClass.simpleName)
     }
 
-    fun discardDirect(
-        context: Context,
-        instructionJson: String,
-        documentUriValue: String,
-    ): SafOperationResult = try {
+    fun discardDirect(context: Context, instructionJson: String, documentUriValue: String): SafOperationResult = try {
         val instruction = mapper.readValue(instructionJson, SafDirectInstruction::class.java)
         require(validSafDocumentBinding(instruction.treeUri, documentUriValue)) {
             "The SAF temporary document is outside its registered tree"
@@ -266,11 +259,7 @@ internal object SafDocuments {
         SafOperationResult(error = error.message ?: error.javaClass.simpleName)
     }
 
-    fun deleteExported(
-        context: Context,
-        treeUriValue: String,
-        documentUriValue: String,
-    ): SafOperationResult = try {
+    fun deleteExported(context: Context, treeUriValue: String, documentUriValue: String): SafOperationResult = try {
         val treeUri = Uri.parse(treeUriValue)
         val documentUri = Uri.parse(documentUriValue)
         require(treeUri.scheme == "content" && documentUri.scheme == "content") {
@@ -284,7 +273,7 @@ internal object SafDocuments {
         }
         val rootDocumentUri = DocumentsContract.buildDocumentUriUsingTree(
             treeUri,
-            DocumentsContract.getTreeDocumentId(treeUri),
+            DocumentsContract.getTreeDocumentId(treeUri)
         )
         require(documentUri != treeUri && documentUri != rootDocumentUri) {
             "The registered document tree cannot be deleted"
@@ -294,7 +283,7 @@ internal object SafDocuments {
                 DocumentsContract.isChildDocument(
                     context.contentResolver,
                     rootDocumentUri,
-                    documentUri,
+                    documentUri
                 )
             ) {
                 "The document provider reports that the export is outside its registered tree"
@@ -354,12 +343,7 @@ internal object SafDocuments {
         } ?: error("Could not enumerate the staging directory")
     }
 
-    private fun copyFile(
-        context: Context,
-        source: File,
-        parent: DocumentFile,
-        name: String,
-    ): DocumentFile {
+    private fun copyFile(context: Context, source: File, parent: DocumentFile, name: String): DocumentFile {
         val existing = parent.findFile(name)
         require(existing?.isDirectory != true) { "A directory blocks the SAF file path: $name" }
         val mimeType = URLConnection.guessContentTypeFromName(name) ?: "application/octet-stream"
@@ -383,11 +367,7 @@ internal object SafDocuments {
         }
     }
 
-    private fun requireExpectedLength(
-        context: Context,
-        document: DocumentFile,
-        expectedLength: Long?,
-    ) {
+    private fun requireExpectedLength(context: Context, document: DocumentFile, expectedLength: Long?) {
         if (expectedLength != null) {
             val actualLength = context.contentResolver
                 .openFileDescriptor(document.uri, "r")

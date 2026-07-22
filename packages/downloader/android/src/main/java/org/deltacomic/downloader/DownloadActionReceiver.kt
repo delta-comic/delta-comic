@@ -1,4 +1,4 @@
-package org.delta_comic.downloader
+package org.deltacomic.downloader
 
 import android.content.BroadcastReceiver
 import android.content.Context

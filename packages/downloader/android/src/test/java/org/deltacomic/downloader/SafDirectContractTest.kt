@@ -1,4 +1,4 @@
-package org.delta_comic.downloader
+package org.deltacomic.downloader
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -40,7 +40,7 @@ class SafDirectContractTest {
         assertTrue(commit.readyToCommit)
         assertEquals(
             "content://provider/tree/root/document/partial",
-            commit.temporaryDocumentUri,
+            commit.temporaryDocumentUri
         )
     }
 
@@ -50,13 +50,13 @@ class SafDirectContractTest {
         assertTrue(
             validSafDocumentBinding(
                 "content://provider/tree/root",
-                "content://provider/tree/root/document/root%2Fpartial",
+                "content://provider/tree/root/document/root%2Fpartial"
             )
         )
         assertFalse(
             validSafDocumentBinding(
                 "content://provider/tree/root",
-                "content://provider/tree/other/document/other%2Fpartial",
+                "content://provider/tree/other/document/other%2Fpartial"
             )
         )
     }

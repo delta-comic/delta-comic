@@ -1,4 +1,4 @@
-package org.delta_comic.downloader
+package org.deltacomic.downloader
 
 import android.content.Context
 import androidx.work.CoroutineWorker
@@ -29,27 +29,28 @@ class DownloadWorker(context: Context, params: WorkerParameters) : CoroutineWork
             ForegroundInfo(
                 stablePlatformId(taskId),
                 notification,
-                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
             )
         } else {
             ForegroundInfo(stablePlatformId(taskId), notification)
         }
     }
 
-    private suspend fun runCancellable(taskId: String): ExecutionResult =
-        suspendCancellableCoroutine { continuation ->
-            val future = DownloadRuntime.runAsync(applicationContext, taskId) { result ->
-                if (continuation.isActive) continuation.resume(result)
-            }
-            continuation.invokeOnCancellation {
-                future.cancel(true)
-                DownloadRuntime.dispatchControl(
-                    applicationContext,
-                    taskId,
-                    ControlAction.SYSTEM_STOP,
-                )
-            }
+    private suspend fun runCancellable(taskId: String): ExecutionResult = suspendCancellableCoroutine { continuation ->
+        val future = DownloadRuntime.runAsync(applicationContext, taskId) { result ->
+            if (continuation.isActive) continuation.resume(result)
         }
+        continuation.invokeOnCancellation {
+            future.cancel(true)
+            DownloadRuntime.dispatchControl(
+                applicationContext,
+                taskId,
+                ControlAction.SYSTEM_STOP
+            )
+        }
+    }
 
-    companion object { const val TASK_ID = "taskId" }
+    companion object {
+        const val TASK_ID = "taskId"
+    }
 }

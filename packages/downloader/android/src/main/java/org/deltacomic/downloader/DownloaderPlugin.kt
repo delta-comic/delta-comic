@@ -1,4 +1,4 @@
-package org.delta_comic.downloader
+package org.deltacomic.downloader
 
 import android.Manifest
 import android.app.Activity
@@ -17,8 +17,8 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import app.tauri.annotation.Command
 import app.tauri.annotation.ActivityCallback
+import app.tauri.annotation.Command
 import app.tauri.annotation.InvokeArg
 import app.tauri.annotation.Permission
 import app.tauri.annotation.PermissionCallback
@@ -47,7 +47,7 @@ data class PickDestinationResult(
     val cancelled: Boolean,
     val id: String? = null,
     val label: String? = null,
-    val uri: String? = null,
+    val uri: String? = null
 )
 data class DeleteExportResult(val deleted: Boolean)
 
@@ -61,7 +61,7 @@ class DeleteExportOptions {
     permissions = [
         Permission(
             strings = [Manifest.permission.POST_NOTIFICATIONS],
-            alias = DownloaderPlugin.NOTIFICATION_PERMISSION_ALIAS,
+            alias = DownloaderPlugin.NOTIFICATION_PERMISSION_ALIAS
         )
     ]
 )
@@ -122,7 +122,7 @@ class DownloaderPlugin(private val activity: Activity) : Plugin(activity) {
                     cancelled = false,
                     id = safDestinationId(treeUri.toString()),
                     label = label,
-                    uri = treeUri.toString(),
+                    uri = treeUri.toString()
                 )
             )
         } catch (error: SecurityException) {
@@ -147,7 +147,7 @@ class DownloaderPlugin(private val activity: Activity) : Plugin(activity) {
         val config = HeadlessEngineConfig(
             version = options.version,
             databasePath = options.databasePath,
-            downloadDir = options.downloadDir,
+            downloadDir = options.downloadDir
         )
         if (!validHeadlessEngineConfig(config)) {
             invoke.reject("Android downloader headless configuration is invalid")
@@ -178,7 +178,7 @@ class DownloaderPlugin(private val activity: Activity) : Plugin(activity) {
             requestPermissionForAlias(
                 NOTIFICATION_PERMISSION_ALIAS,
                 invoke,
-                "scheduleAfterNotificationPermission",
+                "scheduleAfterNotificationPermission"
             )
             return
         }
@@ -191,15 +191,11 @@ class DownloaderPlugin(private val activity: Activity) : Plugin(activity) {
         scheduleAndResolve(
             invoke,
             options,
-            getPermissionState(NOTIFICATION_PERMISSION_ALIAS)?.toString(),
+            getPermissionState(NOTIFICATION_PERMISSION_ALIAS)?.toString()
         )
     }
 
-    private fun scheduleAndResolve(
-        invoke: Invoke,
-        options: ScheduleOptions,
-        permissionState: String?,
-    ) {
+    private fun scheduleAndResolve(invoke: Invoke, options: ScheduleOptions, permissionState: String?) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 if (!scheduleUidt(options)) {
@@ -243,7 +239,7 @@ class DownloaderPlugin(private val activity: Activity) : Plugin(activity) {
             ?: nextAvailablePlatformId(options.taskId, pendingJobs.mapTo(mutableSetOf()) { it.id })
         val info = JobInfo.Builder(
             jobId,
-            ComponentName(activity, DownloadJobService::class.java),
+            ComponentName(activity, DownloadJobService::class.java)
         )
             .setRequiredNetworkType(networkType)
             .setUserInitiated(true)
@@ -276,7 +272,7 @@ class DownloaderPlugin(private val activity: Activity) : Plugin(activity) {
         WorkManager.getInstance(activity).enqueueUniqueWork(
             "delta-download-${options.taskId}",
             ExistingWorkPolicy.KEEP,
-            request,
+            request
         )
     }
 

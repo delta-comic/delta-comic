@@ -1,4 +1,4 @@
-package org.delta_comic.downloader
+package org.deltacomic.downloader
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -32,7 +32,7 @@ internal object DownloadRuntime {
             NotificationChannel(
                 CHANNEL,
                 context.getString(R.string.download_channel_name),
-                NotificationManager.IMPORTANCE_LOW,
+                NotificationManager.IMPORTANCE_LOW
             )
         )
         val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
@@ -47,7 +47,11 @@ internal object DownloadRuntime {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .addAction(android.R.drawable.ic_media_pause, context.getString(R.string.download_pause), pause)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(R.string.download_cancel), cancel)
+            .addAction(
+                android.R.drawable.ic_menu_close_clear_cancel,
+                context.getString(R.string.download_cancel),
+                cancel
+            )
             .setProgress(0, 0, true)
         launch?.let {
             builder.setContentIntent(
@@ -55,7 +59,7 @@ internal object DownloadRuntime {
                     context,
                     stablePlatformId(taskId),
                     it,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
             )
         }
@@ -94,11 +98,7 @@ internal object DownloadRuntime {
         }
     }
 
-    private fun runDirectSaf(
-        context: Context,
-        taskId: String,
-        instructionJson: String,
-    ): ExecutionResult? {
+    private fun runDirectSaf(context: Context, taskId: String, instructionJson: String): ExecutionResult? {
         val instruction = SafDocuments.parseDirectInstruction(instructionJson)
             ?: return ExecutionResult.RETRY
         if (instruction.readyToCommit) {
@@ -110,13 +110,14 @@ internal object DownloadRuntime {
                 val code = NativeBridge.runTaskDirectSaf(
                     taskId,
                     opened.fileDescriptor,
-                    opened.documentUri,
+                    opened.documentUri
                 )
                 if (code != DIRECT_SAF_COMMIT_REQUIRED) return executionResult(code)
                 val readyInstruction = NativeBridge.getSafDirectInstruction(taskId)
                     ?: return ExecutionResult.RETRY
                 commitDirectSaf(context, taskId, readyInstruction)
             }
+
             is SafDirectOpenResult.Fallback -> {
                 val temporaryDocumentUri = opened.documentUri
                 if (temporaryDocumentUri != null) {
@@ -126,12 +127,12 @@ internal object DownloadRuntime {
                     val discarded = SafDocuments.discardDirect(
                         context,
                         instructionJson,
-                        temporaryDocumentUri,
+                        temporaryDocumentUri
                     )
                     if (!discarded.succeeded) {
                         NativeBridge.failSafExport(
                             taskId,
-                            discarded.error ?: "Unknown direct SAF cleanup failure",
+                            discarded.error ?: "Unknown direct SAF cleanup failure"
                         )
                         return ExecutionResult.STOPPED
                     }
@@ -141,11 +142,7 @@ internal object DownloadRuntime {
         }
     }
 
-    private fun commitDirectSaf(
-        context: Context,
-        taskId: String,
-        instructionJson: String,
-    ): ExecutionResult {
+    private fun commitDirectSaf(context: Context, taskId: String, instructionJson: String): ExecutionResult {
         val commit = SafDocuments.commitDirect(context, instructionJson)
         if (!commit.succeeded) {
             NativeBridge.failSafExport(taskId, commit.error ?: "Unknown direct SAF commit failure")
@@ -154,18 +151,10 @@ internal object DownloadRuntime {
         return executionResult(NativeBridge.completeSafExport(taskId, commit.value!!))
     }
 
-    fun runAsync(
-        context: Context,
-        taskId: String,
-        onResult: (ExecutionResult) -> Unit,
-    ): Future<*> = transferExecutor.submit { onResult(run(context, taskId)) }
+    fun runAsync(context: Context, taskId: String, onResult: (ExecutionResult) -> Unit): Future<*> =
+        transferExecutor.submit { onResult(run(context, taskId)) }
 
-    fun dispatchControl(
-        context: Context,
-        taskId: String,
-        action: ControlAction,
-        onFinished: () -> Unit = {},
-    ) {
+    fun dispatchControl(context: Context, taskId: String, action: ControlAction, onFinished: () -> Unit = {}) {
         controlExecutor.execute {
             try {
                 if (!ensureNativeEngine(context)) return@execute
@@ -193,7 +182,7 @@ internal object DownloadRuntime {
                 initializeCredentialContext = {
                     NativeBridge.initializeCredentialContext(context.applicationContext)
                 },
-                bootstrap = { NativeBridge.bootstrap(config.databasePath, config.downloadDir) },
+                bootstrap = { NativeBridge.bootstrap(config.databasePath, config.downloadDir) }
             )
         } catch (_: UnsatisfiedLinkError) {
             false
@@ -205,7 +194,7 @@ internal object DownloadRuntime {
         val config = HeadlessEngineConfig(
             version = preferences.getInt(CONFIG_VERSION, 0),
             databasePath = preferences.getString(CONFIG_DATABASE_PATH, null) ?: return null,
-            downloadDir = preferences.getString(CONFIG_DOWNLOAD_DIR, null) ?: return null,
+            downloadDir = preferences.getString(CONFIG_DOWNLOAD_DIR, null) ?: return null
         )
         return config.takeIf(::validHeadlessEngineConfig)
     }
@@ -228,11 +217,7 @@ internal object DownloadRuntime {
         return false
     }
 
-    private fun createControlPendingIntent(
-        context: Context,
-        taskId: String,
-        action: ControlAction,
-    ): PendingIntent {
+    private fun createControlPendingIntent(context: Context, taskId: String, action: ControlAction): PendingIntent {
         val (intentAction, requestSalt, actionPath) = when (action) {
             ControlAction.PAUSE -> Triple(ACTION_PAUSE, PAUSE_REQUEST_SALT, "pause")
             ControlAction.CANCEL -> Triple(ACTION_CANCEL, CANCEL_REQUEST_SALT, "cancel")
@@ -253,7 +238,7 @@ internal object DownloadRuntime {
             context,
             stablePlatformId(taskId, requestSalt),
             intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 }
@@ -276,10 +261,7 @@ internal object NativeBridge {
     external fun systemStopTask(taskId: String)
 }
 
-internal fun initializeNativeEngine(
-    initializeCredentialContext: () -> Int,
-    bootstrap: () -> Int,
-): Boolean {
+internal fun initializeNativeEngine(initializeCredentialContext: () -> Int, bootstrap: () -> Int): Boolean {
     if (initializeCredentialContext() != 0) return false
     return bootstrap() == 0
 }

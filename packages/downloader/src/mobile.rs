@@ -29,7 +29,7 @@ use crate::{
   },
 };
 
-const PLUGIN_IDENTIFIER: &str = "org.delta_comic.downloader";
+const PLUGIN_IDENTIFIER: &str = "org.deltacomic.downloader";
 type MobileEventSink = Arc<dyn Fn(EngineEvent) + Send + Sync>;
 
 #[derive(Clone)]
