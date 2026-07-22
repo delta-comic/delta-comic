@@ -187,6 +187,13 @@ declare module 'vue-router/auto-routes' {
       { plugin: ParamValue<false>, key: ParamValue<false> },
       | never
     >,
+    '/user/download': RouteRecordInfo<
+      '/user/download',
+      '/user/download',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/user/edit/[plugin]': RouteRecordInfo<
       '/user/edit/[plugin]',
       '/user/edit/:plugin',
@@ -413,6 +420,14 @@ declare module 'vue-router/auto-routes' {
         | never
       pathParamNames:
         | 'key'
+    }
+    'src/pages/user/download.vue': {
+      routes:
+        | '/user/download'
+      views:
+        | never
+      pathParamNames:
+        | never
     }
     'src/pages/user/edit/[plugin].vue': {
       routes:

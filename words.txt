@@ -10,6 +10,7 @@ bika
 bili
 Booter
 booters
+btih
 cdylib
 codegen
 colada
@@ -68,6 +69,7 @@ reloadable
 Reloadable
 Repobeats
 reqwest
+Refreshable
 retriable
 retryable
 revisioned
@@ -96,6 +98,7 @@ typebox
 UIDT
 unplugin
 unlisten
+unlistens
 unstub
 userscript
 vicons

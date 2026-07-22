@@ -9,6 +9,7 @@ const {
   clipboard,
   definitions,
   dialog,
+  downloads,
   intervalCallbacks,
   message,
   pluginRuntime,
@@ -20,6 +21,7 @@ const {
   clipboard: { read: vi.fn(), write: vi.fn() },
   definitions: new Map<string, (...args: unknown[]) => unknown>(),
   dialog: { info: vi.fn() },
+  downloads: { connect: vi.fn(), disconnect: vi.fn(), refresh: vi.fn() },
   intervalCallbacks: [] as Array<() => Promise<void>>,
   message: { success: vi.fn() },
   pluginRuntime: { activatePreboot: vi.fn(), clearRecovery: vi.fn(), readRecovery: vi.fn() },
@@ -74,6 +76,7 @@ vi.mock('@delta-comic/utils', () => ({
       definitions.set(name, handler),
   },
 }))
+vi.mock('@/stores/downloads', () => ({ useDownloadsStore: () => downloads }))
 vi.mock('@vueuse/core', () => ({
   useIntervalFn: (callback: () => Promise<void>) => intervalCallbacks.push(callback),
   useStyleTag: (style: { value: string }) => styleRefs.push(style),
@@ -198,6 +201,9 @@ describe('App share-token orchestration', () => {
     clipboard.write.mockReset().mockResolvedValue(undefined)
     definitions.clear()
     dialog.info.mockClear()
+    downloads.connect.mockReset().mockResolvedValue(undefined)
+    downloads.disconnect.mockReset()
+    downloads.refresh.mockReset().mockResolvedValue(undefined)
     intervalCallbacks.length = 0
     message.success.mockClear()
     router.push.mockReset().mockResolvedValue(undefined)
@@ -213,6 +219,7 @@ describe('App share-token orchestration', () => {
     await flushPromises()
 
     expect(router.push).toHaveBeenCalledExactlyOnceWith('/library?tab=recent')
+    expect(downloads.connect).toHaveBeenCalledOnce()
     const pushShareToken = definitions.get('pushShareToken')
     expect(pushShareToken).toBeDefined()
 
@@ -223,6 +230,17 @@ describe('App share-token orchestration', () => {
     expect(clipboard.write).toHaveBeenCalledExactlyOnceWith('delta://shared/42')
     expect(message.success).toHaveBeenCalledExactlyOnceWith('common.feedback.copied')
     expect(dialog.info).not.toHaveBeenCalled()
+  })
+
+  it('releases the global downloader connection with the application root', async () => {
+    wrapper = mountAsync(App)
+    await flushPromises()
+
+    wrapper.unmount()
+    wrapper = undefined
+
+    expect(downloads.connect).toHaveBeenCalledOnce()
+    expect(downloads.disconnect).toHaveBeenCalledOnce()
   })
 
   it('opens a non-dismissible dialog for matching clipboard text and delegates both outcomes', async () => {

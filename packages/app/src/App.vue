@@ -7,11 +7,13 @@ import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 
+import { useDownloadLifecycle } from './features/downloads/useDownloadLifecycle'
 import { readClipboardText, writeClipboardText } from './platform'
 import { pluginName } from './symbol'
 const $router = useRouter()
 const $route = useRoute()
 const { t } = useI18n()
+useDownloadLifecycle()
 
 await $router.push($route.fullPath)
 
