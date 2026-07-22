@@ -24,6 +24,14 @@ await vi.hoisted(async () => {
           slots.default?.(),
         ),
   })
+  const Alert = defineComponent({
+    name: 'NAlert',
+    props: { title: String },
+    setup:
+      (props, { slots }) =>
+      () =>
+        h('div', [props.title, slots.default?.()]),
+  })
   const Input = defineComponent({
     name: 'NInput',
     inheritAttrs: false,
@@ -75,7 +83,14 @@ await vi.hoisted(async () => {
 
   window.$$lib$$ = {
     ...window.$$lib$$,
-    Naive: { NButton: Button, NEmpty: Empty, NInput: Input, NSelect: Select, NSpin: Spin },
+    Naive: {
+      NAlert: Alert,
+      NButton: Button,
+      NEmpty: Empty,
+      NInput: Input,
+      NSelect: Select,
+      NSpin: Spin,
+    },
     Vue,
   } as typeof window.$$lib$$
 })
@@ -86,7 +101,16 @@ vi.mock('vue-i18n', () => ({
 
 import LogContentViewer from './LogContentViewer.vue'
 import LogFileList from './LogFileList.vue'
+import LogReaderPanel from './LogReaderPanel.vue'
 import LogToolbar from './LogToolbar.vue'
+
+describe('LogReaderPanel', () => {
+  it('offers an explicit close action', async () => {
+    const wrapper = mount(LogReaderPanel)
+    await wrapper.get('header button').trigger('click')
+    expect(wrapper.emitted('close')).toEqual([[]])
+  })
+})
 
 describe('LogToolbar', () => {
   it('emits filter updates and action events', async () => {

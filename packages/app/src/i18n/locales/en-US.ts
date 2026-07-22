@@ -496,7 +496,7 @@ const enUS = {
       title: 'Core',
     },
     logs: {
-      actions: { export: 'Export logs', refresh: 'Refresh' },
+      actions: { close: 'Close', export: 'Export logs', refresh: 'Refresh' },
       content: {
         empty: 'This log file is empty',
         noMatches: 'No log entries match the filters',

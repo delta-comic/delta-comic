@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NAlert } from 'naive-ui'
+import { NAlert, NButton } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -10,6 +10,7 @@ import LogFileList from './LogFileList.vue'
 import LogToolbar from './LogToolbar.vue'
 
 const { t } = useI18n()
+const emit = defineEmits<{ close: [] }>()
 const reader = useLogReader()
 const levelModel = computed({ get: () => reader.level.value, set: reader.setLevel })
 const scopeQueryModel = computed({ get: () => reader.scopeQuery.value, set: reader.setScopeQuery })
@@ -19,13 +20,20 @@ const scopeQueryModel = computed({ get: () => reader.scopeQuery.value, set: read
   <section
     class="flex h-[min(72dvh,48rem)] min-h-[28rem] w-full flex-col overflow-hidden rounded-xl border border-(--dc-border) bg-(--dc-surface)"
   >
-    <header class="shrink-0 border-b border-(--dc-border) px-3 py-3 sm:px-4">
-      <h2 class="m-0 text-base font-semibold text-(--dc-text)">
-        {{ t('settings.logs.title') }}
-      </h2>
-      <p class="mt-1 mb-0 text-xs text-(--dc-text-secondary)">
-        {{ t('settings.logs.description') }}
-      </p>
+    <header
+      class="flex shrink-0 items-start justify-between gap-3 border-b border-(--dc-border) px-3 py-3 sm:px-4"
+    >
+      <div class="min-w-0">
+        <h2 class="m-0 text-base font-semibold text-(--dc-text)">
+          {{ t('settings.logs.title') }}
+        </h2>
+        <p class="mt-1 mb-0 text-xs text-(--dc-text-secondary)">
+          {{ t('settings.logs.description') }}
+        </p>
+      </div>
+      <NButton quaternary size="small" @click="emit('close')">
+        {{ t('settings.logs.actions.close') }}
+      </NButton>
     </header>
     <LogToolbar
       v-model:level="levelModel"

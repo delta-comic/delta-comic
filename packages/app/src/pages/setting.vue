@@ -156,6 +156,6 @@ const localizeFormConfig = <T extends FormSingleConfigure>(config: T): T => {
     </div>
   </NScrollbar>
   <NModal v-if="showNativeLogs" v-model:show="showLogReader" class="w-[min(96vw,72rem)]">
-    <LogReaderPanel />
+    <LogReaderPanel @close="showLogReader = false" />
   </NModal>
 </template>

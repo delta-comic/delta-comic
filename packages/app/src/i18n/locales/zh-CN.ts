@@ -452,7 +452,7 @@ const zhCN = {
       title: '核心',
     },
     logs: {
-      actions: { export: '导出日志', refresh: '刷新' },
+      actions: { close: '关闭', export: '导出日志', refresh: '刷新' },
       content: {
         empty: '这个日志文件为空',
         noMatches: '没有符合筛选条件的日志',

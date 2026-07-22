@@ -457,7 +457,7 @@ const zhTW = {
       title: '核心',
     },
     logs: {
-      actions: { export: '匯出日誌', refresh: '重新整理' },
+      actions: { close: '關閉', export: '匯出日誌', refresh: '重新整理' },
       content: {
         empty: '這個日誌檔案是空的',
         noMatches: '沒有符合篩選條件的日誌',
