@@ -103,10 +103,11 @@ fn emit_progress<R: Runtime>(
 }
 
 fn strip_port(input: &str) -> &str {
-  if let Some((host, port)) = input.rsplit_once(':') {
-    if !port.is_empty() && port.chars().all(|ch| ch.is_ascii_digit()) {
-      return host;
-    }
+  if let Some((host, port)) = input.rsplit_once(':')
+    && !port.is_empty()
+    && port.chars().all(|ch| ch.is_ascii_digit())
+  {
+    return host;
   }
   input
 }

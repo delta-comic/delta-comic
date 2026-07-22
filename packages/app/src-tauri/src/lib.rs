@@ -100,14 +100,14 @@ _____   _________________ ____        __________________ _____   ______
 
   match builder.build(tauri::generate_context!()) {
     Ok(builder) => builder.run(|handler, event| match event {
-      tauri::RunEvent::Exit { .. } => {
+      tauri::RunEvent::Exit => {
         if let Err(error) = tauri::async_runtime::block_on(handler.downloader().shutdown()) {
           log::error!("failed to stop downloader cleanly: {error}");
         }
         let _ = handler.track_event("app_exited", None);
         handler.flush_events_blocking();
       }
-      tauri::RunEvent::Ready { .. } => {
+      tauri::RunEvent::Ready => {
         let _ = handler.track_event("app_started", None);
       }
       _ => {}
