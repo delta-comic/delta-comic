@@ -7,6 +7,8 @@ use std::{
 use std::{collections::HashMap, path::Component, sync::Mutex as StdMutex, time::Duration};
 
 use futures_util::future::BoxFuture;
+#[cfg(feature = "bittorrent")]
+use tokio::io::AsyncWriteExt;
 use tokio_util::sync::CancellationToken;
 
 use crate::{
@@ -101,32 +103,46 @@ pub struct TorrentManager {
 }
 
 impl TorrentManager {
-  pub async fn new(session_dir: PathBuf) -> Result<Self> {
+  pub async fn new(session_dir: PathBuf, default_peer_limit: u8) -> Result<Self> {
     tokio::fs::create_dir_all(&session_dir).await?;
+    #[cfg(not(feature = "bittorrent"))]
+    let _ = default_peer_limit;
     #[cfg(feature = "bittorrent")]
     {
       use librqbit::{Session, SessionOptions, SessionPersistenceConfig};
 
+      pause_persisted_torrents(&session_dir).await?;
       let session = Session::new_with_opts(
         session_dir.join("unused-default-output"),
         SessionOptions {
           fastresume: true,
+          peer_limit: Some(usize::from(default_peer_limit.max(1))),
           persistence: Some(SessionPersistenceConfig::Json {
             folder: Some(session_dir),
           }),
           #[cfg(any(target_os = "android", test))]
-          disable_dht: true,
-          #[cfg(any(target_os = "android", test))]
-          disable_dht_persistence: true,
-          #[cfg(any(target_os = "android", test))]
-          listen_port_range: None,
-          #[cfg(any(target_os = "android", test))]
-          enable_upnp_port_forwarding: false,
+          dht: None,
+          #[cfg(target_os = "android")]
+          disable_local_service_discovery: true,
           ..Default::default()
         },
       )
       .await
       .map_err(|error| Error::BitTorrent(error.to_string()))?;
+      let restored_active = session.with_torrents(|torrents| {
+        for (_, handle) in torrents {
+          if !handle.is_paused() {
+            return true;
+          }
+        }
+        false
+      });
+      if restored_active {
+        session.stop().await;
+        return Err(Error::BitTorrent(
+          "restored torrent escaped the paused startup state".into(),
+        ));
+      }
       Ok(Self {
         session,
         owners: Arc::new(StdMutex::new(HashMap::new())),
@@ -176,6 +192,7 @@ impl TorrentManager {
             only_files: only_files.clone(),
             overwrite: true,
             output_folder: Some(destination.to_string_lossy().into_owned()),
+            peer_limit: Some(torrent_peer_limit(settings)),
             ..Default::default()
           }),
         )
@@ -400,6 +417,70 @@ impl TorrentManager {
 }
 
 #[cfg(feature = "bittorrent")]
+async fn pause_persisted_torrents(session_dir: &Path) -> Result<()> {
+  let database_path = session_dir.join("session.json");
+  let bytes = match tokio::fs::read(&database_path).await {
+    Ok(bytes) => bytes,
+    Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+    Err(error) => return Err(error.into()),
+  };
+  let mut database = serde_json::from_slice::<serde_json::Value>(&bytes)?;
+  let torrents = database
+    .get_mut("torrents")
+    .and_then(serde_json::Value::as_object_mut)
+    .ok_or_else(|| Error::BitTorrent("invalid fast-resume session structure".into()))?;
+  let mut changed = false;
+  for torrent in torrents.values_mut() {
+    let paused = torrent
+      .get_mut("is_paused")
+      .ok_or_else(|| Error::BitTorrent("invalid fast-resume torrent state".into()))?;
+    let was_paused = paused
+      .as_bool()
+      .ok_or_else(|| Error::BitTorrent("invalid fast-resume pause state".into()))?;
+    if !was_paused {
+      *paused = true.into();
+      changed = true;
+    }
+  }
+  if !changed {
+    return Ok(());
+  }
+
+  // A process can be killed before the engine checkpoints active torrents.
+  // Rewrite the persisted state atomically before librqbit sees it, otherwise
+  // restored handles can connect or seed before the scheduler acquires a slot.
+  let temporary_path = session_dir.join(format!(
+    ".session-pause-{}.tmp",
+    uuid::Uuid::new_v4().as_simple()
+  ));
+  let payload = serde_json::to_vec(&database)?;
+  let write_result = async {
+    let mut temporary = tokio::fs::OpenOptions::new()
+      .create_new(true)
+      .write(true)
+      .open(&temporary_path)
+      .await?;
+    temporary.write_all(&payload).await?;
+    temporary.sync_all().await
+  }
+  .await;
+  if let Err(error) = write_result {
+    let _ = tokio::fs::remove_file(&temporary_path).await;
+    return Err(error.into());
+  }
+  if let Err(error) = crate::target_file::replace(&temporary_path, &database_path).await {
+    let _ = tokio::fs::remove_file(&temporary_path).await;
+    return Err(error);
+  }
+  Ok(())
+}
+
+#[cfg(feature = "bittorrent")]
+fn torrent_peer_limit(settings: &DownloaderSettings) -> usize {
+  usize::from(settings.per_task_connections.max(1))
+}
+
+#[cfg(feature = "bittorrent")]
 fn validate_resume_identity(
   session_id: usize,
   info_hash: &str,
@@ -480,7 +561,7 @@ fn torrent_sample(handle: &Arc<librqbit::ManagedTorrent>, speed: u64) -> Torrent
     downloaded_bytes: stats.progress_bytes,
     speed_bytes_per_second: speed,
     uploaded_bytes: stats.uploaded_bytes,
-    peer_count: u64::try_from(peer_count).unwrap_or(u64::MAX),
+    peer_count: u64::from(peer_count),
     info_hash: Some(handle.info_hash().as_string()),
     session_id: u64::try_from(handle.id()).ok(),
   }
@@ -646,7 +727,8 @@ mod tests {
     let source_path = root.path().join("payload.bin");
     let payload = b"local torrent cleanup fixture";
     tokio::fs::write(&source_path, payload).await.unwrap();
-    let torrent = librqbit::create_torrent(&source_path, CreateTorrentOptions::default())
+    let spawner = librqbit::spawn_utils::BlockingSpawner::new(2);
+    let torrent = librqbit::create_torrent(&source_path, CreateTorrentOptions::default(), &spawner)
       .await
       .unwrap();
     let torrent_bytes = torrent.as_bytes().unwrap();
@@ -657,7 +739,7 @@ mod tests {
     tokio::fs::write(&downloaded_path, payload).await.unwrap();
 
     let session_dir = root.path().join("session");
-    let manager = TorrentManager::new(session_dir.clone()).await.unwrap();
+    let manager = TorrentManager::new(session_dir.clone(), 4).await.unwrap();
     let add_precompleted = || {
       manager.session.add_torrent(
         AddTorrent::from_bytes(torrent_bytes.clone()),
@@ -726,12 +808,15 @@ mod tests {
     listen_port_range: Option<std::ops::Range<u16>>,
     persistence: Option<librqbit::SessionPersistenceConfig>,
   ) -> librqbit::SessionOptions {
+    let listen = listen_port_range.map(|range| librqbit::ListenerOptions {
+      listen_addr: (std::net::Ipv4Addr::LOCALHOST, range.start).into(),
+      ipv4_only: true,
+      ..Default::default()
+    });
     librqbit::SessionOptions {
-      disable_dht: true,
-      disable_dht_persistence: true,
-      enable_upnp_port_forwarding: false,
+      dht: None,
       fastresume: persistence.is_some(),
-      listen_port_range,
+      listen,
       persistence,
       ..Default::default()
     }
@@ -757,12 +842,15 @@ mod tests {
       .await
       .unwrap();
 
+    let spawner = librqbit::spawn_utils::BlockingSpawner::new(2);
     let torrent = librqbit::create_torrent(
       &source,
       CreateTorrentOptions {
         name: Some("offline-transfer"),
         piece_length: Some(4 * 1024),
+        ..Default::default()
       },
+      &spawner,
     )
     .await
     .unwrap();
@@ -880,12 +968,15 @@ mod tests {
     tokio::fs::write(&source, vec![0x7a; 32 * 1024])
       .await
       .unwrap();
+    let spawner = librqbit::spawn_utils::BlockingSpawner::new(2);
     let torrent = librqbit::create_torrent(
       &source,
       CreateTorrentOptions {
         name: Some("resume.bin"),
         piece_length: Some(4 * 1024),
+        ..Default::default()
       },
+      &spawner,
     )
     .await
     .unwrap();
@@ -935,13 +1026,20 @@ mod tests {
       .unwrap();
     assert!(persisted.contains(&destination.to_string_lossy().into_owned()));
 
-    let restored_session = Session::new_with_opts(
-      root.path().join("different-unused-default"),
-      offline_session_options(None, Some(persistence())),
+    // Simulate an abrupt process death that persisted the torrent as running.
+    // TorrentManager must pause it before the engine scheduler can expose it.
+    let mut persistence_json = serde_json::from_str::<serde_json::Value>(&persisted).unwrap();
+    persistence_json["torrents"][id.to_string()]["is_paused"] = false.into();
+    tokio::fs::write(
+      persistence_dir.join("session.json"),
+      serde_json::to_vec(&persistence_json).unwrap(),
     )
     .await
     .unwrap();
-    let restored = restored_session
+
+    let restored_manager = TorrentManager::new(persistence_dir, 3).await.unwrap();
+    let restored = restored_manager
+      .session
       .get(id.into())
       .expect("persisted torrent handle was not restored");
     tokio::time::timeout(Duration::from_secs(5), restored.wait_until_initialized())
@@ -952,7 +1050,7 @@ mod tests {
     assert_eq!(restored.info_hash(), info_hash);
     assert_eq!(restored.only_files(), Some(vec![0]));
     assert!(restored.is_paused());
-    restored_session.stop().await;
+    restored_manager.stop().await.unwrap();
   }
 
   #[cfg(feature = "bittorrent")]
@@ -980,6 +1078,16 @@ mod tests {
     assert_eq!(expected, Some(vec![1, 4]));
     assert!(same_file_selection(Some(vec![4, 1]), &expected));
     assert!(!same_file_selection(Some(vec![1, 3]), &expected));
+  }
+
+  #[cfg(feature = "bittorrent")]
+  #[test]
+  fn peer_limit_uses_the_scheduler_fair_share() {
+    let mut settings = DownloaderSettings::platform_default();
+    settings.per_task_connections = 7;
+    assert_eq!(torrent_peer_limit(&settings), 7);
+    settings.per_task_connections = 0;
+    assert_eq!(torrent_peer_limit(&settings), 1);
   }
 
   #[cfg(feature = "bittorrent")]

@@ -31,7 +31,9 @@ futures-util = "0.3.32"
 hex = "0.4.3"
 httpdate = "1.0.3"
 keyring-core = "1.0.0"
-librqbit = { version = "8.1.1", default-features = false, features = ["rust-tls"], optional = true }
+librqbit = { version = "=9.0.0-rc.0", default-features = false, features = [
+  "rust-tls",
+], optional = true }
 log = { workspace = true }
 md-5 = "0.10.6"
 rand = "0.9.2"

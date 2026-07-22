@@ -132,7 +132,12 @@ impl Engine {
       .connect_timeout(Duration::from_secs(20))
       .read_timeout(Duration::from_secs(60))
       .build()?;
-    let torrent = TorrentManager::new(default_download_dir.join(".torrent-session")).await?;
+    let settings = repository.get_settings().await?;
+    let torrent = TorrentManager::new(
+      default_download_dir.join(".torrent-session"),
+      Self::fair_connection_limit(&settings),
+    )
+    .await?;
     let staging_root = default_download_dir.join(".saf-staging");
     tokio::fs::create_dir_all(&staging_root).await?;
     Ok(Self {
@@ -688,8 +693,7 @@ impl Engine {
         }
       }
       let active = self.controls.lock().await.len();
-      let effective_task_limit =
-        usize::from(settings.max_active_tasks).min(usize::from(settings.connection_budget));
+      let effective_task_limit = Self::effective_task_limit(&settings);
       let available = effective_task_limit.saturating_sub(active);
       if available == 0 {
         continue;
@@ -707,10 +711,7 @@ impl Engine {
         };
         let engine = self.clone();
         let mut task_settings = settings.clone();
-        let fair_share = (settings.connection_budget
-          / u16::try_from(effective_task_limit.max(1)).unwrap_or(u16::MAX))
-        .max(1) as u8;
-        task_settings.per_task_connections = task_settings.per_task_connections.min(fair_share);
+        task_settings.per_task_connections = Self::fair_connection_limit(&settings);
         tauri::async_runtime::spawn(async move {
           engine.run_task(task, task_settings, token).await;
         });
@@ -867,12 +868,23 @@ impl Engine {
 
   #[cfg(any(target_os = "android", test))]
   fn background_resource_limits(settings: &DownloaderSettings) -> (usize, u8) {
-    let task_limit = usize::from(settings.max_active_tasks)
+    (
+      Self::effective_task_limit(settings),
+      Self::fair_connection_limit(settings),
+    )
+  }
+
+  fn effective_task_limit(settings: &DownloaderSettings) -> usize {
+    usize::from(settings.max_active_tasks)
       .min(usize::from(settings.connection_budget))
-      .max(1);
+      .max(1)
+  }
+
+  fn fair_connection_limit(settings: &DownloaderSettings) -> u8 {
+    let task_limit = Self::effective_task_limit(settings);
     let fair_share =
       (settings.connection_budget / u16::try_from(task_limit).unwrap_or(u16::MAX)).max(1) as u8;
-    (task_limit, settings.per_task_connections.min(fair_share))
+    settings.per_task_connections.min(fair_share).max(1)
   }
 
   #[cfg(any(target_os = "android", test))]
@@ -2181,7 +2193,8 @@ mod tests {
     let payload = b"torrent checksum payload";
     let source_path = root.path().join("payload.bin");
     tokio::fs::write(&source_path, payload).await.unwrap();
-    let torrent = librqbit::create_torrent(&source_path, CreateTorrentOptions::default())
+    let spawner = librqbit::spawn_utils::BlockingSpawner::new(2);
+    let torrent = librqbit::create_torrent(&source_path, CreateTorrentOptions::default(), &spawner)
       .await
       .unwrap();
     let task = engine

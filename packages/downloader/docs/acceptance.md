@@ -24,6 +24,8 @@
 
 - magnet、torrent URL 与 torrent 字节输入。
 - 文件筛选、暂停、恢复与 fast-resume。
+- 每个 Torrent 的 live peer 上限使用调度器分配的公平连接份额，HTTP worker 与 BT peer
+  共同受全局连接预算约束。
 - 下载完成默认立即停止上传。
 - 分享率、做种时长和“任一条件达到”策略。
 - SQLite 任务与磁盘/协议恢复状态不一致时可安全重建。
@@ -54,5 +56,6 @@
 - 允许并执行 Web/Vitest 与 macOS 桌面构建测试。
 - 不启动 Android 模拟器或真机，使用 Android JVM 单元测试、lint、AAR 构建、Rust/JNI
   契约测试和故障注入测试替代日常回归。
-- Windows MSVC、Android 真机后台限制、系统强制停止和不同 SAF provider 的行为仍需在
-  发布候选版本阶段做真实平台验收。
+- Windows MSVC 下载器和完整宿主已通过交叉编译静态检查；Windows 运行时、Android
+  真机后台限制、系统强制停止和不同 SAF provider 的行为仍需在发布候选版本阶段做真实
+  平台验收。
