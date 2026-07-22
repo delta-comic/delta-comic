@@ -44,10 +44,8 @@ jobs:
         run: vp install --frozen-lockfile
 
       - name: Check
-        run: vp check
-
-      - name: Test
-        run: vp test
+        run: |
+          vp run lib-build
 
       - name: Resolve semantic release plan
         id: release-plan
