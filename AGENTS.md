@@ -54,3 +54,4 @@ In cloud environments, use `pnpm exec vp`.
 ## 要点
 
 - 添加ui文本记得使用i18n
+- 保证测试完善
