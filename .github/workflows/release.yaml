@@ -118,21 +118,18 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
           cd packages/app
-          vp exec tauri android init
+          node ./node_modules/@tauri-apps/cli/tauri.js android init
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./packages/app/src-tauri/gen/android/gradlew
 
       - name: Build Android app
-        uses: tauri-apps/tauri-action@v1
+        working-directory: packages/app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        with:
-          mobile: 'android'
-          projectPath: packages/app
-          retryAttempts: 0
+        run: node ./node_modules/@tauri-apps/cli/tauri.js android build --apk
 
       - name: Restore Android keystore
         env:
@@ -227,6 +224,8 @@ jobs:
         run: node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
 
       - name: Build workspace libraries
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
         run: vp run lib-build
 
       - name: Setup Rust
