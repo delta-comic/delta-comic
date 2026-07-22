@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import type {
   ServerPluginAction,
   ServerPluginConfig,
@@ -13,6 +14,8 @@ import { computed, shallowRef } from 'vue'
 import { readableApiError } from '@/shared/api/AdminApiClient'
 
 import { useConnectionStore } from './connection'
+
+const pluginsLogger = logger.scoped('server-admin:store:plugins')
 
 export const usePluginsStore = defineStore('serverPlugins', () => {
   const connection = useConnectionStore()
@@ -35,6 +38,7 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
   const load = async (): Promise<void> => {
     if (!connection.hasCredentials) {
       error.value = '请先配置服务器连接'
+      pluginsLogger.warn('plugin snapshot load skipped because credentials are incomplete')
       return
     }
     loading.value = true
@@ -44,8 +48,10 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
         .createClient()
         .get<ServerPluginSnapshot>('/api/admin/plugins')
       if (selectedId.value && !selected.value) selectedId.value = ''
+      pluginsLogger.debug('plugin snapshot loaded', { count: snapshot.value.plugins.length })
     } catch (cause) {
       error.value = readableApiError(cause)
+      pluginsLogger.error('plugin snapshot load failed', { error: error.value })
     } finally {
       loading.value = false
     }
@@ -63,6 +69,7 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
     action: ServerPluginAction,
     config?: ServerPluginConfig,
   ): Promise<ServerPluginJob | undefined> => {
+    pluginsLogger.info('plugin action requested', { action, pluginId })
     setPending(pluginId, action)
     error.value = ''
     try {
@@ -76,10 +83,20 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
             : await client.post<ServerPluginJob>(`${path}/${action}`)
       const jobError = job.status === 'failed' ? (job.errorMessage ?? `${action} 操作失败`) : ''
       await load()
-      if (jobError) error.value = jobError
+      if (jobError) {
+        error.value = jobError
+        pluginsLogger.warn('plugin action completed with failed job', {
+          action,
+          jobId: job.id,
+          pluginId,
+        })
+      } else {
+        pluginsLogger.info('plugin action completed', { action, jobId: job.id, pluginId })
+      }
       return job
     } catch (cause) {
       error.value = readableApiError(cause)
+      pluginsLogger.error('plugin action request failed', { action, error: error.value, pluginId })
       return undefined
     } finally {
       setPending(pluginId)
@@ -102,8 +119,14 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
       ])
       script.value = nextScript
       scriptRuns.value = nextRuns
+      pluginsLogger.debug('plugin script state loaded', {
+        pluginId,
+        runCount: nextRuns.length,
+        scriptConfigured: nextScript !== null,
+      })
     } catch (cause) {
       error.value = readableApiError(cause)
+      pluginsLogger.error('plugin script state load failed', { error: error.value, pluginId })
     } finally {
       scriptPending.value = false
     }
@@ -119,9 +142,18 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
       const path = `/api/admin/plugins/${encodeURIComponent(pluginId)}/script`
       script.value = await connection.createClient().put<ServerPluginScript>(path, input)
       await loadScript(pluginId)
+      pluginsLogger.info('plugin script configuration saved', {
+        enabled: input.enabled,
+        intervalHours: input.intervalHours,
+        pluginId,
+      })
       return true
     } catch (cause) {
       error.value = readableApiError(cause)
+      pluginsLogger.error('plugin script configuration save failed', {
+        error: error.value,
+        pluginId,
+      })
       return false
     } finally {
       scriptPending.value = false
@@ -138,9 +170,15 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
       const path = `/api/admin/plugins/${encodeURIComponent(pluginId)}/script/run`
       const result = await connection.createClient().post<ServerPluginScriptRun>(path, { input })
       await loadScript(pluginId)
+      pluginsLogger.info('manual plugin script run completed', {
+        pluginId,
+        runId: result.id,
+        status: result.status,
+      })
       return result
     } catch (cause) {
       error.value = readableApiError(cause)
+      pluginsLogger.error('manual plugin script run failed', { error: error.value, pluginId })
       return null
     } finally {
       scriptPending.value = false

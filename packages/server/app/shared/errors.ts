@@ -1,3 +1,7 @@
+import { logger } from '@delta-comic/logger'
+
+const errorLogger = logger.scoped('server:error')
+
 export type ErrorDetails = Record<string, unknown> | unknown[] | string | number | boolean | null
 
 export class AppError extends Error {
@@ -18,6 +22,6 @@ export const isAppError = (error: unknown): error is AppError => error instanceo
 
 export const asPublicError = (error: unknown): AppError => {
   if (isAppError(error)) return error
-  console.error('[server] unhandled error', error)
+  errorLogger.error('unhandled error', error)
   return new AppError('INTERNAL_ERROR', 'internal server error', 500)
 }

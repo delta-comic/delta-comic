@@ -1,7 +1,10 @@
+import { logger } from '@delta-comic/logger'
 import { isEmpty, isString } from 'es-toolkit/compat'
 import { shallowReactive } from 'vue'
 
 import { SourcedKeyMap, Struct, type Metadata, type Metadatable } from '../struct'
+
+const resourceLogger = logger.scoped('model:resource')
 
 export type ProcessInstance = (
   nowPath: string,
@@ -62,9 +65,10 @@ export class Resource extends Struct<RawResource> implements RawResource {
       // preflight
       const instance = Resource.processInstances.get([this.$$plugin, option.referenceName])
       if (!instance) {
-        console.warn(
-          `[Resource.getUrl] process not found, fullname: [${this.$$plugin}, ${option.referenceName}]`,
-        )
+        resourceLogger.warn('resource process not found', {
+          plugin: this.$$plugin,
+          referenceName: option.referenceName,
+        })
         continue
       }
 

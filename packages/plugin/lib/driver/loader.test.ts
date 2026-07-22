@@ -1,4 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
+import { Logger } from '@delta-comic/logger'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { ref } from 'vue'
 
@@ -119,7 +120,7 @@ describe('plugin config booting', () => {
 
   it('preserves the boot error even if rollback also fails', async () => {
     const progress = createProgress()
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const consoleError = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined)
     mocks.bootPlugin.mockRejectedValueOnce(new Error('boot failed'))
 
     await expect(
@@ -132,7 +133,8 @@ describe('plugin config booting', () => {
     ).rejects.toThrow('boot failed')
 
     expect(consoleError).toHaveBeenCalledWith(
-      '[plugin bootConfig] rollback failed',
+      'plugin boot rollback failed',
+      { plugin: 'fixture' },
       expect.objectContaining({ message: 'rollback failed' }),
     )
   })

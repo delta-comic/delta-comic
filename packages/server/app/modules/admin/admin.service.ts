@@ -1,3 +1,5 @@
+import { logger } from '@delta-comic/logger'
+
 import { type AppEnv, readNumberVar } from '@/env'
 
 import {
@@ -14,6 +16,8 @@ import type {
   AdminReadiness,
   AdminRequiredSecrets,
 } from './admin.schemas'
+
+const adminLogger = logger.scoped('server:admin')
 
 const secretConfigured = (value: string | undefined): boolean => Boolean(value?.trim())
 
@@ -68,12 +72,7 @@ const describeModuleRuntime = (module: ServerModuleDefinition, env: AppEnv) => {
 }
 
 const logProbeFailure = (error: unknown) => {
-  console.error(
-    JSON.stringify({
-      error: error instanceof Error ? error.message : String(error),
-      message: 'admin D1 readiness probe failed',
-    }),
-  )
+  adminLogger.error('D1 readiness probe failed', error)
 }
 
 export class AdminMetricsService {
@@ -115,6 +114,7 @@ export class AdminMetricsService {
   }
 
   async readiness(checkedAt = this.now()): Promise<AdminReadiness> {
+    adminLogger.debug('readiness probe started')
     let databaseHealthy = true
     try {
       await this.repository.probeDatabase()
@@ -136,6 +136,8 @@ export class AdminMetricsService {
       : missingSecrets.length > 0
         ? 'degraded'
         : 'ready'
+
+    adminLogger.info('readiness probe completed', { issueCount: issues.length, status })
 
     return {
       checkedAt,

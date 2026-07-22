@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logger } from '@delta-comic/logger'
 import { pluginRuntime } from '@delta-comic/plugin'
 import { type MenuOption, NIcon } from 'naive-ui'
 import type { Component } from 'vue'
@@ -7,6 +8,8 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { Icons } from '@/icons'
+
+const pluginPageLogger = logger.scoped('app:plugin-page')
 definePage({ redirect: { name: '/main/plugin/list' } })
 const router = useRouter()
 const { t } = useI18n()
@@ -31,11 +34,14 @@ const reloading = shallowRef(false)
 const reloadPlugins = async () => {
   if (reloading.value) return
   reloading.value = true
+  pluginPageLogger.info('plugin reload started')
   try {
     const { operation } = pluginRuntime.reloadNormal()
     await operation
+    pluginPageLogger.info('plugin reload completed')
     window.$message.success(t('plugin.reload.success'))
   } catch (error) {
+    pluginPageLogger.error('plugin reload failed', error)
     window.$message.error(error instanceof Error ? error.message : String(error))
   } finally {
     reloading.value = false

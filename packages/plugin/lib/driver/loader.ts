@@ -1,4 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import { Mutex } from 'es-toolkit'
 import type { Ref } from 'vue'
 
@@ -11,6 +12,8 @@ import { isBuiltInPlugin } from './builtIn'
 import { cleanupPlugin } from './cleanup'
 import { runtimeExtensions } from './extensions'
 import { isTauriRuntime } from './init/storage'
+
+const pluginLoaderLogger = logger.scoped('plugin:loader')
 
 export const loaders = runtimeExtensions.loaders.values
 
@@ -79,7 +82,11 @@ export const bootConfig = async (
       try {
         await rollback(cfg, expectedName)
       } catch (rollbackError) {
-        console.error('[plugin bootConfig] rollback failed', rollbackError)
+        pluginLoaderLogger.error(
+          'plugin boot rollback failed',
+          { plugin: progressName },
+          rollbackError,
+        )
       }
     }
     throw error
@@ -98,6 +105,10 @@ export const loadPluginConfig = async (meta: PluginArchiveDB.Archive) => {
   const lock = getLoadLock(meta.pluginName)
   try {
     await lock.acquire()
+    pluginLoaderLogger.debug('loading plugin config', {
+      loader: meta.loaderName,
+      plugin: meta.pluginName,
+    })
     if (isBuiltInPlugin(meta)) return builtInPluginRegistry.get(meta.pluginName)?.config
     const loader = loaders.find(value => value.name === meta.loaderName)
     if (!loader) {
@@ -118,7 +129,7 @@ export const loadPlugin = async (
   meta: PluginArchiveDB.Archive,
   info: Ref<Record<string, PluginLoadingInfo>>,
 ) => {
-  console.log(`[plugin bootPlugin] booting name "${meta.pluginName}"`)
+  pluginLoaderLogger.info('plugin boot started', { plugin: meta.pluginName })
   ensurePluginLoadingInfo(info, meta.pluginName)
   try {
     const configFactory = await loadPluginConfig(meta)
@@ -133,8 +144,9 @@ export const loadPlugin = async (
       expectedName: meta.pluginName,
       rollback: config => cleanupPlugin(config ?? ({ name: meta.pluginName } as PluginConfig)),
     })
-    console.log(`[plugin bootPlugin] boot name done "${meta.pluginName}"`)
+    pluginLoaderLogger.info('plugin boot completed', { plugin: meta.pluginName })
   } catch (error) {
+    pluginLoaderLogger.error('plugin boot failed', { plugin: meta.pluginName }, error)
     markPluginLoadError(info, meta.pluginName, error)
     throw error
   }

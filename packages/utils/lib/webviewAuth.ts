@@ -1,4 +1,7 @@
+import { logger } from '@delta-comic/logger'
 import { isTauri } from '@tauri-apps/api/core'
+
+const webviewAuthLogger = logger.scoped('utils:webview-auth')
 
 const CALLBACK_NAME = 'authCallback'
 const DEFAULT_POLL_INTERVAL = 300
@@ -290,7 +293,7 @@ export class PageWebviewAuth<T = unknown> extends WebviewAuth<T> {
           this.done(result)
           const label = this.page.label
           await this.unmount().catch((error: unknown) => {
-            console.warn('[webview auth] failed to close auth page', label, error)
+            webviewAuthLogger.warn('failed to close auth page', { label }, error)
           })
           return result
         }

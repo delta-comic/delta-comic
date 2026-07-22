@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { isString } from 'es-toolkit'
 import { markRaw, type Ref } from 'vue'
 
@@ -6,6 +7,8 @@ import type { PluginConfig } from '@/plugin'
 import { runtimeExtensions } from './extensions'
 import type { PluginLoadingInfo } from './loader'
 import { usePluginStore } from './store'
+
+const pluginBooterLogger = logger.scoped('plugin:booter')
 
 export const booters = runtimeExtensions.booters.values
 
@@ -24,6 +27,7 @@ export const bootPlugin = async (
       const msIndex = info.value[cfg.name].steps.length
       info.value[cfg.name].steps[msIndex] = { name: booter.name, description: '' }
       info.value[cfg.name].progress = { stepsIndex: msIndex, status: 'process' }
+      pluginBooterLogger.debug('plugin boot step started', { plugin: cfg.name, step: msIndex })
       await booter.call(
         cfg,
         meta => {
@@ -40,9 +44,10 @@ export const bootPlugin = async (
     info.value[cfg.name].progress.status = 'done'
     store.$markReady(cfg.name)
 
-    console.log(`[plugin usePluginStore.$loadPlugin] plugin "${cfg.name}" load done`)
+    pluginBooterLogger.info('plugin boot pipeline completed', { plugin: cfg.name })
   } catch (error) {
     store.$markUnloaded(cfg.name)
+    pluginBooterLogger.error('plugin boot pipeline failed', { plugin: cfg.name }, error)
     throw error
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { satisfies as versionSatisfies } from 'semver'
 
 import { AppError } from '@/shared/errors'
@@ -28,6 +29,8 @@ import type {
 } from './plugins.types'
 
 type JobResult = Record<string, unknown>
+
+const pluginLogger = logger.scoped('server:plugins:lifecycle')
 
 const parseJson = <T>(value: string | null, fallback: T): T => {
   if (!value) return fallback
@@ -329,6 +332,7 @@ export class ServerPluginService {
       status: 'queued',
       updated_at: createdAt,
     }
+    pluginLogger.info('plugin job started', { action, jobId: row.id, pluginId })
     await this.repository.saveJob(row)
     row = { ...row, started_at: this.now(), status: 'running', updated_at: this.now() }
     await this.repository.saveJob(row)
@@ -345,6 +349,12 @@ export class ServerPluginService {
       }
       await this.repository.saveJob(row)
       await this.saveAudit(row, actorId, 'succeeded', result)
+      pluginLogger.info('plugin job completed', {
+        action,
+        durationMs: completedAt - createdAt,
+        jobId: row.id,
+        pluginId,
+      })
       return toJob(row)
     } catch (error) {
       const completedAt = this.now()
@@ -362,6 +372,16 @@ export class ServerPluginService {
         await this.markInstallationFailed(pluginId, message)
       }
       await this.saveAudit(row, actorId, 'failed', { error: message })
+      const details = {
+        action,
+        code: error instanceof AppError ? error.code : undefined,
+        durationMs: completedAt - createdAt,
+        error,
+        jobId: row.id,
+        pluginId,
+      }
+      if (isRejectedOperation) pluginLogger.warn('plugin job rejected', details)
+      else pluginLogger.error('plugin job failed', details)
       return toJob(row)
     }
   }

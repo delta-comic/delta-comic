@@ -24,6 +24,7 @@ describe('ReleaseWorkspace', () => {
     const packages = await new ReleaseWorkspace(rootDir).publishablePackages()
 
     expect(packages.map(pkg => pkg.name)).toEqual([
+      '@delta-comic/logger',
       '@delta-comic/model',
       '@delta-comic/db',
       '@delta-comic/downloader',
@@ -33,7 +34,7 @@ describe('ReleaseWorkspace', () => {
     ])
     expect(packages.map(pkg => pkg.path).toSorted()).toEqual(
       jsonVersionPaths
-        .filter(path => /^packages\/(?:db|downloader|model|plugin|ui|utils)\//.test(path))
+        .filter(path => /^packages\/(?:db|downloader|logger|model|plugin|ui|utils)\//.test(path))
         .toSorted(),
     )
   })

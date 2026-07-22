@@ -1,6 +1,9 @@
+import { logger } from '@delta-comic/logger'
 import type { FormResult, FormSingleConfigure } from '@delta-comic/model'
 import { fromPairs } from 'es-toolkit/compat'
 import { ref, watch, type Ref } from 'vue'
+
+const configLogger = logger.scoped('db:config')
 
 export type ConfigDescription = Record<
   string,
@@ -34,7 +37,7 @@ const parseJson = <T>(value: unknown, fallback: T): T => {
   try {
     return JSON.parse(value) as T
   } catch (error) {
-    console.warn('[db] failed to parse config value', error)
+    configLogger.warn('failed to parse config value', error)
     return cloneValue(fallback)
   }
 }
@@ -45,6 +48,7 @@ const upsertConfig = async (belongTo: string, form: ConfigDescription, data: unk
     .replaceInto('config')
     .values({ belongTo, form: JSON.stringify(form), data: JSON.stringify(data) })
     .execute()
+  configLogger.debug('config persisted', { belongTo })
 }
 
 export const useConfig = <T extends ConfigDescription>(
@@ -60,7 +64,7 @@ export const useConfig = <T extends ConfigDescription>(
     if (saveTimer) clearTimeout(saveTimer)
     saveTimer = setTimeout(() => {
       void upsertConfig(belongTo, form, data.value).catch(error => {
-        console.warn('[db] failed to persist config value', error)
+        configLogger.warn('failed to persist config value', { belongTo }, error)
       })
     }, 100)
   }
@@ -74,12 +78,13 @@ export const useConfig = <T extends ConfigDescription>(
         .where('belongTo', '=', belongTo)
         .executeTakeFirst()
       data.value = parseJson(stored?.data, defaultData)
+      configLogger.debug('config hydrated', { belongTo, found: Boolean(stored) })
       hydrated = true
       const storedForm =
         typeof stored?.form === 'string' ? stored.form : JSON.stringify(stored?.form)
       if (!stored || storedForm !== JSON.stringify(form)) persist()
     } catch (error) {
-      console.warn('[db] failed to load config value', error)
+      configLogger.warn('failed to load config value', { belongTo }, error)
       data.value = cloneValue(defaultData)
       hydrated = true
     }

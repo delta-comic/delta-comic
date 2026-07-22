@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { db, DBUtils, FavouriteDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import type { uni } from '@delta-comic/model'
 import { DcToggleIcon, DcState } from '@delta-comic/ui'
 import { useMessage } from 'naive-ui'
@@ -7,6 +8,8 @@ import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
+
+const favouriteLogger = logger.scoped('app:favourite-select')
 
 const $props = defineProps<{ item: uni.item.Item; plain?: boolean }>()
 
@@ -33,7 +36,7 @@ const { t } = useI18n()
 let promise = Promise.withResolvers<FavouriteDB.Card['createAt'][]>()
 
 const create = async () => {
-  console.log('create popup for favselect')
+  favouriteLogger.debug('favourite selection opened')
   promise = Promise.withResolvers<FavouriteDB.Card['createAt'][]>()
   if (isShow.value) {
     $message.warning(t('common.feedback.selecting'))
@@ -41,13 +44,12 @@ const create = async () => {
     return promise.promise
   }
   selectList.clear()
-  console.log('favselect getting data')
   const items = await db
     .selectFrom('favouriteItem')
     .where('itemKey', '=', $props.item.id)
     .selectAll()
     .execute()
-  console.log('favselect done', selectList)
+  favouriteLogger.debug('favourite selection loaded', { selectionCount: items.length })
   for (const v of items) selectList.add(v.belongTo)
   isShow.value = true
   return await promise.promise

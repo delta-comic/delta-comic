@@ -1,5 +1,8 @@
+import { logger } from '@delta-comic/logger'
 import { SourcedValue } from '@delta-comic/model'
 import { ref, toValue, watch, type MaybeRefOrGetter, type Ref } from 'vue'
+
+const nativeStoreLogger = logger.scoped('db:native-store')
 
 export interface Table {
   namespace: string
@@ -32,7 +35,7 @@ const parseValue = <T extends object>(value: unknown, defaultValue: MaybeRefOrGe
   try {
     return JSON.parse(value) as T
   } catch (error) {
-    console.warn('[db] failed to parse native store value', error)
+    nativeStoreLogger.warn('failed to parse native store value', error)
     return cloneDefault(defaultValue)
   }
 }
@@ -71,7 +74,11 @@ export const useNativeStore = <T extends object>(
     const encoded = JSON.stringify(value)
     saveTimer = setTimeout(() => {
       void setStoreValue(namespace, resolvedKey, encoded).catch(error => {
-        console.warn('[db] failed to persist native store value', error)
+        nativeStoreLogger.warn(
+          'failed to persist native store value',
+          { key: resolvedKey, namespace },
+          error,
+        )
       })
     }, 100)
   }
@@ -85,10 +92,19 @@ export const useNativeStore = <T extends object>(
       const storedValue = storeValue ?? legacyValue(namespace, resolvedKey)
       if (current !== version) return
       state.value = parseValue(storedValue, defaultValue)
+      nativeStoreLogger.debug('native store value hydrated', {
+        key: resolvedKey,
+        namespace,
+        source: storeValue === null ? 'legacy-or-default' : 'database',
+      })
       hydrated = true
       if (storeValue === null) persist(resolvedKey, state.value)
     } catch (error) {
-      console.warn('[db] failed to load native store value', error)
+      nativeStoreLogger.warn(
+        'failed to load native store value',
+        { key: resolvedKey, namespace },
+        error,
+      )
       if (current !== version) return
       state.value = cloneDefault(defaultValue)
       hydrated = true

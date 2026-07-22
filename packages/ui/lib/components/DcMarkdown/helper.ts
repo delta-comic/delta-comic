@@ -42,7 +42,6 @@ export const createTemplate = (cfg: {
           return;
         }
         // 发送请求给父窗口，请求导航
-        console.debug('${cfg.messageKey}', href)
         window.parent.postMessage({ type:'${cfg.messageKey}', href });
       });
     </script>

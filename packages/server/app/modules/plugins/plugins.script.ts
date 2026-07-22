@@ -1,3 +1,5 @@
+import { logger } from '@delta-comic/logger'
+
 import { all, first, run } from '@/infrastructure/d1/database'
 import { AppError } from '@/shared/errors'
 
@@ -8,6 +10,8 @@ import type {
 } from '../../../lib/plugin'
 
 import type { PluginDatabaseBinding } from './plugins.database'
+
+const scriptLogger = logger.scoped('server:plugins:scripts')
 
 export interface ScriptRow {
   plugin_id: string
@@ -291,6 +295,11 @@ export class ServerPluginScriptService {
       source: input.source,
       updated_at: now,
     })
+    scriptLogger.info('plugin script configuration saved', {
+      enabled: input.enabled,
+      intervalHours: input.intervalHours,
+      pluginId,
+    })
     return (await this.find(pluginId))!
   }
 
@@ -307,6 +316,7 @@ export class ServerPluginScriptService {
     const row = await this.repository.find(pluginId)
     if (!row) throw new AppError('PLUGIN_SCRIPT_NOT_FOUND', 'plugin code is not configured', 404)
     const startedAt = this.now()
+    scriptLogger.debug('plugin script run started', { pluginId, trigger })
     try {
       const result = await this.runner.run(toScript(row), input, trigger, scheduledTime)
       const completedAt = this.now()
@@ -322,6 +332,11 @@ export class ServerPluginScriptService {
         trigger,
       }
       await this.repository.saveRun(runRow)
+      scriptLogger.debug('plugin script run completed', {
+        durationMs: completedAt - startedAt,
+        pluginId,
+        trigger,
+      })
       return toScriptRun(runRow)
     } catch (error) {
       const completedAt = this.now()
@@ -337,12 +352,23 @@ export class ServerPluginScriptService {
         trigger,
       }
       await this.repository.saveRun(runRow)
+      scriptLogger.error('plugin script run failed', {
+        durationMs: completedAt - startedAt,
+        error,
+        pluginId,
+        trigger,
+      })
       return toScriptRun(runRow)
     }
   }
 
   async runDue(scheduledTime: number, cron: string): Promise<void> {
     const scripts = await this.repository.listDue(scheduledTime)
+    if (scripts.length > 0) {
+      scriptLogger.info('scheduled plugin script batch started', { count: scripts.length, cron })
+    } else {
+      scriptLogger.debug('scheduled plugin script batch has no due work', { cron })
+    }
     await Promise.all(
       scripts.map(async row => {
         await this.run(row.plugin_id, { cron }, 'scheduled', scheduledTime)
@@ -350,6 +376,9 @@ export class ServerPluginScriptService {
         await this.repository.advance(row.plugin_id, nextRunAt, this.now())
       }),
     )
+    if (scripts.length > 0) {
+      scriptLogger.info('scheduled plugin script batch completed', { count: scripts.length, cron })
+    }
   }
 }
 

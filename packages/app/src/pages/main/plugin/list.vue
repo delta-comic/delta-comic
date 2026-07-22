@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { PluginArchiveDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import { Install, translatePluginText, usePluginStore } from '@delta-comic/plugin'
 import { memoize } from 'es-toolkit'
 import type { DropdownOption } from 'naive-ui'
@@ -12,13 +13,20 @@ import { Icons } from '@/icons'
 
 import pkg from '../../../../package.json'
 
+const pluginListLogger = logger.scoped('app:plugin-list')
+
 const updating = shallowReactive(new Set<string>())
 const { t } = useI18n()
 const updatePlugin = async (plugin: PluginArchiveDB.Archive) => {
   if (updating.has(plugin.pluginName)) throw new Error(t('plugin.list.feedback.alreadyUpdating'))
   updating.add(plugin.pluginName)
+  pluginListLogger.info('plugin update started', { plugin: plugin.pluginName })
   try {
     await Install.updatePlugin(plugin)
+    pluginListLogger.info('plugin update completed', { plugin: plugin.pluginName })
+  } catch (error) {
+    pluginListLogger.error('plugin update failed', { plugin: plugin.pluginName }, error)
+    throw error
   } finally {
     updating.delete(plugin.pluginName)
   }
@@ -74,6 +82,7 @@ const actionsFor = (plugin: PluginArchiveDB.Archive): DropdownOption[] => {
 }
 
 const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
+  pluginListLogger.debug('plugin action requested', { action: key, plugin: plugin.pluginName })
   switch (key) {
     case 'toggle':
       await toggle({ keys: [plugin.pluginName] })
@@ -90,6 +99,7 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
     case 'remove':
       await Install.uninstallPlugin(plugin.pluginName)
       await codeArchives.refetch()
+      pluginListLogger.info('plugin removed', { plugin: plugin.pluginName })
   }
 }
 </script>

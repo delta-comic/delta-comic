@@ -1,3 +1,4 @@
+import { Logger } from '@delta-comic/logger'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { AppEnv } from '@/env'
@@ -109,7 +110,7 @@ describe('AdminMetricsService', () => {
   it('marks readiness unhealthy when the real database probe fails', async () => {
     const repository = new FakeAdminMetricsRepository()
     repository.probeError = new Error('database unavailable')
-    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const error = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
     const service = new AdminMetricsService(repository, createEnv(), undefined, () => observedAt)
 
     const result = await service.readiness()

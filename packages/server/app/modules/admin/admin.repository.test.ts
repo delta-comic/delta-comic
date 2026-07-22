@@ -1,3 +1,4 @@
+import { Logger } from '@delta-comic/logger'
 import { describe, expect, it, vi } from 'vitest'
 
 import { D1Recorder } from '../../test/d1'
@@ -128,7 +129,7 @@ describe('D1AdminMetricsRepository', () => {
   })
 
   it('returns structured degraded results when table inspection fails', async () => {
-    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const error = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
     const db = {
       prepare: () => ({
         bind: () => ({ all: async () => Promise.reject(new Error('D1 unavailable')) }),

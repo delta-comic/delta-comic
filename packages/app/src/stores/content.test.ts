@@ -1,3 +1,4 @@
+import { Logger } from '@delta-comic/logger'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { isProxy } from 'vue'
@@ -34,7 +35,7 @@ describe('content store page cache', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     pageTypes.clear()
-    vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    vi.spyOn(Logger.prototype, 'debug').mockImplementation(() => undefined)
   })
 
   it('uses a stable sourced-type key across tuple and serialized inputs', () => {

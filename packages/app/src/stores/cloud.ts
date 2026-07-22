@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { useConfig } from '@delta-comic/plugin'
 import {
   CloudClientError,
@@ -13,6 +14,8 @@ import { defineStore } from 'pinia'
 import { computed, shallowRef } from 'vue'
 
 import { createAppCloudRuntime, type AppCloudRuntime } from '@/cloud'
+
+const cloudLogger = logger.scoped('app:cloud')
 
 type CloudStatus = 'idle' | 'loading' | 'syncing'
 
@@ -44,11 +47,13 @@ export const useCloudStore = defineStore('cloud', () => {
         serverUrl: serverUrl.value,
       })
       runtimeKey.value = key
+      cloudLogger.info('cloud runtime configured')
     }
     return runtime.value
   }
 
   const run = async <T>(nextStatus: CloudStatus, handler: () => Promise<T>): Promise<T> => {
+    cloudLogger.debug('cloud operation started', { status: nextStatus })
     status.value = nextStatus
     lastError.value = undefined
     try {
@@ -61,9 +66,14 @@ export const useCloudStore = defineStore('cloud', () => {
               'CLOUD_APP_ERROR',
               error instanceof Error ? error.message : String(error),
             )
+      cloudLogger.error('cloud operation failed', {
+        code: lastError.value.code,
+        status: nextStatus,
+      })
       throw lastError.value
     } finally {
       status.value = 'idle'
+      cloudLogger.debug('cloud operation finished', { status: nextStatus })
     }
   }
 
@@ -71,18 +81,21 @@ export const useCloudStore = defineStore('cloud', () => {
     const currentRuntime =
       runtime.value ?? createAppCloudRuntime({ enabled: false, serverUrl: serverUrl.value })
     session.value = await currentRuntime.sessionStorage.getSession()
+    cloudLogger.info('cloud session hydrated', { authenticated: Boolean(session.value) })
     return session.value
   }
 
   const login = async (input: CloudLoginInput): Promise<CloudSession> =>
     await run('loading', async () => {
       session.value = await getRuntime().client.auth.login(input)
+      cloudLogger.info('cloud login completed')
       return session.value
     })
 
   const register = async (input: CloudRegisterInput): Promise<CloudSession> =>
     await run('loading', async () => {
       session.value = await getRuntime().client.auth.register(input)
+      cloudLogger.info('cloud registration completed')
       return session.value
     })
 
@@ -93,6 +106,7 @@ export const useCloudStore = defineStore('cloud', () => {
         runtime.value ?? createAppCloudRuntime({ enabled: false, serverUrl: serverUrl.value })
       await currentRuntime.sessionStorage.clearSession()
       session.value = null
+      cloudLogger.info('cloud logout completed')
     })
 
   const me = async () => await run('loading', async () => await getRuntime().client.auth.me())
@@ -106,6 +120,10 @@ export const useCloudStore = defineStore('cloud', () => {
       )
       await currentRuntime.metadata.setCheckpoint(result.checkpoint.latestSeq)
       lastSyncedAt.value = Date.now()
+      cloudLogger.info('cloud snapshot pushed', {
+        checkpoint: result.checkpoint.latestSeq,
+        collectionCount: Object.keys(collections).length,
+      })
       return result
     })
 
@@ -115,6 +133,10 @@ export const useCloudStore = defineStore('cloud', () => {
       const result = await currentRuntime.client.sync.push({ operations, schemaVersion: 1 })
       await currentRuntime.metadata.setCheckpoint(result.checkpoint.latestSeq)
       lastSyncedAt.value = Date.now()
+      cloudLogger.info('cloud operations pushed', {
+        checkpoint: result.checkpoint.latestSeq,
+        operationCount: operations.length,
+      })
       return result
     })
 
@@ -130,6 +152,10 @@ export const useCloudStore = defineStore('cloud', () => {
       await currentRuntime.adapter.applyRemoteChanges(result.changes)
       await currentRuntime.metadata.setCheckpoint(result.checkpoint.latestSeq)
       lastSyncedAt.value = Date.now()
+      cloudLogger.info('cloud changes pulled', {
+        changeCount: result.changes.length,
+        checkpoint: result.checkpoint.latestSeq,
+      })
       return result
     })
 

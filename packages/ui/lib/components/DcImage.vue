@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logger } from '@delta-comic/logger'
 import { uni } from '@delta-comic/model'
 import { useTemp } from '@delta-comic/utils'
 import { computedAsync } from '@vueuse/core'
@@ -19,6 +20,8 @@ import { cn } from '@/utils'
 
 import DcLoading from './DcLoading.vue'
 import { WarningRound } from './icons'
+
+const imageLogger = logger.scoped('ui:image')
 
 const $props = withDefaults(
   defineProps<{
@@ -46,7 +49,7 @@ const src = computedAsync(async () => {
     if (isString($props.src)) return $props.src
     return await $props.src.getUrl()
   } catch (error) {
-    console.warn(error)
+    imageLogger.warn('image source resolution failed', error)
   }
   return ''
 }, '')
@@ -99,7 +102,7 @@ const fallbackSrc = computedAsync(async () => {
     if (isString($props.fallback)) return $props.fallback
     return await $props.fallback.getUrl()
   } catch (error) {
-    console.error(error)
+    imageLogger.error('fallback image source resolution failed', error)
   }
   return
 }, undefined)

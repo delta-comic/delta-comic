@@ -8,6 +8,7 @@ export const jsonVersionPaths = [
   'packages/app/src-tauri/tauri.conf.json',
   'packages/db/package.json',
   'packages/downloader/package.json',
+  'packages/logger/package.json',
   'packages/model/package.json',
   'packages/plugin/package.json',
   'packages/ui/package.json',
@@ -23,6 +24,7 @@ export const cargoLockPackageNames = [
   'delta-comic',
   'tauri-plugin-db',
   'tauri-plugin-downloader',
+  'tauri-plugin-logger',
   'tauri-plugin-plugin',
   'tauri-plugin-utils',
 ] as const

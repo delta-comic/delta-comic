@@ -1,4 +1,5 @@
 import { db, type PluginArchiveDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import {
   AwesomeRegistryClient,
   type AwesomeMarketplaceEntry,
@@ -13,6 +14,8 @@ import {
   mergePluginMarketplaceItems,
   type PluginMarketplaceFilter,
 } from './model'
+
+const marketplaceLogger = logger.scoped('app:plugin-marketplace')
 
 export interface UsePluginMarketplaceOptions {
   client?: AwesomeRegistryClient
@@ -45,6 +48,9 @@ export const usePluginMarketplace = (options: UsePluginMarketplaceOptions) => {
 
   const refreshInstalled = async () => {
     installedPlugins.value = await db.selectFrom('plugin').selectAll().execute()
+    marketplaceLogger.debug('installed plugin catalog refreshed', {
+      count: installedPlugins.value.length,
+    })
   }
 
   const loadEntries = async (path: string) => {
@@ -55,6 +61,11 @@ export const usePluginMarketplace = (options: UsePluginMarketplaceOptions) => {
         try {
           return { listing, manifest: await client.loadManifest(listing) }
         } catch (manifestError) {
+          marketplaceLogger.warn(
+            'marketplace manifest load failed',
+            { plugin: listing.id },
+            manifestError,
+          )
           return {
             listing,
             manifestError:
@@ -69,6 +80,7 @@ export const usePluginMarketplace = (options: UsePluginMarketplaceOptions) => {
   const refresh = async () => {
     if (loading.value || loadingMore.value) return
     loading.value = true
+    marketplaceLogger.info('plugin marketplace refresh started')
     error.value = undefined
     try {
       const [indexResult] = await Promise.all([client.loadIndex(), refreshInstalled()])
@@ -78,9 +90,14 @@ export const usePluginMarketplace = (options: UsePluginMarketplaceOptions) => {
       entries.value = loaded?.entries ?? []
       nextPage.value = loaded?.nextPage ?? null
       stale.value = indexResult.stale || Boolean(loaded?.stale)
+      marketplaceLogger.info('plugin marketplace refreshed', {
+        entryCount: entries.value.length,
+        stale: stale.value,
+      })
     } catch (reason) {
       failedAction.value = 'refresh'
       error.value = reason instanceof Error ? reason : new Error(String(reason))
+      marketplaceLogger.error('plugin marketplace refresh failed', error.value)
     } finally {
       loading.value = false
     }
@@ -90,6 +107,7 @@ export const usePluginMarketplace = (options: UsePluginMarketplaceOptions) => {
     const path = nextPage.value
     if (!path || loading.value || loadingMore.value) return
     loadingMore.value = true
+    marketplaceLogger.debug('plugin marketplace page load started')
     error.value = undefined
     try {
       const loaded = await loadEntries(path)
@@ -99,9 +117,14 @@ export const usePluginMarketplace = (options: UsePluginMarketplaceOptions) => {
       )
       nextPage.value = loaded.nextPage
       stale.value ||= loaded.stale
+      marketplaceLogger.info('plugin marketplace page loaded', {
+        entryCount: loaded.entries.length,
+        stale: loaded.stale,
+      })
     } catch (reason) {
       failedAction.value = 'loadMore'
       error.value = reason instanceof Error ? reason : new Error(String(reason))
+      marketplaceLogger.error('plugin marketplace page load failed', error.value)
     } finally {
       loadingMore.value = false
     }

@@ -1,4 +1,8 @@
+import { logger } from '@delta-comic/logger'
+
 import type { ApiResponse } from './types'
+
+const apiLogger = logger.scoped('server-admin:api')
 
 export interface AdminApiClientOptions {
   baseUrl: string
@@ -68,6 +72,8 @@ export class AdminApiClient {
   }
 
   async request<T>(path: string, options: AdminRequestOptions = {}): Promise<T> {
+    const method = options.method ?? 'GET'
+    const startedAt = Date.now()
     const controller = new AbortController()
     let timedOut = false
     const abortFromCaller = () => controller.abort(options.signal?.reason)
@@ -78,6 +84,7 @@ export class AdminApiClient {
     }, this.timeout)
 
     try {
+      apiLogger.debug('admin API request started', { method, path })
       const headers = new Headers({ accept: 'application/json' })
       const token = this.options.getToken?.().trim()
       if (token) headers.set('authorization', `Bearer ${token}`)
@@ -86,7 +93,7 @@ export class AdminApiClient {
       const response = await this.fetcher(this.resolve(path), {
         body: options.body === undefined ? undefined : JSON.stringify(options.body),
         headers,
-        method: options.method ?? 'GET',
+        method,
         signal: controller.signal,
       })
 
@@ -121,13 +128,42 @@ export class AdminApiClient {
       if (!response.ok) {
         throw new AdminApiError('ADMIN_HTTP_ERROR', `HTTP ${response.status}`, response.status)
       }
+      apiLogger.debug('admin API request completed', {
+        durationMs: Date.now() - startedAt,
+        method,
+        path,
+        status: response.status,
+      })
       return payload.data
     } catch (error) {
-      if (error instanceof AdminApiError) throw error
-      if (timedOut) throw new AdminApiError('ADMIN_REQUEST_TIMEOUT', '请求超时，请检查服务器连接')
+      if (error instanceof AdminApiError) {
+        apiLogger.warn('admin API request rejected', {
+          code: error.code,
+          durationMs: Date.now() - startedAt,
+          method,
+          path,
+          status: error.status,
+        })
+        throw error
+      }
+      if (timedOut) {
+        apiLogger.warn('admin API request timed out', {
+          durationMs: Date.now() - startedAt,
+          method,
+          path,
+        })
+        throw new AdminApiError('ADMIN_REQUEST_TIMEOUT', '请求超时，请检查服务器连接')
+      }
       if (controller.signal.aborted) {
+        apiLogger.debug('admin API request aborted', { method, path })
         throw new AdminApiError('ADMIN_REQUEST_ABORTED', '请求已取消', undefined, error)
       }
+      apiLogger.error('admin API request failed', {
+        durationMs: Date.now() - startedAt,
+        error,
+        method,
+        path,
+      })
       throw new AdminApiError(
         'ADMIN_REQUEST_FAILED',
         error instanceof Error ? error.message : '管理 API 请求失败',

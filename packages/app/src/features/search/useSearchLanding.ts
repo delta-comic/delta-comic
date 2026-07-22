@@ -1,4 +1,5 @@
 import { useNativeStore } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import { Global, type Search, usePluginStore } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
 import { computedAsync } from '@vueuse/core'
@@ -6,6 +7,8 @@ import { uniq } from 'es-toolkit'
 import { computed, readonly, shallowRef } from 'vue'
 
 import { pluginName } from '@/symbol'
+
+const searchLogger = logger.scoped('app:search')
 
 export interface ResolvedHotSearchSection {
   id: string
@@ -60,7 +63,7 @@ export function useSearchLanding(options: UseSearchLandingOptions) {
             } satisfies ResolvedHotSearchSection
           } catch (error) {
             if (!controller.signal.aborted)
-              console.warn(`[hot search] provider "${plugin}" failed`, error)
+              searchLogger.warn('hot-search provider failed', { plugin }, error)
             return undefined
           }
         }),

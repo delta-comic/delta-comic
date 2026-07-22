@@ -1,3 +1,5 @@
+import { logger } from '@delta-comic/logger'
+
 import { readNumberVar } from '@/env'
 import { AppError } from '@/shared/errors'
 import { createId, isUuid } from '@/shared/ids'
@@ -14,6 +16,8 @@ import type {
 } from './auth.types'
 import { createPasswordRecord, verifyPassword } from './password'
 import { createTokenPair, hashToken } from './token'
+
+const authLogger = logger.scoped('server:auth')
 
 const normalizeLoginName = (loginName: string): string => loginName.trim().toLowerCase()
 
@@ -46,6 +50,7 @@ export class AuthService {
   }
 
   async register(input: RegisterRequest): Promise<AuthTokensResponse> {
+    authLogger.debug('registration started')
     this.assertSecrets()
     this.assertTerminalUuid(input.terminalUuid)
     const loginName = normalizeLoginName(input.loginName)
@@ -68,16 +73,19 @@ export class AuthService {
       updated_at: current,
     })
     await this.upsertTerminal(userId, input, current)
-    return await this.createSessionResponse(
+    const response = await this.createSessionResponse(
       userId,
       loginName,
       input.terminalUuid,
       input.terminalName,
       current,
     )
+    authLogger.info('user registration completed')
+    return response
   }
 
   async login(input: LoginRequest): Promise<AuthTokensResponse> {
+    authLogger.debug('login started')
     this.assertSecrets()
     this.assertTerminalUuid(input.terminalUuid)
     const loginName = normalizeLoginName(input.loginName)
@@ -98,13 +106,15 @@ export class AuthService {
 
     const current = readNow()
     await this.upsertTerminal(user.id, input, current)
-    return await this.createSessionResponse(
+    const response = await this.createSessionResponse(
       user.id,
       user.login_name,
       input.terminalUuid,
       input.terminalName,
       current,
     )
+    authLogger.info('user login completed')
+    return response
   }
 
   async refresh(refreshToken: string): Promise<AuthTokensResponse> {
@@ -145,17 +155,20 @@ export class AuthService {
     }
     await this.repository.rotateSession(session.id, current, newSession)
 
-    return this.toTokenResponse(
+    const response = this.toTokenResponse(
       user.id,
       user.login_name,
       terminal.terminal_uuid,
       terminal.display_name,
       tokens,
     )
+    authLogger.debug('authentication session refreshed')
+    return response
   }
 
   async logout(auth: AuthContext): Promise<{ loggedOut: true }> {
     await this.repository.revokeSession(auth.sessionId, readNow())
+    authLogger.info('authentication session logged out')
     return { loggedOut: true }
   }
 

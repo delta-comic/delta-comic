@@ -246,7 +246,8 @@ describe('webviewAuth', () => {
       if (command === 'plugin:utils|webview_close_page') throw closeError
       throw new Error(`unexpected command: ${command}`)
     })
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const { Logger } = await import('@delta-comic/logger')
+    const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
 
     const { PageWebviewAuth } = await import('./webviewAuth')
     const auth = new PageWebviewAuth(
@@ -264,8 +265,8 @@ describe('webviewAuth', () => {
       title: 'Login',
     })
     expect(warn).toHaveBeenCalledWith(
-      '[webview auth] failed to close auth page',
-      'delta-auth-fallback',
+      'failed to close auth page',
+      { label: 'delta-auth-fallback' },
       closeError,
     )
   })

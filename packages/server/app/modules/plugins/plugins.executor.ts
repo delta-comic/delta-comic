@@ -1,3 +1,5 @@
+import { logger } from '@delta-comic/logger'
+
 import { AppError } from '@/shared/errors'
 
 import type {
@@ -10,6 +12,8 @@ import type {
 
 import { normalizeServerPluginConfig, validateServerPluginDefinition } from './plugins.manifest'
 import { staticServerPluginRegistry } from './plugins.registry'
+
+const executorLogger = logger.scoped('server:plugins:executor')
 
 export abstract class ServerPluginExecutor {
   abstract listDefinitions(): readonly ServerPluginDefinition[]
@@ -53,6 +57,7 @@ export class StaticPluginExecutor extends ServerPluginExecutor {
         500,
       )
     }
+    executorLogger.info('static plugin definitions loaded', { count: this.definitions.size })
   }
 
   listDefinitions(): readonly ServerPluginDefinition[] {
@@ -67,6 +72,7 @@ export class StaticPluginExecutor extends ServerPluginExecutor {
 
   async install(pluginId: string, config: ServerPluginConfig): Promise<void> {
     const { context, definition } = this.resolve(pluginId, config)
+    executorLogger.debug('installing plugin runtime', { pluginId })
     await definition.runtime.install?.(context)
   }
 
@@ -76,6 +82,7 @@ export class StaticPluginExecutor extends ServerPluginExecutor {
     config: ServerPluginConfig,
   ): Promise<void> {
     const { context, definition } = this.resolve(pluginId, config)
+    executorLogger.debug('updating plugin runtime', { pluginId })
     if (definition.runtime.update) {
       await definition.runtime.update(context, previousVersion)
       return
@@ -85,16 +92,19 @@ export class StaticPluginExecutor extends ServerPluginExecutor {
 
   async start(pluginId: string, config: ServerPluginConfig): Promise<void> {
     const { context, definition } = this.resolve(pluginId, config)
+    executorLogger.debug('starting plugin runtime', { pluginId })
     await definition.runtime.start?.(context)
   }
 
   async stop(pluginId: string, config: ServerPluginConfig): Promise<void> {
     const { context, definition } = this.resolve(pluginId, config)
+    executorLogger.debug('stopping plugin runtime', { pluginId })
     await definition.runtime.stop?.(context)
   }
 
   async uninstall(pluginId: string, config: ServerPluginConfig): Promise<void> {
     const { context, definition } = this.resolve(pluginId, config)
+    executorLogger.debug('uninstalling plugin runtime', { pluginId })
     await definition.runtime.uninstall?.(context)
   }
 

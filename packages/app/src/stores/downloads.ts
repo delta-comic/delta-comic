@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { uni } from '@delta-comic/model'
 import { usePluginStore } from '@delta-comic/plugin'
 import { defineStore } from 'pinia'
@@ -31,6 +32,8 @@ import {
   type SourceRefreshWarning,
   type SourceRefreshWarningStatus,
 } from '@/features/downloads/sourceRefresh'
+
+const downloadsLogger = logger.scoped('app:downloads')
 
 const DEFAULT_SETTINGS: DownloaderSettings = {
   allowMetered: true,
@@ -204,6 +207,7 @@ export const useDownloadsStore = defineStore('downloads', () => {
     }
     const controller = new AbortController()
     sourceRefreshControllers.set(task.id, controller)
+    downloadsLogger.info('download source refresh started', { taskId: task.id })
     try {
       const source = await candidate.provider.refreshSource(
         {
@@ -228,14 +232,16 @@ export const useDownloadsStore = defineStore('downloads', () => {
         return
       }
       applyTask(await downloaderClient.updateSource(task.id, source), true)
+      downloadsLogger.info('download source refresh completed', { taskId: task.id })
       clearSourceRefreshState(task.id)
       scheduleRefresh()
-    } catch {
+    } catch (error) {
       if (controller.signal.aborted) return
       const current = tasks.value.find(value => value.id === task.id)
       if (current?.status !== 'waitingForSource' || current.revision !== task.revision) return
       sourceRefreshFailureRevisions.set(task.id, task.revision)
       setSourceRefreshWarning(task, 'refresh-failed', collection)
+      downloadsLogger.warn('download source refresh failed', { taskId: task.id }, error)
     } finally {
       if (sourceRefreshControllers.get(task.id) === controller) {
         sourceRefreshControllers.delete(task.id)
@@ -298,6 +304,8 @@ export const useDownloadsStore = defineStore('downloads', () => {
       while (sourceRefreshPending) {
         sourceRefreshPending = false
         const waitingTasks = tasks.value.filter(task => task.status === 'waitingForSource')
+        if (waitingTasks.length)
+          downloadsLogger.debug('reconciling download sources', { taskCount: waitingTasks.length })
         for (const task of waitingTasks) await reconcileSourceRefreshTask(task)
       }
     })().finally(() => {
@@ -341,6 +349,7 @@ export const useDownloadsStore = defineStore('downloads', () => {
       return
     }
     const baselineRevision = revision.value
+    downloadsLogger.debug('downloader snapshot refresh started', { baselineRevision })
     loading.value = true
     refreshPromise = Promise.all([
       downloaderClient.listTasks(),
@@ -357,10 +366,17 @@ export const useDownloadsStore = defineStore('downloads', () => {
         destinations.value = nextDestinations
         revision.value = Math.max(revision.value, nextSettings.revision)
         error.value = undefined
+        downloadsLogger.debug('downloader snapshot refreshed', {
+          collectionCount: nextCollections.length,
+          destinationCount: nextDestinations.length,
+          revision: revision.value,
+          taskCount: nextTasks.length,
+        })
         void reconcileSourceRefreshes()
       })
       .catch(cause => {
         error.value = errorMessage(cause)
+        downloadsLogger.error('downloader snapshot refresh failed', cause)
         throw cause
       })
       .finally(() => {
@@ -402,6 +418,11 @@ export const useDownloadsStore = defineStore('downloads', () => {
   }
 
   function handleUpsert(event: DownloadTaskUpsertEvent) {
+    downloadsLogger.trace('download task event received', {
+      revision: event.revision,
+      status: event.task.status,
+      taskId: event.task.id,
+    })
     const revisionAccepted = acceptRevision(event.revision)
     if (!applyTask(event.task) && !revisionAccepted) return
     if (selectedTaskId.value === event.task.id) {
@@ -413,6 +434,10 @@ export const useDownloadsStore = defineStore('downloads', () => {
   }
 
   function handleRemoved(event: DownloadTaskRemovedEvent) {
+    downloadsLogger.debug('download task removed', {
+      revision: event.revision,
+      taskId: event.taskId,
+    })
     acceptRevision(event.revision)
     const current = tasks.value.find(task => task.id === event.taskId)
     if (current && current.revision > event.revision) return
@@ -427,6 +452,11 @@ export const useDownloadsStore = defineStore('downloads', () => {
   }
 
   function handleAttention(event: DownloadAttentionEvent) {
+    downloadsLogger.warn('download task needs attention', {
+      code: event.code,
+      revision: event.revision,
+      taskId: event.taskId,
+    })
     attention.value = event
     sourceRefreshAttentionCodes.set(event.taskId, event.code)
     if (!acceptRevision(event.revision)) {
@@ -439,6 +469,7 @@ export const useDownloadsStore = defineStore('downloads', () => {
   async function connect() {
     references += 1
     if (references > 1) return await connectPromise
+    downloadsLogger.info('connecting downloader event stream')
     const generation = ++connectionGeneration
     const operation = (async () => {
       let listenerError: unknown
@@ -452,14 +483,17 @@ export const useDownloadsStore = defineStore('downloads', () => {
         else unlisten = nextUnlisten
       } catch (cause) {
         listenerError = cause
+        downloadsLogger.error('downloader event stream connection failed', cause)
       }
       if (generation !== connectionGeneration || references === 0) return
       try {
         await refresh()
-      } catch {
+      } catch (cause) {
+        downloadsLogger.warn('initial downloader snapshot failed after connection', cause)
         // Keep the snapshot error while retaining a successful event subscription.
       }
       if (listenerError) error.value ??= errorMessage(listenerError)
+      else downloadsLogger.info('downloader event stream connected')
     })()
     connectPromise = operation
     try {
@@ -472,6 +506,7 @@ export const useDownloadsStore = defineStore('downloads', () => {
   function disconnect() {
     references = Math.max(0, references - 1)
     if (references) return
+    downloadsLogger.info('disconnecting downloader event stream')
     connectionGeneration += 1
     unlisten?.()
     unlisten = undefined
@@ -483,16 +518,19 @@ export const useDownloadsStore = defineStore('downloads', () => {
     sourceRefreshControllers.clear()
   }
 
-  async function mutate<T>(operation: () => Promise<T>) {
+  async function mutate<T>(name: string, operation: () => Promise<T>) {
     mutationCount += 1
     mutating.value = true
     error.value = undefined
+    downloadsLogger.debug('download operation started', { operation: name })
     try {
       const result = await operation()
       await refresh(true)
+      downloadsLogger.info('download operation completed', { operation: name })
       return result
     } catch (cause) {
       error.value = errorMessage(cause)
+      downloadsLogger.error('download operation failed', { operation: name }, cause)
       throw cause
     } finally {
       mutationCount = Math.max(0, mutationCount - 1)
@@ -500,27 +538,30 @@ export const useDownloadsStore = defineStore('downloads', () => {
     }
   }
 
-  const enqueueUrl = (input: EnqueueUrlInput) => mutate(() => downloaderClient.enqueueUrl(input))
-  const enqueuePlan = (input: EnqueuePlanInput) => mutate(() => downloaderClient.enqueuePlan(input))
+  const enqueueUrl = (input: EnqueueUrlInput) =>
+    mutate('enqueue-url', () => downloaderClient.enqueueUrl(input))
+  const enqueuePlan = (input: EnqueuePlanInput) =>
+    mutate('enqueue-plan', () => downloaderClient.enqueuePlan(input))
   const enqueueTorrent = (input: EnqueueTorrentInput) =>
-    mutate(() => downloaderClient.enqueueTorrent(input))
-  const pickDestination = () => mutate(() => downloaderClient.pickDestination())
-  const pauseTask = (id: string) => mutate(() => downloaderClient.pauseTask(id))
-  const resumeTask = (id: string) => mutate(() => downloaderClient.resumeTask(id))
-  const retryTask = (id: string) => mutate(() => downloaderClient.retryTask(id))
-  const cancelTask = (id: string) => mutate(() => downloaderClient.cancelTask(id))
-  const forgetTask = (id: string) => mutate(() => downloaderClient.forgetTask(id))
-  const deleteTaskFiles = (id: string) => mutate(() => downloaderClient.deleteTaskFiles(id))
+    mutate('enqueue-torrent', () => downloaderClient.enqueueTorrent(input))
+  const pickDestination = () => mutate('pick-destination', () => downloaderClient.pickDestination())
+  const pauseTask = (id: string) => mutate('pause-task', () => downloaderClient.pauseTask(id))
+  const resumeTask = (id: string) => mutate('resume-task', () => downloaderClient.resumeTask(id))
+  const retryTask = (id: string) => mutate('retry-task', () => downloaderClient.retryTask(id))
+  const cancelTask = (id: string) => mutate('cancel-task', () => downloaderClient.cancelTask(id))
+  const forgetTask = (id: string) => mutate('forget-task', () => downloaderClient.forgetTask(id))
+  const deleteTaskFiles = (id: string) =>
+    mutate('delete-task-files', () => downloaderClient.deleteTaskFiles(id))
   const setPriority = (id: string, priority: number) =>
-    mutate(() => downloaderClient.setPriority(id, priority))
+    mutate('set-priority', () => downloaderClient.setPriority(id, priority))
   const updateSettings = (patch: Partial<DownloaderSettings>) =>
-    mutate(async () => {
+    mutate('update-settings', async () => {
       settings.value = await downloaderClient.updateSettings(patch)
       return settings.value
     })
 
   async function pauseAll() {
-    await mutate(() =>
+    await mutate('pause-all', () =>
       Promise.all(pausableTasks.value.map(task => downloaderClient.pauseTask(task.id))),
     )
   }

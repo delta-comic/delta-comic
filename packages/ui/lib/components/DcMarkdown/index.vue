@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logger } from '@delta-comic/logger'
 import { isTauri } from '@tauri-apps/api/core'
 import { useCssVar, useEventListener } from '@vueuse/core'
 import MarkdownIt, { type Options } from 'markdown-it'
@@ -7,6 +8,8 @@ import { computed } from 'vue'
 import { cn, type StyleProps } from '../../utils'
 
 import { createTemplate } from './helper'
+
+const markdownLogger = logger.scoped('ui:markdown')
 
 const $props = withDefaults(
   defineProps<
@@ -53,7 +56,10 @@ const openExternalLink = (href: string) => {
 
   void import('@tauri-apps/plugin-shell')
     .then(({ open }) => open(href))
-    .catch(() => openInBrowser(href))
+    .catch(error => {
+      markdownLogger.warn('native external link open failed; using browser fallback', error)
+      openInBrowser(href)
+    })
 }
 
 useEventListener('message', ev => {
@@ -68,6 +74,7 @@ useEventListener('message', ev => {
   ) {
     return
   }
+  markdownLogger.debug('opening delegated markdown link')
   openExternalLink(data.href)
 })
 </script>

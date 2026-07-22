@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { logger } from '@delta-comic/logger'
 import { Install, translatePluginText } from '@delta-comic/plugin'
 import { toReactive, useFileDialog } from '@vueuse/core'
 import { useDialog, useMessage } from 'naive-ui'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+const pluginInstallLogger = logger.scoped('app:plugin-install')
 const { installFilePlugin, installPlugin, installers } = Install
 const { t } = useI18n()
 
@@ -32,9 +35,11 @@ const confirmAdd = async (url: string) => {
         isAdding.value = false
       },
     })
+    pluginInstallLogger.info('plugin installation confirmed')
     await installPlugin(url)
+    pluginInstallLogger.info('plugin installation completed')
   } catch (error) {
-    console.error(error)
+    pluginInstallLogger.error('plugin installation failed', error)
   }
   isAdding.value = false
 }
@@ -55,7 +60,11 @@ const useUploadPlugin = () => {
       const file = files?.item(0)
       if (!file) throw new Error(t('plugin.install.errors.noFile'))
 
+      pluginInstallLogger.info('local plugin installation started')
       await installFilePlugin(file)
+      pluginInstallLogger.info('local plugin installation completed')
+    } catch (error) {
+      pluginInstallLogger.error('local plugin installation failed', error)
     } finally {
       upload.reset()
       isAdding.value = false

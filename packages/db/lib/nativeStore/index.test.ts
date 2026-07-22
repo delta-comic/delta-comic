@@ -116,7 +116,8 @@ describe('useNativeStore', () => {
 
   it('falls back to a cloned default value when stored JSON is invalid', async () => {
     const defaultValue = { mode: 'light' }
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { Logger } = await import('@delta-comic/logger')
+    const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => {})
     const { useNativeStore } = await mockSqliteStore([['settings:theme', '{bad json']])
 
     const state = useNativeStore('settings', 'theme', defaultValue)
@@ -124,7 +125,7 @@ describe('useNativeStore', () => {
     await flushNativeStore()
     await waitForExpect(() =>
       expect(warn).toHaveBeenCalledWith(
-        '[db] failed to parse native store value',
+        'failed to parse native store value',
         expect.any(SyntaxError),
       ),
     )
@@ -135,16 +136,18 @@ describe('useNativeStore', () => {
 
   it('recovers from sqlite load failures without exposing a mutable default object', async () => {
     const defaultValue = { mode: 'light' }
+    const { Logger } = await import('@delta-comic/logger')
+    const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
     const { useNativeStore } = await mockSqliteStore([], {
       loadError: new Error('database unavailable'),
     })
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
     const state = useNativeStore('settings', 'theme', defaultValue)
     await flushNativeStore()
     await waitForExpect(() =>
       expect(warn).toHaveBeenCalledWith(
-        '[db] failed to load native store value',
+        'failed to load native store value',
+        { key: 'theme', namespace: 'settings' },
         expect.objectContaining({ message: 'database unavailable' }),
       ),
     )
@@ -155,7 +158,8 @@ describe('useNativeStore', () => {
 
   it('contains asynchronous persistence failures after state changes', async () => {
     vi.useFakeTimers()
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const { Logger } = await import('@delta-comic/logger')
+    const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
     const { useNativeStore } = await mockSqliteStore(
       [['settings:theme', JSON.stringify({ mode: 'dark' })]],
       { saveError: new Error('disk full') },
@@ -169,7 +173,8 @@ describe('useNativeStore', () => {
     await vi.advanceTimersByTimeAsync(100)
 
     expect(warn).toHaveBeenCalledWith(
-      '[db] failed to persist native store value',
+      'failed to persist native store value',
+      { key: 'theme', namespace: 'settings' },
       expect.objectContaining({ message: 'disk full' }),
     )
   })

@@ -19,13 +19,14 @@ export const runOtherProgress = async (
   progresses: readonly Config[],
   {
     setMeta,
-    onBackgroundError = error => console.error('[plugin otherProgress]', error),
+    onBackgroundError = error => otherProgressLogger.error('background plugin steps failed', error),
   }: OtherProgressRunnerOptions,
 ) => {
   let parallelGroup: Promise<void>[] = []
 
   for (const progress of progresses) {
     if (progress.async) {
+      otherProgressLogger.debug('background plugin step started', { name: progress.name })
       parallelGroup.push(runProgress(progress, setMeta))
       continue
     }
@@ -35,6 +36,7 @@ export const runOtherProgress = async (
       parallelGroup = []
     }
     await runProgress(progress, setMeta)
+    otherProgressLogger.debug('plugin step completed', { name: progress.name })
   }
 
   if (parallelGroup.length === 0) return
@@ -43,3 +45,6 @@ export const runOtherProgress = async (
     if (errors.length > 0) onBackgroundError(new AggregateError(errors, '后台插件步骤执行失败'))
   })
 }
+import { logger } from '@delta-comic/logger'
+
+const otherProgressLogger = logger.scoped('plugin:background-progress')

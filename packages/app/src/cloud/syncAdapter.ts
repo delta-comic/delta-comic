@@ -1,4 +1,7 @@
+import { logger } from '@delta-comic/logger'
 import { syncCollectionNames, type SyncChange, type SyncCollection } from '@delta-comic/server'
+
+const syncAdapterLogger = logger.scoped('app:cloud:sync-adapter')
 
 type SnapshotCollections = Record<SyncCollection, unknown[]>
 
@@ -30,6 +33,7 @@ const splitEntityId = (entityId: string): [string, string] => {
 
 export class DbCloudSyncAdapter {
   async collectSnapshot(): Promise<SnapshotCollections> {
+    syncAdapterLogger.info('collecting local sync snapshot')
     const { db } = await import('@delta-comic/db')
     const collections = await Promise.all(
       syncCollectionNames.map(
@@ -37,10 +41,16 @@ export class DbCloudSyncAdapter {
           [collection, await db.selectFrom(collection).selectAll().execute()] as const,
       ),
     )
-    return Object.fromEntries(collections) as SnapshotCollections
+    const snapshot = Object.fromEntries(collections) as SnapshotCollections
+    syncAdapterLogger.info('local sync snapshot collected', {
+      collectionCount: collections.length,
+      rowCount: collections.reduce((count, [, rows]) => count + rows.length, 0),
+    })
+    return snapshot
   }
 
   async applyRemoteChanges(changes: SyncChange[]): Promise<void> {
+    syncAdapterLogger.info('applying remote sync changes', { changeCount: changes.length })
     const sorted = [...changes].sort((left, right) => {
       const leftOrder =
         left.action === 'delete' ? deleteOrder[left.collection] : upsertOrder[left.collection]
@@ -59,6 +69,7 @@ export class DbCloudSyncAdapter {
         await (trx as any).replaceInto(change.collection).values(change.data).execute()
       }
     }, db)
+    syncAdapterLogger.info('remote sync changes applied', { changeCount: changes.length })
   }
 
   private async deleteRemoteChange(

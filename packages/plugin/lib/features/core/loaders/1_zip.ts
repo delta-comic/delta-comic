@@ -1,4 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import JSZip from 'jszip'
 
 import { pluginI18n } from '@/i18n'
@@ -13,6 +14,8 @@ import {
   listPluginFiles,
   readPluginText,
 } from '../../../driver/init/storage'
+
+const zipLoaderLogger = logger.scoped('plugin:loader:zip')
 
 export const rewriteCssAssetUrls = async (
   cssPath: string,
@@ -40,7 +43,7 @@ export default new (class extends PluginLoader {
     file: File,
     context?: PluginLoaderInstallContext,
   ): Promise<PluginArchiveDB.Meta> {
-    console.log('[loader zip] begin:', file)
+    zipLoaderLogger.info('zip plugin installation started', { bytes: file.size })
     return await installZipFile(file, progress => {
       const percent = progress.total > 0 ? (progress.current / progress.total) * 90 : 0
       context?.report({
@@ -58,6 +61,7 @@ export default new (class extends PluginLoader {
   public override async load(
     pluginMeta: PluginArchiveDB.Archive,
   ): Promise<PluginConfigFactory | undefined> {
+    zipLoaderLogger.debug('zip plugin module load started', { plugin: pluginMeta.pluginName })
     if (!pluginMeta.meta.entry) throw new Error('not found entry')
     const files = await listPluginFiles(pluginMeta.pluginName)
     const javascriptFiles = files.filter(path => /\.(?:js|mjs)$/i.test(path))
@@ -91,6 +95,7 @@ export default new (class extends PluginLoader {
       path => createPluginAssetUrl(pluginMeta.pluginName, path),
     )
     document.head.appendChild(style)
+    zipLoaderLogger.debug('zip plugin stylesheet attached', { plugin: pluginMeta.pluginName })
 
     return result
   }

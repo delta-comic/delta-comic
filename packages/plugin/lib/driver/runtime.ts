@@ -1,4 +1,5 @@
 import { db, type PluginArchiveDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import { ref, type App, type Ref } from 'vue'
 
 import { useConfig } from '@/config'
@@ -19,6 +20,8 @@ import {
   type ClientPluginKind,
 } from './runtimePlan'
 import { pluginStore } from './store'
+
+const pluginRuntimeLogger = logger.scoped('plugin:runtime')
 
 const recoveryKey = 'delta-comic:preboot-recovery'
 
@@ -79,6 +82,9 @@ class PluginRuntime {
       throw new Error('normal plugins are already active; use reloadNormal()')
     }
     const progress = ref<Record<string, PluginLoadingInfo>>({})
+    pluginRuntimeLogger.info('normal plugin load requested', {
+      selectedCount: options.pluginNames?.length,
+    })
     const operation = this.loadKind('normal', progress, options)
     this.trackNormalOperation(operation)
     return { operation, progress }
@@ -87,6 +93,9 @@ class PluginRuntime {
   reloadNormal(options: LoadNormalOptions = {}): PluginRuntimeOperation {
     if (this.normalOperation) throw new Error('normal plugins are already loading')
     const progress = ref<Record<string, PluginLoadingInfo>>({})
+    pluginRuntimeLogger.info('normal plugin reload requested', {
+      selectedCount: options.pluginNames?.length,
+    })
     const operation = (async () => {
       const unloadErrors = await this.unloadKind('normal')
       await this.loadKind('normal', progress, options)
@@ -99,6 +108,7 @@ class PluginRuntime {
   }
 
   async preparePreboot(app: App): Promise<{ reloadRequired: boolean }> {
+    pluginRuntimeLogger.info('preboot plugin preparation started')
     await this.ensureBuiltInPlugins()
     await pluginStore.$refreshI18nNames()
     const allPlugins = await db.selectFrom('plugin').selectAll().execute()
@@ -110,6 +120,7 @@ class PluginRuntime {
       this.activePrebootNames,
     )
     this.enabledPrebootNames = plugins.map(plugin => plugin.pluginName)
+    pluginRuntimeLogger.debug('preboot plugins selected', { count: plugins.length })
     if (plugins.length === 0) {
       this.prebootActivated = true
       return { reloadRequired: false }
@@ -140,8 +151,10 @@ class PluginRuntime {
           })
         }
       }
+      pluginRuntimeLogger.info('preboot plugin preparation completed', { count: plugins.length })
       return { reloadRequired: false }
     } catch (error) {
+      pluginRuntimeLogger.error('preboot plugin preparation failed', error)
       return await this.failPreboot(this.enabledPrebootNames, error)
     }
   }
@@ -149,6 +162,9 @@ class PluginRuntime {
   async activatePreboot(progress = ref<Record<string, PluginLoadingInfo>>({})) {
     if (this.prebootActivated) return { reloadRequired: false }
     try {
+      pluginRuntimeLogger.info('preboot plugin activation started', {
+        count: this.preparedPreboot.size,
+      })
       for (const [name, config] of this.preparedPreboot) {
         await Global.withRegistrationOwner(name, async () => {
           await bootResolvedConfig(config, progress)
@@ -159,13 +175,16 @@ class PluginRuntime {
       }
       this.preparedPreboot.clear()
       this.prebootActivated = true
+      pluginRuntimeLogger.info('preboot plugin activation completed')
       return { reloadRequired: false }
     } catch (error) {
+      pluginRuntimeLogger.error('preboot plugin activation failed', error)
       return await this.failPreboot(this.enabledPrebootNames, error)
     }
   }
 
   async uninstall(pluginName: string) {
+    pluginRuntimeLogger.info('plugin uninstall started', { plugin: pluginName })
     const archive = await db
       .selectFrom('plugin')
       .selectAll()
@@ -206,6 +225,10 @@ class PluginRuntime {
     await db.deleteFrom('plugin').where('pluginName', '=', pluginName).execute()
     await pluginStore.$refreshI18nNames()
     pluginStore.$touch()
+    pluginRuntimeLogger.info('plugin uninstall completed', {
+      cleanupErrorCount: errors.length,
+      plugin: pluginName,
+    })
     if (errors.length > 0) {
       throw new AggregateError(errors, `plugin "${pluginName}" was removed with cleanup errors`)
     }
@@ -217,7 +240,7 @@ class PluginRuntime {
       if (!value) return null
       return JSON.parse(value) as PrebootRecovery
     } catch (error) {
-      console.warn('[plugin runtime] failed to read preboot recovery', error)
+      pluginRuntimeLogger.warn('failed to read preboot recovery', error)
       return null
     }
   }
@@ -226,15 +249,21 @@ class PluginRuntime {
     try {
       globalThis.localStorage?.removeItem(recoveryKey)
     } catch (error) {
-      console.warn('[plugin runtime] failed to clear preboot recovery', error)
+      pluginRuntimeLogger.warn('failed to clear preboot recovery', error)
     }
   }
 
   private trackNormalOperation(operation: Promise<void>) {
     this.normalOperation = operation
     void operation.then(
-      () => (this.normalOperation = undefined),
-      () => (this.normalOperation = undefined),
+      () => {
+        this.normalOperation = undefined
+        pluginRuntimeLogger.info('normal plugin operation completed')
+      },
+      error => {
+        this.normalOperation = undefined
+        pluginRuntimeLogger.error('normal plugin operation failed', error)
+      },
     )
   }
 
@@ -275,6 +304,10 @@ class PluginRuntime {
       options.pluginNames ? new Set(options.pluginNames) : undefined,
     )
     const plan = planPluginLoadOrder(plugins)
+    pluginRuntimeLogger.info('plugin load plan created', {
+      levelCount: plan.levels.length,
+      pluginCount: plugins.length,
+    })
     const planError = formatPluginLoadPlanError(plan)
     if (planError) throw new Error(planError)
 
@@ -317,7 +350,7 @@ class PluginRuntime {
             try {
               cleanupPlugin(config)
             } catch (cleanupError) {
-              console.error(`[plugin runtime] rollback failed for ${name}`, cleanupError)
+              pluginRuntimeLogger.error('plugin rollback failed', { plugin: name }, cleanupError)
             }
           } else {
             Global.removeOwnedRegistrations(name)
@@ -327,6 +360,7 @@ class PluginRuntime {
             ...current,
             progress: { ...current.progress, errorReason: reasonText(error), status: 'error' },
           }
+          pluginRuntimeLogger.error('plugin load failed', { plugin: name }, error)
         }
       }
     }
@@ -335,9 +369,11 @@ class PluginRuntime {
   private async unloadKind(kind: ClientPluginKind) {
     const entries = [...this.active.entries()].filter(([, active]) => active.kind === kind)
     const errors: unknown[] = []
+    pluginRuntimeLogger.info('plugin unload phase started', { count: entries.length, kind })
     for (const [name, active] of entries.reverse()) {
       errors.push(...(await this.unloadOne(name, active, false)))
     }
+    pluginRuntimeLogger.info('plugin unload phase completed', { errorCount: errors.length, kind })
     return errors
   }
 
@@ -409,7 +445,7 @@ class PluginRuntime {
     try {
       globalThis.localStorage?.setItem(recoveryKey, JSON.stringify(recovery))
     } catch (storageError) {
-      console.warn('[plugin runtime] failed to persist preboot recovery', storageError)
+      pluginRuntimeLogger.warn('failed to persist preboot recovery', storageError)
     }
     this.prebootActivated = true
     return { reloadRequired: disabled }

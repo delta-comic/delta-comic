@@ -6,6 +6,7 @@
     TComponent extends GlobalEnvironments[TKey] = GlobalEnvironments[TKey]
   "
 >
+import { logger } from '@delta-comic/logger'
 import { computed } from 'vue'
 import type { ComponentProps } from 'vue-component-type-helpers'
 
@@ -18,6 +19,8 @@ import {
   type GlobalEnvironments,
 } from './registry'
 
+const environmentLogger = logger.scoped('ui:environment')
+
 const props = defineProps<{ args: ComponentProps<TComponent>; name: TKey }>()
 
 const registrations = computed(() => environmentRegistry.forKey(props.name))
@@ -26,7 +29,7 @@ const matches = async (registration: EnvironmentRegistration<TKey>) => {
   try {
     return await registration.condition(props.args)
   } catch (error) {
-    console.warn(`[ui environment] condition failed for "${String(props.name)}"`, error)
+    environmentLogger.warn('environment condition failed', { name: String(props.name) }, error)
     return false
   }
 }

@@ -1,9 +1,12 @@
 import { db, type PluginArchiveDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import type { Raw } from 'vue'
 import { shallowReactive, shallowRef } from 'vue'
 
 import { translatePluginText } from '@/i18n'
 import type { PluginConfig } from '@/plugin'
+
+const pluginStoreLogger = logger.scoped('plugin:store')
 
 export class PluginStore {
   public readonly plugins = shallowReactive(new Map<string, Raw<PluginConfig>>())
@@ -41,6 +44,7 @@ export class PluginStore {
     const names = await db.selectFrom('plugin').select(['pluginName', 'displayName']).execute()
     this.pluginNames.clear()
     for (const plugin of names) this.pluginNames.set(plugin.pluginName, plugin.displayName)
+    pluginStoreLogger.debug('plugin display names refreshed', { count: names.length })
   }
 
   public $getI18nName(key: string) {
@@ -55,6 +59,7 @@ export class PluginStore {
       .execute()
     await this.$refreshI18nNames()
     this.$touch()
+    pluginStoreLogger.info('plugin archives persisted', { count: archives.length })
   }
 
   public $touch() {

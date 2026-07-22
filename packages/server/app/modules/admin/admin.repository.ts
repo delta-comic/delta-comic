@@ -1,3 +1,5 @@
+import { logger } from '@delta-comic/logger'
+
 import type {
   AdminMetric,
   AdminMetricIssue,
@@ -115,14 +117,10 @@ const availableMetric = (definition: MetricDefinition, value: number): AdminMetr
 const errorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : String(error)
 
+const metricsLogger = logger.scoped('server:admin:metrics')
+
 const logQueryFailure = (operation: string, error: unknown) => {
-  console.error(
-    JSON.stringify({
-      error: errorMessage(error),
-      message: 'admin metrics query failed',
-      operation,
-    }),
-  )
+  metricsLogger.error('admin metrics query failed', { error: errorMessage(error), operation })
 }
 
 const parseAuditDetail = (value: string | null): unknown => {

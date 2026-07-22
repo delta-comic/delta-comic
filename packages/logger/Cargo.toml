@@ -2,6 +2,7 @@
 name = "tauri-plugin-logger"
 description = "Unified, non-blocking tracing logger for Delta Comic and its plugins"
 readme = "README.md"
+include = ["/src/**", "/permissions/**", "/build.rs", "/Cargo.toml", "/README.md"]
 authors = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }

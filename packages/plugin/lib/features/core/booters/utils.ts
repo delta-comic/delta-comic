@@ -1,6 +1,9 @@
+import { logger } from '@delta-comic/logger'
 import { isEmpty, sortBy } from 'es-toolkit/compat'
 
 import type { PluginConfig } from '@/plugin'
+
+const pluginProbeLogger = logger.scoped('plugin:probe')
 
 export const testApi = async (cfg: NonNullable<PluginConfig['api']>[string]) => {
   const forks = await cfg.forks()
@@ -23,33 +26,33 @@ const test = async (
   const abortController = new AbortController()
   try {
     await Promise.all(
-      forks.map(async fork => {
+      forks.map(async (_fork, index) => {
         try {
           const begin = Date.now()
           const stopTimeout = setTimeout(() => {
             abortController.abort()
           }, 10000)
-          await test(fork, abortController.signal)
+          await test(_fork, abortController.signal)
           clearTimeout(stopTimeout)
           const end = Date.now()
           const time = end - begin
-          record.push([fork, time])
-          console.log(`[plugin test] fetch url ${fork} connected time ${time}ms`)
+          record.push([_fork, time])
+          pluginProbeLogger.debug('plugin endpoint probe succeeded', { index, latencyMs: time })
           abortController.abort()
         } catch {
-          record.push([fork, false])
-          console.log(`[plugin test] fetch url ${fork} can not connected`)
+          record.push([_fork, false])
+          pluginProbeLogger.debug('plugin endpoint probe failed', { index })
         }
       }),
     )
   } catch (err) {
-    console.log('[plugin test] fetch test aborted', err)
+    pluginProbeLogger.debug('plugin endpoint probe aborted', err)
   }
   const result = sortBy(
     record.filter(v => v[1] != false),
     v => v[1],
   )[0]
-  console.log(`[plugin test] fetch test done`, result)
+  pluginProbeLogger.debug('plugin endpoint probe completed', { found: Boolean(result) })
   if (!result) {
     return ['', false] as [string, false]
   }

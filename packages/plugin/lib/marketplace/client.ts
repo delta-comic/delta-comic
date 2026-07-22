@@ -1,4 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import ky from 'ky'
 
 import { parsePluginManifest } from '../manifest'
@@ -19,6 +20,8 @@ import {
   parseAwesomeRegistryPage,
   AwesomeRegistryValidationError,
 } from './validation'
+
+const marketplaceLogger = logger.scoped('plugin:marketplace')
 
 export interface AwesomeRegistryClientOptions {
   baseUrl?: string
@@ -79,11 +82,15 @@ export class AwesomeRegistryClient {
   }
 
   public async findListing(id: string): Promise<AwesomePluginListing> {
+    marketplaceLogger.debug('searching marketplace listing', { plugin: id })
     const { data: index } = await this.loadIndex()
     for (const pageReference of index.pages) {
       const { data: page } = await this.loadPage(pageReference.path)
       const listing = page.items.find(item => item.id === id)
-      if (listing) return listing
+      if (listing) {
+        marketplaceLogger.debug('marketplace listing found', { plugin: id })
+        return listing
+      }
     }
     throw new Error(`Plugin "${id}" is not registered in awesome-plugins`)
   }
@@ -115,10 +122,15 @@ export class AwesomeRegistryClient {
       if (error instanceof AwesomeRegistryValidationError || error instanceof SyntaxError)
         throw error
       const cached = readCache()
-      if (cached) return { ...cached, stale: true }
+      if (cached) {
+        marketplaceLogger.warn('marketplace request failed; using stale cache', { path }, error)
+        return { ...cached, stale: true }
+      }
+      marketplaceLogger.error('marketplace request failed without cache', { path }, error)
       throw new AwesomeRegistryNetworkError(`Failed to request awesome-plugins ${path}`, error)
     }
     const data = parse(payload)
+    marketplaceLogger.debug('marketplace response cached', { path })
     return { cachedAt: writeCache(data), data, stale: false }
   }
 }

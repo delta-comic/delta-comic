@@ -1,4 +1,5 @@
 import { PluginArchiveDB, db } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import { createDownloadMessage, type DownloadMessageBind } from '@delta-comic/ui'
 import { isString } from 'es-toolkit'
 
@@ -10,6 +11,8 @@ import { runtimeExtensions } from './extensions'
 import { loaders } from './loader'
 import { pluginRuntime } from './runtime'
 import { pluginStore } from './store'
+
+const pluginInstallLogger = logger.scoped('plugin:install')
 
 const clampProgress = (progress: number) => Math.min(100, Math.max(0, progress))
 
@@ -30,9 +33,12 @@ export const installDepends = (
     for (const { id, download } of meta.require) {
       const isDownloaded = plugins.has(id)
       if (isDownloaded || !download) continue
-      console.log(`从 ${meta.name.id} 发现未安装依赖: ${id} ->`, download)
+      pluginInstallLogger.info('installing missing plugin dependency', {
+        dependency: id,
+        plugin: meta.name.id,
+      })
       v.description = pluginI18n.translate('plugin.progress.dependencies.installing', { id })
-      let downloadCommend = overrides.find(c => c.key == id)?.value ?? download
+      const downloadCommend = overrides.find(c => c.key == id)?.value ?? download
       await installPlugin(downloadCommend)
       count++
     }
@@ -46,6 +52,7 @@ const installPluginFile = async (
   installInput: string,
   __installedPlugins?: Set<string>,
 ) => {
+  pluginInstallLogger.info('plugin archive installation started', { installer: installerName })
   const meta = await m.createProgress(
     pluginI18n.translate('plugin.progress.installing'),
     async v => {
@@ -84,7 +91,7 @@ const installPluginFile = async (
       return meta
     },
   )
-  console.log(`安装插件成功: ${meta.name.id} ->`, meta)
+  pluginInstallLogger.info('plugin archive installed', { plugin: meta.name.id })
 
   await installDepends(m, meta, __installedPlugins)
 }
@@ -135,6 +142,7 @@ export const updatePlugin = async (
   return createDownloadMessage(
     pluginI18n.translate('plugin.progress.updateTitle', { plugin: pluginMeta.pluginName }),
     async m => {
+      pluginInstallLogger.info('plugin update started', { plugin: pluginMeta.pluginName })
       const file = await m.createLoading(
         pluginI18n.translate('plugin.progress.updating'),
         async v => {
@@ -175,6 +183,7 @@ export const updatePlugin = async (
       await pluginStore.$upsertArchives([{ ...pluginMeta, meta }])
 
       await installDepends(m, meta, __installedPlugins)
+      pluginInstallLogger.info('plugin update completed', { plugin: pluginMeta.pluginName })
     },
   )
 }

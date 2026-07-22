@@ -1,3 +1,4 @@
+import { Logger } from '@delta-comic/logger'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import { StreamQuery, Struct } from '../struct'
@@ -73,7 +74,7 @@ beforeEach(() => {
 
 describe('resource resolution', () => {
   it('normalizes process steps, skips missing processors, and stops on exit', async () => {
-    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const warning = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
     const resize = vi.fn(async (path: string) => [`resized/${path}`, false] as [string, boolean])
     const cache = vi.fn(
       async (path: string) => [`https://cdn.test/${path}`, true] as [string, boolean],
@@ -88,7 +89,10 @@ describe('resource resolution', () => {
 
     await expect(resource.getUrl()).resolves.toBe('https://cdn.test/resized/cover.jpg')
 
-    expect(warning).toHaveBeenCalledWith(expect.stringContaining('fixture, missing'))
+    expect(warning).toHaveBeenCalledWith('resource process not found', {
+      plugin: 'fixture',
+      referenceName: 'missing',
+    })
     expect(resize).toHaveBeenCalledWith('cover.jpg', resource)
     expect(cache).toHaveBeenCalledWith('resized/cover.jpg', resource)
     expect(unreachable).not.toHaveBeenCalled()

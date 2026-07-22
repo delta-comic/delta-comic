@@ -1,3 +1,4 @@
+import { Logger } from '@delta-comic/logger'
 import { describe, expect, it, vi } from 'vitest'
 
 import { bindRuntime, getRuntime, readNumberVar, type AppRuntime } from '../env'
@@ -91,13 +92,14 @@ describe('public error and response helpers', () => {
     expect(isAppError(new Error('other'))).toBe(false)
     expect(asPublicError(appError)).toBe(appError)
 
-    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const log = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
     expect(asPublicError(new Error('database password leaked'))).toMatchObject({
       code: 'INTERNAL_ERROR',
       message: 'internal server error',
       status: 500,
     })
     expect(log).toHaveBeenCalledOnce()
+    expect(log).toHaveBeenCalledWith('unhandled error', expect.any(Error))
   })
 
   it('builds success/failure payloads and maps framework errors to HTTP responses', async () => {

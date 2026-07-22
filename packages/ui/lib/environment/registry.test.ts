@@ -1,3 +1,4 @@
+import { Logger } from '@delta-comic/logger'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent } from 'vue'
@@ -63,7 +64,7 @@ describe('DcEnvironment', () => {
     })
     const Hidden = defineComponent({ template: '<output class="hidden">hidden</output>' })
     const condition = vi.fn(({ comicId }: any) => comicId === 'comic-1')
-    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const warning = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
     const disposeVisible = environmentRegistry.register('test-environment', Visible, condition)
     const disposeHidden = environmentRegistry.register('test-environment', Hidden, () => false)
     const disposeBroken = environmentRegistry.register('test-environment', Hidden, async () => {
@@ -79,7 +80,8 @@ describe('DcEnvironment', () => {
     expect(wrapper.get('.visible').text()).toBe('comic-1')
     expect(wrapper.find('.hidden').exists()).toBe(false)
     expect(warning).toHaveBeenCalledWith(
-      '[ui environment] condition failed for "test-environment"',
+      'environment condition failed',
+      { name: 'test-environment' },
       expect.any(Error),
     )
 

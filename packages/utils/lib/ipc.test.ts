@@ -37,8 +37,9 @@ describe('SharedFunction', () => {
   })
 
   it('calls the only registered random implementation and errors when none exist', async () => {
+    const { Logger } = await import('@delta-comic/logger')
+    const log = vi.spyOn(Logger.prototype, 'debug').mockImplementation(() => {})
     const { SharedFunction } = await import('./ipc')
-    const log = vi.spyOn(console, 'log').mockImplementation(() => {})
 
     SharedFunction.define(value => `only:${value}`, 'only', 'format')
 
@@ -49,7 +50,12 @@ describe('SharedFunction', () => {
     expect(() => SharedFunction.callRandom('double', 1)).toThrow(
       '[SharedFunction.callRandom] call double, but not resigner any function.',
     )
-    expect(log).toHaveBeenCalledWith('[SharedFunction.callRandom] call index: 0 in 1', 'only')
+    expect(log).toHaveBeenCalledWith('random shared function selected', {
+      candidateCount: 1,
+      index: 0,
+      name: 'format',
+      plugin: 'only',
+    })
   })
 
   it('throws when calling a specific plugin without a registered function', async () => {

@@ -1,3 +1,4 @@
+import { Logger } from '@delta-comic/logger'
 import type { CloudSession } from '@delta-comic/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
@@ -82,14 +83,14 @@ describe('cloud database storage', () => {
   it('treats corrupt session and checkpoint values as absent without leaking parse failures', async () => {
     nativeStore.set('cloud:session', '{not-json')
     nativeStore.set('cloud:sync-checkpoint', 'null')
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
 
     await expect(new DbCloudSessionStorage().getSession()).resolves.toBeNull()
     await expect(new DbCloudSyncStorage().getCheckpoint()).resolves.toBe(0)
 
     expect(warn).toHaveBeenCalledOnce()
     expect(warn).toHaveBeenCalledWith(
-      '[cloud] failed to parse cloud native store value',
+      'failed to parse cloud storage value',
       expect.any(SyntaxError),
     )
   })

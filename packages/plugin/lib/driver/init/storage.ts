@@ -1,8 +1,11 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 import { isTauri } from '@tauri-apps/api/core'
 import JSZip from 'jszip'
 
 import type { NativeInstallProgress } from './native'
+
+const pluginStorageLogger = logger.scoped('plugin:storage')
 
 const databaseName = 'delta-comic-plugin-files'
 const storeName = 'files'
@@ -106,7 +109,7 @@ const withStore = async <T>(
     })
   } catch (error) {
     database?.close()
-    console.warn('[plugin storage] IndexedDB operation failed, using memory fallback', error)
+    pluginStorageLogger.warn('IndexedDB operation failed; using memory fallback', error)
     return undefined
   }
 }
@@ -302,6 +305,7 @@ export const releasePluginObjectUrls = (pluginId: string) => {
 }
 
 export const removePluginFiles = async (pluginId: string) => {
+  pluginStorageLogger.info('removing plugin files', { plugin: pluginId })
   releasePluginObjectUrls(pluginId)
   if (!isTauriRuntime()) {
     await replaceWebPlugin(pluginId, new Map())
@@ -310,6 +314,7 @@ export const removePluginFiles = async (pluginId: string) => {
   const fs = await import('@tauri-apps/plugin-fs')
   const root = await getTauriPluginPath(pluginId, '')
   if (await fs.exists(root)) await fs.remove(root, { recursive: true })
+  pluginStorageLogger.info('plugin files removed', { plugin: pluginId })
 }
 
 export const decodeDevMetaFromCode = (code: string): PluginArchiveDB.Meta => {
@@ -343,7 +348,7 @@ export const digestPluginBytes = async (
     const { hash } = await loadBlake3(wasmUrl)
     return { algorithm: 'blake3', digest: hash(bytes).toString('hex') }
   } catch (error) {
-    console.warn('[plugin storage] Rust BLAKE3 WASM unavailable, using Web Crypto', error)
+    pluginStorageLogger.warn('BLAKE3 unavailable; using SHA-256 fallback', error)
     const digest = await globalThis.crypto.subtle.digest('SHA-256', Uint8Array.from(bytes).buffer)
     return { algorithm: 'sha256', digest: hex(new Uint8Array(digest)) }
   }
@@ -355,6 +360,7 @@ const withIntegrity = async (meta: PluginArchiveDB.Meta, bytes: Uint8Array) => (
 })
 
 export const installDevCode = async (code: string): Promise<PluginArchiveDB.Meta> => {
+  pluginStorageLogger.info('development plugin installation started')
   const bytes = new TextEncoder().encode(code)
   const meta = await withIntegrity(decodeDevMetaFromCode(code), bytes)
   if (isTauriRuntime()) {
@@ -364,6 +370,7 @@ export const installDevCode = async (code: string): Promise<PluginArchiveDB.Meta
   }
   const pluginId = assertPluginId(meta)
   await replaceWebPlugin(pluginId, new Map([['us.js', bytes]]))
+  pluginStorageLogger.info('development plugin installation completed', { plugin: pluginId })
   return meta
 }
 
@@ -371,6 +378,7 @@ export const installZipFile = async (
   file: File,
   onProgress?: (progress: NativeInstallProgress) => void,
 ): Promise<PluginArchiveDB.Meta> => {
+  pluginStorageLogger.info('plugin archive extraction started', { bytes: file.size })
   const archiveBytes = new Uint8Array(await file.arrayBuffer())
   if (isTauriRuntime()) {
     const { createNativeOperationId, installZip, writeNativeTempFile } = await import('./native')
@@ -407,5 +415,9 @@ export const installZipFile = async (
   }
   await replaceWebPlugin(pluginId, stagedFiles)
   onProgress?.({ current: entries.length, opId: '', phase: 'done', total: entries.length })
+  pluginStorageLogger.info('plugin archive extraction completed', {
+    fileCount: stagedFiles.size,
+    plugin: pluginId,
+  })
   return meta
 }

@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { uni } from '@delta-comic/model'
 
 import { useConfig } from '@/config'
@@ -7,10 +8,12 @@ import type { PluginConfig } from '@/plugin'
 
 import { PluginBooter, type PluginBooterSetMeta } from '../../../driver/extensionTypes'
 
+const configSetterLogger = logger.scoped('plugin:config-setter')
+
 class _ConfigSetter extends PluginBooter {
   public override name = pluginMessageKey('plugin.runtime.steps.presets.title')
   public override async call(cfg: PluginConfig, setMeta: PluginBooterSetMeta): Promise<any> {
-    console.log('[PluginBooter->_ConfigSetter] new plugin defining...', cfg)
+    configSetterLogger.debug('registering plugin capabilities', { plugin: cfg.name })
     setMeta(pluginMessageKey('plugin.runtime.steps.presets.applying'))
     const { name: plugin, content, resource, search, user, subscribe, share } = cfg
     if (content)

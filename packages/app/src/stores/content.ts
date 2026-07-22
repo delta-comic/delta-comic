@@ -1,6 +1,9 @@
+import { logger } from '@delta-comic/logger'
 import { uni } from '@delta-comic/model'
 import { defineStore } from 'pinia'
 import { markRaw, shallowReactive, type Raw } from 'vue'
+
+const contentLogger = logger.scoped('app:content')
 
 export const useContentStore = defineStore('content', helper => {
   const history = shallowReactive(new Map<string, Raw<uni.content.ContentPage>>())
@@ -22,7 +25,7 @@ export const useContentStore = defineStore('content', helper => {
           new (uni.content.ContentPage.contentPages.get(contentType_)!)(preload, id, ep),
         )
         history.set(itemId, newIns)
-        console.log('[useContentStore.$load] page cache miss', newIns)
+        contentLogger.debug('content page cache miss', { contentType: contentType_, id, ep })
       } else var newIns = history.get(itemId)!
     },
     'load',

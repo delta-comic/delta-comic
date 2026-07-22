@@ -1,3 +1,7 @@
+import { logger } from '@delta-comic/logger'
+
+const pluginStartupLogger = logger.scoped('app:plugin-startup')
+
 export interface PluginStartupPreference {
   pluginNames: string[]
   safe: boolean
@@ -36,7 +40,7 @@ export class PluginStartupMemory {
       if (isPreference(preference)) return preference
       this.clear()
     } catch (error) {
-      console.warn('[plugin startup] failed to read remembered plugins', error)
+      pluginStartupLogger.warn('failed to read remembered plugins', error)
       this.clear()
     }
     return null

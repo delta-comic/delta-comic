@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { createForm } from '@delta-comic/ui'
 import { PageWebviewAuth } from '@delta-comic/utils'
 import { Mutex } from 'es-toolkit'
@@ -10,6 +11,8 @@ import { pluginI18n, pluginMessageKey } from '@/i18n'
 import type { Auth, PluginConfig } from '@/plugin'
 
 import { PluginBooter, type PluginBooterSetMeta } from '../../../driver/extensionTypes'
+
+const pluginAuthLogger = logger.scoped('plugin:auth')
 
 const authPopupMutex = new Mutex()
 
@@ -24,7 +27,10 @@ class _PluginAuth extends PluginBooter {
       setMeta(pluginMessageKey('plugin.runtime.steps.auth.checking'))
       const isPass = await cfg.auth.passSelect()
       const waitMethod = Promise.withResolvers<'logIn' | 'signUp'>()
-      console.log(`[plugin auth] ${pluginName}, isPass: ${isPass}`)
+      pluginAuthLogger.info('plugin authentication state checked', {
+        authenticated: Boolean(isPass),
+        plugin: cfg.name,
+      })
       await authPopupMutex.acquire()
       mutexAcquired = true
       setMeta(pluginMessageKey('plugin.runtime.steps.auth.waiting'))
@@ -88,9 +94,11 @@ class _PluginAuth extends PluginBooter {
       authPopupMutex.release()
       mutexAcquired = false
       setMeta(pluginMessageKey('plugin.runtime.steps.auth.success'))
+      pluginAuthLogger.info('plugin authentication completed', { plugin: cfg.name })
     } catch (error: any) {
       if (mutexAcquired) authPopupMutex.release()
       setMeta(pluginI18n.translate('plugin.runtime.steps.auth.failure', { error: String(error) }))
+      pluginAuthLogger.error('plugin authentication failed', { plugin: cfg.name }, error)
       throw error
     }
   }

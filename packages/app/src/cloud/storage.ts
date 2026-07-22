@@ -1,5 +1,7 @@
+import { logger } from '@delta-comic/logger'
 import type { CloudSession, CloudSessionStorage, CloudTerminalInput } from '@delta-comic/server'
 
+const cloudStorageLogger = logger.scoped('app:cloud:storage')
 const namespace = 'cloud'
 const sessionKey = 'session'
 const checkpointKey = 'sync-checkpoint'
@@ -38,7 +40,7 @@ const parseJson = <T>(value: string | null): T | null => {
   try {
     return JSON.parse(value) as T
   } catch (error) {
-    console.warn('[cloud] failed to parse cloud native store value', error)
+    cloudStorageLogger.warn('failed to parse cloud storage value', error)
     return null
   }
 }
@@ -56,14 +58,18 @@ const randomUuid = (): string => {
 export class DbCloudSessionStorage implements CloudSessionStorage {
   async clearSession(): Promise<void> {
     await removeValue(sessionKey)
+    cloudStorageLogger.info('cloud session removed')
   }
 
   async getSession(): Promise<CloudSession | null> {
-    return parseJson<CloudSession>(await readValue(sessionKey))
+    const session = parseJson<CloudSession>(await readValue(sessionKey))
+    cloudStorageLogger.debug('cloud session loaded', { found: Boolean(session) })
+    return session
   }
 
   async setSession(session: CloudSession): Promise<void> {
     await writeValue(sessionKey, JSON.stringify(session))
+    cloudStorageLogger.info('cloud session persisted')
   }
 }
 
@@ -75,13 +81,17 @@ export class DbCloudSyncStorage {
 
   async setCheckpoint(latestSeq: number): Promise<void> {
     await writeValue(checkpointKey, JSON.stringify({ latestSeq }))
+    cloudStorageLogger.debug('sync checkpoint persisted', { latestSeq })
   }
 }
 
 export const getCloudTerminal = async (): Promise<CloudTerminalInput> => {
   const stored = parseJson<{ terminalUuid: string }>(await readValue(terminalUuidKey))
   const terminalUuid = stored?.terminalUuid ?? randomUuid()
-  if (!stored) await writeValue(terminalUuidKey, JSON.stringify({ terminalUuid }))
+  if (!stored) {
+    await writeValue(terminalUuidKey, JSON.stringify({ terminalUuid }))
+    cloudStorageLogger.info('cloud terminal identity created')
+  }
   const navigatorInfo = globalThis.navigator
   return {
     platform: navigatorInfo?.platform || 'unknown',

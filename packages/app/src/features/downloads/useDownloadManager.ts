@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, shallowRef } from 'vue'
 
@@ -5,6 +6,8 @@ import { useDownloadsStore } from '@/stores/downloads'
 
 import type { DownloadTask } from './downloaderClient'
 import { activeDownloadStatuses } from './format'
+
+const downloadManagerLogger = logger.scoped('app:downloads:manager')
 
 export type DownloadFilter = 'active' | 'all' | 'completed' | 'failed'
 
@@ -32,11 +35,16 @@ export function useDownloadManager() {
   })
 
   const handleVisibility = () => {
-    if (document.visibilityState === 'visible') void store.refresh().catch(() => undefined)
+    if (document.visibilityState === 'visible')
+      void store.refresh().catch(error => {
+        downloadManagerLogger.warn('visible-state refresh failed', error)
+      })
   }
 
   onMounted(() => {
-    void store.connect()
+    void store.connect().catch(error => {
+      downloadManagerLogger.error('download manager connection failed', error)
+    })
     document.addEventListener('visibilitychange', handleVisibility)
   })
   onUnmounted(() => {

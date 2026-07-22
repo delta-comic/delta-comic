@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logger } from '@delta-comic/logger'
 import { Global } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
 import { useIntervalFn } from '@vueuse/core'
@@ -10,6 +11,8 @@ import { useRouter, useRoute } from 'vue-router'
 import { useDownloadLifecycle } from './features/downloads/useDownloadLifecycle'
 import { readClipboardText, writeClipboardText } from './platform'
 import { pluginName } from './symbol'
+
+const appShellLogger = logger.scoped('app:shell')
 const $router = useRouter()
 const $route = useRoute()
 const { t } = useI18n()
@@ -34,7 +37,7 @@ const handleShareTokenCheck = async () => {
     if (scanned.has(chipText)) return
     scanned.add(chipText)
     const handlers = Array.from(Global.shareToken.values()).filter(v => v.patten(chipText))
-    console.log('new chipText discovery', chipText, handlers)
+    appShellLogger.debug('share token handlers matched', { handlerCount: handlers.length })
     const lock = new Mutex()
     for (const handler of handlers) {
       await lock.acquire()
@@ -57,10 +60,15 @@ const handleShareTokenCheck = async () => {
         },
       })
     }
-  } catch {}
+  } catch (error) {
+    appShellLogger.debug('clipboard share-token scan skipped', error)
+  }
 }
 // App.addListener('resume', handleShareTokenCheck)
-onMounted(handleShareTokenCheck)
+onMounted(() => {
+  appShellLogger.info('application shell mounted')
+  void handleShareTokenCheck()
+})
 useIntervalFn(handleShareTokenCheck, 2000)
 </script>
 

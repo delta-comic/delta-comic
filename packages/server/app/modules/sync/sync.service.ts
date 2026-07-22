@@ -1,3 +1,5 @@
+import { logger } from '@delta-comic/logger'
+
 import { readNumberVar } from '@/env'
 import { AppError, isAppError } from '@/shared/errors'
 import { parseJson } from '@/shared/json'
@@ -20,6 +22,8 @@ import type {
   SyncPushResponse,
   SyncSnapshotRequest,
 } from './sync.types'
+
+const syncLogger = logger.scoped('server:sync')
 
 export interface SyncServiceConfig {
   maxPullChanges?: string
@@ -65,6 +69,10 @@ export class SyncService {
         )
       }
     }
+    syncLogger.info('sync snapshot prepared', {
+      collectionCount: Object.keys(input.collections).length,
+      operationCount: operations.length,
+    })
     return await this.push(auth, { operations, schemaVersion: 1 })
   }
 
@@ -78,6 +86,7 @@ export class SyncService {
         413,
       )
     }
+    syncLogger.debug('sync push started', { operationCount: input.operations.length })
     const results: SyncPushItemResult[] = []
     for (const operation of input.operations) {
       results.push(await this.applyOperation(auth, operation))
@@ -88,10 +97,16 @@ export class SyncService {
       terminalUuid: auth.terminalUuid,
       userId: auth.userId,
     })
-    return {
+    const response = {
       checkpoint: { latestSeq: await this.repository.latestSeq(auth.userId), serverTime },
       results,
     }
+    syncLogger.debug('sync push completed', {
+      appliedCount: results.filter(result => result.result === 'applied').length,
+      failedCount: results.filter(result => result.result === 'failed').length,
+      operationCount: results.length,
+    })
+    return response
   }
 
   async pull(auth: AuthContext, input: SyncPullRequest): Promise<SyncPullResponse> {
@@ -103,6 +118,11 @@ export class SyncService {
       throw new AppError('SYNC_INVALID_LIMIT', 'limit must be a positive number', 400)
     }
     const collections = (input.collections ?? syncCollectionNames).map(assertSyncCollection)
+    syncLogger.debug('sync pull started', {
+      collectionCount: collections.length,
+      limit,
+      sinceSeq: input.sinceSeq,
+    })
     const rows = await this.repository.pullChanges({
       collections,
       includeOwn: input.includeOwn ?? false,
@@ -119,7 +139,7 @@ export class SyncService {
       terminalUuid: auth.terminalUuid,
       userId: auth.userId,
     })
-    return {
+    const response = {
       changes: rows.map(this.toChange),
       checkpoint: {
         hasMore: rows.length === limit && nextSeq < latestSeq,
@@ -128,6 +148,12 @@ export class SyncService {
         sinceSeq: input.sinceSeq,
       },
     }
+    syncLogger.debug('sync pull completed', {
+      changeCount: rows.length,
+      hasMore: response.checkpoint.hasMore,
+      nextSeq,
+    })
+    return response
   }
 
   private async applyOperation(
@@ -163,6 +189,10 @@ export class SyncService {
       return await this.applyClaimedOperation(auth, operation, receivedAt)
     } catch (error) {
       if (isAppError(error)) {
+        syncLogger.warn('sync operation rejected', {
+          code: error.code,
+          collection: rawOperation.collection,
+        })
         return {
           collection: rawOperation.collection as SyncCollection,
           entityId: rawOperation.entityId,
@@ -171,6 +201,10 @@ export class SyncService {
           result: 'failed' as const,
         }
       }
+      syncLogger.error('sync operation failed unexpectedly', {
+        collection: rawOperation.collection,
+        error,
+      })
       throw error
     }
   }

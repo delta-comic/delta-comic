@@ -1,6 +1,9 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
 
 import { decodeDevMetaFromCode, isTauriRuntime } from './storage'
+
+const nativeInstallLogger = logger.scoped('plugin:native-install')
 
 const progressEvent = 'plugin://install-progress'
 
@@ -25,6 +28,7 @@ interface NativeLocalFile {
 export const createNativeOperationId = () => crypto.randomUUID()
 
 export const writeNativeTempFile = async (file: File): Promise<string> => {
+  nativeInstallLogger.debug('writing native installer temporary file', { bytes: file.size })
   const [{ appLocalDataDir, join }, fs] = await Promise.all([
     import('@tauri-apps/api/path'),
     import('@tauri-apps/plugin-fs'),
@@ -34,6 +38,7 @@ export const writeNativeTempFile = async (file: File): Promise<string> => {
   const safeName = file.name.replace(/[\\/]/g, '_') || 'plugin.bin'
   const path = await join(temp, `${Date.now()}-${crypto.randomUUID()}-${safeName}`)
   await fs.writeFile(path, new Uint8Array(await file.arrayBuffer()))
+  nativeInstallLogger.debug('native installer temporary file written')
   return path
 }
 
@@ -62,6 +67,7 @@ export const installZip = async (
   opId: string,
   onProgress?: (progress: NativeInstallProgress) => void,
 ) => {
+  nativeInstallLogger.info('native plugin archive installation started')
   const { listen } = await import('@tauri-apps/api/event')
   const unlisten = onProgress
     ? await listen<NativeInstallProgress>(progressEvent, event => {
@@ -69,7 +75,14 @@ export const installZip = async (
       })
     : undefined
   try {
-    return await call<PluginArchiveDB.Meta>('install_zip', { opId, zipPath })
+    const meta = await call<PluginArchiveDB.Meta>('install_zip', { opId, zipPath })
+    nativeInstallLogger.info('native plugin archive installation completed', {
+      plugin: meta.name.id,
+    })
+    return meta
+  } catch (error) {
+    nativeInstallLogger.error('native plugin archive installation failed', error)
+    throw error
   } finally {
     unlisten?.()
   }

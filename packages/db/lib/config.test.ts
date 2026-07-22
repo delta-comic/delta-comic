@@ -1,3 +1,4 @@
+import { Logger } from '@delta-comic/logger'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { nextTick } from 'vue'
 
@@ -94,7 +95,7 @@ describe('database-backed config refs', () => {
   })
 
   it('falls back to detached defaults for malformed stored JSON', async () => {
-    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const warning = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
     mocks.selectExecute.mockResolvedValueOnce({ data: '{broken', form: JSON.stringify(form) })
 
     const first = useConfig('first', form)
@@ -106,20 +107,18 @@ describe('database-backed config refs', () => {
 
     expect((first.value as any).nested.retries).toBe(99)
     expect((second.value as any).nested.retries).toBe(2)
-    expect(warning).toHaveBeenCalledWith(
-      '[db] failed to parse config value',
-      expect.any(SyntaxError),
-    )
+    expect(warning).toHaveBeenCalledWith('failed to parse config value', expect.any(SyntaxError))
   })
 
   it('keeps defaults when hydration fails and reports asynchronous persistence errors', async () => {
-    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const warning = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
     mocks.selectExecute.mockRejectedValueOnce(new Error('select failed'))
     const failedLoad = useConfig('failed-load', form)
     await failedLoad.ready
     expect(failedLoad.value).toEqual({ enabled: true, nested: { retries: 2 } })
     expect(warning).toHaveBeenCalledWith(
-      '[db] failed to load config value',
+      'failed to load config value',
+      { belongTo: 'failed-load' },
       expect.objectContaining({ message: 'select failed' }),
     )
 
@@ -128,7 +127,8 @@ describe('database-backed config refs', () => {
     await nextTick()
     await vi.advanceTimersByTimeAsync(100)
     expect(warning).toHaveBeenCalledWith(
-      '[db] failed to persist config value',
+      'failed to persist config value',
+      { belongTo: 'failed-load' },
       expect.objectContaining({ message: 'write failed' }),
     )
   })

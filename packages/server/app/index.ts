@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { openapi } from '@elysiajs/openapi'
 import { Elysia, t } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
@@ -14,6 +15,8 @@ import { cors } from './shared/http/cors'
 import { apiSuccessSchema, errorResponse, ok } from './shared/response'
 
 export { PluginDatabase } from './modules/plugins/plugins.database'
+
+const serverLogger = logger.scoped('server:lifecycle')
 
 const healthResponseSchema = t.Object({
   service: t.Literal('delta-comic-server'),
@@ -96,10 +99,15 @@ const compiled = app.compile()
 export default {
   ...compiled,
   fetch(request: Request, env: AppEnv, ctx: ExecutionContext) {
+    serverLogger.debug('request received', {
+      method: request.method,
+      path: new URL(request.url).pathname,
+    })
     bindRuntime(request, { ctx, env })
     return compiled.fetch(request)
   },
   scheduled(controller: ScheduledController, env: AppEnv, ctx: ExecutionContext) {
+    serverLogger.info('scheduled plugin run started', { cron: controller.cron })
     ctx.waitUntil(runScheduledPluginScripts(env, ctx, controller.scheduledTime, controller.cron))
   },
 } satisfies ExportedHandler<AppEnv>

@@ -1,7 +1,10 @@
+import { logger } from '@delta-comic/logger'
 import { computed, onMounted, readonly, shallowRef } from 'vue'
 
 import { loggerClient, type LogReaderClient } from './loggerClient'
 import { filterLogContent, type LogFileInfo, type LogLevelFilter } from './model'
+
+const logReaderLogger = logger.scoped('app:settings:logs')
 
 export interface UseLogReaderOptions {
   client?: LogReaderClient
@@ -46,8 +49,16 @@ export const useLogReader = (options: UseLogReaderOptions = {}) => {
       if (request !== readRequest) return
       selectedLog.value = result.content
       selectedLogTruncated.value = result.truncated
+      logReaderLogger.debug('log file loaded', {
+        path,
+        size: result.size,
+        truncated: result.truncated,
+      })
     } catch (cause) {
-      if (request === readRequest) error.value = errorMessage(cause)
+      if (request === readRequest) {
+        error.value = errorMessage(cause)
+        logReaderLogger.error('failed to read log file', { path }, cause)
+      }
     } finally {
       if (request === readRequest) loadingContent.value = false
     }
@@ -62,6 +73,7 @@ export const useLogReader = (options: UseLogReaderOptions = {}) => {
       files.value = [...(await client.listLogFiles())].sort(
         (left, right) => right.modifiedAt - left.modifiedAt,
       )
+      logReaderLogger.debug('log file list refreshed', { fileCount: files.value.length })
       const nextPath = files.value.some(file => file.path === selectedPath.value)
         ? selectedPath.value
         : files.value[0]?.path
@@ -78,6 +90,7 @@ export const useLogReader = (options: UseLogReaderOptions = {}) => {
       }
     } catch (cause) {
       error.value = errorMessage(cause)
+      logReaderLogger.error('failed to list log files', cause)
     } finally {
       loadingFiles.value = false
     }
@@ -90,8 +103,13 @@ export const useLogReader = (options: UseLogReaderOptions = {}) => {
     exportPath.value = undefined
     try {
       exportPath.value = await client.exportLogs(files.value.map(file => file.path))
+      logReaderLogger.info('logs exported', {
+        fileCount: files.value.length,
+        path: exportPath.value,
+      })
     } catch (cause) {
       error.value = errorMessage(cause)
+      logReaderLogger.error('failed to export logs', cause)
     } finally {
       exporting.value = false
     }

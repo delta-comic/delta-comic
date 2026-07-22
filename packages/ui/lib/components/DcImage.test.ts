@@ -1,3 +1,4 @@
+import { Logger } from '@delta-comic/logger'
 import { uni } from '@delta-comic/model'
 import { flushPromises, mount, shallowMount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
@@ -132,7 +133,7 @@ describe('DcImage', () => {
   })
 
   it('degrades URL resolution failures to an empty source', async () => {
-    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const warning = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
     const resource = { getUrl: vi.fn().mockRejectedValue(new Error('resolver failed')) }
     const wrapper = mount(DcImage, {
       global: { stubs: { Image: ImageStub } },
@@ -140,7 +141,10 @@ describe('DcImage', () => {
     })
     await flushPromises()
     expect(wrapper.getComponent(ImageStub).props('src')).toBe('')
-    expect(warning).toHaveBeenCalledWith(expect.objectContaining({ message: 'resolver failed' }))
+    expect(warning).toHaveBeenCalledWith(
+      'image source resolution failed',
+      expect.objectContaining({ message: 'resolver failed' }),
+    )
   })
 })
 

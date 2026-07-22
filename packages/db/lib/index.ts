@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { isTauri } from '@tauri-apps/api/core'
 import { CamelCasePlugin, type Dialect, Kysely } from 'kysely'
 import { SerializePlugin } from 'kysely-plugin-serialize'
@@ -30,7 +31,9 @@ export interface DB {
   config: ConfigDB.Table
 }
 
-console.log('[db] loading')
+const databaseLogger = logger.scoped('db:lifecycle')
+
+databaseLogger.info('database initialization started')
 
 export const isTauriRuntime = isTauri
 
@@ -41,10 +44,12 @@ const createDialect = async (): Promise<Dialect> => {
       import('kysely-dialect-tauri'),
     ])
     const database = await Database.load('sqlite:app.db')
+    databaseLogger.info('native sqlite dialect initialized')
     return new TauriSqliteDialect({ database })
   }
 
   const { createWebDialect } = await import('./web')
+  databaseLogger.info('web sqlite dialect initialized')
   return createWebDialect()
 }
 

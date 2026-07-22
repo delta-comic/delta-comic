@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { isTauri } from '@tauri-apps/api/core'
 import { listen, TauriEvent, type UnlistenFn } from '@tauri-apps/api/event'
 import { onMounted, onUnmounted, watch } from 'vue'
@@ -6,6 +7,8 @@ import { useI18n } from 'vue-i18n'
 import { useDownloadsStore } from '@/stores/downloads'
 
 import { createDownloadAttentionReporter } from './attention'
+
+const downloadLifecycleLogger = logger.scoped('app:downloads:lifecycle')
 
 export function useDownloadLifecycle() {
   const store = useDownloadsStore()
@@ -24,7 +27,10 @@ export function useDownloadLifecycle() {
   )
 
   const refreshSnapshot = () => {
-    if (!disposed) void store.refresh().catch(() => undefined)
+    if (!disposed)
+      void store.refresh().catch(error => {
+        downloadLifecycleLogger.warn('lifecycle snapshot refresh failed', error)
+      })
   }
 
   const handleVisibilityChange = () => {
@@ -33,7 +39,10 @@ export function useDownloadLifecycle() {
 
   onMounted(() => {
     disposed = false
-    void store.connect().catch(() => undefined)
+    downloadLifecycleLogger.debug('download lifecycle mounted')
+    void store.connect().catch(error => {
+      downloadLifecycleLogger.error('download lifecycle connection failed', error)
+    })
     document.addEventListener('visibilitychange', handleVisibilityChange)
     window.addEventListener('focus', refreshSnapshot)
     window.addEventListener('pageshow', refreshSnapshot)
@@ -44,12 +53,15 @@ export function useDownloadLifecycle() {
           if (disposed) unlisten()
           else unlistenResume = unlisten
         })
-        .catch(() => undefined)
+        .catch(error => {
+          downloadLifecycleLogger.warn('failed to subscribe to native resume event', error)
+        })
     }
   })
 
   onUnmounted(() => {
     disposed = true
+    downloadLifecycleLogger.debug('download lifecycle unmounted')
     document.removeEventListener('visibilitychange', handleVisibilityChange)
     window.removeEventListener('focus', refreshSnapshot)
     window.removeEventListener('pageshow', refreshSnapshot)
