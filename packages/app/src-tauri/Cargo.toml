@@ -33,7 +33,7 @@ workspace = true
 
 [dependencies.tauri]
 workspace = true
-features = ["protocol-asset"]
+features = ["protocol-asset", "tray-icon"]
 
 [dependencies.tauri-plugin-aptabase]
 workspace = true
@@ -45,6 +45,9 @@ workspace = true
 workspace = true
 
 [dependencies.tauri-plugin-db]
+workspace = true
+
+[dependencies.tauri-plugin-downloader]
 workspace = true
 
 [dependencies.tauri-plugin-fs]

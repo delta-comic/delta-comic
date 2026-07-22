@@ -25,6 +25,11 @@
     "plugin:default",
     "utils:default",
     "db:default",
+    "downloader:default",
+    "downloader:allow-delete-files",
+    "downloader:delete-secrets",
+    "downloader:manage-destinations",
+    "downloader:store-secrets",
     "better-cors-fetch:default",
     "shell:default"
   ]
