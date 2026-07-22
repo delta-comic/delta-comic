@@ -1,8 +1,6 @@
-import 'core-js'
 import { pluginRuntime, useConfig } from '@delta-comic/plugin'
+import 'core-js'
 import { configureUiI18n, type UiMessageKey, type UiMessageParams } from '@delta-comic/ui'
-
-import './logger'
 import { PiniaColada } from '@pinia/colada'
 import { reactiveComputed, useDark } from '@vueuse/core'
 import Color from 'color'
@@ -23,13 +21,14 @@ import {
   NGlobalStyle,
 } from 'naive-ui'
 import { createPinia, setActivePinia } from 'pinia'
+import { computed, createApp, defineComponent, watch } from 'vue'
 
 import '@/index.css'
-import { computed, createApp, defineComponent, watch } from 'vue'
 import { DataLoaderPlugin } from 'vue-router/experimental'
 
 import AppSetup from './AppSetup.vue'
 import { i18n, resolveAppLocale } from './i18n'
+import { appLogger } from './logger'
 import { initializePlatform } from './platform'
 import { router } from './router'
 
@@ -40,6 +39,7 @@ configureUiI18n((key: UiMessageKey, params?: UiMessageParams) =>
 document.addEventListener('contextmenu', e => e.preventDefault())
 
 await initializePlatform().then(v => {
+  appLogger.scoped('platform').info('platform initialized', { nativeInsets: v || undefined })
   for (const direction of ['Top', 'Bottom', 'Left', 'Right'] as const)
     document.documentElement.style.setProperty(
       `--safe-area-inset-${direction.toLowerCase()}`,
@@ -128,7 +128,11 @@ app.use(i18n)
 app.use(router)
 
 const preboot = await pluginRuntime.preparePreboot(app)
+appLogger
+  .scoped('plugin')
+  .info('plugin preboot prepared', { reloadRequired: preboot.reloadRequired })
 if (preboot.reloadRequired) {
+  appLogger.scoped('plugin').warn('plugin preboot requested application reload')
   location.reload()
   await new Promise<never>(() => {})
 }
@@ -138,3 +142,4 @@ meta.name = 'naive-ui-style'
 document.head.appendChild(meta)
 
 app.mount('#app')
+appLogger.info('frontend application mounted')

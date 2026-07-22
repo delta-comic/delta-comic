@@ -21,7 +21,7 @@
     "sql:allow-execute",
     "m3:default",
     "aptabase:allow-track-event",
-    "log:default",
+    "logger:default",
     "plugin:default",
     "utils:default",
     "db:default",

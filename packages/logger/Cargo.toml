@@ -1,0 +1,40 @@
+[package]
+name = "tauri-plugin-logger"
+description = "Unified, non-blocking tracing logger for Delta Comic and its plugins"
+readme = "README.md"
+authors = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+links = "tauri-plugin-logger"
+keywords = ["tauri", "logging", "tracing", "async"]
+categories = ["development-tools::debugging"]
+
+[package.metadata.platforms]
+windows = { level = "full", notes = "" }
+linux = { level = "full", notes = "" }
+macos = { level = "full", notes = "" }
+android = { level = "full", notes = "" }
+ios = { level = "full", notes = "" }
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+
+[dependencies]
+chrono = { version = "0.4.44", features = ["serde"] }
+flate2 = "1.1.9"
+log = { workspace = true }
+serde = { workspace = true }
+tauri = { workspace = true }
+thiserror = "2.0.18"
+tokio = { workspace = true, features = ["fs", "io-std", "io-util", "sync", "time"] }
+tracing = { workspace = true }
+tracing-log = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+zip = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

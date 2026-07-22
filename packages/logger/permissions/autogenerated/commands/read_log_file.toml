@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-read-log-file"
+description = "Enables the read_log_file command without any pre-configured scope."
+commands.allow = ["read_log_file"]
+
+[[permission]]
+identifier = "deny-read-log-file"
+description = "Denies the read_log_file command without any pre-configured scope."
+commands.deny = ["read_log_file"]

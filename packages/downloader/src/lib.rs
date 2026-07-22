@@ -97,9 +97,14 @@ impl Builder {
         let database_path = self
           .database_path
           .unwrap_or_else(|| app_data.join("downloader.sqlite"));
+        tracing::info!(
+          target: "downloader::lifecycle",
+          database = %database_path.display(),
+          "downloader initialization started"
+        );
         let ephemeral_root = ephemeral::EphemeralRoot::new(app_data.join(".downloader-ephemeral"));
         if let Err(error) = tauri::async_runtime::block_on(ephemeral_root.clean_stale()) {
-          log::warn!("stale ephemeral download cleanup failed: {error}");
+          tracing::warn!("stale ephemeral download cleanup failed: {error}");
         }
         app.manage(ephemeral_root);
         #[cfg(target_os = "android")]
@@ -162,6 +167,7 @@ impl Builder {
           ))
           .map_err(|error| error.to_string())?;
           engine.start();
+          tracing::info!(target: "downloader::lifecycle", "desktop downloader engine started");
           app.manage(credentials);
           app.manage(engine);
           let _ = api;

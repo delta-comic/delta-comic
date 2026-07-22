@@ -12,6 +12,7 @@
     "typecheck": "vue-tsc -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
+    "@delta-comic/logger": "workspace:",
     "@delta-comic/server": "workspace:",
     "@delta-comic/ui": "workspace:",
     "@vueuse/core": "catalog:",

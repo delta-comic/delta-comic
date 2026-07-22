@@ -40,6 +40,7 @@
     "typecheck": "vue-tsc -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
+    "@delta-comic/logger": "workspace:",
     "@lhlyu/vue-virtual-waterfall": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-shell": "catalog:",

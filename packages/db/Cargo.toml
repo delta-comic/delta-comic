@@ -22,4 +22,5 @@ tauri-plugin = { workspace = true, features = ["build"] }
 [dependencies]
 percent-encoding = { workspace = true }
 tauri = { workspace = true }
+tracing = { workspace = true }
 tauri-plugin-sql = { workspace = true }

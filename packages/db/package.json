@@ -33,6 +33,7 @@
     "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
+    "@delta-comic/logger": "workspace:",
     "@subframe7536/sqlite-wasm": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-sql": "catalog:",

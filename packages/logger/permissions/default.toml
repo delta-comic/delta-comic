@@ -1,0 +1,15 @@
+"$schema" = "schemas/schema.json"
+
+[default]
+description = """
+Enables the Delta Comic logger's normal application integration.
+
+Allows the frontend to forward its logs, inspect bounded log tails, list log
+files, and export selected logs to a ZIP archive.
+"""
+permissions = [
+  "allow-write-logs",
+  "allow-list-log-files",
+  "allow-read-log-file",
+  "allow-export-logs",
+]

@@ -549,7 +549,7 @@ impl Engine {
     if Path::new(&record.staging_path).starts_with(&task_root)
       && let Err(error) = remove_path_if_exists(&task_root).await
     {
-      log::warn!("completed SAF staging cleanup failed for task {id}: {error}");
+      tracing::warn!("completed SAF staging cleanup failed for task {id}: {error}");
     }
     Ok(())
   }
@@ -676,14 +676,14 @@ impl Engine {
               self.emit_task(task);
             }
           }
-          Err(error) => log::warn!("network recovery probe could not requeue tasks: {error}"),
+          Err(error) => tracing::warn!("network recovery probe could not requeue tasks: {error}"),
         }
         next_network_reprobe = tokio::time::Instant::now() + NETWORK_REPROBE_INTERVAL;
       }
       let settings = match self.repository.get_settings().await {
         Ok(settings) => settings,
         Err(error) => {
-          log::error!("downloader scheduler could not read settings: {error}");
+          tracing::error!("downloader scheduler could not read settings: {error}");
           continue;
         }
       };
@@ -701,7 +701,7 @@ impl Engine {
       let queued = match self.repository.next_queued(available).await {
         Ok(tasks) => tasks,
         Err(error) => {
-          log::error!("downloader scheduler could not read queue: {error}");
+          tracing::error!("downloader scheduler could not read queue: {error}");
           continue;
         }
       };
@@ -730,7 +730,7 @@ impl Engine {
     match result {
       Ok(()) => {
         if let Err(error) = self.complete_task_if_active(&task.id).await {
-          log::error!(
+          tracing::error!(
             "download task {} could not commit completion: {error}",
             task.id
           );
@@ -1076,7 +1076,7 @@ impl Engine {
           .await
           {
             Ok(report) => {
-              log::info!(
+              tracing::info!(
                 "download task {} transferred {} bytes in {:?}",
                 task.id,
                 report.total_bytes,
@@ -1100,7 +1100,7 @@ impl Engine {
                 () = token.cancelled() => return Err(Error::Cancelled),
                 () = tokio::time::sleep(delay + Duration::from_millis(jitter)) => {},
               }
-              log::warn!(
+              tracing::warn!(
                 "retrying download task {} after transient error: {error}",
                 task.id
               );

@@ -16,6 +16,7 @@
   "dependencies": {
     "@delta-comic/db": "workspace:",
     "@delta-comic/downloader": "workspace:",
+    "@delta-comic/logger": "workspace:",
     "@delta-comic/model": "workspace:",
     "@delta-comic/plugin": "workspace:",
     "@delta-comic/server": "workspace:",

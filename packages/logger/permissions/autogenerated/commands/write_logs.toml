@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-write-logs"
+description = "Enables the write_logs command without any pre-configured scope."
+commands.allow = ["write_logs"]
+
+[[permission]]
+identifier = "deny-write-logs"
+description = "Denies the write_logs command without any pre-configured scope."
+commands.deny = ["write_logs"]

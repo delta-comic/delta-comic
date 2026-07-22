@@ -20,10 +20,9 @@ ios = { level = "full", notes = "" }
 tauri-plugin = { workspace = true, features = ["build"] }
 
 [dependencies]
-log = { workspace = true }
 mime_guess = { workspace = true }
 percent-encoding = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tauri = { workspace = true }
-tauri-plugin-log = { workspace = true }
+tracing = { workspace = true }

@@ -71,6 +71,7 @@ impl Builder {
         };
         std::fs::create_dir_all(&root)
           .map_err(|err| format!("failed to create native store directory: {err}"))?;
+        tracing::info!(target: "database::native_store", path = %root.display(), "native store initialized");
         app.manage(NativeStore { root });
         Ok(())
       })

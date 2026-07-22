@@ -33,6 +33,7 @@
     "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
+    "@delta-comic/logger": "workspace:",
     "es-toolkit": "catalog:"
   },
   "devDependencies": {

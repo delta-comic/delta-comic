@@ -22,9 +22,6 @@ workspace = true
 name = "delta_comic"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
-[dependencies.log]
-workspace = true
-
 [dependencies.serde]
 workspace = true
 
@@ -50,10 +47,10 @@ workspace = true
 [dependencies.tauri-plugin-downloader]
 workspace = true
 
-[dependencies.tauri-plugin-fs]
+[dependencies.tauri-plugin-logger]
 workspace = true
 
-[dependencies.tauri-plugin-log]
+[dependencies.tauri-plugin-fs]
 workspace = true
 
 [dependencies.tauri-plugin-m3]
@@ -75,6 +72,9 @@ workspace = true
 workspace = true
 
 [dependencies.tokio]
+workspace = true
+
+[dependencies.tracing]
 workspace = true
 
 [build-dependencies.tauri-build]

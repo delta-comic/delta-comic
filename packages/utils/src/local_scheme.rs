@@ -20,7 +20,7 @@ pub fn init<R: Runtime>(builder: Builder<R>, scheme: String) -> Builder<R> {
           .first_or_octet_stream()
           .to_string();
 
-        log::debug!("[local-protocol] successfully read file: {:?}", path);
+        tracing::debug!("[local-protocol] successfully read file: {:?}", path);
 
         Response::builder()
           .status(StatusCode::OK)
@@ -30,7 +30,7 @@ pub fn init<R: Runtime>(builder: Builder<R>, scheme: String) -> Builder<R> {
           .unwrap()
       }
       Err(err) => {
-        log::warn!("[local-protocol] 404 path: {:?}, reason: {}", path, err);
+        tracing::warn!("[local-protocol] 404 path: {:?}, reason: {}", path, err);
         Response::builder()
           .status(StatusCode::NOT_FOUND)
           .header(header::CONTENT_TYPE, "text/plain")

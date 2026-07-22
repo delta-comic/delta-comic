@@ -306,6 +306,9 @@ importers:
       '@delta-comic/downloader':
         specifier: 'workspace:'
         version: link:../downloader
+      '@delta-comic/logger':
+        specifier: 'workspace:'
+        version: link:../logger
       '@delta-comic/model':
         specifier: 'workspace:'
         version: link:../model
@@ -439,6 +442,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@delta-comic/logger':
+        specifier: 'workspace:'
+        version: link:../logger
       '@delta-comic/model':
         specifier: workspace:*
         version: link:../model
@@ -502,8 +508,27 @@ importers:
         specifier: 4.1.10
         version: 4.1.10(@types/node@26.1.0)(@vitest/browser-preview@4.1.10)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(vite@8.0.16(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0))
 
+  packages/logger:
+    dependencies:
+      '@tauri-apps/api':
+        specifier: 'catalog:'
+        version: 2.11.0
+    devDependencies:
+      '@typescript/native-preview':
+        specifier: 'catalog:'
+        version: 7.0.0-dev.20260707.2
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.2.4(@types/node@26.1.0)(@vitest/coverage-v8@4.1.10)(esbuild@0.28.1)(happy-dom@20.10.6)(jiti@2.7.0)(typescript@6.0.3)(vite@8.0.16(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0))(yaml@2.9.0)
+      vitest:
+        specifier: 4.1.10
+        version: 4.1.10(@types/node@26.1.0)(@vitest/browser-preview@4.1.10)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(vite@8.0.16(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0))
+
   packages/model:
     dependencies:
+      '@delta-comic/logger':
+        specifier: 'workspace:'
+        version: link:../logger
       es-toolkit:
         specifier: 'catalog:'
         version: 1.49.0
@@ -529,6 +554,9 @@ importers:
       '@delta-comic/downloader':
         specifier: 'workspace:'
         version: link:../downloader
+      '@delta-comic/logger':
+        specifier: 'workspace:'
+        version: link:../logger
       '@delta-comic/model':
         specifier: workspace:*
         version: link:../model
@@ -612,6 +640,9 @@ importers:
 
   packages/server:
     dependencies:
+      '@delta-comic/logger':
+        specifier: 'workspace:'
+        version: link:../logger
       '@elysia/eden':
         specifier: 'catalog:'
         version: 1.4.10(elysia@1.4.29(@sinclair/typebox@0.34.49)(exact-mirror@1.2.2)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@6.0.3))
@@ -667,6 +698,9 @@ importers:
 
   packages/server-admin:
     dependencies:
+      '@delta-comic/logger':
+        specifier: 'workspace:'
+        version: link:../logger
       '@delta-comic/server':
         specifier: 'workspace:'
         version: link:../server
@@ -737,6 +771,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@delta-comic/logger':
+        specifier: 'workspace:'
+        version: link:../logger
       '@delta-comic/model':
         specifier: workspace:*
         version: link:../model
@@ -852,6 +889,9 @@ importers:
       '@aptabase/tauri':
         specifier: 'catalog:'
         version: 0.4.1
+      '@delta-comic/logger':
+        specifier: 'workspace:'
+        version: link:../logger
       '@tauri-apps/api':
         specifier: 'catalog:'
         version: 2.11.0

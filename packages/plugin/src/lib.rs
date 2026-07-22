@@ -17,7 +17,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
       commands::read_local_file,
     ])
     .setup(|_app, _api| {
-      log::debug!("plugin initialized");
+      tracing::info!(target: "plugin::runtime", "plugin runtime initialized");
       Ok(())
     })
     .build()

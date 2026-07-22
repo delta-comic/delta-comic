@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@delta-comic/downloader": "workspace:",
+    "@delta-comic/logger": "workspace:",
     "@octokit/rest": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-fs": "catalog:",

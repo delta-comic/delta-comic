@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@aptabase/tauri": "catalog:",
+    "@delta-comic/logger": "workspace:",
     "@tauri-apps/api": "catalog:",
     "@vue/language-core": "catalog:",
     "acorn": "^8.15.0",

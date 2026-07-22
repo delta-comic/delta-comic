@@ -34,7 +34,6 @@ keyring-core = "1.0.0"
 librqbit = { version = "=9.0.0-rc.0", default-features = false, features = [
   "rust-tls",
 ], optional = true }
-log = { workspace = true }
 md-5 = "0.10.6"
 rand = "0.9.2"
 reqwest = { version = "0.13.4", default-features = false, features = ["json", "rustls", "stream"] }
@@ -54,6 +53,7 @@ tokio = { workspace = true, features = [
   "time",
 ] }
 tokio-util = { version = "0.7.18", features = ["rt"] }
+tracing = { workspace = true }
 url = "2.5.8"
 uuid = { version = "1.23.0", features = ["serde", "v4"] }
 zeroize = "1.8.2"

@@ -52,9 +52,11 @@ fn setup_download_tray(app: &mut tauri::App) -> tauri::Result<()> {
 #[tokio::main]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub async fn run() {
-  log::debug!("app started");
-
-  let builder = tauri_plugin_utils::init(tauri::Builder::default().plugin(tauri_plugin_fs::init()));
+  let builder = tauri_plugin_utils::init(
+    tauri::Builder::default()
+      .plugin(tauri_plugin_logger::init())
+      .plugin(tauri_plugin_fs::init()),
+  );
   let builder = builder
     .plugin(tauri_plugin_shell::init())
     .plugin(tauri_plugin_m3::init())
@@ -65,6 +67,7 @@ pub async fn run() {
     .plugin(tauri_plugin_aptabase::Builder::new("A-US-9793062880").build());
   let builder = builder.plugin(tauri_plugin_downloader::init());
   let builder = tauri_plugin_db::init(builder).setup(|app| {
+    tracing::info!(target: "app::lifecycle", "application bootstrap started");
     let logo = r#"
 _____   _________________ ____        __________________ _____   ______
 |  __ \|  ____|| |__   __| __ \      / ______\   |  \/  |_   _| / _____\
@@ -76,7 +79,7 @@ _____   _________________ ____        __________________ _____   ______
   Per aspera Ad astra                                Copyright © Wenxig
 "#;
 
-    log::error!("{}", logo);
+    tracing::info!(target: "app::lifecycle", "{logo}");
     #[cfg(desktop)]
     setup_download_tray(app)?;
     Ok(())
@@ -101,19 +104,23 @@ _____   _________________ ____        __________________ _____   ______
   match builder.build(tauri::generate_context!()) {
     Ok(builder) => builder.run(|handler, event| match event {
       tauri::RunEvent::Exit => {
+        tracing::info!(target: "app::lifecycle", "application shutdown started");
         if let Err(error) = tauri::async_runtime::block_on(handler.downloader().shutdown()) {
-          log::error!("failed to stop downloader cleanly: {error}");
+          tracing::error!(target: "app::downloader", %error, "failed to stop downloader cleanly");
         }
         let _ = handler.track_event("app_exited", None);
         handler.flush_events_blocking();
       }
       tauri::RunEvent::Ready => {
+        tracing::info!(target: "app::lifecycle", "application runtime ready");
         let _ = handler.track_event("app_started", None);
       }
       _ => {}
     }),
-    Err(err) => log::error!("error while running tauri application: {}", err),
+    Err(error) => {
+      tracing::error!(target: "app::lifecycle", %error, "tauri runtime failed");
+    }
   }
 
-  log::debug!("app exited");
+  tracing::info!(target: "app::lifecycle", "application exited");
 }

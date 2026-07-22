@@ -9,7 +9,10 @@ import App from './App.vue'
 import Plugin from './components/plugin/index.vue'
 import PrebootRecoveryAlert from './components/plugin/PrebootRecoveryAlert.vue'
 import UpdateChecker from './components/updateChecker.vue'
+import { appLogger } from './logger'
 import { revealMainEntry } from './startup/entry'
+
+const startupLogger = appLogger.scoped('startup')
 
 window.$message = useMessage()
 window.$loading = useLoadingBar()
@@ -43,14 +46,22 @@ const dismissPrebootRecovery = () => {
 }
 
 onMounted(async () => {
-  const result = await pluginRuntime.activatePreboot()
-  if (result.reloadRequired) {
-    location.reload()
-    return
+  try {
+    startupLogger.info('plugin activation started')
+    const result = await pluginRuntime.activatePreboot()
+    if (result.reloadRequired) {
+      startupLogger.warn('plugin activation requested application reload')
+      location.reload()
+      return
+    }
+    startupReady.value = true
+    await nextTick()
+    await revealMainEntry()
+    startupLogger.info('main entry revealed')
+  } catch (error) {
+    startupLogger.error('application startup failed', error)
+    throw error
   }
-  startupReady.value = true
-  await nextTick()
-  await revealMainEntry()
 })
 </script>
 

@@ -257,7 +257,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_initializeC
   match initialize_credential_context(&mut env, &context) {
     Ok(()) => 0,
     Err(error) => {
-      log::error!("Android credential context initialization failed: {error}");
+      tracing::error!("Android credential context initialization failed: {error}");
       1
     }
   }
@@ -282,13 +282,13 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_runTask(
         Ok(Some(_)) => 3,
         Ok(None) => 0,
         Err(error) => {
-          log::error!("Android SAF export lookup failed: {error}");
+          tracing::error!("Android SAF export lookup failed: {error}");
           1
         }
       }
     }
     Err(error) => {
-      log::error!("Android background download failed: {error}");
+      tracing::error!("Android background download failed: {error}");
       let task = tauri::async_runtime::block_on(engine.repository.get_task(&task_id))
         .ok()
         .flatten();
@@ -327,7 +327,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_getSafDirec
       Ok(Some(instruction)) => instruction,
       Ok(None) => return std::ptr::null_mut(),
       Err(error) => {
-        log::error!("Android direct SAF instruction lookup failed: {error}");
+        tracing::error!("Android direct SAF instruction lookup failed: {error}");
         return std::ptr::null_mut();
       }
     };
@@ -370,7 +370,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_rememberDir
   ) {
     Ok(()) => 0,
     Err(error) => {
-      log::error!("Android direct SAF state could not be persisted: {error}");
+      tracing::error!("Android direct SAF state could not be persisted: {error}");
       1
     }
   }
@@ -408,7 +408,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_runTaskDire
   match tauri::async_runtime::block_on(engine.run_task_now_with_direct_saf(&task_id, target)) {
     Ok(()) => 4,
     Err(error) => {
-      log::error!("Android direct SAF download failed: {error}");
+      tracing::error!("Android direct SAF download failed: {error}");
       let task = tauri::async_runtime::block_on(engine.repository.get_task(&task_id))
         .ok()
         .flatten();
@@ -445,7 +445,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_abandonDire
   match tauri::async_runtime::block_on(engine.abandon_direct_saf_transfer(&task_id)) {
     Ok(()) => 0,
     Err(error) => {
-      log::error!("Android direct SAF fallback failed: {error}");
+      tracing::error!("Android direct SAF fallback failed: {error}");
       1
     }
   }
@@ -467,7 +467,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_resumeSafCo
   match tauri::async_runtime::block_on(engine.resume_saf_commit(&task_id)) {
     Ok(()) => 0,
     Err(error) => {
-      log::error!("Android SAF commit resume failed: {error}");
+      tracing::error!("Android SAF commit resume failed: {error}");
       1
     }
   }
@@ -491,7 +491,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_getSafExpor
       Ok(Some(instruction)) => instruction,
       Ok(None) => return std::ptr::null_mut(),
       Err(error) => {
-        log::error!("Android SAF export instruction lookup failed: {error}");
+        tracing::error!("Android SAF export instruction lookup failed: {error}");
         return std::ptr::null_mut();
       }
     };
@@ -528,7 +528,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_completeSaf
   match tauri::async_runtime::block_on(engine.complete_saf_export(&task_id, &document_uri)) {
     Ok(()) => 0,
     Err(error) => {
-      log::error!("Android SAF export completion failed: {error}");
+      tracing::error!("Android SAF export completion failed: {error}");
       2
     }
   }
@@ -552,7 +552,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_failSafExpo
     return;
   };
   if let Err(error) = tauri::async_runtime::block_on(engine.fail_saf_export(&task_id, &message)) {
-    log::error!("Android SAF export failure could not be persisted: {error}");
+    tracing::error!("Android SAF export failure could not be persisted: {error}");
   }
 }
 
@@ -570,7 +570,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_pauseTask(
     return;
   };
   if let Err(error) = tauri::async_runtime::block_on(engine.pause(&task_id)) {
-    log::error!("Android downloader pause action failed: {error}");
+    tracing::error!("Android downloader pause action failed: {error}");
   }
 }
 
@@ -588,7 +588,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_cancelTask(
     return;
   };
   if let Err(error) = tauri::async_runtime::block_on(engine.cancel(&task_id)) {
-    log::error!("Android downloader cancel action failed: {error}");
+    tracing::error!("Android downloader cancel action failed: {error}");
   }
 }
 
@@ -602,7 +602,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_checkpointT
   if let Some(engine) = ENGINE.get().map(|registered| &registered.engine)
     && let Err(error) = tauri::async_runtime::block_on(engine.handle().checkpoint())
   {
-    log::error!("Android downloader checkpoint failed: {error}");
+    tracing::error!("Android downloader checkpoint failed: {error}");
   }
 }
 
@@ -620,7 +620,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_systemStopT
     return;
   };
   if let Err(error) = tauri::async_runtime::block_on(engine.system_stop_task(&task_id)) {
-    log::error!("Android downloader system stop failed: {error}");
+    tracing::error!("Android downloader system stop failed: {error}");
   }
 }
 
@@ -644,18 +644,18 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_bootstrap(
   ) {
     Ok(config) => config,
     Err(error) => {
-      log::error!("Android downloader bootstrap rejected its configuration: {error}");
+      tracing::error!("Android downloader bootstrap rejected its configuration: {error}");
       return 2;
     }
   };
   if let Err(error) = register_system_secret_resolver_if_missing() {
-    log::error!("Android credential store initialization failed: {error}");
+    tracing::error!("Android credential store initialization failed: {error}");
     return 1;
   }
   match tauri::async_runtime::block_on(open_or_reuse_engine(config, None)) {
     Ok(_) => 0,
     Err(error) => {
-      log::error!("Android downloader bootstrap failed: {error}");
+      tracing::error!("Android downloader bootstrap failed: {error}");
       1
     }
   }

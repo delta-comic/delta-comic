@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-list-log-files"
+description = "Enables the list_log_files command without any pre-configured scope."
+commands.allow = ["list_log_files"]
+
+[[permission]]
+identifier = "deny-list-log-files"
+description = "Denies the list_log_files command without any pre-configured scope."
+commands.deny = ["list_log_files"]
