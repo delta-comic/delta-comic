@@ -30,6 +30,8 @@ release
 *.sw?
 
 .vercel
+.codex
+.codex/config.toml
 
 .wrangler
 .dev.vars
