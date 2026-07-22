@@ -2,12 +2,18 @@
 import type { FormSingleConfigure } from '@delta-comic/model'
 import { useConfig } from '@delta-comic/plugin'
 import { DcCell, DcCellGroup } from '@delta-comic/ui'
+import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+
+import LogReaderPanel from '@/components/logs/LogReaderPanel.vue'
+import { isTauriRuntime } from '@/platform'
 
 const $router = useRouter()
 const config = useConfig()
 const { t, te } = useI18n()
+const showNativeLogs = isTauriRuntime()
+const showLogReader = shallowRef(false)
 
 const translateText = (value: string | undefined) => (value && te(value) ? t(value) : (value ?? ''))
 
@@ -142,6 +148,14 @@ const localizeFormConfig = <T extends FormSingleConfigure>(config: T): T => {
           </DcVar>
         </template>
       </DcCellGroup>
+      <DcCellGroup v-if="showNativeLogs" :title="t('settings.logs.sectionTitle')">
+        <DcCell center clickable :title="t('settings.logs.open')" @click="showLogReader = true">
+          {{ t('settings.logs.openDescription') }}
+        </DcCell>
+      </DcCellGroup>
     </div>
   </NScrollbar>
+  <NModal v-if="showNativeLogs" v-model:show="showLogReader" class="w-[min(96vw,72rem)]">
+    <LogReaderPanel />
+  </NModal>
 </template>
