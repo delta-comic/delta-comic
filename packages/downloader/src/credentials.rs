@@ -19,6 +19,12 @@ use uuid::Uuid;
 use crate::{Error, Result, SecretResolver};
 
 const CREDENTIAL_PREFIX: &str = "credential:";
+#[cfg(any(
+  test,
+  target_os = "macos",
+  target_os = "windows",
+  target_os = "android"
+))]
 const CREDENTIAL_SERVICE: &str = "org.wenxig.delta-comic.downloader";
 // Windows Credential Manager limits generic credential blobs to 2560 bytes. Keeping a small
 // margin gives every supported platform the same predictable contract.
