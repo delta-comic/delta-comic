@@ -1,10 +1,12 @@
-import { downloadEphemeral } from '@delta-comic/downloader'
+import { Downloader } from '@delta-comic/downloader'
 import ky from 'ky'
 
 import { isTauriRuntime } from '../../../driver/init/storage'
 
 export const MAX_PLUGIN_ASSET_BYTES = 128 * 1024 * 1024
 export const PLUGIN_DOWNLOAD_TIMEOUT_MS = 5 * 60 * 1000
+
+const downloader = Downloader.get()
 
 export interface DownloadInstallerAssetOptions {
   retry: number
@@ -20,7 +22,7 @@ export const downloadInstallerAsset = async (
   options: DownloadInstallerAssetOptions,
 ): Promise<Blob> => {
   if (isTauriRuntime()) {
-    const bytes = await downloadEphemeral(url, {
+    const bytes = await downloader.downloadEphemeral(url, {
       maxBytes: options.maxBytes ?? MAX_PLUGIN_ASSET_BYTES,
     })
     return new Blob([bytes])

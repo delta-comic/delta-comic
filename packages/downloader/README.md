@@ -48,10 +48,11 @@ tauri::Builder::default()
 TypeScript：
 
 ```ts
-import { deleteSecret, enqueueUrl, listenTaskUpsert, storeSecret } from '@delta-comic/downloader'
+import { Downloader } from '@delta-comic/downloader'
 
-const secretRef = await storeSecret('Bearer private-token')
-await enqueueUrl({
+const downloader = Downloader.get()
+const secretRef = await downloader.storeSecret('Bearer private-token')
+await downloader.enqueueUrl({
   url: 'https://example.com/archive.zip',
   priority: 8,
   mirrors: [{
@@ -59,9 +60,9 @@ await enqueueUrl({
     headers: { Authorization: { type: 'secretRef', secretRef } },
   }],
 })
-const unlisten = await listenTaskUpsert(({ task }) => console.info(task.status))
+const unlisten = await downloader.onTaskUpsert(({ task }) => console.info(task.status))
 // 不再需要凭据时显式删除；重复删除是安全的。
-await deleteSecret(secretRef)
+await downloader.deleteSecret(secretRef)
 ```
 
 HTTP 请求头可以直接提供普通值。Cookie、Authorization 等敏感值应通过上述系统凭据

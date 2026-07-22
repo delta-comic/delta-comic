@@ -7,7 +7,9 @@ const mocks = vi.hoisted(() => ({
   isTauriRuntime: vi.fn(() => false),
 }))
 
-vi.mock('@delta-comic/downloader', () => ({ downloadEphemeral: mocks.downloadEphemeral }))
+vi.mock('@delta-comic/downloader', () => ({
+  Downloader: { get: () => ({ downloadEphemeral: mocks.downloadEphemeral }) },
+}))
 vi.mock('ky', () => ({ default: { get: mocks.get } }))
 vi.mock('../../../driver/init/storage', () => ({ isTauriRuntime: mocks.isTauriRuntime }))
 

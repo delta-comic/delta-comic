@@ -11,7 +11,9 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('ky', () => ({ default: { get: mocks.get } }))
-vi.mock('@delta-comic/downloader', () => ({ downloadEphemeral: mocks.downloadEphemeral }))
+vi.mock('@delta-comic/downloader', () => ({
+  Downloader: { get: () => ({ downloadEphemeral: mocks.downloadEphemeral }) },
+}))
 vi.mock('../../../driver/init/native', () => ({
   prepareDevScript: mocks.prepareDevScript,
   readLocalFile: mocks.readLocalFile,

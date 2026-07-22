@@ -1,37 +1,20 @@
 import {
-  cancelTask,
-  deleteTaskFiles,
-  enqueuePlan,
-  enqueueTorrent,
-  enqueueUrl,
-  forgetTask,
-  getCapabilities,
-  getCollections,
-  getSettings,
-  getTask,
-  getTaskDetail,
-  listDestinations,
-  listTasks,
-  listenDownloaderEvents,
-  moveQueue,
-  pauseTask,
-  pickDestination,
-  resumeTask,
-  retryTask,
-  setPriority,
-  updateSource,
-  updateSettings,
+  Downloader,
   type ContentRefreshContext,
+  type Destination,
+  type DownloadCollection,
+  type DownloaderCapabilities,
+  type DownloaderEventHandlers,
+  type DownloaderSettings,
+  type DownloadSource,
   type DownloadTask,
   type DownloadTaskDetail,
-  type DownloadCollection,
-  type DownloadSource,
-  type Destination,
-  type DownloaderSettings,
-  type DownloaderCapabilities,
   type EnqueuePlanInput,
   type EnqueueTorrentInput,
   type EnqueueUrlInput,
+  type TaskAttention,
+  type TaskRemovedEvent,
+  type TaskUpsertEvent,
 } from '@delta-comic/downloader'
 
 export type {
@@ -52,53 +35,10 @@ export type AddDownloadRequest =
   | { input: EnqueueTorrentInput; type: 'torrent' }
   | { input: EnqueueUrlInput; type: 'http' }
 
-export interface DownloadTaskUpsertEvent {
-  revision: number
-  task: DownloadTask
-}
-
-export interface DownloadTaskRemovedEvent {
-  revision: number
-  taskId: string
-}
-
-export interface DownloadAttentionEvent {
-  code: string
-  message: string
-  revision: number
-  taskId: string
-}
-
-export interface DownloadEventHandlers {
-  attention?: (event: DownloadAttentionEvent) => void
-  removed?: (event: DownloadTaskRemovedEvent) => void
-  upsert?: (event: DownloadTaskUpsertEvent) => void
-}
+export type DownloadTaskUpsertEvent = TaskUpsertEvent
+export type DownloadTaskRemovedEvent = TaskRemovedEvent
+export type DownloadAttentionEvent = TaskAttention
+export type DownloadEventHandlers = DownloaderEventHandlers
 
 /** Keeps the native SDK boundary out of stores and components. */
-export const downloaderClient = {
-  cancelTask,
-  deleteTaskFiles,
-  enqueuePlan,
-  enqueueTorrent,
-  enqueueUrl,
-  forgetTask,
-  getCollections,
-  getCapabilities,
-  getSettings,
-  getTask,
-  getTaskDetail,
-  listDestinations,
-  listTasks,
-  listen(handlers: DownloadEventHandlers) {
-    return listenDownloaderEvents(handlers)
-  },
-  moveQueue,
-  pauseTask,
-  pickDestination,
-  resumeTask,
-  retryTask,
-  setPriority,
-  updateSource,
-  updateSettings,
-}
+export const downloaderClient = Downloader.get()
