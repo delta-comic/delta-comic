@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from 'vite-plus/test'
 
-import { runOtherProgress, type Config } from './otherProgress'
+import type { OtherProgress } from '@/plugin'
+
+import { runOtherProgress } from './50_otherProcess'
 
 const deferredProgress = (name: string, async = false) => {
   const deferred = Promise.withResolvers<void>()
-  const progress: Config = { name, async, call: () => deferred.promise }
+  const progress: OtherProgress.Config = { name, async, call: () => deferred.promise }
   return { deferred, progress }
 }
 
@@ -14,7 +16,7 @@ describe('otherProgress scheduler', () => {
     const first = deferredProgress('A', true)
     const second = deferredProgress('B', true)
     const trailing = deferredProgress('D', true)
-    const sync: Config = {
+    const sync: OtherProgress.Config = {
       name: 'C',
       async call() {
         events.push('C')
@@ -39,7 +41,7 @@ describe('otherProgress scheduler', () => {
 
   it('reports trailing background failures without rejecting plugin loading', async () => {
     const onBackgroundError = vi.fn()
-    const background: Config = {
+    const background: OtherProgress.Config = {
       name: 'background',
       async: true,
       call: async () => await Promise.reject(new Error('background failed')),
