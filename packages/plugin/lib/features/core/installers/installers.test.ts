@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const mocks = vi.hoisted(() => ({
   blob: vi.fn(async () => new Blob(['archive'])),
+  downloadEphemeral: vi.fn(async () => new Uint8Array([110, 97, 116, 105, 118, 101])),
   get: vi.fn(),
   isTauriRuntime: vi.fn(() => false),
   prepareDevScript: vi.fn(async (_input: string, code: string) => `processed:${code}`),
@@ -10,6 +11,7 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('ky', () => ({ default: { get: mocks.get } }))
+vi.mock('@delta-comic/downloader', () => ({ downloadEphemeral: mocks.downloadEphemeral }))
 vi.mock('../../../driver/init/native', () => ({
   prepareDevScript: mocks.prepareDevScript,
   readLocalFile: mocks.readLocalFile,
@@ -53,6 +55,33 @@ describe('fallback URL installer', () => {
     await expect(installer.download('https://plugins.test')).resolves.toMatchObject({
       name: 'plugins.test',
     })
+  })
+
+  it('uses the ephemeral native backend in Tauri without falling back to ky', async () => {
+    const installer = new _PluginInstallByFallbackUrl()
+    mocks.isTauriRuntime.mockReturnValue(true)
+
+    const file = await installer.download(
+      'https://plugins.test/releases/My%20Plugin.zip?signature=secret',
+    )
+
+    expect(file.name).toBe('My Plugin.zip')
+    await expect(file.text()).resolves.toBe('native')
+    expect(mocks.downloadEphemeral).toHaveBeenCalledWith(
+      'https://plugins.test/releases/My%20Plugin.zip?signature=secret',
+      { maxBytes: 128 * 1024 * 1024 },
+    )
+    expect(mocks.get).not.toHaveBeenCalled()
+  })
+
+  it('propagates native download failures without leaving the native path', async () => {
+    const installer = new _PluginInstallByFallbackUrl()
+    const failure = new Error('native download failed')
+    mocks.isTauriRuntime.mockReturnValue(true)
+    mocks.downloadEphemeral.mockRejectedValueOnce(failure)
+
+    await expect(installer.download('https://plugins.test/plugin.zip')).rejects.toBe(failure)
+    expect(mocks.get).not.toHaveBeenCalled()
   })
 })
 

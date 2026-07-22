@@ -1,8 +1,27 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import ky from 'ky'
 
 import { PluginInstaller, type PluginInstallerDescription } from '../../../driver/extensionTypes'
 import { pluginMessageKey } from '../../../i18n'
+
+import { downloadInstallerAsset } from './downloadAsset'
+
+const getFileName = (input: string): string => {
+  const url = new URL(input)
+  const encoded = url.pathname.split('/').filter(Boolean).at(-1) ?? url.hostname
+  let decoded = encoded
+  try {
+    decoded = decodeURIComponent(encoded)
+  } catch {
+    // Keep malformed percent escapes verbatim; URL parsing has already validated the input.
+  }
+  const withoutControlCharacters = [...decoded]
+    .map(character => {
+      const code = character.charCodeAt(0)
+      return code < 32 || code === 127 ? '_' : character
+    })
+    .join('')
+  return withoutControlCharacters.replace(/[<>:"/\\|?*]/g, '_').trim() || 'us.js'
+}
 
 export class _PluginInstallByFallbackUrl extends PluginInstaller {
   public override description: PluginInstallerDescription = {
@@ -11,9 +30,8 @@ export class _PluginInstallByFallbackUrl extends PluginInstaller {
   }
   public override name = 'fallbackUrl'
   private async installer(input: string): Promise<File> {
-    const res = await ky.get(input, { retry: 3, timeout: 1000 * 60 * 5 }).blob()
-    const name = input.split('/').at(-1) ?? 'us.js'
-    return new File([res], name)
+    const data = await downloadInstallerAsset(input, { retry: 3 })
+    return new File([data], getFileName(input))
   }
 
   public override async download(input: string): Promise<File> {

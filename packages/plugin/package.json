@@ -37,6 +37,7 @@
     "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
+    "@delta-comic/downloader": "workspace:",
     "@octokit/rest": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-fs": "catalog:",

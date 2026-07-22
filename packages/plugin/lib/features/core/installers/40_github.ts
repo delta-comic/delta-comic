@@ -1,12 +1,13 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import { Octokit } from '@octokit/rest'
-import ky from 'ky'
 
 import pkg from '../../../../package.json'
 import { useConfig } from '../../../config'
 import { PluginInstaller, type PluginInstallerDescription } from '../../../driver/extensionTypes'
 import { pluginI18n, pluginMessageKey } from '../../../i18n'
 import { isPluginManifestCompatible, parsePluginManifest } from '../../../manifest'
+
+import { downloadInstallerAsset } from './downloadAsset'
 
 type GitHubRelease = Awaited<ReturnType<Octokit['rest']['repos']['listReleases']>>['data'][number]
 
@@ -26,9 +27,9 @@ export interface GitHubInstallerDependencies {
   ) => AsyncIterable<readonly GitHubRelease[]>
 }
 
-const defaultDependencies: GitHubInstallerDependencies = {
+export const defaultGitHubInstallerDependencies: GitHubInstallerDependencies = {
   coreVersion: pkg.version,
-  downloadAsset: async url => await ky.get(url, { retry: 2, timeout: 1000 * 60 * 5 }).blob(),
+  downloadAsset: async url => await downloadInstallerAsset(url, { retry: 2 }),
   getConfig: () => useConfig().$loadApp().data.value,
   async *listReleasePages(owner, repo, token) {
     const octokit = new Octokit({ auth: token })
@@ -69,7 +70,7 @@ export class _PluginInstallByNormalUrl extends PluginInstaller {
   }
   public override name = 'github'
 
-  public constructor(private readonly dependencies = defaultDependencies) {
+  public constructor(private readonly dependencies = defaultGitHubInstallerDependencies) {
     super()
   }
 
