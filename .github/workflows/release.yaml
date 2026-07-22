@@ -205,9 +205,9 @@ jobs:
           - platform: ubuntu-22.04
             args: ''
             rust-targets: ''
-          - platform: windows-latest
-            args: ''
-            rust-targets: ''
+          # - platform: windows-latest
+          #   args: ''
+          #   rust-targets: ''
     runs-on: ${{ matrix.platform }}
     env:
       HUSKY: 0
@@ -228,8 +228,7 @@ jobs:
       - name: Synchronize build version
         run: |
           node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
-          vp run -t ui#build
-          vp run ui#build
+          vp run lib-build
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
