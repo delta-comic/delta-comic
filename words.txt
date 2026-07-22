@@ -33,6 +33,7 @@ httpdate
 iarna
 jmcomic
 kysely
+ktlint
 Levelboard
 lhlyu
 libappindicator
@@ -78,10 +79,12 @@ rolldown
 Roundhand
 rustflags
 rustls
+sdkmanager
 serde
 sider
 splited
 staticlib
+Swatinem
 subframe
 Strs
 stylesheet

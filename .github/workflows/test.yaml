@@ -6,6 +6,9 @@ on:
       - 'packages/**'
       - 'script/**'
       - '.github/workflows/test.yaml'
+      - '.node-version'
+      - 'Cargo.lock'
+      - 'Cargo.toml'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
@@ -16,6 +19,9 @@ on:
       - 'packages/**'
       - 'script/**'
       - '.github/workflows/test.yaml'
+      - '.node-version'
+      - 'Cargo.lock'
+      - 'Cargo.toml'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
@@ -27,6 +33,7 @@ permissions:
 
 jobs:
   test:
+    name: Web 单元测试
     runs-on: ubuntu-latest
     env:
       HUSKY: 0
@@ -36,7 +43,8 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: voidzero-dev/setup-vp@v1
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
         with:
           node-version-file: .node-version
           cache: true
@@ -48,3 +56,76 @@ jobs:
         run: |
           vp run lib-build
           vp test run
+
+  rust:
+    name: Rust 单元测试
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Test Rust workspace
+        env:
+          CARGO_BUILD_JOBS: 2
+        run: cargo test --workspace --locked -- --test-threads=2
+
+  android:
+    name: Android JVM 单元测试
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Rust metadata toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust registry
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-targets: false
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3.2.2
+
+      - name: Install Android SDK components
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+
+      - name: Resolve Tauri Android library
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest_path="$(cargo metadata --locked --format-version 1 | jq -r 'first(.packages[] | select(.name == "tauri") | .manifest_path) // empty')"
+          if [ -z "$manifest_path" ]; then
+            echo 'Unable to resolve the Tauri crate from Cargo metadata.' >&2
+            exit 1
+          fi
+          tauri_android_path="$(dirname "$manifest_path")/mobile/android"
+          test -f "$tauri_android_path/build.gradle.kts"
+          echo "TAURI_ANDROID_LIBRARY_PATH=$tauri_android_path" >> "$GITHUB_ENV"
+
+      - name: Test Android downloader module
+        run: |
+          chmod +x ./packages/app/src-tauri/gen/android/gradlew
+          ./packages/app/src-tauri/gen/android/gradlew \
+            -p packages/downloader/android \
+            testDebugUnitTest \
+            --no-daemon \
+            --max-workers=2
