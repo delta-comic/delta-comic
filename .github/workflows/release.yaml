@@ -228,7 +228,7 @@ jobs:
       - name: Synchronize build version
         run: |
           node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
-          vp run utils#build
+          vp run -t ui#build
           vp run ui#build
 
       - name: Setup Rust
