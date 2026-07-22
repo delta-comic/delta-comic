@@ -252,6 +252,10 @@ pub(crate) struct DownloadRequest<'a> {
   pub source: &'a HttpSource,
   pub settings: &'a DownloaderSettings,
   pub temp_path: &'a Path,
+  /// An already-open, seekable destination owned by the caller. Android SAF
+  /// uses this to write directly through a detached document-provider file
+  /// descriptor while retaining the same range and checkpoint engine.
+  pub target_file: Option<Arc<File>>,
   pub cancellation: CancellationToken,
   pub secret_resolver: Option<&'a dyn crate::SecretResolver>,
   pub maximum_bytes: Option<u64>,
@@ -351,13 +355,18 @@ async fn download_from_mirror(
     return Err(Error::RemoteChanged);
   }
 
-  let destination_root = task_storage_root(task)?;
-  if let Some(parent) = request.temp_path.parent() {
-    reject_symlinks_below(&destination_root, parent)?;
-    tokio::fs::create_dir_all(parent).await?;
-    reject_symlinks_below(&destination_root, parent)?;
-  }
-  let file = Arc::new(open_partial_file(&destination_root, request.temp_path)?);
+  let file = match &request.target_file {
+    Some(file) => file.clone(),
+    None => {
+      let destination_root = task_storage_root(task)?;
+      if let Some(parent) = request.temp_path.parent() {
+        reject_symlinks_below(&destination_root, parent)?;
+        tokio::fs::create_dir_all(parent).await?;
+        reject_symlinks_below(&destination_root, parent)?;
+      }
+      Arc::new(open_partial_file(&destination_root, request.temp_path)?)
+    }
+  };
 
   let mut completed = request.repository.completed_ranges(&task.id).await?;
   if !completed.is_empty() {
@@ -1131,6 +1140,23 @@ async fn can_reuse_completed(
   let Some(total) = probe.total_bytes else {
     return Ok(false);
   };
+  // Remote validators identify the source object, not the local partial
+  // file. A recreated file must not inherit persisted ranges merely because
+  // the source still has the same ETag.
+  let required_local_length = repository
+    .completed_ranges(&task.id)
+    .await?
+    .into_iter()
+    .map(|range| range.end)
+    .max()
+    .unwrap_or(0);
+  if file.metadata()?.len() < required_local_length {
+    return Ok(false);
+  }
+  let samples = repository.integrity_samples(&task.id).await?;
+  if !verify_local_integrity_samples(file, &samples, total)? {
+    return Ok(false);
+  }
   if let (Some(previous), Some(current)) = (
     strong_etag(task.etag.as_deref()),
     strong_etag(probe.etag.as_deref()),
@@ -1143,21 +1169,16 @@ async fn can_reuse_completed(
   if task.total_bytes != Some(total) {
     return Ok(false);
   }
-  verify_integrity_samples(client, url, headers, file, repository, &task.id, total).await
+  verify_remote_integrity_samples(client, url, headers, &samples, total).await
 }
 
-async fn verify_integrity_samples(
-  client: &Client,
-  url: &str,
-  headers: &HeaderMap,
+fn verify_local_integrity_samples(
   file: &File,
-  repository: &Repository,
-  task_id: &str,
+  samples: &[IntegritySample],
   total: u64,
 ) -> Result<bool> {
   use sha2::{Digest, Sha256};
 
-  let samples = repository.integrity_samples(task_id).await?;
   if samples.is_empty() {
     return Ok(false);
   }
@@ -1179,7 +1200,23 @@ async fn verify_integrity_samples(
     {
       return Ok(false);
     }
+  }
+  Ok(true)
+}
 
+async fn verify_remote_integrity_samples(
+  client: &Client,
+  url: &str,
+  headers: &HeaderMap,
+  samples: &[IntegritySample],
+  total: u64,
+) -> Result<bool> {
+  use sha2::{Digest, Sha256};
+
+  for sample in samples {
+    let Some(end) = sample.start.checked_add(sample.length) else {
+      return Ok(false);
+    };
     let response = client
       .get(url)
       .headers(headers.clone())

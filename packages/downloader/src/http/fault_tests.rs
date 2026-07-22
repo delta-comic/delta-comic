@@ -355,6 +355,7 @@ async fn run_fixture(mode: FaultMode, size: usize, expected_size: Option<u64>) -
       source: &source,
       settings: &settings,
       temp_path: &partial,
+      target_file: None,
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
@@ -378,6 +379,7 @@ async fn run_error(mode: FaultMode, size: usize, expected_size: Option<u64>) -> 
       source: &source,
       settings: &settings,
       temp_path: &root.path().join("fixture.bin.part"),
+      target_file: None,
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
@@ -425,6 +427,22 @@ async fn assert_stale_resume_restarts(
   tokio::fs::write(&partial, &bytes[..completed as usize])
     .await
     .unwrap();
+  let partial_file = std::fs::OpenOptions::new()
+    .read(true)
+    .write(true)
+    .open(&partial)
+    .unwrap();
+  persist_integrity_samples(
+    &repository,
+    &task.id,
+    &partial_file,
+    &[CompletedRange {
+      start: 0,
+      end: completed,
+    }],
+  )
+  .await
+  .unwrap();
 
   download(
     &reqwest::Client::new(),
@@ -434,6 +452,7 @@ async fn assert_stale_resume_restarts(
       source: &source,
       settings: &settings,
       temp_path: &partial,
+      target_file: None,
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
@@ -454,11 +473,142 @@ async fn assert_stale_resume_restarts(
 }
 
 #[tokio::test]
+async fn strong_validator_does_not_trust_locally_modified_completed_ranges() {
+  let size = 5 * 1024 * 1024 + 37;
+  let completed = 2 * 1024 * 1024_u64;
+  let bytes = fixture(size);
+  let server = FaultServer::start(bytes.clone(), FaultMode::Standard).await;
+  let root = TempDir::new().unwrap();
+  let (repository, mut task, source, settings) =
+    setup_task(&root, &server.url, Some(size as u64)).await;
+  task.total_bytes = Some(size as u64);
+  task.etag = Some("\"fixture-v1\"".into());
+  repository
+    .update_probe(
+      &task.id,
+      task.total_bytes,
+      task.etag.as_deref(),
+      task.last_modified.as_deref(),
+    )
+    .await
+    .unwrap();
+  let range = CompletedRange {
+    start: 0,
+    end: completed,
+  };
+  repository
+    .replace_completed_ranges(&task.id, &[range])
+    .await
+    .unwrap();
+  let partial = root.path().join("fixture.bin.part");
+  let file = std::fs::OpenOptions::new()
+    .create(true)
+    .truncate(true)
+    .read(true)
+    .write(true)
+    .open(&partial)
+    .unwrap();
+  file.set_len(size as u64).unwrap();
+  super::write_all_at(&file, &bytes[..completed as usize], 0).unwrap();
+  persist_integrity_samples(&repository, &task.id, &file, &[range])
+    .await
+    .unwrap();
+  super::write_all_at(&file, &[0_u8; 1024], 0).unwrap();
+
+  download(
+    &reqwest::Client::new(),
+    DownloadRequest {
+      repository: &repository,
+      task: &task,
+      source: &source,
+      settings: &settings,
+      temp_path: &partial,
+      target_file: None,
+      cancellation: CancellationToken::new(),
+      secret_resolver: None,
+      maximum_bytes: None,
+    },
+  )
+  .await
+  .unwrap();
+
+  assert_eq!(tokio::fs::read(&partial).await.unwrap(), bytes);
+  assert!(
+    server
+      .requested_ranges()
+      .into_iter()
+      .any(|(start, end)| start == 0 && end > super::INTEGRITY_SAMPLE_BYTES),
+  );
+}
+
+#[tokio::test]
 async fn downloads_parallel_standard_ranges() {
   let size = 9 * 1024 * 1024 + 37;
   assert_eq!(
     run_fixture(FaultMode::Standard, size, Some(size as u64)).await,
     fixture(size),
+  );
+}
+
+#[tokio::test]
+async fn writes_to_a_preopened_seekable_target_without_trusting_stale_local_ranges() {
+  let size = 5 * 1024 * 1024 + 37;
+  let bytes = fixture(size);
+  let server = FaultServer::start(bytes.clone(), FaultMode::Standard).await;
+  let root = TempDir::new().unwrap();
+  let (repository, mut task, source, settings) =
+    setup_task(&root, &server.url, Some(size as u64)).await;
+  task.total_bytes = Some(size as u64);
+  task.etag = Some("\"fixture-v1\"".into());
+  repository
+    .update_probe(&task.id, task.total_bytes, task.etag.as_deref(), None)
+    .await
+    .unwrap();
+  repository
+    .replace_completed_ranges(
+      &task.id,
+      &[CompletedRange {
+        start: 0,
+        end: 1024 * 1024,
+      }],
+    )
+    .await
+    .unwrap();
+  let provider_path = root.path().join("provider-document");
+  let provider_file = std::fs::OpenOptions::new()
+    .create(true)
+    .truncate(true)
+    .read(true)
+    .write(true)
+    .open(&provider_path)
+    .unwrap();
+  let unused_staging_path = root.path().join("unused.part");
+  download(
+    &reqwest::Client::new(),
+    DownloadRequest {
+      repository: &repository,
+      task: &task,
+      source: &source,
+      settings: &settings,
+      temp_path: &unused_staging_path,
+      target_file: Some(Arc::new(provider_file)),
+      cancellation: CancellationToken::new(),
+      secret_resolver: None,
+      maximum_bytes: None,
+    },
+  )
+  .await
+  .unwrap();
+
+  assert_eq!(tokio::fs::read(provider_path).await.unwrap(), bytes);
+  assert!(!tokio::fs::try_exists(unused_staging_path).await.unwrap());
+  assert!(
+    server
+      .requested_ranges()
+      .into_iter()
+      .filter(|range| *range != (0, 1))
+      .any(|(start, end)| start == 0 && end > 1),
+    "a recreated provider document must restart from byte zero",
   );
 }
 
@@ -604,6 +754,7 @@ async fn refuses_a_symlinked_partial_file_without_touching_its_target() {
       source: &source,
       settings: &settings,
       temp_path: &partial,
+      target_file: None,
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
@@ -647,6 +798,7 @@ async fn rejects_a_body_that_exceeds_content_range() {
       source: &source,
       settings: &settings,
       temp_path: &root.path().join("fixture.bin.part"),
+      target_file: None,
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
@@ -693,6 +845,22 @@ async fn resume_requests_only_missing_ranges() {
   tokio::fs::write(&partial, &bytes[..completed as usize])
     .await
     .unwrap();
+  let partial_file = std::fs::OpenOptions::new()
+    .read(true)
+    .write(true)
+    .open(&partial)
+    .unwrap();
+  persist_integrity_samples(
+    &repository,
+    &task.id,
+    &partial_file,
+    &[CompletedRange {
+      start: 0,
+      end: completed,
+    }],
+  )
+  .await
+  .unwrap();
 
   download(
     &reqwest::Client::new(),
@@ -702,6 +870,7 @@ async fn resume_requests_only_missing_ranges() {
       source: &source,
       settings: &settings,
       temp_path: &partial,
+      target_file: None,
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
@@ -747,6 +916,7 @@ async fn cancellation_checkpoints_and_resume_only_requests_missing_ranges() {
         source: &download_source,
         settings: &download_settings,
         temp_path: &download_partial,
+        target_file: None,
         cancellation: download_cancellation,
         secret_resolver: None,
         maximum_bytes: None,
@@ -790,6 +960,7 @@ async fn cancellation_checkpoints_and_resume_only_requests_missing_ranges() {
       source: &source,
       settings: &settings,
       temp_path: &partial,
+      target_file: None,
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
@@ -856,6 +1027,7 @@ async fn resumes_without_validators_only_after_sample_verification() {
       source: &source,
       settings: &settings,
       temp_path: &partial,
+      target_file: None,
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
@@ -905,6 +1077,7 @@ async fn falls_back_to_the_next_mirror_by_priority() {
       source: &source,
       settings: &settings,
       temp_path: &partial,
+      target_file: None,
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,

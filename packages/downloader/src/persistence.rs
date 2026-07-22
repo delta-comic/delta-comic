@@ -51,6 +51,47 @@ pub(crate) struct SafExportInstruction {
   pub is_directory: bool,
 }
 
+#[cfg(any(target_os = "android", test))]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct DirectSafInstruction {
+  pub tree_uri: String,
+  pub relative_path: String,
+  pub expected_length: Option<u64>,
+  pub temporary_name: String,
+  pub temporary_document_uri: Option<String>,
+  pub ready_to_commit: bool,
+}
+
+#[cfg(any(target_os = "android", test))]
+const DIRECT_SAF_TRANSFERRING_PREFIX: &str = "saf-direct:transferring:";
+#[cfg(any(target_os = "android", test))]
+const DIRECT_SAF_READY_PREFIX: &str = "saf-direct:ready:";
+
+#[cfg(any(target_os = "android", test))]
+fn direct_saf_staging_value(document_uri: &str, ready: bool) -> String {
+  format!(
+    "{}{document_uri}",
+    if ready {
+      DIRECT_SAF_READY_PREFIX
+    } else {
+      DIRECT_SAF_TRANSFERRING_PREFIX
+    }
+  )
+}
+
+#[cfg(any(target_os = "android", test))]
+fn parse_direct_saf_staging(value: &str) -> Option<(&str, bool)> {
+  value
+    .strip_prefix(DIRECT_SAF_TRANSFERRING_PREFIX)
+    .map(|uri| (uri, false))
+    .or_else(|| {
+      value
+        .strip_prefix(DIRECT_SAF_READY_PREFIX)
+        .map(|uri| (uri, true))
+    })
+    .filter(|(uri, _)| !uri.is_empty())
+}
+
 impl CompletedRange {
   pub fn new(start: u64, end: u64) -> Result<Self> {
     if start >= end {
@@ -302,6 +343,7 @@ impl Repository {
     })
   }
 
+  #[cfg(not(target_os = "android"))]
   pub async fn next_queued(&self, limit: usize) -> Result<Vec<DownloadTask>> {
     let rows = sqlx::query(
       "SELECT * FROM tasks WHERE status = 'queued' \
@@ -390,6 +432,178 @@ impl Repository {
     Ok(())
   }
 
+  #[cfg(any(target_os = "android", test))]
+  pub(crate) async fn direct_saf_instruction(
+    &self,
+    task_id: &str,
+  ) -> Result<Option<DirectSafInstruction>> {
+    let row = sqlx::query(
+      "SELECT d.path AS tree_uri, t.relative_path, t.total_bytes, e.staging_path \
+       FROM tasks t \
+       JOIN destinations d ON d.id = t.destination_id \
+       LEFT JOIN saf_exports e ON e.task_id = t.id AND e.destination_id = d.id \
+       WHERE t.id = ? AND t.kind = 'http' AND d.kind = 'android_saf' \
+       AND t.status IN ('queued', 'probing', 'downloading', 'verifying', 'waiting_for_network') \
+       AND (e.task_id IS NULL OR e.staging_path LIKE 'saf-direct:%')",
+    )
+    .bind(task_id)
+    .fetch_optional(&self.pool)
+    .await?;
+    row
+      .map(|row| {
+        let persisted = row
+          .try_get::<Option<String>, _>("staging_path")?
+          .and_then(|value| {
+            parse_direct_saf_staging(&value).map(|(uri, ready)| (uri.to_owned(), ready))
+          });
+        let (temporary_document_uri, ready_to_commit) = persisted
+          .map(|(uri, ready)| (Some(uri), ready))
+          .unwrap_or((None, false));
+        Ok(DirectSafInstruction {
+          tree_uri: row.try_get("tree_uri")?,
+          relative_path: row.try_get("relative_path")?,
+          expected_length: row
+            .try_get::<Option<i64>, _>("total_bytes")?
+            .map(u64::try_from)
+            .transpose()
+            .map_err(|_| Error::InvalidInput("negative direct SAF expected length".into()))?,
+          temporary_name: format!(".delta-{task_id}.part"),
+          temporary_document_uri,
+          ready_to_commit,
+        })
+      })
+      .transpose()
+  }
+
+  #[cfg(any(target_os = "android", test))]
+  pub(crate) async fn begin_direct_saf_transfer(
+    &self,
+    task_id: &str,
+    document_uri: &str,
+  ) -> Result<()> {
+    let destination: Option<(String, String)> = sqlx::query_as(
+      "SELECT d.id, d.path FROM tasks t \
+       JOIN destinations d ON d.id = t.destination_id \
+       WHERE t.id = ? AND t.kind = 'http' AND d.kind = 'android_saf'",
+    )
+    .bind(task_id)
+    .fetch_optional(&self.pool)
+    .await?;
+    let (destination_id, tree_uri) = destination.ok_or_else(|| {
+      Error::InvalidInput("direct SAF transfer requires an HTTP task and SAF destination".into())
+    })?;
+    validate_saf_document_uri(&tree_uri, document_uri)?;
+
+    let mut transaction = self.writer.begin().await?;
+    let existing: Option<String> =
+      sqlx::query_scalar("SELECT staging_path FROM saf_exports WHERE task_id = ?")
+        .bind(task_id)
+        .fetch_optional(&mut *transaction)
+        .await?;
+    let same_document = existing
+      .as_deref()
+      .and_then(parse_direct_saf_staging)
+      .is_some_and(|(uri, _)| uri == document_uri);
+    if !same_document {
+      sqlx::query("DELETE FROM segments WHERE task_id = ?")
+        .bind(task_id)
+        .execute(&mut *transaction)
+        .await?;
+      sqlx::query("DELETE FROM integrity_samples WHERE task_id = ?")
+        .bind(task_id)
+        .execute(&mut *transaction)
+        .await?;
+      sqlx::query("UPDATE tasks SET downloaded_bytes = 0 WHERE id = ?")
+        .bind(task_id)
+        .execute(&mut *transaction)
+        .await?;
+    }
+    let staging = direct_saf_staging_value(document_uri, false);
+    sqlx::query(
+      "INSERT INTO saf_exports(\
+         task_id, destination_id, staging_path, document_uri, state, error_message, updated_at\
+       ) VALUES (?, ?, ?, ?, 'pending', NULL, ?) \
+       ON CONFLICT(task_id) DO UPDATE SET destination_id = excluded.destination_id, \
+       staging_path = excluded.staging_path, document_uri = excluded.document_uri, \
+       state = 'pending', error_message = NULL, updated_at = excluded.updated_at",
+    )
+    .bind(task_id)
+    .bind(destination_id)
+    .bind(staging)
+    .bind(document_uri)
+    .bind(now_millis())
+    .execute(&mut *transaction)
+    .await?;
+    transaction.commit().await?;
+    Ok(())
+  }
+
+  #[cfg(any(target_os = "android", test))]
+  pub(crate) async fn mark_direct_saf_ready(
+    &self,
+    task_id: &str,
+    document_uri: &str,
+  ) -> Result<()> {
+    let transferring = direct_saf_staging_value(document_uri, false);
+    let ready = direct_saf_staging_value(document_uri, true);
+    let result = sqlx::query(
+      "UPDATE saf_exports SET staging_path = ?, document_uri = ?, error_message = NULL, \
+       updated_at = ? WHERE task_id = ? AND state = 'pending' AND staging_path = ?",
+    )
+    .bind(ready)
+    .bind(document_uri)
+    .bind(now_millis())
+    .bind(task_id)
+    .bind(transferring)
+    .execute(&self.writer)
+    .await?;
+    if result.rows_affected() != 1 {
+      return Err(Error::InvalidInput(
+        "direct SAF transfer is missing or changed before commit".into(),
+      ));
+    }
+    Ok(())
+  }
+
+  #[cfg(any(target_os = "android", test))]
+  pub(crate) async fn abandon_direct_saf_transfer(&self, task_id: &str) -> Result<()> {
+    let mut transaction = self.writer.begin().await?;
+    let deleted =
+      sqlx::query("DELETE FROM saf_exports WHERE task_id = ? AND staging_path LIKE 'saf-direct:%'")
+        .bind(task_id)
+        .execute(&mut *transaction)
+        .await?;
+    if deleted.rows_affected() != 0 {
+      sqlx::query("DELETE FROM segments WHERE task_id = ?")
+        .bind(task_id)
+        .execute(&mut *transaction)
+        .await?;
+      sqlx::query("DELETE FROM integrity_samples WHERE task_id = ?")
+        .bind(task_id)
+        .execute(&mut *transaction)
+        .await?;
+      sqlx::query("UPDATE tasks SET downloaded_bytes = 0 WHERE id = ?")
+        .bind(task_id)
+        .execute(&mut *transaction)
+        .await?;
+    }
+    transaction.commit().await?;
+    Ok(())
+  }
+
+  #[cfg(any(target_os = "android", test))]
+  pub(crate) async fn has_pending_saf_commit(&self, task_id: &str) -> Result<bool> {
+    let exists: i64 = sqlx::query_scalar(
+      "SELECT EXISTS(SELECT 1 FROM saf_exports e \
+       JOIN destinations d ON d.id = e.destination_id \
+       WHERE e.task_id = ? AND e.state = 'pending' AND d.kind = 'android_saf')",
+    )
+    .bind(task_id)
+    .fetch_one(&self.pool)
+    .await?;
+    Ok(exists != 0)
+  }
+
   pub(crate) async fn saf_export_record(&self, task_id: &str) -> Result<Option<SafExportRecord>> {
     let row = sqlx::query(
       "SELECT task_id, destination_id, staging_path, document_uri, state, error_message \
@@ -422,7 +636,8 @@ impl Repository {
        FROM saf_exports e \
        JOIN tasks t ON t.id = e.task_id AND t.destination_id = e.destination_id \
        JOIN destinations d ON d.id = e.destination_id \
-       WHERE e.task_id = ? AND e.state = 'pending' AND d.kind = 'android_saf'",
+       WHERE e.task_id = ? AND e.state = 'pending' AND d.kind = 'android_saf' \
+       AND e.staging_path NOT LIKE 'saf-direct:%'",
     )
     .bind(task_id)
     .fetch_optional(&self.pool)
@@ -2032,5 +2247,95 @@ mod tests {
         .unwrap()
         .is_none()
     );
+  }
+
+  #[tokio::test]
+  async fn direct_saf_state_resumes_only_the_same_temporary_document() {
+    let repository = Repository::memory().await.unwrap();
+    initialized(&repository).await;
+    let destination = Destination {
+      id: "saf-direct".into(),
+      label: "Shared".into(),
+      kind: DestinationKind::AndroidSaf,
+      path: "content://provider/tree/primary%3ADownloads".into(),
+      is_default: false,
+    };
+    repository.register_destination(&destination).await.unwrap();
+    let mut task = task("direct-task");
+    task.destination_id = destination.id.clone();
+    task.relative_path = "Comic/chapter.cbz".into();
+    repository.insert_task(&mut task).await.unwrap();
+
+    let initial = repository
+      .direct_saf_instruction(&task.id)
+      .await
+      .unwrap()
+      .unwrap();
+    assert_eq!(initial.temporary_name, ".delta-direct-task.part");
+    assert_eq!(initial.expected_length, task.total_bytes);
+    assert_eq!(initial.temporary_document_uri, None);
+    assert!(!initial.ready_to_commit);
+
+    let first = "content://provider/tree/primary%3ADownloads/document/primary%3ADownloads%2Ffirst";
+    repository
+      .begin_direct_saf_transfer(&task.id, first)
+      .await
+      .unwrap();
+    repository
+      .replace_completed_ranges(&task.id, &[CompletedRange { start: 0, end: 4 }])
+      .await
+      .unwrap();
+    repository
+      .begin_direct_saf_transfer(&task.id, first)
+      .await
+      .unwrap();
+    assert_eq!(
+      repository.completed_ranges(&task.id).await.unwrap(),
+      vec![CompletedRange { start: 0, end: 4 }]
+    );
+    repository
+      .mark_direct_saf_ready(&task.id, first)
+      .await
+      .unwrap();
+    let ready = repository
+      .direct_saf_instruction(&task.id)
+      .await
+      .unwrap()
+      .unwrap();
+    assert_eq!(ready.temporary_document_uri.as_deref(), Some(first));
+    assert!(ready.ready_to_commit);
+    assert!(
+      repository
+        .pending_saf_export(&task.id)
+        .await
+        .unwrap()
+        .is_none()
+    );
+    assert!(repository.has_pending_saf_commit(&task.id).await.unwrap());
+
+    let replacement =
+      "content://provider/tree/primary%3ADownloads/document/primary%3ADownloads%2Freplacement";
+    repository
+      .begin_direct_saf_transfer(&task.id, replacement)
+      .await
+      .unwrap();
+    assert!(
+      repository
+        .completed_ranges(&task.id)
+        .await
+        .unwrap()
+        .is_empty()
+    );
+    assert!(
+      repository
+        .begin_direct_saf_transfer(&task.id, "content://other/tree/root/document/outside",)
+        .await
+        .is_err()
+    );
+    repository
+      .abandon_direct_saf_transfer(&task.id)
+      .await
+      .unwrap();
+    assert!(!repository.has_pending_saf_commit(&task.id).await.unwrap());
   }
 }

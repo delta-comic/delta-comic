@@ -74,6 +74,11 @@ internal object DownloadRuntime {
     fun run(context: Context, taskId: String): ExecutionResult {
         if (!ensureNativeEngine(context)) return ExecutionResult.RETRY
         return try {
+            val directInstruction = NativeBridge.getSafDirectInstruction(taskId)
+            if (directInstruction != null) {
+                val directResult = runDirectSaf(context, taskId, directInstruction)
+                if (directResult != null) return directResult
+            }
             val code = NativeBridge.runTask(taskId)
             if (code != SAF_EXPORT_REQUIRED) return executionResult(code)
             val instruction = NativeBridge.getSafExportInstruction(taskId)
@@ -87,6 +92,66 @@ internal object DownloadRuntime {
         } catch (_: UnsatisfiedLinkError) {
             ExecutionResult.RETRY
         }
+    }
+
+    private fun runDirectSaf(
+        context: Context,
+        taskId: String,
+        instructionJson: String,
+    ): ExecutionResult? {
+        val instruction = SafDocuments.parseDirectInstruction(instructionJson)
+            ?: return ExecutionResult.RETRY
+        if (instruction.readyToCommit) {
+            if (NativeBridge.resumeSafCommit(taskId) != 0) return ExecutionResult.RETRY
+            return commitDirectSaf(context, taskId, instructionJson)
+        }
+        return when (val opened = SafDocuments.openDirect(context, instructionJson)) {
+            is SafDirectOpenResult.Ready -> {
+                val code = NativeBridge.runTaskDirectSaf(
+                    taskId,
+                    opened.fileDescriptor,
+                    opened.documentUri,
+                )
+                if (code != DIRECT_SAF_COMMIT_REQUIRED) return executionResult(code)
+                val readyInstruction = NativeBridge.getSafDirectInstruction(taskId)
+                    ?: return ExecutionResult.RETRY
+                commitDirectSaf(context, taskId, readyInstruction)
+            }
+            is SafDirectOpenResult.Fallback -> {
+                val temporaryDocumentUri = opened.documentUri
+                if (temporaryDocumentUri != null) {
+                    if (NativeBridge.rememberDirectSaf(taskId, temporaryDocumentUri) != 0) {
+                        return ExecutionResult.RETRY
+                    }
+                    val discarded = SafDocuments.discardDirect(
+                        context,
+                        instructionJson,
+                        temporaryDocumentUri,
+                    )
+                    if (!discarded.succeeded) {
+                        NativeBridge.failSafExport(
+                            taskId,
+                            discarded.error ?: "Unknown direct SAF cleanup failure",
+                        )
+                        return ExecutionResult.STOPPED
+                    }
+                }
+                if (NativeBridge.abandonDirectSaf(taskId) != 0) ExecutionResult.RETRY else null
+            }
+        }
+    }
+
+    private fun commitDirectSaf(
+        context: Context,
+        taskId: String,
+        instructionJson: String,
+    ): ExecutionResult {
+        val commit = SafDocuments.commitDirect(context, instructionJson)
+        if (!commit.succeeded) {
+            NativeBridge.failSafExport(taskId, commit.error ?: "Unknown direct SAF commit failure")
+            return ExecutionResult.STOPPED
+        }
+        return executionResult(NativeBridge.completeSafExport(taskId, commit.value!!))
     }
 
     fun runAsync(
@@ -197,6 +262,11 @@ internal object NativeBridge {
     external fun initializeCredentialContext(context: Context): Int
     external fun bootstrap(databasePath: String, downloadDir: String): Int
     external fun runTask(taskId: String): Int
+    external fun getSafDirectInstruction(taskId: String): String?
+    external fun rememberDirectSaf(taskId: String, documentUri: String): Int
+    external fun runTaskDirectSaf(taskId: String, fileDescriptor: Int, documentUri: String): Int
+    external fun abandonDirectSaf(taskId: String): Int
+    external fun resumeSafCommit(taskId: String): Int
     external fun getSafExportInstruction(taskId: String): String?
     external fun completeSafExport(taskId: String, documentUri: String): Int
     external fun failSafExport(taskId: String, message: String)
@@ -215,3 +285,4 @@ internal fun initializeNativeEngine(
 }
 
 private const val SAF_EXPORT_REQUIRED = 3
+private const val DIRECT_SAF_COMMIT_REQUIRED = 4

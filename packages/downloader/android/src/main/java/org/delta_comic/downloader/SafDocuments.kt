@@ -4,6 +4,9 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.DocumentsContract
+import android.system.ErrnoException
+import android.system.Os
+import android.system.OsConstants
 import androidx.documentfile.provider.DocumentFile
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.File
@@ -18,6 +21,20 @@ internal data class SafExportInstruction(
     val stagingPath: String = "",
     val isDirectory: Boolean = false,
 )
+
+internal data class SafDirectInstruction(
+    val treeUri: String = "",
+    val relativePath: String = "",
+    val expectedLength: Long? = null,
+    val temporaryName: String = "",
+    val temporaryDocumentUri: String? = null,
+    val readyToCommit: Boolean = false,
+)
+
+internal sealed interface SafDirectOpenResult {
+    data class Ready(val fileDescriptor: Int, val documentUri: String) : SafDirectOpenResult
+    data class Fallback(val documentUri: String?) : SafDirectOpenResult
+}
 
 internal data class SafOperationResult(
     val value: String? = null,
@@ -65,6 +82,12 @@ internal fun validSafDocumentBinding(treeUri: String, documentUri: String): Bool
 internal object SafDocuments {
     private val mapper = ObjectMapper()
 
+    fun parseDirectInstruction(instructionJson: String): SafDirectInstruction? = try {
+        mapper.readValue(instructionJson, SafDirectInstruction::class.java)
+    } catch (_: Exception) {
+        null
+    }
+
     fun export(context: Context, instructionJson: String): SafOperationResult = try {
         val instruction = mapper.readValue(instructionJson, SafExportInstruction::class.java)
         require(validSafRelativePath(instruction.relativePath)) {
@@ -98,6 +121,147 @@ internal object SafDocuments {
             copyFile(context, staging, parent, components.last())
         }
         SafOperationResult(value = exported.uri.toString())
+    } catch (error: Exception) {
+        SafOperationResult(error = error.message ?: error.javaClass.simpleName)
+    }
+
+    fun openDirect(context: Context, instructionJson: String): SafDirectOpenResult {
+        var openedDocumentUri: String? = null
+        return try {
+            val instruction = mapper.readValue(instructionJson, SafDirectInstruction::class.java)
+            require(!instruction.readyToCommit) { "A completed SAF transfer must be committed" }
+            require(validSafRelativePath(instruction.relativePath)) {
+                "The persisted SAF relative path is invalid"
+            }
+            require(
+                instruction.temporaryName.isNotBlank() &&
+                    '/' !in instruction.temporaryName && '\\' !in instruction.temporaryName &&
+                    instruction.temporaryName != "." && instruction.temporaryName != ".."
+            ) { "The SAF temporary file name is invalid" }
+            val treeUri = requireWritableTree(context, instruction.treeUri)
+            val tree = requireTree(context, treeUri)
+            val components = instruction.relativePath.split('/')
+            val parent = components.dropLast(1).fold(tree) { directory, component ->
+                requireDirectory(directory, component)
+            }
+            val document = instruction.temporaryDocumentUri?.let { value ->
+                require(validSafDocumentBinding(instruction.treeUri, value)) {
+                    "The SAF temporary document is outside its registered tree"
+                }
+                DocumentFile.fromSingleUri(context, Uri.parse(value))
+                    ?.takeIf { it.exists() && it.isFile }
+                    ?: error("The SAF temporary document no longer exists")
+            } ?: run {
+                val mimeType = URLConnection.guessContentTypeFromName(components.last())
+                    ?: "application/octet-stream"
+                parent.createFile(mimeType, instruction.temporaryName)
+                    ?: error("Could not create a seekable SAF temporary file")
+            }
+            openedDocumentUri = document.uri.toString()
+            val descriptor = context.contentResolver.openFileDescriptor(document.uri, "rw")
+                ?: return SafDirectOpenResult.Fallback(openedDocumentUri)
+            descriptor.use {
+                try {
+                    Os.lseek(it.fileDescriptor, 0, OsConstants.SEEK_CUR)
+                } catch (_: ErrnoException) {
+                    return SafDirectOpenResult.Fallback(openedDocumentUri)
+                }
+                SafDirectOpenResult.Ready(it.detachFd(), openedDocumentUri)
+            }
+        } catch (_: Exception) {
+            SafDirectOpenResult.Fallback(openedDocumentUri)
+        }
+    }
+
+    fun commitDirect(context: Context, instructionJson: String): SafOperationResult = try {
+        val instruction = mapper.readValue(instructionJson, SafDirectInstruction::class.java)
+        require(instruction.readyToCommit) { "The direct SAF transfer is not ready to commit" }
+        require(validSafRelativePath(instruction.relativePath)) {
+            "The persisted SAF relative path is invalid"
+        }
+        val temporaryUriValue = instruction.temporaryDocumentUri
+            ?: error("The direct SAF temporary document is missing")
+        require(validSafDocumentBinding(instruction.treeUri, temporaryUriValue)) {
+            "The SAF temporary document is outside its registered tree"
+        }
+        val treeUri = requireWritableTree(context, instruction.treeUri)
+        val tree = requireTree(context, treeUri)
+        val temporaryUri = Uri.parse(temporaryUriValue)
+        val components = instruction.relativePath.split('/')
+        val parent = components.dropLast(1).fold(tree) { directory, component ->
+            requireDirectory(directory, component)
+        }
+        val finalName = components.last()
+        val temporary = DocumentFile.fromSingleUri(context, temporaryUri)
+            ?.takeIf { it.exists() && it.isFile }
+        if (temporary == null) {
+            // The provider commit can succeed immediately before the process is
+            // reclaimed. A ready marker makes discovering the final relative
+            // path an idempotent recovery, not a reason to redownload.
+            val committed = parent.findFile(finalName)
+                ?.takeIf { it.exists() && it.isFile }
+                ?: error("Neither the direct SAF temporary nor final document exists")
+            requireExpectedLength(context, committed, instruction.expectedLength)
+            SafOperationResult(value = committed.uri.toString())
+        } else {
+            requireExpectedLength(context, temporary, instruction.expectedLength)
+            val existing = parent.findFile(finalName)
+            require(existing?.isDirectory != true) {
+                "A directory blocks the SAF file path: $finalName"
+            }
+            if (existing != null && existing.uri != temporaryUri && !existing.delete()) {
+                error("The existing SAF destination could not be replaced")
+            }
+
+            val renamed = try {
+                DocumentsContract.renameDocument(context.contentResolver, temporaryUri, finalName)
+            } catch (_: UnsupportedOperationException) {
+                null
+            }
+            if (renamed != null) {
+                require(validSafDocumentBinding(instruction.treeUri, renamed.toString())) {
+                    "The renamed SAF document escaped its registered tree"
+                }
+                SafOperationResult(value = renamed.toString())
+            } else {
+                val destination = parent.findFile(finalName)
+                    ?: parent.createFile(
+                        URLConnection.guessContentTypeFromName(finalName)
+                            ?: "application/octet-stream",
+                        finalName,
+                    )
+                    ?: error("Could not create the final SAF document")
+                if (destination.uri == temporary.uri) {
+                    SafOperationResult(value = destination.uri.toString())
+                } else {
+                    copyDocument(context, temporary.uri, destination.uri)
+                    if (!temporary.delete()) {
+                        error("The committed SAF temporary document could not be removed")
+                    }
+                    SafOperationResult(value = destination.uri.toString())
+                }
+            }
+        }
+    } catch (error: Exception) {
+        SafOperationResult(error = error.message ?: error.javaClass.simpleName)
+    }
+
+    fun discardDirect(
+        context: Context,
+        instructionJson: String,
+        documentUriValue: String,
+    ): SafOperationResult = try {
+        val instruction = mapper.readValue(instructionJson, SafDirectInstruction::class.java)
+        require(validSafDocumentBinding(instruction.treeUri, documentUriValue)) {
+            "The SAF temporary document is outside its registered tree"
+        }
+        requireWritableTree(context, instruction.treeUri)
+        val document = DocumentFile.fromSingleUri(context, Uri.parse(documentUriValue))
+            ?: error("The SAF temporary document URI is invalid")
+        if (document.exists() && !document.delete()) {
+            error("The SAF temporary document could not be removed")
+        }
+        SafOperationResult(value = documentUriValue)
     } catch (error: Exception) {
         SafOperationResult(error = error.message ?: error.javaClass.simpleName)
     }
@@ -151,6 +315,22 @@ internal object SafDocuments {
             permission.uri == treeUri && permission.isWritePermission
         }
 
+    private fun requireWritableTree(context: Context, treeUriValue: String): Uri {
+        val treeUri = Uri.parse(treeUriValue)
+        require(treeUri.scheme == "content") { "The SAF destination is not a content URI" }
+        require(hasPersistedWritePermission(context, treeUri)) {
+            "Write permission for the SAF destination is no longer available"
+        }
+        return treeUri
+    }
+
+    private fun requireTree(context: Context, treeUri: Uri): DocumentFile {
+        val tree = DocumentFile.fromTreeUri(context, treeUri)
+            ?: error("The SAF document tree is unavailable")
+        require(tree.exists() && tree.isDirectory) { "The SAF destination no longer exists" }
+        return tree
+    }
+
     private fun requireDirectory(parent: DocumentFile, name: String): DocumentFile {
         val existing = parent.findFile(name)
         if (existing != null) {
@@ -191,5 +371,31 @@ internal object SafDocuments {
             output.buffered().use { target -> input.copyTo(target, DEFAULT_BUFFER_SIZE * 16) }
         }
         return destination
+    }
+
+    private fun copyDocument(context: Context, source: Uri, destination: Uri) {
+        val input = context.contentResolver.openInputStream(source)
+            ?: error("Could not read the direct SAF temporary document")
+        val output = context.contentResolver.openOutputStream(destination, "wt")
+            ?: error("Could not write the final SAF document")
+        input.buffered().use { from ->
+            output.buffered().use { target -> from.copyTo(target, DEFAULT_BUFFER_SIZE * 16) }
+        }
+    }
+
+    private fun requireExpectedLength(
+        context: Context,
+        document: DocumentFile,
+        expectedLength: Long?,
+    ) {
+        if (expectedLength != null) {
+            val actualLength = context.contentResolver
+                .openFileDescriptor(document.uri, "r")
+                ?.use { it.statSize }
+                ?: -1L
+            require(expectedLength >= 0 && actualLength == expectedLength) {
+                "The direct SAF document length no longer matches the completed download"
+            }
+        }
     }
 }

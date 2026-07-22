@@ -33,8 +33,10 @@
 - macOS 与 Windows 使用系统 Downloads，活动下载时关闭窗口进入托盘。
 - Android API 26–33 使用前台 WorkManager；API 34+ 使用 UIDT Job。
 - Android 通知暂停/取消、断网、`onStopJob`、进程重建和非计费网络策略。
-- SAF 当前以应用私有 staging 完成并校验，再通过持久 URI 授权导出；可 seek 文件描述符
-  的直接分片写入仍属于后续真实 provider 兼容性优化，不能用 staging 测试替代验收。
+- SAF 对可 seek provider 使用持久化临时文档与脱离 `ParcelFileDescriptor` 的原生 FD，
+  直接复用 HTTP Range、校验和区间恢复引擎；进程重建后按临时 URI 重新打开。不可 seek
+  provider 自动清理直写状态并回退应用私有 staging，rename 不可用时才在提交阶段复制。
+  不同厂商 provider 的 seek、rename 与进程回收行为仍需在真机发布候选阶段验证。
 
 ## 性能基线
 

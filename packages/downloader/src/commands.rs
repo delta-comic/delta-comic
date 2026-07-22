@@ -72,13 +72,13 @@ pub(crate) async fn download_ephemeral(
 }
 
 #[cfg(target_os = "android")]
-async fn schedule_android(
-  app: &tauri::AppHandle,
+async fn schedule_android<R: tauri::Runtime>(
+  app: &tauri::AppHandle<R>,
   engine: &Engine,
   task: &DownloadTask,
 ) -> Result<()> {
   let settings = engine.repository.get_settings().await?;
-  let mobile = app.state::<crate::mobile::MobileDownloader<tauri::Wry>>();
+  let mobile = app.state::<crate::mobile::MobileDownloader<R>>();
   let allow_metered =
     crate::mobile_contract::android_task_allows_metered_network(&task.source, &settings);
   let notification_permission = mobile
@@ -178,9 +178,9 @@ pub(crate) async fn enqueue_url(
 
 #[cfg(target_os = "android")]
 #[tauri::command]
-pub(crate) async fn enqueue_url(
+pub(crate) async fn enqueue_url<R: tauri::Runtime>(
   engine: State<'_, Engine>,
-  app: tauri::AppHandle,
+  app: tauri::AppHandle<R>,
   input: EnqueueUrlInput,
 ) -> Result<DownloadTask> {
   let task = engine.enqueue_url(input).await?;
@@ -199,9 +199,9 @@ pub(crate) async fn enqueue_torrent(
 
 #[cfg(target_os = "android")]
 #[tauri::command]
-pub(crate) async fn enqueue_torrent(
+pub(crate) async fn enqueue_torrent<R: tauri::Runtime>(
   engine: State<'_, Engine>,
-  app: tauri::AppHandle,
+  app: tauri::AppHandle<R>,
   input: EnqueueTorrentInput,
 ) -> Result<DownloadTask> {
   let task = engine.enqueue_torrent(input).await?;
@@ -220,9 +220,9 @@ pub(crate) async fn enqueue_plan(
 
 #[cfg(target_os = "android")]
 #[tauri::command]
-pub(crate) async fn enqueue_plan(
+pub(crate) async fn enqueue_plan<R: tauri::Runtime>(
   engine: State<'_, Engine>,
-  app: tauri::AppHandle,
+  app: tauri::AppHandle<R>,
   input: EnqueuePlanInput,
 ) -> Result<Vec<DownloadTask>> {
   let tasks = engine.enqueue_plan(input).await?;
@@ -245,9 +245,9 @@ pub(crate) async fn resume_task(engine: State<'_, Engine>, id: String) -> Result
 
 #[cfg(target_os = "android")]
 #[tauri::command]
-pub(crate) async fn resume_task(
+pub(crate) async fn resume_task<R: tauri::Runtime>(
   engine: State<'_, Engine>,
-  app: tauri::AppHandle,
+  app: tauri::AppHandle<R>,
   id: String,
 ) -> Result<DownloadTask> {
   let task = engine.resume(&id).await?;
@@ -263,9 +263,9 @@ pub(crate) async fn retry_task(engine: State<'_, Engine>, id: String) -> Result<
 
 #[cfg(target_os = "android")]
 #[tauri::command]
-pub(crate) async fn retry_task(
+pub(crate) async fn retry_task<R: tauri::Runtime>(
   engine: State<'_, Engine>,
-  app: tauri::AppHandle,
+  app: tauri::AppHandle<R>,
   id: String,
 ) -> Result<DownloadTask> {
   let task = engine.retry(&id).await?;
@@ -418,9 +418,9 @@ pub(crate) async fn update_source(
 
 #[cfg(target_os = "android")]
 #[tauri::command]
-pub(crate) async fn update_source(
+pub(crate) async fn update_source<R: tauri::Runtime>(
   engine: State<'_, Engine>,
-  app: tauri::AppHandle,
+  app: tauri::AppHandle<R>,
   id: String,
   source: DownloadSource,
 ) -> Result<DownloadTask> {

@@ -28,7 +28,9 @@ queue scheduler ── SQLite repository (WAL)
 `.part` 文件，校验成功后再重命名。
 
 桌面默认目录是系统 Downloads；Android 默认目录是应用数据目录下的
-`downloads`。入队命令只接受已经登记的 destination ID 和经过清洗的相对路径。
+`downloads`。用户登记的 SAF provider 支持 seek 时，HTTP 分片直接写入持久化临时
+文档并在重启后续传；不支持 seek 时自动回退私有 staging 后导出。入队命令只接受已经
+登记的 destination ID 和经过清洗的相对路径。
 
 ## 接入
 

@@ -1,5 +1,6 @@
 use std::{
   collections::{BTreeMap, HashMap, HashSet},
+  fs::File,
   path::{Path, PathBuf},
   sync::Arc,
   time::Duration,
@@ -44,6 +45,13 @@ enum BackgroundClaim {
   Claimed(CancellationToken),
   Wait,
   Stopped,
+}
+
+#[cfg(any(target_os = "android", test))]
+#[derive(Clone)]
+pub(crate) struct DirectSafTarget {
+  pub file: Arc<File>,
+  pub document_uri: String,
 }
 
 #[derive(Clone)]
@@ -460,6 +468,7 @@ impl Engine {
     Ok(())
   }
 
+  #[cfg(not(target_os = "android"))]
   pub async fn delete_files(&self, id: &str) -> Result<()> {
     self
       .delete_files_with_external(id, |_destination, _export| Ok(()))
@@ -541,6 +550,29 @@ impl Engine {
   }
 
   #[cfg(any(target_os = "android", test))]
+  pub(crate) async fn resume_saf_commit(&self, id: &str) -> Result<()> {
+    if !self.repository.has_pending_saf_commit(id).await? {
+      return Err(Error::InvalidInput("SAF commit is not pending".into()));
+    }
+    let task = self
+      .repository
+      .get_task(id)
+      .await?
+      .ok_or_else(|| Error::NotFound(id.into()))?;
+    if task.status.is_active() {
+      return Ok(());
+    }
+    let verifying = self.repository.resume_pending_export(id).await?;
+    self.emit_task(verifying);
+    Ok(())
+  }
+
+  #[cfg(any(target_os = "android", test))]
+  pub(crate) async fn abandon_direct_saf_transfer(&self, id: &str) -> Result<()> {
+    self.repository.abandon_direct_saf_transfer(id).await
+  }
+
+  #[cfg(any(target_os = "android", test))]
   pub(crate) async fn fail_saf_export(&self, id: &str, message: &str) -> Result<()> {
     let failed = self.repository.fail_saf_export(id, message).await?;
     let attention = AttentionEvent {
@@ -612,6 +644,7 @@ impl Engine {
     }
   }
 
+  #[cfg(not(target_os = "android"))]
   async fn dispatch_loop(self) {
     #[cfg(not(target_os = "android"))]
     let mut next_network_reprobe = tokio::time::Instant::now() + NETWORK_REPROBE_INTERVAL;
@@ -685,13 +718,14 @@ impl Engine {
     }
   }
 
+  #[cfg(not(target_os = "android"))]
   async fn run_task(
     &self,
     task: DownloadTask,
     settings: DownloaderSettings,
     token: CancellationToken,
   ) {
-    let result = self.run_task_inner(&task, &settings, token).await;
+    let result = self.run_task_inner(&task, &settings, token, None).await;
     match result {
       Ok(()) => {
         if let Err(error) = self.complete_task_if_active(&task.id).await {
@@ -748,6 +782,29 @@ impl Engine {
 
   #[cfg(any(target_os = "android", test))]
   pub(crate) async fn run_task_now(&self, id: &str) -> Result<()> {
+    self.run_task_now_with_target(id, None).await
+  }
+
+  #[cfg(any(target_os = "android", test))]
+  pub(crate) async fn run_task_now_with_direct_saf(
+    &self,
+    id: &str,
+    target: DirectSafTarget,
+  ) -> Result<()> {
+    self
+      .repository
+      .begin_direct_saf_transfer(id, &target.document_uri)
+      .await?;
+    self.run_task_now_with_target(id, Some(target)).await
+  }
+
+  #[cfg(any(target_os = "android", test))]
+  async fn run_task_now_with_target(
+    &self,
+    id: &str,
+    direct_target: Option<DirectSafTarget>,
+  ) -> Result<()> {
+    let mut direct_abandoned = false;
     let stop_generation = self.background_stop_generation(id).await;
     self.prepare_background_task(id).await?;
     loop {
@@ -762,7 +819,13 @@ impl Engine {
       if !Self::should_wait_for_controlled_task(task.status) {
         return Err(Self::background_task_stopped(task.status));
       }
-      if let Some(export) = self.repository.pending_saf_export(id).await? {
+      if direct_target.is_none() && !direct_abandoned {
+        self.repository.abandon_direct_saf_transfer(id).await?;
+        direct_abandoned = true;
+      }
+      if direct_target.is_none()
+        && let Some(export) = self.repository.pending_saf_export(id).await?
+      {
         if tokio::fs::try_exists(&export.staging_path).await? {
           if task.status != TaskStatus::Verifying {
             let verifying = self.repository.resume_pending_export(id).await?;
@@ -791,7 +854,9 @@ impl Engine {
         }
       };
       settings.per_task_connections = per_task_connections;
-      let result = self.run_task_inner(&task, &settings, token).await;
+      let result = self
+        .run_task_inner(&task, &settings, token, direct_target.clone())
+        .await;
       let outcome = self.finish_task_now(id, result).await;
       self.controls.lock().await.remove(id);
       self.workers_changed.notify_waiters();
@@ -872,7 +937,15 @@ impl Engine {
   async fn finish_task_now(&self, id: &str, result: Result<()>) -> Result<()> {
     match result {
       Ok(()) => {
-        if self.repository.pending_saf_export(id).await?.is_some() {
+        if self.repository.has_pending_saf_commit(id).await? {
+          let current = self
+            .repository
+            .get_task(id)
+            .await?
+            .ok_or_else(|| Error::NotFound(id.into()))?;
+          if Self::should_preserve_external_status(current.status) {
+            return Err(Self::background_task_stopped(current.status));
+          }
           return Ok(());
         }
         if self.complete_task_if_active(id).await? {
@@ -935,6 +1008,8 @@ impl Engine {
     task: &DownloadTask,
     settings: &DownloaderSettings,
     token: CancellationToken,
+    #[cfg(any(target_os = "android", test))] direct_target: Option<DirectSafTarget>,
+    #[cfg(not(any(target_os = "android", test)))] _direct_target: Option<()>,
   ) -> Result<()> {
     if token.is_cancelled() {
       return Err(Error::Cancelled);
@@ -947,11 +1022,24 @@ impl Engine {
       .map(PathBuf::from)
       .ok_or_else(|| Error::InvalidInput("task has no destination path".into()))?;
     let temp_path = PathBuf::from(format!("{}.part", final_path.display()));
+    #[cfg(any(target_os = "android", test))]
+    let is_direct_saf = direct_target.is_some();
+    #[cfg(not(any(target_os = "android", test)))]
+    let is_direct_saf = false;
+    #[cfg(any(target_os = "android", test))]
+    let direct_file = direct_target.as_ref().map(|target| target.file.clone());
+    #[cfg(not(any(target_os = "android", test)))]
+    let direct_file: Option<Arc<File>> = None;
+    if is_direct_saf && !matches!(task.source, DownloadSource::Http(_)) {
+      return Err(Error::InvalidInput(
+        "direct SAF targets support HTTP tasks only".into(),
+      ));
+    }
     self
       .repository
       .set_paths(&task.id, &final_path, &temp_path)
       .await?;
-    if let Some(parent) = final_path.parent() {
+    if !is_direct_saf && let Some(parent) = final_path.parent() {
       tokio::fs::create_dir_all(parent).await?;
     }
 
@@ -967,6 +1055,7 @@ impl Engine {
               source,
               settings,
               temp_path: &temp_path,
+              target_file: direct_file.clone(),
               cancellation: token.clone(),
               secret_resolver: self.secret_resolver.as_deref(),
               maximum_bytes: None,
@@ -1079,17 +1168,35 @@ impl Engine {
     if let Some(checksum) = &task.checksum {
       let verifying = self.repository.begin_verification(&task.id).await?;
       self.emit_task(verifying);
-      let checksum_path = match &torrent_report {
-        Some(report) => report.checksum_path()?,
-        None => temp_path.as_path(),
-      };
-      checksum::verify(checksum_path, checksum).await?;
+      if let Some(file) = &direct_file {
+        checksum::verify_file(file, checksum).await?;
+      } else {
+        let checksum_path = match &torrent_report {
+          Some(report) => report.checksum_path()?,
+          None => temp_path.as_path(),
+        };
+        checksum::verify(checksum_path, checksum).await?;
+      }
     }
-    if matches!(task.source, DownloadSource::Http(_)) {
+    if matches!(task.source, DownloadSource::Http(_)) && !is_direct_saf {
       target_file::replace(&temp_path, &final_path).await?;
     }
     let destination = self.repository.destination(&task.destination_id).await?;
     if destination.kind == DestinationKind::AndroidSaf {
+      #[cfg(any(target_os = "android", test))]
+      if let Some(target) = direct_target {
+        target.file.sync_all()?;
+        self
+          .repository
+          .mark_direct_saf_ready(&task.id, &target.document_uri)
+          .await?;
+      } else {
+        self
+          .repository
+          .upsert_pending_saf_export(&task.id, &task.destination_id, &final_path)
+          .await?;
+      }
+      #[cfg(not(any(target_os = "android", test)))]
       self
         .repository
         .upsert_pending_saf_export(&task.id, &task.destination_id, &final_path)
@@ -1167,6 +1274,7 @@ async fn remove_path_if_exists(path: &Path) -> Result<()> {
 mod tests {
   use std::{
     collections::BTreeMap,
+    fs::OpenOptions,
     path::PathBuf,
     sync::{Arc, Mutex as StdMutex},
     time::Duration,
@@ -1176,7 +1284,7 @@ mod tests {
   use tokio::time::timeout;
   use tokio_util::sync::CancellationToken;
 
-  use super::{BackgroundClaim, Engine, EngineEvent};
+  use super::{BackgroundClaim, DirectSafTarget, Engine, EngineEvent};
   #[cfg(feature = "bittorrent")]
   use crate::domain::{Checksum, ChecksumAlgorithm};
   use crate::{
@@ -2113,6 +2221,7 @@ mod tests {
         &task,
         &engine.repository.get_settings().await.unwrap(),
         CancellationToken::new(),
+        None,
       )
       .await
       .unwrap();
@@ -2343,6 +2452,114 @@ mod tests {
       !tokio::fs::try_exists(engine.staging_root.join(&task.id))
         .await
         .unwrap()
+    );
+  }
+
+  #[tokio::test]
+  async fn direct_saf_transfer_persists_resume_identity_and_commit_state() {
+    let root = TempDir::new().unwrap();
+    let engine = engine(&root).await;
+    let destination = Destination {
+      id: "saf-direct".into(),
+      label: "Shared".into(),
+      kind: DestinationKind::AndroidSaf,
+      path: "content://provider/tree/primary%3ADownloads".into(),
+      is_default: false,
+    };
+    engine
+      .repository
+      .register_destination(&destination)
+      .await
+      .unwrap();
+    let mut direct_asset = asset("direct", "chapter.cbz", 4);
+    let DownloadSource::Http(source) = &mut direct_asset.source else {
+      unreachable!();
+    };
+    source.expires_at = Some(crate::persistence::now_millis() - 1);
+    let task = engine
+      .enqueue_plan(EnqueuePlanInput {
+        key: "direct-plan".into(),
+        title: "Direct".into(),
+        assets: vec![direct_asset],
+        destination_id: Some(destination.id.clone()),
+        priority: None,
+        refresh_context: None,
+      })
+      .await
+      .unwrap()
+      .remove(0);
+    let partial_path = root.path().join("provider-document");
+    let file = OpenOptions::new()
+      .create(true)
+      .truncate(false)
+      .read(true)
+      .write(true)
+      .open(&partial_path)
+      .unwrap();
+    let document_uri =
+      "content://provider/tree/primary%3ADownloads/document/primary%3ADownloads%2Fpartial";
+    let result = engine
+      .run_task_now_with_direct_saf(
+        &task.id,
+        DirectSafTarget {
+          file: Arc::new(file),
+          document_uri: document_uri.into(),
+        },
+      )
+      .await;
+    assert!(matches!(result, Err(Error::SourceExpired)));
+    assert_eq!(
+      engine
+        .repository
+        .saf_export_record(&task.id)
+        .await
+        .unwrap()
+        .unwrap()
+        .document_uri
+        .as_deref(),
+      Some(document_uri)
+    );
+
+    engine
+      .repository
+      .mark_direct_saf_ready(&task.id, document_uri)
+      .await
+      .unwrap();
+    assert!(engine.finish_task_now(&task.id, Ok(())).await.is_err());
+    assert_eq!(
+      engine
+        .repository
+        .get_task(&task.id)
+        .await
+        .unwrap()
+        .unwrap()
+        .status,
+      TaskStatus::WaitingForSource
+    );
+    engine
+      .repository
+      .set_status(&task.id, TaskStatus::Queued)
+      .await
+      .unwrap();
+    engine.resume_saf_commit(&task.id).await.unwrap();
+    assert_eq!(
+      engine
+        .repository
+        .get_task(&task.id)
+        .await
+        .unwrap()
+        .unwrap()
+        .status,
+      TaskStatus::Verifying
+    );
+    engine.abandon_direct_saf_transfer(&task.id).await.unwrap();
+    assert!(
+      engine
+        .repository
+        .saf_export_record(&task.id)
+        .await
+        .unwrap()
+        .is_none()
     );
   }
 
