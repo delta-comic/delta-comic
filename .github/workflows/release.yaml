@@ -43,9 +43,8 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
-      - name: Check
-        run: |
-          vp run lib-build
+      - name: Build workspace libraries
+        run: vp run lib-build
 
       - name: Resolve semantic release plan
         id: release-plan
@@ -81,6 +80,9 @@ jobs:
 
       - name: Synchronize build version
         run: node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
+
+      - name: Build workspace libraries
+        run: vp run lib-build
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -223,6 +225,9 @@ jobs:
 
       - name: Synchronize build version
         run: node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
+
+      - name: Build workspace libraries
+        run: vp run lib-build
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
