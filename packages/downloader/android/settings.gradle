@@ -1,0 +1,34 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            switch (requested.id.id) {
+                case 'com.android.library':
+                    useVersion('8.11.0')
+                    break
+                case 'org.jetbrains.kotlin.android':
+                    useVersion('1.9.25')
+                    break
+            }
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'tauri-plugin-downloader-android'
+
+include ':tauri-android'
+def tauriAndroidLibraryPath = providers.environmentVariable('TAURI_ANDROID_LIBRARY_PATH')
+    .getOrElse('./.tauri/tauri-api')
+project(':tauri-android').projectDir = new File(tauriAndroidLibraryPath)

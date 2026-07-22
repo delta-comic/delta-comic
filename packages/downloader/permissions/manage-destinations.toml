@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "manage-destinations"
+description = "Allows the host UI to open the native destination picker."
+commands.allow = ["pick_destination"]

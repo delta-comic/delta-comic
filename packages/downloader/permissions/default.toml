@@ -1,0 +1,26 @@
+"$schema" = "schemas/schema.json"
+
+[default]
+description = "Enables normal downloader queue, query, and control commands."
+permissions = [
+  "allow-cancel-task",
+  "allow-enqueue-plan",
+  "allow-enqueue-torrent",
+  "allow-enqueue-url",
+  "allow-download-ephemeral",
+  "allow-forget-task",
+  "allow-get-collections",
+  "allow-get-capabilities",
+  "allow-get-settings",
+  "allow-get-task",
+  "allow-get-task-detail",
+  "allow-list-destinations",
+  "allow-list-tasks",
+  "allow-move-queue",
+  "allow-pause-task",
+  "allow-resume-task",
+  "allow-retry-task",
+  "allow-set-priority",
+  "allow-update-settings",
+  "allow-update-source",
+]

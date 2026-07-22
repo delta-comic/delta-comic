@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-enqueue-torrent"
+description = "Enables the enqueue_torrent command without any pre-configured scope."
+commands.allow = ["enqueue_torrent"]
+
+[[permission]]
+identifier = "deny-enqueue-torrent"
+description = "Denies the enqueue_torrent command without any pre-configured scope."
+commands.deny = ["enqueue_torrent"]

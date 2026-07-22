@@ -1,0 +1,8 @@
+<resources>
+    <string name="download_destination_fallback">Selected folder</string>
+    <string name="download_channel_name">Downloads</string>
+    <string name="download_notification_title">Delta Comic</string>
+    <string name="download_notification_progress">Download in progress</string>
+    <string name="download_pause">Pause</string>
+    <string name="download_cancel">Cancel</string>
+</resources>

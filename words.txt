@@ -28,12 +28,14 @@ gradlew
 Hanime
 Hentai
 hoverable
+httpdate
 iarna
 jmcomic
 kysely
 Levelboard
 lhlyu
 libappindicator
+librqbit
 librsvg
 libwebkit
 lightningcss
@@ -68,6 +70,7 @@ Repobeats
 reqwest
 retriable
 retryable
+revisioned
 rlib
 rolldown
 Roundhand
@@ -90,6 +93,7 @@ topbar
 tsgo
 tsgolint
 typebox
+UIDT
 unplugin
 unlisten
 unstub

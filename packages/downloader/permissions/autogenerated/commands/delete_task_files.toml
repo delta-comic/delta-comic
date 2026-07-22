@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-delete-task-files"
+description = "Enables the delete_task_files command without any pre-configured scope."
+commands.allow = ["delete_task_files"]
+
+[[permission]]
+identifier = "deny-delete-task-files"
+description = "Denies the delete_task_files command without any pre-configured scope."
+commands.deny = ["delete_task_files"]

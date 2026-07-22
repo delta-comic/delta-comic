@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-retry-task"
+description = "Enables the retry_task command without any pre-configured scope."
+commands.allow = ["retry_task"]
+
+[[permission]]
+identifier = "deny-retry-task"
+description = "Denies the retry_task command without any pre-configured scope."
+commands.deny = ["retry_task"]

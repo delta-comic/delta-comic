@@ -1,6 +1,13 @@
 [workspace]
 resolver = "3"
-members = ["packages/app/src-tauri", "packages/db", "packages/plugin", "packages/utils"]
+members = [
+  "packages/app/src-tauri",
+  "packages/db",
+  "packages/downloader",
+  "packages/downloader/tools/performance-baseline",
+  "packages/plugin",
+  "packages/utils",
+]
 
 [workspace.package]
 authors = ["wenxig"]
@@ -27,6 +34,7 @@ tauri-plugin-better-cors-fetch = { version = "1.8.0", features = [
 ] }
 tauri-plugin-clipboard-manager = "2.3.2"
 tauri-plugin-db = { path = "packages/db" }
+tauri-plugin-downloader = { path = "packages/downloader" }
 tauri-plugin-fs = "2.5.1"
 tauri-plugin-log = { version = "2.8.0", features = ["colored"] }
 tauri-plugin-m3 = "0.3.1"

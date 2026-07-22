@@ -26,13 +26,14 @@ describe('ReleaseWorkspace', () => {
     expect(packages.map(pkg => pkg.name)).toEqual([
       '@delta-comic/model',
       '@delta-comic/db',
+      '@delta-comic/downloader',
       '@delta-comic/utils',
       '@delta-comic/ui',
       '@delta-comic/plugin',
     ])
     expect(packages.map(pkg => pkg.path).toSorted()).toEqual(
       jsonVersionPaths
-        .filter(path => /^packages\/(?:db|model|plugin|ui|utils)\//.test(path))
+        .filter(path => /^packages\/(?:db|downloader|model|plugin|ui|utils)\//.test(path))
         .toSorted(),
     )
   })

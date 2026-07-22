@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-set-priority"
+description = "Enables the set_priority command without any pre-configured scope."
+commands.allow = ["set_priority"]
+
+[[permission]]
+identifier = "deny-set-priority"
+description = "Denies the set_priority command without any pre-configured scope."
+commands.deny = ["set_priority"]

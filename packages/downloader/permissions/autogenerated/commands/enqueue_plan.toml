@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-enqueue-plan"
+description = "Enables the enqueue_plan command without any pre-configured scope."
+commands.allow = ["enqueue_plan"]
+
+[[permission]]
+identifier = "deny-enqueue-plan"
+description = "Denies the enqueue_plan command without any pre-configured scope."
+commands.deny = ["enqueue_plan"]

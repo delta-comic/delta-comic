@@ -1,0 +1,618 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PermissionFile",
+  "description": "Permission file that can define a default permission, a set of permissions or a list of inlined permissions.",
+  "type": "object",
+  "properties": {
+    "default": {
+      "description": "The default permission set for the plugin",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/DefaultPermission"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "set": {
+      "description": "A list of permissions sets defined",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PermissionSet"
+      }
+    },
+    "permission": {
+      "description": "A list of inlined permissions",
+      "default": [],
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Permission"
+      }
+    }
+  },
+  "definitions": {
+    "DefaultPermission": {
+      "description": "The default permission set of the plugin.\n\nWorks similarly to a permission with the \"default\" identifier.",
+      "type": "object",
+      "required": [
+        "permissions"
+      ],
+      "properties": {
+        "version": {
+          "description": "The version of the permission.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 1.0
+        },
+        "description": {
+          "description": "Human-readable description of what the permission does. Tauri convention is to use `<h4>` headings in markdown content for Tauri documentation generation purposes.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "permissions": {
+          "description": "All permissions this set contains.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "PermissionSet": {
+      "description": "A set of direct permissions grouped together under a new name.",
+      "type": "object",
+      "required": [
+        "description",
+        "identifier",
+        "permissions"
+      ],
+      "properties": {
+        "identifier": {
+          "description": "A unique identifier for the permission.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Human-readable description of what the permission does.",
+          "type": "string"
+        },
+        "permissions": {
+          "description": "All permissions this set contains.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PermissionKind"
+          }
+        }
+      }
+    },
+    "Permission": {
+      "description": "Descriptions of explicit privileges of commands.\n\nIt can enable commands to be accessible in the frontend of the application.\n\nIf the scope is defined it can be used to fine grain control the access of individual or multiple commands.",
+      "type": "object",
+      "required": [
+        "identifier"
+      ],
+      "properties": {
+        "version": {
+          "description": "The version of the permission.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 1.0
+        },
+        "identifier": {
+          "description": "A unique identifier for the permission.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Human-readable description of what the permission does. Tauri internal convention is to use `<h4>` headings in markdown content for Tauri documentation generation purposes.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "commands": {
+          "description": "Allowed or denied commands when using this permission.",
+          "default": {
+            "allow": [],
+            "deny": []
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/Commands"
+            }
+          ]
+        },
+        "scope": {
+          "description": "Allowed or denied scoped when using this permission.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Scopes"
+            }
+          ]
+        },
+        "platforms": {
+          "description": "Target platforms this permission applies. By default all platforms are affected by this permission.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/Target"
+          }
+        }
+      }
+    },
+    "Commands": {
+      "description": "Allowed and denied commands inside a permission.\n\nIf two commands clash inside of `allow` and `deny`, it should be denied by default.",
+      "type": "object",
+      "properties": {
+        "allow": {
+          "description": "Allowed command.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deny": {
+          "description": "Denied command, which takes priority.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Scopes": {
+      "description": "An argument for fine grained behavior control of Tauri commands.\n\nIt can be of any serde serializable type and is used to allow or prevent certain actions inside a Tauri command. The configured scope is passed to the command and will be enforced by the command implementation.\n\n## Example\n\n```json { \"allow\": [{ \"path\": \"$HOME/**\" }], \"deny\": [{ \"path\": \"$HOME/secret.txt\" }] } ```",
+      "type": "object",
+      "properties": {
+        "allow": {
+          "description": "Data that defines what is allowed by the scope.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        "deny": {
+          "description": "Data that defines what is denied by the scope. This should be prioritized by validation logic.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        }
+      }
+    },
+    "Value": {
+      "description": "All supported ACL values.",
+      "anyOf": [
+        {
+          "description": "Represents a null JSON value.",
+          "type": "null"
+        },
+        {
+          "description": "Represents a [`bool`].",
+          "type": "boolean"
+        },
+        {
+          "description": "Represents a valid ACL [`Number`].",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Number"
+            }
+          ]
+        },
+        {
+          "description": "Represents a [`String`].",
+          "type": "string"
+        },
+        {
+          "description": "Represents a list of other [`Value`]s.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        {
+          "description": "Represents a map of [`String`] keys to [`Value`]s.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Value"
+          }
+        }
+      ]
+    },
+    "Number": {
+      "description": "A valid ACL number.",
+      "anyOf": [
+        {
+          "description": "Represents an [`i64`].",
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "description": "Represents a [`f64`].",
+          "type": "number",
+          "format": "double"
+        }
+      ]
+    },
+    "Target": {
+      "description": "Platform target.",
+      "oneOf": [
+        {
+          "description": "MacOS.",
+          "type": "string",
+          "enum": [
+            "macOS"
+          ]
+        },
+        {
+          "description": "Windows.",
+          "type": "string",
+          "enum": [
+            "windows"
+          ]
+        },
+        {
+          "description": "Linux.",
+          "type": "string",
+          "enum": [
+            "linux"
+          ]
+        },
+        {
+          "description": "Android.",
+          "type": "string",
+          "enum": [
+            "android"
+          ]
+        },
+        {
+          "description": "iOS.",
+          "type": "string",
+          "enum": [
+            "iOS"
+          ]
+        }
+      ]
+    },
+    "PermissionKind": {
+      "type": "string",
+      "oneOf": [
+        {
+          "description": "Enables the cancel_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-cancel-task",
+          "markdownDescription": "Enables the cancel_task command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the cancel_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-cancel-task",
+          "markdownDescription": "Denies the cancel_task command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the delete_secret command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete-secret",
+          "markdownDescription": "Enables the delete_secret command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete_secret command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete-secret",
+          "markdownDescription": "Denies the delete_secret command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the delete_task_files command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete-task-files",
+          "markdownDescription": "Enables the delete_task_files command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete_task_files command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete-task-files",
+          "markdownDescription": "Denies the delete_task_files command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the download_ephemeral command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-download-ephemeral",
+          "markdownDescription": "Enables the download_ephemeral command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the download_ephemeral command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-download-ephemeral",
+          "markdownDescription": "Denies the download_ephemeral command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the enqueue_plan command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-enqueue-plan",
+          "markdownDescription": "Enables the enqueue_plan command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the enqueue_plan command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-enqueue-plan",
+          "markdownDescription": "Denies the enqueue_plan command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the enqueue_torrent command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-enqueue-torrent",
+          "markdownDescription": "Enables the enqueue_torrent command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the enqueue_torrent command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-enqueue-torrent",
+          "markdownDescription": "Denies the enqueue_torrent command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the enqueue_url command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-enqueue-url",
+          "markdownDescription": "Enables the enqueue_url command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the enqueue_url command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-enqueue-url",
+          "markdownDescription": "Denies the enqueue_url command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the forget_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-forget-task",
+          "markdownDescription": "Enables the forget_task command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the forget_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-forget-task",
+          "markdownDescription": "Denies the forget_task command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_capabilities command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-capabilities",
+          "markdownDescription": "Enables the get_capabilities command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_capabilities command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-capabilities",
+          "markdownDescription": "Denies the get_capabilities command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_collections command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-collections",
+          "markdownDescription": "Enables the get_collections command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_collections command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-collections",
+          "markdownDescription": "Denies the get_collections command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_settings command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-settings",
+          "markdownDescription": "Enables the get_settings command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_settings command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-settings",
+          "markdownDescription": "Denies the get_settings command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-task",
+          "markdownDescription": "Enables the get_task command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-task",
+          "markdownDescription": "Denies the get_task command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_task_detail command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-task-detail",
+          "markdownDescription": "Enables the get_task_detail command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_task_detail command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-task-detail",
+          "markdownDescription": "Denies the get_task_detail command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_destinations command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-destinations",
+          "markdownDescription": "Enables the list_destinations command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_destinations command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-destinations",
+          "markdownDescription": "Denies the list_destinations command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_tasks command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-tasks",
+          "markdownDescription": "Enables the list_tasks command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_tasks command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-tasks",
+          "markdownDescription": "Denies the list_tasks command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the move_queue command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-move-queue",
+          "markdownDescription": "Enables the move_queue command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the move_queue command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-move-queue",
+          "markdownDescription": "Denies the move_queue command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the pause_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-pause-task",
+          "markdownDescription": "Enables the pause_task command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the pause_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-pause-task",
+          "markdownDescription": "Denies the pause_task command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the pick_destination command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-pick-destination",
+          "markdownDescription": "Enables the pick_destination command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the pick_destination command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-pick-destination",
+          "markdownDescription": "Denies the pick_destination command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the resume_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-resume-task",
+          "markdownDescription": "Enables the resume_task command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the resume_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-resume-task",
+          "markdownDescription": "Denies the resume_task command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the retry_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-retry-task",
+          "markdownDescription": "Enables the retry_task command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the retry_task command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-retry-task",
+          "markdownDescription": "Denies the retry_task command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the set_priority command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-set-priority",
+          "markdownDescription": "Enables the set_priority command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the set_priority command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-set-priority",
+          "markdownDescription": "Denies the set_priority command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the store_secret command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-store-secret",
+          "markdownDescription": "Enables the store_secret command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the store_secret command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-store-secret",
+          "markdownDescription": "Denies the store_secret command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the update_settings command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-update-settings",
+          "markdownDescription": "Enables the update_settings command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the update_settings command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-update-settings",
+          "markdownDescription": "Denies the update_settings command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the update_source command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-update-source",
+          "markdownDescription": "Enables the update_source command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the update_source command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-update-source",
+          "markdownDescription": "Denies the update_source command without any pre-configured scope."
+        },
+        {
+          "description": "Enables normal downloader queue, query, and control commands.\n#### This default permission set includes:\n\n- `allow-cancel-task`\n- `allow-enqueue-plan`\n- `allow-enqueue-torrent`\n- `allow-enqueue-url`\n- `allow-download-ephemeral`\n- `allow-forget-task`\n- `allow-get-collections`\n- `allow-get-capabilities`\n- `allow-get-settings`\n- `allow-get-task`\n- `allow-get-task-detail`\n- `allow-list-destinations`\n- `allow-list-tasks`\n- `allow-move-queue`\n- `allow-pause-task`\n- `allow-resume-task`\n- `allow-retry-task`\n- `allow-set-priority`\n- `allow-update-settings`\n- `allow-update-source`",
+          "type": "string",
+          "const": "default",
+          "markdownDescription": "Enables normal downloader queue, query, and control commands.\n#### This default permission set includes:\n\n- `allow-cancel-task`\n- `allow-enqueue-plan`\n- `allow-enqueue-torrent`\n- `allow-enqueue-url`\n- `allow-download-ephemeral`\n- `allow-forget-task`\n- `allow-get-collections`\n- `allow-get-capabilities`\n- `allow-get-settings`\n- `allow-get-task`\n- `allow-get-task-detail`\n- `allow-list-destinations`\n- `allow-list-tasks`\n- `allow-move-queue`\n- `allow-pause-task`\n- `allow-resume-task`\n- `allow-retry-task`\n- `allow-set-priority`\n- `allow-update-settings`\n- `allow-update-source`"
+        },
+        {
+          "description": "Allows deleting files associated with a downloader task.",
+          "type": "string",
+          "const": "allow-delete-files",
+          "markdownDescription": "Allows deleting files associated with a downloader task."
+        },
+        {
+          "description": "Allows deleting secrets from the operating system credential store by opaque reference.",
+          "type": "string",
+          "const": "delete-secrets",
+          "markdownDescription": "Allows deleting secrets from the operating system credential store by opaque reference."
+        },
+        {
+          "description": "Allows the host UI to open the native destination picker.",
+          "type": "string",
+          "const": "manage-destinations",
+          "markdownDescription": "Allows the host UI to open the native destination picker."
+        },
+        {
+          "description": "Allows creating opaque references backed by the operating system credential store.",
+          "type": "string",
+          "const": "store-secrets",
+          "markdownDescription": "Allows creating opaque references backed by the operating system credential store."
+        }
+      ]
+    }
+  }
+}

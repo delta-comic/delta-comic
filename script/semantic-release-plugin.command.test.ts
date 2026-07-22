@@ -32,7 +32,7 @@ beforeEach(() => {
 
 describe('semantic-release command runner', () => {
   it('runs ordered package builds and recursive publish through inherited stdio', async () => {
-    mocks.statuses = [0, 0, 0, 0, 0, 0]
+    mocks.statuses = [0, 0, 0, 0, 0, 0, 0]
     const { publish } = await import('./semantic-release-plugin.mts')
 
     await publish({}, { env: {}, nextRelease: { version: '2.3.0' } })
@@ -44,7 +44,13 @@ describe('semantic-release command runner', () => {
       expect.objectContaining({ stdio: 'inherit' }),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      6,
+      3,
+      'vp',
+      ['run', '--filter', '@delta-comic/downloader', '--fail-if-no-match', 'build'],
+      expect.objectContaining({ stdio: 'inherit' }),
+    )
+    expect(mocks.spawn).toHaveBeenNthCalledWith(
+      7,
       'vp',
       ['pm', 'publish', '-r', '--no-git-checks', '--provenance', '--tag', 'latest'],
       expect.objectContaining({ stdio: 'inherit' }),

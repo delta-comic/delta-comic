@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-forget-task"
+description = "Enables the forget_task command without any pre-configured scope."
+commands.allow = ["forget_task"]
+
+[[permission]]
+identifier = "deny-forget-task"
+description = "Denies the forget_task command without any pre-configured scope."
+commands.deny = ["forget_task"]

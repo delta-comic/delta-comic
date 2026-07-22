@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-update-settings"
+description = "Enables the update_settings command without any pre-configured scope."
+commands.allow = ["update_settings"]
+
+[[permission]]
+identifier = "deny-update-settings"
+description = "Denies the update_settings command without any pre-configured scope."
+commands.deny = ["update_settings"]

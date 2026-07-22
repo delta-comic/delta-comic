@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "allow-delete-files"
+description = "Allows deleting files associated with a downloader task."
+commands.allow = ["delete_task_files"]

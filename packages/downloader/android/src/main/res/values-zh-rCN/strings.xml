@@ -1,0 +1,8 @@
+<resources>
+    <string name="download_destination_fallback">已选文件夹</string>
+    <string name="download_channel_name">下载</string>
+    <string name="download_notification_title">Delta Comic</string>
+    <string name="download_notification_progress">正在下载</string>
+    <string name="download_pause">暂停</string>
+    <string name="download_cancel">取消</string>
+</resources>

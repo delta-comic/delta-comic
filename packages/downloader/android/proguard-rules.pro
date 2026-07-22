@@ -1,0 +1,1 @@
+-keep class org.delta_comic.downloader.** { *; }
