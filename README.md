@@ -94,9 +94,9 @@ gh:delta-comic/delta-comic-plugin-cosav
 
 <a href="https://www.star-history.com/?repos=delta-comic%2Fdelta-comic&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&theme=dark&legend=top-left&sealed_token=x-IHSjGD7vCOI9zzr2qloazU_LXrCugkN_4gJvQMKSjgDg9FE3eaFI66SFACqWZvchb8br4BQj6RXH4HZXDxiu_oWeeqbNwpUnL83Jp8qP8y_vk2QKUbTQM3Bgo4rLb6mbpRA7FxollQvaEHV_VdB-xz-w_5fjheC9mWDjtFuAKSTznoiHkF91GSia01" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left&sealed_token=x-IHSjGD7vCOI9zzr2qloazU_LXrCugkN_4gJvQMKSjgDg9FE3eaFI66SFACqWZvchb8br4BQj6RXH4HZXDxiu_oWeeqbNwpUnL83Jp8qP8y_vk2QKUbTQM3Bgo4rLb6mbpRA7FxollQvaEHV_VdB-xz-w_5fjheC9mWDjtFuAKSTznoiHkF91GSia01" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left&sealed_token=x-IHSjGD7vCOI9zzr2qloazU_LXrCugkN_4gJvQMKSjgDg9FE3eaFI66SFACqWZvchb8br4BQj6RXH4HZXDxiu_oWeeqbNwpUnL83Jp8qP8y_vk2QKUbTQM3Bgo4rLb6mbpRA7FxollQvaEHV_VdB-xz-w_5fjheC9mWDjtFuAKSTznoiHkF91GSia01" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&theme=dark&legend=top-left&sealed_token=8PCtrXiRP9wJM66RfINprAim9FlJkf2gN7LKTuLB1F9N9moxOxCon5xxqyaufAoKtkViEw8XtJsGm_h6Kilx5p0-DlIHs3g0rM3e6myklWwEPYUb8B9Ul7Y05GRNi65AYqQMnpR-WvtogMZ2FespkVOHC890yKm40v4GQamhQiNdouaDMCwMWL38PgeN" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left&sealed_token=8PCtrXiRP9wJM66RfINprAim9FlJkf2gN7LKTuLB1F9N9moxOxCon5xxqyaufAoKtkViEw8XtJsGm_h6Kilx5p0-DlIHs3g0rM3e6myklWwEPYUb8B9Ul7Y05GRNi65AYqQMnpR-WvtogMZ2FespkVOHC890yKm40v4GQamhQiNdouaDMCwMWL38PgeN" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left&sealed_token=8PCtrXiRP9wJM66RfINprAim9FlJkf2gN7LKTuLB1F9N9moxOxCon5xxqyaufAoKtkViEw8XtJsGm_h6Kilx5p0-DlIHs3g0rM3e6myklWwEPYUb8B9Ul7Y05GRNi65AYqQMnpR-WvtogMZ2FespkVOHC890yKm40v4GQamhQiNdouaDMCwMWL38PgeN" />
  </picture>
 </a>
 
