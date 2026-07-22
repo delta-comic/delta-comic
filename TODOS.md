@@ -17,17 +17,17 @@
 - [ ] 创建一个新的子repo，名叫`downloader`，它是一个完整的tauri插件，用途是实现高性能的通用下载功能；代码实现可以参考<https://github.com/mpiton/vortex>这个下载器的实现，它与本项目都是tauri项目，技术上具有共同性；具体需求如下  
   **http下载使用`reqwest + tokio`；BitTorrent下载使用`librqbit`**  
   **特别的：对于给定range起始相应却违反的，顺从它，从它给的位置继续下载**  
-  - [ ] HTTP Range 并行分片
-  - [ ] 动态分片
-  - [ ] 慢尾重平衡
-  - [ ] 重启续传
-  - [ ] 下载队列和优先级
-  - [ ] 1–20 并发任务
-  - [ ] SHA-256/MD5 校验
-  - [ ] SQLite 持久化
-  - [ ] 增量下载
-  - [ ] BitTorrent
-  - [ ] 对于现有的插件系统，扩展download相关字段(如`uni.content.ContentPage`添加`downloadUrl: (signal: AbortSignal) => Promise<string>`(仅举例，不构成参考))之类的，其他的自行按需求规划补充，保证高度灵活性
-  - [ ] 下载管理面板，注意响应式设计  
+  - [x] HTTP Range 并行分片
+  - [x] 动态分片
+  - [x] 慢尾重平衡
+  - [x] 重启续传
+  - [x] 下载队列和优先级
+  - [x] 1–20 并发任务
+  - [x] SHA-256/MD5 校验
+  - [x] SQLite 持久化
+  - [x] 增量下载
+  - [x] BitTorrent
+  - [x] 对于现有的插件系统，扩展download相关字段(如`uni.content.ContentPage`添加`downloadUrl: (signal: AbortSignal) => Promise<string>`(仅举例，不构成参考))之类的，其他的自行按需求规划补充，保证高度灵活性
+  - [x] 下载管理面板，注意响应式设计
   注意：从新构建一个下载器插件**十分困难**，且它需要同时**兼容`android`和`macos`和`windows`平台**，如**android的网络生命周期和后台运行**仍需进一步处理；因此：你需要规划好一套**严密的高可扩展高可维护的架构**，同时还要保证**性能优良**。  
   我希望你的目标是构建一个**不输专业下载器**的下载系统，而不是凑合能用的残次品！
