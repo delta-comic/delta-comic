@@ -226,7 +226,9 @@ jobs:
         run: vp install --frozen-lockfile
 
       - name: Synchronize build version
-        run: node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
+        run: |
+          node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
+          vp run lib-build
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
