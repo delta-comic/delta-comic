@@ -20,6 +20,7 @@ const mocks = vi.hoisted(() => {
     levelboard: registry(),
     mainLists: registry(),
     pluginI18nRemove: vi.fn(),
+    pluginMarkUnloaded: vi.fn(),
     pluginStore: registry(),
     precedenceFork: registry(),
     processInstances: registry(),
@@ -85,7 +86,9 @@ vi.mock('@/global', () => ({
 }))
 vi.mock('@/i18n', () => ({ pluginI18n: { remove: mocks.pluginI18nRemove } }))
 vi.mock('./init/storage', () => ({ releasePluginObjectUrls: mocks.releaseObjectUrls }))
-vi.mock('./store', () => ({ usePluginStore: () => ({ plugins: mocks.pluginStore }) }))
+vi.mock('./store', () => ({
+  usePluginStore: () => ({ $markUnloaded: mocks.pluginMarkUnloaded, plugins: mocks.pluginStore }),
+}))
 
 import { cleanupPlugin } from './cleanup'
 
@@ -124,6 +127,7 @@ describe('plugin cleanup', () => {
 
     expect(mocks.globalRemoveOwned).toHaveBeenCalledExactlyOnceWith('fixture')
     expect(mocks.pluginI18nRemove).toHaveBeenCalledExactlyOnceWith('fixture')
+    expect(mocks.pluginMarkUnloaded).toHaveBeenCalledExactlyOnceWith('fixture')
     for (const map of [mocks.share, mocks.shareToken, mocks.subscribes, mocks.userActions]) {
       expect([...map.keys()]).toEqual(['other:preserved'])
     }
@@ -164,6 +168,7 @@ describe('plugin cleanup', () => {
     expect(caught).toBeInstanceOf(AggregateError)
     expect((caught as AggregateError).errors).toHaveLength(2)
     expect((caught as Error).message).toContain('fixture')
+    expect(mocks.pluginMarkUnloaded).toHaveBeenCalledExactlyOnceWith('fixture')
     for (const registry of [
       mocks.categories,
       mocks.barcode,

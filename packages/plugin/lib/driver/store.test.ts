@@ -1,5 +1,6 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { computed } from 'vue'
 
 const mocks = vi.hoisted(() => ({
   executeNames: vi.fn(async () => [] as { displayName: string; pluginName: string }[]),
@@ -45,6 +46,26 @@ beforeEach(() => {
 })
 
 describe('plugin store', () => {
+  it('tracks completed boot state reactively and invalidates it for reload and unload', () => {
+    const store = new PluginStore()
+    const isLoaded = computed(() => store.$isLoaded('fixture'))
+
+    expect(isLoaded.value).toBe(false)
+
+    store.plugins.set('fixture', { name: 'fixture' })
+    expect(isLoaded.value).toBe(false)
+
+    store.$markReady('fixture')
+    expect(isLoaded.value).toBe(true)
+
+    store.$markLoading('fixture')
+    expect(isLoaded.value).toBe(false)
+
+    store.$markReady('fixture')
+    store.$markUnloaded('fixture')
+    expect(isLoaded.value).toBe(false)
+  })
+
   it('refreshes display names atomically and falls back to the plugin key', async () => {
     const store = new PluginStore()
     mocks.executeNames.mockResolvedValueOnce([

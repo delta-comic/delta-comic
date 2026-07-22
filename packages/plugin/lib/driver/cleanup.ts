@@ -20,6 +20,7 @@ const removeSourcedEntries = (
 
 export const cleanupPlugin = (config: PluginConfig) => {
   const plugin = config.name
+  const pluginStore = usePluginStore()
   const errors: unknown[] = []
   const attempt = (action: () => void) => {
     try {
@@ -29,6 +30,9 @@ export const cleanupPlugin = (config: PluginConfig) => {
     }
   }
 
+  // Invalidate readiness before removing registrations so reactive consumers
+  // cannot reconstruct runtime-only classes from a plugin being unloaded.
+  attempt(() => pluginStore.$markUnloaded(plugin))
   attempt(() => Global.tabbar.delete(plugin))
   attempt(() => Global.categories.delete(plugin))
   attempt(() => Global.barcode.delete(plugin))
@@ -67,7 +71,7 @@ export const cleanupPlugin = (config: PluginConfig) => {
   for (const pointer of config.config ?? []) attempt(() => useConfig().$unregisterConfig(pointer))
 
   attempt(() => defaultDependencyRegistry.delete(declareDepType(plugin)))
-  attempt(() => usePluginStore().plugins.delete(plugin))
+  attempt(() => pluginStore.plugins.delete(plugin))
   attempt(() => releasePluginObjectUrls(plugin))
   if (typeof document !== 'undefined') {
     for (const node of document.querySelectorAll<HTMLStyleElement>('style[data-plugin]')) {
