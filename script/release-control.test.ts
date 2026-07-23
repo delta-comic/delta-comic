@@ -137,7 +137,7 @@ describe('semantic-release monorepo plugin', () => {
       writeOutput,
     })
     const context = {
-      env: { GITHUB_OUTPUT: '/tmp/output', NPM_TOKEN: 'secret' },
+      env: { GITHUB_OUTPUT: '/tmp/output', GITHUB_TOKEN: 'secret' },
       nextRelease: { version: '3.0.0' },
     }
 
@@ -186,12 +186,12 @@ describe('semantic-release monorepo plugin', () => {
     ])
   })
 
-  it('requires an npm token before publishing', async () => {
+  it('requires a GitHub token before publishing workspace packages', async () => {
     const plugin = createReleasePlugin({ resolvePublishablePackages })
 
     await expect(
       plugin.verifyConditions({}, { env: {}, nextRelease: { version: '3.0.0' } }),
-    ).rejects.toThrow('NPM_TOKEN is required')
+    ).rejects.toThrow('GITHUB_TOKEN is required')
     expect(resolvePublishablePackages).not.toHaveBeenCalled()
   })
 
