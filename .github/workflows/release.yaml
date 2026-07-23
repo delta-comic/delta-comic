@@ -117,6 +117,7 @@ jobs:
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> "$GITHUB_PATH"
           echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
+
           cd packages/app
           vp exec tauri android init
 
@@ -125,7 +126,7 @@ jobs:
 
       - name: Build Android App
         id: build
-        uses: tauri-apps/tauri-action@v1
+        uses: tauri-apps/tauri-action@dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
@@ -208,6 +209,7 @@ jobs:
           - platform: windows-latest
             args: ''
             rust-targets: ''
+
     runs-on: ${{ matrix.platform }}
     env:
       HUSKY: 0
@@ -246,7 +248,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           args: ${{ matrix.args }}
           projectPath: packages/app
