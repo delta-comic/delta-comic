@@ -22,6 +22,8 @@ describe('release channel configuration', () => {
     expect(workflow).toContain("if: github.ref_name == 'main' || github.ref_name == 'next'")
     expect(workflow).toContain('vp run --no-cache release:dry-run')
     expect(workflow).toContain('vp run --no-cache release')
+    expect(workflow).toContain('recover_withdrawn_2x')
+    expect(workflow).toContain('DELTA_RELEASE_RECOVERY: ${{ inputs.recover_withdrawn_2x')
     expect(workflow).not.toContain('[pub]')
     expect(workflow).not.toMatch(/branches:\n(?:\s+- .*\n)*\s+- 'develop'/)
   })
@@ -57,6 +59,9 @@ describe('release channel configuration', () => {
 
   it('commits version changes for newly added workspace manifests', () => {
     expect(versionAssetPaths).toContain('packages/*/package.json')
+    expect(
+      releaseConfig.plugins.map(plugin => (Array.isArray(plugin) ? plugin[0] : plugin)),
+    ).not.toContain('@semantic-release/git')
   })
 
   it('uses Chinese release names and complete Chinese changelog sections', () => {

@@ -2,11 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   error: undefined as Error | undefined,
+  execFile: vi.fn(),
   spawn: vi.fn(),
   statuses: [] as (number | null)[],
 }))
 
-vi.mock('node:child_process', () => ({ spawn: mocks.spawn }))
+vi.mock('node:child_process', () => ({ execFile: mocks.execFile, spawn: mocks.spawn }))
 
 beforeEach(() => {
   vi.clearAllMocks()

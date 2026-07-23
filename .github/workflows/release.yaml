@@ -6,6 +6,12 @@ on:
       - 'main'
       - 'next'
   workflow_dispatch:
+    inputs:
+      recover_withdrawn_2x:
+        description: '使用已撤回 2.0.0 的 semantic-release note 恢复 3.x 发布序列'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: read
@@ -26,6 +32,7 @@ jobs:
       has-release: ${{ steps.release-plan.outputs.has-release }}
       version: ${{ steps.release-plan.outputs.version }}
       channel: ${{ steps.release-plan.outputs.channel }}
+      recovery-required: ${{ steps.release-plan.outputs.recovery-required }}
     env:
       HUSKY: 0
     steps:
@@ -52,6 +59,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          DELTA_RELEASE_RECOVERY: ${{ inputs.recover_withdrawn_2x && 'withdrawn-2x' || '' }}
         run: vp run --no-cache release:dry-run
 
       - name: Synchronize release build version
@@ -81,8 +89,14 @@ jobs:
           retention-days: 1
 
       - name: No release required
-        if: steps.release-plan.outputs.has-release != 'true'
+        if:
+          steps.release-plan.outputs.has-release != 'true' &&
+          steps.release-plan.outputs.recovery-required != 'true'
         run: echo 'No releasable Conventional Commit was found.'
+
+      - name: Recovery required
+        if: steps.release-plan.outputs.recovery-required == 'true'
+        run: echo 'Run this workflow manually with recover_withdrawn_2x enabled.'
 
   android:
     needs: plan
@@ -338,4 +352,5 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+          DELTA_RELEASE_RECOVERY: ${{ inputs.recover_withdrawn_2x && 'withdrawn-2x' || '' }}
         run: vp run --no-cache release

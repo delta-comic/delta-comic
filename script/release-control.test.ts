@@ -4,11 +4,6 @@ import { join } from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  readCurrentVersion,
-  ReleaseHistoryBootstrap,
-  type GitRunner,
-} from './bootstrap-release-history.mts'
 import type { PublishableWorkspacePackage } from './release-workspace.mts'
 import {
   createReleasePlugin,
@@ -118,42 +113,6 @@ describe('VersionSynchronizer', () => {
   })
 })
 
-describe('ReleaseHistoryBootstrap', () => {
-  it('creates the missing current-version tag at the migration parent', async () => {
-    const calls: string[][] = []
-    const git = vi.fn<GitRunner>(async (args, options) => {
-      calls.push(args)
-      if (options?.allowFailure) return { status: 1, stdout: '' }
-      if (args[0] === 'log') return { status: 0, stdout: 'migration-sha\n' }
-      return { status: 0, stdout: '' }
-    })
-
-    await expect(new ReleaseHistoryBootstrap(git).ensureBaseline('2.3.0')).resolves.toBe(true)
-    expect(calls.at(-1)).toEqual(['tag', '--no-sign', '2.3.0', 'migration-sha^'])
-  })
-
-  it('does not replace an existing release tag', async () => {
-    const git = vi.fn<GitRunner>(async () => ({ status: 0, stdout: 'tag-sha\n' }))
-    await expect(new ReleaseHistoryBootstrap(git).ensureBaseline('2.3.0')).resolves.toBe(false)
-    expect(git).toHaveBeenCalledOnce()
-  })
-
-  it('reports when the configured migration file cannot be found', async () => {
-    const git = vi.fn<GitRunner>(async args => ({
-      status: args[0] === 'rev-parse' ? 1 : 0,
-      stdout: '',
-    }))
-
-    await expect(
-      new ReleaseHistoryBootstrap(git, 'missing.config.mjs').ensureBaseline('2.3.0'),
-    ).rejects.toThrow('Unable to locate the commit that added missing.config.mjs')
-  })
-
-  it('reads the current workspace version from the root manifest', async () => {
-    await expect(readCurrentVersion()).resolves.toBe('2.3.0')
-  })
-})
-
 describe('semantic-release monorepo plugin', () => {
   it('maps stable and preview channels to safe npm dist-tags', () => {
     expect(resolveDistTag()).toBe('latest')
@@ -163,11 +122,17 @@ describe('semantic-release monorepo plugin', () => {
 
   it('reports and prepares the version calculated by semantic-release', async () => {
     const synchronizeVersion = vi.fn<(version: string) => Promise<void>>().mockResolvedValue()
+    const cleanPendingRelease = vi.fn<(version: string) => Promise<void>>().mockResolvedValue()
+    const removeEphemeralTag = vi
+      .fn<(env: NodeJS.ProcessEnv) => Promise<void>>()
+      .mockResolvedValue()
     const writeOutput = vi
       .fn<(path: string, contents: string) => Promise<void>>()
       .mockResolvedValue()
     const plugin = createReleasePlugin({
       resolvePublishablePackages,
+      cleanPendingRelease,
+      removeEphemeralTag,
       synchronizeVersion,
       writeOutput,
     })
@@ -185,6 +150,8 @@ describe('semantic-release monorepo plugin', () => {
       'has-release=true\nversion=3.0.0\nchannel=latest\n',
     )
     expect(synchronizeVersion).toHaveBeenCalledWith('3.0.0')
+    expect(removeEphemeralTag).toHaveBeenCalledWith(context.env)
+    expect(cleanPendingRelease).toHaveBeenCalledWith('3.0.0')
   })
 
   it('builds every publishable package in dependency order before recursively publishing', async () => {
@@ -280,5 +247,25 @@ describe('semantic-release monorepo plugin', () => {
     await expect(
       plugin.generateNotes({}, { env: {}, nextRelease: { version: '3.1.0' } }),
     ).resolves.toBe('')
+  })
+
+  it('commits prepared versions only after publishing succeeds', async () => {
+    const commitPreparedRelease = vi.fn().mockResolvedValue(undefined)
+    const plugin = createReleasePlugin({ commitPreparedRelease, resolvePublishablePackages })
+
+    await plugin.success(
+      {},
+      {
+        branch: { name: 'next' },
+        env: {},
+        nextRelease: { channel: 'next', notes: 'release notes', version: '3.0.0-next.2' },
+      },
+    )
+
+    expect(commitPreparedRelease).toHaveBeenCalledExactlyOnceWith(
+      '3.0.0-next.2',
+      'release notes',
+      'next',
+    )
   })
 })

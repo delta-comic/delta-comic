@@ -6,8 +6,6 @@ import {
   releaseNotePresetConfig,
   releaseNoteWriterOptions,
 } from './script/release-notes.mts'
-import { versionAssetPaths } from './script/set-version.mts'
-
 export const releaseBranches = ['main', { name: 'next', channel: 'next', prerelease: 'next' }]
 
 export default {
@@ -26,13 +24,6 @@ export default {
       },
     ],
     ['@semantic-release/changelog', { changelogFile: 'CHANGELOG.md' }],
-    [
-      '@semantic-release/git',
-      {
-        assets: ['CHANGELOG.md', ...versionAssetPaths],
-        message: 'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
-      },
-    ],
     [
       '@semantic-release/github',
       { assets: ['dist/release/**/*'], releaseNameTemplate: createReleaseNameTemplate() },
