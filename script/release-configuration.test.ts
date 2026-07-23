@@ -7,6 +7,7 @@ import releaseConfig, { releaseBranches } from '../release.config.ts'
 
 import { releaseNoteTypes } from './release-notes.mts'
 import { rootDir, versionAssetPaths } from './set-version.mts'
+import { toWindowsMsiVersion } from './windows-msi-version.mts'
 
 describe('release channel configuration', () => {
   it('maps main to stable releases and next to next prereleases', () => {
@@ -31,9 +32,22 @@ describe('release channel configuration', () => {
     expect(workflow.match(/run: vp run lib-build/g)).toHaveLength(2)
     expect(workflow).toContain('name: workspace-libraries')
     expect(workflow.match(/name: Download workspace libraries/g)).toHaveLength(2)
+    expect(workflow).toContain('uses: pnpm/action-setup@v4')
     expect(workflow).toContain('pnpm tauri android init --ci --skip-targets-install')
     expect(workflow).toContain('pnpm tauri android build --ci --target aarch64 armv7')
     expect(workflow).not.toContain('uses: tauri-apps/tauri-action@dev')
+  })
+
+  it('maps semantic prereleases to ordered numeric Windows MSI versions', async () => {
+    const workflow = await readFile(join(rootDir, '.github/workflows/release.yaml'), 'utf-8')
+
+    expect(toWindowsMsiVersion('3.0.0-next.1')).toBe('3.0.0.1')
+    expect(toWindowsMsiVersion('3.0.0')).toBe('3.0.0.65535')
+    expect(() => toWindowsMsiVersion('256.0.0')).toThrow('exceeds its limit')
+    expect(() => toWindowsMsiVersion('3.0.0-next')).toThrow('numeric final identifier')
+    expect(workflow).toContain(
+      'node ./script/windows-msi-version.mts "${{ needs.plan.outputs.version }}"',
+    )
   })
 
   it('does not cache package scripts with external side effects', async () => {
