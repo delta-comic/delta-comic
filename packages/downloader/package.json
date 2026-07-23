@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/downloader",
-  "version": "2.3.0",
+  "version": "3.0.0-next.1",
   "description": "Delta Comic high-performance native download manager",
   "homepage": "https://github.com/delta-comic/delta-comic",
   "license": "AGPL-3.0-only",
