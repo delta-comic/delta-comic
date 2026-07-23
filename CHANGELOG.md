@@ -1,6 +1,6 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
-## [3.0.0-next.1](https://github.com/delta-comic/delta-comic/compare/2.3.0...3.0.0-next.1) (2026-07-23)
+## [3.0.0-next.1](https://github.com/delta-comic/delta-comic/compare/2.0.0...3.0.0-next.1) (2026-07-23)
 
 # delta-comic
 
