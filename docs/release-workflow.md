@@ -41,7 +41,7 @@ vp run --no-cache release:stable
 
 仓库配置已关闭 Vite+ package script 缓存，命令仍显式保留 `--no-cache`，避免未来配置变化或命令行覆盖导致副作用命令只重放旧输出。命令会拒绝脏工作区；本地源分支或目标分支只要含有尚未同步到远端的提交，也会停止。晋级使用普通合并保留分支历史，不会 force push。若合并发生冲突，命令会停留在目标分支，由维护者检查、解决并自行继续推送。
 
-正式版 CI 完成后，将 semantic-release 写入 `main` 的版本和 changelog 合并回开发线：
+semantic-release 会先完成 tag、npm 包和 GitHub Release，再将版本与 changelog 提交回发布分支。正式版 CI 完成后，将该提交从 `main` 合并回开发线：
 
 ```sh
 vp run --no-cache branch:develop
@@ -52,5 +52,11 @@ vp run --no-cache branch:develop
 ## 手动重跑与保护规则
 
 GitHub Actions 的“构建和发布”工作流可以手动运行，但必须在分支选择器中选择 `main` 或 `next`；选择 `develop` 时发布任务会跳过。重复运行不会强制产生版本，没有新的可发布提交时会安全结束。
+
+### 2.x 撤回后的 3.x 恢复
+
+已撤回的 `2.x` tag 不会重新推送，也不能复用这些版本号。仓库保留的 `semantic-release-2.0.0` git note 指向原始发布提交；在首个 `3.x` 预览版和正式版发布时，维护者需要手动运行“构建和发布”，勾选 `recover_withdrawn_2x`。恢复过程只在 runner 本地临时创建 `2.0.0` 版本下限，并在 semantic-release 推送前删除它，因此远端只会收到真实的 `3.x` tag。
+
+未勾选恢复选项时，工作流会安全结束并提示需要恢复，不会错误地复用 `2.x`。首个 `3.x` tag 建立后，后续发布恢复为普通自动流程。发布前会拒绝任何本地存在但远端不存在的非恢复 tag，避免再次发生全量 tag 推送污染。
 
 建议在 GitHub 中保护三个长期分支：禁止 force push 和删除；`main` 只接受来自 `next` 的晋级，`next` 只接受来自 `develop` 的晋级；必须通过现有检查后才能合并。仓库保护属于 GitHub 管理配置，不由本地脚本修改。
