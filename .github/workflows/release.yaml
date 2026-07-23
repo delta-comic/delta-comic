@@ -104,6 +104,9 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
+      - name: Setup pnpm for Android Tauri lifecycle
+        uses: pnpm/action-setup@v4
+
       - name: Synchronize build version
         run: node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
 
@@ -254,6 +257,10 @@ jobs:
 
       - name: Synchronize build version
         run: node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
+
+      - name: Configure Windows MSI version
+        if: matrix.platform == 'windows-latest'
+        run: node ./script/windows-msi-version.mts "${{ needs.plan.outputs.version }}"
 
       - name: Download workspace libraries
         uses: actions/download-artifact@v7
