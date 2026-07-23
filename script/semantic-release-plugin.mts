@@ -99,7 +99,9 @@ export function createReleasePlugin({
 }: ReleasePluginDependencies = {}) {
   return {
     async verifyConditions(_pluginConfig: unknown, { env }: ReleaseContext) {
-      if (!env.NPM_TOKEN) throw new Error('NPM_TOKEN is required to publish workspace packages')
+      if (!env.GITHUB_TOKEN) {
+        throw new Error('GITHUB_TOKEN is required to publish workspace packages')
+      }
       await resolvePublishablePackages()
     },
 

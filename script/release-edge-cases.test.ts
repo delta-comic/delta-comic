@@ -121,7 +121,7 @@ describe('semantic-release default output writer', () => {
     await plugin.verifyRelease(
       {},
       {
-        env: { GITHUB_OUTPUT: outputPath, NPM_TOKEN: 'secret' },
+        env: { GITHUB_OUTPUT: outputPath, GITHUB_TOKEN: 'secret' },
         nextRelease: { version: '4.0.0' },
       },
     )
