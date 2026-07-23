@@ -25,6 +25,17 @@ describe('release channel configuration', () => {
     expect(workflow).not.toMatch(/branches:\n(?:\s+- .*\n)*\s+- 'develop'/)
   })
 
+  it('reuses Linux-built libraries and keeps Android on a replayable CLI command', async () => {
+    const workflow = await readFile(join(rootDir, '.github/workflows/release.yaml'), 'utf-8')
+
+    expect(workflow.match(/run: vp run lib-build/g)).toHaveLength(2)
+    expect(workflow).toContain('name: workspace-libraries')
+    expect(workflow.match(/name: Download workspace libraries/g)).toHaveLength(2)
+    expect(workflow).toContain('pnpm tauri android init --ci --skip-targets-install')
+    expect(workflow).toContain('pnpm tauri android build --ci --target aarch64 armv7')
+    expect(workflow).not.toContain('uses: tauri-apps/tauri-action@dev')
+  })
+
   it('does not cache package scripts with external side effects', async () => {
     const viteConfig = await readFile(join(rootDir, 'vite.config.ts'), 'utf-8')
     expect(viteConfig).toContain('run: { cache: { tasks: true, scripts: false } }')

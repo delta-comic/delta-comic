@@ -54,6 +54,32 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: vp run --no-cache release:dry-run
 
+      - name: Synchronize release build version
+        if: steps.release-plan.outputs.has-release == 'true'
+        run: node ./script/set-version.mts "${{ steps.release-plan.outputs.version }}"
+
+      - name: Build release workspace libraries
+        if: steps.release-plan.outputs.has-release == 'true'
+        run: vp run lib-build
+
+      - name: Upload workspace libraries
+        if: steps.release-plan.outputs.has-release == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: workspace-libraries
+          path: |
+            packages/app/public/runtime
+            packages/db/dist
+            packages/downloader/dist
+            packages/logger/dist
+            packages/model/dist
+            packages/plugin/dist
+            packages/ui/dist
+            packages/ui/dist-vite
+            packages/utils/dist
+          if-no-files-found: error
+          retention-days: 1
+
       - name: No release required
         if: steps.release-plan.outputs.has-release != 'true'
         run: echo 'No releasable Conventional Commit was found.'
@@ -81,8 +107,11 @@ jobs:
       - name: Synchronize build version
         run: node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
 
-      - name: Build workspace libraries
-        run: vp run lib-build
+      - name: Download workspace libraries
+        uses: actions/download-artifact@v7
+        with:
+          name: workspace-libraries
+          path: packages
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -119,23 +148,20 @@ jobs:
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
 
           cd packages/app
-          vp exec tauri android init
+          pnpm tauri android init --ci --skip-targets-install
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./packages/app/src-tauri/gen/android/gradlew
 
       - name: Build Android App
         id: build
-        uses: tauri-apps/tauri-action@dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        with:
-          mobile: 'android'
-          args: ''
-          retryAttempts: 0
-          projectPath: packages/app
+        run: |
+          cd packages/app
+          pnpm tauri android build --ci --target aarch64 armv7
 
       - name: Restore Android keystore
         env:
@@ -227,9 +253,13 @@ jobs:
         run: vp install --frozen-lockfile
 
       - name: Synchronize build version
-        run: |
-          node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
-          vp run lib-build
+        run: node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
+
+      - name: Download workspace libraries
+        uses: actions/download-artifact@v7
+        with:
+          name: workspace-libraries
+          path: packages
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
