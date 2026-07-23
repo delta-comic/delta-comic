@@ -118,14 +118,14 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
           cd packages/app
-          node ./node_modules/@tauri-apps/cli/tauri.js android init
+          vp exec tauri android init
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./packages/app/src-tauri/gen/android/gradlew
 
       - name: Build Android App
         id: build
-        uses: tauri-apps/tauri-action@dev
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}

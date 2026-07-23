@@ -1,8 +1,9 @@
 @layer theme, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/preflight.css' layer(base);
-@import 'tailwindcss/utilities.css' layer(utilities);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
 @plugin 'tailwindcss-safe-area-capacitor';
+@source './';
 @source inline("dc-hairline dc-hairline-surround dc-hairline-top dc-hairline-bottom dc-hairline-left dc-hairline-right dc-hairline-top-bottom");
 
 :root,
