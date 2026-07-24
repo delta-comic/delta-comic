@@ -1,7 +1,6 @@
 use std::{fmt, sync::Once};
 
 use tracing::{Event, Subscriber, field::Visit};
-use tracing_log::LogTracer;
 use tracing_subscriber::{
   EnvFilter, Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt,
 };
@@ -18,9 +17,6 @@ pub(crate) struct TracingBridge {
 
 impl TracingBridge {
   pub(crate) fn install(handle: LoggerHandle) -> Result<()> {
-    if let Err(error) = LogTracer::init() {
-      eprintln!("logger could not install the log-to-tracing bridge: {error}");
-    }
     let filter = build_filter();
     tracing_subscriber::registry()
       .with(filter)
