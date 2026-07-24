@@ -71,9 +71,6 @@ workspace = true
 [dependencies.tauri-plugin-utils]
 workspace = true
 
-[dependencies.tokio]
-workspace = true
-
 [dependencies.tracing]
 workspace = true
 

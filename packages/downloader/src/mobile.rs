@@ -249,7 +249,7 @@ impl<R: Runtime> MobileDownloader<R> {
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_initializeCredentialContext(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_initializeCredentialContext(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   context: JObject<'_>,
@@ -265,7 +265,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_initializeC
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_runTask(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_runTask(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -311,7 +311,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_runTask(
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_getSafDirectInstruction(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_getSafDirectInstruction(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -348,7 +348,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_getSafDirec
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_rememberDirectSaf(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_rememberDirectSaf(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -378,7 +378,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_rememberDir
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_runTaskDirectSaf(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_runTaskDirectSaf(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -431,7 +431,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_runTaskDire
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_abandonDirectSaf(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_abandonDirectSaf(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -453,7 +453,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_abandonDire
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_resumeSafCommit(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_resumeSafCommit(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -475,7 +475,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_resumeSafCo
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_getSafExportInstruction(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_getSafExportInstruction(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -510,7 +510,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_getSafExpor
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_completeSafExport(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_completeSafExport(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -536,7 +536,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_completeSaf
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_failSafExport(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_failSafExport(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -558,7 +558,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_failSafExpo
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_pauseTask(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_pauseTask(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -576,7 +576,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_pauseTask(
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_cancelTask(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_cancelTask(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -594,7 +594,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_cancelTask(
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_checkpointTask(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_checkpointTask(
   _env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   _task_id: JString<'_>,
@@ -608,7 +608,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_checkpointT
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_systemStopTask(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_systemStopTask(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
@@ -626,7 +626,7 @@ pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_systemStopT
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_org_delta_1comic_downloader_NativeBridge_bootstrap(
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_bootstrap(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,
   database_path: JString<'_>,

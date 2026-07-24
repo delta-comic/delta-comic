@@ -49,9 +49,8 @@ fn setup_download_tray(app: &mut tauri::App) -> tauri::Result<()> {
   Ok(())
 }
 
-#[tokio::main]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub async fn run() {
+pub fn run() {
   let builder = tauri_plugin_utils::init(
     tauri::Builder::default()
       .plugin(tauri_plugin_logger::init())
@@ -64,9 +63,13 @@ pub async fn run() {
     .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_persisted_scope::init())
     .plugin(tauri_plugin_plugin::init())
-    .plugin(tauri_plugin_aptabase::Builder::new("A-US-9793062880").build());
-  let builder = builder.plugin(tauri_plugin_downloader::init());
+    .plugin(tauri_plugin_downloader::init());
   let builder = tauri_plugin_db::init(builder).setup(|app| {
+    let handle = app.handle().clone();
+    tauri::async_runtime::block_on(async move {
+      handle.plugin(tauri_plugin_aptabase::Builder::new("A-US-9793062880").build())
+    })?;
+
     tracing::info!(target: "app::lifecycle", "application bootstrap started");
     let logo = r#"
 _____   _________________ ____        __________________ _____   ______
