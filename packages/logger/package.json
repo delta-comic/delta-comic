@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/logger",
-  "version": "3.0.0-next.1",
+  "version": "3.0.0-next.2",
   "description": "Delta Comic 的跨 Web 与 Tauri 统一日志 SDK。",
   "homepage": "https://github.com/delta-comic/delta-comic",
   "license": "AGPL-3.0-only",
