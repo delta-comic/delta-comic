@@ -16,7 +16,7 @@ edition = "2024"
 license = "AGPL-3.0-only"
 repository = "https://github.com/delta-comic/delta-comic"
 rust-version = "1.94.0"
-version = "3.0.0-next.1"
+version = "3.0.0-next.2"
 
 [workspace.dependencies]
 log = "0.4.32"
