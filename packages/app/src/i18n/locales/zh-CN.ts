@@ -267,7 +267,7 @@ const zhCN = {
       },
       feedback: { alreadyUpdating: '插件已在更新' },
       incompatible: '插件不支持当前核心版本',
-      kind: { builtInPrefix: '内置 · ', normal: '普通', preboot: '预启动' },
+      kind: { builtInPrefix: '内置', normal: '普通', preboot: '预启动' },
       prebootRestartNotice: '预启动类型和启用状态将在下次重启时应用',
       status: { disabled: '未启用', enabled: '已启用' },
       supportCore: '支持的核心版本：{version}',

@@ -129,24 +129,14 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
                 size="small"
               />
               <span class="dc-ellipsis">
+                <span class="mr-0.5 font-thin italic">{{
+                  isBuiltIn(plugin) ? t('plugin.list.kind.builtInPrefix') : ''
+                }}</span>
                 {{ translatePluginText(plugin.meta.name.display ?? plugin.pluginName) }}
               </span>
             </div>
           </template>
           <template #header-extra>
-            <!-- n-base-select-menu__empty -->
-            <NTag
-              class="ml-2"
-              size="small"
-              :type="plugin.meta.kind === 'preboot' ? 'warning' : 'default'"
-            >
-              {{ isBuiltIn(plugin) ? t('plugin.list.kind.builtInPrefix') : ''
-              }}{{
-                plugin.meta.kind === 'preboot'
-                  ? t('plugin.list.kind.preboot')
-                  : t('plugin.list.kind.normal')
-              }}
-            </NTag>
             <span class="ml-2 font-light text-(--nui-text-color-3) italic">
               {{
                 plugin.enable ? t('plugin.list.status.enabled') : t('plugin.list.status.disabled')
@@ -178,7 +168,7 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
           </div>
           <div
             v-if="plugin.meta.kind === 'preboot'"
-            class="mt-1 text-xs text-(--nui-warning-color)"
+            class="mb-1 text-xs text-(--nui-warning-color)"
           >
             {{ t('plugin.list.prebootRestartNotice') }}
           </div>
