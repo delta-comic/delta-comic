@@ -17,7 +17,7 @@ vi.mock('@tauri-apps/api/window', () => ({
   getCurrentWindow: () => ({ label: 'main', setFocus, show: showMain }),
 }))
 
-import { initializeSplashEntry, MAIN_ENTRY_READY_MESSAGE, revealMainEntry } from './entry'
+import { initializeSplashEntry, revealMainEntry } from './entry'
 
 describe('startup entries', () => {
   beforeEach(() => {
@@ -38,29 +38,12 @@ describe('startup entries', () => {
     document.body.innerHTML = ''
   })
 
-  it('mounts the main web entry in a top-level iframe and waits for its ready signal', async () => {
-    const setFrameSource = vi
-      .spyOn(HTMLIFrameElement.prototype, 'src', 'set')
-      .mockImplementation(() => undefined)
+  it('redirects the web splash entry to the complete main entry', async () => {
+    const replace = vi.spyOn(location, 'replace').mockImplementation(() => undefined)
+
     await initializeSplashEntry()
 
-    const frame = document.querySelector<HTMLIFrameElement>('#main-entry')
-    expect(frame?.hidden).toBe(false)
-    expect(setFrameSource).toHaveBeenCalledExactlyOnceWith(
-      new URL('main.html', document.baseURI).href,
-    )
-    expect(frame?.dataset.ready).toBeUndefined()
-
-    window.dispatchEvent(
-      new MessageEvent('message', {
-        data: MAIN_ENTRY_READY_MESSAGE,
-        origin: location.origin,
-        source: frame?.contentWindow,
-      }),
-    )
-
-    expect(frame?.dataset.ready).toBe('true')
-    expect(document.querySelector('#splash')?.getAttribute('aria-busy')).toBe('false')
+    expect(replace).toHaveBeenCalledExactlyOnceWith(new URL('main.html', document.baseURI).href)
   })
 
   it('keeps the native splash window lightweight when multiple windows are supported', async () => {
@@ -69,7 +52,7 @@ describe('startup entries', () => {
 
     await initializeSplashEntry()
 
-    expect(document.querySelector<HTMLIFrameElement>('#main-entry')?.src).toBe('')
+    expect(location.href).not.toBe(new URL('main.html', document.baseURI).href)
   })
 
   it('reveals the native main window before closing the splash window', async () => {

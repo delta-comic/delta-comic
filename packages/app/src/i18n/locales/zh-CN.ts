@@ -265,6 +265,7 @@ const zhCN = {
         setPreboot: '设为预启动插件',
         updateFromSource: '从下载源更新',
       },
+      empty: { action: '前往市场', description: '暂未安装插件' },
       feedback: { alreadyUpdating: '插件已在更新' },
       incompatible: '插件不支持当前核心版本',
       kind: { builtInPrefix: '内置', normal: '普通', preboot: '预启动' },

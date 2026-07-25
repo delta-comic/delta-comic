@@ -11,25 +11,8 @@ export const initializeSplashEntry = async () => {
     return
   }
 
-  const frame = document.querySelector<HTMLIFrameElement>('#main-entry')
-  if (!frame) throw new Error('Missing main entry iframe')
-
-  const handleMessage = (event: MessageEvent) => {
-    if (
-      event.origin !== location.origin ||
-      event.source !== frame.contentWindow ||
-      event.data !== MAIN_ENTRY_READY_MESSAGE
-    )
-      return
-
-    frame.dataset.ready = 'true'
-    document.querySelector('#splash')?.setAttribute('aria-busy', 'false')
-    window.removeEventListener('message', handleMessage)
-  }
-
-  window.addEventListener('message', handleMessage)
-  frame.src = resolveMainEntryUrl()
-  frame.hidden = false
+  // The web build has no native main window, so it must load the complete app entry itself.
+  location.replace(resolveMainEntryUrl())
 }
 
 export const revealMainEntry = async () => {

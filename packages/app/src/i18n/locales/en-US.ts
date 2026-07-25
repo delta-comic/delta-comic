@@ -297,6 +297,7 @@ const enUS = {
         setPreboot: 'Set as preboot plugin',
         updateFromSource: 'Update from install source',
       },
+      empty: { action: 'Browse marketplace', description: 'No plugins are installed yet' },
       feedback: { alreadyUpdating: 'This plugin is already updating' },
       incompatible: 'This plugin does not support the current core version',
       kind: { builtInPrefix: 'Built-in · ', normal: 'Normal', preboot: 'Preboot' },

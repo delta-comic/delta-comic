@@ -7,6 +7,7 @@ import type { DropdownOption } from 'naive-ui'
 import semver from 'semver'
 import { shallowReactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import { Icons } from '@/icons'
@@ -17,6 +18,8 @@ const pluginListLogger = logger.scoped('app:plugin-list')
 
 const updating = shallowReactive(new Set<string>())
 const { t } = useI18n()
+const router = useRouter()
+const openMarketplace = () => router.force.replace({ name: '/main/plugin/shop' })
 const updatePlugin = async (plugin: PluginArchiveDB.Archive) => {
   if (updating.has(plugin.pluginName)) throw new Error(t('plugin.list.feedback.alreadyUpdating'))
   updating.add(plugin.pluginName)
@@ -111,6 +114,17 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
     v-slot="{ data: query }"
   >
     <NScrollbar class="size-full">
+      <NEmpty
+        v-if="query?.length === 0"
+        :description="t('plugin.list.empty.description')"
+        class="pt-20"
+      >
+        <template #extra>
+          <NButton type="primary" @click="openMarketplace">
+            {{ t('plugin.list.empty.action') }}
+          </NButton>
+        </template>
+      </NEmpty>
       <TransitionGroup tag="ul" name="list">
         <NCard
           v-for="plugin of query"
