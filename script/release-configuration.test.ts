@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest'
 
 import releaseConfig, { releaseBranches } from '../release.config.ts'
 
-import { releaseNoteTypes } from './release-notes.mts'
 import { rootDir, versionAssetPaths } from './set-version.mts'
 import { toWindowsMsiVersion } from './windows-msi-version.mts'
 
@@ -64,21 +63,8 @@ describe('release channel configuration', () => {
     ).not.toContain('@semantic-release/git')
   })
 
-  it('uses Chinese release names and complete Chinese changelog sections', () => {
-    expect(releaseNoteTypes.map(type => type.section)).toEqual([
-      '新功能',
-      '新功能',
-      '问题修复',
-      '性能优化',
-      '代码重构',
-      '文档更新',
-      '构建系统',
-      '持续集成',
-      '测试',
-      '代码样式',
-      '变更回退',
-      '其他变更',
-    ])
+  it('uses the built-in Angular changelog preset and Chinese release names', () => {
+    expect(JSON.stringify(releaseConfig.plugins)).toContain('"preset":"angular"')
     expect(JSON.stringify(releaseConfig.plugins)).toContain('releaseNameTemplate')
     expect(JSON.stringify(releaseConfig.plugins)).toContain('预览版')
     expect(JSON.stringify(releaseConfig.plugins)).toContain('正式版')
