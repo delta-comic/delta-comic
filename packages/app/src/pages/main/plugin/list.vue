@@ -7,6 +7,7 @@ import type { DropdownOption } from 'naive-ui'
 import semver from 'semver'
 import { shallowReactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import { Icons } from '@/icons'
@@ -17,6 +18,8 @@ const pluginListLogger = logger.scoped('app:plugin-list')
 
 const updating = shallowReactive(new Set<string>())
 const { t } = useI18n()
+const router = useRouter()
+const openMarketplace = () => router.force.replace({ name: '/main/plugin/shop' })
 const updatePlugin = async (plugin: PluginArchiveDB.Archive) => {
   if (updating.has(plugin.pluginName)) throw new Error(t('plugin.list.feedback.alreadyUpdating'))
   updating.add(plugin.pluginName)
@@ -111,6 +114,17 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
     v-slot="{ data: query }"
   >
     <NScrollbar class="size-full">
+      <NEmpty
+        v-if="query?.length === 0"
+        :description="t('plugin.list.empty.description')"
+        class="pt-20"
+      >
+        <template #extra>
+          <NButton type="primary" @click="openMarketplace">
+            {{ t('plugin.list.empty.action') }}
+          </NButton>
+        </template>
+      </NEmpty>
       <TransitionGroup tag="ul" name="list">
         <NCard
           v-for="plugin of query"
@@ -129,24 +143,14 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
                 size="small"
               />
               <span class="dc-ellipsis">
+                <span class="mr-0.5 font-thin italic">{{
+                  isBuiltIn(plugin) ? t('plugin.list.kind.builtInPrefix') : ''
+                }}</span>
                 {{ translatePluginText(plugin.meta.name.display ?? plugin.pluginName) }}
               </span>
             </div>
           </template>
           <template #header-extra>
-            <!-- n-base-select-menu__empty -->
-            <NTag
-              class="ml-2"
-              size="small"
-              :type="plugin.meta.kind === 'preboot' ? 'warning' : 'default'"
-            >
-              {{ isBuiltIn(plugin) ? t('plugin.list.kind.builtInPrefix') : ''
-              }}{{
-                plugin.meta.kind === 'preboot'
-                  ? t('plugin.list.kind.preboot')
-                  : t('plugin.list.kind.normal')
-              }}
-            </NTag>
             <span class="ml-2 font-light text-(--nui-text-color-3) italic">
               {{
                 plugin.enable ? t('plugin.list.status.enabled') : t('plugin.list.status.disabled')
@@ -178,7 +182,7 @@ const handleAction = async (plugin: PluginArchiveDB.Archive, key: string) => {
           </div>
           <div
             v-if="plugin.meta.kind === 'preboot'"
-            class="mt-1 text-xs text-(--nui-warning-color)"
+            class="mb-1 text-xs text-(--nui-warning-color)"
           >
             {{ t('plugin.list.prebootRestartNotice') }}
           </div>

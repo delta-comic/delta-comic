@@ -42,16 +42,16 @@ const pluginPages = computed(
         comp: List,
       },
       {
-        label: t('plugin.menu.install'),
-        key: 'download',
-        icon: renderIcon(Icons.material.FileDownloadOutlined),
-        comp: Download,
-      },
-      {
         label: t('plugin.menu.market'),
         key: 'shop',
         icon: renderIcon(Icons.material.ShoppingBagOutlined),
         comp: Shop,
+      },
+      {
+        label: t('plugin.menu.install'),
+        key: 'download',
+        icon: renderIcon(Icons.material.FileDownloadOutlined),
+        comp: Download,
       },
       {
         label: t('plugin.menu.config'),

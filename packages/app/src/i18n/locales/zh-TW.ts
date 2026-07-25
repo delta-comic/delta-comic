@@ -270,6 +270,7 @@ const zhTW = {
         setPreboot: '設為預啟動外掛',
         updateFromSource: '從安裝來源更新',
       },
+      empty: { action: '前往市集', description: '尚未安裝外掛' },
       feedback: { alreadyUpdating: '此外掛已在更新中' },
       incompatible: '此外掛不支援目前的核心版本',
       kind: { builtInPrefix: '內建 · ', normal: '一般', preboot: '預啟動' },

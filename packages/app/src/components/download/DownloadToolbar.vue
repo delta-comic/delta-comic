@@ -21,7 +21,7 @@ const filterOptions = computed(() => [
 </script>
 
 <template>
-  <div class="border-b border-(--dc-border) bg-(--dc-surface) px-3 py-3 md:px-4">
+  <div class="border-b border-dc-border bg-dc-surface px-3 py-3 md:px-4">
     <div class="mx-auto flex max-w-7xl flex-col gap-3">
       <div class="flex flex-wrap items-center gap-2">
         <NInput
@@ -42,7 +42,7 @@ const filterOptions = computed(() => [
           {{ t('download.actions.settings') }}
         </NButton>
       </div>
-      <div class="flex flex-wrap gap-x-5 gap-y-1 text-xs text-(--dc-text-secondary)">
+      <div class="flex flex-wrap gap-x-5 gap-y-1 text-xs text-dc-text-secondary">
         <span>{{ t('download.stats.active', { count: activeCount }) }}</span>
         <span>{{ t('download.stats.speed', { speed: `${formatBytes(speed)}/s` }) }}</span>
       </div>

@@ -69,7 +69,7 @@ onMounted(async () => {
   <AnimatePresence>
     <motion.div
       @click="showContent = true"
-      class="fixed bottom-10 flex -translate-x-1/2 dc-interactive items-center justify-center overflow-hidden rounded-xl bg-(--p-color) shadow-2xl! transition-opacity"
+      class="fixed bottom-10 flex -translate-x-1/2 dc-interactive items-center justify-center overflow-hidden rounded-xl bg-dc-primary shadow-2xl! transition-opacity"
       :initial="{ width: '40px', height: '40px', left: '50%', translateY: '150px' }"
       v-if="!isBooted"
       :exit="{ width: '40px', height: '40px', left: '50%', translateY: '150px' }"
