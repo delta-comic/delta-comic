@@ -14,7 +14,7 @@ release note 与 changelog 使用 semantic-release 内置的 Angular preset 和�
 
 发布 npm workspace 时，脚本会从 `packages/*/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。因此 `@delta-comic/db`、`@delta-comic/model`、`@delta-comic/plugin`、`@delta-comic/ui` 和 `@delta-comic/utils` 会随每次版本一起发布；新增公共 workspace 包也会自动纳入，配置不完整时发布会提前失败。
 
-workspace 包发布到 GitHub Packages，CI 使用当前工作流的短期 `GITHUB_TOKEN` 和 `packages: write` 权限认证，不依赖长期个人访问令牌。
+workspace 包会同时发布到 npmjs 和 GitHub Packages。发布脚本会显式覆盖 `.npmrc` 中的 scope registry，避免两个目标互相干扰；递归发布会跳过目标 registry 中已经存在的版本，因此任一 registry 短暂失败后可以安全重跑。CI 使用 `NPM_TOKEN` 发布 npmjs，并使用当前工作流的短期 `GITHUB_TOKEN` 和 `packages: write` 权限发布 GitHub Packages。
 
 ## 首次建立分支
 

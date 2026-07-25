@@ -137,7 +137,7 @@ describe('semantic-release monorepo plugin', () => {
       writeOutput,
     })
     const context = {
-      env: { GITHUB_OUTPUT: '/tmp/output', GITHUB_TOKEN: 'secret' },
+      env: { GITHUB_OUTPUT: '/tmp/output', GITHUB_TOKEN: 'github-secret', NPM_TOKEN: 'npm-secret' },
       nextRelease: { version: '3.0.0' },
     }
 
@@ -154,7 +154,7 @@ describe('semantic-release monorepo plugin', () => {
     expect(cleanPendingRelease).toHaveBeenCalledWith('3.0.0')
   })
 
-  it('builds every publishable package in dependency order before recursively publishing', async () => {
+  it('builds every publishable package before publishing to npm and GitHub Packages', async () => {
     const publishCommand = vi.fn<CommandRunner>().mockResolvedValue()
     const plugin = createReleasePlugin({ publishCommand, resolvePublishablePackages })
     await plugin.publish({}, { env: {}, nextRelease: { version: '3.0.0' } })
@@ -162,7 +162,36 @@ describe('semantic-release monorepo plugin', () => {
     expect(publishCommand.mock.calls).toEqual([
       ['vp', ['run', '--filter', '@delta-comic/model', '--fail-if-no-match', 'build']],
       ['vp', ['run', '--filter', '@delta-comic/ui', '--fail-if-no-match', 'build']],
-      ['vp', ['pm', 'publish', '-r', '--no-git-checks', '--provenance', '--tag', 'latest']],
+      [
+        'vp',
+        [
+          'pm',
+          'publish',
+          '-r',
+          '--no-git-checks',
+          '--provenance',
+          '--tag',
+          'latest',
+          '--',
+          '--registry=https://registry.npmjs.org/',
+          '--config.@delta-comic:registry=https://registry.npmjs.org/',
+        ],
+      ],
+      [
+        'vp',
+        [
+          'pm',
+          'publish',
+          '-r',
+          '--no-git-checks',
+          '--provenance',
+          '--tag',
+          'latest',
+          '--',
+          '--registry=https://npm.pkg.github.com/',
+          '--config.@delta-comic:registry=https://npm.pkg.github.com/',
+        ],
+      ],
     ])
   })
 
@@ -175,6 +204,18 @@ describe('semantic-release monorepo plugin', () => {
     })
     await plugin.publish({}, { env: {}, nextRelease: { channel: 'next', version: '3.1.0-next.1' } })
 
+    expect(publishCommand).toHaveBeenNthCalledWith(3, 'vp', [
+      'pm',
+      'publish',
+      '-r',
+      '--no-git-checks',
+      '--provenance',
+      '--tag',
+      'next',
+      '--',
+      '--registry=https://registry.npmjs.org/',
+      '--config.@delta-comic:registry=https://registry.npmjs.org/',
+    ])
     expect(publishCommand).toHaveBeenLastCalledWith('vp', [
       'pm',
       'publish',
@@ -183,15 +224,24 @@ describe('semantic-release monorepo plugin', () => {
       '--provenance',
       '--tag',
       'next',
+      '--',
+      '--registry=https://npm.pkg.github.com/',
+      '--config.@delta-comic:registry=https://npm.pkg.github.com/',
     ])
   })
 
-  it('requires a GitHub token before publishing workspace packages', async () => {
+  it('requires both registry tokens before publishing workspace packages', async () => {
     const plugin = createReleasePlugin({ resolvePublishablePackages })
 
     await expect(
       plugin.verifyConditions({}, { env: {}, nextRelease: { version: '3.0.0' } }),
     ).rejects.toThrow('GITHUB_TOKEN is required')
+    await expect(
+      plugin.verifyConditions(
+        {},
+        { env: { GITHUB_TOKEN: 'secret' }, nextRelease: { version: '3.0.0' } },
+      ),
+    ).rejects.toThrow('NPM_TOKEN is required')
     expect(resolvePublishablePackages).not.toHaveBeenCalled()
   })
 
