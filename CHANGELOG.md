@@ -1,10 +1,130 @@
-**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
-
-## [3.0.0-next.2](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.1...3.0.0-next.2) (2026-07-24)
+<!-- cspell:ignore avator cmdline premote wiew tabbar -->
 
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
-## [3.0.0-next.1](https://github.com/delta-comic/delta-comic/compare/2.0.0...3.0.0-next.1) (2026-07-23)
+# [3.0.0-next.2](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.1...3.0.0-next.2) (2026-07-24)
+
+
+### Bug Fixes
+
+* **app:** 修复移动端插件初始化失败 ([1144c0c](https://github.com/delta-comic/delta-comic/commit/1144c0cf548c0bcdc03ec247240a8df1e5eac1ff))
+* **downloader:** 修正 Android JNI 导出包名 ([1b2a536](https://github.com/delta-comic/delta-comic/commit/1b2a536524a37097ca57ad4e071e6ddaccc5f8cd))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
+# [3.0.0-next.1](https://github.com/delta-comic/delta-comic/compare/1.3.0...3.0.0-next.1) (2026-07-23)
+
+
+* feat(release)!: 切换至 semantic-release 发布链路 ([a4b6d1d](https://github.com/delta-comic/delta-comic/commit/a4b6d1d50b619c3ad40c16ffc81999f1a5818551))
+
+
+### Bug Fixes
+
+* **app:** remove final legacy component reference ([a76d96d](https://github.com/delta-comic/delta-comic/commit/a76d96d84b5d558d3061dc4aee5469db1554ea5c))
+* **app:** 完善收藏夹路由与全屏搜索 ([d2cabd0](https://github.com/delta-comic/delta-comic/commit/d2cabd033fabe637416ede28104e78379777649e))
+* **app:** 恢复原生开发热更新 ([f03d563](https://github.com/delta-comic/delta-comic/commit/f03d5630a65d85a07618f2f3ece19c5b227e0cbd))
+* **build:** 兼容 Rust 严格 Clippy 检查 ([760f18d](https://github.com/delta-comic/delta-comic/commit/760f18dea6407d180a20b409ed4a12699a891198))
+* **ci:** lockfile no sync ([ab85f6d](https://github.com/delta-comic/delta-comic/commit/ab85f6d003cef7948765f03cee9f96bd3caa6482))
+* **ci:** 尝试修复ci检查问题 ([83e4c26](https://github.com/delta-comic/delta-comic/commit/83e4c26df99027fbb1a679ce1c99a8ed685bdd39))
+* colada实例随调用初始化 ([8fa7928](https://github.com/delta-comic/delta-comic/commit/8fa79285fd60451c40381948d640b23343f6a722))
+* core的类型问题 ([55cec3d](https://github.com/delta-comic/delta-comic/commit/55cec3d903bf0f14f1f6d6c953212fb0daf92758))
+* **db:** 避免配置水合触发重复写入 ([8977535](https://github.com/delta-comic/delta-comic/commit/8977535bda71daefb0a9f2be4a5ed26c63a1afbe))
+* **docs:** 修复文档图标 ([dde680d](https://github.com/delta-comic/delta-comic/commit/dde680dcc0c46acbce14fb81b03589310c5de939))
+* **downloader:** 限定凭据服务常量的平台范围 ([21f4be7](https://github.com/delta-comic/delta-comic/commit/21f4be7877b7ce2eabed3c6a516819facc6cce45))
+* image重试逻辑 ([3832e1a](https://github.com/delta-comic/delta-comic/commit/3832e1a4e4def829216c6dec95da91a1e005533c))
+* lint ([447e648](https://github.com/delta-comic/delta-comic/commit/447e64838017c5f5ca6bd147a41e8816fd903278))
+* **plugin:** 校验下载运行时插件代次 ([7490668](https://github.com/delta-comic/delta-comic/commit/7490668f41e55765ca783fadb64cdc6a8b45c201))
+* **plugin:** 阻止共享运行时子路径绕过外部化 ([2f6bcf3](https://github.com/delta-comic/delta-comic/commit/2f6bcf39ea29f7410a63baf69927ed569110bbe8))
+* **release:** 使用工作流令牌发布软件包 ([5f41517](https://github.com/delta-comic/delta-comic/commit/5f415171c5228aceedb9cfe1124f87eaf7d14727))
+* **release:** 修复撤回版本的发布恢复流程 ([d5ca405](https://github.com/delta-comic/delta-comic/commit/d5ca405e55a7cd0c35962b15414eeec6cdff86a8))
+* remove NPM_TOKEN env var from .npmrc to avoid local warnings ([4b891ec](https://github.com/delta-comic/delta-comic/commit/4b891ec13767cbb10ca6447d111f3f6080ac3623))
+* **settings:** 补充日志阅读器关闭操作 ([6735f49](https://github.com/delta-comic/delta-comic/commit/6735f49923b3207c8622c2c72c4a0808f9762fbd))
+* tw-merge类型意外泄漏 ([2edfb5e](https://github.com/delta-comic/delta-comic/commit/2edfb5e747ce6867b4b1c1e9a935dc13e737945f))
+* type ([7a20220](https://github.com/delta-comic/delta-comic/commit/7a202201e5e9f6b745bf33a6a9a21fc7c2594ba6))
+* **ui:** 修复组件展示所需的属性契约 ([8d18255](https://github.com/delta-comic/delta-comic/commit/8d18255e1b664f2c2510e1ea093d69c3b40ee8fe))
+* **ui:** 修复返回拦截问题 ([8d4c2ab](https://github.com/delta-comic/delta-comic/commit/8d4c2ab2d911362b1eb418f77cff6d9888896121))
+* **ui:** 对齐桌面文档布局 ([b31f689](https://github.com/delta-comic/delta-comic/commit/b31f689e0136c6aec67becf09818bbf59922ab1f))
+* ui库类型错误 ([7ff0f01](https://github.com/delta-comic/delta-comic/commit/7ff0f01bd6b50310a2a791a8eced226634067f71))
+* ui构建失败 ([cb3f669](https://github.com/delta-comic/delta-comic/commit/cb3f66917f8f9bc18f252955b671aca85645355d))
+* ui构建类型错误问题 ([93cf4a0](https://github.com/delta-comic/delta-comic/commit/93cf4a0c5f147322827f458bb7793b80f4a38079))
+* update不接受预版本更新 [pub][only-lib] ([d225f6b](https://github.com/delta-comic/delta-comic/commit/d225f6b19d4fdf2359d921be83622cc8fea8f70f))
+* **utils:** 修复了由pinia导致的temp卡死问题 ([#36](https://github.com/delta-comic/delta-comic/issues/36)) ([1cdbbcc](https://github.com/delta-comic/delta-comic/commit/1cdbbcca9948503d01f968cc26af8bd9721a8daa))
+* 修复list表现效果 ([49b5c08](https://github.com/delta-comic/delta-comic/commit/49b5c083b3391574da3f0e1033747b8dc0ba8140))
+* 修复peer依赖混乱 ([5ebfe49](https://github.com/delta-comic/delta-comic/commit/5ebfe49326f01726e40395b22eda9caf73a05096))
+* 修复了循环依赖(plugin,db,ui) ([1b828f2](https://github.com/delta-comic/delta-comic/commit/1b828f2ca78c989e874bf7fd4a981db8bdf69b8e))
+* 修复了暗色模式问题 ([371f3c5](https://github.com/delta-comic/delta-comic/commit/371f3c5b562523b4125dd540c3ba308b9bd3781a))
+* 修复了样式检查 ([fcff6ed](https://github.com/delta-comic/delta-comic/commit/fcff6ed11496b07129dd3c69b38fb5344f00146f))
+* 修复了网络错误 ([3725028](https://github.com/delta-comic/delta-comic/commit/3725028ef39597165b0d31cb244ae8b107e2137e))
+* 修复数据库初始同步失效问题 ([f3545ad](https://github.com/delta-comic/delta-comic/commit/f3545ad8710297c710432f91b3cfcbcb0a97cbf5))
+* 构建使用官方 [pub] ([cf0d1ab](https://github.com/delta-comic/delta-comic/commit/cf0d1abc1db9fe4b3f30217444eec6a0d4b632ce))
+* 构建流程sdk无法找到 [pub] ([ac33a33](https://github.com/delta-comic/delta-comic/commit/ac33a330c97f39fd49a0640fda68c54531b607e5))
+* 路由类型修正 ([da05971](https://github.com/delta-comic/delta-comic/commit/da059719c960fb5a9dc9be81bdd571319b435437))
+
+
+### Features
+
+* add GitHub Packages publish workflow and CLI commands ([f787c9f](https://github.com/delta-comic/delta-comic/commit/f787c9fe79cefef5ad24d8c92303cb0963c646b0))
+* **app:** add web runtime and responsive plugin lifecycle ([ad7f845](https://github.com/delta-comic/delta-comic/commit/ad7f8459d2ee2cd7d01808e76383d60c872c080d))
+* **app:** remember plugin startup and add i18n ([7125627](https://github.com/delta-comic/delta-comic/commit/71256272f4840d17f9253aee609252d345e50cfc))
+* **app:** 使用预构建 UMD 共享宿主运行时 ([2c0a2ce](https://github.com/delta-comic/delta-comic/commit/2c0a2ce07e7f76540420c657d915f856a6c31f24))
+* **app:** 修复收藏夹路由并添加列表视图 ([85fb269](https://github.com/delta-comic/delta-comic/commit/85fb269211200955e549dfa0af949c78d78076b6))
+* **app:** 实现分页插件市场 ([ef7d507](https://github.com/delta-comic/delta-comic/commit/ef7d5076d4babcda551d7f671a328775a043f4a9))
+* **app:** 实现响应式下载管理面板 ([8a3fd46](https://github.com/delta-comic/delta-comic/commit/8a3fd462ed1fb69f586228c5198374696ba770ff))
+* **app:** 接入下载器原生生命周期 ([ef2e832](https://github.com/delta-comic/delta-comic/commit/ef2e832ba20e789eb7f175b861ab724894882f12))
+* **app:** 添加等待插件预启动的开屏界面 ([0f41b12](https://github.com/delta-comic/delta-comic/commit/0f41b12433533cbf1a839950c3d7e3a4185eb25b))
+* **app:** 重构多入口开屏与原生启动流程 ([de4cd8a](https://github.com/delta-comic/delta-comic/commit/de4cd8abcc74a83243faba511dc2a02e5324d399))
+* **app:** 重现主界面底部导航 ([7f7672f](https://github.com/delta-comic/delta-comic/commit/7f7672ff9de97f387d823ff22c02f0de83cde96e))
+* **db,app:** 使用`@pinia/colada`重构数据库的响应式系统 ([f6fd159](https://github.com/delta-comic/delta-comic/commit/f6fd159213953b292568d1d1c33cc3f951098ccb))
+* **db:** persist native and config stores in sqlite ([#40](https://github.com/delta-comic/delta-comic/issues/40)) ([e49eda6](https://github.com/delta-comic/delta-comic/commit/e49eda67bdc7c16d5172a7668667d066f6ea61c7))
+* **downloader:** 将 BT peer 纳入全局连接预算 ([888a1ff](https://github.com/delta-comic/delta-comic/commit/888a1ff0b97202d0419dc9732f76bb16c1579141))
+* **downloader:** 搭建专业下载器插件与持久化内核 ([3c1a778](https://github.com/delta-comic/delta-comic/commit/3c1a778f3090fb2b5ad8b20c4eaef6f66b8e1cd5))
+* **downloader:** 支持 SAF 可寻址文件直写 ([3b09cf4](https://github.com/delta-comic/delta-comic/commit/3b09cf42cc7a7bc12b06c5566f0fe7e3b2e0c4d4))
+* **i18n:** 完成应用界面文案国际化 ([994693f](https://github.com/delta-comic/delta-comic/commit/994693f5477287e3880ec91f560bbbbc7d2c8e88))
+* **i18n:** 新增台湾繁体中文支持 ([7476e0b](https://github.com/delta-comic/delta-comic/commit/7476e0bb7910dd5764121278fa5b5e9e37d172c9))
+* **logger:** 建立统一异步日志基础设施 ([de4cbb3](https://github.com/delta-comic/delta-comic/commit/de4cbb3bd0873f29177144d37f7bb9a966f23dce))
+* **logger:** 接入全仓关键运行日志 ([86235c3](https://github.com/delta-comic/delta-comic/commit/86235c3929d8630571268ce01134da33f207cb0a))
+* **plugin:** add bundled plugin runtime ([6c33ad0](https://github.com/delta-comic/delta-comic/commit/6c33ad03f3fe2d7bfc6dcc5ac5215787582ca8c8))
+* **plugin:** select compatible GitHub release ([c071d70](https://github.com/delta-comic/delta-comic/commit/c071d709cf0629ae3fb50d6322b8e654f4121726))
+* **plugin:** 使用原生下载器获取插件资源 ([1d352c6](https://github.com/delta-comic/delta-comic/commit/1d352c6755aa488eb719c5380d9f2bbdf658691c))
+* **plugin:** 完成响应式数据库重构 ([1aa519c](https://github.com/delta-comic/delta-comic/commit/1aa519c210dc61d03c6ccb9fc3c541294dc44bb8))
+* **plugin:** 扩展内容下载协议 ([bbac8c6](https://github.com/delta-comic/delta-comic/commit/bbac8c6211320a56376ab4be3c2686bbaa0cd2e4))
+* plugin插件内容无下载解析 ([739ffde](https://github.com/delta-comic/delta-comic/commit/739ffde095364f17b923ac2614050deb47e640c8))
+* **plugin:** 支持插件图标展示 ([44726a7](https://github.com/delta-comic/delta-comic/commit/44726a715ebe948f577e73e6c15ce60b4475c50c))
+* **release:** 完善工作区发布与中文说明 ([abdf558](https://github.com/delta-comic/delta-comic/commit/abdf55826c3a86d1b460174c2bf6de36132df5b7))
+* **search:** 添加独立搜索页和热搜插件接口 ([37a32c3](https://github.com/delta-comic/delta-comic/commit/37a32c34df20f93539304584818e800411c9a1e6))
+* **server-admin:** manage scheduled plugin scripts ([938f617](https://github.com/delta-comic/delta-comic/commit/938f6176710a0915cd3e3af38e6fcdf941a12a64))
+* **server:** add cloudflare pages admin panel ([#41](https://github.com/delta-comic/delta-comic/issues/41)) ([cdbfec9](https://github.com/delta-comic/delta-comic/commit/cdbfec99b85abe70ece5a0428341c1158172bd3d))
+* **server:** add isolated scheduled plugin scripts ([26c335a](https://github.com/delta-comic/delta-comic/commit/26c335a7d0678fa78971f8b7373d91e64bcd9610))
+* **server:** grant scripts network and database access ([85d1aab](https://github.com/delta-comic/delta-comic/commit/85d1aab972d4789a0c725063f305b27391811751))
+* **settings:** 增加原生日志阅读与导出 ([cff9963](https://github.com/delta-comic/delta-comic/commit/cff9963ed5ada4c417a9bea9e4ab5283f3c42130))
+* **ui:** 优化了导航栏的行为 ([12af4bd](https://github.com/delta-comic/delta-comic/commit/12af4bd83d2164ecaa66291c49ad651b3b7365c3))
+* **ui:** 补齐全部组件展示条目 ([f32a9b0](https://github.com/delta-comic/delta-comic/commit/f32a9b0c2a8ecfbf8a7ff50e474c3fe7283d8f25))
+* **ui:** 重构组件展示页面 ([dd2cd2c](https://github.com/delta-comic/delta-comic/commit/dd2cd2c240c78a87a73f7a01a175e4813d038b32))
+* webview鉴权 ([59c16bf](https://github.com/delta-comic/delta-comic/commit/59c16bf0cd99e156906d07f33ca30ae4f854e154))
+* 为list添加stream模式 ([82ab5eb](https://github.com/delta-comic/delta-comic/commit/82ab5eb35bfcafc52b83a6853ff1e358eadd5e4e))
+* 优化fetch返回 [pub] ([3661464](https://github.com/delta-comic/delta-comic/commit/36614649c757b35b0d423a69be0a9fde09a108fe))
+* 优化了server代码架构 ([6189783](https://github.com/delta-comic/delta-comic/commit/6189783de9e46af2c237f2faa657ab84e098b8d4))
+* 实现客户端server ([81ef9f8](https://github.com/delta-comic/delta-comic/commit/81ef9f88ebd3affa1fee4d55dc7a03626a98fac8))
+* 更好的实现popup ([1999e0a](https://github.com/delta-comic/delta-comic/commit/1999e0a3128e3442cad3ccbe6f4950bafa952151))
+* 调优model [pub][only-lib] ([6591832](https://github.com/delta-comic/delta-comic/commit/6591832109eec33a5eee6ed80d48b1f72eb46cb8))
+* 重返启动dev ([85a86f2](https://github.com/delta-comic/delta-comic/commit/85a86f24f53cbab77e6e5e5b8b3b22e8ceec3a01))
+
+
+### Performance Improvements
+
+* 基本完成了服务端插件系统 ([ede7f76](https://github.com/delta-comic/delta-comic/commit/ede7f76cfb15bd42d5eb1a630a47f79f21fffffb))
+
+
+### pref
+
+* 新版本发布触发 ([2b0e051](https://github.com/delta-comic/delta-comic/commit/2b0e0517c911311a783e8546436bc860ddfbcc3d))
+
+
+### BREAKING CHANGES
+
+* 发布版本改由 Conventional Commits 自动推断。
+* 插件底层大改，旧插件要完全重构
+* 插件底层大改，旧插件要完全重构
 
 # delta-comic
 
