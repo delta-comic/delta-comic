@@ -33,7 +33,7 @@ beforeEach(() => {
 
 describe('semantic-release command runner', () => {
   it('runs ordered package builds and recursive publish through inherited stdio', async () => {
-    mocks.statuses = [0, 0, 0, 0, 0, 0, 0, 0]
+    mocks.statuses = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     const { publish } = await import('./semantic-release-plugin.mts')
 
     await publish({}, { env: {}, nextRelease: { version: '2.3.0' } })
@@ -53,7 +53,35 @@ describe('semantic-release command runner', () => {
     expect(mocks.spawn).toHaveBeenNthCalledWith(
       8,
       'vp',
-      ['pm', 'publish', '-r', '--no-git-checks', '--provenance', '--tag', 'latest'],
+      [
+        'pm',
+        'publish',
+        '-r',
+        '--no-git-checks',
+        '--provenance',
+        '--tag',
+        'latest',
+        '--',
+        '--registry=https://registry.npmjs.org/',
+        '--config.@delta-comic:registry=https://registry.npmjs.org/',
+      ],
+      expect.objectContaining({ stdio: 'inherit' }),
+    )
+    expect(mocks.spawn).toHaveBeenNthCalledWith(
+      9,
+      'vp',
+      [
+        'pm',
+        'publish',
+        '-r',
+        '--no-git-checks',
+        '--provenance',
+        '--tag',
+        'latest',
+        '--',
+        '--registry=https://npm.pkg.github.com/',
+        '--config.@delta-comic:registry=https://npm.pkg.github.com/',
+      ],
       expect.objectContaining({ stdio: 'inherit' }),
     )
   })

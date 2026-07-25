@@ -59,6 +59,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           DELTA_RELEASE_RECOVERY: ${{ inputs.recover_withdrawn_2x && 'withdrawn-2x' || '' }}
         run: vp run --no-cache release:dry-run
 
@@ -345,12 +346,17 @@ jobs:
       - name: Configure package registry authentication
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: vp pm config set '//npm.pkg.github.com/:_authToken' "$GITHUB_TOKEN"
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          test -n "$NPM_TOKEN"
+          vp pm config set '//registry.npmjs.org/:_authToken' "$NPM_TOKEN"
+          vp pm config set '//npm.pkg.github.com/:_authToken' "$GITHUB_TOKEN"
 
       - name: Publish semantic release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
           DELTA_RELEASE_RECOVERY: ${{ inputs.recover_withdrawn_2x && 'withdrawn-2x' || '' }}
         run: vp run --no-cache release

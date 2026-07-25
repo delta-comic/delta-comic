@@ -49,6 +49,7 @@ minidump
 minimizable
 miui
 msvc
+npmjs
 nvim
 nttld
 noopener
