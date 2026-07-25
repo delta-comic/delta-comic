@@ -111,9 +111,6 @@ catalogs:
     commitlint-plugin-cspell:
       specifier: ^0.9.3
       version: 0.9.3
-    conventional-changelog-conventionalcommits:
-      specifier: ^10.2.1
-      version: 10.2.1
     core-js:
       specifier: ^3.48.0
       version: 3.49.0
@@ -261,6 +258,9 @@ importers:
       '@semantic-release/changelog':
         specifier: ^6.0.3
         version: 6.0.3(semantic-release@25.0.7(typescript@6.0.3))
+      '@semantic-release/release-notes-generator':
+        specifier: ^14.1.1
+        version: 14.1.1(semantic-release@25.0.7(typescript@6.0.3))
       '@typescript/native-preview':
         specifier: 'catalog:'
         version: 7.0.0-dev.20260707.2
@@ -273,9 +273,6 @@ importers:
       commitlint-plugin-cspell:
         specifier: 'catalog:'
         version: 0.9.3(@commitlint/lint@21.2.0)
-      conventional-changelog-conventionalcommits:
-        specifier: 'catalog:'
-        version: 10.2.1
       cspell:
         specifier: 'catalog:'
         version: 10.0.1
