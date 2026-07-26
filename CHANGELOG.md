@@ -1,3 +1,12 @@
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
+# [3.0.0-next.4](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.3...3.0.0-next.4) (2026-07-26)
+
+
+### Bug Fixes
+
+* **release:** 使用 OIDC 发布 npm 包 ([3403f5c](https://github.com/delta-comic/delta-comic/commit/3403f5cd466ba12b347781663cf6094cf5198db6))
+
 <!-- cspell:ignore avator cmdline premote wiew tabbar -->
 
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
