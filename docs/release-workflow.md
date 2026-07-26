@@ -12,9 +12,11 @@
 
 release note 与 changelog 使用 semantic-release 内置的 Angular preset 和默认英文分类。预览版开头会显示加粗的谨慎更新提示，GitHub Release 标题也会明确标记“预览版”或“正式版”。
 
-发布 npm workspace 时，脚本会从 `packages/*/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。因此 `@delta-comic/db`、`@delta-comic/model`、`@delta-comic/plugin`、`@delta-comic/ui` 和 `@delta-comic/utils` 会随每次版本一起发布；新增公共 workspace 包也会自动纳入，配置不完整时发布会提前失败。
+发布 npm workspace 时，脚本会从 `packages/*/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。因此 `@delta-comic/db`、`@delta-comic/downloader`、`@delta-comic/logger`、`@delta-comic/model`、`@delta-comic/plugin`、`@delta-comic/ui` 和 `@delta-comic/utils` 会随每次版本一起发布；新增公共 workspace 包也会自动纳入，配置不完整时发布会提前失败。
 
-workspace 包会同时发布到 npmjs 和 GitHub Packages。发布脚本会显式覆盖 `.npmrc` 中的 scope registry，避免两个目标互相干扰；递归发布会跳过目标 registry 中已经存在的版本，因此任一 registry 短暂失败后可以安全重跑。CI 使用 `NPM_TOKEN` 发布 npmjs，并使用当前工作流的短期 `GITHUB_TOKEN` 和 `packages: write` 权限发布 GitHub Packages。
+workspace 包会同时发布到 npmjs 和 GitHub Packages。发布脚本会显式覆盖 `.npmrc` 中的 scope registry，避免两个目标互相干扰；递归发布会跳过目标 registry 中已经存在的版本，因此任一 registry 短暂失败后可以安全重跑。CI 使用 GitHub Actions OIDC 和 `id-token: write` 权限可信发布到 npmjs，并使用当前工作流的短期 `GITHUB_TOKEN` 和 `packages: write` 权限发布 GitHub Packages，不保存长期 npm token。
+
+npm 可信发布只能配置到已经存在的包。新增公共 workspace 包时，维护者必须先用短期 CLI 登录手动发布一次预览版本，在 npm 包设置中为 `delta-comic/delta-comic` 的 `release.yaml` 添加 GitHub Actions 可信发布，然后才能将包纳入自动发布。首次发布完成后应撤销临时登录 token。
 
 ## 首次建立分支
 
