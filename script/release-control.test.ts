@@ -137,7 +137,7 @@ describe('semantic-release monorepo plugin', () => {
       writeOutput,
     })
     const context = {
-      env: { GITHUB_OUTPUT: '/tmp/output', GITHUB_TOKEN: 'github-secret', NPM_TOKEN: 'npm-secret' },
+      env: { GITHUB_OUTPUT: '/tmp/output', GITHUB_TOKEN: 'github-secret' },
       nextRelease: { version: '3.0.0' },
     }
 
@@ -230,7 +230,7 @@ describe('semantic-release monorepo plugin', () => {
     ])
   })
 
-  it('requires both registry tokens before publishing workspace packages', async () => {
+  it('requires the GitHub token while npm authentication uses OIDC', async () => {
     const plugin = createReleasePlugin({ resolvePublishablePackages })
 
     await expect(
@@ -241,8 +241,8 @@ describe('semantic-release monorepo plugin', () => {
         {},
         { env: { GITHUB_TOKEN: 'secret' }, nextRelease: { version: '3.0.0' } },
       ),
-    ).rejects.toThrow('NPM_TOKEN is required')
-    expect(resolvePublishablePackages).not.toHaveBeenCalled()
+    ).resolves.toBeUndefined()
+    expect(resolvePublishablePackages).toHaveBeenCalledOnce()
   })
 
   it('validates release versions and skips GitHub output outside Actions', async () => {
