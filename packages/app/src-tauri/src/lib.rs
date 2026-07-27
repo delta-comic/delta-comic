@@ -56,6 +56,8 @@ pub fn run() {
       .plugin(tauri_plugin_logger::init())
       .plugin(tauri_plugin_fs::init()),
   );
+  #[cfg(target_os = "android")]
+  let builder = builder.plugin(tauri_plugin_webview_upgrade::init());
   let builder = builder
     .plugin(tauri_plugin_shell::init())
     .plugin(tauri_plugin_m3::init())

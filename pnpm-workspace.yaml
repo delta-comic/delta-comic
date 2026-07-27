@@ -38,6 +38,7 @@ catalog:
   '@types/markdown-it': ^14.1.2
   '@types/node': 25.9.3
   '@types/semver': ^7.7.1
+  '@vitejs/plugin-legacy': ^7.2.1
   '@vitejs/plugin-vue': ^6.0.7
   '@vitejs/plugin-vue-jsx': ^5.1.5
   '@vue/language-core': ^3.3.2
@@ -47,7 +48,6 @@ catalog:
   blake3-wasm: 2.1.5
   color: ^5.0.3
   commitlint-plugin-cspell: ^0.9.3
-  core-js: ^3.48.0
   cspell: ^10.0.1
   dayjs: ^1.11.21
   elysia: ^1.4.29

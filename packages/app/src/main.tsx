@@ -1,5 +1,4 @@
 import { pluginRuntime, useConfig } from '@delta-comic/plugin'
-import 'core-js'
 import {
   configureUiI18n,
   DcConfigProvider,

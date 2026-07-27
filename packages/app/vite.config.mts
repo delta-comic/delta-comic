@@ -6,6 +6,8 @@ import { browserslistToTargets } from 'lightningcss'
 import type { UserConfig } from 'vite-plus'
 import { defineConfig, lazyPlugins } from 'vite-plus'
 
+import { legacyBuildOptions } from './legacyBuild'
+
 const host = process.env.TAURI_DEV_HOST
 
 export default defineConfig(
@@ -15,6 +17,7 @@ export default defineConfig(
         const [
           { exposeHostLibraries },
           { default: tailwindcss },
+          { default: legacy },
           { default: vue },
           { default: vueJsx },
           { default: MotionResolver },
@@ -27,6 +30,7 @@ export default defineConfig(
         ] = await Promise.all([
           import('@delta-comic/utils/vite'),
           import('@tailwindcss/vite'),
+          import('@vitejs/plugin-legacy'),
           import('@vitejs/plugin-vue'),
           import('@vitejs/plugin-vue-jsx'),
           import('motion-v/resolver'),
@@ -41,6 +45,7 @@ export default defineConfig(
         return [
           // @ts-ignore
           wasm(),
+          legacy(legacyBuildOptions),
           VueRouter({ dts: 'typed-router.d.ts' }),
           vueDevTools(),
           vue({
@@ -93,7 +98,7 @@ export default defineConfig(
           ignored: ['**/src-tauri/**', 'src-tauri'],
         },
       },
-      test: { environment: 'happy-dom', include: ['src/**/*.test.ts'] },
+      test: { environment: 'happy-dom', include: ['src/**/*.test.ts', 'legacyBuild.test.ts'] },
       clearScreen: false,
       envPrefix: ['VITE_', 'TAURI_ENV_*'],
     }) as UserConfig,
