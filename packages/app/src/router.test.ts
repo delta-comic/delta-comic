@@ -21,15 +21,11 @@ vi.mock('@delta-comic/model', () => ({
       return typeof value === 'string' ? value : value.join(':')
     }
   },
-  uni: {
-    content: {
-      ContentPage: {
-        contentPages: {
-          key: {
-            toString: (value: string | [string, string]) =>
-              typeof value === 'string' ? value : value.join(':'),
-          },
-        },
+  UniContentPage: {
+    contentPages: {
+      key: {
+        toString: (value: string | [string, string]) =>
+          typeof value === 'string' ? value : value.join(':'),
       },
     },
   },

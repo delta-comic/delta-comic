@@ -11,15 +11,11 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@delta-comic/model', () => ({
   SourcedKeyMap: { createReactive: () => new Map() },
-  uni: {
-    content: {
-      ContentPage: {
-        contentPages: {
-          key: {
-            toJSON: (value: string) => `json:${value}`,
-            toString: (value: string) => `string:${value}`,
-          },
-        },
+  UniContentPage: {
+    contentPages: {
+      key: {
+        toJSON: (value: string) => `json:${value}`,
+        toString: (value: string) => `string:${value}`,
       },
     },
   },

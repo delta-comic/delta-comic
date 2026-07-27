@@ -39,9 +39,7 @@ vi.mock('@delta-comic/db', () => ({
     }),
   },
 }))
-vi.mock('@delta-comic/model', () => ({
-  uni: { image: { Image: { create: (cover: unknown) => cover } } },
-}))
+vi.mock('@delta-comic/model', () => ({ UniImage: { create: (cover: unknown) => cover } }))
 vi.mock('@delta-comic/ui', () => {
   const { defineComponent, h } = window.$$lib$$.Vue
   return {

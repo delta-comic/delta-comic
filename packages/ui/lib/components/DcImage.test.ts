@@ -1,5 +1,5 @@
 import { Logger } from '@delta-comic/logger'
-import { uni } from '@delta-comic/model'
+import { UniImage, UniItem } from '@delta-comic/model'
 import { flushPromises, mount, shallowMount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, nextTick } from 'vue'
@@ -150,7 +150,7 @@ describe('DcImage', () => {
 
 describe('image-backed icons', () => {
   it('renders image model icons through DcImage', () => {
-    const image = uni.image.Image.create({
+    const image = UniImage.create({
       $$plugin: 'test',
       forkNamespace: 'cover',
       path: 'https://cdn.example/icon.jpg',
@@ -162,8 +162,8 @@ describe('image-backed icons', () => {
     const rendered = wrapper.getComponent(DcImage)
     expect(rendered.props()).toMatchObject({ fit: 'cover', round: true })
     const renderedSource = rendered.props('src')
-    expect(uni.image.Image.is(renderedSource)).toBe(true)
-    expect((renderedSource as uni.image.Image).pathname).toBe('https://cdn.example/icon.jpg')
+    expect(UniImage.is(renderedSource)).toBe(true)
+    expect((renderedSource as UniImage).pathname).toBe('https://cdn.example/icon.jpg')
   })
 
   it('renders component icons with a size derived from spacing', () => {
@@ -178,7 +178,7 @@ describe('image-backed icons', () => {
 
   it('resolves registered author icons and creates raw author images', async () => {
     const RegisteredIcon = defineComponent(() => () => h('svg'))
-    uni.item.Item.authorIcon.set(['plugin-a', 'registered'], RegisteredIcon)
+    UniItem.authorIcon.set(['plugin-a', 'registered'], RegisteredIcon)
     const registered = shallowMount(DcAuthorIcon, {
       props: { author: { $$plugin: 'plugin-a', icon: 'registered' }, sizeSpacing: 6 },
     })
@@ -186,7 +186,7 @@ describe('image-backed icons', () => {
 
     const raw = { $$plugin: 'plugin-a', forkNamespace: 'cover', path: '/author.jpg' }
     await registered.setProps({ author: { $$plugin: 'plugin-a', icon: raw } })
-    expect(uni.image.Image.is(registered.getComponent(DcImagedIcon).props('icon'))).toBe(true)
-    uni.item.Item.authorIcon.delete(['plugin-a', 'registered'])
+    expect(UniImage.is(registered.getComponent(DcImagedIcon).props('icon'))).toBe(true)
+    UniItem.authorIcon.delete(['plugin-a', 'registered'])
   })
 })

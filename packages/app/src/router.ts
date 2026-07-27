@@ -1,4 +1,4 @@
-import { uni } from '@delta-comic/model'
+import { UniContentPage } from '@delta-comic/model'
 import { useConfig } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
 import type { DeltaRouter } from '@delta-comic/utils'
@@ -38,7 +38,7 @@ SharedFunction.define(
       params: {
         id: encodeURI(id),
         ep: encodeURI(ep),
-        contentType: uni.content.ContentPage.contentPages.key.toString(contentType_),
+        contentType: UniContentPage.contentPages.key.toString(contentType_),
       },
     })
   },

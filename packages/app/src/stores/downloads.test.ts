@@ -79,11 +79,7 @@ const { client, handlers, sourceRefresh } = vi.hoisted(() => {
 
 vi.mock('@/features/downloads/downloaderClient', () => ({ downloaderClient: client }))
 vi.mock('@delta-comic/model', () => ({
-  uni: {
-    content: {
-      ContentPage: { contentPages: { get: vi.fn() }, downloadProviders: { get: vi.fn() } },
-    },
-  },
+  UniContentPage: { contentPages: { get: vi.fn() }, downloadProviders: { get: vi.fn() } },
 }))
 vi.mock('@delta-comic/plugin', () => ({ usePluginStore: () => sourceRefresh.pluginStore }))
 vi.mock('@/features/downloads/contentPlan', () => ({

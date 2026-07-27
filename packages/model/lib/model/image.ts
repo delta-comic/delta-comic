@@ -1,21 +1,24 @@
 import type { Metadatable } from '../struct'
 
-import { Resource, type RawResource, type ProcessStep_ } from './resource'
+import { UniResource, type UniResourceRaw, type UniResourceProcessStep_ } from './resource'
 
-export interface RawImage extends Metadatable {
+export interface UniImageRaw extends Metadatable {
   path: string
   forkNamespace: string
-  processSteps?: ProcessStep_[]
+  processSteps?: UniResourceProcessStep_[]
 }
 
-export class Image extends Resource {
-  public static override is(value: unknown): value is Image {
+export class UniImage extends UniResource {
+  public static override is(value: unknown): value is UniImage {
     return value instanceof this
   }
-  public static override create(v: RawResource | RawImage, aspect?: ImageAspect): Image {
+  public static override create(
+    v: UniResourceRaw | UniImageRaw,
+    aspect?: UniImageAspect,
+  ): UniImage {
     return new this(v, aspect)
   }
-  protected constructor(v: RawResource | RawImage, aspect?: ImageAspect) {
+  protected constructor(v: UniResourceRaw | UniImageRaw, aspect?: UniImageAspect) {
     if ('forkNamespace' in v)
       super({
         $$plugin: v.$$plugin,
@@ -27,7 +30,7 @@ export class Image extends Resource {
     else super(v)
   }
   public get aspect() {
-    return this.$$meta!.aspect as Partial<ImageAspect> | undefined
+    return this.$$meta!.aspect as Partial<UniImageAspect> | undefined
   }
   public set aspect(v) {
     if (!v) return
@@ -37,8 +40,8 @@ export class Image extends Resource {
     this.$$meta.aspect.height = v.height
   }
 }
-export interface ImageAspect {
+export interface UniImageAspect {
   width: number
   height: number
 }
-export type Image_ = string | Image
+export type UniImage_ = string | UniImage

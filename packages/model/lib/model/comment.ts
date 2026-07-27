@@ -2,12 +2,12 @@ import { type Component } from 'vue'
 
 import { SourcedKeyMap, Struct, type Metadata, type Metadatable, type StreamQuery } from '../struct'
 
-import type { ContentType } from './content'
-import type { Item } from './item'
-import type { User } from './user'
+import type { UniContentType } from './content'
+import type { UniItem } from './item'
+import type { UniUser } from './user'
 
-export interface RawComment extends Metadatable {
-  sender: User
+export interface UniCommentRaw extends Metadatable {
+  sender: UniUser
   content: { type: 'string' | 'html'; text: string }
   time: number
   id: string
@@ -18,12 +18,16 @@ export interface RawComment extends Metadatable {
   isTop: boolean
 }
 
-export type CommentRow = Component<{ comment: Comment; item: Item; parentComment?: Comment }>
+export type UniCommentRow = Component<{
+  comment: UniComment
+  item: UniItem
+  parentComment?: UniComment
+}>
 
-export abstract class Comment extends Struct<RawComment> implements RawComment {
-  public static commentRow = SourcedKeyMap.createReactive<ContentType, CommentRow>()
+export abstract class UniComment extends Struct<UniCommentRaw> implements UniCommentRaw {
+  public static commentRow = SourcedKeyMap.createReactive<UniContentType, UniCommentRow>()
 
-  constructor(v: RawComment) {
+  constructor(v: UniCommentRaw) {
     super(v)
     this.content = v.content
     this.time = v.time
@@ -36,7 +40,7 @@ export abstract class Comment extends Struct<RawComment> implements RawComment {
     this.$$meta = v.$$meta
     this.isTop = v.isTop
   }
-  public abstract sender: User
+  public abstract sender: UniUser
   public content: { type: 'string' | 'html'; text: string }
   public time: number
   public id: string
@@ -50,5 +54,5 @@ export abstract class Comment extends Struct<RawComment> implements RawComment {
   public abstract like(signal?: AbortSignal): PromiseLike<boolean>
   public abstract report(signal?: AbortSignal): PromiseLike<any>
   public abstract sendComment(text: string, signal?: AbortSignal): PromiseLike<any>
-  public abstract fetchChildren: StreamQuery<Comment>
+  public abstract fetchChildren: StreamQuery<UniComment>
 }

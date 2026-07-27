@@ -1,16 +1,16 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vite-plus/test'
 // cspell:ignore btih
 
-import type { ContentPage } from './content'
+import type { UniContentPage } from './content'
 import {
-  Downloader,
-  type ContentDownloadProvider,
-  type DownloadPlan,
-  type DownloadSource,
-  type LegacyDownloader,
+  UniDownloader,
+  type UniContentDownloadProvider,
+  type UniDownloadPlan,
+  type UniDownloadSource,
+  type UniLegacyDownloader,
 } from './download'
 
-const plan: DownloadPlan = {
+const plan: UniDownloadPlan = {
   assets: [
     {
       checksum: { algorithm: 'sha256', value: 'abc123' },
@@ -50,18 +50,18 @@ const plan: DownloadPlan = {
 describe('content download contracts', () => {
   it('keeps plans and source variants JSON-serializable', () => {
     const serialized = JSON.stringify(plan)
-    const parsed = JSON.parse(serialized) as DownloadPlan
+    const parsed = JSON.parse(serialized) as UniDownloadPlan
 
     expect(parsed).toEqual(plan)
-    expectTypeOf(parsed.assets[0]!.source).toEqualTypeOf<DownloadSource>()
+    expectTypeOf(parsed.assets[0]!.source).toEqualTypeOf<UniDownloadSource>()
   })
 
   it('passes content context and cancellation to providers', async () => {
-    const page = {} as ContentPage
+    const page = {} as UniContentPage
     const signal = new AbortController().signal
     const resolve = vi.fn(async () => plan)
     const refreshSource = vi.fn(async () => plan.assets[0]!.source)
-    const provider: ContentDownloadProvider = { refreshSource, resolve }
+    const provider: UniContentDownloadProvider = { refreshSource, resolve }
 
     await expect(
       provider.resolve(
@@ -99,7 +99,7 @@ describe('content download contracts', () => {
   })
 })
 
-class TestLegacyDownloader extends Downloader {
+class TestLegacyDownloader extends UniDownloader {
   id = 'legacy'
   name = 'Legacy downloader'
   $$plugin = 'fixture'
@@ -111,7 +111,7 @@ class TestLegacyDownloader extends Downloader {
 
 describe('legacy downloader compatibility', () => {
   it('preserves the imperative controller contract during migration', () => {
-    const downloader: LegacyDownloader = new TestLegacyDownloader()
+    const downloader: UniLegacyDownloader = new TestLegacyDownloader()
 
     downloader.begin()
     downloader.pause()

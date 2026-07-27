@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { uni } from '@delta-comic/model'
+import { UniItem } from '@delta-comic/model'
 import { useConfig, usePluginStore, type Search } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
 import { useInfiniteQuery } from '@pinia/colada'
@@ -190,7 +190,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
       ref="list"
       :source="{ type: 'stream', value: query }"
     >
-      <component :is="uni.item.Item.itemCards.get(item.contentType)" :item />
+      <component :is="UniItem.itemCards.get(item.contentType)" :item />
     </DcList>
   </div>
 </template>

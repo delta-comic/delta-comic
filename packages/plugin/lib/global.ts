@@ -1,4 +1,4 @@
-import { SourcedKeyMap, uni } from '@delta-comic/model'
+import { SourcedKeyMap, UniContentPage } from '@delta-comic/model'
 import { environmentRegistry } from '@delta-comic/ui'
 import { SharedFunction } from '@delta-comic/utils'
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
@@ -131,7 +131,7 @@ Global.share.set(['core', 'token'], {
     const compressed = compressToEncodedURIComponent(
       JSON.stringify(<CorePluginTokenShareMeta>{
         item: {
-          contentType: uni.content.ContentPage.contentPages.key.toString(item.contentType),
+          contentType: UniContentPage.contentPages.key.toString(item.contentType),
           ep: item.thisEp.id,
           name: item.title,
         },
@@ -155,7 +155,7 @@ Global.share.set(['core', 'native'], {
     const compressed = compressToEncodedURIComponent(
       JSON.stringify(<CorePluginTokenShareMeta>{
         item: {
-          contentType: uni.content.ContentPage.contentPages.key.toString(item.contentType),
+          contentType: UniContentPage.contentPages.key.toString(item.contentType),
           ep: item.thisEp.id,
           name: item.title,
         },
@@ -193,7 +193,7 @@ Global.shareToken.set(['core', 'token'], {
       onPositive() {
         return SharedFunction.call(
           'routeToContent',
-          uni.content.ContentPage.contentPages.key.toJSON(meta.item.contentType),
+          UniContentPage.contentPages.key.toJSON(meta.item.contentType),
           meta.id,
           meta.item.ep,
         )

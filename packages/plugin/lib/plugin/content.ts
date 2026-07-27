@@ -1,13 +1,20 @@
-import type { uni } from '@delta-comic/model'
+import type {
+  UniCommentRow,
+  UniContentDownloadProvider,
+  UniContentLayoutComponent,
+  UniContentPageLike,
+  UniItemCardComponent,
+  UniItemTranslator,
+} from '@delta-comic/model'
 
 export type Config = Record<
   string,
   {
-    itemCard?: uni.item.ItemCardComponent
-    commentRow?: uni.comment.CommentRow
-    layout?: uni.content.LayoutComponent
-    contentPage?: uni.content.ContentPageLike
-    downloadProvider?: uni.download.ContentDownloadProvider
-    itemTranslator?: uni.item.ItemTranslator
+    itemCard?: UniItemCardComponent
+    commentRow?: UniCommentRow
+    layout?: UniContentLayoutComponent
+    contentPage?: UniContentPageLike
+    downloadProvider?: UniContentDownloadProvider
+    itemTranslator?: UniItemTranslator
   }
 >

@@ -2,28 +2,28 @@ import { shallowReactive, type Component } from 'vue'
 
 import type { Metadata, Metadatable } from '@/struct'
 
-import { Image } from './image'
-import type { RawResource } from './resource'
+import { UniImage } from './image'
+import type { UniResourceRaw } from './resource'
 
-export interface RawUser extends Metadatable {
-  avatar?: RawResource
+export interface UniUserRaw extends Metadatable {
+  avatar?: UniResourceRaw
   name: string
   id: string
 }
 
-export abstract class User {
-  public static userBase = shallowReactive(new Map<string, User>())
+export abstract class UniUser {
+  public static userBase = shallowReactive(new Map<string, UniUser>())
   public static userEditorBase = shallowReactive(new Map<string, Component>())
-  public static userCards = shallowReactive(new Map<string, UserCardComponent>())
+  public static userCards = shallowReactive(new Map<string, UniUserCardComponent>())
 
-  constructor(v: RawUser) {
-    if (v.avatar) this.avatar = Image.create(v.avatar)
+  constructor(v: UniUserRaw) {
+    if (v.avatar) this.avatar = UniImage.create(v.avatar)
     this.name = v.name
     this.id = v.id
     this.$$plugin = v.$$plugin
     this.$$meta = v.$$meta
   }
-  public avatar?: Image
+  public avatar?: UniImage
   public name: string
   public id: string
   public $$plugin: string
@@ -31,4 +31,4 @@ export abstract class User {
   public abstract customUser: object
 }
 
-export type UserCardComponent = Component<{ user: User; isSmall?: boolean }>
+export type UniUserCardComponent = Component<{ user: UniUser; isSmall?: boolean }>

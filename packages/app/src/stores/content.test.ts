@@ -13,17 +13,13 @@ const { pageTypes } = vi.hoisted(() => ({
 }))
 
 vi.mock('@delta-comic/model', () => ({
-  uni: {
-    content: {
-      ContentPage: {
-        contentPages: {
-          get: (key: string | [string, string]) =>
-            pageTypes.get(typeof key === 'string' ? key : key.join(':')),
-          key: {
-            toString: (key: string | [string, string]) =>
-              typeof key === 'string' ? key : key.join(':'),
-          },
-        },
+  UniContentPage: {
+    contentPages: {
+      get: (key: string | [string, string]) =>
+        pageTypes.get(typeof key === 'string' ? key : key.join(':')),
+      key: {
+        toString: (key: string | [string, string]) =>
+          typeof key === 'string' ? key : key.join(':'),
       },
     },
   },

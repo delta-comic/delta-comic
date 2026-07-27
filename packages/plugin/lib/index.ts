@@ -1,12 +1,12 @@
-import type { uni } from '@delta-comic/model'
+import type { UniContentType_, UniItem } from '@delta-comic/model'
 
 declare module '@delta-comic/utils' {
   export interface SharedFunctions {
     routeToContent(
-      contentType_: uni.content.ContentType_,
+      contentType_: UniContentType_,
       id: string,
       ep: string,
-      preload?: uni.item.Item,
+      preload?: UniItem,
     ): Promise<any>
     routeToSearch(
       input: string,

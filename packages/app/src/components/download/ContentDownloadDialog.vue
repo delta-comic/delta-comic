@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type uni } from '@delta-comic/model'
+import { type UniContentPage, type UniEp } from '@delta-comic/model'
 import {
   NAlert,
   NButton,
@@ -25,7 +25,7 @@ type SelectionMode = 'allEpisodes' | 'currentEpisode' | 'episodes'
 const props = defineProps<{
   destinations: readonly Destination[]
   disabled?: boolean
-  page: uni.content.ContentPage
+  page: UniContentPage
 }>()
 const emit = defineEmits<{ submit: [request: ContentDownloadRequest] }>()
 const show = defineModel<boolean>('show', { required: true })
@@ -33,7 +33,7 @@ const { t } = useI18n()
 
 const mode = shallowRef<SelectionMode>('currentEpisode')
 const destinationId = shallowRef<string>()
-const episodes = shallowRef<uni.ep.Ep[]>([])
+const episodes = shallowRef<UniEp[]>([])
 const selectedEpisodeIds = shallowRef<string[]>([])
 const loading = shallowRef(false)
 const loadError = shallowRef<string>()

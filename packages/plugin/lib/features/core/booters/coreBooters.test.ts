@@ -40,31 +40,23 @@ const mocks = vi.hoisted(() => {
 })
 
 vi.mock('@delta-comic/model', () => ({
-  uni: {
-    comment: { Comment: { commentRow: mocks.commentRow } },
-    content: {
-      ContentPage: {
-        contentPages: mocks.contentPages,
-        downloadProviders: mocks.downloadProviders,
-        layouts: mocks.layouts,
-      },
-    },
-    item: {
-      Item: {
-        authorIcon: mocks.authorIcon,
-        itemCards: mocks.itemCards,
-        itemTranslator: mocks.itemTranslator,
-      },
-    },
-    resource: {
-      Resource: {
-        fork: mocks.fork,
-        precedenceFork: mocks.precedenceFork,
-        processInstances: mocks.processInstances,
-      },
-    },
-    user: { User: { userCards: mocks.userCards, userEditorBase: mocks.userEditorBase } },
+  UniComment: { commentRow: mocks.commentRow },
+  UniContentPage: {
+    contentPages: mocks.contentPages,
+    downloadProviders: mocks.downloadProviders,
+    layouts: mocks.layouts,
   },
+  UniItem: {
+    authorIcon: mocks.authorIcon,
+    itemCards: mocks.itemCards,
+    itemTranslator: mocks.itemTranslator,
+  },
+  UniResource: {
+    fork: mocks.fork,
+    precedenceFork: mocks.precedenceFork,
+    processInstances: mocks.processInstances,
+  },
+  UniUser: { userCards: mocks.userCards, userEditorBase: mocks.userEditorBase },
 }))
 vi.mock('@delta-comic/ui', () => ({ createForm: mocks.createForm }))
 vi.mock('@delta-comic/utils', () => ({

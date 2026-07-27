@@ -1,10 +1,10 @@
-import type { uni } from '@delta-comic/model'
+import type { UniContentDownloadSelection } from '@delta-comic/model'
 
 import type { Destination } from './downloaderClient'
 
 export interface ContentDownloadRequest {
   destinationId?: string
-  selection: uni.download.ContentDownloadSelection
+  selection: UniContentDownloadSelection
 }
 
 export function resolveDestinationId(

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SourcedValue, uni } from '@delta-comic/model'
+import { SourcedValue, UniItem } from '@delta-comic/model'
 import { Global, usePluginStore } from '@delta-comic/plugin'
 import { useQuery } from '@pinia/colada'
 import { computed } from 'vue'
@@ -25,7 +25,7 @@ const items = useQuery({
   query: async ({ signal }) => (source.value ? await source.value.content(signal) : []),
 })
 
-const getItemCard = (item: uni.item.Item) => uni.item.Item.itemCards.get(item.contentType)
+const getItemCard = (item: UniItem) => UniItem.itemCards.get(item.contentType)
 const getColor = (index: number) => {
   if (index == 0) return 'rgb(255,215,0)'
   if (index == 1) return 'rgb(192,192,192)' // silver

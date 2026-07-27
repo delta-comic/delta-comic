@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { uni } from '@delta-comic/model'
+import type { UniItem } from '@delta-comic/model'
 import { SharedFunction } from '@delta-comic/utils'
 import { NButton, NDropdown, NIcon, type DropdownOption } from 'naive-ui'
 import { computed, h } from 'vue'
@@ -8,8 +8,8 @@ import { useI18n } from 'vue-i18n'
 import { Icons } from '@/icons'
 import { createDateString } from '@/utils/date'
 
-defineProps<{ item: uni.item.Item }>()
-const emit = defineEmits<{ unsubscribe: [item: uni.item.Item] }>()
+defineProps<{ item: UniItem }>()
+const emit = defineEmits<{ unsubscribe: [item: UniItem] }>()
 const { t } = useI18n()
 
 const menuOptions = computed<DropdownOption[]>(() => [
@@ -25,7 +25,7 @@ const ShareIcon = () =>
     }),
   ])
 
-const handleMenuSelect = (key: string | number, item: uni.item.Item) => {
+const handleMenuSelect = (key: string | number, item: UniItem) => {
   if (key === 'unsubscribe') emit('unsubscribe', item)
 }
 </script>

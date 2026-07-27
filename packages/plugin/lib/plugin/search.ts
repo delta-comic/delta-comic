@@ -1,4 +1,4 @@
-import type { StreamQuery, uni } from '@delta-comic/model'
+import type { StreamQuery, UniContentType_, UniItem } from '@delta-comic/model'
 import type { Component } from 'vue'
 
 export interface Config {
@@ -26,13 +26,13 @@ export interface Config {
   fetchRandomItems?: ItemProvider
 }
 
-export type ItemProvider = (signal: AbortSignal) => uni.item.Item[] | PromiseLike<uni.item.Item[]>
+export type ItemProvider = (signal: AbortSignal) => UniItem[] | PromiseLike<UniItem[]>
 
 export interface SearchMethod {
   name: string
   sorts: { text: string; value: string }[]
   defaultSort: string
-  fetchSearchResult: StreamQuery<uni.item.Item, { input: string; sort: string }>
+  fetchSearchResult: StreamQuery<UniItem, { input: string; sort: string }>
   getAutoComplete(
     input: string,
     signal: AbortSignal,
@@ -90,10 +90,10 @@ export interface Tabbar {
 }
 
 export type RouteToContent = (
-  contentType_: uni.content.ContentType_,
+  contentType_: UniContentType_,
   id: string,
   ep: string,
-  preload?: uni.item.Item,
+  preload?: UniItem,
 ) => PromiseLike<any>
 
 export interface Barcode {

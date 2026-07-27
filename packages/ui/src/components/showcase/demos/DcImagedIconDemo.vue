@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { uni } from '@delta-comic/model'
+import { UniImage } from '@delta-comic/model'
 import { NTag } from 'naive-ui'
 import { h } from 'vue'
 
@@ -16,7 +16,7 @@ const imageUrl = `data:image/svg+xml,${encodeURIComponent(`
   </svg>
 `)}`
 
-const imageIcon = uni.image.Image.create({
+const imageIcon = UniImage.create({
   $$plugin: 'showcase',
   forkNamespace: 'showcase-icon',
   path: imageUrl,

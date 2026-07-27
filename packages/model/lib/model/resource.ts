@@ -6,64 +6,67 @@ import { SourcedKeyMap, Struct, type Metadata, type Metadatable } from '../struc
 
 const resourceLogger = logger.scoped('model:resource')
 
-export type ProcessInstance = (
+export type UniResourceProcessInstance = (
   nowPath: string,
-  resource: Resource,
+  resource: UniResource,
 ) => Promise<[path: string, exit: boolean]>
-export interface ProcessStep {
+export interface UniResourceProcessStep {
   referenceName: string
   ignoreExit?: boolean
 }
-export type ProcessStep_ = ProcessStep | string
+export type UniResourceProcessStep_ = UniResourceProcessStep | string
 
-export interface ResourceType {
+export interface UniResourceType {
   type: string
   urls: string[]
   test: (url: string, signal: AbortSignal) => PromiseLike<void>
 }
-export interface RawResource extends Metadatable {
+export interface UniResourceRaw extends Metadatable {
   pathname: string
   type: string
-  processSteps?: ProcessStep_[]
+  processSteps?: UniResourceProcessStep_[]
 }
-export class Resource extends Struct<RawResource> implements RawResource {
+export class UniResource extends Struct<UniResourceRaw> implements UniResourceRaw {
   public static processInstances = SourcedKeyMap.createReactive<
     [plugin: string, referenceName: string],
-    ProcessInstance
+    UniResourceProcessInstance
   >()
 
-  public static fork = SourcedKeyMap.createReactive<[plugin: string, type: string], ResourceType>()
+  public static fork = SourcedKeyMap.createReactive<
+    [plugin: string, type: string],
+    UniResourceType
+  >()
   public static precedenceFork = SourcedKeyMap.createReactive<
     [plugin: string, type: string],
     string
   >()
 
-  public static is(value: unknown): value is Resource {
+  public static is(value: unknown): value is UniResource {
     return value instanceof this
   }
-  public static create(v: RawResource): Resource {
+  public static create(v: UniResourceRaw): UniResource {
     return new this(v)
   }
-  protected constructor(v: RawResource) {
+  protected constructor(v: UniResourceRaw) {
     super(v)
     this.$$plugin = v.$$plugin
     this.$$meta = v.$$meta
     this.pathname = v.pathname
     this.type = v.type
-    this.processSteps = (v.processSteps ?? []).map<ProcessStep>(v =>
+    this.processSteps = (v.processSteps ?? []).map<UniResourceProcessStep>(v =>
       isString(v) ? { referenceName: v, ignoreExit: false } : v,
     )
   }
   public type: string
   public pathname: string
-  public processSteps: ProcessStep[]
+  public processSteps: UniResourceProcessStep[]
   public $$meta?: Metadata
   public $$plugin: string
   public async getUrl(): Promise<string> {
     let resultPath = this.pathname
     for (const option of this.processSteps) {
       // preflight
-      const instance = Resource.processInstances.get([this.$$plugin, option.referenceName])
+      const instance = UniResource.processInstances.get([this.$$plugin, option.referenceName])
       if (!instance) {
         resourceLogger.warn('resource process not found', {
           plugin: this.$$plugin,
@@ -83,22 +86,22 @@ export class Resource extends Struct<RawResource> implements RawResource {
   }
   public omittedForks = shallowReactive(new Set<string>())
   public getThisFork() {
-    const all = new Set(Resource.fork.get([this.$$plugin, this.type])?.urls ?? [])
+    const all = new Set(UniResource.fork.get([this.$$plugin, this.type])?.urls ?? [])
     let fork: string | undefined
     if (isEmpty(this.omittedForks)) {
-      fork = Resource.precedenceFork.get([this.$$plugin, this.type])
+      fork = UniResource.precedenceFork.get([this.$$plugin, this.type])
     } else {
       const diff = Array.from(all.difference(this.omittedForks).values())
       fork = diff[0]
     }
     if (!fork)
       throw new Error(
-        `[Resource.getThisFork] fork not found, type: [${this.$$plugin}, ${this.type}]`,
+        `[UniResource.getThisFork] fork not found, type: [${this.$$plugin}, ${this.type}]`,
       )
     return fork
   }
   public localChangeFork() {
-    const all = new Set(Resource.fork.get([this.$$plugin, this.type])?.urls ?? [])
+    const all = new Set(UniResource.fork.get([this.$$plugin, this.type])?.urls ?? [])
     this.omittedForks.add(this.getThisFork())
     const isChangedFail = isEmpty(all.difference(this.omittedForks))
     if (isChangedFail) this.omittedForks.clear()

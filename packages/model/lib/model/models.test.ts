@@ -3,38 +3,38 @@ import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import { StreamQuery, Struct } from '../struct'
 
-import { Comment, type RawComment } from './comment'
-import { ContentPage } from './content'
-import { Ep } from './ep'
-import { Image } from './image'
-import { Item, type RawItem } from './item'
-import { Resource, type RawResource } from './resource'
-import { User, type RawUser } from './user'
+import { UniComment, type UniCommentRaw } from './comment'
+import { UniContentPage } from './content'
+import { UniEp } from './ep'
+import { UniImage } from './image'
+import { UniItem, type UniItemRaw } from './item'
+import { UniResource, type UniResourceRaw } from './resource'
+import { UniUser, type UniUserRaw } from './user'
 
-class TestItem extends Item {
+class TestItem extends UniItem {
   like = vi.fn(async () => undefined)
   report = vi.fn(async () => undefined)
   sendComment = vi.fn(async () => undefined)
 }
 
-class TestUser extends User {
+class TestUser extends UniUser {
   customUser = { role: 'reader' }
 }
 
-class TestComment extends Comment {
-  sender: User
+class TestComment extends UniComment {
+  sender: UniUser
   fetchChildren = new StreamQuery(async () => ({ data: [] }), 1)
   like = vi.fn(async () => true)
   report = vi.fn(async () => undefined)
   sendComment = vi.fn(async () => undefined)
 
-  constructor(raw: RawComment) {
+  constructor(raw: UniCommentRaw) {
     super(raw)
     this.sender = raw.sender
   }
 }
 
-class TestContentPage extends ContentPage {
+class TestContentPage extends UniContentPage {
   plugin = 'fixture'
   contentType = ['fixture', 'manga'] as [string, string]
   ViewComponent = {} as never
@@ -47,10 +47,10 @@ class TestContentPage extends ContentPage {
 
 const rawResource = (
   pathname = 'covers/fixture.jpg',
-  processSteps: RawResource['processSteps'] = [],
-): RawResource => ({ $$plugin: 'fixture', pathname, processSteps, type: 'image' })
+  processSteps: UniResourceRaw['processSteps'] = [],
+): UniResourceRaw => ({ $$plugin: 'fixture', pathname, processSteps, type: 'image' })
 
-const rawItem = (overrides: Partial<RawItem> = {}): RawItem => ({
+const rawItem = (overrides: Partial<UniItemRaw> = {}): UniItemRaw => ({
   $$plugin: 'fixture',
   author: [{ $$plugin: 'fixture', description: 'human artist', icon: rawResource(), label: 'A' }],
   categories: [],
@@ -66,10 +66,10 @@ const rawItem = (overrides: Partial<RawItem> = {}): RawItem => ({
 })
 
 beforeEach(() => {
-  Resource.processInstances.clear()
-  Resource.fork.clear()
-  Resource.precedenceFork.clear()
-  Item.itemTranslator.clear()
+  UniResource.processInstances.clear()
+  UniResource.fork.clear()
+  UniResource.precedenceFork.clear()
+  UniItem.itemTranslator.clear()
 })
 
 describe('resource resolution', () => {
@@ -80,10 +80,10 @@ describe('resource resolution', () => {
       async (path: string) => [`https://cdn.test/${path}`, true] as [string, boolean],
     )
     const unreachable = vi.fn(async (path: string) => [path, false] as [string, boolean])
-    Resource.processInstances.set(['fixture', 'resize'], resize)
-    Resource.processInstances.set(['fixture', 'cache'], cache)
-    Resource.processInstances.set(['fixture', 'unreachable'], unreachable)
-    const resource = Resource.create(
+    UniResource.processInstances.set(['fixture', 'resize'], resize)
+    UniResource.processInstances.set(['fixture', 'cache'], cache)
+    UniResource.processInstances.set(['fixture', 'unreachable'], unreachable)
+    const resource = UniResource.create(
       rawResource('cover.jpg', ['missing', 'resize', { referenceName: 'cache' }, 'unreachable']),
     )
 
@@ -100,21 +100,21 @@ describe('resource resolution', () => {
   })
 
   it('honors ignoreExit and prefixes relative results with the selected fork', async () => {
-    Resource.processInstances.set(
+    UniResource.processInstances.set(
       ['fixture', 'first'],
       vi.fn(async () => ['processed.jpg', true] as [string, boolean]),
     )
-    Resource.processInstances.set(
+    UniResource.processInstances.set(
       ['fixture', 'second'],
       vi.fn(async path => [`final/${path}`, false] as [string, boolean]),
     )
-    Resource.fork.set(['fixture', 'image'], {
+    UniResource.fork.set(['fixture', 'image'], {
       test: vi.fn(),
       type: 'image',
       urls: ['https://a.test', 'https://b.test'],
     })
-    Resource.precedenceFork.set(['fixture', 'image'], 'https://b.test')
-    const resource = Resource.create(
+    UniResource.precedenceFork.set(['fixture', 'image'], 'https://b.test')
+    const resource = UniResource.create(
       rawResource('cover.jpg', [{ ignoreExit: true, referenceName: 'first' }, 'second']),
     )
 
@@ -123,13 +123,13 @@ describe('resource resolution', () => {
   })
 
   it('rotates through alternate forks and resets after exhausting all choices', () => {
-    Resource.fork.set(['fixture', 'image'], {
+    UniResource.fork.set(['fixture', 'image'], {
       test: vi.fn(),
       type: 'image',
       urls: ['https://a.test', 'https://b.test'],
     })
-    Resource.precedenceFork.set(['fixture', 'image'], 'https://a.test')
-    const resource = Resource.create(rawResource())
+    UniResource.precedenceFork.set(['fixture', 'image'], 'https://a.test')
+    const resource = UniResource.create(rawResource())
 
     expect(resource.localChangeFork()).toBe(false)
     expect(resource.getThisFork()).toBe('https://b.test')
@@ -139,7 +139,7 @@ describe('resource resolution', () => {
   })
 
   it('reports a missing fork for relative paths', async () => {
-    const resource = Resource.create(rawResource('relative.jpg'))
+    const resource = UniResource.create(rawResource('relative.jpg'))
 
     expect(() => resource.getThisFork()).toThrow('fork not found')
     await expect(resource.getUrl()).rejects.toThrow('fork not found')
@@ -148,7 +148,7 @@ describe('resource resolution', () => {
 
 describe('image, item, and episode projections', () => {
   it('converts legacy raw images and updates aspect metadata without replacing other metadata', () => {
-    const image = Image.create(
+    const image = UniImage.create(
       {
         $$meta: { source: 'legacy' },
         $$plugin: 'fixture',
@@ -158,8 +158,8 @@ describe('image, item, and episode projections', () => {
       { height: 300, width: 200 },
     )
 
-    expect(Image.is(image)).toBe(true)
-    expect(Resource.is(image)).toBe(true)
+    expect(UniImage.is(image)).toBe(true)
+    expect(UniResource.is(image)).toBe(true)
     expect(image.pathname).toBe('cover.jpg')
     expect(image.type).toBe('image')
     expect(image.aspect).toEqual({ height: 300, width: 200 })
@@ -171,16 +171,16 @@ describe('image, item, and episode projections', () => {
   })
 
   it('creates items through the content translator and exposes typed projections', () => {
-    const translator = vi.fn((raw: RawItem) => new TestItem(raw))
-    Item.itemTranslator.set(['fixture', 'manga'], translator)
+    const translator = vi.fn((raw: UniItemRaw) => new TestItem(raw))
+    UniItem.itemTranslator.set(['fixture', 'manga'], translator)
     const raw = rawItem()
 
-    const item = Item.create(raw)
+    const item = UniItem.create(raw)
 
-    expect(Item.is(item)).toBe(true)
+    expect(UniItem.is(item)).toBe(true)
     expect(translator).toHaveBeenCalledExactlyOnceWith(raw)
     expect(item.contentType).toEqual(['fixture', 'manga'])
-    expect(item.$cover).toBeInstanceOf(Image)
+    expect(item.$cover).toBeInstanceOf(UniImage)
     expect(item.$thisEp).toEqual(expect.objectContaining({ id: 'ep-1', name: 'Episode 1' }))
     expect(item.$isAi).toBe(false)
   })
@@ -207,14 +207,14 @@ describe('image, item, and episode projections', () => {
   })
 
   it('reports the missing content type when no item translator is registered', () => {
-    expect(() => Item.create(rawItem({ contentType: 'fixture:unknown' }))).toThrow(
+    expect(() => UniItem.create(rawItem({ contentType: 'fixture:unknown' }))).toThrow(
       'fixture:unknown',
     )
   })
 
   it('keeps episode metadata and serializes structs to detached raw objects', () => {
     const raw = { $$meta: { page: 1 }, $$plugin: 'fixture', id: 'ep-1', name: 'Episode 1' }
-    const ep = new Ep(raw)
+    const ep = new UniEp(raw)
     const json = ep.toJSON()
 
     expect(json).toEqual(raw)
@@ -226,7 +226,7 @@ describe('image, item, and episode projections', () => {
 
 describe('user, comment, content, and streaming contracts', () => {
   it('projects optional avatars to Image and preserves plugin metadata', () => {
-    const raw: RawUser = {
+    const raw: UniUserRaw = {
       $$meta: { source: 'remote' },
       $$plugin: 'fixture',
       avatar: rawResource('avatar.jpg'),
@@ -235,7 +235,7 @@ describe('user, comment, content, and streaming contracts', () => {
     }
     const user = new TestUser(raw)
 
-    expect(user.avatar).toBeInstanceOf(Image)
+    expect(user.avatar).toBeInstanceOf(UniImage)
     expect(user).toMatchObject({
       $$meta: { source: 'remote' },
       $$plugin: 'fixture',
@@ -247,7 +247,7 @@ describe('user, comment, content, and streaming contracts', () => {
 
   it('copies comment counters and moderation state while retaining the sender contract', () => {
     const sender = new TestUser({ $$plugin: 'fixture', id: 'user-1', name: 'Reader' })
-    const raw: RawComment = {
+    const raw: UniCommentRaw = {
       $$plugin: 'fixture',
       childrenCount: 2,
       content: { text: 'hello', type: 'string' },

@@ -1,4 +1,4 @@
-import type { uni } from '@delta-comic/model'
+import type { UniContentPage, UniImage } from '@delta-comic/model'
 import type { Component } from 'vue'
 
 export interface Config {
@@ -23,8 +23,8 @@ export interface PopupConfig {
 export interface InitiativeItem {
   key: string
   name: string
-  icon: Component | uni.image.Image
+  icon: Component | UniImage
   bgColor?: string
-  call(page: uni.content.ContentPage): Promise<{ token?: string } | void>
-  filter(page: uni.content.ContentPage): boolean
+  call(page: UniContentPage): Promise<{ token?: string } | void>
+  filter(page: UniContentPage): boolean
 }

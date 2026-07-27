@@ -1,4 +1,4 @@
-import { uni } from '@delta-comic/model'
+import { UniComment, UniContentPage, UniItem, UniResource, UniUser } from '@delta-comic/model'
 
 import { useConfig } from '@/config'
 import { declareDepType, defaultDependencyRegistry } from '@/depends'
@@ -48,25 +48,24 @@ export const cleanupPlugin = (config: PluginConfig) => {
   attempt(() => removeSourcedEntries(Global.subscribes, plugin))
 
   for (const [contentType, value] of Object.entries(config.content ?? {})) {
-    if (value.layout) attempt(() => uni.content.ContentPage.layouts.delete(contentType))
-    if (value.itemCard) attempt(() => uni.item.Item.itemCards.delete(contentType))
-    if (value.contentPage) attempt(() => uni.content.ContentPage.contentPages.delete(contentType))
-    if (value.downloadProvider)
-      attempt(() => uni.content.ContentPage.downloadProviders.delete(contentType))
-    if (value.commentRow) attempt(() => uni.comment.Comment.commentRow.delete(contentType))
-    if (value.itemTranslator) attempt(() => uni.item.Item.itemTranslator.delete(contentType))
+    if (value.layout) attempt(() => UniContentPage.layouts.delete(contentType))
+    if (value.itemCard) attempt(() => UniItem.itemCards.delete(contentType))
+    if (value.contentPage) attempt(() => UniContentPage.contentPages.delete(contentType))
+    if (value.downloadProvider) attempt(() => UniContentPage.downloadProviders.delete(contentType))
+    if (value.commentRow) attempt(() => UniComment.commentRow.delete(contentType))
+    if (value.itemTranslator) attempt(() => UniItem.itemTranslator.delete(contentType))
   }
   for (const type of config.resource?.types ?? []) {
-    attempt(() => uni.resource.Resource.fork.delete([plugin, type.type]))
-    attempt(() => uni.resource.Resource.precedenceFork.delete([plugin, type.type]))
+    attempt(() => UniResource.fork.delete([plugin, type.type]))
+    attempt(() => UniResource.precedenceFork.delete([plugin, type.type]))
   }
   for (const name of Object.keys(config.resource?.process ?? {})) {
-    attempt(() => uni.resource.Resource.processInstances.delete([plugin, name]))
+    attempt(() => UniResource.processInstances.delete([plugin, name]))
   }
-  if (config.user?.card) attempt(() => uni.user.User.userCards.delete(plugin))
-  if (config.user?.edit) attempt(() => uni.user.User.userEditorBase.delete(plugin))
+  if (config.user?.card) attempt(() => UniUser.userCards.delete(plugin))
+  if (config.user?.edit) attempt(() => UniUser.userEditorBase.delete(plugin))
   for (const key of Object.keys(config.user?.authorIcon ?? {})) {
-    attempt(() => uni.item.Item.authorIcon.delete([plugin, key]))
+    attempt(() => UniItem.authorIcon.delete([plugin, key]))
   }
   for (const pointer of config.config ?? []) attempt(() => useConfig().$unregisterConfig(pointer))
 

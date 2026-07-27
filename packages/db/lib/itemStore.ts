@@ -1,4 +1,10 @@
-import { SourcedValue, Struct, uni } from '@delta-comic/model'
+import {
+  SourcedValue,
+  Struct,
+  UniContentPage,
+  type UniItem,
+  type UniItemRaw,
+} from '@delta-comic/model'
 import { defineMutation, useMutation, useQueryCache } from '@pinia/colada'
 import type { JSONColumnType, Kysely, Selectable } from 'kysely'
 
@@ -9,9 +15,9 @@ import type { DB } from '.'
 export interface Table {
   /** @description primary key */
   key: string
-  item: JSONColumnType<uni.item.RawItem>
+  item: JSONColumnType<UniItemRaw>
 }
-export type StorableItem = uni.item.Item | uni.item.RawItem
+export type StorableItem = UniItem | UniItemRaw
 export type StoredItem = Selectable<Table>
 export const itemKey = new SourcedValue('*')
 
@@ -26,7 +32,7 @@ export const useUpsert = defineMutation(() => {
     mutation: async ({ item, trx }: { item: StorableItem; trx?: Kysely<DB> }) =>
       withTransition(async trx => {
         const k = itemKey.toString([
-          uni.content.ContentPage.contentPages.key.toString(item.contentType),
+          UniContentPage.contentPages.key.toString(item.contentType),
           item.id,
         ])
         await trx

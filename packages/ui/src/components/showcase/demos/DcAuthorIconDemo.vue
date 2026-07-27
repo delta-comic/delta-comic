@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { uni } from '@delta-comic/model'
+import { UniItem } from '@delta-comic/model'
 import { NTag } from 'naive-ui'
 import { h } from 'vue'
 
@@ -22,7 +22,7 @@ const RegisteredPenIcon = () =>
     h('path', { 'd': 'm13.8 7.4 2.8 2.8', 'stroke': 'white', 'stroke-width': '1.5' }),
   ])
 
-uni.item.Item.authorIcon.set(['showcase', 'pen'], RegisteredPenIcon)
+UniItem.authorIcon.set(['showcase', 'pen'], RegisteredPenIcon)
 
 const resourceAuthor = {
   $$plugin: 'showcase',

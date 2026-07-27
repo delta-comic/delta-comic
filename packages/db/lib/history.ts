@@ -1,4 +1,4 @@
-import { Struct, type uni } from '@delta-comic/model'
+import { Struct, type UniEpRaw } from '@delta-comic/model'
 import {
   defineMutation,
   useMutation,
@@ -16,7 +16,7 @@ export interface Table {
   /** @description primary key */
   timestamp: number
   itemKey: string
-  ep: JSONColumnType<uni.ep.RawEp>
+  ep: JSONColumnType<UniEpRaw>
 }
 
 export type Item = Selectable<Table>

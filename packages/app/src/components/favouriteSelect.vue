@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { db, DBUtils, FavouriteDB } from '@delta-comic/db'
 import { logger } from '@delta-comic/logger'
-import type { uni } from '@delta-comic/model'
+import type { UniItem } from '@delta-comic/model'
 import { DcToggleIcon, DcState } from '@delta-comic/ui'
 import { useMessage } from 'naive-ui'
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
@@ -11,7 +11,7 @@ import { Icons } from '@/icons'
 
 const favouriteLogger = logger.scoped('app:favourite-select')
 
-const $props = defineProps<{ item: uni.item.Item; plain?: boolean }>()
+const $props = defineProps<{ item: UniItem; plain?: boolean }>()
 
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())

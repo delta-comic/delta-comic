@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FavouriteDB } from '@delta-comic/db'
-import { uni } from '@delta-comic/model'
+import { UniImage } from '@delta-comic/model'
 import { DcState } from '@delta-comic/ui'
 import { isEmpty } from 'es-toolkit/compat'
 import { useI18n } from 'vue-i18n'
@@ -63,7 +63,7 @@ const { state: favouriteItems } = FavouriteDB.useQueryItem(
             class="flex w-[30%] flex-col gap-2"
           >
             <DcImage
-              :src="uni.image.Image.create(item.cover)"
+              :src="UniImage.create(item.cover)"
               class="z-2 aspect-3/4 rounded-lg!"
               fit="cover"
             />
@@ -89,7 +89,7 @@ const { state: favouriteItems } = FavouriteDB.useQueryItem(
       >
         <DcImage
           v-if="items[0]"
-          :src="uni.image.Image.create(items[0].item.cover)"
+          :src="UniImage.create(items[0].item.cover)"
           class="size-full! rounded-lg!"
           fit="cover"
         />
