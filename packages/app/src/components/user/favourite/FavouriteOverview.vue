@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/db'
-import { type uni } from '@delta-comic/model'
+import { type UniItemRaw } from '@delta-comic/model'
 import { usePluginStore } from '@delta-comic/plugin'
 import { createDownloadMessage, DcState } from '@delta-comic/ui'
 import { useTemp } from '@delta-comic/utils'
@@ -65,7 +65,7 @@ const syncFromCloud = () =>
             t('favourite.sync.persist', { plugin: pluginStore.$getI18nName(plugin) }),
             c =>
               DBUtils.withTransition(async trx => {
-                let diff: uni.item.RawItem[] = []
+                let diff: UniItemRaw[] = []
                 c.retryable = true
                 c.description = t('favourite.sync.writing')
                 await createCard({

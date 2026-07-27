@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { uni } from '@delta-comic/model'
+import { UniUser } from '@delta-comic/model'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -7,7 +7,7 @@ import { useRoute, useRouter } from 'vue-router'
 const $router = useRouter()
 const $route = useRoute<'/user/edit/[plugin]'>()
 const plugin = computed(() => $route.params.plugin.toString())
-const editor = computed(() => uni.user.User.userEditorBase.get(plugin.value))
+const editor = computed(() => UniUser.userEditorBase.get(plugin.value))
 const { t } = useI18n()
 </script>
 

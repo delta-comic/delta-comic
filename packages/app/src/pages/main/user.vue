@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DBUtils, FavouriteDB, RecentDB, SubscribeDB } from '@delta-comic/db'
-import { uni } from '@delta-comic/model'
+import { UniUser } from '@delta-comic/model'
 import { useConfig, usePluginStore } from '@delta-comic/plugin'
 import { createReusableTemplate } from '@vueuse/core'
 import { isEmpty } from 'es-toolkit/compat'
@@ -36,19 +36,19 @@ const { data: recentCount } = RecentDB.useQuery(
 
 const app = useAppStore()
 watch(
-  () => uni.user.User.userBase,
+  () => UniUser.userBase,
   user => {
     if (!app.activatedUser) app.activatedUser = Array.from(user.values()).at(0)
   },
   { immediate: true },
 )
 const userNoTopUserList = computed(() =>
-  Array.from(uni.user.User.userBase.entries()).filter(v => v[1] != app.activatedUser),
+  Array.from(UniUser.userBase.entries()).filter(v => v[1] != app.activatedUser),
 )
 
 const showActivatedUserSelect = shallowRef(false)
 
-const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin: string }>()
+const [DefineUser, User] = createReusableTemplate<{ user: UniUser; plugin: string }>()
 </script>
 
 <template>
@@ -135,7 +135,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
       :initial="{ opacity: 0 }"
       :animate="{ opacity: 1 }"
       :exit="{ opacity: 0 }"
-      v-if="uni.user.User.userBase.size > 1"
+      v-if="UniUser.userBase.size > 1"
     >
       <NDivider class="my-0! bg-(--dc-surface)">
         <NIcon @click="showActivatedUserSelect = !showActivatedUserSelect" size="20px">
@@ -147,7 +147,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: uni.user.User; plugin:
   </AnimatePresence>
 
   <div
-    v-if="isEmpty(uni.user.User.userBase)"
+    v-if="isEmpty(UniUser.userBase)"
     class="flex h-20 w-full items-center justify-center bg-(--dc-surface)"
   >
     <span class="text-(--dc-text-secondary) italic">{{ t('user.noRegisteredUsers') }}</span>

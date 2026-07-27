@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { HistoryDB } from '@delta-comic/db'
-import { uni } from '@delta-comic/model'
+import { UniContentPage } from '@delta-comic/model'
 import { usePreventBack } from '@delta-comic/ui'
 import { useFullscreen } from '@delta-comic/utils'
 import { NButton, NIcon, useMessage } from 'naive-ui'
@@ -29,9 +29,9 @@ const page = computed(
   () => contentStore.history.get(contentStore.$createHistoryKey(contentType, id, ep))!,
 )
 
-const layout = computed(() => uni.content.ContentPage.layouts.get($route.params.contentType))
+const layout = computed(() => UniContentPage.layouts.get($route.params.contentType))
 const downloadProvider = computed(() =>
-  uni.content.ContentPage.downloadProviders.get(page.value.contentType),
+  UniContentPage.downloadProviders.get(page.value.contentType),
 )
 
 const { isFullscreen } = useFullscreen()

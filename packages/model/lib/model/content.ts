@@ -3,58 +3,58 @@ import { type Component } from 'vue'
 import { SourcedKeyMap, type StreamQuery, type SourcedKeyType } from '../struct'
 
 import * as comment from './comment'
-import type { ContentDownloadProvider } from './download'
+import type { UniContentDownloadProvider } from './download'
 import * as ep from './ep'
 import * as item from './item'
 
-export type ContentPageLike = new (
-  preload: item.Item | undefined,
+export type UniContentPageLike = new (
+  preload: item.UniItem | undefined,
   id: string,
   ep: string,
-) => ContentPage
+) => UniContentPage
 
-export type ContentType_ = SourcedKeyType<typeof ContentPage.contentPages>
-export type ContentType = Exclude<ContentType_, string>
+export type UniContentType_ = SourcedKeyType<typeof UniContentPage.contentPages>
+export type UniContentType = Exclude<UniContentType_, string>
 
-export type ViewComponent = Component<{ page: ContentPage; union?: item.Item }>
-export type LayoutComponent = Component<
-  { page: ContentPage },
+export type UniContentViewComponent = Component<{ page: UniContentPage; union?: item.UniItem }>
+export type UniContentLayoutComponent = Component<
+  { page: UniContentPage },
   any,
   any,
   any,
   any,
   any,
-  { view(args: { item?: item.Item }): any }
+  { view(args: { item?: item.UniItem }): any }
 >
 
-export abstract class ContentPage {
-  public static layouts = SourcedKeyMap.createReactive<ContentType, LayoutComponent>()
+export abstract class UniContentPage {
+  public static layouts = SourcedKeyMap.createReactive<UniContentType, UniContentLayoutComponent>()
   public static contentPages = SourcedKeyMap.createReactive<
     [plugin: string, name: string],
-    ContentPageLike
+    UniContentPageLike
   >()
   public static downloadProviders = SourcedKeyMap.createReactive<
-    ContentType,
-    ContentDownloadProvider
+    UniContentType,
+    UniContentDownloadProvider
   >()
 
   constructor(
-    public preload: item.Item | undefined,
+    public preload: item.UniItem | undefined,
     public id: string,
     public ep: string,
   ) {}
   public abstract plugin: string
-  public abstract contentType: ContentType
+  public abstract contentType: UniContentType
 
   public abstract fetchShortId(signal?: AbortSignal): Promise<string>
 
-  public abstract fetchDetail(signal?: AbortSignal): Promise<item.Item>
+  public abstract fetchDetail(signal?: AbortSignal): Promise<item.UniItem>
 
-  public abstract fetchRecommends: StreamQuery<item.Item>
+  public abstract fetchRecommends: StreamQuery<item.UniItem>
 
-  public abstract fetchComments: StreamQuery<comment.Comment>
+  public abstract fetchComments: StreamQuery<comment.UniComment>
 
-  public abstract fetchEps: StreamQuery<ep.Ep>
+  public abstract fetchEps: StreamQuery<ep.UniEp>
 
-  public abstract ViewComponent: ViewComponent
+  public abstract ViewComponent: UniContentViewComponent
 }

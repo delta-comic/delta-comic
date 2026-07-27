@@ -1,6 +1,11 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import type { ContentRefreshContext } from '@delta-comic/downloader'
-import type { uni } from '@delta-comic/model'
+import type {
+  UniContentDownloadProvider,
+  UniContentPage,
+  UniContentPageLike,
+  UniContentType,
+} from '@delta-comic/model'
 
 import { fingerprintContentDownloadProvider, fingerprintContentPage } from './contentPlan'
 
@@ -9,14 +14,14 @@ export interface ContentRefreshPluginIdentity {
   pluginIntegrity?: string
 }
 
-export type RefreshableContentDownloadProvider = uni.download.ContentDownloadProvider & {
-  refreshSource: NonNullable<uni.download.ContentDownloadProvider['refreshSource']>
+export type RefreshableContentDownloadProvider = UniContentDownloadProvider & {
+  refreshSource: NonNullable<UniContentDownloadProvider['refreshSource']>
 }
 
 export interface ContentSourceRefreshCandidate {
   context: ContentRefreshContext
-  contentPageClass: uni.content.ContentPageLike
-  page: uni.content.ContentPage
+  contentPageClass: UniContentPageLike
+  page: UniContentPage
   provider: RefreshableContentDownloadProvider
   pluginIdentity: ContentRefreshPluginIdentity
   contentPageFingerprint: string
@@ -39,7 +44,7 @@ export type ContentSourceRefreshResult =
   | {
       status: 'content-page-identity-mismatch'
       expected: { plugin: string; contentType: [string, string] }
-      current: { plugin: string; contentType: uni.content.ContentType }
+      current: { plugin: string; contentType: UniContentType }
     }
   | { status: 'plugin-metadata-missing'; plugin: string }
   | { status: 'plugin-metadata-unavailable'; plugin: string; error: unknown }
@@ -61,16 +66,14 @@ type MaybePromise<T> = Promise<T> | T
 export interface ContentSourceRefreshRuntime {
   /** Returns true only after the plugin's complete boot pipeline has settled successfully. */
   isPluginLoaded(plugin: string): boolean
-  getContentPage(contentType: [string, string]): uni.content.ContentPageLike | undefined
-  getDownloadProvider(
-    contentType: [string, string],
-  ): uni.download.ContentDownloadProvider | undefined
+  getContentPage(contentType: [string, string]): UniContentPageLike | undefined
+  getDownloadProvider(contentType: [string, string]): UniContentDownloadProvider | undefined
   getPluginIdentity(plugin: string): MaybePromise<ContentRefreshPluginIdentity | undefined>
   fingerprintProvider?: (
-    provider: uni.download.ContentDownloadProvider,
-    ContentPage: uni.content.ContentPageLike,
+    provider: UniContentDownloadProvider,
+    ContentPage: UniContentPageLike,
   ) => MaybePromise<string>
-  fingerprintContentPage?: (ContentPage: uni.content.ContentPageLike) => MaybePromise<string>
+  fingerprintContentPage?: (ContentPage: UniContentPageLike) => MaybePromise<string>
 }
 
 export function isContentSourceRefreshCandidateCurrent(
@@ -95,12 +98,12 @@ export function pluginArchiveToContentRefreshIdentity(
 }
 
 function isRefreshableProvider(
-  provider: uni.download.ContentDownloadProvider,
+  provider: UniContentDownloadProvider,
 ): provider is RefreshableContentDownloadProvider {
   return typeof provider.refreshSource === 'function'
 }
 
-function sameContentType(left: uni.content.ContentType, right: [string, string]) {
+function sameContentType(left: UniContentType, right: [string, string]) {
   return left[0] === right[0] && left[1] === right[1]
 }
 
@@ -174,7 +177,7 @@ export async function prepareContentSourceRefresh(
     return { status: 'source-refresh-unsupported', contentType: context.contentType }
   }
 
-  let page: uni.content.ContentPage
+  let page: UniContentPage
   try {
     page = new ContentPage(undefined, context.contentId, context.episodeId)
   } catch (error) {

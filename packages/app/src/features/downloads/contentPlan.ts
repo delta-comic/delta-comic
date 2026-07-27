@@ -1,6 +1,12 @@
 import { db, type PluginArchiveDB } from '@delta-comic/db'
 import type { ContentRefreshContext, EnqueuePlanInput } from '@delta-comic/downloader'
-import { uni } from '@delta-comic/model'
+import {
+  type UniContentDownloadProvider,
+  UniContentPage,
+  type UniContentPageLike,
+  type UniContentType,
+  type UniDownloadPlan,
+} from '@delta-comic/model'
 
 const textEncoder = new TextEncoder()
 
@@ -119,7 +125,7 @@ const encodeFingerprintPart = (name: string, source: string) =>
 
 const functionSource = (value: object) => Function.prototype.toString.call(value)
 
-const canonicalProviderSource = (provider: uni.download.ContentDownloadProvider) =>
+const canonicalProviderSource = (provider: UniContentDownloadProvider) =>
   [
     encodeFingerprintPart('resolve', functionSource(provider.resolve)),
     encodeFingerprintPart(
@@ -133,23 +139,21 @@ const canonicalProviderSource = (provider: uni.download.ContentDownloadProvider)
  * Fixed field order and length-prefixing make the fingerprint independent of object insertion order.
  */
 export async function fingerprintContentDownloadProvider(
-  provider: uni.download.ContentDownloadProvider,
+  provider: UniContentDownloadProvider,
 ): Promise<string> {
   const canonicalSource = canonicalProviderSource(provider)
   return `sha256:${await sha256Hex(`content-download-provider:v1|${canonicalSource}`)}`
 }
 
 /** Fingerprints the exact registered page class used to reconstruct runtime-only page state. */
-export async function fingerprintContentPage(
-  ContentPage: uni.content.ContentPageLike,
-): Promise<string> {
+export async function fingerprintContentPage(ContentPage: UniContentPageLike): Promise<string> {
   return `sha256:${await sha256Hex(`content-page:v1|${functionSource(ContentPage)}`)}`
 }
 
 export class ContentDownloadRuntimeChangedError extends Error {
-  public constructor(contentType: uni.content.ContentType) {
+  public constructor(contentType: UniContentType) {
     super(
-      `content download runtime changed for ${uni.content.ContentPage.downloadProviders.key.toString(contentType)}`,
+      `content download runtime changed for ${UniContentPage.downloadProviders.key.toString(contentType)}`,
     )
     this.name = 'ContentDownloadRuntimeChangedError'
   }
@@ -177,12 +181,12 @@ export async function getPluginDownloadIdentity(plugin: string): Promise<PluginD
 }
 
 const createRefreshContext = async (
-  page: uni.content.ContentPage,
-  expectedProvider?: uni.download.ContentDownloadProvider,
+  page: UniContentPage,
+  expectedProvider?: UniContentDownloadProvider,
 ): Promise<ContentRefreshContext> => {
   const contentType = page.contentType
-  const provider = uni.content.ContentPage.downloadProviders.get(contentType)
-  const ContentPage = uni.content.ContentPage.contentPages.get(contentType)
+  const provider = UniContentPage.downloadProviders.get(contentType)
+  const ContentPage = UniContentPage.contentPages.get(contentType)
   if (!provider || !ContentPage || (expectedProvider && provider !== expectedProvider)) {
     throw new ContentDownloadRuntimeChangedError(contentType)
   }
@@ -196,8 +200,8 @@ const createRefreshContext = async (
     fingerprintContentPage(ContentPage),
   ])
   if (
-    uni.content.ContentPage.contentPages.get(contentType) !== ContentPage ||
-    uni.content.ContentPage.downloadProviders.get(contentType) !== provider
+    UniContentPage.contentPages.get(contentType) !== ContentPage ||
+    UniContentPage.downloadProviders.get(contentType) !== provider
   ) {
     throw new ContentDownloadRuntimeChangedError(page.contentType)
   }
@@ -217,10 +221,10 @@ const createRefreshContext = async (
  * later protocol versions have one migration point, while preserving every source field today.
  */
 export async function contentPlanToEnqueueInput(
-  plan: uni.download.DownloadPlan,
-  page: uni.content.ContentPage,
+  plan: UniDownloadPlan,
+  page: UniContentPage,
   destinationId?: string,
-  provider?: uni.download.ContentDownloadProvider,
+  provider?: UniContentDownloadProvider,
 ): Promise<EnqueuePlanInput> {
   return {
     assets: plan.assets,

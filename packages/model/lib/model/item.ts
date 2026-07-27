@@ -2,20 +2,20 @@ import { type Component } from 'vue'
 
 import { SourcedKeyMap, Struct, type Metadatable } from '../struct'
 
-import { ContentPage, type ContentType, type ContentType_ } from './content'
-import { Ep, type RawEp } from './ep'
+import { UniContentPage, type UniContentType, type UniContentType_ } from './content'
+import { UniEp, type UniEpRaw } from './ep'
 import * as image from './image'
-import type { RawResource } from './resource'
+import type { UniResourceRaw } from './resource'
 
-export interface Category extends Metadatable {
+export interface UniItemCategory extends Metadatable {
   name: string
   group: string
   search: { keyword: string; source: string; sort: string }
 }
 
-export interface Author extends Metadatable {
+export interface UniItemAuthor extends Metadatable {
   label: string
-  icon: RawResource | image.RawImage | string
+  icon: UniResourceRaw | image.UniImageRaw | string
   description: string
   /**
    * 为空则不可订阅
@@ -24,31 +24,31 @@ export interface Author extends Metadatable {
   actions?: string[]
 }
 
-export interface RawItem extends Metadatable {
-  cover: RawResource | image.RawImage
+export interface UniItemRaw extends Metadatable {
+  cover: UniResourceRaw | image.UniImageRaw
   title: string
   id: string
   /** @alias tags  */
-  categories: Category[]
-  author: Author[]
+  categories: UniItemCategory[]
+  author: UniItemAuthor[]
   viewNumber?: number
   likeNumber?: number
   commentNumber?: number
   isLiked?: boolean
   updateTime?: number
   customIsAI?: boolean
-  contentType: ContentType_
+  contentType: UniContentType_
   length: string
   epLength: string
-  description?: Description
-  thisEp: RawEp
+  description?: UniItemDescription
+  thisEp: UniEpRaw
   commentSendable: boolean
   customIsSafe?: boolean
 }
 
-export type ItemCardComponent = Component<
+export type UniItemCardComponent = Component<
   {
-    item: Item
+    item: UniItem
     freeHeight?: boolean
     disabled?: boolean
     type?: 'default' | 'big' | 'small'
@@ -63,23 +63,23 @@ export type ItemCardComponent = Component<
   { default(): void; smallTopInfo(): void; cover(): void }
 >
 
-export type ItemTranslator = (raw: RawItem) => Item
+export type UniItemTranslator = (raw: UniItemRaw) => UniItem
 
-export type Description =
+export type UniItemDescription =
   | string
   | { type: 'html'; content: string }
   | { type: 'text'; content: string }
 
-export abstract class Item extends Struct<RawItem> implements RawItem {
+export abstract class UniItem extends Struct<UniItemRaw> implements UniItemRaw {
   public static itemTranslator = SourcedKeyMap.createReactive<
     [plugin: string, name: string],
-    ItemTranslator
+    UniItemTranslator
   >()
-  public static create(raw: RawItem) {
+  public static create(raw: UniItemRaw) {
     const translator = this.itemTranslator.get(raw.contentType)
     if (!translator)
       throw new Error(
-        `can not found itemTranslator contentType:"${ContentPage.contentPages.key.toString(raw.contentType)}"`,
+        `can not found itemTranslator contentType:"${UniContentPage.contentPages.key.toString(raw.contentType)}"`,
       )
     return translator(raw)
   }
@@ -88,40 +88,40 @@ export abstract class Item extends Struct<RawItem> implements RawItem {
     Component
   >()
 
-  public static itemCards = SourcedKeyMap.createReactive<ContentType, ItemCardComponent>()
+  public static itemCards = SourcedKeyMap.createReactive<UniContentType, UniItemCardComponent>()
 
   public abstract like(): Promise<any>
   public abstract report(): Promise<any>
   public abstract sendComment(text: string): Promise<any>
 
-  public static is(value: unknown): value is Item {
+  public static is(value: unknown): value is UniItem {
     return value instanceof this
   }
-  public cover: RawResource | image.RawImage
+  public cover: UniResourceRaw | image.UniImageRaw
   public get $cover() {
-    return image.Image.create(this.cover)
+    return image.UniImage.create(this.cover)
   }
   public title: string
   public id: string
-  public categories: Category[]
-  public author: Author[]
+  public categories: UniItemCategory[]
+  public author: UniItemAuthor[]
   public viewNumber?: number
   public likeNumber?: number
   public commentNumber?: number
   public isLiked?: boolean
-  public description?: Description
+  public description?: UniItemDescription
   public updateTime?: number
-  public contentType: ContentType
+  public contentType: UniContentType
   public length: string
   public epLength: string
   public $$plugin: string
   public $$meta
-  public thisEp: RawEp
+  public thisEp: UniEpRaw
   public customIsSafe?: boolean
   public get $thisEp() {
-    return new Ep(this.thisEp)
+    return new UniEp(this.thisEp)
   }
-  constructor(v: RawItem) {
+  constructor(v: UniItemRaw) {
     super(v)
     this.$$plugin = v.$$plugin
     this.$$meta = v.$$meta
@@ -138,7 +138,7 @@ export abstract class Item extends Struct<RawItem> implements RawItem {
     this.commentNumber = v.commentNumber
     this.isLiked = v.isLiked
     this.customIsAI = v.customIsAI
-    this.contentType = ContentPage.contentPages.key.toJSON(v.contentType)
+    this.contentType = UniContentPage.contentPages.key.toJSON(v.contentType)
     this.length = v.length
     this.epLength = v.epLength
     this.description = v.description

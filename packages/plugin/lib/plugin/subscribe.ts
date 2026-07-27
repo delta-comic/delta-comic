@@ -1,11 +1,11 @@
-import type { StreamQuery, uni } from '@delta-comic/model'
+import type { StreamQuery, UniItem, UniItemAuthor } from '@delta-comic/model'
 
 export interface Config {
   getUpdateList(
-    olds: { author: uni.item.Author; list: uni.item.Item[] }[],
+    olds: { author: UniItemAuthor; list: UniItem[] }[],
     signal: AbortSignal,
-  ): PromiseLike<{ isUpdated: boolean; whichUpdated: uni.item.Author[] }>
-  onAdd?(author: uni.item.Author): any
-  onRemove?(author: uni.item.Author): any
-  fetchAuthorContent: StreamQuery<uni.item.Item, { author: uni.item.Author }>
+  ): PromiseLike<{ isUpdated: boolean; whichUpdated: UniItemAuthor[] }>
+  onAdd?(author: UniItemAuthor): any
+  onRemove?(author: UniItemAuthor): any
+  fetchAuthorContent: StreamQuery<UniItem, { author: UniItemAuthor }>
 }

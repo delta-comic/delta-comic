@@ -1,4 +1,4 @@
-import { uni } from '@delta-comic/model'
+import { UniResource } from '@delta-comic/model'
 
 import { pluginI18n, pluginMessageKey } from '@/i18n'
 import type { PluginConfig } from '@/plugin'
@@ -17,8 +17,7 @@ class _TestPluginResource extends PluginBooter {
     const results = await Promise.all(types.map(type => testResourceApi(type.val)))
     const displayResult = new Array<[type: (typeof types)[number], time: number | false]>()
     types.forEach((type, i) => {
-      if (results[i][1])
-        uni.resource.Resource.precedenceFork.set([cfg.name, type.type], results[i][0])
+      if (results[i][1]) UniResource.precedenceFork.set([cfg.name, type.type], results[i][0])
       displayResult.push([type, results[i][1]])
     })
     if (results.some(v => v[1] == false)) {

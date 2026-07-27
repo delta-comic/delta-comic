@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { uni } from '@delta-comic/model'
+import { type UniEp, UniItem, type UniItemRaw } from '@delta-comic/model'
 import { computed } from 'vue'
 
 import { Icons } from '@/icons'
-const $props = defineProps<{ item: uni.item.RawItem; ep: uni.ep.Ep['id'] }>()
+const $props = defineProps<{ item: UniItemRaw; ep: UniEp['id'] }>()
 
-const item = computed(() => uni.item.Item.create($props.item))
+const item = computed(() => UniItem.create($props.item))
 </script>
 
 <template>
-  <component :is="uni.item.Item.itemCards.get(item.contentType)" :item>
+  <component :is="UniItem.itemCards.get(item.contentType)" :item>
     <div class="flex flex-nowrap items-center dc-ellipsis *:text-nowrap">
       <NIcon color="var(--dc-text-secondary)" size="14px">
         <Icons.antd.UserOutlined />

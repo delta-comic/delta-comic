@@ -1,5 +1,11 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import { uni } from '@delta-comic/model'
+import {
+  type UniContentDownloadProvider,
+  UniContentPage,
+  type UniContentPageLike,
+  type UniContentType,
+  type UniDownloadPlan,
+} from '@delta-comic/model'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const database = vi.hoisted(() => {
@@ -28,11 +34,7 @@ const model = vi.hoisted(() => {
 
 vi.mock('@delta-comic/db', () => ({ db: { selectFrom: database.selectFrom } }))
 vi.mock('@delta-comic/model', () => ({
-  uni: {
-    content: {
-      ContentPage: { contentPages: model.contentPages, downloadProviders: model.downloadProviders },
-    },
-  },
+  UniContentPage: { contentPages: model.contentPages, downloadProviders: model.downloadProviders },
 }))
 
 import {
@@ -42,7 +44,7 @@ import {
   sha256Hex,
 } from './contentPlan'
 
-const contentType: uni.content.ContentType = ['reader', 'comic']
+const contentType: UniContentType = ['reader', 'comic']
 
 const TestContentPage = class {
   public contentType = contentType
@@ -53,11 +55,11 @@ const TestContentPage = class {
     public id: string,
     public ep: string,
   ) {}
-} as unknown as uni.content.ContentPageLike
+} as unknown as UniContentPageLike
 
 const page = new TestContentPage(undefined, 'comic-1', 'episode-2')
 
-const httpPlan: uni.download.DownloadPlan = {
+const httpPlan: UniDownloadPlan = {
   assets: [
     {
       key: 'cover',
@@ -81,9 +83,9 @@ const httpPlan: uni.download.DownloadPlan = {
 
 const resolve = async () => httpPlan
 
-const registerProvider = (provider: uni.download.ContentDownloadProvider = { resolve }) => {
+const registerProvider = (provider: UniContentDownloadProvider = { resolve }) => {
   model.contentPages.set(contentType, TestContentPage)
-  uni.content.ContentPage.downloadProviders.set(contentType, provider)
+  UniContentPage.downloadProviders.set(contentType, provider)
   return provider
 }
 
@@ -111,7 +113,7 @@ describe('contentPlanToEnqueueInput', () => {
 
   afterEach(() => {
     model.contentPages.clear()
-    uni.content.ContentPage.downloadProviders.clear()
+    UniContentPage.downloadProviders.clear()
   })
 
   it('preserves HTTP mirrors and persists the exact content reconstruction context', async () => {
@@ -252,7 +254,7 @@ describe('fingerprintContentDownloadProvider', () => {
         public id: string,
         public ep: string,
       ) {}
-    } as unknown as uni.content.ContentPageLike
+    } as unknown as UniContentPageLike
 
     const [first, second] = await Promise.all([
       fingerprintContentPage(TestContentPage),
@@ -269,11 +271,10 @@ describe('fingerprintContentDownloadProvider', () => {
   })
 
   it('changes when refreshSource implementation changes', async () => {
-    const refreshSourceA: NonNullable<
-      uni.download.ContentDownloadProvider['refreshSource']
-    > = async input => input.source
+    const refreshSourceA: NonNullable<UniContentDownloadProvider['refreshSource']> = async input =>
+      input.source
     const refreshSourceB: NonNullable<
-      uni.download.ContentDownloadProvider['refreshSource']
+      UniContentDownloadProvider['refreshSource']
     > = async input => ({ ...input.source })
 
     const [first, second] = await Promise.all([
@@ -285,9 +286,8 @@ describe('fingerprintContentDownloadProvider', () => {
   })
 
   it('is independent of provider property insertion order', async () => {
-    const refreshSource: NonNullable<
-      uni.download.ContentDownloadProvider['refreshSource']
-    > = async input => input.source
+    const refreshSource: NonNullable<UniContentDownloadProvider['refreshSource']> = async input =>
+      input.source
     const forward = { resolve, refreshSource }
     const reverse = Object.assign({}, { refreshSource }, { resolve })
 

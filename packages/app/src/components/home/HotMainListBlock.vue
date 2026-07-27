@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { uni } from '@delta-comic/model'
+import { type UniContentType_, UniItem } from '@delta-comic/model'
 import type { Search } from '@delta-comic/plugin'
 import { useQuery } from '@pinia/colada'
 import { chunk } from 'es-toolkit'
@@ -11,11 +11,10 @@ const source = useQuery({
   query: async ({ signal }) => await props.block.content(signal),
 })
 
-const getItemCard = (contentType: uni.content.ContentType_) =>
-  uni.item.Item.itemCards.get(contentType)
+const getItemCard = (contentType: UniContentType_) => UniItem.itemCards.get(contentType)
 
 const splitItems = (value: unknown) => {
-  const items = Array.isArray(value) ? (value as uni.item.Item[]) : []
+  const items = Array.isArray(value) ? (value as UniItem[]) : []
   return chunk(items, Math.max(1, Math.ceil(items.length / 2)))
 }
 </script>

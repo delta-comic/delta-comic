@@ -1,5 +1,5 @@
 import { logger } from '@delta-comic/logger'
-import { uni } from '@delta-comic/model'
+import { UniComment, UniContentPage, UniItem, UniResource, UniUser } from '@delta-comic/model'
 
 import { useConfig } from '@/config'
 import { Global } from '@/global'
@@ -21,20 +21,20 @@ class _ConfigSetter extends PluginBooter {
         ct,
         { commentRow, contentPage, downloadProvider, itemCard, layout, itemTranslator },
       ] of Object.entries(content)) {
-        if (layout) uni.content.ContentPage.layouts.set(ct, layout)
-        if (itemCard) uni.item.Item.itemCards.set(ct, itemCard)
-        if (contentPage) uni.content.ContentPage.contentPages.set(ct, contentPage)
-        if (downloadProvider) uni.content.ContentPage.downloadProviders.set(ct, downloadProvider)
-        if (commentRow) uni.comment.Comment.commentRow.set(ct, commentRow)
-        if (itemTranslator) uni.item.Item.itemTranslator.set(ct, itemTranslator)
+        if (layout) UniContentPage.layouts.set(ct, layout)
+        if (itemCard) UniItem.itemCards.set(ct, itemCard)
+        if (contentPage) UniContentPage.contentPages.set(ct, contentPage)
+        if (downloadProvider) UniContentPage.downloadProviders.set(ct, downloadProvider)
+        if (commentRow) UniComment.commentRow.set(ct, commentRow)
+        if (itemTranslator) UniItem.itemTranslator.set(ct, itemTranslator)
       }
 
     if (resource) {
       if (resource.types)
-        for (const type of resource.types) uni.resource.Resource.fork.set([plugin, type.type], type)
+        for (const type of resource.types) UniResource.fork.set([plugin, type.type], type)
       if (resource.process)
         for (const [name, fn] of Object.entries(resource.process))
-          uni.resource.Resource.processInstances.set([plugin, name], fn)
+          UniResource.processInstances.set([plugin, name], fn)
     }
     if (search) {
       if (search.categories) for (const c of search.categories) Global.addCategories(plugin, c)
@@ -52,14 +52,14 @@ class _ConfigSetter extends PluginBooter {
       }
     }
     if (user) {
-      if (user.card) uni.user.User.userCards.set(plugin, user.card)
-      if (user.edit) uni.user.User.userEditorBase.set(plugin, user.edit as any)
+      if (user.card) UniUser.userCards.set(plugin, user.card)
+      if (user.edit) UniUser.userEditorBase.set(plugin, user.edit as any)
       if (user.userActions)
         for (const [type, value] of Object.entries(user.userActions))
           Global.userActions.set([plugin, type], value)
       if (user.authorIcon)
         for (const [key, value] of Object.entries(user.authorIcon))
-          uni.item.Item.authorIcon.set([plugin, key], value as any)
+          UniItem.authorIcon.set([plugin, key], value as any)
     }
     if (subscribe) {
       for (const [key, value] of Object.entries(subscribe))

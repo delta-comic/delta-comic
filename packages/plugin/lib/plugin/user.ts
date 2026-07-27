@@ -1,17 +1,17 @@
-import type { uni } from '@delta-comic/model'
+import type { UniItem, UniItemAuthor, UniItemRaw, UniUserCardComponent } from '@delta-comic/model'
 import type { Component, MaybeRefOrGetter } from 'vue'
 
 export interface Config {
   edit?: Component
-  card?: uni.user.UserCardComponent
+  card?: UniUserCardComponent
   authorIcon?: Record<string, Component>
   /**
    * 1. download
    * 2. upload (收藏那些云端未收藏的漫画)
    */
   syncFavourite?: {
-    download: () => PromiseLike<uni.item.Item[]>
-    upload: (items: uni.item.RawItem[]) => PromiseLike<any>
+    download: () => PromiseLike<UniItem[]>
+    upload: (items: UniItemRaw[]) => PromiseLike<any>
   }
 
   /**
@@ -25,7 +25,7 @@ export interface Config {
 }
 
 export interface UserAction {
-  call(author: uni.item.Author): any
+  call(author: UniItemAuthor): any
   name: string
   icon?: Component
 }

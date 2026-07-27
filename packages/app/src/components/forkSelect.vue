@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { uni } from '@delta-comic/model'
+import { UniImage } from '@delta-comic/model'
 import { NSelect } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
@@ -15,15 +15,9 @@ const { t } = useI18n()
       <div
         v-for="[plugin, value] in Object.entries(
           Object.groupBy(
-            Array.from(uni.image.Image.fork.entries()).map(([key, { urls: forks }]) => {
-              const [plugin, namespace] = uni.image.Image.fork.key.toJSON(key)
-              return {
-                plugin,
-                namespace,
-                forks,
-                active: uni.image.Image.precedenceFork.get(key)!,
-                key,
-              }
+            Array.from(UniImage.fork.entries()).map(([key, { urls: forks }]) => {
+              const [plugin, namespace] = UniImage.fork.key.toJSON(key)
+              return { plugin, namespace, forks, active: UniImage.precedenceFork.get(key)!, key }
             }),
             v => v.plugin,
           ),
@@ -37,7 +31,7 @@ const { t } = useI18n()
             :value="v.active"
             @update:value="
               url => {
-                uni.image.Image.precedenceFork.set(v.key, url)
+                UniImage.precedenceFork.set(v.key, url)
                 $emit('change')
               }
             "

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { uni } from '@delta-comic/model'
+import { UniItem } from '@delta-comic/model'
 import { usePluginStore } from '@delta-comic/plugin'
 import { useTemp } from '@delta-comic/utils'
 import { useInfiniteQuery } from '@pinia/colada'
@@ -75,7 +75,7 @@ watch(
     ref="waterfall"
   >
     <component
-      :is="uni.item.Item.itemCards.get(item.contentType)"
+      :is="UniItem.itemCards.get(item.contentType)"
       :item
       type="small"
       free-height

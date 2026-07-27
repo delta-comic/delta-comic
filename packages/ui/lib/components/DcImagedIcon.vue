@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { uni } from '@delta-comic/model'
+import { UniImage, UniResource } from '@delta-comic/model'
 import { NIcon } from 'naive-ui'
 import type { Component } from 'vue'
 
@@ -9,11 +9,7 @@ import DcImage from './DcImage.vue'
 import DcVar from './DcVar.vue'
 
 const $props = defineProps<
-  {
-    icon: Component | uni.image.Image | uni.resource.Resource
-    bgColor?: string
-    sizeSpacing: number
-  } & StyleProps
+  { icon: Component | UniImage | UniResource; bgColor?: string; sizeSpacing: number } & StyleProps
 >()
 </script>
 
@@ -27,8 +23,8 @@ const $props = defineProps<
   >
     <DcImage
       :class="cn('aspect-square size-[--spacing(var(--box-size))] shrink-0', $props.class)"
-      v-if="uni.image.Image.is(icon) || uni.resource.Resource.is(icon)"
-      :src="uni.resource.Resource.is(icon) ? uni.image.Image.create(icon) : icon"
+      v-if="UniImage.is(icon) || UniResource.is(icon)"
+      :src="UniResource.is(icon) ? UniImage.create(icon) : icon"
       round
       fit="cover"
       :style

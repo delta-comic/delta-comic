@@ -1,4 +1,4 @@
-import type { uni } from '@delta-comic/model'
+import type { UniContentPage, UniEp } from '@delta-comic/model'
 import type { PageKey } from '@delta-comic/model'
 
 export class EpisodePaginationError extends Error {
@@ -13,11 +13,11 @@ function pageIdentity(page: PageKey) {
 }
 
 export async function loadContentEpisodes(
-  page: Pick<uni.content.ContentPage, 'fetchEps'>,
+  page: Pick<UniContentPage, 'fetchEps'>,
   signal: AbortSignal,
   maxPages = 1000,
-): Promise<uni.ep.Ep[]> {
-  const episodes = new Map<string, uni.ep.Ep>()
+): Promise<UniEp[]> {
+  const episodes = new Map<string, UniEp>()
   const visitedPages = new Set<string>()
   let pageKey = page.fetchEps.initPage
 

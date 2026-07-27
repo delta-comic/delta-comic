@@ -1,4 +1,4 @@
-import { SourcedValue, type SourcedKeyType, type uni } from '@delta-comic/model'
+import { SourcedValue, type SourcedKeyType, type UniItemAuthor } from '@delta-comic/model'
 import {
   defineMutation,
   useMutation,
@@ -16,7 +16,7 @@ export type Key_ = SourcedKeyType<typeof key>
 export type Key = Exclude<Key_, string>
 
 export interface AuthorTable {
-  author: JSONColumnType<uni.item.Author>
+  author: JSONColumnType<UniItemAuthor>
   itemKey: null
   type: 'author'
   /** @description primary key */

@@ -1,5 +1,5 @@
 import type { ContentRefreshContext } from '@delta-comic/downloader'
-import type { uni } from '@delta-comic/model'
+import type { UniContentDownloadProvider, UniContentPageLike } from '@delta-comic/model'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const mocks = vi.hoisted(() => ({
@@ -34,11 +34,11 @@ const context = {
 const provider = {
   resolve: vi.fn(),
   refreshSource: vi.fn(),
-} as unknown as uni.download.ContentDownloadProvider
+} as unknown as UniContentDownloadProvider
 
 function contentPageClass(
   identity: { plugin?: string; contentType?: [string, string] } = {},
-): uni.content.ContentPageLike {
+): UniContentPageLike {
   return class {
     public plugin = identity.plugin ?? 'reader'
     public contentType = identity.contentType ?? ['reader', 'manga']
@@ -48,7 +48,7 @@ function contentPageClass(
       public id: string,
       public ep: string,
     ) {}
-  } as unknown as uni.content.ContentPageLike
+  } as unknown as UniContentPageLike
 }
 
 function runtime(
@@ -164,7 +164,7 @@ describe('content source refresh preparation', () => {
       constructor() {
         construct()
       }
-    } as unknown as uni.content.ContentPageLike
+    } as unknown as UniContentPageLike
 
     await expect(
       prepareContentSourceRefresh(
@@ -194,7 +194,7 @@ describe('content source refresh preparation', () => {
       constructor(...args: [unknown, string, string]) {
         constructorArguments.push(args)
       }
-    } as unknown as uni.content.ContentPageLike
+    } as unknown as UniContentPageLike
 
     const result = await prepareContentSourceRefresh(
       context,
@@ -211,7 +211,7 @@ describe('content source refresh preparation', () => {
       constructor() {
         throw failure
       }
-    } as unknown as uni.content.ContentPageLike
+    } as unknown as UniContentPageLike
 
     await expect(
       prepareContentSourceRefresh(context, runtime({ getContentPage: () => ThrowingPage })),

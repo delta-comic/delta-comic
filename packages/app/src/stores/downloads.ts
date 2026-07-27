@@ -1,5 +1,5 @@
 import { logger } from '@delta-comic/logger'
-import { uni } from '@delta-comic/model'
+import { UniContentPage } from '@delta-comic/model'
 import { usePluginStore } from '@delta-comic/plugin'
 import { defineStore } from 'pinia'
 import { computed, shallowRef, watch } from 'vue'
@@ -102,10 +102,9 @@ export const useDownloadsStore = defineStore('downloads', () => {
 
   const sourceRefreshRuntime = {
     isPluginLoaded: (plugin: string) => pluginStore.$isLoaded(plugin),
-    getContentPage: (contentType: [string, string]) =>
-      uni.content.ContentPage.contentPages.get(contentType),
+    getContentPage: (contentType: [string, string]) => UniContentPage.contentPages.get(contentType),
     getDownloadProvider: (contentType: [string, string]) =>
-      uni.content.ContentPage.downloadProviders.get(contentType),
+      UniContentPage.downloadProviders.get(contentType),
     getPluginIdentity: getPluginDownloadIdentity,
   }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { logger } from '@delta-comic/logger'
-import { uni } from '@delta-comic/model'
+import { type UniImage_, UniResource } from '@delta-comic/model'
 import { useTemp } from '@delta-comic/utils'
 import { computedAsync } from '@vueuse/core'
 import { isString } from 'es-toolkit/compat'
@@ -25,7 +25,7 @@ const imageLogger = logger.scoped('ui:image')
 
 const $props = withDefaults(
   defineProps<{
-    src?: uni.image.Image_
+    src?: UniImage_
     alt?: string
     previewable?: boolean
     retryMax?: number
@@ -39,7 +39,7 @@ const $props = withDefaults(
     imgProp?: ImgHTMLAttributes
     cacheList?: { loaded: Set<string>; error: Set<string> }
     fetchpriority?: 'high' | 'low' | 'auto'
-    fallback?: uni.image.Image_
+    fallback?: UniImage_
   }>(),
   { fetchpriority: 'auto', retryMax: 4 },
 )
@@ -66,7 +66,7 @@ const handleFail = async () => {
   reloadTime++
   show.value = false
   if (reloadTime > $props.retryMax) {
-    if (!uni.resource.Resource.is($props.src)) {
+    if (!UniResource.is($props.src)) {
       isForkEmpty = true
       handleFail()
       return
