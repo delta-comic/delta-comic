@@ -1,5 +1,14 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.5](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.4...3.0.0-next.5) (2026-07-27)
+
+
+### Bug Fixes
+
+* **release:** 触发 Uni 模型 API 预览发布 ([954327c](https://github.com/delta-comic/delta-comic/commit/954327c5d76bda6a84be348d155cd032a0e72176))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.4](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.3...3.0.0-next.4) (2026-07-26)
 
 
