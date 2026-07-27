@@ -1,5 +1,15 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.6](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.5...3.0.0-next.6) (2026-07-27)
+
+
+### Features
+
+* **ui:** 提取共享 Tailwind 插件 ([d2cf313](https://github.com/delta-comic/delta-comic/commit/d2cf313b89590d1fecc8d1b6c5b307e9a1f35b1c))
+* **ui:** 重新设计样式系统 ([1782b00](https://github.com/delta-comic/delta-comic/commit/1782b00adb2fa9dbc83a66c6998138eaefe9bb28))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.5](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.4...3.0.0-next.5) (2026-07-27)
 
 
