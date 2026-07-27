@@ -3,6 +3,7 @@ import DcAuthorIcon from './components/DcAuthorIcon.vue'
 import DcAwait from './components/DcAwait.vue'
 import DcCell from './components/DcCell.vue'
 import DcCellGroup from './components/DcCellGroup.vue'
+import DcConfigProvider from './components/DcConfigProvider.vue'
 import DcContent from './components/DcContent.vue'
 import DcImage from './components/DcImage.vue'
 import DcImagedIcon from './components/DcImagedIcon.vue'
@@ -18,6 +19,7 @@ import DcVar from './components/DcVar.vue'
 import DcWaterfall from './components/DcWaterfall.vue'
 import DcEnvironment from './environment/DcEnvironment.vue'
 export * from './components/form'
+export * from './components/config-provider/context'
 export * from './environment'
 export * from './i18n'
 
@@ -25,6 +27,7 @@ export {
   DcAuthorIcon,
   DcCell,
   DcCellGroup,
+  DcConfigProvider,
   DcImagedIcon,
   DcAwait,
   DcContent,

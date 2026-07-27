@@ -1,6 +1,6 @@
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
-import { defineComponent, h, nextTick, ref, Suspense } from 'vue'
+import { defineComponent, h, nextTick, Suspense } from 'vue'
 import type { SetupContext } from 'vue'
 
 // cspell:ignore vnode
@@ -16,7 +16,6 @@ const {
   revealMainEntry,
   router,
   shareToken,
-  styleRefs,
 } = vi.hoisted(() => ({
   clipboard: { read: vi.fn(), write: vi.fn() },
   definitions: new Map<string, (...args: unknown[]) => unknown>(),
@@ -41,7 +40,6 @@ const {
       }>
     }
   >(),
-  styleRefs: [] as Array<{ value: string }>,
 }))
 
 await vi.hoisted(async () => {
@@ -64,7 +62,6 @@ await vi.hoisted(async () => {
     useDialog: () => dialog,
     useLoadingBar: () => ({ start: vi.fn() }),
     useMessage: () => message,
-    useThemeVars: () => window.$$lib$$.Vue.ref({ fontSize12: '12px', primaryColor: '#234567' }),
   }
 })
 
@@ -79,7 +76,6 @@ vi.mock('@delta-comic/utils', () => ({
 vi.mock('@/stores/downloads', () => ({ useDownloadsStore: () => downloads }))
 vi.mock('@vueuse/core', () => ({
   useIntervalFn: (callback: () => Promise<void>) => intervalCallbacks.push(callback),
-  useStyleTag: (style: { value: string }) => styleRefs.push(style),
 }))
 vi.mock('es-toolkit', () => ({
   Mutex: class Mutex {
@@ -110,7 +106,6 @@ vi.mock('naive-ui', () => ({
   useDialog: () => dialog,
   useLoadingBar: () => ({ start: vi.fn() }),
   useMessage: () => message,
-  useThemeVars: () => ref({ fontSize12: '12px', primaryColor: '#234567' }),
 }))
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -289,11 +284,10 @@ describe('AppSetup startup shell', () => {
     pluginRuntime.readRecovery
       .mockReset()
       .mockReturnValue({ plugins: ['reader'], reason: 'previous startup failed' })
-    styleRefs.length = 0
     revealMainEntry.mockReset().mockResolvedValue(undefined)
   })
 
-  it('exposes theme variables, activates preboot and delegates recovery actions', async () => {
+  it('activates preboot and delegates recovery actions', async () => {
     const wrapper = mount(AppSetup, {
       global: {
         stubs: {
@@ -308,8 +302,6 @@ describe('AppSetup startup shell', () => {
     await flushPromises()
     await nextTick()
     expect(pluginRuntime.activatePreboot).toHaveBeenCalledOnce()
-    expect(styleRefs[0]?.value).toContain('--nui-primary-color: #234567;')
-    expect(styleRefs[0]?.value).toContain('--nui-font-size-12: 12px;')
 
     const recoveryListeners = wrapper.getComponent({ name: 'PrebootRecoveryAlert' }).vm.$.vnode
       .props as Record<string, (...args: unknown[]) => void>

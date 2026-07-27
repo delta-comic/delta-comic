@@ -6,5 +6,3 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 
 @plugin '../tailwind/index.ts';
-@source './';
-@source '../lib';

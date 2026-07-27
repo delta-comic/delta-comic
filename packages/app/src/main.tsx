@@ -1,6 +1,11 @@
 import { pluginRuntime, useConfig } from '@delta-comic/plugin'
 import 'core-js'
-import { configureUiI18n, type UiMessageKey, type UiMessageParams } from '@delta-comic/ui'
+import {
+  configureUiI18n,
+  DcConfigProvider,
+  type UiMessageKey,
+  type UiMessageParams,
+} from '@delta-comic/ui'
 import { PiniaColada } from '@pinia/colada'
 import { reactiveComputed, useDark } from '@vueuse/core'
 import Color from 'color'
@@ -102,16 +107,18 @@ const app = createApp(
         theme={config.isDark ? darkTheme : lightTheme}
         themeOverrides={themeOverrides}
       >
-        <NGlobalStyle />
-        <NLoadingBarProvider>
-          <NDialogProvider>
-            <div class='h-full overflow-hidden'>
-              <NMessageProvider max={5}>
-                <AppSetup />
-              </NMessageProvider>
-            </div>
-          </NDialogProvider>
-        </NLoadingBarProvider>
+        <DcConfigProvider locale={locale.value} theme={config.isDark ? 'dark' : 'light'}>
+          <NGlobalStyle />
+          <NLoadingBarProvider>
+            <NDialogProvider>
+              <div class='h-full overflow-hidden'>
+                <NMessageProvider max={5}>
+                  <AppSetup />
+                </NMessageProvider>
+              </div>
+            </NDialogProvider>
+          </NLoadingBarProvider>
+        </DcConfigProvider>
       </NConfigProvider>
     )
   }),
