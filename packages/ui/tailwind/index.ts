@@ -1,0 +1,227 @@
+import safeArea from 'tailwindcss-safe-area-capacitor'
+import plugin, { type PluginWithConfig } from 'tailwindcss/plugin'
+
+const interactiveUtility = {
+  'cursor': 'pointer',
+  'WebkitTapHighlightColor': 'transparent',
+  '&:active': { opacity: '0.72' },
+}
+
+const hairlineAfter = {
+  pointerEvents: 'none',
+  position: 'absolute',
+  boxSizing: 'border-box',
+  borderColor: 'var(--dc-color-border)',
+  borderStyle: 'solid',
+  content: '""',
+}
+
+export const DeltaComicTailwindPlugin: PluginWithConfig = plugin(
+  ({ addBase, addUtilities }) => {
+    addBase({
+      ':root, :host, body': {
+        '--safe-area-inset-top': '0px',
+        '--safe-area-inset-right': '0px',
+        '--safe-area-inset-bottom': '0px',
+        '--safe-area-inset-left': '0px',
+        '--dc-background': 'var(--nui-body-color, #f7f8fa)',
+        '--dc-surface': 'var(--nui-card-color, #ffffff)',
+        '--dc-text': 'var(--nui-text-color-1, #323233)',
+        '--dc-text-secondary': 'var(--nui-text-color-2, #969799)',
+        '--dc-text-tertiary': 'var(--nui-text-color-3, #c8c9cc)',
+        '--dc-border': 'var(--nui-divider-color, #ebedf0)',
+        '--dc-overlay': 'rgb(0 0 0 / 48%)',
+        '--dc-error': 'var(--nui-error-color, #ee0a24)',
+        '--dc-gray-1': 'var(--nui-hover-color, #f2f3f5)',
+        '--dc-gray-6': '#969799',
+        '--dc-gray-7': '#646566',
+        '--dc-navigation-height': '72px',
+        '--dc-desktop-navigation-width': '88px',
+        '--dc-page-header-height': '52px',
+        '--dc-tabs-height': '44px',
+        '--dc-tabs-padding-bottom': '10px',
+        '--dc-content-padding': '16px',
+        '--bili-blue': '#00aeec',
+        '--dc-color-page': 'var(--dc-background)',
+        '--dc-color-surface': 'var(--dc-surface)',
+        '--dc-color-text': 'var(--dc-text)',
+        '--dc-color-text-secondary': 'var(--dc-text-secondary)',
+        '--dc-color-text-tertiary': 'var(--dc-text-tertiary)',
+        '--dc-color-border': 'var(--dc-border)',
+        '--dc-color-active': 'var(--dc-gray-1)',
+        '--dc-color-overlay': 'var(--dc-overlay)',
+        '--dc-color-danger': 'var(--dc-error)',
+        '--dc-color-primary': 'var(--p-color, var(--nui-primary-color, #1989fa))',
+        '--dc-color-icon': 'var(--dc-text-tertiary)',
+        '--dc-font-size-sm': '12px',
+        '--dc-font-size-md': '14px',
+        '--dc-font-size-lg': '16px',
+        '--dc-line-height-sm': '18px',
+        '--dc-line-height-md': '24px',
+        '--dc-space-1': '4px',
+        '--dc-space-2': '8px',
+        '--dc-space-3': '12px',
+        '--dc-space-4': '16px',
+        '--dc-radius-lg': '8px',
+        '--dc-duration-fast': '200ms',
+        '--dc-duration-base': '300ms',
+
+        // Transitional aliases for plugin-authored styles.
+        '--dc-background-2': 'var(--dc-surface)',
+        '--dc-black': 'var(--dc-overlay)',
+        '--dc-text-color': 'var(--dc-text)',
+        '--dc-text-color-2': 'var(--dc-text-secondary)',
+        '--dc-text-color-3': 'var(--dc-text-tertiary)',
+        '--dc-danger-color': 'var(--dc-error)',
+        '--dc-tabs-line-height': 'var(--dc-tabs-height)',
+        '--dc-cell-group-inset-padding': 'var(--dc-content-padding)',
+      },
+      ":root[data-theme='light'], :root[data-theme='light'] body": {
+        '--dc-background': '#f5f5f7',
+        '--dc-surface': '#ffffff',
+        '--dc-text': '#1f2329',
+        '--dc-text-secondary': '#646a73',
+        '--dc-text-tertiary': '#8f959e',
+        '--dc-border': 'rgb(31 35 41 / 10%)',
+        '--dc-overlay': 'rgb(0 0 0 / 48%)',
+        '--dc-error': '#d03050',
+        '--dc-gray-1': '#f7f8fa',
+        '--dc-gray-6': '#969799',
+        '--dc-gray-7': '#646566',
+        '--p-color': '#fb7299',
+      },
+      ":root[data-theme='dark'], :root[data-theme='dark'] body": {
+        '--dc-background': '#101113',
+        '--dc-surface': '#17181a',
+        '--dc-text': '#f2f3f5',
+        '--dc-text-secondary': '#b7bbc2',
+        '--dc-text-tertiary': '#8c9199',
+        '--dc-border': 'rgb(255 255 255 / 10%)',
+        '--dc-overlay': 'rgb(0 0 0 / 64%)',
+        '--dc-gray-1': '#202226',
+        '--dc-gray-6': '#a1a5ac',
+        '--dc-gray-7': '#c2c5ca',
+        '--dc-error': '#d03050',
+        '--p-color': '#fb7299',
+      },
+      '*': { boxSizing: 'border-box', userSelect: 'none', WebkitUserSelect: 'none' },
+      'html, body': { overflow: 'hidden !important' },
+      'body': {
+        margin: '0',
+        background: 'var(--dc-background)',
+        color: 'var(--dc-text)',
+        fontFamily: 'var(--nui-font-family, system-ui, sans-serif)',
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+      },
+      'input::-webkit-search-cancel-button': { display: 'none' },
+      '@media (min-width: 60rem)': { ':root, :host, body': { '--dc-content-padding': '24px' } },
+      '.v-binder-follower-container': { zIndex: '1000000 !important' },
+      '#messages': {
+        'position': 'fixed',
+        'zIndex': '2147483647',
+        'inset': '0',
+        'width': '100vw',
+        'height': '100vh',
+        'pointerEvents': 'none',
+        '*': { pointerEvents: 'all' },
+      },
+      '* .n-progress-graph-line-indicator': { display: 'none !important' },
+      '.list-move, .list-enter-active, .list-leave-active': {
+        transition: 'transform 420ms cubic-bezier(0.22, 1.5, 0.5, 1), opacity 240ms ease-out',
+        willChange: 'transform, opacity',
+      },
+      '.list-enter-from, .list-leave-to': { opacity: '0', transform: 'translateY(30px)' },
+      '.list-leave-active': { position: 'absolute' },
+    })
+
+    addUtilities({
+      '.dc-interactive': interactiveUtility,
+      '.dc-haptics-feedback': interactiveUtility,
+      '.dc-ellipsis': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+      '.dc-clamp-2': {
+        display: '-webkit-box',
+        overflow: 'hidden',
+        WebkitBoxOrient: 'vertical',
+        WebkitLineClamp: '2',
+      },
+      '.dc-scrollbar-hidden': {
+        'scrollbarWidth': 'none',
+        '&::-webkit-scrollbar': { display: 'none' },
+      },
+      '.dc-hairline': {
+        'position': 'relative',
+        '&::after': { ...hairlineAfter, inset: '-50%', scale: '0.5', borderWidth: '1px' },
+      },
+      '.dc-hairline-surround': {
+        'position': 'relative',
+        '&::after': { ...hairlineAfter, inset: '-50%', scale: '0.5', borderWidth: '1px' },
+      },
+      '.dc-hairline-top': {
+        'position': 'relative',
+        '&::after': {
+          ...hairlineAfter,
+          inset: '0 0 auto',
+          scale: '1 0.5',
+          transformOrigin: 'top',
+          borderWidth: '1px 0 0',
+        },
+      },
+      '.dc-hairline-bottom': {
+        'position': 'relative',
+        '&::after': {
+          ...hairlineAfter,
+          inset: 'auto 0 0',
+          scale: '1 0.5',
+          transformOrigin: 'bottom',
+          borderWidth: '0 0 1px',
+        },
+      },
+      '.dc-hairline-left': {
+        'position': 'relative',
+        '&::after': {
+          ...hairlineAfter,
+          inset: '0 auto 0 0',
+          scale: '0.5 1',
+          transformOrigin: 'left',
+          borderWidth: '0 0 0 1px',
+        },
+      },
+      '.dc-hairline-right': {
+        'position': 'relative',
+        '&::after': {
+          ...hairlineAfter,
+          inset: '0 0 0 auto',
+          scale: '0.5 1',
+          transformOrigin: 'right',
+          borderWidth: '0 1px 0 0',
+        },
+      },
+      '.dc-hairline-top-bottom': {
+        'position': 'relative',
+        '&::after': { ...hairlineAfter, inset: '-50% 0', scale: '1 0.5', borderWidth: '1px 0' },
+      },
+    })
+  },
+  {
+    plugins: [safeArea],
+    theme: {
+      extend: {
+        colors: {
+          'dc-page': 'var(--dc-color-page)',
+          'dc-surface': 'var(--dc-color-surface)',
+          'dc-text': 'var(--dc-color-text)',
+          'dc-text-secondary': 'var(--dc-color-text-secondary)',
+          'dc-text-tertiary': 'var(--dc-color-text-tertiary)',
+          'dc-border': 'var(--dc-color-border)',
+          'dc-overlay': 'var(--dc-color-overlay)',
+          'dc-danger': 'var(--dc-color-danger)',
+          'dc-primary': 'var(--dc-color-primary)',
+        },
+        screens: { desktop: '60rem' },
+      },
+    },
+  },
+)
+
+export default DeltaComicTailwindPlugin

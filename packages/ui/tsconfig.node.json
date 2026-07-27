@@ -6,5 +6,5 @@
     "emitDeclarationOnly": false,
     "isolatedDeclarations": true
   },
-  "include": ["./vite.config.mts", "./vite/**/*", "./package.json"]
+  "include": ["./vite.config.mts", "./vite/**/*", "./tailwind/**/*", "./package.json"]
 }
