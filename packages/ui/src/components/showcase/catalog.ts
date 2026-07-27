@@ -225,6 +225,17 @@ export const componentEntries: readonly ShowcaseEntry[] = [
     ],
   ),
   component(
+    'DcConfigProvider',
+    'ConfigProvider 全局配置',
+    '运行环境',
+    '为组件树提供主题、语言、Naive UI 变量和可继承的自定义样式。',
+    ['全局配置', '主题变量', '依赖注入'],
+    [
+      { id: 'config-provider-root', label: '根配置' },
+      { id: 'config-provider-nested', label: '嵌套与覆盖' },
+    ],
+  ),
+  component(
     'DcForm',
     'Form 动态表单',
     '表单组件',

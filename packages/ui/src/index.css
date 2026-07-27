@@ -5,25 +5,4 @@
 @import 'tailwindcss/preflight.css' layer(base);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
-@plugin 'tailwindcss-safe-area-capacitor';
-
-@import '@/index.css';
-
-@layer base {
-  html,
-  body {
-    @apply overflow-hidden!;
-  }
-
-  body {
-    @apply m-0 min-w-80 antialiased;
-  }
-
-  #app {
-    @apply h-dvh;
-  }
-
-  input::-webkit-search-cancel-button {
-    @apply hidden;
-  }
-}
+@plugin '../tailwind/index.ts';

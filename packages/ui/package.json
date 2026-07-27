@@ -14,7 +14,8 @@
   },
   "files": [
     "dist",
-    "dist-vite"
+    "dist-vite",
+    "tailwind"
   ],
   "type": "module",
   "main": "./dist/index.js",
@@ -28,6 +29,10 @@
     "./vite": {
       "types": "./dist-vite/index.d.mts",
       "import": "./dist-vite/index.mjs"
+    },
+    "./tailwind": {
+      "types": "./tailwind/index.ts",
+      "import": "./tailwind/index.ts"
     },
     "./style.css": "./dist/index.css"
   },
@@ -79,7 +84,13 @@
     "@pinia/colada": "catalog:",
     "naive-ui": "catalog:",
     "pinia": "catalog:",
+    "tailwindcss": "catalog:",
     "vue": "catalog:",
     "vue-router": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
   }
 }

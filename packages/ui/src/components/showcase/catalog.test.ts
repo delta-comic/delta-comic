@@ -20,7 +20,7 @@ describe('UI showcase catalog', () => {
     ].sort()
     const catalogComponentNames = componentEntries.map(entry => entry.name).sort()
 
-    expect(catalogComponentNames).toHaveLength(28)
+    expect(catalogComponentNames).toHaveLength(29)
     expect(catalogComponentNames).toEqual(publicComponentNames)
   })
 

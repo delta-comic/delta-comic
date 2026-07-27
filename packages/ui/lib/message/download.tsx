@@ -112,7 +112,7 @@ export const createDownloadMessage = async <T,>(
             <div class='relative size-full' onClick={() => (minsize.value = false)}>
               <DcLoading class='absolute top-0 left-0 size-full' color='var(--p-color)' />
               <NIcon
-                class='absolute! top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
+                class='absolute! top-1/2 left-1/2 -translate-1/2'
                 size='18px'
                 color='var(--p-color)'
               >

@@ -1,3 +1,5 @@
+import { resolve } from 'node:path'
+
 import { defineConfig } from 'vite-plus'
 import type { OxfmtConfig } from 'vite-plus/fmt'
 import type { OxlintConfig } from 'vite-plus/lint'
@@ -5,13 +7,19 @@ import type { OxlintConfig } from 'vite-plus/lint'
 import fmt from './.oxfmtrc.json' with { type: 'json' }
 import lint from './.oxlintrc.json' with { type: 'json' }
 
+const lintConfig = lint as OxlintConfig
+const uiTailwindConfigPath = resolve(import.meta.dirname, 'packages/ui/src/index.css')
+
 export default defineConfig({
   staged: {
     '*': 'vp check --fix',
     '*.{ts,tsx,mts,js,jsx,mjs,vue,html,md,json,yaml,toml}': 'vp exec cspell --no-must-find-files',
   },
   fmt: fmt as OxfmtConfig,
-  lint: lint as OxlintConfig,
+  lint: {
+    ...lintConfig,
+    settings: { ...lintConfig.settings, tailwindcss: { cssConfigPath: uiTailwindConfigPath } },
+  },
   run: { cache: { tasks: true, scripts: false } },
   test: {
     clearMocks: true,

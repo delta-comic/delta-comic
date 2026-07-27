@@ -15,6 +15,8 @@ import { createPinia } from 'pinia'
 import { createApp, defineComponent, watch } from 'vue'
 import { DataLoaderPlugin } from 'vue-router/experimental'
 
+import DcConfigProvider from '../lib/components/DcConfigProvider.vue'
+
 import App from './App.vue'
 import { router } from './router'
 
@@ -45,14 +47,16 @@ const app = createApp(
           },
         }}
       >
-        <NGlobalStyle />
-        <NLoadingBarProvider>
-          <NDialogProvider>
-            <NMessageProvider max={5}>
-              <App />
-            </NMessageProvider>
-          </NDialogProvider>
-        </NLoadingBarProvider>
+        <DcConfigProvider locale='zh-CN' theme={isDark.value ? 'dark' : 'light'}>
+          <NGlobalStyle />
+          <NLoadingBarProvider>
+            <NDialogProvider>
+              <NMessageProvider max={5}>
+                <App />
+              </NMessageProvider>
+            </NDialogProvider>
+          </NLoadingBarProvider>
+        </DcConfigProvider>
       </NConfigProvider>
     )
   }),

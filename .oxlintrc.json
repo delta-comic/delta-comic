@@ -26,5 +26,21 @@
     "**/worker-configuration.d.ts",
     "packages/ui/lib/components/DcPullRefresh.vue"
   ],
+  "overrides": [
+    {
+      "files": ["packages/app/**/*", "packages/ui/**/*"],
+      "jsPlugins": ["eslint-plugin-tailwindcss"],
+      "rules": {
+        "tailwindcss/classnames-order": "warn",
+        "tailwindcss/enforces-negative-arbitrary-values": "warn",
+        "tailwindcss/enforces-shorthand": "warn",
+        "tailwindcss/important-modifier-suffix": "warn",
+        "tailwindcss/no-arbitrary-value": "off",
+        "tailwindcss/no-custom-classname": "warn",
+        "tailwindcss/no-contradicting-classname": "error",
+        "tailwindcss/no-unnecessary-arbitrary-value": "warn"
+      }
+    }
+  ],
   "options": { "typeAware": false, "typeCheck": false }
 }
