@@ -14,7 +14,8 @@
 
 ## app侧清单
 
-无
+- [x] 为oxlint配置`eslint-plugin-tailwindcss`插件
+- [x] 将tailwindcss(ui和app)的实用部分和主题变量等一切自定义内容提取为一个tailwindcss插件，保存在ui库(记得导出)
 
 ## server侧清单
 

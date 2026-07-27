@@ -47,9 +47,11 @@
     "@vue/test-utils": "catalog:",
     "commitlint-plugin-cspell": "catalog:",
     "cspell": "catalog:",
+    "eslint-plugin-tailwindcss": "catalog:",
     "happy-dom": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "semantic-release": "^25.0.7",
+    "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   },
