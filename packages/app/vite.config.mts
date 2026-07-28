@@ -15,6 +15,7 @@ export default defineConfig(
         const [
           { exposeHostLibraries },
           { default: tailwindcss },
+          { default: legacy },
           { default: vue },
           { default: vueJsx },
           { default: MotionResolver },
@@ -27,6 +28,7 @@ export default defineConfig(
         ] = await Promise.all([
           import('@delta-comic/utils/vite'),
           import('@tailwindcss/vite'),
+          import('@vitejs/plugin-legacy'),
           import('@vitejs/plugin-vue'),
           import('@vitejs/plugin-vue-jsx'),
           import('motion-v/resolver'),
@@ -41,6 +43,7 @@ export default defineConfig(
         return [
           // @ts-ignore
           wasm(),
+          legacy({ targets: ['ie >= 11'], renderModernChunks: false }),
           VueRouter({ dts: 'typed-router.d.ts' }),
           vueDevTools(),
           vue({

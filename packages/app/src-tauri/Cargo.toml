@@ -65,6 +65,9 @@ workspace = true
 [dependencies.tauri-plugin-shell]
 workspace = true
 
+[target.'cfg(target_os = "android")'.dependencies.tauri-plugin-webview-upgrade]
+workspace = true
+
 [dependencies.tauri-plugin-sql]
 workspace = true
 
