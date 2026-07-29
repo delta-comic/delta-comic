@@ -1,5 +1,19 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.7](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.6...3.0.0-next.7) (2026-07-29)
+
+
+### Bug Fixes
+
+* **plugin:** 修复了config没有泛型的问题 ([e2f2143](https://github.com/delta-comic/delta-comic/commit/e2f214329d1865c139325c6a0b15de277cda4302))
+
+
+### Features
+
+* **app:** 适配策略优化 ([9638049](https://github.com/delta-comic/delta-comic/commit/9638049e6feae05fc7363dd8e438b8148150c35f))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.6](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.5...3.0.0-next.6) (2026-07-27)
 
 
