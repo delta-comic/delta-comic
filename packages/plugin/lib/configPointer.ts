@@ -5,8 +5,11 @@ export type ConfigDescription = Record<
   Required<Pick<FormSingleConfigure, 'defaultValue'>> & FormSingleConfigure
 >
 
+export type UnwrapConfigPointer<T extends ConfigPointer> = T['_type']
+
 export class ConfigPointer<T extends ConfigDescription = ConfigDescription> {
   public readonly key: symbol
+  public readonly _type = {} as T
 
   constructor(
     public pluginName: string,

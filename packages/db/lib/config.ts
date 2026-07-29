@@ -5,11 +5,6 @@ import { ref, watch, type Ref } from 'vue'
 
 const configLogger = logger.scoped('db:config')
 
-export type ConfigDescription = Record<
-  string,
-  Required<Pick<FormSingleConfigure, 'defaultValue'>> & FormSingleConfigure
->
-
 export interface Table {
   /** @description config owner, usually plugin name */
   belongTo: string
@@ -20,6 +15,11 @@ export interface Table {
 }
 
 export type ConfigRef<T> = Ref<T> & { readonly ready: Promise<void> }
+
+export type ConfigDescription = Record<
+  string,
+  Required<Pick<FormSingleConfigure, 'defaultValue'>> & FormSingleConfigure
+>
 
 const cloneValue = <T>(value: T): T => {
   if (typeof structuredClone === 'function') return structuredClone(value)
@@ -42,7 +42,7 @@ const parseJson = <T>(value: unknown, fallback: T): T => {
   }
 }
 
-const upsertConfig = async (belongTo: string, form: ConfigDescription, data: unknown) => {
+const upsertConfig = async (belongTo: string, form: any, data: unknown) => {
   const { db } = await import('.')
   await db
     .replaceInto('config')

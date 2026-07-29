@@ -59,7 +59,7 @@ describe('plugin config store', () => {
     }
 
     const first = store.$registerConfig(pointer as never)
-    const second = store.$resignerConfig(pointer as never)
+    const second = store.$registerConfig(pointer as never)
 
     expect(first).toBe(second)
     expect(store.$isExistConfig(pointer as never)).toBe(true)
