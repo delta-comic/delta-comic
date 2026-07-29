@@ -1096,6 +1096,7 @@ dependencies = [
  "tauri-plugin-shell",
  "tauri-plugin-sql",
  "tauri-plugin-utils",
+ "tauri-plugin-webview-upgrade",
  "tracing",
 ]
 
@@ -6120,6 +6121,15 @@ dependencies = [
  "tauri",
  "tauri-plugin",
  "tracing",
+]
+
+[[package]]
+name = "tauri-plugin-webview-upgrade"
+version = "0.1.0"
+source = "git+https://github.com/readest/tauri-plugin-webview-upgrade#c7c04abee8a12e32823febec44779c075e076e25"
+dependencies = [
+ "tauri",
+ "tauri-plugin",
 ]
 
 [[package]]

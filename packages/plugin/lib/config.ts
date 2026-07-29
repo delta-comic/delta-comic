@@ -2,20 +2,20 @@ import { useConfig as useDbConfig } from '@delta-comic/db'
 import type { FormResult } from '@delta-comic/model'
 import { computed, shallowReactive, type Ref } from 'vue'
 
-import type { ConfigDescription, ConfigPointer } from './configPointer'
+import type { ConfigPointer, UnwrapConfigPointer } from './configPointer'
 import { coreConfig } from './features/core/config'
 
 export * from './configPointer'
 
-export type ConfigSave<T> = {
-  form: ConfigDescription
-  data: Ref<T>
+export type ConfigSave<T extends ConfigPointer = ConfigPointer> = {
+  form: UnwrapConfigPointer<T>
+  data: Ref<FormResult<T['config']>>
   name: string
   ready: Promise<void>
 }
 
 export class ConfigStore {
-  public readonly form = shallowReactive(new Map<symbol, ConfigSave<any>>())
+  public readonly form = shallowReactive(new Map<symbol, ConfigSave>())
   private readonly darkMode = computed(() => {
     if (!this.$isExistConfig(coreConfig)) return this.isSystemDark
     const config = this.$load(coreConfig).data.value
@@ -42,7 +42,7 @@ export class ConfigStore {
     this.$registerConfig(coreConfig)
   }
 
-  public $load<T extends ConfigPointer>(pointer: T): ConfigSave<FormResult<T['config']>> {
+  public $load<T extends ConfigPointer>(pointer: T): ConfigSave<T> {
     const value = this.form.get(pointer.key)
     if (!value) throw new Error(`not found config by plugin "${pointer.pluginName}"`)
     return value
@@ -56,24 +56,19 @@ export class ConfigStore {
     return this.form.has(pointer.key)
   }
 
-  public $registerConfig(pointer: ConfigPointer) {
+  public $registerConfig<T extends ConfigPointer>(pointer: T) {
     const registered = this.form.get(pointer.key)
     if (registered) return registered
 
     const store = useDbConfig(pointer.pluginName, pointer.config)
-    const saved: ConfigSave<any> = {
+    const saved: ConfigSave<T> = {
       form: pointer.config,
-      data: store,
+      data: store as any,
       name: pointer.configName,
-      ready: (store as typeof store & { ready: Promise<void> }).ready,
+      ready: store.ready,
     }
     this.form.set(pointer.key, saved)
     return saved
-  }
-
-  /** @deprecated Use `$registerConfig`. */
-  public $resignerConfig(pointer: ConfigPointer) {
-    return this.$registerConfig(pointer)
   }
 
   public $unregisterConfig(pointer: ConfigPointer) {

@@ -42,12 +42,16 @@ describe('DcConfigProvider', () => {
     expect(wrapper.attributes()).toMatchObject({ 'data-dc-theme': 'dark', 'lang': 'zh-CN' })
     expect(wrapper.attributes('style')).toContain('--nui-primary-color: #234567')
     expect(wrapper.attributes('style')).toContain('--nui-font-size-12: 12px')
+    expect(document.documentElement.style.getPropertyValue('--nui-primary-color')).toBe('#234567')
     expect(wrapper.get('output').attributes()).toMatchObject({
       'data-accent': '#fb7299',
       'data-locale': 'zh-CN',
       'data-primary': '#234567',
       'data-theme': 'dark',
     })
+
+    wrapper.unmount()
+    expect(document.documentElement.style.getPropertyValue('--nui-primary-color')).toBe('')
   })
 
   it('inherits parent values and lets nested providers override them', () => {
@@ -70,5 +74,25 @@ describe('DcConfigProvider', () => {
       'data-locale': 'zh-TW',
       'data-theme': 'light',
     })
+
+    wrapper.unmount()
+  })
+
+  it('restores CSS variables that existed before the root provider mounted', () => {
+    mockedUseThemeVars.mockReturnValue({
+      value: { primaryColor: '#234567' },
+    } as unknown as ReturnType<typeof useThemeVars>)
+    document.documentElement.style.setProperty('--nui-primary-color', '#original', 'important')
+
+    const wrapper = mount(DcConfigProvider)
+
+    expect(document.documentElement.style.getPropertyValue('--nui-primary-color')).toBe('#234567')
+
+    wrapper.unmount()
+    expect(document.documentElement.style.getPropertyValue('--nui-primary-color')).toBe('#original')
+    expect(document.documentElement.style.getPropertyPriority('--nui-primary-color')).toBe(
+      'important',
+    )
+    document.documentElement.style.removeProperty('--nui-primary-color')
   })
 })

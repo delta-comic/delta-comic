@@ -9,7 +9,12 @@ const { t } = useI18n()
 
 <template>
   <NScrollbar class="size-full">
-    <div class="mb-2 ml-4 text-lg font-semibold">{{ t('plugin.config.installOverride') }}</div>
+    <div class="mb-2 ml-4 text-lg font-semibold">{{ cfg.form.receivePerReleaseUpdate.info }}</div>
+    <DcFormSwitch
+      :config="cfg.form.receivePerReleaseUpdate"
+      v-model="cfg.data.value.receivePerReleaseUpdate"
+    />
+    <div class="mb-2 ml-4 text-lg font-semibold">{{ cfg.form.installOverride.info }}</div>
     <NDynamicInput
       v-model:value="cfg.data.value.installOverride"
       :on-create="() => ({ key: '', value: '' })"

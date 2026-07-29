@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useThemeVars } from 'naive-ui'
-import { computed, inject, provide } from 'vue'
+import { computed, inject, onBeforeUnmount, provide, watch } from 'vue'
 
 import {
   dcConfigInjectionKey,
@@ -40,6 +40,53 @@ const mergedStyle = computed<Readonly<DcConfigStyle>>(() => ({
   ...parentConfig?.style.value,
   ...props.style,
 }))
+
+if (!parentConfig && typeof document !== 'undefined') {
+  const rootStyle = document.documentElement.style
+  const originalValues = new Map<`--${string}`, { priority: string; value: string }>()
+  const syncedNames = new Set<`--${string}`>()
+
+  const restoreOriginalValue = (name: `--${string}`) => {
+    const original = originalValues.get(name)
+    if (original?.value) rootStyle.setProperty(name, original.value, original.priority)
+    else rootStyle.removeProperty(name)
+  }
+
+  const stopSyncingRootStyle = watch(
+    mergedStyle,
+    style => {
+      const nextVariables = Object.entries(style).filter(
+        (entry): entry is [`--${string}`, number | string] =>
+          entry[0].startsWith('--') && entry[1] != null,
+      )
+      const nextNames = new Set(nextVariables.map(([name]) => name))
+
+      for (const name of syncedNames) {
+        if (!nextNames.has(name)) {
+          restoreOriginalValue(name)
+          syncedNames.delete(name)
+        }
+      }
+
+      for (const [name, value] of nextVariables) {
+        if (!originalValues.has(name)) {
+          originalValues.set(name, {
+            priority: rootStyle.getPropertyPriority(name),
+            value: rootStyle.getPropertyValue(name),
+          })
+        }
+        rootStyle.setProperty(name, String(value))
+        syncedNames.add(name)
+      }
+    },
+    { immediate: true },
+  )
+
+  onBeforeUnmount(() => {
+    stopSyncingRootStyle()
+    for (const name of syncedNames) restoreOriginalValue(name)
+  })
+}
 
 provide(dcConfigInjectionKey, { locale: mergedLocale, style: mergedStyle, theme: mergedTheme })
 </script>
