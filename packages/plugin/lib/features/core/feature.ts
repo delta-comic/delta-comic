@@ -1,3 +1,4 @@
+import pkg from '../../../package.json'
 import { pluginMessageKey } from '../../i18n'
 import { defineInnerPlugin } from '../../plugin'
 
@@ -12,7 +13,7 @@ export default defineInnerPlugin({
     description: pluginMessageKey('plugin.core.description'),
     require: [],
     name: { display: pluginMessageKey('settings.core.title'), id: 'core' },
-    version: { plugin: '2.3.0', supportCore: '*' },
+    version: { plugin: pkg.version, supportCore: pkg.version },
   },
   enabledByDefault: true,
   config: () => ({ name: 'core', config: [coreConfig] }),

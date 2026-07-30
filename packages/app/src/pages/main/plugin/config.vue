@@ -15,6 +15,7 @@ const translateTitle = (title: string) => (te(title) ? t(title) : title)
       {{ translateTitle(cfg.form.receivePerReleaseUpdate.info) }}
     </div>
     <DcFormSwitch
+      class="ml-6"
       :config="cfg.form.receivePerReleaseUpdate"
       v-model="cfg.data.value.receivePerReleaseUpdate"
     />
@@ -26,19 +27,18 @@ const translateTitle = (title: string) => (te(title) ? t(title) : title)
       :on-create="() => ({ key: '', value: '' })"
     >
       <template #default="{ value }">
-        <div class="flex w-[calc(100%-var(--spacing)*25)] items-center">
+        <div class="flex w-[calc(100%-var(--spacing)*25)] flex-col items-center gap-2 pl-6">
           <NInput
             v-model:value="value.key"
-            class="w-2/3!"
             type="text"
             :placeholder="t('plugin.config.pluginId')"
           />
           <NInput
             v-model:value="value.value"
             type="text"
-            class="my-2"
             :placeholder="t('plugin.config.downloadCommand')"
           />
+          <NDivider class="my-2!" />
         </div>
       </template>
     </NDynamicInput>
