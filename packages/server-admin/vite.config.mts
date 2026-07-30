@@ -35,5 +35,5 @@ export default defineConfig({
   css: { transformer: 'lightningcss' },
   build: { outDir: 'dist', target: 'es2022', minify: 'oxc' },
   server: { port: 5174, strictPort: true },
-  test: { environment: 'happy-dom', include: ['src/**/*.test.ts'] },
+  test: { environment: 'happy-dom', include: ['test/**/*.test.ts'] },
 } as UserConfig)

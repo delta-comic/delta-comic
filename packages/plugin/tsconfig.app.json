@@ -7,5 +7,5 @@
     "paths": { "@/*": ["./lib/*"] },
     "types": ["vite-plus/client"]
   },
-  "include": ["lib", "vite"]
+  "include": ["lib", "vite", "test"]
 }

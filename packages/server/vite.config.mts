@@ -24,7 +24,7 @@ export default defineConfig({
       'cloudflare:workers': fileURLToPath(new URL('./test/cloudflareWorkers.ts', import.meta.url)),
     },
     environment: 'node',
-    include: ['app/**/*.test.ts', 'lib/**/*.test.ts'],
+    include: ['test/**/*.test.ts'],
     root,
   },
 })

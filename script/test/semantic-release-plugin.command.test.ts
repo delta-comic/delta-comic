@@ -1,0 +1,114 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import workspacePackage from '../../package.json'
+
+const workspaceVersion = workspacePackage.version
+
+const mocks = vi.hoisted(() => ({
+  error: undefined as Error | undefined,
+  execFile: vi.fn(),
+  spawn: vi.fn(),
+  statuses: [] as (number | null)[],
+}))
+
+vi.mock('node:child_process', () => ({ execFile: mocks.execFile, spawn: mocks.spawn }))
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  mocks.error = undefined
+  mocks.statuses = []
+  mocks.spawn.mockImplementation(() => {
+    const listeners = new Map<string, (...args: any[]) => void>()
+    const child = {
+      on(event: string, listener: (...args: any[]) => void) {
+        listeners.set(event, listener)
+        if (event === 'close') {
+          queueMicrotask(() => {
+            if (mocks.error) listeners.get('error')?.(mocks.error)
+            else listener(mocks.statuses.length === 0 ? 0 : mocks.statuses.shift())
+          })
+        }
+        return child
+      },
+    }
+    return child
+  })
+})
+
+describe('semantic-release command runner', () => {
+  it('runs ordered package builds and recursive publish through inherited stdio', async () => {
+    mocks.statuses = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    const { publish } = await import('../semantic-release-plugin.mts')
+
+    await publish({}, { env: {}, nextRelease: { version: workspaceVersion } })
+
+    expect(mocks.spawn).toHaveBeenNthCalledWith(
+      1,
+      'vp',
+      ['run', '--filter', '@delta-comic/logger', '--fail-if-no-match', 'build'],
+      expect.objectContaining({ stdio: 'inherit' }),
+    )
+    expect(mocks.spawn).toHaveBeenNthCalledWith(
+      4,
+      'vp',
+      ['run', '--filter', '@delta-comic/downloader', '--fail-if-no-match', 'build'],
+      expect.objectContaining({ stdio: 'inherit' }),
+    )
+    expect(mocks.spawn).toHaveBeenNthCalledWith(
+      8,
+      'vp',
+      [
+        'pm',
+        'publish',
+        '-r',
+        '--no-git-checks',
+        '--provenance',
+        '--tag',
+        'latest',
+        '--',
+        '--registry=https://registry.npmjs.org/',
+        '--config.@delta-comic:registry=https://registry.npmjs.org/',
+      ],
+      expect.objectContaining({ stdio: 'inherit' }),
+    )
+    expect(mocks.spawn).toHaveBeenNthCalledWith(
+      9,
+      'vp',
+      [
+        'pm',
+        'publish',
+        '-r',
+        '--no-git-checks',
+        '--provenance',
+        '--tag',
+        'latest',
+        '--',
+        '--registry=https://npm.pkg.github.com/',
+        '--config.@delta-comic:registry=https://npm.pkg.github.com/',
+      ],
+      expect.objectContaining({ stdio: 'inherit' }),
+    )
+  })
+
+  it.each([
+    [1, 'Command failed (1): vp run --filter @delta-comic/logger --fail-if-no-match build'],
+    [null, 'Command failed (1): vp run --filter @delta-comic/logger --fail-if-no-match build'],
+  ] as const)('reports non-zero command status %s', async (status, message) => {
+    mocks.statuses = [status]
+    const { publish } = await import('../semantic-release-plugin.mts')
+
+    await expect(
+      publish({}, { env: {}, nextRelease: { version: workspaceVersion } }),
+    ).rejects.toThrow(message)
+    expect(mocks.spawn).toHaveBeenCalledOnce()
+  })
+
+  it('preserves spawn errors from the operating system', async () => {
+    mocks.error = new Error('vp not found')
+    const { publish } = await import('../semantic-release-plugin.mts')
+
+    await expect(
+      publish({}, { env: {}, nextRelease: { version: workspaceVersion } }),
+    ).rejects.toThrow('vp not found')
+  })
+})

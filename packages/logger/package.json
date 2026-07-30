@@ -32,7 +32,7 @@
   },
   "scripts": {
     "build": "vp pack",
-    "test": "vp test run lib",
+    "test": "vp test run test/lib",
     "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
   },
   "dependencies": {

@@ -96,7 +96,7 @@ export default defineConfig(
           ignored: ['**/src-tauri/**', 'src-tauri'],
         },
       },
-      test: { environment: 'happy-dom', include: ['src/**/*.test.ts'] },
+      test: { environment: 'happy-dom', include: ['test/**/*.test.ts'] },
       clearScreen: false,
       envPrefix: ['VITE_', 'TAURI_ENV_*'],
     }) as UserConfig,

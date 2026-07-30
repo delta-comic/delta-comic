@@ -6,5 +6,5 @@
     "composite": true,
     "types": ["vite-plus/client"]
   },
-  "include": ["lib"]
+  "include": ["lib", "test"]
 }
