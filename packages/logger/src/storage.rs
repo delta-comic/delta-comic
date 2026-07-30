@@ -48,7 +48,7 @@ impl LoggerHandle {
   }
 
   pub(crate) fn try_record(&self, record: LogRecord) -> bool {
-    if !record.level.enabled_in_build() {
+    if !record.level.meets_minimum_level() {
       return true;
     }
     match self.sender.try_send(WorkerMessage::Write(record)) {
@@ -62,7 +62,7 @@ impl LoggerHandle {
 
   pub(crate) async fn write_frontend_batch(&self, entries: Vec<FrontendLogEntry>) -> Result<()> {
     for entry in entries {
-      if !entry.level.enabled_in_build() {
+      if !entry.level.meets_minimum_level() {
         continue;
       }
       self
@@ -139,8 +139,8 @@ impl FileSink {
   }
 
   async fn write(&mut self, record: LogRecord) -> Result<()> {
-    let line = record.format();
-    let line_size = line.len() as u64;
+    let file_line = record.format_for_file();
+    let line_size = file_line.len() as u64;
     let today = Local::now().date_naive();
     let rotate = self.active.as_ref().is_none_or(|active| {
       active.day != today || active.size.saturating_add(line_size) > self.max_file_size
@@ -150,13 +150,14 @@ impl FileSink {
     }
 
     let active = self.active.as_mut().ok_or(Error::WorkerUnavailable)?;
-    active.writer.write_all(line.as_bytes()).await?;
+    active.writer.write_all(file_line.as_bytes()).await?;
     // Every record is flushed so crash diagnostics are durable immediately.
     active.writer.flush().await?;
     active.size = active.size.saturating_add(line_size);
 
+    let console_line = record.format_for_console();
     let mut console = tokio::io::stdout();
-    let _ = console.write_all(line.as_bytes()).await;
+    let _ = console.write_all(console_line.as_bytes()).await;
     let _ = console.flush().await;
     Ok(())
   }

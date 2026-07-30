@@ -24,12 +24,8 @@ impl LogLevel {
     }
   }
 
-  pub(crate) const fn enabled_in_build(self) -> bool {
-    if cfg!(debug_assertions) {
-      true
-    } else {
-      matches!(self, Self::Info | Self::Warn | Self::Error)
-    }
+  pub(crate) const fn meets_minimum_level(self) -> bool {
+    matches!(self, Self::Info | Self::Warn | Self::Error)
   }
 }
 
@@ -84,9 +80,18 @@ impl LogRecord {
     }
   }
 
-  pub(crate) fn format(&self) -> String {
+  pub(crate) fn format_for_file(&self) -> String {
     let scope = sanitize_inline(&self.scope);
     let content = sanitize_inline(&self.content);
+    self.format_with(&scope, &content)
+  }
+
+  pub(crate) fn format_for_console(&self) -> String {
+    let scope = sanitize_inline(&self.scope);
+    self.format_with(&scope, &self.content)
+  }
+
+  fn format_with(&self, scope: &str, content: &str) -> String {
     format!(
       "[{}] ({scope}) {} > {content}\n",
       self.timestamp.format("%Y/%m/%d %H:%M:%S"),
@@ -140,7 +145,16 @@ mod tests {
   use super::{LogLevel, LogRecord};
 
   #[test]
-  fn formats_the_public_line_contract_exactly() {
+  fn enforces_info_as_the_minimum_level() {
+    assert!(!LogLevel::Trace.meets_minimum_level());
+    assert!(!LogLevel::Debug.meets_minimum_level());
+    assert!(LogLevel::Info.meets_minimum_level());
+    assert!(LogLevel::Warn.meets_minimum_level());
+    assert!(LogLevel::Error.meets_minimum_level());
+  }
+
+  #[test]
+  fn formats_the_file_line_contract_exactly() {
     let record = LogRecord {
       timestamp: Local.with_ymd_and_hms(2026, 7, 22, 9, 8, 7).unwrap(),
       scope: "reader".into(),
@@ -148,7 +162,7 @@ mod tests {
       content: "cache miss".into(),
     };
     assert_eq!(
-      record.format(),
+      record.format_for_file(),
       "[2026/07/22 09:08:07] (reader) warn > cache miss\n"
     );
   }
@@ -156,9 +170,23 @@ mod tests {
   #[test]
   fn keeps_each_record_on_one_physical_line() {
     let record = LogRecord::new("ui\nworker", LogLevel::Error, "first\r\nsecond");
-    let formatted = record.format();
+    let formatted = record.format_for_file();
     assert_eq!(formatted.lines().count(), 1);
     assert!(formatted.contains("ui\\nworker"));
     assert!(formatted.contains("first\\r\\nsecond"));
+  }
+
+  #[test]
+  fn preserves_content_line_breaks_for_console_output() {
+    let record = LogRecord {
+      timestamp: Local.with_ymd_and_hms(2026, 7, 22, 9, 8, 7).unwrap(),
+      scope: "ui\nworker".into(),
+      level: LogLevel::Info,
+      content: "first\r\nsecond".into(),
+    };
+    assert_eq!(
+      record.format_for_console(),
+      "[2026/07/22 09:08:07] (ui\\nworker) info > first\r\nsecond\n"
+    );
   }
 }

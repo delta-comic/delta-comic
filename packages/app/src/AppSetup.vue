@@ -49,9 +49,19 @@ onMounted(async () => {
 
 <template>
   <AnimatePresence>
+    <motion.img
+      v-if="!isBooted"
+      src="/setup.avif"
+      alt=""
+      aria-hidden="true"
+      class="pointer-events-none fixed inset-0 size-full object-contain"
+      :initial="{ opacity: 0 }"
+      :animate="{ opacity: 1 }"
+      :exit="{ opacity: 0 }"
+    />
     <motion.div
       @click="showContent = true"
-      class="fixed bottom-10 flex -translate-x-1/2 dc-interactive items-center justify-center overflow-hidden rounded-xl bg-dc-primary shadow-2xl! transition-opacity"
+      class="fixed bottom-10 z-1 flex -translate-x-1/2 dc-interactive items-center justify-center overflow-hidden rounded-xl bg-dc-primary shadow-2xl! transition-opacity"
       :initial="{ width: '40px', height: '40px', left: '50%', translateY: '150px' }"
       v-if="!isBooted"
       :exit="{ width: '40px', height: '40px', left: '50%', translateY: '150px' }"

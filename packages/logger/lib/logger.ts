@@ -31,16 +31,11 @@ const LEVEL_CONSOLE: Record<LogLevel, ConsoleMethod> = {
   error: 'error',
 }
 
-const isDevelopment = (): boolean => {
-  const env = (import.meta as ImportMeta & { env?: { DEV?: boolean; PROD?: boolean } }).env
-  return env?.DEV === true || env?.PROD === false
-}
-
 const levelValue = (level: LogLevel) => LOG_LEVELS.indexOf(level)
 
 const resolveMinLevel = (requested?: LogLevel): LogLevel => {
-  const level = requested ?? (isDevelopment() ? 'trace' : 'info')
-  return !isDevelopment() && levelValue(level) < levelValue('info') ? 'info' : level
+  const level = requested ?? 'info'
+  return levelValue(level) < levelValue('info') ? 'info' : level
 }
 
 const normalizeScope = (scope: string) => scope.trim() || 'app'

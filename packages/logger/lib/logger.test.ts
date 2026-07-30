@@ -21,7 +21,7 @@ afterEach(async () => {
   vi.unstubAllGlobals()
 })
 
-const setup = (minLevel: 'trace' | 'info' = 'trace') => {
+const setup = (minLevel: 'trace' | 'info' = 'info') => {
   const invoke = vi.fn<Invoke>(async () => undefined as never)
   const info = vi.spyOn(console, 'info').mockImplementation(() => undefined)
   const debug = vi.spyOn(console, 'debug').mockImplementation(() => undefined)
@@ -37,6 +37,20 @@ const setup = (minLevel: 'trace' | 'info' = 'trace') => {
 }
 
 describe('Logger', () => {
+  it('enforces info as the minimum level', () => {
+    const logger = createLogger('app', { captureErrors: false, flushOnLifecycle: false })
+    const explicitlyVerboseLogger = createLogger('app', {
+      captureErrors: false,
+      flushOnLifecycle: false,
+      minLevel: 'trace',
+    })
+    loggers.push(logger)
+    loggers.push(explicitlyVerboseLogger)
+
+    expect(logger.minLevel).toBe('info')
+    expect(explicitlyVerboseLogger.minLevel).toBe('info')
+  })
+
   it('exports one shared client for UI and plugin consumers', () => {
     expect(loggerClient).toBe(sharedLogger.client)
   })
@@ -78,7 +92,7 @@ describe('Logger', () => {
     })
   })
 
-  it('filters below the configured production-style minimum', async () => {
+  it('filters below the unified minimum', async () => {
     const { debug, info, invoke, logger } = setup('info')
 
     logger.debug('hidden')

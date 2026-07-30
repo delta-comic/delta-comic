@@ -100,6 +100,14 @@ vi.mock('motion-v', () => ({
         () =>
           window.$$lib$$.Vue.h('div', attrs, slots.default?.()),
     }),
+    img: window.$$lib$$.Vue.defineComponent({
+      name: 'MotionImg',
+      inheritAttrs: false,
+      setup:
+        (_props: Record<string, never>, { attrs }: SetupContext) =>
+        () =>
+          window.$$lib$$.Vue.h('img', attrs),
+    }),
   },
 }))
 vi.mock('naive-ui', () => ({
@@ -299,6 +307,8 @@ describe('AppSetup startup shell', () => {
     })
 
     expect(wrapper.find('.recovery-stub').exists()).toBe(true)
+    const artwork = wrapper.get('img[src="/setup.avif"]')
+    expect(artwork.attributes('aria-hidden')).toBe('true')
     await flushPromises()
     await nextTick()
     expect(pluginRuntime.activatePreboot).toHaveBeenCalledOnce()
