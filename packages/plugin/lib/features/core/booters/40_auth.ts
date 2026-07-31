@@ -2,7 +2,7 @@ import { logger } from '@delta-comic/logger'
 import { createForm } from '@delta-comic/ui'
 import { PageWebviewAuth } from '@delta-comic/utils'
 import { Mutex } from 'es-toolkit'
-import { NModal, useDialog } from 'naive-ui'
+import { NModal } from 'naive-ui'
 import { defineComponent, h, markRaw, ref } from 'vue'
 
 import { usePluginStore } from '@/driver/store'
@@ -36,7 +36,7 @@ class _PluginAuth extends PluginBooter {
       setMeta(pluginMessageKey('plugin.runtime.steps.auth.waiting'))
       if (!isPass) {
         setMeta(pluginMessageKey('plugin.runtime.steps.auth.selecting'))
-        void useDialog().create({
+        void window.$dialog.create({
           type: 'default',
           positiveText: pluginI18n.translate('plugin.runtime.steps.auth.logIn'),
           negativeText: pluginI18n.translate('plugin.runtime.steps.auth.signUp'),
