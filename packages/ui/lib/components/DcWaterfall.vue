@@ -1,5 +1,4 @@
 <script setup lang="ts" generic="T extends object">
-import { VirtualWaterfall } from '@lhlyu/vue-virtual-waterfall'
 import { useEventListener, useScroll } from '@vueuse/core'
 import { isArray } from 'es-toolkit/compat'
 import { computed, markRaw, nextTick, onUnmounted, shallowReactive, shallowRef, watch } from 'vue'
@@ -12,6 +11,7 @@ import type { RawSource, StyleProps } from '../utils'
 
 import DcContent from './DcContent.vue'
 import DcPullRefresh from './DcPullRefresh.vue'
+import DcVirtualWaterfall from './DcVirtualWaterfall.vue'
 
 const $props = withDefaults(
   defineProps<
@@ -132,12 +132,12 @@ const mutationObserver = new MutationObserver(mutations => {
 })
 
 watch(waterfallEl, el => {
-  if (!el) {
+  if (!el?.element) {
     mutationObserver.disconnect()
     return
   }
-  mutationObserver.observe(el.$el as HTMLElement, { childList: true })
-  observeNewChildren(el.$el as HTMLElement)
+  mutationObserver.observe(el.element, { childList: true })
+  observeNewChildren(el.element)
 })
 
 onUnmounted(() => {
@@ -192,9 +192,10 @@ defineSlots<{
       :hideLoading="isPullRefreshHold && source.isLoading"
       ref="content"
     >
-      <VirtualWaterfall
+      <DcVirtualWaterfall
         :key="waterfallKey"
         :items="source.data"
+        :scrollParent
         :gap
         :padding
         :preloadScreenCount="[0, 1]"
@@ -206,7 +207,7 @@ defineSlots<{
         :maxColumnCount="column[1]"
       >
         <slot :item :index :height="sizeMap.get(item)" :length="source.data.length" :minHeight />
-      </VirtualWaterfall>
+      </DcVirtualWaterfall>
     </DcContent>
   </DcPullRefresh>
 </template>

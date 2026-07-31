@@ -2,17 +2,28 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, nextTick, shallowRef } from 'vue'
 
-vi.mock('@lhlyu/vue-virtual-waterfall', async () => {
-  const { defineComponent, h } = await import('vue')
+vi.mock('../../../lib/components/DcVirtualWaterfall.vue', async () => {
+  const { defineComponent, h, shallowRef } = await import('vue')
   return {
-    VirtualWaterfall: defineComponent({
-      name: 'VirtualWaterfall',
-      props: ['calcItemHeight', 'gap', 'items', 'maxColumnCount', 'minColumnCount', 'padding'],
-      setup(props, { slots }) {
+    default: defineComponent({
+      name: 'DcVirtualWaterfall',
+      props: [
+        'calcItemHeight',
+        'gap',
+        'items',
+        'maxColumnCount',
+        'minColumnCount',
+        'padding',
+        'preloadScreenCount',
+        'scrollParent',
+      ],
+      setup(props, { expose, slots }) {
+        const element = shallowRef<HTMLElement>()
+        expose({ element })
         return () =>
           h(
             'div',
-            { class: 'virtual-waterfall' },
+            { class: 'virtual-waterfall', ref: element },
             (props.items as object[]).map((item, index) =>
               h('div', { 'data-index': index }, slots.default?.({ index, item })),
             ),
@@ -106,7 +117,7 @@ describe('DcWaterfall', () => {
       },
     })
     await nextTick()
-    const virtual = wrapper.getComponent({ name: 'VirtualWaterfall' })
+    const virtual = wrapper.getComponent({ name: 'DcVirtualWaterfall' })
 
     expect(virtual.props()).toMatchObject({
       gap: 8,
@@ -115,6 +126,7 @@ describe('DcWaterfall', () => {
       minColumnCount: 2,
       padding: 6,
     })
+    expect(virtual.props('scrollParent')).toBe(wrapper.get('.content-stub').element)
     expect(wrapper.findAll('.item').map(item => item.text())).toEqual(['1/2/40', '2/2/40'])
     expect(resizeObserve).toHaveBeenCalledTimes(2)
   })
