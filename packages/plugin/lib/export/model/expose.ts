@@ -1,0 +1,1 @@
+export type ExposeModel = Record<string, any>
