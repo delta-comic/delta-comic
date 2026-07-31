@@ -1,5 +1,21 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.8](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.7...3.0.0-next.8) (2026-07-31)
+
+
+### Bug Fixes
+
+* **ui:** 修复列表虚拟可见区域计算 ([3a0ebae](https://github.com/delta-comic/delta-comic/commit/3a0ebaeafa7a0dce1efcf53d0559473107822456))
+
+
+### Features
+
+* **app:** 为启动页添加背景 ([a2c9196](https://github.com/delta-comic/delta-comic/commit/a2c9196f830a5bd1509d60219668cc83732b7529))
+* **app:** 优化了配置显示 ([c3a1077](https://github.com/delta-comic/delta-comic/commit/c3a1077f818ec053188486778238a9644eb79f96))
+* **ui:** 完善瀑布流展示页数据操作 ([bef5ab0](https://github.com/delta-comic/delta-comic/commit/bef5ab05ebee743083ba41b4f85face899677cb3))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.7](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.6...3.0.0-next.7) (2026-07-29)
 
 
