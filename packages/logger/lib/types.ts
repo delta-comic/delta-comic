@@ -45,7 +45,7 @@ export interface LoggerClient {
 }
 
 export interface LoggerOptions {
-  /** Defaults to `trace` in development and `info` in production. */
+  /** Defaults to `info`; lower levels are clamped to `info`. */
   minLevel?: LogLevel
   /** Maximum entries sent in one invoke call. */
   batchSize?: number

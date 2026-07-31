@@ -6,5 +6,5 @@
     "composite": true,
     "paths": { "@/*": ["./lib/*"] }
   },
-  "include": ["lib", "vite"]
+  "include": ["lib", "vite", "test"]
 }

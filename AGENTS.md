@@ -38,6 +38,10 @@ In cloud environments, use `pnpm exec vp`.
 - 格式化请使用`vp fmt`和`vp lint`，最好不要手动修复格式问题
 - 最好遵守`dry`(不要重复自己)规则
 - 对于重复使用相同或相似的dom结构的，最好使用`提取组件`或`v-for`或vueuse的`createReusableTemplate`创建复用，这与上一条的`dry`思想相同
+- 测试不应当堆砌无意义的断言，而是精确的分析用户的使用后切入关键；而且，测试通常位于
+  - 如果在monorepo侧某个子包：`packages/xxx/lib`对应测试位置`packages/xxx/test/lib`、`packages/xxx/src`对应测试位置`packages/xxx/test/src`
+  - 如果不在某个子包内，那就在同级创建test文件夹：`script/xxx`对应测试位置`script/test/xxx`
+  - 总之，永远不要将测试和真正的程序房子同一个目录内，而是集中存放，且复原相应目录树，如`packages/app/src/cloud/storage.ts`->`packages/app/test/src/cloud/storage.test.ts`
 
 ## 项目概览
 

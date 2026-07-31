@@ -163,10 +163,8 @@ jobs:
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> "$GITHUB_PATH"
           echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
-
           cd packages/app
           pnpm tauri android init --ci --skip-targets-install
-
       - name: Make Gradle wrapper executable
         run: chmod +x ./packages/app/src-tauri/gen/android/gradlew
 
@@ -179,7 +177,6 @@ jobs:
         run: |
           cd packages/app
           pnpm tauri android build --ci --target aarch64 armv7
-
       - name: Restore Android keystore
         env:
           KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
@@ -197,7 +194,6 @@ jobs:
           keyPassword=$KEYSTORE_PASS
           keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
           EOF
-
       - name: Install APK signer
         run: sudo apt-get update && sudo apt-get install -y apksigner
 
@@ -225,7 +221,6 @@ jobs:
             --out "./dist/release/delta-comic-$RELEASE_VERSION-android.apk" \
             "$APK_SRC"
           apksigner verify "./dist/release/delta-comic-$RELEASE_VERSION-android.apk"
-
       - name: Upload Android artifact
         uses: actions/upload-artifact@v7
         with:
@@ -292,7 +287,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-
       - name: Build desktop app
         uses: tauri-apps/tauri-action@v1
         env:
@@ -340,7 +334,6 @@ jobs:
         run: |
           git config user.name 'delta-comic-bot'
           git config user.email 'delta-comic-bot@proton.me'
-
       - name: Configure GitHub Packages authentication
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

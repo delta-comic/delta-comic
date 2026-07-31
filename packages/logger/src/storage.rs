@@ -48,7 +48,7 @@ impl LoggerHandle {
   }
 
   pub(crate) fn try_record(&self, record: LogRecord) -> bool {
-    if !record.level.enabled_in_build() {
+    if !record.level.meets_minimum_level() {
       return true;
     }
     match self.sender.try_send(WorkerMessage::Write(record)) {
@@ -62,7 +62,7 @@ impl LoggerHandle {
 
   pub(crate) async fn write_frontend_batch(&self, entries: Vec<FrontendLogEntry>) -> Result<()> {
     for entry in entries {
-      if !entry.level.enabled_in_build() {
+      if !entry.level.meets_minimum_level() {
         continue;
       }
       self
@@ -139,8 +139,8 @@ impl FileSink {
   }
 
   async fn write(&mut self, record: LogRecord) -> Result<()> {
-    let line = record.format();
-    let line_size = line.len() as u64;
+    let file_line = record.format_for_file();
+    let line_size = file_line.len() as u64;
     let today = Local::now().date_naive();
     let rotate = self.active.as_ref().is_none_or(|active| {
       active.day != today || active.size.saturating_add(line_size) > self.max_file_size
@@ -150,13 +150,14 @@ impl FileSink {
     }
 
     let active = self.active.as_mut().ok_or(Error::WorkerUnavailable)?;
-    active.writer.write_all(line.as_bytes()).await?;
+    active.writer.write_all(file_line.as_bytes()).await?;
     // Every record is flushed so crash diagnostics are durable immediately.
     active.writer.flush().await?;
     active.size = active.size.saturating_add(line_size);
 
+    let console_line = record.format_for_console();
     let mut console = tokio::io::stdout();
-    let _ = console.write_all(line.as_bytes()).await;
+    let _ = console.write_all(console_line.as_bytes()).await;
     let _ = console.flush().await;
     Ok(())
   }
@@ -221,52 +222,5 @@ fn chunk_index(name: &str, prefix: &str) -> Option<u32> {
 }
 
 #[cfg(test)]
-mod tests {
-  use chrono::{Local, NaiveDate};
-  use tempfile::tempdir;
-  use tokio::fs;
-
-  use super::{FileSink, select_chunk};
-  use crate::model::{LogLevel, LogRecord};
-
-  #[tokio::test]
-  async fn appends_to_the_latest_non_full_chunk() {
-    let directory = tempdir().unwrap();
-    let day = NaiveDate::from_ymd_opt(2026, 7, 22).unwrap();
-    let old = directory.path().join("delta-comic-2026-07-22-002.log");
-    fs::write(&old, b"hello").await.unwrap();
-    let (selected, size) = select_chunk(directory.path(), day, 100).await.unwrap();
-    assert_eq!(selected, old);
-    assert_eq!(size, 5);
-  }
-
-  #[tokio::test]
-  async fn rotates_when_the_size_limit_would_be_exceeded() {
-    let directory = tempdir().unwrap();
-    let today = Local::now().date_naive();
-    let mut sink = FileSink::new(directory.path().to_path_buf(), 1)
-      .await
-      .unwrap();
-    sink
-      .write(LogRecord::new("test", LogLevel::Info, "one"))
-      .await
-      .unwrap();
-    sink
-      .write(LogRecord::new("test", LogLevel::Info, "two"))
-      .await
-      .unwrap();
-    let date = today.format("%Y-%m-%d");
-    assert!(
-      directory
-        .path()
-        .join(format!("delta-comic-{date}-000.log"))
-        .exists()
-    );
-    assert!(
-      directory
-        .path()
-        .join(format!("delta-comic-{date}-001.log"))
-        .exists()
-    );
-  }
-}
+#[path = "../test/src/storage.rs"]
+mod tests;

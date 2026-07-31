@@ -24,12 +24,8 @@ impl LogLevel {
     }
   }
 
-  pub(crate) const fn enabled_in_build(self) -> bool {
-    if cfg!(debug_assertions) {
-      true
-    } else {
-      matches!(self, Self::Info | Self::Warn | Self::Error)
-    }
+  pub(crate) const fn meets_minimum_level(self) -> bool {
+    matches!(self, Self::Info | Self::Warn | Self::Error)
   }
 }
 
@@ -84,9 +80,18 @@ impl LogRecord {
     }
   }
 
-  pub(crate) fn format(&self) -> String {
+  pub(crate) fn format_for_file(&self) -> String {
     let scope = sanitize_inline(&self.scope);
     let content = sanitize_inline(&self.content);
+    self.format_with(&scope, &content)
+  }
+
+  pub(crate) fn format_for_console(&self) -> String {
+    let scope = sanitize_inline(&self.scope);
+    self.format_with(&scope, &self.content)
+  }
+
+  fn format_with(&self, scope: &str, content: &str) -> String {
     format!(
       "[{}] ({scope}) {} > {content}\n",
       self.timestamp.format("%Y/%m/%d %H:%M:%S"),
@@ -134,31 +139,5 @@ pub struct LogFileContent {
 }
 
 #[cfg(test)]
-mod tests {
-  use chrono::{Local, TimeZone};
-
-  use super::{LogLevel, LogRecord};
-
-  #[test]
-  fn formats_the_public_line_contract_exactly() {
-    let record = LogRecord {
-      timestamp: Local.with_ymd_and_hms(2026, 7, 22, 9, 8, 7).unwrap(),
-      scope: "reader".into(),
-      level: LogLevel::Warn,
-      content: "cache miss".into(),
-    };
-    assert_eq!(
-      record.format(),
-      "[2026/07/22 09:08:07] (reader) warn > cache miss\n"
-    );
-  }
-
-  #[test]
-  fn keeps_each_record_on_one_physical_line() {
-    let record = LogRecord::new("ui\nworker", LogLevel::Error, "first\r\nsecond");
-    let formatted = record.format();
-    assert_eq!(formatted.lines().count(), 1);
-    assert!(formatted.contains("ui\\nworker"));
-    assert!(formatted.contains("first\\r\\nsecond"));
-  }
-}
+#[path = "../test/src/model.rs"]
+mod tests;

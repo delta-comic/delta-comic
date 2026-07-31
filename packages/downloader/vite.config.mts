@@ -11,5 +11,5 @@ export default defineConfig({
     entry: './lib/index.ts',
   },
   root,
-  test: { environment: 'node', include: ['lib/**/*.test.ts'] },
+  test: { environment: 'node', include: ['test/**/*.test.ts'] },
 })

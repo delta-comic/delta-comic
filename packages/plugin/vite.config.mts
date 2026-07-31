@@ -13,5 +13,5 @@ export default defineConfig({
   },
   resolve: { alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) } },
   root,
-  test: { environment: 'node', include: ['lib/**/*.test.ts', 'vite/**/*.test.ts'] },
+  test: { environment: 'node', include: ['test/**/*.test.ts'] },
 })

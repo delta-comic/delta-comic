@@ -14,8 +14,7 @@
 
 ## app侧清单
 
-- [x] 为oxlint配置`eslint-plugin-tailwindcss`插件
-- [x] 将tailwindcss(ui和app)的实用部分和主题变量等一切自定义内容提取为一个tailwindcss插件，保存在ui库(记得导出)
+- [x] ui包的list代码均有问题: list的不可见剔除有问题，错误的剔除了本来可见的元素，且判定不可见被错误的放到了外层滚动页面而不是组件内的滚动。ui子包配有展示页，你可以调用`vp run ui#dev`启动展示页服务器。
 
 ## server侧清单
 

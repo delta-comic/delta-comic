@@ -2,7 +2,7 @@ use std::{fmt, sync::Once};
 
 use tracing::{Event, Subscriber, field::Visit};
 use tracing_subscriber::{
-  EnvFilter, Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt,
+  Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt,
 };
 
 use crate::{
@@ -17,9 +17,8 @@ pub(crate) struct TracingBridge {
 
 impl TracingBridge {
   pub(crate) fn install(handle: LoggerHandle) -> Result<()> {
-    let filter = build_filter();
     tracing_subscriber::registry()
-      .with(filter)
+      .with(LevelFilter::INFO)
       .with(Self { handle })
       .try_init()
       .map_err(|error| Error::Initialization(error.to_string()))
@@ -44,22 +43,6 @@ where
       LogLevel::from(metadata.level()),
       content,
     ));
-  }
-}
-
-fn build_filter() -> EnvFilter {
-  #[cfg(debug_assertions)]
-  {
-    EnvFilter::builder()
-      .with_default_directive(LevelFilter::TRACE.into())
-      .from_env_lossy()
-  }
-  #[cfg(not(debug_assertions))]
-  {
-    // Production builds never accept an environment override below `info`.
-    EnvFilter::builder()
-      .with_default_directive(LevelFilter::INFO.into())
-      .parse_lossy("info")
   }
 }
 
@@ -144,17 +127,5 @@ impl PanicCapture {
 }
 
 #[cfg(test)]
-mod tests {
-  use super::EventVisitor;
-
-  #[test]
-  fn event_visitor_separates_scope_message_and_structured_fields() {
-    let visitor = EventVisitor {
-      message: Some("download started".into()),
-      scope: Some("downloader".into()),
-      fields: vec!["task=42".into()],
-    };
-    assert_eq!(visitor.scope.as_deref(), Some("downloader"));
-    assert_eq!(visitor.into_content(), "download started task=42");
-  }
-}
+#[path = "../test/src/tracing_bridge.rs"]
+mod tests;
