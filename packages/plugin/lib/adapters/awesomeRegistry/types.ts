@@ -1,5 +1,3 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
-
 export const AWESOME_REGISTRY_BASE_URL =
   'https://raw.githubusercontent.com/delta-comic/awesome-plugins/main/'
 export const AWESOME_REGISTRY_INDEX_PATH = 'registry/index.json'
@@ -69,13 +67,7 @@ export interface AwesomeRegistryResult<T> {
   stale: boolean
 }
 
-export interface AwesomeMarketplaceEntry {
-  listing: AwesomePluginListing
-  manifest?: PluginArchiveDB.Meta
-  manifestError?: string
-}
-
-export interface MarketplaceStorage {
+export interface AwesomeRegistryStorage {
   getItem(key: string): string | null
   removeItem(key: string): void
   setItem(key: string, value: string): void

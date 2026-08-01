@@ -1,10 +1,23 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
 import { logger } from '@delta-comic/logger'
+import type { PluginManifest } from '@delta-comic/model'
 import ky from 'ky'
 
-import { parsePluginManifest } from '../install/manifest'
+import type {
+  PluginCatalog,
+  PluginCatalogIndex,
+  PluginCatalogListing,
+  PluginCatalogPage,
+  PluginCatalogResult,
+} from '../../install/catalog'
+import { parsePluginManifest } from '../../install/manifest'
 
 import { AwesomeRegistryCache } from './cache'
+import {
+  assertAwesomeRegistryPagePath,
+  parseAwesomeRegistryIndex,
+  parseAwesomeRegistryPage,
+  AwesomeRegistryValidationError,
+} from './schema'
 import {
   AWESOME_REGISTRY_BASE_URL,
   AWESOME_REGISTRY_INDEX_PATH,
@@ -12,14 +25,8 @@ import {
   type AwesomeRegistryIndex,
   type AwesomeRegistryPage,
   type AwesomeRegistryResult,
-  type MarketplaceStorage,
+  type AwesomeRegistryStorage,
 } from './types'
-import {
-  assertAwesomeRegistryPagePath,
-  parseAwesomeRegistryIndex,
-  parseAwesomeRegistryPage,
-  AwesomeRegistryValidationError,
-} from './validation'
 
 const marketplaceLogger = logger.scoped('plugin:marketplace')
 
@@ -27,7 +34,7 @@ export interface AwesomeRegistryClientOptions {
   baseUrl?: string
   cache?: AwesomeRegistryCache
   requestJson?: (url: string, signal?: AbortSignal) => Promise<unknown>
-  storage?: MarketplaceStorage
+  storage?: AwesomeRegistryStorage
 }
 
 const defaultRequestJson = async (url: string, signal?: AbortSignal) =>
@@ -51,7 +58,27 @@ export class AwesomeRegistryNetworkError extends Error {
   }
 }
 
-export class AwesomeRegistryClient {
+const catalogIndex = (index: AwesomeRegistryIndex): PluginCatalogIndex => ({
+  pageSize: index.pageSize,
+  pages: index.pages,
+  totalItems: index.totalItems,
+  totalPages: index.totalPages,
+})
+
+const catalogListing = (listing: AwesomePluginListing): PluginCatalogListing => ({
+  authors: listing.authors,
+  id: listing.id,
+  ...(listing.release ? { release: listing.release } : {}),
+  ...(listing.repository ? { repository: listing.repository } : {}),
+  source: listing.download,
+})
+
+const catalogPage = (page: AwesomeRegistryPage): PluginCatalogPage => ({
+  items: page.items.map(catalogListing),
+  pagination: page.pagination,
+})
+
+export class AwesomeRegistryClient implements PluginCatalog {
   private readonly baseUrl: string
   private readonly cache: AwesomeRegistryCache
   private readonly requestJson: (url: string, signal?: AbortSignal) => Promise<unknown>
@@ -62,33 +89,38 @@ export class AwesomeRegistryClient {
     this.requestJson = options.requestJson ?? defaultRequestJson
   }
 
-  public async loadIndex(
-    signal?: AbortSignal,
-  ): Promise<AwesomeRegistryResult<AwesomeRegistryIndex>> {
-    return await this.load(
+  public async loadIndex(signal?: AbortSignal): Promise<PluginCatalogResult<PluginCatalogIndex>> {
+    const result = await this.load(
       AWESOME_REGISTRY_INDEX_PATH,
       parseAwesomeRegistryIndex,
       () => this.cache.readIndex(),
       data => this.cache.writeIndex(data),
       signal,
     )
+    return { ...result, data: catalogIndex(result.data) }
   }
 
   public async loadPage(
     path: string,
     signal?: AbortSignal,
-  ): Promise<AwesomeRegistryResult<AwesomeRegistryPage>> {
+  ): Promise<PluginCatalogResult<PluginCatalogPage>> {
     const safePath = assertAwesomeRegistryPagePath(path)
-    return await this.load(
+    const result = await this.load(
       safePath,
       parseAwesomeRegistryPage,
       () => this.cache.readPage(safePath),
       data => this.cache.writePage(safePath, data),
       signal,
     )
+    return { ...result, data: catalogPage(result.data) }
   }
 
-  public async findListing(id: string, signal?: AbortSignal): Promise<AwesomePluginListing> {
+  public async resolveInstallInput(id: string, signal: AbortSignal) {
+    const listing = await this.findListing(id, signal)
+    return listing.source.type === 'github' ? `gh:${listing.source.repository}` : listing.source.url
+  }
+
+  public async findListing(id: string, signal?: AbortSignal): Promise<PluginCatalogListing> {
     marketplaceLogger.debug('searching marketplace listing', { plugin: id })
     const { data: index } = await this.loadIndex(signal)
     for (const pageReference of index.pages) {
@@ -103,11 +135,12 @@ export class AwesomeRegistryClient {
   }
 
   public async loadManifest(
-    listing: AwesomePluginListing,
-  ): Promise<PluginArchiveDB.Meta | undefined> {
+    listing: PluginCatalogListing,
+    signal?: AbortSignal,
+  ): Promise<PluginManifest | undefined> {
     const manifestUrl = listing.release?.manifestUrl
     if (!manifestUrl) return undefined
-    const manifest = parsePluginManifest(await this.requestJson(manifestUrl))
+    const manifest = parsePluginManifest(await this.requestJson(manifestUrl, signal))
     if (manifest.name.id !== listing.id) {
       throw new AwesomeRegistryValidationError(
         `listing ${listing.id} points to manifest for ${manifest.name.id}`,

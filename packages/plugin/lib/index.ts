@@ -3,7 +3,6 @@ export * from './capabilities'
 export * from './composition'
 export * from './install'
 export * from './kernel'
-export * from './marketplace'
 export * from './runtime'
 
 export * as Core from './core'

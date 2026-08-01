@@ -1,21 +1,32 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import { isPluginManifestCompatible, type AwesomeMarketplaceEntry } from '@delta-comic/plugin'
+import {
+  isPluginManifestCompatible,
+  pluginCatalogInstallInput,
+  type PluginCatalogListing,
+  type PluginManifest,
+} from '@delta-comic/plugin'
 import semver from 'semver'
 
 export type PluginMarketplaceFilter = 'all' | 'available' | 'installed' | 'updates'
 export type PluginMarketplaceCompatibility = 'compatible' | 'incompatible' | 'unknown'
 
-export interface PluginMarketplaceItem extends AwesomeMarketplaceEntry {
+export interface PluginMarketplaceEntry {
+  listing: PluginCatalogListing
+  manifest?: PluginManifest
+  manifestError?: string
+}
+
+export interface PluginMarketplaceItem extends PluginMarketplaceEntry {
   installed?: PluginArchiveDB.Archive
   compatibility: PluginMarketplaceCompatibility
   updateAvailable: boolean
 }
 
-const releaseVersion = (entry: AwesomeMarketplaceEntry) =>
+const releaseVersion = (entry: PluginMarketplaceEntry) =>
   entry.manifest?.version.plugin ?? entry.listing.release?.version
 
 export const mergePluginMarketplaceItems = (
-  entries: AwesomeMarketplaceEntry[],
+  entries: PluginMarketplaceEntry[],
   installedPlugins: PluginArchiveDB.Archive[],
   coreVersion: string,
 ): PluginMarketplaceItem[] => {
@@ -47,6 +58,14 @@ export const mergePluginMarketplaceItems = (
     }
   })
 }
+
+export const pluginMarketplaceInstallInput = (listing: PluginCatalogListing) =>
+  pluginCatalogInstallInput(listing.id)
+
+export const pluginMarketplaceSourceUrl = (listing: PluginCatalogListing) =>
+  listing.source.type === 'github'
+    ? `https://github.com/${listing.source.repository}`
+    : listing.source.url
 
 export const filterPluginMarketplaceItems = (
   items: PluginMarketplaceItem[],

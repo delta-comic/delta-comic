@@ -1,6 +1,11 @@
 import { isTauri } from '@tauri-apps/api/core'
 
-import { ConfigStore, createDefaultPluginFileStore, pluginI18n } from './adapters'
+import {
+  AwesomeRegistryClient,
+  ConfigStore,
+  createDefaultPluginFileStore,
+  pluginI18n,
+} from './adapters'
 import { corePluginDefinition, internalPluginDefinitions } from './builtins'
 import { createDefaultCapabilities, type PluginAuthGateway } from './capabilities'
 import {
@@ -11,6 +16,7 @@ import {
   InstalledPluginCandidateProvider,
   LocalFileSourceResolver,
   MarketplaceSourceResolver,
+  type PluginCatalog,
   PluginInstallService,
   StoredPluginModuleReader,
   ZipPackageCodec,
@@ -59,7 +65,10 @@ const httpSource = new HttpSourceResolver()
 const githubSource = new GitHubSourceResolver({
   coreVersion: corePluginDefinition.manifest.version.plugin,
 })
-const marketplaceSource = new MarketplaceSourceResolver(githubSource, httpSource)
+const awesomeRegistry = new AwesomeRegistryClient()
+const marketplaceSource = new MarketplaceSourceResolver(awesomeRegistry, [githubSource, httpSource])
+
+export const pluginCatalog: PluginCatalog = awesomeRegistry
 
 export const pluginInstaller = new PluginInstallService({
   codecs: [new ZipPackageCodec(), new DevScriptCodec()],

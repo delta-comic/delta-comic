@@ -12,6 +12,10 @@ api <- kernel <- runtime
 builtins -> api
 composition -> capabilities / adapters / runtime / install / builtins
 index -> public API and read-only facades
+
+install/PluginCatalog <- adapters/awesomeRegistry
+                         ^
+                         composition -> app/features/pluginMarketplace
 ```
 
 ## Import rules
@@ -21,9 +25,10 @@ index -> public API and read-only facades
   capability modules.
 - `runtime` depends only on API and kernel protocols. Installed-source normalization lives in
   `install`, so the runtime never knows how a candidate was persisted or decoded.
-- `install` depends on kernel ports instead of concrete persistence, UI, or platform
-  implementations; `adapters` supplies those implementations.
-- `adapters` implement kernel ports and never import application services.
+- `install` owns package acquisition protocols and provider-neutral catalog ports. It depends on
+  ports instead of concrete persistence, registry, UI, or platform implementations.
+- `adapters` implement kernel/install ports and never import application services. External wire
+  schemas are translated to host contracts at this boundary.
 - `builtins` use the same public author contract as external plugins.
 - `composition.ts` is the only place allowed to assemble capabilities, adapters, providers, and
   runtime services.
@@ -41,6 +46,11 @@ and activation behavior. It is then added once to the explicit capability list i
 `createDefaultCapabilities`. The activation pipeline itself must not gain plugin IDs, origins, or
 feature-specific branches. Host-only operations such as authentication are injected through a
 gateway; plugin contracts never import application UI.
+
+The product marketplace is an application feature, not a plugin-runtime layer. Its loading and
+view models live under `packages/app/src/features/pluginMarketplace`. The concrete
+`awesome-plugins` network, schema, and cache implementation lives under
+`adapters/awesomeRegistry`; install source resolution sees only `PluginInstallCatalog`.
 
 Internal and installed plugins are normalized to `PluginCandidate` before dependency planning.
 Everything after `candidate.load()` is source-agnostic and shares the same activation, rollback,
@@ -70,6 +80,7 @@ order.
 | Built-in plugin | Add one default-exporting `builtins/*.builtin.ts` definition | composition, runtime, installed loader |
 | Installed package format | Add a `PluginPackageCodec` and wire it in composition | candidate protocol, runtime, capabilities |
 | Download source | Add a `PluginSourceResolver` and wire it in composition | codecs, candidate protocol, runtime |
+| Catalog provider | Add an adapter implementing `PluginCatalog` and wire it in composition | install resolver, runtime, application view model |
 | Business model | Add an API model plus one capability module; optionally add a typed contribution channel | candidate providers, dependency planner, runtime engine |
 | Host-only UI/platform operation | Add a narrow gateway interface and inject its host adapter | public plugin model, runtime kernel |
 

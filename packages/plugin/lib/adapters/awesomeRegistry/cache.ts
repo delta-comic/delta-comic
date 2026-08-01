@@ -1,5 +1,5 @@
-import type { AwesomeRegistryIndex, AwesomeRegistryPage, MarketplaceStorage } from './types'
-import { parseAwesomeRegistryIndex, parseAwesomeRegistryPage } from './validation'
+import { parseAwesomeRegistryIndex, parseAwesomeRegistryPage } from './schema'
+import type { AwesomeRegistryIndex, AwesomeRegistryPage, AwesomeRegistryStorage } from './types'
 
 interface CacheEnvelope {
   cachedAt: string
@@ -18,7 +18,7 @@ const parseEnvelope = (value: string): CacheEnvelope | undefined => {
 
 export class AwesomeRegistryCache {
   public constructor(
-    private readonly storage?: MarketplaceStorage,
+    private readonly storage?: AwesomeRegistryStorage,
     private readonly prefix = 'delta-comic:awesome-registry:v1',
   ) {}
 

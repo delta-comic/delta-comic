@@ -10,6 +10,7 @@ import {
   type AwesomeRegistryPageReference,
 } from './types'
 
+/** Paths are validated before they are resolved against the configured registry origin. */
 const PAGE_PATH_PATTERN = /^registry\/pages\/[1-9][0-9]*\.json$/
 const PLUGIN_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/
 const GITHUB_LOGIN_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/

@@ -1,5 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import type { AwesomeRegistryClient } from '@delta-comic/plugin'
+import type { PluginCatalog } from '@delta-comic/plugin'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 
 await vi.hoisted(async () => {
@@ -18,15 +18,14 @@ vi.mock('@delta-comic/db', () => ({
 }))
 
 vi.mock('@delta-comic/plugin', () => ({
-  AwesomeRegistryClient: class AwesomeRegistryClient {},
   isPluginManifestCompatible: vi.fn(() => true),
+  pluginCatalog: {},
 }))
 
 import { usePluginMarketplace } from '../../../../src/features/pluginMarketplace/usePluginMarketplace'
 
 const listing = (id: string, manifestUrl = `https://example.test/${id}.json`) => ({
   authors: ['Delta Comic'],
-  download: { repository: `delta-comic/${id}`, type: 'github' as const },
   id,
   release: {
     manifestUrl,
@@ -34,7 +33,7 @@ const listing = (id: string, manifestUrl = `https://example.test/${id}.json`) =>
     url: `https://example.test/${id}`,
     version: '2.0.0',
   },
-  schemaVersion: 1 as const,
+  source: { repository: `delta-comic/${id}`, type: 'github' as const },
 })
 
 const manifest = (id: string) => ({
@@ -73,7 +72,7 @@ describe('usePluginMarketplace', () => {
       return manifest(item.id)
     })
     const marketplace = usePluginMarketplace({
-      client: client as unknown as AwesomeRegistryClient,
+      catalog: client as unknown as PluginCatalog,
       coreVersion: '2.3.0',
     })
 
@@ -108,7 +107,7 @@ describe('usePluginMarketplace', () => {
     })
     client.loadManifest.mockResolvedValue(manifest('alpha'))
     const marketplace = usePluginMarketplace({
-      client: client as unknown as AwesomeRegistryClient,
+      catalog: client as unknown as PluginCatalog,
       coreVersion: '2.3.0',
     })
 
@@ -135,7 +134,7 @@ describe('usePluginMarketplace', () => {
       })
     client.loadManifest.mockImplementation(async item => manifest(item.id))
     const marketplace = usePluginMarketplace({
-      client: client as unknown as AwesomeRegistryClient,
+      catalog: client as unknown as PluginCatalog,
       coreVersion: '2.3.0',
     })
 
@@ -163,7 +162,7 @@ describe('usePluginMarketplace', () => {
       })
     client.loadManifest.mockImplementation(async item => manifest(item.id))
     const marketplace = usePluginMarketplace({
-      client: client as unknown as AwesomeRegistryClient,
+      catalog: client as unknown as PluginCatalog,
       coreVersion: '2.3.0',
     })
 
@@ -185,7 +184,7 @@ describe('usePluginMarketplace', () => {
     let resolveIndex!: (value: unknown) => void
     client.loadIndex.mockReturnValue(new Promise(resolve => (resolveIndex = resolve)))
     const marketplace = usePluginMarketplace({
-      client: client as unknown as AwesomeRegistryClient,
+      catalog: client as unknown as PluginCatalog,
       coreVersion: '2.3.0',
     })
 

@@ -1,7 +1,6 @@
 import { Octokit } from '@octokit/rest'
 
-import { AwesomeRegistryClient, marketplaceDownloadToInstallInput } from '../marketplace'
-
+import { pluginCatalogIdFromInstallInput, type PluginInstallCatalog } from './catalog'
 import type { PluginInstallInput, PluginSourceResolver, ResolvedPluginSource } from './contracts'
 import { isPluginManifestCompatible, parsePluginManifest } from './manifest'
 
@@ -93,22 +92,25 @@ export class MarketplaceSourceResolver implements PluginSourceResolver {
   public readonly id = 'marketplace'
 
   public constructor(
-    private readonly github: GitHubSourceResolver,
-    private readonly http: HttpSourceResolver,
-    private readonly registry = new AwesomeRegistryClient(),
+    private readonly catalog: PluginInstallCatalog,
+    private readonly sources: readonly PluginSourceResolver[],
   ) {}
 
   public matches(input: PluginInstallInput): input is string {
-    return typeof input === 'string' && /^ap:[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(input)
+    return pluginCatalogIdFromInstallInput(input) !== undefined
   }
 
   public async resolve(input: PluginInstallInput, signal: AbortSignal) {
-    if (typeof input !== 'string') throw new TypeError('marketplace resolver requires a plugin id')
-    const listing = await this.registry.findListing(input.slice(3), signal)
-    const redirected = marketplaceDownloadToInstallInput(listing.download)
-    const source = this.github.matches(redirected)
-      ? await this.github.resolve(redirected, signal)
-      : await this.http.resolve(redirected, signal)
+    if (typeof input !== 'string') {
+      throw new TypeError('marketplace resolver requires a plugin catalog id')
+    }
+    const plugin = pluginCatalogIdFromInstallInput(input)
+    if (!plugin) throw new TypeError('marketplace resolver requires a plugin catalog id')
+    const redirected = await this.catalog.resolveInstallInput(plugin, signal)
+    const resolver = this.sources.find(source => source.matches(redirected))
+    if (!resolver)
+      throw new Error(`plugin catalog returned an unsupported install source: ${redirected}`)
+    const source = await resolver.resolve(redirected, signal)
     return { ...source, installInput: input, resolverId: this.id }
   }
 }

@@ -38,7 +38,7 @@ describe('plugin package architecture', () => {
     }
   })
 
-  it('keeps kernel and capabilities independent from higher layers', () => {
+  it('keeps layered modules within their allowed dependency directions', () => {
     const rules = [
       {
         forbidden: new Set([
@@ -62,6 +62,10 @@ describe('plugin package architecture', () => {
       {
         forbidden: new Set(['adapters', 'builtins', 'capabilities', 'install', 'module']),
         path: '/lib/runtime/',
+      },
+      {
+        forbidden: new Set(['builtins', 'capabilities', 'composition', 'runtime']),
+        path: '/lib/adapters/',
       },
     ]
 
@@ -91,6 +95,21 @@ describe('plugin package architecture', () => {
       expect(source, `${path} must use scoped contributions instead of Global`).not.toMatch(
         /\bGlobal\./,
       )
+    }
+  })
+
+  it('keeps marketplace presentation and concrete registries out of the top-level layers', () => {
+    const paths = Object.keys(sourceModules)
+    const installSources = Object.entries(sourceModules).filter(([path]) =>
+      path.includes('/lib/install/'),
+    )
+
+    expect(paths.some(path => path.includes('/lib/marketplace/'))).toBe(false)
+    for (const [path, source] of installSources) {
+      expect(
+        source,
+        `${path} must depend on catalog ports rather than Awesome Registry`,
+      ).not.toMatch(/AwesomeRegistry/)
     }
   })
 })

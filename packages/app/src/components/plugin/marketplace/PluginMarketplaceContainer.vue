@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import {
-  installPlugin,
-  marketplaceListingInstallId,
-  marketplaceListingSource,
-  updatePlugin,
-} from '@delta-comic/plugin'
+import { installPlugin, updatePlugin } from '@delta-comic/plugin'
 import { useDialog, useMessage } from 'naive-ui'
 import { computed, onMounted, shallowReactive, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import type { PluginMarketplaceItem } from '@/features/pluginMarketplace/model'
+import {
+  pluginMarketplaceInstallInput,
+  pluginMarketplaceSourceUrl,
+  type PluginMarketplaceItem,
+} from '@/features/pluginMarketplace/model'
 import { usePluginMarketplace } from '@/features/pluginMarketplace/usePluginMarketplace'
 import { openExternal } from '@/platform'
 
@@ -36,7 +35,7 @@ const runInstall = async (item: PluginMarketplaceItem) => {
   installingIds.add(item.listing.id)
   try {
     if (item.installed) await updatePlugin(item.installed)
-    else await installPlugin(marketplaceListingInstallId(item.listing))
+    else await installPlugin(pluginMarketplaceInstallInput(item.listing))
     await marketplace.refreshInstalled()
     message.success(
       t(item.installed ? 'plugin.market.messages.updated' : 'plugin.market.messages.installed'),
@@ -51,7 +50,7 @@ const runInstall = async (item: PluginMarketplaceItem) => {
 
 const confirmInstall = (item: PluginMarketplaceItem) => {
   if (item.compatibility === 'incompatible' || (item.installed && !item.updateAvailable)) return
-  const source = marketplaceListingSource(item.listing)
+  const source = pluginMarketplaceSourceUrl(item.listing)
   const insecureNotice = source.startsWith('http:')
     ? `\n${t('plugin.market.security.insecure')}`
     : ''

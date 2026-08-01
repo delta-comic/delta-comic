@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { marketplaceListingSource } from '@delta-comic/plugin'
 import { NAlert, NButton, NModal, NTag } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import PluginIcon from '@/components/plugin/PluginIcon.vue'
-import type { PluginMarketplaceItem } from '@/features/pluginMarketplace/model'
+import {
+  pluginMarketplaceInstallInput,
+  pluginMarketplaceSourceUrl,
+  type PluginMarketplaceItem,
+} from '@/features/pluginMarketplace/model'
 
 const props = defineProps<{ item?: PluginMarketplaceItem }>()
 const emit = defineEmits<{ install: []; openSource: [url: string] }>()
@@ -18,7 +21,10 @@ const title = computed(
     props.item?.listing.repository?.name ??
     props.item?.listing.id,
 )
-const source = computed(() => (props.item ? marketplaceListingSource(props.item.listing) : ''))
+const installInput = computed(() =>
+  props.item ? pluginMarketplaceInstallInput(props.item.listing) : '',
+)
+const source = computed(() => (props.item ? pluginMarketplaceSourceUrl(props.item.listing) : ''))
 const publishedAt = computed(() => {
   const value = props.item?.listing.release?.publishedAt
   return value
@@ -58,7 +64,7 @@ const canInstall = computed(
         <div>
           <dt>{{ t('plugin.market.details.installId') }}</dt>
           <dd>
-            <code>ap:{{ item.listing.id }}</code>
+            <code>{{ installInput }}</code>
           </dd>
         </div>
         <div>

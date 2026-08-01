@@ -1,5 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import type { AwesomeMarketplaceEntry, PrebootRecovery } from '@delta-comic/plugin'
+import type { PrebootRecovery } from '@delta-comic/plugin'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
@@ -118,17 +118,19 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 
-import type { PluginMarketplaceItem } from '@/features/pluginMarketplace/model'
+import type {
+  PluginMarketplaceEntry,
+  PluginMarketplaceItem,
+} from '@/features/pluginMarketplace/model'
 
 import PluginMarketplaceCard from '../../../../../src/components/plugin/marketplace/PluginMarketplaceCard.vue'
 import PluginMarketplaceFilters from '../../../../../src/components/plugin/marketplace/PluginMarketplaceFilters.vue'
 import PrebootRecoveryAlert from '../../../../../src/components/plugin/PrebootRecoveryAlert.vue'
 
 const marketplaceItem = (overrides: Partial<PluginMarketplaceItem> = {}): PluginMarketplaceItem => {
-  const entry: AwesomeMarketplaceEntry = {
+  const entry: PluginMarketplaceEntry = {
     listing: {
       authors: ['Delta Comic'],
-      download: { repository: 'delta-comic/reader', type: 'github' },
       id: 'reader',
       release: {
         manifestUrl: 'https://example.test/manifest.json',
@@ -136,7 +138,7 @@ const marketplaceItem = (overrides: Partial<PluginMarketplaceItem> = {}): Plugin
         url: 'https://example.test/release',
         version: '2.0.0',
       },
-      schemaVersion: 1,
+      source: { repository: 'delta-comic/reader', type: 'github' },
     },
     manifest: {
       apiVersion: 1,
