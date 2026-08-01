@@ -93,12 +93,17 @@ const boot = async (safe = false, pluginNames?: readonly string[], remembered = 
   if (!props.startupReady) return $message.warning(t('plugin.startup.prebootLoading'))
   if (bootingSteps.value || isBooted.value) return $message.warning(t('plugin.startup.loading'))
   window.$$safe$$ = safe
-  const { operation, progress } = pluginRuntime.loadNormal({ pluginNames })
-  const watcher = watch(progress, steps => (bootingSteps.value = steps), {
-    immediate: true,
-    deep: true,
-  })
+  bootingSteps.value = undefined
+  let watcher: ReturnType<typeof watch> | undefined
   try {
+    const { operation, progress } =
+      pluginRuntime.activeNormalPluginNames.length > 0
+        ? pluginRuntime.reloadNormal({ pluginNames })
+        : pluginRuntime.loadNormal({ pluginNames })
+    watcher = watch(progress, steps => (bootingSteps.value = steps), {
+      immediate: true,
+      deep: true,
+    })
     await operation
     if (Object.values(progress.value).some(value => value.progress.status === 'error')) {
       show.value = true
@@ -111,8 +116,7 @@ const boot = async (safe = false, pluginNames?: readonly string[], remembered = 
     show.value = true
     $message.error(error instanceof Error ? error.message : String(error))
   } finally {
-    watcher.stop()
-    bootingSteps.value = undefined
+    watcher?.stop()
   }
 }
 

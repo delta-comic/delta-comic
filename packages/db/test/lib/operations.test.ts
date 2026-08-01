@@ -273,6 +273,7 @@ describe('plugin archive mutations', () => {
     installerName: '',
     loaderName: 'zip',
     meta: {
+      apiVersion: 1 as const,
       author: 'test',
       description: 'test',
       icon: 'assets/icon.png',

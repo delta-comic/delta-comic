@@ -34,21 +34,20 @@
   },
   "scripts": {
     "build": "vp pack",
-    "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "@aptabase/tauri": "catalog:",
     "@delta-comic/logger": "workspace:",
     "@tauri-apps/api": "catalog:",
     "@vue/language-core": "catalog:",
-    "acorn": "^8.15.0",
-    "es-module-lexer": "^2.3.0",
+    "acorn": "^8.18.0",
+    "es-module-lexer": "^2.3.1",
     "es-toolkit": "catalog:",
-    "magic-string": "^0.30.21",
+    "magic-string": "^1.1.0",
     "mitt": "catalog:"
   },
   "devDependencies": {
-    "@typescript/native-preview": "catalog:",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {

@@ -23,13 +23,13 @@ const {
   downloads: { connect: vi.fn(), disconnect: vi.fn(), refresh: vi.fn() },
   intervalCallbacks: [] as Array<() => Promise<void>>,
   message: { success: vi.fn() },
-  pluginRuntime: { activatePreboot: vi.fn(), clearRecovery: vi.fn(), readRecovery: vi.fn() },
+  pluginRuntime: { clearRecovery: vi.fn(), readRecovery: vi.fn() },
   revealMainEntry: vi.fn(),
   router: { push: vi.fn() },
   shareToken: new Map<
     string,
     {
-      patten: (text: string) => boolean
+      isMatched: (text: string) => boolean
       show: (
         text: string,
       ) => Promise<{
@@ -65,7 +65,14 @@ await vi.hoisted(async () => {
   }
 })
 
-vi.mock('@delta-comic/plugin', () => ({ Global: { globalNodes: [], shareToken }, pluginRuntime }))
+vi.mock('@delta-comic/plugin', () => ({
+  configurePluginHost: vi.fn(),
+  pluginRuntime,
+  usePluginStore: () => ({
+    modelEntries: (key: string) =>
+      key === 'social' ? [['comic', { share: { tokenListen: [...shareToken.values()] } }]] : [],
+  }),
+}))
 vi.mock('@delta-comic/ui', () => ({ DcImage: { name: 'DcImage', render: () => null } }))
 vi.mock('@delta-comic/utils', () => ({
   SharedFunction: {
@@ -250,7 +257,7 @@ describe('App share-token orchestration', () => {
     const onPositive = vi.fn()
     const onNegative = vi.fn()
     const handler = {
-      patten: vi.fn((text: string) => text.startsWith('delta://')),
+      isMatched: vi.fn((text: string) => text.startsWith('delta://')),
       show: vi.fn(async () => ({
         detail: 'Shared comic details',
         onNegative,
@@ -266,7 +273,7 @@ describe('App share-token orchestration', () => {
     clipboard.read.mockResolvedValue('delta://shared/99')
     await intervalCallbacks[0]?.()
 
-    expect(handler.patten).toHaveBeenCalledWith('delta://shared/99')
+    expect(handler.isMatched).toHaveBeenCalledWith('delta://shared/99')
     expect(handler.show).toHaveBeenCalledWith('delta://shared/99')
     expect(dialog.info).toHaveBeenCalledOnce()
     const options = dialog.info.mock.calls[0][0]
@@ -287,7 +294,6 @@ describe('App share-token orchestration', () => {
 
 describe('AppSetup startup shell', () => {
   beforeEach(() => {
-    pluginRuntime.activatePreboot.mockReset().mockResolvedValue({ reloadRequired: false })
     pluginRuntime.clearRecovery.mockClear()
     pluginRuntime.readRecovery
       .mockReset()
@@ -311,8 +317,6 @@ describe('AppSetup startup shell', () => {
     expect(artwork.attributes('aria-hidden')).toBe('true')
     await flushPromises()
     await nextTick()
-    expect(pluginRuntime.activatePreboot).toHaveBeenCalledOnce()
-
     const recoveryListeners = wrapper.getComponent({ name: 'PrebootRecoveryAlert' }).vm.$.vnode
       .props as Record<string, (...args: unknown[]) => void>
     expect(recoveryListeners.onManage).toBeTypeOf('function')
@@ -329,13 +333,7 @@ describe('AppSetup startup shell', () => {
     wrapper.unmount()
   })
 
-  it('reveals the main entry only after preboot activation is ready', async () => {
-    let finishPreboot!: (result: { reloadRequired: boolean }) => void
-    pluginRuntime.activatePreboot.mockReturnValueOnce(
-      new Promise(resolve => {
-        finishPreboot = resolve
-      }),
-    )
+  it('reveals the main entry after the mounted shell is ready', async () => {
     const wrapper = mount(AppSetup, {
       global: {
         stubs: {
@@ -344,12 +342,6 @@ describe('AppSetup startup shell', () => {
         },
       },
     })
-    const plugin = wrapper.getComponent({ name: 'Plugin' })
-
-    expect(plugin.props('startupReady')).toBe(false)
-    expect(revealMainEntry).not.toHaveBeenCalled()
-
-    finishPreboot({ reloadRequired: false })
     await flushPromises()
     await nextTick()
 

@@ -1,3 +1,4 @@
+import type { PluginManifest } from '@delta-comic/model'
 import {
   defineMutation,
   useMutation,
@@ -10,18 +11,7 @@ import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
 
-export interface Meta {
-  name: { display: string; id: string }
-  version: { plugin: string; supportCore: string }
-  author: string
-  description: string
-  /** An HTTP(S) URL or a path relative to the installed plugin root. */
-  icon?: string
-  require: { id: string; download?: string | undefined }[]
-  entry?: { jsPath: string; cssPath?: string }
-  kind?: 'normal' | 'preboot'
-  integrity?: { algorithm: 'blake3' | 'sha256'; digest: string }
-}
+export type Meta = PluginManifest
 
 export interface Table {
   installerName: string

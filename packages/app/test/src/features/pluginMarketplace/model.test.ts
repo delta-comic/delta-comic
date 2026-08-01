@@ -1,5 +1,4 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import type { AwesomeMarketplaceEntry } from '@delta-comic/plugin'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
 vi.mock('@delta-comic/plugin', () => ({
@@ -9,12 +8,12 @@ vi.mock('@delta-comic/plugin', () => ({
 import {
   filterPluginMarketplaceItems,
   mergePluginMarketplaceItems,
+  type PluginMarketplaceEntry,
 } from '../../../../src/features/pluginMarketplace/model'
 
-const entry = (version = '2.0.0'): AwesomeMarketplaceEntry => ({
+const entry = (version = '2.0.0'): PluginMarketplaceEntry => ({
   listing: {
     authors: ['delta-comic'],
-    download: { repository: 'delta-comic/example', type: 'github' },
     id: 'example',
     release: {
       manifestUrl: 'https://example.test/manifest.json',
@@ -22,9 +21,10 @@ const entry = (version = '2.0.0'): AwesomeMarketplaceEntry => ({
       url: 'https://example.test/releases/2.0.0',
       version,
     },
-    schemaVersion: 1,
+    source: { repository: 'delta-comic/example', type: 'github' },
   },
   manifest: {
+    apiVersion: 1,
     author: 'delta-comic',
     description: 'Searchable description',
     name: { display: 'Example Plugin', id: 'example' },

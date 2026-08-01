@@ -1,4 +1,4 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
+import type { PluginManifest } from '@delta-comic/model'
 import { exposeHostLibraries, extendsDepends } from '@delta-comic/utils/vite'
 import { merge } from 'es-toolkit'
 import JSZip from 'jszip'
@@ -31,7 +31,7 @@ type DeltaComicPlugin = {
 type DeltaComicPluginOption = DeltaComicPlugin | DeltaComicPluginOption[] | false | null | undefined
 
 export const deltaComic = (
-  meta: PluginArchiveDB.Meta,
+  meta: PluginManifest,
   command: 'build' | 'serve',
 ): DeltaComicPluginOption[] => {
   const externalGlobals = extendsDepends as Record<string, string>

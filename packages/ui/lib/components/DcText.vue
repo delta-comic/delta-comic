@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { escape } from 'es-toolkit'
-import Link from 'linkify-it'
+import { LinkifyIt } from 'linkify-it'
 import tlds from 'tlds'
 import { computed } from 'vue'
 
@@ -8,7 +8,7 @@ import { cn, type StyleProps } from '../utils'
 
 const $props = withDefaults(defineProps<{ text?: string } & StyleProps>(), { text: '' })
 
-const linker = new Link().tlds(tlds).tlds('onion', true).set({ fuzzyIP: true })
+const linker = new LinkifyIt().tlds(tlds).tlds('onion', true).set({ fuzzyIP: true })
 
 const texts = computed(() => {
   const matches = linker.match($props.text)

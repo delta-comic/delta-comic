@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import LogReaderPanel from '@/components/logs/LogReaderPanel.vue'
+import PluginConfigField from '@/components/plugin/PluginConfigField.vue'
 import { isTauriRuntime } from '@/platform'
 
 const $router = useRouter()
@@ -16,7 +17,6 @@ const showNativeLogs = isTauriRuntime()
 const showLogReader = shallowRef(false)
 
 const translateText = (value: string | undefined) => (value && te(value) ? t(value) : (value ?? ''))
-
 const localizeFormConfig = <T extends FormSingleConfigure>(config: T): T => {
   const localized: FormSingleConfigure = {
     ...config,
@@ -54,98 +54,11 @@ const localizeFormConfig = <T extends FormSingleConfigure>(config: T): T => {
         :title="translateText(title)"
       >
         <template v-for="[name, config] of Object.entries(form)" :key="name">
-          <DcCell center v-if="config.type == 'switch'" :title="translateText(config.info)">
-            <template #right-icon>
-              <DcFormSwitch :config="localizeFormConfig(config)" v-model="store.value[name]" />
-            </template>
-          </DcCell>
-          <NPopselect :options="[]" trigger="click" size="huge" v-else-if="config.type == 'string'">
-            <DcCell center :title="translateText(config.info)" clickable>
-              {{ store.value[name] }}
-            </DcCell>
-            <template #empty>
-              <DcFormString
-                :config="localizeFormConfig(config)"
-                v-model="store.value[name]"
-                class="max-w-[80vw]!"
-              />
-            </template>
-          </NPopselect>
-          <NPopselect :options="[]" trigger="click" size="huge" v-else-if="config.type == 'number'">
-            <DcCell center :title="translateText(config.info)" clickable>
-              {{ store.value[name] }}
-            </DcCell>
-            <template #empty>
-              <DcFormNumber
-                :config="localizeFormConfig(config)"
-                v-model="store.value[name]"
-                class="max-w-[80vw]!"
-              />
-            </template>
-          </NPopselect>
-          <NPopselect
-            :options="localizeFormConfig(config).selects"
-            trigger="click"
-            placement="bottom-end"
-            size="huge"
-            v-else-if="config.type == 'radio'"
-            v-model:value="store.value[name]"
-          >
-            <DcCell center :title="translateText(config.info)" clickable>
-              {{
-                localizeFormConfig(config).selects.find(v => v.value == store.value[name])?.label
-              }}
-            </DcCell>
-          </NPopselect>
-          <NPopselect
-            :options="localizeFormConfig(config).selects"
-            trigger="click"
-            placement="bottom-end"
-            size="huge"
-            multiple
-            v-else-if="config.type == 'checkbox'"
-            v-model:value="store.value[name]"
-          >
-            <DcCell center :title="translateText(config.info)" clickable>
-              {{ store.value[name] }}
-            </DcCell>
-          </NPopselect>
-          <DcVar v-else-if="config.type == 'date'" :value="{ show: false }" v-slot="{ value }">
-            <DcCell center :title="translateText(config.info)" clickable @click="value.show = true">
-              {{ store.value[name] }}
-              <NModal v-model:show="value.show" preset="dialog" :title="store.value[name]">
-                <DcFormDate
-                  :config="localizeFormConfig(config)"
-                  v-model="store.value[name]"
-                  class="max-w-[80vw]!"
-                />
-              </NModal>
-            </DcCell>
-          </DcVar>
-          <DcVar v-else-if="config.type == 'dateRange'" :value="{ show: false }" v-slot="{ value }">
-            <DcCell center :title="translateText(config.info)" clickable @click="value.show = true">
-              {{ store.value[name] }}
-              <NModal v-model:show="value.show" preset="dialog" :title="store.value[name]">
-                <DcFormDateRange
-                  :config="localizeFormConfig(config)"
-                  v-model="store.value[name]"
-                  class="max-w-[80vw]!"
-                />
-              </NModal>
-            </DcCell>
-          </DcVar>
-          <DcVar v-else-if="config.type == 'pairs'" :value="{ show: false }" v-slot="{ value }">
-            <DcCell center :title="translateText(config.info)" clickable @click="value.show = true">
-              {{ store.value[name] }}
-              <NModal v-model:show="value.show" preset="dialog" :title="store.value[name]">
-                <DcFormPairs
-                  :config="localizeFormConfig(config)"
-                  v-model="store.value[name]"
-                  class="max-w-[80vw]!"
-                />
-              </NModal>
-            </DcCell>
-          </DcVar>
+          <PluginConfigField
+            :config="localizeFormConfig(config)"
+            :model-value="store[name]"
+            @update:model-value="store[name] = $event"
+          />
         </template>
       </DcCellGroup>
       <DcCellGroup v-if="showNativeLogs" :title="t('settings.logs.sectionTitle')">

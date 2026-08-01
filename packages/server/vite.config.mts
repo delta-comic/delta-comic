@@ -6,8 +6,8 @@ const root = fileURLToPath(new URL('.', import.meta.url))
 
 export default defineConfig({
   pack: [
-    { entry: './app/index.ts', dts: { tsgo: true, tsconfig: './tsconfig.app.json' } },
-    { entry: './lib/index.ts', dts: { tsgo: true, tsconfig: './tsconfig.lib.json' } },
+    { entry: './app/index.ts', dts: { tsconfig: './tsconfig.app.json' } },
+    { entry: './lib/index.ts', dts: { tsconfig: './tsconfig.lib.json' } },
   ],
   plugins: lazyPlugins((async () => {
     if (process.env.VITEST || process.env.VP_COMMAND == 'test') return []

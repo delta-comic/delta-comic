@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { UniItem } from '@delta-comic/model'
-import { useConfig, usePluginStore, type Search } from '@delta-comic/plugin'
+import { Core, useConfig, usePluginStore, type Content } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
 import { useInfiniteQuery } from '@pinia/colada'
 import { isEmpty } from 'es-toolkit/compat'
@@ -14,18 +14,23 @@ import { Icons } from '@/icons'
 
 const route = useRoute<'/search/[keyword]/[sort]/[method]'>()
 const pluginStore = usePluginStore()
-const config = useConfig().$loadApp()
+const config = useConfig().load(Core.cfg)
 const { t } = useI18n()
 
 const allSearchSource = computed(() =>
-  Array.from(pluginStore.plugins.values())
-    .filter(v => v.search?.methods)
-    .map(
-      v =>
-        [v.name, Object.entries(v.search?.methods ?? {})] as [
-          plugin: string,
-          sources: [name: string, method: Search.SearchMethod][],
-        ],
+  pluginStore
+    .modelEntries('content')
+    .flatMap(([plugin, content]) =>
+      content.search
+        ? [
+            [
+              plugin,
+              content.search.methods.map(
+                method => [method.id, method] as [string, Content.SearchMethod],
+              ),
+            ] as const,
+          ]
+        : [],
     ),
 )
 
@@ -47,7 +52,12 @@ const query = useInfiniteQuery({
   query: async ({ signal, pageParam }) => {
     return await method.value.fetchSearchResult
       .query(
-        { input: decodeURIComponent(route.params.keyword), sort: route.params.sort },
+        {
+          aim: {
+            input: decodeURIComponent(route.params.keyword),
+            search: { method: method.value.id, sort: route.params.sort },
+          },
+        },
         pageParam,
         signal,
       )
@@ -77,7 +87,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
           :options="
             allSearchSource.map(([plugin, sources]) => ({
               type: 'group',
-              label: pluginStore.$getI18nName(plugin),
+              label: pluginStore.displayName(plugin),
               children: sources.map(([id, { name }]) => ({
                 label: name,
                 value: searchSourceKey.toString([plugin, id]),
@@ -94,7 +104,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
         >
           <NButton quaternary>
             {{ t('search.source') }}:<span class="text-xs text-(--nui-primary-color)">
-              {{ pluginStore.$getI18nName(searchSourceKey.toJSON(route.params.method)[0]) }}:{{
+              {{ pluginStore.displayName(searchSourceKey.toJSON(route.params.method)[0]) }}:{{
                 method.name
               }}
             </span>
@@ -106,7 +116,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
           </NButton>
         </NPopselect>
         <NPopselect
-          :options="method.sorts.map(({ text, value }) => ({ label: text, value }))"
+          :options="method.sorts.options.map(({ label, id }) => ({ label, value: id }))"
           :value="route.params.sort"
           @update:value="
             (v: string) =>
@@ -132,7 +142,7 @@ const searchText = shallowRef(decodeURIComponent(route.params.keyword))
             {{ t('search.sort') }}
             <span class="text-xs text-(--nui-primary-color)">
               -{{
-                method.sorts.find(v => v.value == route.params.sort)?.text ??
+                method.sorts.options.find(v => v.id == route.params.sort)?.label ??
                 t('common.status.missing')
               }}
             </span>

@@ -19,7 +19,7 @@ const randomProvider = computed(() =>
   plugin.plugins
     .values()
     .toArray()
-    .map(v => v.search?.fetchRandomItems)
+    .map(v => v.model?.content?.promotes?.fetchRandomItems)
     .filter(v => !!v),
 )
 const getRandomItems = async (signal: AbortSignal) => {

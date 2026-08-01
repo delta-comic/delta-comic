@@ -6,7 +6,11 @@ const { dialog, memory, message, pluginRuntime } = vi.hoisted(() => ({
   dialog: { info: vi.fn() },
   memory: { clear: vi.fn(), read: vi.fn(), remember: vi.fn() },
   message: { error: vi.fn(), warning: vi.fn() },
-  pluginRuntime: { activeNormalPluginNames: ['reader'], loadNormal: vi.fn() },
+  pluginRuntime: {
+    activeNormalPluginNames: [] as string[],
+    loadNormal: vi.fn(),
+    reloadNormal: vi.fn(),
+  },
 }))
 
 await vi.hoisted(async () => {
@@ -107,7 +111,9 @@ describe('plugin startup drawer', () => {
     memory.remember.mockClear()
     message.error.mockClear()
     message.warning.mockClear()
+    pluginRuntime.activeNormalPluginNames.splice(0)
     pluginRuntime.loadNormal.mockReset()
+    pluginRuntime.reloadNormal.mockReset()
   })
 
   afterEach(() => wrapper?.unmount())
@@ -131,7 +137,7 @@ describe('plugin startup drawer', () => {
 
   it('boots normally, closes the drawer and remembers only after confirmation', async () => {
     pluginRuntime.loadNormal.mockReturnValue({
-      operation: Promise.resolve(),
+      operation: Promise.resolve().then(() => pluginRuntime.activeNormalPluginNames.push('reader')),
       progress: progress('done'),
     })
     const current = mountStartup()
@@ -154,7 +160,9 @@ describe('plugin startup drawer', () => {
 
   it('keeps management open and reports partial plugin failures without remembering', async () => {
     pluginRuntime.loadNormal.mockReturnValue({
-      operation: Promise.resolve(),
+      operation: Promise.resolve().then(() =>
+        pluginRuntime.activeNormalPluginNames.push('reader', 'sync'),
+      ),
       progress: progress('error'),
     })
     const current = mountStartup()
@@ -167,6 +175,21 @@ describe('plugin startup drawer', () => {
     expect(current.emitted('update:isBooted')).toBeUndefined()
     expect(current.props()).toMatchObject({ show: true })
     expect(dialog.info).not.toHaveBeenCalled()
+  })
+
+  it('reloads partial active state when startup is retried', async () => {
+    pluginRuntime.activeNormalPluginNames.push('reader')
+    pluginRuntime.reloadNormal.mockReturnValue({
+      operation: Promise.resolve(),
+      progress: progress('done'),
+    })
+    const current = mountStartup()
+
+    await current.findAll('.startup-actions button')[1].trigger('click')
+    await flushPromises()
+
+    expect(pluginRuntime.reloadNormal).toHaveBeenCalledExactlyOnceWith({ pluginNames: undefined })
+    expect(pluginRuntime.loadNormal).not.toHaveBeenCalled()
   })
 
   it('automatically applies a remembered safe selection without prompting again', async () => {

@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import { Global, usePluginStore } from '@delta-comic/plugin'
+import { usePluginStore } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 const $router = useRouter()
 const pluginStore = usePluginStore()
 const { t } = useI18n()
+const categoryEntries = computed(() =>
+  pluginStore
+    .modelEntries('content')
+    .flatMap(([plugin, content]) =>
+      content.promotes?.categories ? [[plugin, content.promotes.categories] as const] : [],
+    ),
+)
 </script>
 
 <template>
@@ -18,10 +26,10 @@ const { t } = useI18n()
     </div>
     <NScrollbar class="h-[calc(100%-var(--dc-page-header-height)-var(--safe-area-inset-top))]!">
       <div class="mx-auto w-full max-w-6xl py-2">
-        <div v-for="[plugin, categories] in Global.categories.entries()" :key="plugin">
+        <div v-for="[plugin, categories] in categoryEntries" :key="plugin">
           <NH1 prefix="bar" align-text type="success" class="mb-0! ml-2!">
             <NText type="primary">
-              {{ pluginStore.$getI18nName(plugin) }}
+              {{ pluginStore.displayName(plugin) }}
             </NText>
           </NH1>
           <div
@@ -41,8 +49,8 @@ const { t } = useI18n()
                   SharedFunction.call(
                     'routeToSearch',
                     cate.search.input,
-                    [plugin, cate.search.methodId],
-                    cate.search.sort,
+                    [plugin, cate.search.search.method],
+                    cate.search.search.sort,
                   )
                 "
               >

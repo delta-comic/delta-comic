@@ -20,7 +20,7 @@
     "migrate:local": "wrangler d1 migrations apply delta-comic-server-db --local",
     "migrate:remote": "wrangler d1 migrations apply delta-comic-server-db --remote",
     "preview": "vp build && vp preview",
-    "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "@delta-comic/logger": "workspace:",
@@ -36,7 +36,7 @@
     "@sinclair/typebox": "catalog:",
     "@types/node": "catalog:",
     "@types/semver": "catalog:",
-    "@typescript/native-preview": "catalog:",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",

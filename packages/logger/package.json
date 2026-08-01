@@ -33,13 +33,13 @@
   "scripts": {
     "build": "vp pack",
     "test": "vp test run test/lib",
-    "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "@tauri-apps/api": "catalog:"
   },
   "devDependencies": {
-    "@typescript/native-preview": "catalog:",
+    "typescript": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
   },

@@ -101,7 +101,7 @@ export const useDownloadsStore = defineStore('downloads', () => {
   const removedTaskRevisions = new Map<string, number>()
 
   const sourceRefreshRuntime = {
-    isPluginLoaded: (plugin: string) => pluginStore.$isLoaded(plugin),
+    isPluginLoaded: (plugin: string) => pluginStore.isLoaded(plugin),
     getContentPage: (contentType: [string, string]) => UniContentPage.contentPages.get(contentType),
     getDownloadProvider: (contentType: [string, string]) =>
       UniContentPage.downloadProviders.get(contentType),

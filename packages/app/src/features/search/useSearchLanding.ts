@@ -1,6 +1,6 @@
 import { useNativeStore } from '@delta-comic/db'
 import { logger } from '@delta-comic/logger'
-import { Global, type Search, usePluginStore } from '@delta-comic/plugin'
+import { type Content, usePluginStore } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
 import { computedAsync } from '@vueuse/core'
 import { uniq } from 'es-toolkit'
@@ -12,14 +12,15 @@ const searchLogger = logger.scoped('app:search')
 
 export interface ResolvedHotSearchSection {
   id: string
-  items: Search.HotSearchItem[]
+  items: Content.SearchAim[]
   plugin: string
-  target: Search.HotSearchTarget
   title: string
 }
 
-interface ResolvedSearchTarget extends Search.HotSearchTarget {
+interface ResolvedSearchTarget {
+  method: string
   plugin: string
+  sort?: string
 }
 
 interface UseSearchLandingOptions {
@@ -34,32 +35,32 @@ export function useSearchLanding(options: UseSearchLandingOptions) {
 
   const fallbackTarget = computed<ResolvedSearchTarget | undefined>(() => {
     for (const [plugin, config] of pluginStore.plugins) {
-      const entry = Object.entries(config.search?.methods ?? {})[0]
-      if (!entry) continue
-      const [method, definition] = entry
-      return { method, plugin, sort: definition.defaultSort }
+      const method = config.model?.content?.search?.methods[0]
+      if (!method) continue
+      return { method: method.id, plugin, sort: method.sorts.default }
     }
     return undefined
   })
 
   const hotSearchSections = computedAsync<ResolvedHotSearchSection[]>(
     async onCancel => {
-      const providers = Array.from(Global.hotSearch.entries()).flatMap(([plugin, entries]) =>
-        entries.map((provider, index) => ({ index, plugin, provider })),
-      )
+      const providers = pluginStore
+        .modelEntries('content')
+        .flatMap(([plugin, content]) =>
+          content.search?.getHotSearch ? [{ plugin, provider: content.search.getHotSearch }] : [],
+        )
       const controller = new AbortController()
       onCancel(() => controller.abort())
 
       const sections = await Promise.all(
-        providers.map(async ({ index, plugin, provider }) => {
+        providers.map(async ({ plugin, provider }, index) => {
           try {
-            const items = await provider.fetchItems(controller.signal)
+            const items = await provider(controller.signal)
             return {
               id: `${plugin}:${index}`,
               items,
               plugin,
-              target: provider.target,
-              title: provider.title,
+              title: pluginStore.displayName(plugin),
             } satisfies ResolvedHotSearchSection
           } catch (error) {
             if (!controller.signal.aborted)
@@ -76,15 +77,21 @@ export function useSearchLanding(options: UseSearchLandingOptions) {
 
   function resolveTarget(
     plugin?: string,
-    target?: Search.HotSearchTarget,
+    target?: Content.SearchAim['search'],
   ): ResolvedSearchTarget | undefined {
     if (!plugin || !target) return fallbackTarget.value
-    const method = pluginStore.plugins.get(plugin)?.search?.methods?.[target.method]
+    const method = pluginStore.plugins
+      .get(plugin)
+      ?.model?.content?.search?.methods.find(value => value.id === target.method)
     if (!method) return fallbackTarget.value
-    return { method: target.method, plugin, sort: target.sort ?? method.defaultSort }
+    return { method: target.method, plugin, sort: target.sort ?? method.sorts.default }
   }
 
-  async function submit(input = query.value, plugin?: string, target?: Search.HotSearchTarget) {
+  async function submit(
+    input = query.value,
+    plugin?: string,
+    target?: Content.SearchAim['search'],
+  ) {
     const normalized = input.trim()
     if (!normalized) return false
     const resolvedTarget = resolveTarget(plugin, target)
@@ -104,10 +111,10 @@ export function useSearchLanding(options: UseSearchLandingOptions) {
     return true
   }
 
-  function selectHotSearchItem(section: ResolvedHotSearchSection, item: Search.HotSearchItem) {
-    const value = item.value ?? item.text
+  function selectHotSearchItem(section: ResolvedHotSearchSection, item: Content.SearchAim) {
+    const value = item.input
     query.value = value
-    return submit(value, section.plugin, item.target ?? section.target)
+    return submit(value, section.plugin, item.search)
   }
 
   function clearHistory() {

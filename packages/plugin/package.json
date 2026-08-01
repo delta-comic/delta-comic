@@ -34,7 +34,7 @@
   },
   "scripts": {
     "build": "vp pack",
-    "typecheck": "tsgo -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "@delta-comic/downloader": "workspace:",
@@ -52,7 +52,8 @@
   },
   "devDependencies": {
     "@types/semver": "catalog:",
-    "@typescript/native-preview": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
   "peerDependencies": {
