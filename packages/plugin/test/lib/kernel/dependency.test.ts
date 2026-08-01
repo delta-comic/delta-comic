@@ -6,7 +6,7 @@ import { planPluginDependencies } from '../../../lib/kernel'
 
 const candidate = (id: string, require: string[] = []): PluginCandidate => ({
   enabled: true,
-  load: async () => () => ({ name: id }),
+  load: async () => ({ factory: () => ({ name: id }) }),
   management: { canDisable: true, canUninstall: true, canUpdate: true },
   manifest: {
     apiVersion: 1,

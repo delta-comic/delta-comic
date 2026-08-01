@@ -55,6 +55,10 @@ describe('plugin package architecture', () => {
         forbidden: new Set(['adapters', 'builtins', 'install', 'module', 'runtime']),
         path: '/lib/capabilities/',
       },
+      {
+        forbidden: new Set(['adapters', 'builtins', 'capabilities', 'module', 'runtime']),
+        path: '/lib/install/',
+      },
     ]
 
     for (const [path, source] of Object.entries(sourceModules)) {
@@ -65,6 +69,13 @@ describe('plugin package architecture', () => {
         specifier.split('/').some(segment => rule.forbidden.has(segment)),
       )
       expect(forbidden, `${path} crosses its allowed dependency boundary`).toEqual([])
+    }
+  })
+
+  it('uses glob imports only for homogeneous built-in discovery', () => {
+    for (const [path, source] of Object.entries(sourceModules)) {
+      if (!source.includes('import.meta.glob')) continue
+      expect(path).toContain('/lib/builtins/')
     }
   })
 })
