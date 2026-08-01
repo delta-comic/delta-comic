@@ -1,21 +1,25 @@
 <script setup lang="ts">
-import { Global, pluginRuntime } from '@delta-comic/plugin'
+import { configurePluginHost, pluginRuntime } from '@delta-comic/plugin'
 import { AnimatePresence, motion } from 'motion-v'
 import { useDialog, useLoadingBar, useMessage } from 'naive-ui'
 import { nextTick, onMounted, shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import App from './App.vue'
 import Plugin from './components/plugin/index.vue'
 import PrebootRecoveryAlert from './components/plugin/PrebootRecoveryAlert.vue'
 import UpdateChecker from './components/updateChecker.vue'
+import { createPluginAuthGateway } from './features/pluginAuth/gateway'
 import { appLogger } from './logger'
 import { revealMainEntry } from './startup/entry'
 
 const startupLogger = appLogger.scoped('startup')
+const { t } = useI18n()
 
 window.$message = useMessage()
 window.$loading = useLoadingBar()
 window.$dialog = useDialog()
+configurePluginHost({ auth: createPluginAuthGateway(() => t('common.actions.confirm')) })
 
 const isBooted = shallowRef(false)
 const showContent = shallowRef(false)
@@ -29,13 +33,6 @@ const dismissPrebootRecovery = () => {
 
 onMounted(async () => {
   try {
-    startupLogger.info('plugin activation started')
-    const result = await pluginRuntime.activatePreboot()
-    if (result.reloadRequired) {
-      startupLogger.warn('plugin activation requested application reload')
-      location.reload()
-      return
-    }
     startupReady.value = true
     await nextTick()
     await revealMainEntry()
@@ -91,6 +88,5 @@ onMounted(async () => {
     @dismiss="dismissPrebootRecovery"
     @manage="showContent = true"
   />
-  <component v-for="c of Global.globalNodes" :is="c" />
   <UpdateChecker />
 </template>

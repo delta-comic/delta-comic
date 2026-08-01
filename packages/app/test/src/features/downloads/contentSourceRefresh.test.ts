@@ -76,6 +76,7 @@ describe('content source refresh preparation', () => {
     expect(
       pluginArchiveToContentRefreshIdentity({
         meta: {
+          apiVersion: 1,
           author: 'author',
           description: 'description',
           name: { display: 'Reader', id: 'reader' },
@@ -89,6 +90,7 @@ describe('content source refresh preparation', () => {
     expect(
       pluginArchiveToContentRefreshIdentity({
         meta: {
+          apiVersion: 1,
           author: 'author',
           description: 'description',
           name: { display: 'Reader', id: 'reader' },

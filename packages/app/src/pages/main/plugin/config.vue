@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useConfig } from '@delta-comic/plugin'
+import { Core, useConfig } from '@delta-comic/plugin'
 import { NDynamicInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
-const cfg = useConfig().$loadApp()
+const cfg = useConfig().load(Core.cfg)
 const { t, te } = useI18n()
 
 const translateTitle = (title: string) => (te(title) ? t(title) : title)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { HistoryDB, useNativeStore } from '@delta-comic/db'
-import { useConfig } from '@delta-comic/plugin'
+import { Core, useConfig } from '@delta-comic/plugin'
 import { DcState } from '@delta-comic/ui'
 import { useDialog } from 'naive-ui'
 import { shallowRef, useTemplateRef } from 'vue'
@@ -23,7 +23,7 @@ const { state: historiesState } = HistoryDB.useQuery(
   [],
   () => [],
 )
-const config = useConfig().$loadApp()
+const config = useConfig().load(Core.cfg)
 const searcher = useTemplateRef('searcher')
 
 const showConfig = shallowRef(false)

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { type UniContentType_, UniItem } from '@delta-comic/model'
-import type { Search } from '@delta-comic/plugin'
+import type { Content } from '@delta-comic/plugin'
 import { useQuery } from '@pinia/colada'
 import { chunk } from 'es-toolkit'
 
-const props = defineProps<{ block: Search.HotMainList; blockIndex: number; plugin: string }>()
+type HotBlock = Content.HotCategory & { onClick?: () => void }
+const props = defineProps<{ block: HotBlock; blockIndex: number; plugin: string }>()
 
 const source = useQuery({
   key: () => ['hot-main-list', props.plugin, props.block.name, props.blockIndex],

@@ -54,7 +54,7 @@ const getProgressLabel = ({ steps, progress }: PluginLoadingInfo) => {
           <DcCell
             v-for="[plugin, info] in visibleSteps"
             :key="plugin"
-            :title="pluginStore.$getI18nName(plugin)"
+            :title="pluginStore.displayName(plugin)"
             :label="getProgressLabel(info)"
             :class="[info.progress.status === 'error' && 'bg-(--nui-error-color)/20!']"
           />

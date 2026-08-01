@@ -2,7 +2,8 @@ import { UniContentPage } from '@delta-comic/model'
 import { SharedFunction } from '@delta-comic/utils'
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
 
-import { pluginMessageKey, pluginI18n, type Social } from '@/index'
+import { pluginI18n, pluginMessageKey } from '../adapters'
+import type { Social } from '../api'
 
 interface CorePluginTokenShareMeta {
   item: { name: string; contentType: string; ep: string }
@@ -76,10 +77,7 @@ export const tokenShare: Social.ShareToken = {
     )
     return {
       title: pluginI18n.translate('plugin.share.tokenTitle'),
-      detail: pluginI18n.translate('plugin.share.tokenDetail', {
-        item: meta.item.name,
-        // plugin: pluginStore.$getI18nName(meta.plugin),
-      }),
+      detail: pluginI18n.translate('plugin.share.tokenDetail', { item: meta.item.name }),
       onNegative() {},
       onPositive() {
         return SharedFunction.call(

@@ -1,10 +1,9 @@
 import { db, type PluginArchiveDB } from '@delta-comic/db'
 import { logger } from '@delta-comic/logger'
 import {
-  AwesomeRegistryClient,
-  type AwesomeMarketplaceEntry,
-  type AwesomeRegistryClientOptions,
-  type AwesomeRegistryIndex,
+  pluginCatalog as defaultCatalog,
+  type PluginCatalog,
+  type PluginCatalogIndex,
 } from '@delta-comic/plugin'
 import { refDebounced } from '@vueuse/core'
 import { computed, readonly, shallowRef } from 'vue'
@@ -12,21 +11,21 @@ import { computed, readonly, shallowRef } from 'vue'
 import {
   filterPluginMarketplaceItems,
   mergePluginMarketplaceItems,
+  type PluginMarketplaceEntry,
   type PluginMarketplaceFilter,
 } from './model'
 
 const marketplaceLogger = logger.scoped('app:plugin-marketplace')
 
 export interface UsePluginMarketplaceOptions {
-  client?: AwesomeRegistryClient
-  clientOptions?: AwesomeRegistryClientOptions
+  catalog?: PluginCatalog
   coreVersion: string
 }
 
 export const usePluginMarketplace = (options: UsePluginMarketplaceOptions) => {
-  const client = options.client ?? new AwesomeRegistryClient(options.clientOptions)
-  const index = shallowRef<AwesomeRegistryIndex>()
-  const entries = shallowRef<AwesomeMarketplaceEntry[]>([])
+  const catalog = options.catalog ?? defaultCatalog
+  const index = shallowRef<PluginCatalogIndex>()
+  const entries = shallowRef<PluginMarketplaceEntry[]>([])
   const installedPlugins = shallowRef<PluginArchiveDB.Archive[]>([])
   const nextPage = shallowRef<string | null>(null)
   const loading = shallowRef(false)
@@ -54,12 +53,12 @@ export const usePluginMarketplace = (options: UsePluginMarketplaceOptions) => {
   }
 
   const loadEntries = async (path: string) => {
-    const result = await client.loadPage(path)
+    const result = await catalog.loadPage(path)
     const pageEntries = await Promise.all(
       result.data.items.map(async listing => {
         if (!listing.release?.manifestUrl) return { listing }
         try {
-          return { listing, manifest: await client.loadManifest(listing) }
+          return { listing, manifest: await catalog.loadManifest(listing) }
         } catch (manifestError) {
           marketplaceLogger.warn(
             'marketplace manifest load failed',
@@ -83,7 +82,7 @@ export const usePluginMarketplace = (options: UsePluginMarketplaceOptions) => {
     marketplaceLogger.info('plugin marketplace refresh started')
     error.value = undefined
     try {
-      const [indexResult] = await Promise.all([client.loadIndex(), refreshInstalled()])
+      const [indexResult] = await Promise.all([catalog.loadIndex(), refreshInstalled()])
       const firstPage = indexResult.data.pages[0]
       const loaded = firstPage ? await loadEntries(firstPage.path) : undefined
       index.value = indexResult.data

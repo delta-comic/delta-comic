@@ -1,4 +1,4 @@
-import { pluginRuntime, useConfig } from '@delta-comic/plugin'
+import { Core, pluginRuntime, useConfig } from '@delta-comic/plugin'
 import {
   configureUiI18n,
   DcConfigProvider,
@@ -59,7 +59,7 @@ const app = createApp(
     const themeColor = Color('#fb7299').hex()
     const themeColorDark = Color(themeColor).darken(0.2).hex()
     const config = useConfig()
-    const locale = computed(() => resolveAppLocale(config.$loadApp().data.value.language))
+    const locale = computed(() => resolveAppLocale(config.load(Core.cfg).data.value.language))
     const naiveLocale = computed(() => {
       switch (locale.value) {
         case 'zh-CN':
@@ -136,12 +136,10 @@ app.use(router)
 const preboot = await pluginRuntime.preparePreboot(app)
 appLogger
   .scoped('plugin')
-  .info('plugin preboot prepared', { reloadRequired: preboot.reloadRequired })
-if (preboot.reloadRequired) {
-  appLogger.scoped('plugin').warn('plugin preboot requested application reload')
-  location.reload()
-  await new Promise<never>(() => {})
-}
+  .info('plugin preboot prepared', {
+    activated: preboot.activated,
+    failureCount: preboot.failures.length,
+  })
 
 const meta = document.createElement('meta')
 meta.name = 'naive-ui-style'

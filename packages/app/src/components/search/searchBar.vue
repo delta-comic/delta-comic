@@ -44,11 +44,17 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
   const { method, plugin } = source.value
   const st = searchText.value
   if (isEmpty(st)) return history.value.map(v => ({ text: v, value: v }))
-  const localSource = pluginStore.plugins.get(plugin)?.search?.methods?.[method]
+  const localSource = pluginStore.plugins
+    .get(plugin)
+    ?.model?.content?.search?.methods.find(value => value.id === method)
   try {
     const barcodeList = await getBarcodeList(st, thinkListAbort.signal)
     if (!localSource) return [...barcodeList, ...history.value.map(v => ({ text: v, value: v }))]
-    return [...barcodeList, ...(await localSource.getAutoComplete(st, thinkListAbort.signal))]
+    const autocomplete = await localSource.getAutoComplete(st, thinkListAbort.signal)
+    const items = Array.isArray(autocomplete)
+      ? autocomplete.map(value => ({ text: value.input, value: value.input }))
+      : [autocomplete]
+    return [...barcodeList, ...items]
   } catch {
     return []
   }

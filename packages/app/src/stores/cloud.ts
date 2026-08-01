@@ -1,5 +1,5 @@
 import { logger } from '@delta-comic/logger'
-import { useConfig } from '@delta-comic/plugin'
+import { Core, useConfig } from '@delta-comic/plugin'
 import {
   CloudClientError,
   CloudDisabledError,
@@ -33,7 +33,7 @@ export const useCloudStore = defineStore('cloud', () => {
   const runtime = shallowRef<AppCloudRuntime>()
   const runtimeKey = shallowRef('')
 
-  const coreConfig = computed(() => configStore.$loadApp().data.value as CloudCoreConfig)
+  const coreConfig = computed(() => configStore.load(Core.cfg).data.value as CloudCoreConfig)
   const isEnabled = computed(() => Boolean(coreConfig.value.cloudEnabled))
   const serverUrl = computed(() => (coreConfig.value.cloudServerUrl ?? '').trim())
   const isConfigured = computed(() => isEnabled.value && serverUrl.value.length > 0)

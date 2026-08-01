@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SourcedValue, UniItem } from '@delta-comic/model'
-import { Global, usePluginStore } from '@delta-comic/plugin'
+import { usePluginStore } from '@delta-comic/plugin'
 import { useQuery } from '@pinia/colada'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -13,12 +13,24 @@ const { t } = useI18n()
 const selectLevelKey = new SourcedValue<[plugin: string, name: string]>()
 
 const plugin = computed(() => $route.params.plugin.toString())
+const leaderboards = computed(
+  () =>
+    new Map(
+      pluginStore
+        .modelEntries('content')
+        .flatMap(([owner, content]) =>
+          content.promotes?.hotPageContent?.levelboard
+            ? ([[owner, content.promotes.hotPageContent.levelboard]] as const)
+            : [],
+        ),
+    ),
+)
 const select = computed(
-  () => $route.query.dfSel?.toString() ?? Global.levelboard.get(plugin.value)?.[0]?.name ?? '',
+  () => $route.query.dfSel?.toString() ?? leaderboards.value.get(plugin.value)?.[0]?.name ?? '',
 )
 const selectLevel = computed(() => selectLevelKey.stringify([plugin.value, select.value]))
 const source = computed(() =>
-  Global.levelboard.get(plugin.value)?.find(v => v.name == select.value),
+  leaderboards.value.get(plugin.value)?.find(v => v.name == select.value),
 )
 const items = useQuery({
   key: () => ['hot-levelboard', plugin.value, select.value],
@@ -48,7 +60,7 @@ const routeToLevel = (source: string) => {
         <template #extra>
           <NPopselect
             :options="
-              Array.from(Global.levelboard.entries()).map(([plugin, sources]) => ({
+              Array.from(leaderboards.entries()).map(([plugin, sources]) => ({
                 type: 'group',
                 label: plugin,
                 children: sources.map(s => ({
@@ -68,7 +80,7 @@ const routeToLevel = (source: string) => {
                   :value="selectLevelKey.toJSON(selectLevel)"
                   v-slot="{ value: [plugin, name] }"
                 >
-                  {{ pluginStore.$getI18nName(plugin) }}:{{ name }}
+                  {{ pluginStore.displayName(plugin) }}:{{ name }}
                 </DcVar>
               </span>
             </NButton>

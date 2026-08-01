@@ -13,9 +13,8 @@ const pluginStore = usePluginStore()
 const subscribe = computed(() => {
   const [plugin] = SubscribeDB.key.toJSON($props.source.key)
   if ($props.source.type == 'author') {
-    const type = $props.source.author.subscribe!
-    const sub = pluginStore.plugins.get(plugin)?.subscribe?.[type]
-    if (!sub) throw new Error(`Can not found subscribe item which type: ${type}, plugin: ${plugin}`)
+    const sub = pluginStore.plugins.get(plugin)?.model?.social?.subscribe
+    if (!sub) throw new Error(`Can not find subscribe model for plugin: ${plugin}`)
     return sub
   }
   throw new Error('not impl')

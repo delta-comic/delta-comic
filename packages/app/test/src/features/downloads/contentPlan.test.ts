@@ -93,6 +93,7 @@ const archiveMeta = (
   integrity?: PluginArchiveDB.Meta['integrity'],
 ): Pick<PluginArchiveDB.Archive, 'meta'> => ({
   meta: {
+    apiVersion: 1,
     author: 'Delta',
     description: 'Reader',
     integrity,

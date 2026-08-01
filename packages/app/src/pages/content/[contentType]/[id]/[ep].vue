@@ -25,8 +25,8 @@ const contentType = $route.params.contentType
 const contentStore = useContentStore()
 contentStore.$load(contentType, id, ep)
 
-const page = computed(
-  () => contentStore.history.get(contentStore.$createHistoryKey(contentType, id, ep))!,
+const page = computed(() =>
+  contentStore.history.get(contentStore.$createHistoryKey(contentType, id, ep))!,
 )
 
 const layout = computed(() => UniContentPage.layouts.get($route.params.contentType))

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { logger } from '@delta-comic/logger'
-import { Global } from '@delta-comic/plugin'
+import { usePluginStore } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
 import { useIntervalFn } from '@vueuse/core'
 import { Mutex } from 'es-toolkit'
@@ -16,6 +16,7 @@ const appShellLogger = logger.scoped('app:shell')
 const $router = useRouter()
 const $route = useRoute()
 const { t } = useI18n()
+const pluginStore = usePluginStore()
 useDownloadLifecycle()
 
 await $router.push($route.fullPath)
@@ -36,7 +37,10 @@ const handleShareTokenCheck = async () => {
     const chipText = await readClipboardText()
     if (scanned.has(chipText)) return
     scanned.add(chipText)
-    const handlers = Array.from(Global.shareToken.values()).filter(v => v.patten(chipText))
+    const handlers = pluginStore
+      .modelEntries('social')
+      .flatMap(([, social]) => social.share?.tokenListen ?? [])
+      .filter(handler => handler.isMatched(chipText))
     appShellLogger.debug('share token handlers matched', { handlerCount: handlers.length })
     const lock = new Mutex()
     for (const handler of handlers) {

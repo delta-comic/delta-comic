@@ -10,16 +10,21 @@ const mocks = await vi.hoisted(async () => {
   window.$$lib$$ = { ...window.$$lib$$, Vue } as typeof window.$$lib$$
   return {
     history: Vue.shallowRef<string[]>([]),
-    hotSearch: new Map<string, unknown[]>(),
-    plugins: new Map<string, unknown>(),
+    plugins: new Map<string, { model: { content: unknown } }>(),
     routeCall: vi.fn(),
   }
 })
 
 vi.mock('@delta-comic/db', () => ({ useNativeStore: () => mocks.history }))
 vi.mock('@delta-comic/plugin', () => ({
-  Global: { hotSearch: mocks.hotSearch },
-  usePluginStore: () => ({ plugins: mocks.plugins }),
+  usePluginStore: () => ({
+    displayName: (plugin: string) => `${plugin} trending`,
+    modelEntries: (key: string) =>
+      key === 'content'
+        ? [...mocks.plugins].map(([plugin, config]) => [plugin, config.model.content])
+        : [],
+    plugins: mocks.plugins,
+  }),
 }))
 vi.mock('@delta-comic/utils', () => ({ SharedFunction: { call: mocks.routeCall } }))
 vi.mock('@/symbol', () => ({ pluginName: 'app' }))
@@ -31,7 +36,6 @@ describe('useSearchLanding', () => {
 
   beforeEach(() => {
     mocks.history.value = []
-    mocks.hotSearch.clear()
     mocks.plugins.clear()
     mocks.routeCall.mockReset().mockResolvedValue(undefined)
   })
@@ -41,12 +45,18 @@ describe('useSearchLanding', () => {
   it('loads plugin hot searches and routes a selected item through its declared target', async () => {
     const fetchItems = vi.fn(async (signal: AbortSignal) => {
       expect(signal.aborted).toBe(false)
-      return [{ badge: { text: 'New', tone: 'warning' as const }, text: 'Delta' }]
+      return [{ input: 'Delta', search: { method: 'title' } }]
     })
-    mocks.plugins.set('reader', { search: { methods: { title: { defaultSort: 'popular' } } } })
-    mocks.hotSearch.set('reader', [
-      { fetchItems, target: { method: 'title' }, title: 'Reader trending' },
-    ])
+    mocks.plugins.set('reader', {
+      model: {
+        content: {
+          search: {
+            getHotSearch: fetchItems,
+            methods: [{ id: 'title', sorts: { default: 'popular', options: [] } }],
+          },
+        },
+      },
+    })
     const onMissingTarget = vi.fn()
     scope = effectScope()
     const landing = scope.run(() => useSearchLanding({ onMissingTarget }))!
@@ -56,7 +66,7 @@ describe('useSearchLanding', () => {
     expect(landing.hotSearchSections.value).toHaveLength(1)
     expect(landing.hotSearchSections.value[0]).toMatchObject({
       plugin: 'reader',
-      title: 'Reader trending',
+      title: 'reader trending',
     })
     await landing.selectHotSearchItem(
       landing.hotSearchSections.value[0],
