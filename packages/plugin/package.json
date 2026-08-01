@@ -53,6 +53,7 @@
   "devDependencies": {
     "@types/semver": "catalog:",
     "typescript": "catalog:",
+    "vitest": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
   "peerDependencies": {

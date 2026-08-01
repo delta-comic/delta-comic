@@ -2,7 +2,8 @@ import { UniContentPage } from '@delta-comic/model'
 import { SharedFunction } from '@delta-comic/utils'
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
 
-import { pluginMessageKey, pluginI18n, type Social } from '@/index'
+import type { Social } from '../export'
+import { pluginI18n, pluginMessageKey } from '../module/i18n'
 
 interface CorePluginTokenShareMeta {
   item: { name: string; contentType: string; ep: string }

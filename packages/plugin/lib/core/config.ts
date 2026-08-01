@@ -1,4 +1,4 @@
-import { ConfigPointer } from '@/index'
+import { ConfigPointer } from '../module/config/pointer'
 
 import { pluginName } from './env'
 

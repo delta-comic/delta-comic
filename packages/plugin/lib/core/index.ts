@@ -1,4 +1,5 @@
-import { defineDeltaComicPlugin, useConfig } from '@/index'
+import { defineDeltaComicPlugin } from '../export'
+import { useConfig } from '../module/config/store'
 
 import { cfg } from './config'
 export { cfg } from './config'
