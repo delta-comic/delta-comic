@@ -139,6 +139,7 @@ const marketplaceItem = (overrides: Partial<PluginMarketplaceItem> = {}): Plugin
       schemaVersion: 1,
     },
     manifest: {
+      apiVersion: 1,
       author: 'Delta Comic',
       description: 'Reads comics',
       icon: 'https://cdn.example.test/reader.png',

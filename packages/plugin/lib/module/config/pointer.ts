@@ -1,21 +1,2 @@
-import type { FormSingleConfigure } from '@delta-comic/model'
-
-export type ConfigDescription = Record<
-  string,
-  Required<Pick<FormSingleConfigure, 'defaultValue'>> & FormSingleConfigure
->
-
-export type UnwrapConfigPointer<T extends ConfigPointer> = T['_type']
-
-export class ConfigPointer<T extends ConfigDescription = ConfigDescription> {
-  public readonly key: symbol
-  public readonly _type = {} as T
-
-  constructor(
-    public pluginName: string,
-    public config: T,
-    public configName: string,
-  ) {
-    this.key = Symbol.for(`config:${pluginName}`)
-  }
-}
+/** @deprecated Import from the package entry. */
+export * from '../../api/config'

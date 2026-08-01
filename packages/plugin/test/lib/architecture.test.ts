@@ -24,4 +24,17 @@ describe('plugin package architecture', () => {
 
     expect(executableLine).toBeUndefined()
   })
+
+  it('keeps the public api independent from host implementation layers', () => {
+    const implementationLayer = /(^|\/)(?:adapters|builtins|install|kernel|module|runtime)(\/|$)/
+
+    for (const [path, source] of Object.entries(sourceModules)) {
+      if (!path.includes('/lib/api/')) continue
+      const imports = [...source.matchAll(/from\s+["']([^"']+)["']/g)].map(match => match[1])
+      expect(
+        imports.filter(specifier => implementationLayer.test(specifier)),
+        `${path} must contain protocol definitions only`,
+      ).toEqual([])
+    }
+  })
 })

@@ -1,26 +1,9 @@
-import type { RemoteModel } from './remote'
-export * as Remote from './remote'
+/** @deprecated Import from the package entry. */
+export type * from '../../api/model'
 
-import type { UserModel } from './user'
-export * as User from './user'
-
-import type { ExposeModel } from './expose'
-export * as Expose from './expose'
-
-import type { ContentModel } from './content'
-export * as Content from './content'
-
-import type { SocialModel } from './social'
-export * as Social from './social'
-
-import type { SpecialModel } from './special'
-export * as Special from './special'
-
-export interface PluginConfigModel {
-  remotes?: RemoteModel
-  user?: UserModel
-  content?: ContentModel
-  social?: SocialModel
-  expose?: ExposeModel
-  special?: SpecialModel
-}
+export * as Content from '../../api/model/content'
+export * as Expose from '../../api/model/expose'
+export * as Remote from '../../api/model/remote'
+export * as Social from '../../api/model/social'
+export * as Special from '../../api/model/special'
+export * as User from '../../api/model/user'

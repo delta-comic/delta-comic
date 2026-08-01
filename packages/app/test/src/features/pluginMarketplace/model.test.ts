@@ -25,6 +25,7 @@ const entry = (version = '2.0.0'): AwesomeMarketplaceEntry => ({
     schemaVersion: 1,
   },
   manifest: {
+    apiVersion: 1,
     author: 'delta-comic',
     description: 'Searchable description',
     name: { display: 'Example Plugin', id: 'example' },

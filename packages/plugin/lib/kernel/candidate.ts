@@ -1,6 +1,6 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
+import type { PluginManifest } from '@delta-comic/model'
 
-import type { PluginConfigFactory } from '../export'
+import type { PluginConfigFactory } from '../api'
 
 export type PluginOrigin = 'builtin' | 'installed'
 
@@ -11,7 +11,7 @@ export interface PluginManagementCapabilities {
 }
 
 export interface PluginCandidate {
-  readonly manifest: PluginArchiveDB.Meta
+  readonly manifest: PluginManifest
   readonly origin: PluginOrigin
   readonly enabled: boolean
   readonly management: PluginManagementCapabilities
@@ -19,7 +19,7 @@ export interface PluginCandidate {
 }
 
 export interface InternalPluginDefinition {
-  readonly manifest: PluginArchiveDB.Meta
+  readonly manifest: PluginManifest
   readonly factory: PluginConfigFactory
   readonly enabledByDefault?: boolean
 }

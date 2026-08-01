@@ -25,7 +25,7 @@ describe('ActivationPipeline', () => {
     const scope = new PluginScope('example')
 
     const activated = await pipeline.activate(
-      { i18nName: 'example', model: {}, name: 'example' },
+      { model: {}, name: 'example' },
       { owner: 'example', report() {}, scope, signal: scope.signal },
     )
 

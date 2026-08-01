@@ -38,6 +38,7 @@ const listing = (id: string, manifestUrl = `https://example.test/${id}.json`) =>
 })
 
 const manifest = (id: string) => ({
+  apiVersion: 1 as const,
   author: 'Delta Comic',
   description: `${id} description`,
   name: { display: `${id} display`, id },

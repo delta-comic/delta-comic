@@ -1,8 +1,6 @@
-export interface PluginLocaleMessage {
-  [key: string]: PluginLocaleMessage | string
-}
+import type { PluginLocaleMessage, PluginLocaleMessages } from '../../api/i18n'
 
-export type PluginLocaleMessages = Record<string, PluginLocaleMessage>
+export type { PluginLocaleMessage, PluginLocaleMessages } from '../../api/i18n'
 
 export interface PluginI18nAdapter {
   setLocaleMessage(locale: string, message: PluginLocaleMessage): void

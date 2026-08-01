@@ -7,6 +7,7 @@ import { deltaComic } from '../../vite/index'
 vi.mock('vite-plugin-monkey', () => ({ default: () => ({ name: 'vite-plugin-monkey' }) }))
 
 const meta: PluginArchiveDB.Meta = {
+  apiVersion: 1,
   name: { display: 'Test Plugin', id: 'test-plugin' },
   version: { plugin: '1.0.0', supportCore: '1.0.0' },
   author: 'delta',

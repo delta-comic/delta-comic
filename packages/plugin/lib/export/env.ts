@@ -1,5 +1,2 @@
-export type Platform = 'tauri' | 'web'
-export interface ConfigEnv {
-  safe: boolean
-  platform: Platform
-}
+/** @deprecated Import from the package entry. */
+export type * from '../api/env'
