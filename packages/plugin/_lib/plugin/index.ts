@@ -35,22 +35,10 @@ export type * as Resource from './resource'
 
 export interface PluginConfigValues {
   name: string
-  content?: Content.Config
-  resource?: Resource.Content
-  api?: Record<string, Api.Config>
-  user?: User.Config
-  auth?: Auth.Config
   /** Locale messages are merged in plugin load order; later plugins may override existing keys. */
   i18n?: PluginLocaleMessages
   otherProgress?: OtherProgress.Config[]
-  search?: Search.Config
-  /**
-   * 插件的配置项需在此处注册
-   * 传入`Store.ConfigPointer`
-   */
   config?: ConfigPointer[]
-  subscribe?: Record<string, Subscribe.Config>
-  share?: Share.Config
 }
 
 export type DefineResult = { api?: Record<string, string | undefined | false> }

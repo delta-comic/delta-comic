@@ -1,22 +1,3 @@
-import type { UniContentType_, UniItem } from '@delta-comic/model'
-
-declare module '@delta-comic/utils' {
-  export interface SharedFunctions {
-    routeToContent(
-      contentType_: UniContentType_,
-      id: string,
-      ep: string,
-      preload?: UniItem,
-    ): Promise<any>
-    routeToSearch(
-      input: string,
-      source?: [plugin: string, name: string],
-      sort?: string,
-    ): Promise<any>
-    pushShareToken(token: string): Promise<any>
-  }
-}
-
 export * from './plugin'
 export * from './config'
 export * from './depends'

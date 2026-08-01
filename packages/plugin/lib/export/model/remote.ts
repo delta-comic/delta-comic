@@ -4,6 +4,7 @@ export interface TestGroup {
   name: string
   test: TestFunction
   remotes: Definition[]
+  allowNoConnected?: boolean
 }
 
 export interface Definition {

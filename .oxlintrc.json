@@ -24,7 +24,8 @@
     ".vscode",
     "*.md",
     "**/worker-configuration.d.ts",
-    "packages/ui/lib/components/DcPullRefresh.vue"
+    "packages/ui/lib/components/DcPullRefresh.vue",
+    "**/_lib/**"
   ],
   "overrides": [
     {
