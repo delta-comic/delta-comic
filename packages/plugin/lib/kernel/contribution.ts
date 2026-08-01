@@ -1,10 +1,19 @@
 import { shallowReactive } from 'vue'
 
+import type { PluginScope } from './scope'
+
 export interface Contribution<T> {
   readonly owner: string
   readonly id: string
   readonly value: T
 }
+
+export interface ContributionChannel<T> {
+  readonly key: string
+  readonly __type?: T
+}
+
+export const defineContributionChannel = <T>(key: string): ContributionChannel<T> => ({ key })
 
 const contributionKey = (owner: string, id: string) => JSON.stringify([owner, id])
 
@@ -55,5 +64,28 @@ export class ContributionRegistry<T> {
 
   public values() {
     return this.#entries.values()
+  }
+}
+
+export class ContributionHub {
+  private readonly registries = new Map<string, ContributionRegistry<unknown>>()
+
+  public channel<T>(channel: ContributionChannel<T>): ContributionRegistry<T> {
+    let registry = this.registries.get(channel.key)
+    if (!registry) {
+      registry = new ContributionRegistry<unknown>()
+      this.registries.set(channel.key, registry)
+    }
+    return registry as ContributionRegistry<T>
+  }
+
+  public register<T>(scope: PluginScope, channel: ContributionChannel<T>, id: string, value: T) {
+    const unregister = this.channel(channel).register(scope.owner, id, value)
+    scope.defer(() => void unregister())
+    return unregister
+  }
+
+  public removeOwner(owner: string) {
+    for (const registry of this.registries.values()) registry.removeOwner(owner)
   }
 }

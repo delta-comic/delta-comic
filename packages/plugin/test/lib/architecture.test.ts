@@ -37,4 +37,34 @@ describe('plugin package architecture', () => {
       ).toEqual([])
     }
   })
+
+  it('keeps kernel and capabilities independent from higher layers', () => {
+    const rules = [
+      {
+        forbidden: new Set([
+          'adapters',
+          'builtins',
+          'capabilities',
+          'install',
+          'module',
+          'runtime',
+        ]),
+        path: '/lib/kernel/',
+      },
+      {
+        forbidden: new Set(['adapters', 'builtins', 'install', 'module', 'runtime']),
+        path: '/lib/capabilities/',
+      },
+    ]
+
+    for (const [path, source] of Object.entries(sourceModules)) {
+      const rule = rules.find(candidate => path.includes(candidate.path))
+      if (!rule) continue
+      const imports = [...source.matchAll(/from\s+["']([^"']+)["']/g)].map(match => match[1])
+      const forbidden = imports.filter(specifier =>
+        specifier.split('/').some(segment => rule.forbidden.has(segment)),
+      )
+      expect(forbidden, `${path} crosses its allowed dependency boundary`).toEqual([])
+    }
+  })
 })

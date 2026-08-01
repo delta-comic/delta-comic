@@ -1,4 +1,5 @@
 export * from './api'
+export * from './capabilities'
 export * from './kernel'
 export * from './module'
 export * from './global'

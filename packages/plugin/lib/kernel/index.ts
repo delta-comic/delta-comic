@@ -1,4 +1,5 @@
 export * from './candidate'
 export * from './capability'
 export * from './contribution'
+export * from './dependency'
 export * from './scope'

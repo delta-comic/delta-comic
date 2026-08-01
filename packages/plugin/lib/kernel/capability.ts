@@ -1,4 +1,4 @@
-import type { DCPluginConfig } from '../export'
+import type { DCPluginConfig } from '../api'
 
 import type { PluginScope } from './scope'
 
