@@ -8,7 +8,7 @@ export default defineConfig({
   pack: {
     entry: ['./lib/index.ts', './vite/index.ts'],
     alias: { '@': './lib' },
-    dts: { tsconfig: './tsconfig.app.json', tsgo: true },
+    dts: { tsconfig: './tsconfig.app.json' },
     sourcemap: true,
   },
   resolve: { alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) } },

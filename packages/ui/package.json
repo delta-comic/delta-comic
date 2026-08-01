@@ -42,7 +42,7 @@
   "scripts": {
     "build": "vp build && vp pack",
     "dev": "vp dev",
-    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
+    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "@delta-comic/logger": "workspace:",
@@ -64,7 +64,6 @@
     "@tailwindcss/vite": "catalog:",
     "@types/linkify-it": "catalog:",
     "@types/markdown-it": "catalog:",
-    "@typescript/native-preview": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "@vitejs/plugin-vue-jsx": "catalog:",
     "browserslist": "catalog:",

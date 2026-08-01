@@ -7,7 +7,7 @@
   "scripts": {
     "build": "vp build",
     "build:dev": "vp build --mode development",
-    "typecheck": "tsgo -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@pinia/colada": "catalog:",
@@ -17,7 +17,7 @@
     "vue-router": "catalog:"
   },
   "devDependencies": {
-    "@typescript/native-preview": "catalog:",
+    "typescript": "catalog:",
     "vite-plus": "catalog:"
   }
 }

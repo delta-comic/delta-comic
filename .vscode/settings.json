@@ -7,5 +7,7 @@
   "vue.suggest.propNameCasing": "alwaysCamelCase",
   "tailwindCSS.classFunctions": ["twMerge", "cn"],
   "tailwindCSS.classAttributes": ["class", "className", "ngClass", "class:list", ":class"],
-  "[markdown]": { "editor.defaultFormatter": "DavidAnson.vscode-markdownlint" }
+  "[markdown]": { "editor.defaultFormatter": "DavidAnson.vscode-markdownlint" },
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true
 }

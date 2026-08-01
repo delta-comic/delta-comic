@@ -9,7 +9,7 @@
     "dev": "vp dev",
     "pages:preview": "wrangler pages dev dist --compatibility-date=2026-06-28",
     "preview": "vp preview",
-    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit && tsgo -p tsconfig.node.json --noEmit"
+    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
     "@delta-comic/logger": "workspace:",
@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
-    "@typescript/native-preview": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "@vitejs/plugin-vue-jsx": "catalog:",
     "lightningcss": "catalog:",
