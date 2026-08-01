@@ -11,8 +11,8 @@ import type { ContentModel } from './content'
 export * as Content from './content'
 
 export interface PluginConfigModel {
-  remotes: RemoteModel
-  auth: AuthModel
-  expose: ExposeModel
-  content: ContentModel
+  remotes?: RemoteModel
+  auth?: AuthModel
+  expose?: ExposeModel
+  content?: ContentModel
 }
