@@ -2,7 +2,7 @@
 import { logger } from '@delta-comic/logger'
 import { isTauri } from '@tauri-apps/api/core'
 import { useCssVar, useEventListener } from '@vueuse/core'
-import MarkdownIt, { type Options } from 'markdown-it'
+import MarkdownIt, { type Env, type MarkdownItOptions } from 'markdown-it'
 import { computed } from 'vue'
 
 import { cn, type StyleProps } from '../../utils'
@@ -15,9 +15,9 @@ const $props = withDefaults(
   defineProps<
     {
       markdown: string
-      plugins?: Parameters<MarkdownIt['use']>[]
-      config?: Options
-      env?: object
+      plugins?: Parameters<InstanceType<typeof MarkdownIt>['use']>[]
+      config?: MarkdownItOptions
+      env?: Env
       isDarkMode?: boolean
     } & StyleProps
   >(),
@@ -37,8 +37,8 @@ const pColor = useCssVar('--p-color')
 const htmlTemplateUrl = computed(() =>
   createTemplate({
     color: pColor.value ?? '',
-    isDark: $props.isDarkMode,
-    content: md.value.render($props.markdown, $props.env),
+    isDark: !!$props.isDarkMode,
+    content: md.value.render($props.markdown, $props.env ?? {}),
     messageKey,
     delegateLinkOpen: isTauri(),
   }),

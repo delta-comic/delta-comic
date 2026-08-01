@@ -9,7 +9,7 @@ allowBuilds:
   workerd: true
 
 catalog:
-  '@elysia/eden': '^2.0.0-exp.1'
+  '@elysia/eden': '^1.4.10'
   vue-tsc: ^3.3.3
   rolldown-plugin-dts: ^0.28.0
   '@commitlint/cli': ^21.2.1
@@ -19,7 +19,7 @@ catalog:
   '@cloudflare/vite-plugin': 1.50.0
   '@elysiajs/bearer': ^1.4.4
   '@elysiajs/cors': ^1.4.2
-  '@elysiajs/openapi': ^2.0.0-exp.0
+  '@elysiajs/openapi': ^1.4.15
   '@sinclair/typebox': ^0.34.52
   '@octokit/rest': ^22.0.1
   '@pinia/colada': ^1.4.2
@@ -48,7 +48,7 @@ catalog:
   commitlint-plugin-cspell: ^0.9.4
   cspell: ^10.0.1
   dayjs: ^2.0.0-alpha.4
-  elysia: ^2.0.0-exp.61
+  elysia: ^1.4.29
   es-toolkit: ^1.50.0
   jszip: ^3.10.1
   ky: ^2.0.2
@@ -84,7 +84,7 @@ catalog:
   vite-plugin-vue-devtools: ^8.2.1
   vite-plugin-wasm: ^3.6.0
   vite-plus: ^0.2.7
-  vitest: 4.1.10
+  vitest: 5.0.0-beta.7
   vue: ^3.5.40
   vue-i18n: ^12.0.0-alpha.4
   vue-component-type-helpers: ^3.3.9
