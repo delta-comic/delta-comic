@@ -15,6 +15,17 @@ interface PluginFileBackend {
 const cloneFiles = (files: PluginFiles) =>
   new Map([...files].map(([path, bytes]) => [path, Uint8Array.from(bytes)]))
 
+const mimeType = (path: string) =>
+  ({
+    avif: 'image/avif',
+    gif: 'image/gif',
+    jpeg: 'image/jpeg',
+    jpg: 'image/jpeg',
+    png: 'image/png',
+    svg: 'image/svg+xml',
+    webp: 'image/webp',
+  })[path.split('.').at(-1)?.toLowerCase() ?? ''] ?? 'application/octet-stream'
+
 export class MemoryPluginFileStore implements PluginFileStore {
   readonly #files = new Map<string, Map<string, Uint8Array>>()
   readonly #urls = new Map<string, Set<string>>()
@@ -47,8 +58,16 @@ export class MemoryPluginFileStore implements PluginFileStore {
   }
 
   public async createModuleUrl(plugin: string, path: string) {
+    return await this.#createUrl(plugin, path, 'text/javascript')
+  }
+
+  public async createAssetUrl(plugin: string, path: string) {
+    return await this.#createUrl(plugin, path, mimeType(path))
+  }
+
+  async #createUrl(plugin: string, path: string, type: string) {
     const bytes = await this.read(plugin, path)
-    const url = URL.createObjectURL(new Blob([Uint8Array.from(bytes)], { type: 'text/javascript' }))
+    const url = URL.createObjectURL(new Blob([Uint8Array.from(bytes)], { type }))
     const urls = this.#urls.get(plugin) ?? new Set<string>()
     urls.add(url)
     this.#urls.set(plugin, urls)
@@ -190,11 +209,14 @@ class TauriPluginFileBackend implements PluginFileBackend {
       import('@tauri-apps/api/path'),
       import('@tauri-apps/plugin-fs'),
     ])
-    const base = await join(await appLocalDataDir(), 'plugin')
+    const appData = await appLocalDataDir()
+    const base = await join(appData, 'plugin')
     const token = crypto.randomUUID()
     const live = await join(base, plugin)
-    const staging = await join(base, '__staging__', `${plugin}-${token}`)
-    const backup = await join(base, '__backup__', `${plugin}-${token}`)
+    const stagingRoot = await join(appData, 'plugin-staging')
+    const backupRoot = await join(appData, 'plugin-backup')
+    const staging = await join(stagingRoot, `${plugin}-${token}`)
+    const backup = await join(backupRoot, `${plugin}-${token}`)
     await fs.mkdir(staging, { recursive: true })
     try {
       for (const [path, bytes] of files) {
@@ -206,7 +228,7 @@ class TauriPluginFileBackend implements PluginFileBackend {
       }
       const existed = await fs.exists(live)
       if (existed) {
-        await fs.mkdir(await join(base, '__backup__'), { recursive: true })
+        await fs.mkdir(backupRoot, { recursive: true })
         await fs.rename(live, backup)
       }
       try {
@@ -215,7 +237,9 @@ class TauriPluginFileBackend implements PluginFileBackend {
         if (existed && (await fs.exists(backup))) await fs.rename(backup, live)
         throw error
       }
-      if (await fs.exists(backup)) await fs.remove(backup, { recursive: true })
+      if (await fs.exists(backup)) {
+        await fs.remove(backup, { recursive: true }).catch(() => undefined)
+      }
     } catch (error) {
       if (await fs.exists(staging)) await fs.remove(staging, { recursive: true })
       throw error
@@ -264,6 +288,17 @@ export class AtomicPluginFileStore implements PluginFileStore {
     if (this.backend.moduleUrl) return await this.backend.moduleUrl(plugin, safePath)
     const bytes = await this.backend.read(plugin, safePath)
     const url = URL.createObjectURL(new Blob([Uint8Array.from(bytes)], { type: 'text/javascript' }))
+    const urls = this.#urls.get(plugin) ?? new Set<string>()
+    urls.add(url)
+    this.#urls.set(plugin, urls)
+    return url
+  }
+
+  public async createAssetUrl(plugin: string, path: string) {
+    const safePath = safePluginPath(path, 'plugin asset path')
+    if (this.backend.moduleUrl) return await this.backend.moduleUrl(plugin, safePath)
+    const bytes = await this.backend.read(plugin, safePath)
+    const url = URL.createObjectURL(new Blob([Uint8Array.from(bytes)], { type: mimeType(path) }))
     const urls = this.#urls.get(plugin) ?? new Set<string>()
     urls.add(url)
     this.#urls.set(plugin, urls)

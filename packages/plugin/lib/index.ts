@@ -1,9 +1,9 @@
 export * from './api'
 export * from './capabilities'
+export * from './composition'
 export * from './install'
 export * from './kernel'
-export * from './module'
-export * from './global'
+export * from './marketplace'
 export * from './runtime'
 
 export * as Core from './core'

@@ -22,8 +22,13 @@ import type { SpecialModel } from './special'
 export * as Special from './special'
 export type * from './special'
 
+import type { ResourceModel } from './resource'
+export * as Resource from './resource'
+export type * from './resource'
+
 export interface PluginConfigModel {
   remotes?: RemoteModel
+  resource?: ResourceModel
   user?: UserModel
   content?: ContentModel
   social?: SocialModel

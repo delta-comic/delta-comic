@@ -12,7 +12,8 @@ const { configState, createAppCloudRuntime } = vi.hoisted(() => ({
 }))
 
 vi.mock('@delta-comic/plugin', () => ({
-  useConfig: () => ({ $loadApp: () => ({ data: { value: configState.current } }) }),
+  Core: { cfg: {} },
+  useConfig: () => ({ load: () => ({ data: { value: configState.current } }) }),
 }))
 
 vi.mock('@/cloud', () => ({ createAppCloudRuntime }))

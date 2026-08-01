@@ -1,4 +1,9 @@
+import { Octokit } from '@octokit/rest'
+
+import { AwesomeRegistryClient, marketplaceDownloadToInstallInput } from '../marketplace'
+
 import type { PluginInstallInput, PluginSourceResolver, ResolvedPluginSource } from './contracts'
+import { isPluginManifestCompatible, parsePluginManifest } from './manifest'
 
 export class LocalFileSourceResolver implements PluginSourceResolver {
   public readonly id = 'local-file'
@@ -33,5 +38,77 @@ export class HttpSourceResolver implements PluginSourceResolver {
       installInput: input,
       resolverId: this.id,
     }
+  }
+}
+
+export interface GitHubSourceResolverOptions {
+  readonly coreVersion: string
+  readonly token?: string
+}
+
+export class GitHubSourceResolver implements PluginSourceResolver {
+  public readonly id = 'github'
+
+  public constructor(private readonly options: GitHubSourceResolverOptions) {}
+
+  public matches(input: PluginInstallInput): input is string {
+    return typeof input === 'string' && /^gh:[^/]+\/[^/]+$/.test(input)
+  }
+
+  public async resolve(input: PluginInstallInput, signal: AbortSignal) {
+    if (typeof input !== 'string') throw new TypeError('GitHub resolver requires a repository')
+    const [owner, repo] = input.slice(3).split('/') as [string, string]
+    const octokit = new Octokit({ auth: this.options.token })
+    const pages = octokit.paginate.iterator(octokit.rest.repos.listReleases, {
+      owner,
+      per_page: 100,
+      repo,
+      request: { signal },
+    })
+    for await (const page of pages) {
+      for (const release of page.data) {
+        if (release.draft || release.prerelease) continue
+        const manifestAsset = release.assets.find(asset => asset.name === 'manifest.json')
+        const packageAsset = release.assets.find(asset => asset.name === 'plugin.zip')
+        if (!manifestAsset || !packageAsset) continue
+        const manifestResponse = await fetch(manifestAsset.browser_download_url, { signal })
+        if (!manifestResponse.ok) continue
+        const manifest = parsePluginManifest(await manifestResponse.json())
+        if (!isPluginManifestCompatible(manifest, this.options.coreVersion)) continue
+        const packageResponse = await fetch(packageAsset.browser_download_url, { signal })
+        if (!packageResponse.ok)
+          throw new Error(`plugin download failed: ${packageResponse.status}`)
+        return {
+          file: new File([await packageResponse.blob()], packageAsset.name),
+          installInput: input,
+          resolverId: this.id,
+        }
+      }
+    }
+    throw new Error(`no compatible plugin release found for ${owner}/${repo}`)
+  }
+}
+
+export class MarketplaceSourceResolver implements PluginSourceResolver {
+  public readonly id = 'marketplace'
+
+  public constructor(
+    private readonly github: GitHubSourceResolver,
+    private readonly http: HttpSourceResolver,
+    private readonly registry = new AwesomeRegistryClient(),
+  ) {}
+
+  public matches(input: PluginInstallInput): input is string {
+    return typeof input === 'string' && /^ap:[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(input)
+  }
+
+  public async resolve(input: PluginInstallInput, signal: AbortSignal) {
+    if (typeof input !== 'string') throw new TypeError('marketplace resolver requires a plugin id')
+    const listing = await this.registry.findListing(input.slice(3), signal)
+    const redirected = marketplaceDownloadToInstallInput(listing.download)
+    const source = this.github.matches(redirected)
+      ? await this.github.resolve(redirected, signal)
+      : await this.http.resolve(redirected, signal)
+    return { ...source, installInput: input, resolverId: this.id }
   }
 }

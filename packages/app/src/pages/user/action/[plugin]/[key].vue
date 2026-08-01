@@ -11,7 +11,7 @@ const pluginStore = usePluginStore()
 const item = computed(() =>
   pluginStore.plugins
     .get(plugin.value)
-    ?.user?.userActionPages?.flatMap(page => page.items)
+    ?.model?.user?.userActionPages?.flatMap(page => page.items)
     .find(action => action.key == key.value),
 )
 </script>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Global } from '@delta-comic/plugin'
+import { usePluginStore } from '@delta-comic/plugin'
 import { computed, provide, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -19,11 +19,18 @@ definePage({ redirect: { name: '/main/home/random' } })
 const openSearch = () => $router.force.push({ name: '/main/search' })
 
 const app = useAppStore()
+const pluginStore = usePluginStore()
 
 const tabItem = computed(() =>
-  Array.from(Global.tabbar.entries()).flatMap(pair =>
-    pair[1].map(val => ({ title: val.title, name: val.id, queries: { plugin: pair[0] } })),
-  ),
+  pluginStore
+    .modelEntries('content')
+    .flatMap(([plugin, content]) =>
+      (content.promotes?.tabbar ?? []).map(val => ({
+        title: val.title,
+        name: val.id,
+        queries: { plugin },
+      })),
+    ),
 )
 const tabs = computed(() => [
   {

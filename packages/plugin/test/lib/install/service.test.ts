@@ -97,4 +97,33 @@ describe('PluginInstallService', () => {
     await expect(service.install(new File([], 'plugin.zip'))).rejects.toThrow('reserved')
     expect(repository.upsert).not.toHaveBeenCalled()
   })
+
+  it('restores files and metadata when uninstall persistence fails', async () => {
+    const files = new MemoryPluginFileStore()
+    await (
+      await files.replace('example', new Map([['index.mjs', new TextEncoder().encode('old')]]))
+    ).commit()
+    let current: PluginArchiveDB.Archive | undefined = archive('1.0.0')
+    const repository: PluginArchiveRepository = {
+      find: async () => current,
+      list: async () => (current ? [current] : []),
+      remove: async () => {
+        current = undefined
+        throw new Error('database unavailable')
+      },
+      upsert: async value => {
+        current = value
+      },
+    }
+    const service = new PluginInstallService({
+      codecs: [codec],
+      files,
+      repository,
+      resolvers: [resolver],
+    })
+
+    await expect(service.uninstall('example')).rejects.toThrow('database unavailable')
+    expect(new TextDecoder().decode(await files.read('example', 'index.mjs'))).toBe('old')
+    expect(current?.meta.version.plugin).toBe('1.0.0')
+  })
 })

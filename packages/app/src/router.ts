@@ -9,8 +9,7 @@ import {
   isNavigationFailure,
   NavigationFailureType,
   type _RouterClassic,
-  type RouteLocationAsPathGeneric,
-  type RouteLocationAsRelativeGeneric,
+  type RouteLocationRaw,
 } from 'vue-router'
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 
@@ -19,7 +18,7 @@ import { setStatusBar } from '@/platform'
 import { useContentStore } from '@/stores/content'
 import { pluginName } from '@/symbol'
 
-type RouteAim = string | RouteLocationAsRelativeGeneric | RouteLocationAsPathGeneric
+type RouteAim = Parameters<DeltaRouter['force']['push']>[0]
 
 export const router = (window.$router = Object.assign(
   // The main app is hosted by main.html in both native windows and the web iframe.
@@ -61,13 +60,16 @@ SharedFunction.define(
 )
 
 const $routerForceDo = async (mode: keyof typeof router.force, to: RouteAim) => {
-  const aim = router.resolve(to)
-  aim.query.force = 'true'
+  const aim: RouteLocationRaw =
+    typeof to === 'string'
+      ? { path: to, query: { force: 'true' } }
+      : { ...to, query: { ...to.query, force: 'true' } }
+  const classicRouter: _RouterClassic = router
   let attempts = 0
   let r
   do {
     if (attempts++ > 20) throw new Error('Navigation retry exceeded 20 attempts')
-    r = await router[mode](aim)
+    r = await (mode === 'push' ? classicRouter.push(aim) : classicRouter.replace(aim))
   } while (isNavigationFailure(r, NavigationFailureType.aborted))
   return r
 }

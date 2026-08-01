@@ -47,22 +47,24 @@ const syncFromCloud = () =>
   createDownloadMessage(t('favourite.sync.start'), async ({ createLoading }) => {
     if (isSyncing.value) return
     isSyncing.value = true
+    const controller = new AbortController()
     try {
       await Promise.all(
-        Array.from(pluginStore.plugins.entries()).map(async ([plugin, { user }], index) => {
-          if (!user?.syncFavourite) return
+        Array.from(pluginStore.plugins.entries()).map(async ([plugin, config], index) => {
+          const user = config.model?.user
+          if (!user?.favourites) return
 
-          const { download, upload } = user.syncFavourite
+          const { download, upload } = user.favourites
           const downloadItems = await createLoading(
-            t('favourite.sync.download', { plugin: pluginStore.$getI18nName(plugin) }),
+            t('favourite.sync.download', { plugin: pluginStore.displayName(plugin) }),
             async c => {
               c.retryable = true
-              return await download()
+              return await download(controller.signal)
             },
           )
 
           const diff = await createLoading(
-            t('favourite.sync.persist', { plugin: pluginStore.$getI18nName(plugin) }),
+            t('favourite.sync.persist', { plugin: pluginStore.displayName(plugin) }),
             c =>
               DBUtils.withTransition(async trx => {
                 let diff: UniItemRaw[] = []
@@ -100,10 +102,10 @@ const syncFromCloud = () =>
           )
 
           await createLoading(
-            t('favourite.sync.upload', { plugin: pluginStore.$getI18nName(plugin) }),
+            t('favourite.sync.upload', { plugin: pluginStore.displayName(plugin) }),
             async c => {
               c.retryable = true
-              await upload(diff)
+              await upload(diff, controller.signal)
             },
           )
         }),

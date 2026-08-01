@@ -1,3 +1,4 @@
+export * from './candidateProvider'
 export * from './codec'
 export * from './contracts'
 export * from './manifest'

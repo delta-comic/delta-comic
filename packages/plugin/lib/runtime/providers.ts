@@ -1,8 +1,38 @@
-import type { PluginArchiveRepository, PluginModuleReader } from '../install'
 import type { InternalPluginDefinition, PluginCandidate, PluginCandidateProvider } from '../kernel'
+
+const defaultStorage = () => {
+  try {
+    return globalThis.localStorage
+  } catch {
+    return undefined
+  }
+}
 
 export interface InternalPluginPreferences {
   enabled(plugin: string, fallback: boolean): Promise<boolean>
+  setEnabled(plugin: string, enabled: boolean): Promise<void>
+}
+
+export class LocalInternalPluginPreferences implements InternalPluginPreferences {
+  public constructor(
+    private readonly storage: Storage | undefined = defaultStorage(),
+    private readonly prefix = 'delta-comic:internal-plugin:',
+  ) {}
+
+  public async enabled(plugin: string, fallback: boolean) {
+    try {
+      const value = this.storage?.getItem(`${this.prefix}${plugin}`)
+      return value === null || value === undefined ? fallback : value === 'true'
+    } catch {
+      return fallback
+    }
+  }
+
+  public async setEnabled(plugin: string, enabled: boolean) {
+    try {
+      this.storage?.setItem(`${this.prefix}${plugin}`, String(enabled))
+    } catch {}
+  }
 }
 
 export class InternalPluginCandidateProvider implements PluginCandidateProvider {
@@ -10,9 +40,7 @@ export class InternalPluginCandidateProvider implements PluginCandidateProvider 
 
   public constructor(
     private readonly definitions: readonly InternalPluginDefinition[],
-    private readonly preferences: InternalPluginPreferences = {
-      enabled: async (_plugin, fallback) => fallback,
-    },
+    private readonly preferences: InternalPluginPreferences = new LocalInternalPluginPreferences(),
   ) {}
 
   public async list(signal: AbortSignal) {
@@ -20,39 +48,24 @@ export class InternalPluginCandidateProvider implements PluginCandidateProvider 
     for (const definition of this.definitions) {
       if (signal.aborted) throw signal.reason
       candidates.push({
-        enabled: await this.preferences.enabled(
-          definition.manifest.name.id,
-          definition.enabledByDefault ?? true,
-        ),
+        enabled:
+          definition.canDisable === false
+            ? true
+            : await this.preferences.enabled(
+                definition.manifest.name.id,
+                definition.enabledByDefault ?? true,
+              ),
         load: async () => ({ factory: definition.factory }),
-        management: { canDisable: true, canUninstall: false, canUpdate: false },
+        management: {
+          canDisable: definition.canDisable ?? true,
+          canUninstall: false,
+          canUpdate: false,
+        },
         manifest: definition.manifest,
         origin: 'builtin',
       })
     }
     return candidates
-  }
-}
-
-export class InstalledPluginCandidateProvider implements PluginCandidateProvider {
-  public readonly id = 'installed'
-
-  public constructor(
-    private readonly repository: PluginArchiveRepository,
-    private readonly reader: PluginModuleReader,
-  ) {}
-
-  public async list(signal: AbortSignal): Promise<PluginCandidate[]> {
-    const archives = await this.repository.list()
-    if (signal.aborted) throw signal.reason
-    return archives.map(archive => ({
-      enabled: archive.enable,
-      load: async loadSignal =>
-        await this.reader.read(archive.pluginName, archive.meta, loadSignal),
-      management: { canDisable: true, canUninstall: true, canUpdate: true },
-      manifest: archive.meta,
-      origin: 'installed',
-    }))
   }
 }
 

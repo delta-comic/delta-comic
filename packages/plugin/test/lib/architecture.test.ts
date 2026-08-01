@@ -59,6 +59,10 @@ describe('plugin package architecture', () => {
         forbidden: new Set(['adapters', 'builtins', 'capabilities', 'module', 'runtime']),
         path: '/lib/install/',
       },
+      {
+        forbidden: new Set(['adapters', 'builtins', 'capabilities', 'install', 'module']),
+        path: '/lib/runtime/',
+      },
     ]
 
     for (const [path, source] of Object.entries(sourceModules)) {
@@ -76,6 +80,17 @@ describe('plugin package architecture', () => {
     for (const [path, source] of Object.entries(sourceModules)) {
       if (!source.includes('import.meta.glob')) continue
       expect(path).toContain('/lib/builtins/')
+    }
+  })
+
+  it('does not retain legacy global, export, or module compatibility layers', () => {
+    const paths = Object.keys(sourceModules)
+    expect(paths.some(path => /\/lib\/(?:export|module)\//.test(path))).toBe(false)
+    expect(paths.some(path => path.endsWith('/lib/global.ts'))).toBe(false)
+    for (const [path, source] of Object.entries(sourceModules)) {
+      expect(source, `${path} must use scoped contributions instead of Global`).not.toMatch(
+        /\bGlobal\./,
+      )
     }
   })
 })

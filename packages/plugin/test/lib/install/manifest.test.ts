@@ -29,5 +29,8 @@ describe('plugin manifest v1', () => {
     expect(() => parsePluginManifest(manifest({ entry: { jsPath: '../outside.mjs' } }))).toThrow(
       'safe relative path',
     )
+    expect(() =>
+      parsePluginManifest(manifest({ name: { display: 'Unsafe', id: 'unsafe:name' } })),
+    ).toThrow('portable')
   })
 })

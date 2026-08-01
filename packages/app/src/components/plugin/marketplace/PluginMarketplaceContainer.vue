@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { Install, marketplaceListingInstallId, marketplaceListingSource } from '@delta-comic/plugin'
+import {
+  installPlugin,
+  marketplaceListingInstallId,
+  marketplaceListingSource,
+  updatePlugin,
+} from '@delta-comic/plugin'
 import { useDialog, useMessage } from 'naive-ui'
 import { computed, onMounted, shallowReactive, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -30,8 +35,8 @@ const runInstall = async (item: PluginMarketplaceItem) => {
   if (installingIds.has(item.listing.id)) return
   installingIds.add(item.listing.id)
   try {
-    if (item.installed) await Install.updatePlugin(item.installed)
-    else await Install.installPlugin(marketplaceListingInstallId(item.listing))
+    if (item.installed) await updatePlugin(item.installed)
+    else await installPlugin(marketplaceListingInstallId(item.listing))
     await marketplace.refreshInstalled()
     message.success(
       t(item.installed ? 'plugin.market.messages.updated' : 'plugin.market.messages.installed'),

@@ -31,6 +31,7 @@ export interface PluginCandidateProvider {
 export interface InternalPluginDefinition {
   readonly manifest: PluginManifest
   readonly factory: PluginConfigFactory
+  readonly canDisable?: boolean
   readonly enabledByDefault?: boolean
 }
 

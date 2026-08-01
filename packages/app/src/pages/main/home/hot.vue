@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Global } from '@delta-comic/plugin'
+import { usePluginStore } from '@delta-comic/plugin'
 import { isEmpty } from 'es-toolkit/compat'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -9,21 +9,47 @@ import { Icons } from '@/icons'
 
 const $router = useRouter()
 const { t } = useI18n()
+const pluginStore = usePluginStore()
+const leaderboards = computed(() =>
+  pluginStore
+    .modelEntries('content')
+    .flatMap(([plugin, content]) =>
+      (content.promotes?.hotPageContent?.levelboard ?? []).map(value => ({ plugin, value })),
+    ),
+)
 const hotList = computed(() =>
-  Array.from(Global.mainLists.entries()).flatMap(([plugin, blocks]) =>
-    blocks.map((block, blockIndex) => ({ block, blockIndex, plugin })),
-  ),
+  pluginStore
+    .modelEntries('content')
+    .flatMap(([plugin, content]) =>
+      (content.promotes?.hotPageContent?.categories ?? []).map((category, blockIndex) => ({
+        block: {
+          ...category,
+          onClick: () => pluginStore.plugins.get(plugin)?.hooks?.onHotCategoryClick?.(category),
+        },
+        blockIndex,
+        plugin,
+      })),
+    ),
 )
 const topButtons = computed(() => {
-  const buttons = Array.from(Global.topButton.values()).flat()
-  if (!isEmpty(Global.levelboard)) {
+  const buttons = pluginStore
+    .modelEntries('content')
+    .flatMap(([plugin, content]) =>
+      (content.promotes?.hotPageContent?.topButton ?? []).map(button => ({
+        ...button,
+        onClick: () => pluginStore.plugins.get(plugin)?.hooks?.onHotTopButtonClick?.(button),
+      })),
+    )
+  if (!isEmpty(leaderboards.value)) {
     buttons.unshift({
       bgColor: '#ff9212',
       name: t('home.ranking'),
       icon: Icons.other.HotLevel,
       onClick() {
-        const first = Global.levelboard.keys().next().value!
-        return $router.force.push({ name: '/hot/[plugin]', params: { plugin: first } })
+        void $router.force.push({
+          name: '/hot/[plugin]',
+          params: { plugin: leaderboards.value[0].plugin },
+        })
       },
     })
   }

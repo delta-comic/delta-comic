@@ -71,7 +71,7 @@ const { client, handlers, sourceRefresh } = vi.hoisted(() => {
     sourceRefresh: {
       getPluginDownloadIdentity: vi.fn(),
       isCandidateCurrent: vi.fn(() => true),
-      pluginStore: { $isLoaded: vi.fn(() => true), ready: new Set<string>() },
+      pluginStore: { isLoaded: vi.fn(() => true), ready: new Set<string>() },
       prepare: vi.fn(),
     },
   }
@@ -202,7 +202,7 @@ describe('useDownloadsStore', () => {
       totalBytes: 100,
       updatedAt: 2,
     })
-    sourceRefresh.pluginStore.$isLoaded.mockReturnValue(true)
+    sourceRefresh.pluginStore.isLoaded.mockReturnValue(true)
     sourceRefresh.isCandidateCurrent.mockReturnValue(true)
     sourceRefresh.prepare.mockReset()
   })

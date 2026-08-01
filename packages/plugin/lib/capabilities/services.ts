@@ -1,6 +1,6 @@
 import type { App } from 'vue'
 
-import type { ConfigPointer, PluginLocaleMessages } from '../api'
+import type { ConfigPointer, PluginLocaleMessages, User } from '../api'
 import type { ContributionHub } from '../kernel'
 
 export interface RegisteredPluginConfig {
@@ -17,7 +17,12 @@ export interface PluginMessageRegistry {
   remove(plugin: string): void
 }
 
+export interface PluginAuthGateway {
+  authenticate(plugin: string, auth: User.Auth, signal: AbortSignal): Promise<void>
+}
+
 export interface PluginCapabilityServices {
+  readonly auth?: PluginAuthGateway
   readonly app?: App
   readonly config: PluginConfigRegistry
   readonly contributions: ContributionHub

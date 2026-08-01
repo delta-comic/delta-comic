@@ -14,7 +14,7 @@ const router = useRouter()
     <div class="w-full pl-4 text-lg font-semibold">
       {{ card.title }}
       <span class="text-[16px] text-(--dc-text-tertiary) italic"
-        >#{{ pluginStore.$getI18nName(pluginName) }}</span
+        >#{{ pluginStore.displayName(pluginName) }}</span
       >
     </div>
     <NGrid class="w-full" :cols="4" :y-gap="10">

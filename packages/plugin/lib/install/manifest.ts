@@ -16,6 +16,14 @@ const text = (value: unknown, path: string) => {
   return value
 }
 
+const pluginId = (value: unknown, path: string) => {
+  const id = text(value, path)
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(id)) {
+    throw new PluginManifestError(`${path} must be a portable 1-64 character plugin identifier`)
+  }
+  return id
+}
+
 export const safePluginPath = (value: unknown, path: string) => {
   const normalized = text(value, path).replaceAll('\\', '/')
   if (
@@ -63,8 +71,7 @@ export const parsePluginManifest = (value: unknown): PluginManifest => {
   }
   const name = record(manifest.name, 'manifest.name')
   const version = record(manifest.version, 'manifest.version')
-  const id = safePluginPath(name.id, 'manifest.name.id')
-  if (id.includes('/')) throw new PluginManifestError('manifest.name.id cannot contain a slash')
+  const id = pluginId(name.id, 'manifest.name.id')
   if (!Array.isArray(manifest.require)) {
     throw new PluginManifestError('manifest.require must be an array')
   }
@@ -77,7 +84,7 @@ export const parsePluginManifest = (value: unknown): PluginManifest => {
     require: manifest.require.map((value, index) => {
       const dependency = record(value, `manifest.require[${index}]`)
       return {
-        id: text(dependency.id, `manifest.require[${index}].id`),
+        id: pluginId(dependency.id, `manifest.require[${index}].id`),
         ...(dependency.download === undefined
           ? {}
           : { download: text(dependency.download, `manifest.require[${index}].download`) }),

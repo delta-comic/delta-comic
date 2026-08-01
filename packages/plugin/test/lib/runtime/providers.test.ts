@@ -2,11 +2,14 @@ import type { PluginArchiveDB } from '@delta-comic/db'
 import { describe, expect, it, vi } from 'vitest'
 
 import { defineDeltaComicPlugin } from '../../../lib/api'
-import type { PluginArchiveRepository, PluginModuleReader } from '../../../lib/install'
+import {
+  InstalledPluginCandidateProvider,
+  type PluginArchiveRepository,
+  type PluginModuleReader,
+} from '../../../lib/install'
 import { defineInternalPlugin } from '../../../lib/kernel'
 import {
   CompositePluginCandidateProvider,
-  InstalledPluginCandidateProvider,
   InternalPluginCandidateProvider,
 } from '../../../lib/runtime'
 
@@ -32,9 +35,10 @@ const archive = (id: string): PluginArchiveDB.Archive => ({
 describe('plugin candidate providers', () => {
   it('normalizes internal and installed plugins to the same candidate contract', async () => {
     const factory = defineDeltaComicPlugin({ name: 'core' })
-    const internal = new InternalPluginCandidateProvider([
-      defineInternalPlugin({ factory, manifest: manifest('core') }),
-    ])
+    const internal = new InternalPluginCandidateProvider(
+      [defineInternalPlugin({ factory, manifest: manifest('core') })],
+      { enabled: async (_plugin, fallback) => fallback, setEnabled: vi.fn() },
+    )
     const repository: PluginArchiveRepository = {
       find: vi.fn(),
       list: async () => [archive('reader')],
@@ -65,8 +69,14 @@ describe('plugin candidate providers', () => {
       manifest: manifest('duplicate'),
     })
     const provider = new CompositePluginCandidateProvider([
-      new InternalPluginCandidateProvider([definition]),
-      new InternalPluginCandidateProvider([definition]),
+      new InternalPluginCandidateProvider([definition], {
+        enabled: async (_plugin, fallback) => fallback,
+        setEnabled: vi.fn(),
+      }),
+      new InternalPluginCandidateProvider([definition], {
+        enabled: async (_plugin, fallback) => fallback,
+        setEnabled: vi.fn(),
+      }),
     ])
 
     await expect(provider.list(new AbortController().signal)).rejects.toThrow(

@@ -28,8 +28,7 @@ const { t } = useI18n()
       <div v-if="content" class="size-full overflow-auto overscroll-contain p-3 sm:p-4">
         <pre
           class="m-0 min-w-max cursor-text font-mono text-xs leading-5 break-words whitespace-pre-wrap text-(--dc-text) select-text"
-          >{{ content }}</pre
-        >
+          >{{ content }}</pre>
       </div>
       <div v-else class="flex size-full min-h-48 items-center justify-center p-6">
         <NEmpty

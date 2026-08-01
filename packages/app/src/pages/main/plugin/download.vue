@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { logger } from '@delta-comic/logger'
-import { Install, translatePluginText } from '@delta-comic/plugin'
+import { installPlugin } from '@delta-comic/plugin'
 import { toReactive, useFileDialog } from '@vueuse/core'
 import { useDialog, useMessage } from 'naive-ui'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const pluginInstallLogger = logger.scoped('app:plugin-install')
-const { installFilePlugin, installPlugin, installers } = Install
 const { t } = useI18n()
 
 const inputUrl = ref('')
@@ -61,7 +60,7 @@ const useUploadPlugin = () => {
       if (!file) throw new Error(t('plugin.install.errors.noFile'))
 
       pluginInstallLogger.info('local plugin installation started')
-      await installFilePlugin(file)
+      await installPlugin(file)
       pluginInstallLogger.info('local plugin installation completed')
     } catch (error) {
       pluginInstallLogger.error('local plugin installation failed', error)
@@ -111,28 +110,5 @@ const useUploadPlugin = () => {
         >{{ t('plugin.install.useLocalFile') }}
       </NButton>
     </div>
-    <TransitionGroup name="list" tag="ul" class="ml-10 h-1/2 w-full overflow-auto *:my-1">
-      <li
-        name="list"
-        tag="ul"
-        class="mx-auto my-4! flex w-5/6 items-center gap-3 rounded-lg px-2"
-        :class="[index == 0 && inputUrl && 'bg-green-300/60']"
-        :key="desc.name"
-        v-for="(desc, index) of inputUrl.length == 0
-          ? installers
-          : installers.filter(v => v.isMatched(inputUrl))"
-      >
-        <span
-          class="item-center size-2 shrink-0 rounded-full bg-(--dc-text)"
-          aria-hidden="true"
-        ></span>
-        <div>
-          <div class="dc-hairline-bottom text-base font-semibold">
-            {{ translatePluginText(desc.description.title) }}
-          </div>
-          <div>{{ translatePluginText(desc.description.description) }}</div>
-        </div>
-      </li>
-    </TransitionGroup>
   </NScrollbar>
 </template>

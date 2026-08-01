@@ -78,4 +78,33 @@ export class PluginInstallService {
       throw error
     }
   }
+
+  /** Remove archive metadata and files as one compensating transaction. */
+  public async uninstall(plugin: string) {
+    const previous = await this.options.repository.find(plugin)
+    const replacement = await this.options.files.replace(plugin, new Map())
+    try {
+      await this.options.repository.remove(plugin)
+      await replacement.commit()
+    } catch (error) {
+      const rollbackErrors: unknown[] = []
+      try {
+        await replacement.rollback()
+      } catch (rollbackError) {
+        rollbackErrors.push(rollbackError)
+      }
+      try {
+        if (previous) await this.options.repository.upsert(previous)
+      } catch (rollbackError) {
+        rollbackErrors.push(rollbackError)
+      }
+      if (rollbackErrors.length > 0) {
+        throw new AggregateError(
+          [error, ...rollbackErrors],
+          `failed to uninstall plugin "${plugin}"`,
+        )
+      }
+      throw error
+    }
+  }
 }

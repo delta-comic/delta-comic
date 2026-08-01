@@ -52,6 +52,7 @@ export class ActivationPipeline {
     const activated: string[] = []
     for (const module of this.#modules) {
       if (context.signal.aborted) throw context.signal.reason
+      context.report({ description: '', name: module.id })
       if (await module.activate(plugin, context)) activated.push(module.id)
     }
     return activated

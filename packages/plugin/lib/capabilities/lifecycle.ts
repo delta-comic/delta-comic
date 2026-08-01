@@ -5,7 +5,12 @@ import type { PluginCapabilityServices } from './services'
 export const createLifecycleCapability = (services: PluginCapabilityServices): CapabilityModule =>
   defineCapability({
     id: 'lifecycle',
-    select: config => config.hooks,
+    select: config => {
+      const hooks = config.hooks
+      return hooks?.onBooted || hooks?.onPreboot || hooks?.onUnload || hooks?.onUninstall
+        ? hooks
+        : undefined
+    },
     async activate(hooks, context) {
       if (hooks.onUnload) context.scope.defer(() => hooks.onUnload?.())
 
