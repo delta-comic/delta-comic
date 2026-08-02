@@ -1,5 +1,19 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.9](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.8...3.0.0-next.9) (2026-08-02)
+
+
+### Bug Fixes
+
+* **plugin:** 修复了auth调用modal的问题 ([1d28d4f](https://github.com/delta-comic/delta-comic/commit/1d28d4f77bf29132e26c73957546c5cad8185d95))
+
+
+### Features
+
+* **plugin:** 完成了核心插件的定义 ([52512fb](https://github.com/delta-comic/delta-comic/commit/52512fbd51de1724ce105b9ccc59f1905bd34ee1))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.8](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.7...3.0.0-next.8) (2026-07-31)
 
 
