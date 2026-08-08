@@ -1,60 +1,78 @@
-# 项目规范
+# Delta Comic Agent Guide
 
-## Using Vite+, the Unified Toolchain for the Web
+## Toolchain
 
-This project is using Vite+, a unified toolchain built on top of Vite, Rolldown, Vitest, tsdown, Oxlint, Oxfmt, and Vite Task. Vite+ wraps runtime management, package management, and frontend tooling in a single global CLI called `vp`. Vite+ is distinct from Vite, and it invokes Vite through `vp dev` and `vp build`. Run `vp help` to print a list of commands and `vp <command> --help` for information about a specific command.
+- Use Vite+ (`vp`), not direct `pnpm`, `vite`, `vitest`, `oxlint`, or `oxfmt` commands. The
+  repository pins Node `25.9.0`, pnpm `11.18.0`, and Rust `1.94.0` (edition 2024).
+- Run `vp install` after pulling dependency changes. CI uses `vp install --frozen-lockfile`.
+- Vite+ is not Vite: workspace scripts run with `vp run`, for example
+  `vp run --filter app dev:web`. Local Vite+ docs are in `node_modules/vite-plus/docs`.
+- Use the global `vp` in local sessions; use `pnpm exec vp` only where the global CLI is absent.
 
-Docs are local at `node_modules/vite-plus/docs` or online at <https://viteplus.dev/guide/>.
+## Verification
 
-### Review Checklist
+- Build app dependencies before web checks/tests: `vp run lib-build`. Several packages export
+  built `dist` files, so a clean checkout can otherwise fail resolution.
+- Full web verification: `vp run lib-build`, `vp check`, `vp run -r typecheck`, then
+  `vp test run`. `vp check` does not replace the explicit workspace typecheck because root lint
+  type-checking is disabled.
+- Run one test file with `vp test run packages/app/test/src/path/file.test.ts`; add
+  `-t 'test name'` to focus one case. Test watch mode is `vp test watch <path>`.
+- Coverage is `vp test run --coverage`; root thresholds are 75% lines/functions/statements and
+  70% branches.
+- Rust verification is separate: `cargo fmt --all --check`,
+  `cargo clippy --workspace --all-targets --locked -- -D warnings`, and
+  `cargo test --workspace --locked -- --test-threads=2`.
+- Changes under `packages/downloader/android` also require the Gradle `ktlintCheck`, `lintDebug`,
+  and `testDebugUnitTest` tasks. CI's exact JDK 21/Android 36 setup is in
+  `.github/workflows/{lint,test}.yaml`.
 
-- [ ] Run `vp install` after pulling remote changes and before getting started.
-- [ ] Run `vp check` and `vp test` to format, lint, type check and test changes.
-- [ ] Check if there are `vite.config.ts` tasks or `package.json` scripts necessary for validation, run via `vp run <script>`.
-- [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
+## Runtime Entry Points
 
-### Notice
+- `packages/app`: Vue/Tauri client. Web entry is `src/main.tsx`; native entry is
+  `src-tauri/src/main.rs`. `vp run --filter app dev` starts Tauri; `dev:web` starts only the web
+  client. Tauri requires port `5173` and fails rather than selecting another port.
+- The app's `build:web`/`dev:web` first builds `@delta-comic/runtime`, the UMD host-library bridge
+  used by external plugins. Preserve that dependency ordering.
+- `packages/server/app/index.ts`: Elysia Cloudflare Worker entry. `packages/server/lib/index.ts` is
+  the client/shared public API, not the Worker entry. Local startup requires
+  `vp run --filter @delta-comic/server migrate:local` before `... dev`.
+- `packages/server-admin` is a separate Vue admin app. Features are discovered from
+  `src/features/*/feature.ts`; add a feature module instead of editing a central route list.
+- `packages/{db,downloader,logger,model,plugin,ui,utils}` are publishable workspaces; some also map
+  to Rust Tauri plugin crates through the root Cargo workspace. `packages/runtime`, `app`,
+  `server`, and `server-admin` are private.
 
-When working in a local development environment, use `vp` instead of `pnpm exec vp`.
+## Architecture Constraints
 
-In cloud environments, use `pnpm exec vp`.
+- Follow `packages/plugin/ARCHITECTURE.md` for plugin changes. Only `composition.ts` assembles
+  concrete capabilities/adapters; `index.ts` is export-only; package code must not self-import
+  `@delta-comic/plugin` or `@/index`.
+- Built-in client plugins are file-driven `builtins/*.builtin.ts` default exports. Server built-ins
+  are different: Wrangler does not transform `import.meta.glob`, so add an explicit ESM import to
+  `packages/server/app/modules/plugins/definitions/index.ts`.
+- Server deploy does not apply D1 migrations. Run the package's `migrate:remote` explicitly before
+  `deploy`; use `migrate:local` for local D1.
+- Do not hand-edit generated `components.d.ts`, `typed-router.d.ts`, or
+  `packages/server/worker-configuration.d.ts`. Component/router declarations come from Vite
+  plugins; Worker bindings come from `vp run --filter @delta-comic/server cf-typegen`.
 
----
+## Repository Conventions
 
-## 开发思想
-
-### 思想
-
-- 使用文件系统分割模块来保证结构工整；对于按步骤流程运行不同模块的，或许可以使用glob引入执行实现由文件驱动模块
-- 优先使用`oop`(面向对象)思想编写代码，但要避免过度封装，继承链最好不要超过5层(非强制)
-- 使用`依赖注入`思想优化耦合，但也要避免过度封装。
-- 使用类似`条件反转`等技巧减少代码嵌套，但不要过度的不加分辨的使用
-
-### 格式
-
-- css**一定**要使用tailwindcss(包含`不可枚举的动态值属性`除外和使用`@apply`除外)，如果你使用了纯css则你的设计是失败的，应当重做。如果是在`开屏页面`这种地方也除外，因为场景太轻量且加载性能敏感。
-- 提交遵循Angular规则，但描述内容使用中文，如`feat(ui): 实现了列表组件`
-- 组件样式必须使用PascalCase，例如: `<NButton></NButton>`、`<DcList></DcList>`
-- 格式化请使用`vp fmt`和`vp lint`，最好不要手动修复格式问题
-- 最好遵守`dry`(不要重复自己)规则
-- 对于重复使用相同或相似的dom结构的，最好使用`提取组件`或`v-for`或vueuse的`createReusableTemplate`创建复用，这与上一条的`dry`思想相同
-- 测试不应当堆砌无意义的断言，而是精确的分析用户的使用后切入关键；而且，测试通常位于
-  - 如果在monorepo侧某个子包：`packages/xxx/lib`对应测试位置`packages/xxx/test/lib`、`packages/xxx/src`对应测试位置`packages/xxx/test/src`
-  - 如果不在某个子包内，那就在同级创建test文件夹：`script/xxx`对应测试位置`script/test/xxx`
-  - 总之，永远不要将测试和真正的程序房子同一个目录内，而是集中存放，且复原相应目录树，如`packages/app/src/cloud/storage.ts`->`packages/app/test/src/cloud/storage.test.ts`
-
-## 项目概览
-
-**delta-comic** 是基于 **Tauri 2.x** 的跨平台漫画阅读应用，支持 Android 和桌面端。采用 **pnpm monorepo** 架构。
-
-- **前端**: Vue 3 + TypeScript 6 + Vite + NaiveUI + Pinia + Vue Router
-- **后端**: Rust (Tauri 2.x, edition 2024) + SQLite + Kysely ORM
-- **云服务**: Elysia + Cloudflare Workers + Cloudflare Vite Plugin + Wrangler
-- **数据库**: 本地 SQLite，由 `tauri-plugin-sql` 提供 Rust 驱动，Kysely 做类型安全查询
-- **插件系统**: 分级可扩展架构，Rust 端提供命令 API，TS 端通过 Composition API 注入页面和功能
-- **线上仓库**: <https://github.com/delta-comic/delta-comic.git>
-- **依赖管理**: 使用 pnpm catalog 统一管理所有依赖版本（见 `pnpm-workspace.yaml`）
-
-## 要点
-
-- 添加ui文本记得使用i18n
+- UI styling uses Tailwind CSS. Plain CSS is limited to non-enumerable dynamic values, `@apply`,
+  or the lightweight splash screen. Vue/component tags use PascalCase.
+- Every new user-visible app string must use i18n and update `packages/app/src/i18n/locales/en-US.ts`,
+  `zh-CN.ts`, and `zh-TW.ts`. Shared UI messages use the `ui.*` bridge configured in
+  `packages/app/src/main.tsx`.
+- Keep tests outside production directories and mirror the source path:
+  `packages/x/lib/a.ts` -> `packages/x/test/lib/a.test.ts`; root scripts use `script/test`.
+  Rust unit tests normally live under `packages/x/test/src` and are linked with `#[path = ...]`.
+- Formatting is 2 spaces, no semicolons, single quotes, 100 columns; run `vp fmt`/`vp lint` rather
+  than manually reformatting. Markdown and generated declarations are intentionally formatter
+  exclusions.
+- Commits use Conventional/Angular syntax with Chinese descriptions, for example
+  `feat(ui): 实现列表组件`; commits must be signed. Pre-commit runs `vp staged`, which applies
+  `vp check --fix` and cspell to staged files.
+- Public package versions are released together and discovered from `packages/*/package.json`.
+  Use `vp run set-ver -- <version>` rather than editing version-bearing manifests independently.
+  Branch/release operations are documented in `docs/release-workflow.md` and must be dry-run first.
