@@ -1,6 +1,7 @@
 import type {
   ContentModel,
   ExposeModel,
+  PluginExposeRegistry,
   RemoteModel,
   ResourceModel,
   SocialModel,
@@ -11,7 +12,7 @@ import { defineContributionChannel } from '../kernel'
 
 export const pluginModelChannels = {
   content: defineContributionChannel<ContentModel>('model:content'),
-  expose: defineContributionChannel<ExposeModel>('model:expose'),
+  expose: defineContributionChannel<ExposeModel, PluginExposeRegistry>('model:expose'),
   remote: defineContributionChannel<RemoteModel>('model:remote'),
   resource: defineContributionChannel<ResourceModel>('model:resource'),
   social: defineContributionChannel<SocialModel>('model:social'),

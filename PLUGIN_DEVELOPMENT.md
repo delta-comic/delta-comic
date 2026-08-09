@@ -567,7 +567,76 @@ model: {
 
 步骤抛错会使当前插件激活失败并触发回滚。不要用 `special` 模拟第二套 booter 系统；它只适合该插件自身的有限准备工作。
 
-`expose` 可提供任意具名能力，但只有存在明确宿主或其他插件消费者时才应使用。跨插件共享优先设计稳定、窄小的类型契约，不要暴露整个内部 service 实例。
+`expose` 用于向宿主或其他插件提供无法归入现有模型的具名能力。宿主不会解析其中的
+字段，而是把整个对象注册到 `model:expose` contribution channel。只有存在明确消费者时
+才应使用它；跨插件共享应设计稳定、窄小的类型契约，不要暴露整个内部 service 实例。
+
+默认的 `ExposeModel` 是 `Record<string, unknown>`。跨插件调用应通过模块扩展把插件 ID
+登记到 `PluginExposeRegistry`，让 channel 根据提供方 ID 推导具体类型：
+
+```ts
+import type { ExposeModel } from '@delta-comic/plugin'
+
+export interface BasePluginExpose extends ExposeModel {
+  readonly version: 1
+  refresh(signal?: AbortSignal): Promise<void>
+}
+
+declare module '@delta-comic/plugin' {
+  interface PluginExposeRegistry {
+    'base-plugin': BasePluginExpose
+  }
+}
+```
+
+这段契约声明必须同时包含在提供方和消费方的 TypeScript 编译范围内。多个插件共享同一
+契约时，优先放入只包含类型的共享包；通过 `import type` 引用不会把该包带入运行时代码。
+
+提供方实现这个契约并通过 `model.expose` 发布：
+
+```ts
+import { defineDeltaComicPlugin } from '@delta-comic/plugin'
+
+import type { BasePluginExpose } from './contract'
+import { manifest } from './manifest'
+
+const expose: BasePluginExpose = {
+  version: 1,
+  async refresh(signal) {
+    signal?.throwIfAborted()
+    // 刷新提供方拥有的数据。
+  },
+}
+
+export default defineDeltaComicPlugin({
+  name: manifest.name.id,
+  model: { expose },
+})
+```
+
+消费方从共享 channel 按插件 ID 和固定 contribution ID `default` 读取：
+
+```ts
+import {
+  pluginContributions,
+  pluginModelChannels,
+} from '@delta-comic/plugin'
+
+const contribution = pluginContributions
+  .channel(pluginModelChannels.expose)
+  .get('base-plugin', 'default')
+
+// contribution.value 被推导为 BasePluginExpose。
+await contribution?.value.refresh()
+```
+
+消费方应在 manifest 的 `require` 中声明提供方，从而保证提供方先激活；读取应放在
+`onBooted` 等自身激活阶段，而不是模块顶层。模块扩展只提供编译期类型，不会安装、启用
+或授权另一个插件，因此可选依赖仍需处理 `undefined`。插件卸载后 channel 会自动删除其
+记录，但消费方已经缓存的对象引用不会自动失效，因而不应长期缓存 expose 对象。
+
+`expose` 没有访问控制或对象隔离。所有插件都能读取 contribution，且拿到的是原对象
+引用；契约应尽量使用 `readonly` 数据和明确的方法，消费方不得修改提供方内部状态。
 
 ## 6. 生命周期与回滚
 
