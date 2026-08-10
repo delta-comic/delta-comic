@@ -315,8 +315,7 @@ const runCode = () => {
                 <template #description>{{ new Date(run.startedAt).toLocaleString() }}</template>
                 <pre
                   class="plugin-detail__run-result bg-surface-muted mt-2 mb-0 overflow-auto p-2.5 text-[10px] whitespace-pre-wrap"
-                  >{{ run.errorMessage ?? JSON.stringify(run.result, null, 2) }}</pre
-                >
+                  >{{ run.errorMessage ?? JSON.stringify(run.result, null, 2) }}</pre>
               </NThing>
             </NListItem>
           </NList>

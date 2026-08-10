@@ -63,8 +63,7 @@ const alternateSingleValue = ref([{ key: 'command', value: 'install' }])
           class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-[var(--nui-text-color-2)] dark:bg-white/5"
           >{{
             JSON.stringify({ headers: multipleValue, extras: emptyMultipleValue }, null, 2)
-          }}</pre
-        >
+          }}</pre>
       </div>
       <template #note>on-create 会复用 defaultValue 首行的结构，并写入响应式数组模型。</template>
     </DemoSection>

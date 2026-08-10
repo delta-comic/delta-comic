@@ -129,7 +129,7 @@ describe('plugin startup drawer', () => {
   it('blocks startup until preboot activation is ready', async () => {
     const current = mountStartup(false)
 
-    await current.findAll('.startup-actions button')[1].trigger('click')
+    await current.findAll('.startup-actions button')[0].trigger('click')
 
     expect(message.warning).toHaveBeenCalledExactlyOnceWith('plugin.startup.prebootLoading')
     expect(pluginRuntime.loadNormal).not.toHaveBeenCalled()
@@ -142,7 +142,7 @@ describe('plugin startup drawer', () => {
     })
     const current = mountStartup()
 
-    await current.findAll('.startup-actions button')[1].trigger('click')
+    await current.findAll('.startup-actions button')[0].trigger('click')
     await flushPromises()
 
     expect(pluginRuntime.loadNormal).toHaveBeenCalledExactlyOnceWith({ pluginNames: undefined })
@@ -185,7 +185,7 @@ describe('plugin startup drawer', () => {
     })
     const current = mountStartup()
 
-    await current.findAll('.startup-actions button')[1].trigger('click')
+    await current.findAll('.startup-actions button')[0].trigger('click')
     await flushPromises()
 
     expect(pluginRuntime.reloadNormal).toHaveBeenCalledExactlyOnceWith({ pluginNames: undefined })
