@@ -59,8 +59,7 @@ const requiredValues = reactive({ account: 'delta-reader', note: '' })
         </NForm>
         <pre
           class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-[var(--nui-text-color-2)] dark:bg-white/5"
-          >{{ JSON.stringify(typeValues, null, 2) }}</pre
-        >
+          >{{ JSON.stringify(typeValues, null, 2) }}</pre>
       </div>
       <template #note>示例同时覆盖 string、number 与 switch 三种鉴别类型。</template>
     </DemoSection>
@@ -77,8 +76,7 @@ const requiredValues = reactive({ account: 'delta-reader', note: '' })
         </NForm>
         <pre
           class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-[var(--nui-text-color-2)] dark:bg-white/5"
-          >{{ JSON.stringify(requiredValues, null, 2) }}</pre
-        >
+          >{{ JSON.stringify(requiredValues, null, 2) }}</pre>
       </div>
       <template #note>未声明 required 时组件按必填处理；显式 false 会移除必填标识。</template>
     </DemoSection>

@@ -23,7 +23,6 @@ catalog:
   '@sinclair/typebox': ^0.34.52
   '@octokit/rest': ^22.0.1
   '@pinia/colada': ^1.4.2
-  '@sentry/vue': ^10.69.0
   '@tailwindcss/vite': ^4.3.3
   '@tauri-apps/api': ^2.11.1
   '@tauri-apps/cli': ^2.11.4
@@ -41,7 +40,7 @@ catalog:
   '@vitejs/plugin-vue-jsx': ^5.1.6
   '@vue/language-core': ^3.3.9
   '@vueuse/core': ^14.4.0
-  '@vitest/coverage-v8': 5.0.0-beta.7
+  '@vitest/coverage-v8': ^4.1.10
   browserslist: ^4.28.7
   blake3-wasm: 3.0.0
   color: ^5.0.3
@@ -84,7 +83,7 @@ catalog:
   vite-plugin-vue-devtools: ^8.2.1
   vite-plugin-wasm: ^3.6.0
   vite-plus: ^0.2.7
-  vitest: 5.0.0-beta.7
+  vitest: 4.1.10
   vue: ^3.6.0-rc.2
   vue-i18n: ^12.0.0-alpha.4
   vue-component-type-helpers: ^3.3.9

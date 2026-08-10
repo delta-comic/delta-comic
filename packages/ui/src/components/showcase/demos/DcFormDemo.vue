@@ -91,8 +91,7 @@ const overrideValue = ref<FormResult<typeof overrideConfigs>>({ alias: '书架',
           <p class="mb-2 text-xs font-semibold text-[var(--nui-text-color-2)]">CURRENT MODEL</p>
           <pre
             class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-[var(--nui-text-color-2)] dark:bg-white/5"
-            >{{ JSON.stringify(generatedValue, null, 2) }}</pre
-          >
+            >{{ JSON.stringify(generatedValue, null, 2) }}</pre>
         </div>
       </div>
       <template #note>
@@ -130,8 +129,7 @@ const overrideValue = ref<FormResult<typeof overrideConfigs>>({ alias: '书架',
         </DcForm>
         <pre
           class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-[var(--nui-text-color-2)] dark:bg-white/5"
-          >{{ JSON.stringify(overrideValue, null, 2) }}</pre
-        >
+          >{{ JSON.stringify(overrideValue, null, 2) }}</pre>
       </div>
       <template #note> overrideRow 为 true 时可覆盖全部行；数组模式仅覆盖指定 key。 </template>
     </DemoSection>

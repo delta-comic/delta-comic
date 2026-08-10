@@ -8,16 +8,28 @@ export interface Contribution<T> {
   readonly value: T
 }
 
-export interface ContributionChannel<T> {
+export interface ContributionChannel<T, Owners extends Record<keyof Owners, T> = Record<never, T>> {
   readonly key: string
   readonly __type?: T
+  readonly __owners?: Owners
 }
 
-export const defineContributionChannel = <T>(key: string): ContributionChannel<T> => ({ key })
+export const defineContributionChannel = <
+  T,
+  Owners extends Record<keyof Owners, T> = Record<never, T>,
+>(
+  key: string,
+): ContributionChannel<T, Owners> => ({ key })
+
+export type ContributionValue<
+  T,
+  Owners extends Record<keyof Owners, T>,
+  Owner extends string,
+> = Owner extends keyof Owners ? Owners[Owner] : T
 
 const contributionKey = (owner: string, id: string) => JSON.stringify([owner, id])
 
-export class ContributionRegistry<T> {
+export class ContributionRegistry<T, Owners extends Record<keyof Owners, T> = Record<never, T>> {
   readonly #entries = shallowReactive(new Map<string, Contribution<T>>())
 
   public get size() {
@@ -28,7 +40,11 @@ export class ContributionRegistry<T> {
     return this.#entries
   }
 
-  public register(owner: string, id: string, value: T) {
+  public register<Owner extends string>(
+    owner: Owner,
+    id: string,
+    value: ContributionValue<T, Owners, Owner>,
+  ) {
     if (!owner) throw new Error('contribution owner cannot be empty')
     if (!id) throw new Error('contribution id cannot be empty')
 
@@ -37,7 +53,7 @@ export class ContributionRegistry<T> {
       throw new Error(`duplicate contribution "${owner}:${id}"`)
     }
 
-    const contribution: Contribution<T> = { id, owner, value }
+    const contribution: Contribution<T> = { id, owner, value: value as T }
     this.#entries.set(key, contribution)
 
     let active = true
@@ -48,12 +64,16 @@ export class ContributionRegistry<T> {
     }
   }
 
-  public get(owner: string, id: string) {
-    return this.#entries.get(contributionKey(owner, id))
+  public get<Owner extends string>(owner: Owner, id: string) {
+    type Value = ContributionValue<T, Owners, Owner>
+    return this.#entries.get(contributionKey(owner, id)) as Contribution<Value> | undefined
   }
 
-  public byOwner(owner: string) {
-    return [...this.#entries.values()].filter(entry => entry.owner === owner)
+  public byOwner<Owner extends string>(owner: Owner) {
+    type Value = ContributionValue<T, Owners, Owner>
+    return [...this.#entries.values()].filter(
+      entry => entry.owner === owner,
+    ) as Contribution<Value>[]
   }
 
   public removeOwner(owner: string) {
@@ -70,17 +90,28 @@ export class ContributionRegistry<T> {
 export class ContributionHub {
   private readonly registries = new Map<string, ContributionRegistry<unknown>>()
 
-  public channel<T>(channel: ContributionChannel<T>): ContributionRegistry<T> {
+  public channel<T, Owners extends Record<keyof Owners, T> = Record<never, T>>(
+    channel: ContributionChannel<T, Owners>,
+  ): ContributionRegistry<T, Owners> {
     let registry = this.registries.get(channel.key)
     if (!registry) {
       registry = new ContributionRegistry<unknown>()
       this.registries.set(channel.key, registry)
     }
-    return registry as ContributionRegistry<T>
+    return registry as unknown as ContributionRegistry<T, Owners>
   }
 
-  public register<T>(scope: PluginScope, channel: ContributionChannel<T>, id: string, value: T) {
-    const unregister = this.channel(channel).register(scope.owner, id, value)
+  public register<T, Owners extends Record<keyof Owners, T> = Record<never, T>>(
+    scope: PluginScope,
+    channel: ContributionChannel<T, Owners>,
+    id: string,
+    value: T,
+  ) {
+    const unregister = this.channel(channel).register<string>(
+      scope.owner,
+      id,
+      value as ContributionValue<T, Owners, string>,
+    )
     scope.defer(() => void unregister())
     return unregister
   }

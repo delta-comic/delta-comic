@@ -92,7 +92,6 @@ const promptToRemember = (safe: boolean) => {
 const boot = async (safe = false, pluginNames?: readonly string[], remembered = false) => {
   if (!props.startupReady) return $message.warning(t('plugin.startup.prebootLoading'))
   if (bootingSteps.value || isBooted.value) return $message.warning(t('plugin.startup.loading'))
-  window.$$safe$$ = safe
   bootingSteps.value = undefined
   let watcher: ReturnType<typeof watch> | undefined
   try {
@@ -165,11 +164,6 @@ watch(
       <!-- boot button group -->
       <ActionButtonGroup
         :actions="[
-          {
-            title: t('plugin.startup.actions.safeStart'),
-            icon: Icons.antd.SafetyOutlined,
-            onClick: () => boot(true),
-          },
           {
             title: t('plugin.startup.actions.start'),
             icon: Icons.material.CheckRound,
