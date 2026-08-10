@@ -1,5 +1,19 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.10](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.9...3.0.0-next.10) (2026-08-10)
+
+
+### Features
+
+* **plugin:** 让expose类型安全化 ([db8962f](https://github.com/delta-comic/delta-comic/commit/db8962f6fa0ad024eafff3be9bf8646352af681c))
+
+
+### Reverts
+
+* **plugin:** 移除safe模式 ([5ccf3d8](https://github.com/delta-comic/delta-comic/commit/5ccf3d83396d7e4f8f5ee597ed2f10c37f0667c3))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.9](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.8...3.0.0-next.9) (2026-08-02)
 
 
