@@ -401,7 +401,7 @@ const zhCN = {
       tokenTitle: '分享口令',
     },
     startup: {
-      actions: { chooseMode: '选择启动方式', safeStart: '安全启动', start: '启动' },
+      actions: { chooseMode: '选择启动方式', start: '启动' },
       errors: { partialFailure: '部分插件加载失败，请检查详情' },
       loading: '正在启动中',
       prebootLoading: '预启动插件仍在加载',

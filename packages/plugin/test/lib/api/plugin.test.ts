@@ -15,7 +15,7 @@ describe('plugin public api', () => {
     )
     const factory = defineDeltaComicPlugin({ config, name: 'example' })
 
-    expect(factory({ platform: 'web', safe: true })).toEqual({ config, name: 'example' })
+    expect(factory({ platform: 'web' })).toEqual({ config, name: 'example' })
   })
 
   it('publishes one explicit manifest api version', () => {

@@ -156,7 +156,6 @@ export default defineDeltaComicPlugin(env => ({
     onBooted() {
       console.info('[example-plugin] loaded', {
         platform: env.platform,
-        safeStartup: env.safe,
       })
     },
     onUnload() {
@@ -173,7 +172,6 @@ export default defineDeltaComicPlugin(env => ({
 | 字段 | 类型 | 含义 |
 | --- | --- | --- |
 | `platform` | `'tauri' \| 'web'` | 当前运行平台 |
-| `safe` | `boolean` | 用户本次是否选择安全启动配置；它不是安全沙箱 |
 
 Factory 应保持纯净：只根据环境组装并返回配置，不要在模块顶层或 Factory 中注册监听器、启动定时器或修改 DOM。副作用应放进生命周期钩子。
 
@@ -801,7 +799,7 @@ import { manifest } from '../../src/manifest'
 
 describe('plugin contract', () => {
   it('returns a config with the manifest owner', () => {
-    const config = createPlugin({ platform: 'web', safe: true })
+    const config = createPlugin({ platform: 'web' })
 
     expect(config.name).toBe(manifest.name.id)
   })
@@ -873,7 +871,6 @@ entry: { jsPath: 'index.mjs', cssPath: 'index.css' }
 - 不在日志中输出 token、Cookie 和用户内容；
 - 所有 URL、远端 JSON 和剪贴板输入都按不可信数据处理；
 - 对网络请求设置取消、超时和状态码检查；
-- 不把 `env.safe` 当作权限或信任证明；
 - 卸载不应删除不属于当前插件的数据。
 
 ## 13. 仓库内部插件

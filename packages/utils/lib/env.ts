@@ -19,7 +19,6 @@ declare global {
     $dialog: ReturnType<typeof useDialog>
     $api: Record<string, any>
     $$lib$$: Record<ExternalLibKey[keyof ExternalLibKey], any>
-    $$safe$$: boolean
     $router: DeltaRouter
     $isDev: boolean
   }

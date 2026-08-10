@@ -204,7 +204,6 @@ describe('plugin startup drawer', () => {
     expect(pluginRuntime.loadNormal).toHaveBeenCalledExactlyOnceWith({
       pluginNames: ['reader', 'sync'],
     })
-    expect(window.$$safe$$).toBe(true)
     expect(current.emitted('update:isBooted')).toEqual([[true]])
     expect(dialog.info).not.toHaveBeenCalled()
   })

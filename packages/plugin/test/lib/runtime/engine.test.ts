@@ -45,7 +45,7 @@ describe('PluginRuntime', () => {
     }
     const runtime = new PluginRuntime({
       capabilities: phase => createDefaultCapabilities({ ...services, phase }),
-      environment: () => ({ platform: 'web', safe: true }),
+      environment: () => ({ platform: 'web' }),
       provider,
       remove: vi.fn(),
     })
@@ -92,7 +92,7 @@ describe('PluginRuntime', () => {
           i18n: { register: vi.fn(), remove: vi.fn() },
           phase,
         }),
-      environment: () => ({ platform: 'web', safe: true }),
+      environment: () => ({ platform: 'web' }),
       provider,
       remove: vi.fn(),
     })

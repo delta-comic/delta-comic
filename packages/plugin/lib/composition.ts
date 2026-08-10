@@ -88,10 +88,7 @@ export const pluginRuntime = new PluginRuntime({
       i18n: pluginI18n,
       phase,
     }),
-  environment: () => ({
-    platform: isTauri() ? 'tauri' : 'web',
-    safe: (globalThis as typeof globalThis & { $$safe$$?: boolean }).$$safe$$ ?? true,
-  }),
+  environment: () => ({ platform: isTauri() ? 'tauri' : 'web' }),
   provider: candidateProvider,
   remove: plugin => pluginInstaller.uninstall(plugin),
   store: pluginStore,
