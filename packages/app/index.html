@@ -159,6 +159,14 @@
       </div>
     </main>
     <iframe id="main-entry" title="Delta Comic" hidden></iframe>
+    <script>
+      window.process = { env: {} }
+
+      window.$api = {}
+      window.$layout = {}
+      window.$$lib$$ ??= {}
+    </script>
+    <script src="/runtime/host-libraries.umd.js"></script>
     <script type="module" src="./src/entries/splash.ts"></script>
   </body>
 </html>
