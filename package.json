@@ -76,6 +76,6 @@
       "url": "https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg"
     }
   ],
-  "packageManager": "pnpm@11.18.0",
+  "packageManager": "pnpm@12.0.0-rc.3",
   "readme": "./README.md"
 }

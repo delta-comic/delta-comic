@@ -3,7 +3,7 @@
 ## Toolchain
 
 - Use Vite+ (`vp`), not direct `pnpm`, `vite`, `vitest`, `oxlint`, or `oxfmt` commands. The
-  repository pins Node `25.9.0`, pnpm `11.18.0`, and Rust `1.94.0` (edition 2024).
+  repository pins Node `25.9.0`, pnpm `12.0.0-rc.3`, and Rust `1.94.0` (edition 2024).
 - Run `vp install` after pulling dependency changes. CI uses `vp install --frozen-lockfile`.
 - Vite+ is not Vite: workspace scripts run with `vp run`, for example
   `vp run --filter app dev:web`. Local Vite+ docs are in `node_modules/vite-plus/docs`.
