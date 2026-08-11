@@ -8,6 +8,7 @@ import {
 } from './adapters'
 import { corePluginDefinition, internalPluginDefinitions } from './builtins'
 import { createDefaultCapabilities, type PluginAuthGateway } from './capabilities'
+import { cfg } from './core/config'
 import {
   DatabasePluginArchiveRepository,
   DevScriptCodec,
@@ -64,6 +65,9 @@ const candidateProvider = new CompositePluginCandidateProvider([
 const httpSource = new HttpSourceResolver()
 const githubSource = new GitHubSourceResolver({
   coreVersion: corePluginDefinition.manifest.version.plugin,
+  includePrereleases: () =>
+    pluginConfigStore.has(cfg) &&
+    pluginConfigStore.load(cfg).data.value.receivePerReleaseUpdate === true,
 })
 const awesomeRegistry = new AwesomeRegistryClient()
 const marketplaceSource = new MarketplaceSourceResolver(awesomeRegistry, [githubSource, httpSource])
