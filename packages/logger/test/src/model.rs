@@ -43,7 +43,32 @@ fn preserves_content_line_breaks_for_console_output() {
     content: "first\r\nsecond".into(),
   };
   assert_eq!(
-    record.format_for_console(),
+    record.format_for_console(false),
     "[2026/07/22 09:08:07] (ui\\nworker) info > first\r\nsecond\n"
   );
+}
+
+#[test]
+fn colors_console_levels() {
+  let timestamp = Local.with_ymd_and_hms(2026, 7, 22, 9, 8, 7).unwrap();
+  let cases = [
+    (LogLevel::Trace, "\x1b[90mtrace"),
+    (LogLevel::Debug, "\x1b[36mdebug"),
+    (LogLevel::Info, "\x1b[32minfo"),
+    (LogLevel::Warn, "\x1b[33mwarn"),
+    (LogLevel::Error, "\x1b[31merror"),
+  ];
+
+  for (level, colored_level) in cases {
+    let record = LogRecord {
+      timestamp,
+      scope: "reader".into(),
+      level,
+      content: "message".into(),
+    };
+    assert_eq!(
+      record.format_for_console(true),
+      format!("[2026/07/22 09:08:07] (reader) {colored_level}\x1b[0m > message\n")
+    );
+  }
 }

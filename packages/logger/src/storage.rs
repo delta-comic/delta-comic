@@ -1,4 +1,5 @@
 use std::{
+  io::IsTerminal,
   path::{Path, PathBuf},
   sync::{
     Arc,
@@ -126,6 +127,7 @@ pub(crate) struct FileSink {
   directory: PathBuf,
   max_file_size: u64,
   active: Option<ActiveFile>,
+  console_color: bool,
 }
 
 impl FileSink {
@@ -135,6 +137,7 @@ impl FileSink {
       directory,
       max_file_size,
       active: None,
+      console_color: std::io::stdout().is_terminal(),
     })
   }
 
@@ -155,7 +158,7 @@ impl FileSink {
     active.writer.flush().await?;
     active.size = active.size.saturating_add(line_size);
 
-    let console_line = record.format_for_console();
+    let console_line = record.format_for_console(self.console_color);
     let mut console = tokio::io::stdout();
     let _ = console.write_all(console_line.as_bytes()).await;
     let _ = console.flush().await;
