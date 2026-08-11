@@ -83,6 +83,11 @@ export class CompositePluginCandidateProvider implements PluginCandidateProvider
       const id = candidate.manifest.name.id
       const previous = owners.get(id)
       if (previous) {
+        if (previous.origin === 'builtin' && candidate.origin === 'installed') continue
+        if (previous.origin === 'installed' && candidate.origin === 'builtin') {
+          owners.set(id, candidate)
+          continue
+        }
         throw new Error(
           `duplicate plugin candidate "${id}" from ${previous.origin} and ${candidate.origin}`,
         )
