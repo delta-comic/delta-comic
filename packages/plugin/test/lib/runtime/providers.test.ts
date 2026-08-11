@@ -83,4 +83,29 @@ describe('plugin candidate providers', () => {
       'duplicate plugin candidate',
     )
   })
+
+  it('prefers an internal plugin over a stale installed archive with the same id', async () => {
+    const factory = defineDeltaComicPlugin({ name: 'core' })
+    const internal = new InternalPluginCandidateProvider(
+      [defineInternalPlugin({ factory, manifest: manifest('core') })],
+      { enabled: async (_plugin, fallback) => fallback, setEnabled: vi.fn() },
+    )
+    const repository: PluginArchiveRepository = {
+      find: vi.fn(),
+      list: async () => [archive('core')],
+      remove: vi.fn(),
+      upsert: vi.fn(),
+    }
+    const installed = new InstalledPluginCandidateProvider(repository, {
+      read: async () => ({ factory: defineDeltaComicPlugin({ name: 'core' }) }),
+    })
+
+    const candidates = await new CompositePluginCandidateProvider([installed, internal]).list(
+      new AbortController().signal,
+    )
+
+    expect(candidates).toHaveLength(1)
+    expect(candidates[0].origin).toBe('builtin')
+    expect((await candidates[0].load(new AbortController().signal)).factory).toBe(factory)
+  })
 })
