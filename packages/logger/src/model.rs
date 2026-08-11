@@ -27,6 +27,16 @@ impl LogLevel {
   pub(crate) const fn meets_minimum_level(self) -> bool {
     matches!(self, Self::Info | Self::Warn | Self::Error)
   }
+
+  const fn ansi_color(self) -> &'static str {
+    match self {
+      Self::Trace => "\x1b[90m",
+      Self::Debug => "\x1b[36m",
+      Self::Info => "\x1b[32m",
+      Self::Warn => "\x1b[33m",
+      Self::Error => "\x1b[31m",
+    }
+  }
 }
 
 impl From<&tracing::Level> for LogLevel {
@@ -86,9 +96,18 @@ impl LogRecord {
     self.format_with(&scope, &content)
   }
 
-  pub(crate) fn format_for_console(&self) -> String {
+  pub(crate) fn format_for_console(&self, color: bool) -> String {
     let scope = sanitize_inline(&self.scope);
-    self.format_with(&scope, &self.content)
+    if !color {
+      return self.format_with(&scope, &self.content);
+    }
+    format!(
+      "[{}] ({scope}) {}{}\x1b[0m > {}\n",
+      self.timestamp.format("%Y/%m/%d %H:%M:%S"),
+      self.level.ansi_color(),
+      self.level.as_str(),
+      self.content
+    )
   }
 
   fn format_with(&self, scope: &str, content: &str) -> String {
