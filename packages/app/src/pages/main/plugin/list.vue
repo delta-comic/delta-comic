@@ -9,6 +9,7 @@ import {
   type PluginCandidate,
   usePluginStore,
 } from '@delta-comic/plugin'
+import { createDownloadMessage } from '@delta-comic/ui'
 import { memoize } from 'es-toolkit'
 import type { DropdownOption } from 'naive-ui'
 import semver from 'semver'
@@ -36,17 +37,30 @@ type ManagedPlugin = {
 }
 const updatePlugin = async (plugin: ManagedPlugin) => {
   if (updating.has(plugin.pluginName)) throw new Error(t('plugin.list.feedback.alreadyUpdating'))
-  updating.add(plugin.pluginName)
-  pluginListLogger.info('plugin update started', { plugin: plugin.pluginName })
-  try {
-    await updatePluginByName(plugin.pluginName)
-    pluginListLogger.info('plugin update completed', { plugin: plugin.pluginName })
-  } catch (error) {
-    pluginListLogger.error('plugin update failed', { plugin: plugin.pluginName }, error)
-    throw error
-  } finally {
-    updating.delete(plugin.pluginName)
-  }
+  return createDownloadMessage(
+    t('plugin.list.actions.updateFromSource'),
+    async ({ createLoading }) => {
+      updating.add(plugin.pluginName)
+      pluginListLogger.info('plugin update started', { plugin: plugin.pluginName })
+      try {
+        await createLoading(
+          t('plugin.list.feedback.updating', {
+            plugin: translatePluginText(plugin.meta.name.display ?? plugin.pluginName),
+          }),
+          async control => {
+            control.retryable = true
+            return updatePluginByName(plugin.pluginName)
+          },
+        )
+        pluginListLogger.info('plugin update completed', { plugin: plugin.pluginName })
+      } catch (error) {
+        pluginListLogger.error('plugin update failed', { plugin: plugin.pluginName }, error)
+        throw error
+      } finally {
+        updating.delete(plugin.pluginName)
+      }
+    },
+  )
 }
 
 const checkIsSupport = memoize((supportCore: string) => semver.satisfies(pkg.version, supportCore))
