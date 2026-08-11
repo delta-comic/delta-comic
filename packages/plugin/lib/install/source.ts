@@ -42,6 +42,7 @@ export class HttpSourceResolver implements PluginSourceResolver {
 
 export interface GitHubSourceResolverOptions {
   readonly coreVersion: string
+  readonly includePrereleases?: () => boolean
   readonly token?: string
 }
 
@@ -58,6 +59,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
     if (typeof input !== 'string') throw new TypeError('GitHub resolver requires a repository')
     const [owner, repo] = input.slice(3).split('/') as [string, string]
     const octokit = new Octokit({ auth: this.options.token })
+    const includePrereleases = this.options.includePrereleases?.() ?? false
     const pages = octokit.paginate.iterator(octokit.rest.repos.listReleases, {
       owner,
       per_page: 100,
@@ -66,7 +68,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
     })
     for await (const page of pages) {
       for (const release of page.data) {
-        if (release.draft || release.prerelease) continue
+        if (release.draft || (release.prerelease && !includePrereleases)) continue
         const manifestAsset = release.assets.find(asset => asset.name === 'manifest.json')
         const packageAsset = release.assets.find(asset => asset.name === 'plugin.zip')
         if (!manifestAsset || !packageAsset) continue
