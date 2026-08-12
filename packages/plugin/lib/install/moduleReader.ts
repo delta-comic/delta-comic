@@ -24,28 +24,29 @@ export class StoredPluginModuleReader implements PluginModuleReader {
       this.files.release(plugin)
       throw signal.reason
     }
-    let style: HTMLStyleElement | undefined
     try {
       const module = (await import(/* @vite-ignore */ url)) as { default?: unknown }
       signal.throwIfAborted()
-      if (manifest.entry?.cssPath && typeof document !== 'undefined') {
-        style = document.createElement('style')
-        style.dataset.plugin = plugin
-        style.textContent = new TextDecoder().decode(
-          await this.files.read(plugin, manifest.entry.cssPath),
-        )
-        signal.throwIfAborted()
-        document.head.append(style)
-      }
+      const styleText = manifest.entry?.cssPath
+        ? new TextDecoder().decode(await this.files.read(plugin, manifest.entry.cssPath))
+        : undefined
+      signal.throwIfAborted()
       return {
+        activate:
+          styleText === undefined
+            ? undefined
+            : scope => {
+                if (typeof document === 'undefined') return
+                const style = document.createElement('style')
+                style.dataset.plugin = plugin
+                style.textContent = styleText
+                document.head.append(style)
+                scope.defer(() => style.remove())
+              },
         factory: asFactory(module.default, plugin),
-        dispose: () => {
-          style?.remove()
-          this.files.release(plugin)
-        },
+        dispose: () => this.files.release(plugin),
       }
     } catch (error) {
-      style?.remove()
       this.files.release(plugin)
       throw error
     }

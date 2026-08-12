@@ -24,6 +24,10 @@ describe('plugin manifest v1', () => {
     ).toMatchObject({ apiVersion: 1, icon: 'https://example.test/icon.png' })
   })
 
+  it('ignores the removed legacy plugin kind field', () => {
+    expect(parsePluginManifest(manifest({ kind: 'preboot' }))).not.toHaveProperty('kind')
+  })
+
   it('rejects unsupported protocol versions and traversal paths', () => {
     expect(() => parsePluginManifest(manifest({ apiVersion: 0 }))).toThrow(PluginManifestError)
     expect(() => parsePluginManifest(manifest({ entry: { jsPath: '../outside.mjs' } }))).toThrow(

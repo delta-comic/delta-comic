@@ -1,4 +1,4 @@
-import { pluginRuntime, useConfig } from '@delta-comic/plugin'
+import { pluginRuntime, preparePluginHost, useConfig } from '@delta-comic/plugin'
 import {
   configureUiI18n,
   DcConfigProvider,
@@ -50,6 +50,7 @@ await initializePlatform().then(v => {
 
 const pinia = createPinia()
 setActivePinia(pinia)
+await preparePluginHost()
 
 const app = createApp(
   defineComponent(() => {
@@ -111,12 +112,12 @@ app.use(i18n)
 
 app.use(router)
 
-const preboot = await pluginRuntime.preparePreboot(app)
+const preload = await pluginRuntime.preload(app)
 appLogger
   .scoped('plugin')
-  .info('plugin preboot prepared', {
-    activated: preboot.activated,
-    failureCount: preboot.failures.length,
+  .info('plugins preloaded', {
+    activated: preload.activated,
+    failureCount: preload.failures.length,
   })
 
 const meta = document.createElement('meta')

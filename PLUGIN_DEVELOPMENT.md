@@ -135,7 +135,6 @@ export const manifest = {
   entry: {
     jsPath: 'index.mjs',
   },
-  kind: 'normal',
 } satisfies PluginManifest
 ```
 
@@ -221,7 +220,7 @@ vp build
 - `plugin.zip`：供客户端安装的完整插件包。
 - `manifest.json`：供 GitHub Release 和插件市场提前检查的独立 manifest。
 
-在 Delta Comic 的“插件 → 安装”页面选择 `plugin.zip`，随后启动普通插件即可验证最小示例。
+在 Delta Comic 的“插件 → 安装”页面选择 `plugin.zip`，重启应用后启动插件即可验证最小示例。
 
 ## 3. Manifest 完整参考
 
@@ -235,7 +234,6 @@ interface PluginManifest {
   icon?: string
   require: { id: string; download?: string }[]
   entry?: { jsPath: string; cssPath?: string }
-  kind?: 'normal' | 'preboot'
   integrity?: { algorithm: 'blake3' | 'sha256'; digest: string }
 }
 ```
@@ -252,7 +250,6 @@ interface PluginManifest {
 | `require` | 插件依赖；依赖会先激活，缺失、循环或激活失败会阻止当前插件 |
 | `entry.jsPath` | 包内 ESM 入口；省略时默认为 `index.mjs` |
 | `entry.cssPath` | 可选 CSS 文件；激活时注入，卸载时自动移除 |
-| `kind` | 省略时为 `normal`；绝大多数第三方插件都应使用 `normal` |
 | `integrity` | 安装器会根据实际包内容生成 SHA-256 完整性信息，普通作者无需手写 |
 
 路径必须是安全相对路径，不能是绝对路径、盘符路径，不能包含 `..` 或空字符。
@@ -515,7 +512,8 @@ export default defineDeltaComicPlugin(() => ({
 - 用户操作及操作页面；
 - 收藏上传和下载。
 
-只要声明 `user`，`auth` 和 `favourites` 就是必填项。鉴权只能在 normal 插件激活阶段使用，preboot 插件声明鉴权会被拒绝。
+只要声明 `user`，`auth` 和 `favourites` 就是必填项。鉴权在插件正常部分激活时执行，
+不会在预加载阶段触发。
 
 完整类型见 [`user.ts`](packages/plugin/lib/api/model/user.ts)。
 
@@ -640,12 +638,12 @@ await contribution?.value.refresh()
 
 | 钩子 | 调用时机 | 注意事项 |
 | --- | --- | --- |
-| `onPreboot({ app })` | preboot 插件在 Vue `mount` 前 | 可调用 `app.use()`；返回值会作为 cleanup 注册 |
-| `onBooted()` | normal 插件全部能力成功注册后 | 适合启动插件自己的监听、缓存或轻量任务 |
-| `onUnload()` | normal 插件重载、禁用或运行时释放时 | 必须幂等；清除事件、定时器、连接和临时状态 |
+| `onPreboot({ app })` | 已启用插件在 Vue `mount` 前 | 可调用 `app.use()`；返回值会作为 cleanup 注册 |
+| `onBooted()` | 插件正常部分的全部能力成功注册后 | 适合启动插件自己的监听、缓存或轻量任务 |
+| `onUnload()` | 插件正常部分重载、禁用或运行时释放时 | 必须幂等；清除事件、定时器、连接和临时状态 |
 | `onUninstall()` | 未激活插件的文件永久删除前 | 用于清除插件拥有的持久数据；也应保持幂等 |
 
-普通插件示例：
+只有正常部分的插件示例：
 
 ```ts
 export default defineDeltaComicPlugin(() => {
@@ -666,27 +664,45 @@ export default defineDeltaComicPlugin(() => {
 })
 ```
 
-preboot 插件示例：
+同时包含预加载部分和正常部分的插件示例：
 
 ```ts
-// manifest.kind 必须是 'preboot'
-export default defineDeltaComicPlugin(() => ({
-  name: manifest.name.id,
-  hooks: {
-    onPreboot({ app }) {
-      app.use(MyVuePlugin)
+export default defineDeltaComicPlugin(() => {
+  let timer: ReturnType<typeof setInterval> | undefined
 
-      const controller = new AbortController()
-      window.addEventListener('example', handleExample, { signal: controller.signal })
-      return () => controller.abort()
+  return {
+    name: manifest.name.id,
+    hooks: {
+      onPreboot({ app }) {
+        app.use(MyVuePlugin)
+
+        const controller = new AbortController()
+        window.addEventListener('example', handleExample, { signal: controller.signal })
+        return () => controller.abort()
+      },
+      onBooted() {
+        timer = setInterval(() => void refresh(), 60_000)
+      },
+      onUnload() {
+        if (timer) clearInterval(timer)
+        timer = undefined
+      },
     },
-  },
-}))
+  }
+})
 ```
 
-宿主自动回滚配置、i18n、贡献模型、内容注册项、资源注册项、CSS 和模块 URL。插件自行创建的副作用仍必须通过 cleanup 或 `onUnload` 清理。
+宿主启动时会加载所有已启用插件的模块、执行 Factory，并调用各插件的 `onPreboot`；用户
+选择启动插件时，宿主复用同一份配置并激活其正常部分。正常部分重载不会再次执行 Factory、
+`onPreboot` 或其 cleanup。应用已经挂载后新安装、启用或更新的插件必须重启后才能启动。
 
-当前版本有一项卸载限制：如果插件仍处于激活状态，运行时会执行 `onUnload` 后直接删除插件，不会再调用 `onUninstall`。需要清除持久数据时，不要把唯一的关键清理逻辑只放在 `onUninstall`；卸载前应先禁用插件并让 normal 插件完成重载。
+宿主自动回滚配置、i18n、贡献模型、内容注册项、资源注册项和插件 CSS。插件自行创建的
+正常部分副作用必须通过 `onUnload` 清理；预加载副作用必须通过 `onPreboot` 返回的 cleanup
+清理。
+
+当前版本有一项卸载限制：如果插件已经完成预加载，运行时会释放预加载和正常部分后直接删除
+插件，不会再调用 `onUninstall`。需要清除持久数据时，不要把唯一的关键清理逻辑只放在
+`onUninstall`。
 
 能力按固定顺序串行激活，所以 Factory 和声明式模型应保持无副作用。不要依赖未写入公共契约的内部执行细节。
 

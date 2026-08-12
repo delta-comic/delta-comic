@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { PluginFileReplacement, PluginFileStore } from '../../../lib/install'
 import { StoredPluginModuleReader } from '../../../lib/install'
+import { PluginScope } from '../../../lib/kernel'
 
 const manifest = {
   apiVersion: 1 as const,
@@ -47,5 +48,28 @@ describe('StoredPluginModuleReader', () => {
     expect(release).not.toHaveBeenCalled()
     await loaded.dispose?.()
     expect(release).toHaveBeenCalledWith('reader')
+  })
+
+  it('defers plugin CSS injection to normal module activation', async () => {
+    const { files } = fileStore('export default () => ({ name: "reader" })')
+    vi.mocked(files.read).mockResolvedValue(new TextEncoder().encode('.reader { color: red }'))
+    const style = { dataset: {}, remove: vi.fn(), textContent: '' }
+    const append = vi.fn()
+    vi.stubGlobal('document', { createElement: vi.fn(() => style), head: { append } })
+    const loaded = await new StoredPluginModuleReader(files).read(
+      'reader',
+      { ...manifest, entry: { cssPath: 'index.css', jsPath: 'index.mjs' } },
+      new AbortController().signal,
+    )
+
+    expect(append).not.toHaveBeenCalled()
+    const scope = new PluginScope('reader')
+    await loaded.activate?.(scope)
+    expect(append).toHaveBeenCalledExactlyOnceWith(style)
+    expect(style.textContent).toBe('.reader { color: red }')
+
+    await scope.dispose()
+    expect(style.remove).toHaveBeenCalledOnce()
+    vi.unstubAllGlobals()
   })
 })

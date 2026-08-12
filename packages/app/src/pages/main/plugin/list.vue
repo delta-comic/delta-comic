@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { logger } from '@delta-comic/logger'
 import {
+  pluginRuntime,
   setPluginEnabled,
-  setPluginKind,
   translatePluginText,
   uninstallPlugin,
   updatePluginByName,
@@ -87,19 +87,7 @@ const actionsFor = (plugin: ManagedPlugin): DropdownOption[] => {
       ]
     : []
   if (!plugin.management.canUninstall) return actions
-  const installedActions: DropdownOption[] = [
-    {
-      key: 'kind-normal',
-      label: t('plugin.list.actions.setNormal'),
-      disabled: (plugin.meta.kind ?? 'normal') === 'normal',
-    },
-    {
-      key: 'kind-preboot',
-      label: t('plugin.list.actions.setPreboot'),
-      disabled: plugin.meta.kind === 'preboot',
-    },
-    { key: 'remove', label: t('common.actions.delete') },
-  ]
+  const installedActions: DropdownOption[] = [{ key: 'remove', label: t('common.actions.delete') }]
   if (plugin.management.canUpdate) {
     installedActions.splice(installedActions.length - 1, 0, {
       key: 'update',
@@ -115,12 +103,6 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
   switch (key) {
     case 'toggle':
       await setPluginEnabled(plugin.pluginName, !plugin.enable)
-      break
-    case 'kind-normal':
-      await setPluginKind(plugin.pluginName, 'normal')
-      break
-    case 'kind-preboot':
-      await setPluginKind(plugin.pluginName, 'preboot')
       break
     case 'update':
       await updatePlugin(plugin)
@@ -199,8 +181,11 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
         <div class="w-full text-xs text-(--nui-text-color-disabled)">
           {{ t('plugin.list.supportCore', { version: plugin.meta.version.supportCore }) }}
         </div>
-        <div v-if="plugin.meta.kind === 'preboot'" class="mb-1 text-xs text-(--nui-warning-color)">
-          {{ t('plugin.list.prebootRestartNotice') }}
+        <div
+          v-if="pluginRuntime.restartRequired.has(plugin.pluginName)"
+          class="mb-1 text-xs text-(--nui-warning-color)"
+        >
+          {{ t('plugin.list.restartRequired') }}
         </div>
         <div
           class="mt-1 flex w-full items-center gap-1 text-sm! font-bold"

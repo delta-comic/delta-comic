@@ -160,9 +160,9 @@ vi.mock('../../src/components/plugin/index.vue', () => ({
         ]),
   }),
 }))
-vi.mock('../../src/components/plugin/PrebootRecoveryAlert.vue', () => ({
+vi.mock('../../src/components/plugin/PluginPreloadRecoveryAlert.vue', () => ({
   default: window.$$lib$$.Vue.defineComponent({
-    name: 'PrebootRecoveryAlert',
+    name: 'PluginPreloadRecoveryAlert',
     emits: ['dismiss', 'manage'],
     setup:
       (_props: Record<string, never>, { emit }: SetupContext) =>
@@ -301,7 +301,7 @@ describe('AppSetup startup shell', () => {
     revealMainEntry.mockReset().mockResolvedValue(undefined)
   })
 
-  it('activates preboot and delegates recovery actions', async () => {
+  it('reveals the startup shell and delegates plugin preload recovery actions', async () => {
     const wrapper = mount(AppSetup, {
       global: {
         stubs: {
@@ -317,8 +317,8 @@ describe('AppSetup startup shell', () => {
     expect(artwork.attributes('aria-hidden')).toBe('true')
     await flushPromises()
     await nextTick()
-    const recoveryListeners = wrapper.getComponent({ name: 'PrebootRecoveryAlert' }).vm.$.vnode
-      .props as Record<string, (...args: unknown[]) => void>
+    const recoveryListeners = wrapper.getComponent({ name: 'PluginPreloadRecoveryAlert' }).vm.$
+      .vnode.props as Record<string, (...args: unknown[]) => void>
     expect(recoveryListeners.onManage).toBeTypeOf('function')
     recoveryListeners.onManage()
     recoveryListeners.onDismiss()

@@ -95,7 +95,7 @@ declare module 'vue' {
     PluginMarketplaceDetails: typeof import('./src/components/plugin/marketplace/PluginMarketplaceDetails.vue')['default']
     PluginMarketplaceFilters: typeof import('./src/components/plugin/marketplace/PluginMarketplaceFilters.vue')['default']
     PluginMarketplaceList: typeof import('./src/components/plugin/marketplace/PluginMarketplaceList.vue')['default']
-    PrebootRecoveryAlert: typeof import('./src/components/plugin/PrebootRecoveryAlert.vue')['default']
+    PluginPreloadRecoveryAlert: typeof import('./src/components/plugin/PluginPreloadRecoveryAlert.vue')['default']
     RecentCard: typeof import('./src/components/user/recentCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

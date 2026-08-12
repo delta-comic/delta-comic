@@ -98,39 +98,6 @@ export const useToggleEnable = defineMutation(() => {
   return { ...mutation, toggle: mutateAsync, key }
 })
 
-export const useSetKind = defineMutation(() => {
-  const queryCache = useQueryCache()
-  const key = [CommonQueryKey.common, QueryKey.item]
-  const { mutateAsync, ...mutation } = useMutation({
-    mutation: async ({
-      pluginName,
-      kind,
-    }: {
-      pluginName: string
-      kind: NonNullable<Meta['kind']>
-    }) =>
-      withTransition(async trx => {
-        const plugin = await trx
-          .selectFrom('plugin')
-          .select(['loaderName', 'meta'])
-          .where('pluginName', '=', pluginName)
-          .executeTakeFirstOrThrow()
-        if (plugin.loaderName === 'builtin')
-          throw new Error('built-in plugin kind cannot be changed')
-        await trx
-          .updateTable('plugin')
-          .set({ meta: JSON.stringify({ ...plugin.meta, kind }) })
-          .where('pluginName', '=', pluginName)
-          .execute()
-      }),
-    onSettled: () => {
-      void queryCache.invalidateQueries({ key })
-    },
-    key,
-  })
-  return { ...mutation, setKind: mutateAsync, key }
-})
-
 export const useQuery = <T>(
   query: (db: SelectQueryBuilder<DB, 'plugin', {}>) => Promise<T>,
   otherKeys: any[] = [],

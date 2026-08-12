@@ -10,7 +10,6 @@ export const corePluginDefinition = defineInternalPlugin({
     apiVersion: DELTA_COMIC_PLUGIN_API_VERSION,
     author: 'Delta Comic',
     description: 'Delta Comic host capabilities',
-    kind: 'preboot',
     name: { display: 'core', id: 'core' },
     require: [],
     version: { plugin: pkg.version, supportCore: '*' },

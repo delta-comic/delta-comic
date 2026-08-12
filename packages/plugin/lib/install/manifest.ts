@@ -106,12 +106,6 @@ export const parsePluginManifest = (value: unknown): PluginManifest => {
         : { cssPath: safePluginPath(entry.cssPath, 'manifest.entry.cssPath') }),
     }
   }
-  if (manifest.kind !== undefined) {
-    if (manifest.kind !== 'normal' && manifest.kind !== 'preboot') {
-      throw new PluginManifestError('manifest.kind must be "normal" or "preboot"')
-    }
-    result.kind = manifest.kind
-  }
   if (manifest.integrity !== undefined) {
     const integrity = record(manifest.integrity, 'manifest.integrity')
     if (integrity.algorithm !== 'blake3' && integrity.algorithm !== 'sha256') {

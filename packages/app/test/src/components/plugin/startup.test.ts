@@ -126,12 +126,12 @@ describe('plugin startup drawer', () => {
     return wrapper
   }
 
-  it('blocks startup until preboot activation is ready', async () => {
+  it('blocks startup until plugin preload is ready', async () => {
     const current = mountStartup(false)
 
     await current.findAll('.startup-actions button')[0].trigger('click')
 
-    expect(message.warning).toHaveBeenCalledExactlyOnceWith('plugin.startup.prebootLoading')
+    expect(message.warning).toHaveBeenCalledExactlyOnceWith('plugin.startup.preloadLoading')
     expect(pluginRuntime.loadNormal).not.toHaveBeenCalled()
   })
 

@@ -38,5 +38,5 @@ export const createDefaultCapabilities = (
   createRemoteCapability(services),
   createAuthCapability(services),
   createSpecialCapability(),
-  createLifecycleCapability(services),
+  createLifecycleCapability(),
 ]

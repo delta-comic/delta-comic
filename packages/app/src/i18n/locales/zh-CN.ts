@@ -261,15 +261,13 @@ const zhCN = {
         disable: '禁用',
         enable: '启用',
         menu: '插件操作',
-        setNormal: '设为普通插件',
-        setPreboot: '设为预启动插件',
         updateFromSource: '从下载源更新',
       },
       empty: { action: '前往市场', description: '暂未安装插件' },
       feedback: { alreadyUpdating: '插件已在更新', updating: '正在更新：{plugin}' },
       incompatible: '插件不支持当前核心版本',
-      kind: { builtInPrefix: '内置', normal: '普通', preboot: '预启动' },
-      prebootRestartNotice: '预启动类型和启用状态将在下次重启时应用',
+      kind: { builtInPrefix: '内置' },
+      restartRequired: '插件变更将在下次重启后生效',
       status: { disabled: '未启用', enabled: '已启用' },
       supportCore: '支持的核心版本：{version}',
     },
@@ -354,9 +352,9 @@ const zhCN = {
     recovery: {
       affected: '受影响插件：{plugins}',
       manage: '调整插件',
-      title: '预启动插件已自动停用',
+      title: '部分插件预加载失败',
     },
-    reload: { action: '重新加载所有', success: '普通插件已重新加载' },
+    reload: { action: '重新加载所有', success: '插件正常部分已重新加载' },
     runtime: {
       errors: {
         blockedDependencies: '依赖插件加载失败：{plugins}',
@@ -405,7 +403,7 @@ const zhCN = {
       actions: { chooseMode: '选择启动方式', start: '启动' },
       errors: { partialFailure: '部分插件加载失败，请检查详情' },
       loading: '正在启动中',
-      prebootLoading: '预启动插件仍在加载',
+      preloadLoading: '插件预加载尚未完成',
       remember: {
         content: '是否记住本次插件选择，并在下次启动时自动加载？',
         negative: '暂不',

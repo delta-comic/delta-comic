@@ -26,7 +26,6 @@ describe('default plugin capabilities', () => {
         register: (plugin, value) => void messages.set(plugin, value),
         remove: plugin => void messages.delete(plugin),
       },
-      phase: 'normal',
     }
     const scope = new PluginScope('example')
     const onBooted = vi.fn()
@@ -67,7 +66,6 @@ describe('default plugin capabilities', () => {
       config: { register: vi.fn(), unregister: vi.fn() },
       contributions: new ContributionHub(),
       i18n: { register: vi.fn(), remove: vi.fn() },
-      phase: 'normal',
     }
     const scope = new PluginScope('example')
 

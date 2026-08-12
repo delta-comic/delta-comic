@@ -321,25 +321,4 @@ describe('plugin archive mutations', () => {
       { set: { enable: false }, table: 'plugin', where: [['pluginName', '=', 'fixture']] },
     ])
   })
-
-  it('changes normal plugin kind while protecting built-in archives', async () => {
-    const builtinTrx = createTrx()
-    builtinTrx.selected.set('plugin', { loaderName: 'builtin', meta: pluginArchive.meta })
-    mocks.defaultTrx = builtinTrx
-    await expect(
-      PluginDB.useSetKind().setKind({ kind: 'preboot', pluginName: 'fixture' }),
-    ).rejects.toThrow('built-in plugin kind cannot be changed')
-
-    const trx = createTrx()
-    trx.selected.set('plugin', { loaderName: 'zip', meta: pluginArchive.meta })
-    mocks.defaultTrx = trx
-    await PluginDB.useSetKind().setKind({ kind: 'preboot', pluginName: 'fixture' })
-
-    expect(trx.calls.updates[0]).toEqual({
-      set: { meta: JSON.stringify({ ...pluginArchive.meta, kind: 'preboot' }) },
-      table: 'plugin',
-      where: [['pluginName', '=', 'fixture']],
-    })
-    expect((PluginDB.useQuery(vi.fn() as never, ['enabled']) as any).key()).toContain('enabled')
-  })
 })

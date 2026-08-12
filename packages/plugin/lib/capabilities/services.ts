@@ -1,5 +1,3 @@
-import type { App } from 'vue'
-
 import type { ConfigPointer, PluginLocaleMessages, User } from '../api'
 import type { ContributionHub } from '../kernel'
 
@@ -23,9 +21,7 @@ export interface PluginAuthGateway {
 
 export interface PluginCapabilityServices {
   readonly auth?: PluginAuthGateway
-  readonly app?: App
   readonly config: PluginConfigRegistry
   readonly contributions: ContributionHub
   readonly i18n: PluginMessageRegistry
-  readonly phase: 'normal' | 'preboot'
 }

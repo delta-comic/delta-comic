@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { PrebootRecovery } from '@delta-comic/plugin'
+import type { PluginPreloadRecovery } from '@delta-comic/plugin'
 import { useI18n } from 'vue-i18n'
 
-defineProps<{ recovery: PrebootRecovery }>()
+defineProps<{ recovery: PluginPreloadRecovery }>()
 defineEmits<{ dismiss: []; manage: [] }>()
 const { t } = useI18n()
 </script>
 
 <template>
   <NAlert
-    class="preboot-alert fixed top-[max(16px,var(--safe-area-inset-top))] left-1/2 z-2000 w-[min(560px,calc(100vw-32px))] -translate-x-1/2 shadow-(--nui-box-shadow-3)"
+    class="plugin-preload-alert fixed top-[max(16px,var(--safe-area-inset-top))] left-1/2 z-2000 w-[min(560px,calc(100vw-32px))] -translate-x-1/2 shadow-(--nui-box-shadow-3)"
     :title="t('plugin.recovery.title')"
     type="error"
     closable
