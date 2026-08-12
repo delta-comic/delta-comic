@@ -604,6 +604,9 @@ importers:
       '@tauri-apps/api':
         specifier: 'catalog:'
         version: 2.11.1
+      dayjs:
+        specifier: 'catalog:'
+        version: 2.0.0-alpha.4
     devDependencies:
       typescript:
         specifier: npm:typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2

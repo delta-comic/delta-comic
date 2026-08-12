@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 import { TauriLoggerClient } from './client'
 import { serializeLogArguments } from './serializer'
 import {
@@ -45,13 +47,9 @@ const joinScope = (parent: string, child: string) => {
   return normalizedChild ? `${parent}:${normalizedChild}` : parent
 }
 
-const pad = (value: number) => String(value).padStart(2, '0')
-
 export const formatLogEntry = (entry: LogEntry): string => {
-  const date = new Date(entry.timestamp)
-  const timestamp = Number.isNaN(date.getTime())
-    ? entry.timestamp
-    : `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+  const date = dayjs(entry.timestamp)
+  const timestamp = date.isValid() ? date.format('YYYY/MM/DD HH:mm:ss') : entry.timestamp
   return `[${timestamp}] (${entry.scope}) ${entry.level} > ${entry.content}`
 }
 
