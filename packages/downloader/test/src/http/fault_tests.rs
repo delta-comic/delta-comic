@@ -359,6 +359,7 @@ async fn run_fixture(mode: FaultMode, size: usize, expected_size: Option<u64>) -
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await
@@ -383,6 +384,7 @@ async fn run_error(mode: FaultMode, size: usize, expected_size: Option<u64>) -> 
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await
@@ -456,6 +458,7 @@ async fn assert_stale_resume_restarts(
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await
@@ -527,6 +530,7 @@ async fn strong_validator_does_not_trust_locally_modified_completed_ranges() {
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await
@@ -595,6 +599,7 @@ async fn writes_to_a_preopened_seekable_target_without_trusting_stale_local_rang
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await
@@ -758,6 +763,7 @@ async fn refuses_a_symlinked_partial_file_without_touching_its_target() {
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await
@@ -802,6 +808,7 @@ async fn rejects_a_body_that_exceeds_content_range() {
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await
@@ -874,6 +881,7 @@ async fn resume_requests_only_missing_ranges() {
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await
@@ -920,6 +928,7 @@ async fn cancellation_checkpoints_and_resume_only_requests_missing_ranges() {
         cancellation: download_cancellation,
         secret_resolver: None,
         maximum_bytes: None,
+        progress: None,
       },
     )
     .await
@@ -964,6 +973,7 @@ async fn cancellation_checkpoints_and_resume_only_requests_missing_ranges() {
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await
@@ -1031,6 +1041,7 @@ async fn resumes_without_validators_only_after_sample_verification() {
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await
@@ -1081,6 +1092,7 @@ async fn falls_back_to_the_next_mirror_by_priority() {
       cancellation: CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
+      progress: None,
     },
   )
   .await

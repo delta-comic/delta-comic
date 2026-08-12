@@ -3,7 +3,7 @@ use std::{
   fs::{File, OpenOptions},
   path::{Component, Path, PathBuf},
   sync::{
-    Arc,
+    Arc, Mutex as StdMutex,
     atomic::{AtomicU64, Ordering},
   },
   time::{Duration, Instant, SystemTime},
@@ -35,6 +35,39 @@ const REBALANCE_COOLDOWN: Duration = Duration::from_secs(1);
 const CHECKPOINT_BYTES: u64 = 1024 * 1024;
 const INTEGRITY_SAMPLE_BYTES: u64 = 64 * 1024;
 const MAX_INTEGRITY_SAMPLES: usize = 16;
+const PROGRESS_EVENT_INTERVAL: Duration = Duration::from_millis(250);
+
+pub(crate) type ProgressSink = Arc<dyn Fn(DownloadTask) + Send + Sync>;
+
+#[derive(Clone)]
+struct ProgressReporter {
+  sink: Option<ProgressSink>,
+  last_report: Arc<StdMutex<Option<Instant>>>,
+}
+
+impl ProgressReporter {
+  fn new(sink: Option<ProgressSink>) -> Self {
+    Self {
+      sink,
+      last_report: Arc::new(StdMutex::new(None)),
+    }
+  }
+
+  fn report(&self, task: DownloadTask, force: bool) {
+    let Some(sink) = &self.sink else { return };
+    let now = Instant::now();
+    let mut last_report = self
+      .last_report
+      .lock()
+      .unwrap_or_else(std::sync::PoisonError::into_inner);
+    if !force && last_report.is_some_and(|last| now.duration_since(last) < PROGRESS_EVENT_INTERVAL)
+    {
+      return;
+    }
+    *last_report = Some(now);
+    sink(task);
+  }
+}
 
 #[derive(Debug, Clone)]
 pub struct ProbeResult {
@@ -231,6 +264,7 @@ struct SegmentBase {
   task_id: String,
   ledger: Arc<Mutex<RangeLedger>>,
   checkpoint: Arc<Mutex<CheckpointState>>,
+  reporter: ProgressReporter,
   total: u64,
   validator: Option<String>,
   started: Instant,
@@ -259,6 +293,7 @@ pub(crate) struct DownloadRequest<'a> {
   pub cancellation: CancellationToken,
   pub secret_resolver: Option<&'a dyn crate::SecretResolver>,
   pub maximum_bytes: Option<u64>,
+  pub progress: Option<ProgressSink>,
 }
 
 pub(crate) async fn download(
@@ -314,6 +349,7 @@ async fn download_from_mirror(
   task: &DownloadTask,
   request: &DownloadRequest<'_>,
 ) -> Result<DownloadReport> {
+  let reporter = ProgressReporter::new(request.progress.clone());
   let url = url::Url::parse(&mirror.url)?;
   if !matches!(url.scheme(), "http" | "https") {
     return Err(Error::InvalidInput(
@@ -385,7 +421,7 @@ async fn download_from_mirror(
       completed.clear();
     }
   }
-  request
+  let probing = request
     .repository
     .update_probe(
       &task.id,
@@ -394,6 +430,7 @@ async fn download_from_mirror(
       probe.last_modified.as_deref(),
     )
     .await?;
+  reporter.report(probing, true);
   if let Some(total_bytes) = probe.total_bytes {
     file.set_len(total_bytes)?;
   }
@@ -415,6 +452,7 @@ async fn download_from_mirror(
       &file,
       probe.total_bytes,
       request,
+      &reporter,
     )
     .await?;
     return Ok(report);
@@ -457,6 +495,7 @@ async fn download_from_mirror(
         task_id: task.id.clone(),
         ledger: ledger.clone(),
         checkpoint: checkpoint.clone(),
+        reporter: reporter.clone(),
         total: total_bytes,
         validator: strong_etag(probe.etag.as_deref())
           .map(str::to_owned)
@@ -478,6 +517,7 @@ async fn download_from_mirror(
         &file,
         Some(total_bytes),
         request,
+        &reporter,
       )
       .await?;
       return Ok(DownloadReport {
@@ -504,10 +544,11 @@ async fn download_from_mirror(
     .replace_completed_ranges(&task.id, &completed)
     .await?;
   persist_integrity_samples(request.repository, &task.id, &file, &completed).await?;
-  request
+  let completed = request
     .repository
     .update_progress(&task.id, total_bytes, 0)
     .await?;
+  reporter.report(completed, true);
   file.sync_all()?;
   Ok(DownloadReport {
     total_bytes,
@@ -575,6 +616,7 @@ async fn run_segment_round(
         task_id: base.task_id.clone(),
         ledger: base.ledger.clone(),
         checkpoint: base.checkpoint.clone(),
+        reporter: base.reporter.clone(),
         total: base.total,
         validator: base.validator.clone(),
         cancellation: worker_token.clone(),
@@ -676,7 +718,7 @@ async fn checkpoint_segment_round(base: &SegmentBase) -> Result<()> {
     .await?;
   persist_integrity_samples(&base.repository, &base.task_id, &base.file, &completed).await?;
   let elapsed = base.started.elapsed().as_secs_f64().max(0.001);
-  base
+  let task = base
     .repository
     .update_progress(
       &base.task_id,
@@ -684,6 +726,7 @@ async fn checkpoint_segment_round(base: &SegmentBase) -> Result<()> {
       (downloaded as f64 / elapsed) as u64,
     )
     .await?;
+  base.reporter.report(task, false);
   Ok(())
 }
 
@@ -696,6 +739,7 @@ struct SegmentContext {
   task_id: String,
   ledger: Arc<Mutex<RangeLedger>>,
   checkpoint: Arc<Mutex<CheckpointState>>,
+  reporter: ProgressReporter,
   total: u64,
   validator: Option<String>,
   cancellation: CancellationToken,
@@ -815,7 +859,7 @@ async fn download_segment(
       )
       .await?;
       let elapsed = context.started.elapsed().as_secs_f64().max(0.001);
-      context
+      let task = context
         .repository
         .update_progress(
           &context.task_id,
@@ -823,6 +867,7 @@ async fn download_segment(
           (downloaded as f64 / elapsed) as u64,
         )
         .await?;
+      context.reporter.report(task, false);
     }
     offset = offset.saturating_add(bytes.len() as u64);
     if offset >= content_range.end || offset >= context.total {
@@ -844,6 +889,7 @@ async fn sequential_download(
   file: &Arc<File>,
   expected_total: Option<u64>,
   request: &DownloadRequest<'_>,
+  reporter: &ProgressReporter,
 ) -> Result<DownloadReport> {
   let response = client.get(url).headers(headers.clone()).send().await?;
   if let Some(error) = retryable_response_error(&response) {
@@ -909,10 +955,11 @@ async fn sequential_download(
       )
       .await?;
       let speed = (offset as f64 / started.elapsed().as_secs_f64().max(0.001)) as u64;
-      request
+      let task = request
         .repository
         .update_progress(&request.task.id, offset, speed)
         .await?;
+      reporter.report(task, false);
       checkpoint_bytes = offset;
       checkpoint_at = Instant::now();
     }
@@ -941,7 +988,7 @@ async fn sequential_download(
     }],
   )
   .await?;
-  request
+  let task = request
     .repository
     .update_transfer_progress(
       &request.task.id,
@@ -951,6 +998,7 @@ async fn sequential_download(
       0,
     )
     .await?;
+  reporter.report(task, true);
   file.sync_all()?;
   Ok(DownloadReport {
     total_bytes: offset,
