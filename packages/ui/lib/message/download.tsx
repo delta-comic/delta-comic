@@ -45,7 +45,8 @@ export const createDownloadMessage = async <T,>(
   title: string,
   bind: (method: DownloadMessageBind) => Promise<T>,
 ): Promise<T> => {
-  const index = allDownloadMessagesIsMinsize.length
+  const availableIndex = allDownloadMessagesIsMinsize.findIndex(isUndefined)
+  const index = availableIndex === -1 ? allDownloadMessagesIsMinsize.length : availableIndex
   allDownloadMessagesIsMinsize[index] = false
   const isAllDone = ref(false)
   const messageList = reactive(
@@ -235,6 +236,10 @@ export const createDownloadMessage = async <T,>(
     const watcher = watch(
       [_config, state],
       ([, state]) => {
+        const progress =
+          'progress' in _config && isNumber(_config.progress)
+            ? Math.min(100, Math.max(0, _config.progress))
+            : undefined
         messageList[index] = {
           title,
           state,
@@ -242,6 +247,7 @@ export const createDownloadMessage = async <T,>(
           pc,
           retry: _config.retryable ? call : undefined,
           ..._config,
+          ...(isNumber(progress) ? { progress } : {}),
         }
       },
       { immediate: true },
@@ -285,39 +291,39 @@ export const createDownloadMessage = async <T,>(
   const createLoading: DownloadMessageBind['createLoading'] = (title, fn) => {
     return createLine(title, {}, fn)
   }
-  const bindInstance = bind({ createProgress, createLoading })
+  const bindInstance = Promise.resolve().then(() => bind({ createProgress, createLoading }))
   const controller = Promise.withResolvers<T>()
-  void bindInstance.then(async result => {
-    minsize.value = false // 最小化就展开提醒
-    isAllDone.value = true // 展示完成标
-    const maybeError = messageList.find(v => v.state == 'error')
-    if (maybeError) throw maybeError.error
-    controller.resolve(result)
-
+  const destroyWhenMinimized = async () => {
     void delay(3000).then(() => {
       minsize.value = true
-    }) // 到时间自动关
+    })
     await nextTick()
     await until(minsize).toBeTruthy()
 
     minsizeWatcher.stop()
     message.destroy()
     allDownloadMessagesIsMinsize[index] = undefined
-  })
-  bindInstance.catch(async err => {
-    controller.reject(err)
-    minsize.value = false // 最小化就展开提醒
-
-    void delay(3000).then(() => {
-      minsize.value = true
-    }) // 到时间自动关
-    await nextTick()
-    await until(minsize).toBeTruthy()
-
-    minsizeWatcher.stop()
-    message.destroy()
-    allDownloadMessagesIsMinsize[index] = undefined
-  })
+    while (
+      allDownloadMessagesIsMinsize.length > 0 &&
+      isUndefined(allDownloadMessagesIsMinsize.at(-1))
+    ) {
+      allDownloadMessagesIsMinsize.pop()
+    }
+  }
+  void (async () => {
+    try {
+      const result = await bindInstance
+      const maybeError = messageList.find(v => v.state == 'error')
+      if (maybeError) throw maybeError.error
+      isAllDone.value = true
+      controller.resolve(result)
+    } catch (error) {
+      controller.reject(error)
+    } finally {
+      minsize.value = false
+      void destroyWhenMinimized()
+    }
+  })()
 
   return controller.promise
 }

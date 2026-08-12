@@ -129,4 +129,44 @@ describe('createDownloadMessage', () => {
     expect(attempt).toBe(2)
     expect(wrapper.text()).toContain('Recovered')
   })
+
+  it('rejects when aggregate code consumes a failed line', async () => {
+    const task = createDownloadMessage('Download', async bind => {
+      await bind
+        .createLoading('Metadata', async () => {
+          throw new Error('metadata unavailable')
+        })
+        .catch(() => undefined)
+      return 'ignored failure'
+    })
+
+    await expect(task).rejects.toThrow('metadata unavailable')
+    const wrapper = mountRenderedMessage()
+    expect(wrapper.text()).toContain('metadata unavailable')
+
+    await vi.advanceTimersByTimeAsync(3_000)
+    await nextTick()
+    expect(destroy).toHaveBeenCalledOnce()
+  })
+
+  it('clamps progress values to the supported percentage range', async () => {
+    let release: (() => void) | undefined
+    const pending = new Promise<void>(resolve => {
+      release = resolve
+    })
+    const task = createDownloadMessage('Download', bind =>
+      bind.createProgress('Pages', async state => {
+        state.progress = 150
+        await pending
+      }),
+    )
+    await vi.waitFor(() => expect(renderMessage).toBeTypeOf('function'))
+    const wrapper = mountRenderedMessage()
+    await vi.waitFor(() =>
+      expect(wrapper.findComponent({ name: 'Progress' }).attributes('percentage')).toBe('100'),
+    )
+
+    release?.()
+    await task
+  })
 })
