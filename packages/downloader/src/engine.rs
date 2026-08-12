@@ -1071,6 +1071,10 @@ impl Engine {
               cancellation: token.clone(),
               secret_resolver: self.secret_resolver.as_deref(),
               maximum_bytes: None,
+              progress: Some({
+                let engine = self.clone();
+                Arc::new(move |task| engine.emit_task(task))
+              }),
             },
           )
           .await

@@ -116,6 +116,7 @@ async fn download_in_workspace(
         cancellation: cancellation.clone(),
         secret_resolver: secret_resolver.map(Arc::as_ref),
         maximum_bytes: Some(maximum_bytes),
+        progress: None,
       },
     );
     let result = tokio::select! {
