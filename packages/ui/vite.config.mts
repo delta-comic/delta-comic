@@ -84,5 +84,20 @@ export default defineConfig(({ command }) => ({
     sourcemap: true,
     deps: { neverBundle: ['unplugin-vue-components'] },
   },
+  run: {
+    tasks: {
+      build: {
+        command: ['vp build', 'vp pack'],
+        dependsOn: [{ task: 'build', from: ['dependencies', 'peerDependencies'] }],
+        output: ['dist/**', 'dist-vite/**'],
+      },
+      dev: { command: 'vp dev', cache: false },
+      typecheck: {
+        command: ['vue-tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
+        dependsOn: [{ task: 'build', from: ['dependencies', 'peerDependencies'] }],
+        output: [],
+      },
+    },
+  },
   test: { environment: 'happy-dom', include: ['test/**/*.test.ts'] },
 })) as UserConfig

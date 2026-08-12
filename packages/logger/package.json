@@ -30,11 +30,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "scripts": {
-    "build": "vp pack",
-    "test": "vp test run test/lib",
-    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
-  },
   "dependencies": {
     "@tauri-apps/api": "catalog:",
     "dayjs": "catalog:"

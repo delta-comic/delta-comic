@@ -104,7 +104,10 @@ export function createReleasePlugin({
       if (!env.GITHUB_TOKEN) {
         throw new Error('GITHUB_TOKEN is required to publish workspace packages')
       }
-      await resolvePublishablePackages()
+      const packages = await resolvePublishablePackages()
+      for (const pkg of packages) {
+        await publishCommand('vp', ['run', '--filter', pkg.name, '--fail-if-no-match', 'build'])
+      }
     },
 
     async verifyRelease(_pluginConfig: unknown, { env, nextRelease }: ReleaseContext) {

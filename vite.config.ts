@@ -20,7 +20,41 @@ export default defineConfig({
     ...lintConfig,
     settings: { ...lintConfig.settings, tailwindcss: { cssConfigPath: uiTailwindConfigPath } },
   },
-  run: { cache: { tasks: true, scripts: false } },
+  run: {
+    cache: { tasks: true, scripts: false },
+    tasks: {
+      'branch:develop': { command: 'node ./script/release-branches.mts develop', cache: false },
+      'branch:develop:dry-run': {
+        command: 'node ./script/release-branches.mts develop --dry-run',
+        cache: false,
+      },
+      'check': { command: 'vp check', output: [] },
+      'dev': { command: 'vp run app#dev', cache: false },
+      'dev:web': { command: 'vp run app#dev:web', cache: false },
+      'lib-build': { command: 'node -e ""', dependsOn: ['app#build'], output: [] },
+      'release': { command: 'node ./script/release.mts', cache: false },
+      'release:dry-run': { command: 'node ./script/release.mts --dry-run', cache: false },
+      'release:preview': { command: 'node ./script/release-branches.mts preview', cache: false },
+      'release:preview:dry-run': {
+        command: 'node ./script/release-branches.mts preview --dry-run',
+        cache: false,
+      },
+      'release:stable': { command: 'node ./script/release-branches.mts stable', cache: false },
+      'release:stable:dry-run': {
+        command: 'node ./script/release-branches.mts stable --dry-run',
+        cache: false,
+      },
+      'set-ver': { command: 'node ./script/set-version.mts', cache: false },
+      'test': { command: 'vp test', cache: false, dependsOn: ['lib-build'] },
+      'test:coverage': {
+        command: 'vp test run --coverage',
+        dependsOn: ['lib-build'],
+        output: ['coverage/**'],
+      },
+      'typecheck': { command: 'vp run -r typecheck', dependsOn: ['lib-build'], output: [] },
+      'vp:install': { command: 'vp install', cache: false },
+    },
+  },
   test: {
     clearMocks: true,
     restoreMocks: true,

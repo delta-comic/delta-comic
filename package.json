@@ -19,24 +19,6 @@
     "url": "https://github.com/delta-comic/delta-comic.git"
   },
   "type": "module",
-  "scripts": {
-    "branch:develop": "node ./script/release-branches.mts develop",
-    "branch:develop:dry-run": "node ./script/release-branches.mts develop --dry-run",
-    "check": "vp check",
-    "dev": "vp run --filter app dev",
-    "lib-build": "vp run -t app#build",
-    "release": "node ./script/release.mts",
-    "release:dry-run": "node ./script/release.mts --dry-run",
-    "release:preview": "node ./script/release-branches.mts preview",
-    "release:preview:dry-run": "node ./script/release-branches.mts preview --dry-run",
-    "release:stable": "node ./script/release-branches.mts stable",
-    "release:stable:dry-run": "node ./script/release-branches.mts stable --dry-run",
-    "set-ver": "node ./script/set-version.mts",
-    "test": "vp test",
-    "test:coverage": "vp test run --coverage",
-    "typecheck": "vp run -r typecheck",
-    "vp:install": "vp install"
-  },
   "devDependencies": {
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",

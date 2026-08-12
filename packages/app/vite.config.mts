@@ -97,6 +97,38 @@ export default defineConfig(
         },
       },
       test: { environment: 'happy-dom', include: ['test/**/*.test.ts'] },
+      run: {
+        tasks: {
+          'build': {
+            command: 'node -e ""',
+            dependsOn: [{ task: 'build', from: ['dependencies', 'devDependencies'] }],
+            output: [],
+          },
+          'build:app': { command: 'TRUE_BUILD_MAIN_APP=true tauri android build', cache: false },
+          'build:debug': { command: 'tauri android build --debug', cache: false },
+          'build:local': { command: 'tauri build --debug', cache: false },
+          'build:web': {
+            command: 'vp build',
+            dependsOn: [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build'],
+            output: ['dist/**'],
+          },
+          'dev': { command: 'tauri dev', cache: false },
+          'dev:web': {
+            command: 'vp dev',
+            cache: false,
+            dependsOn: [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build:dev'],
+          },
+          'tauri': { command: 'vp exec tauri', cache: false },
+          'typecheck': {
+            command: [
+              'vue-tsc -p tsconfig.app.json --noEmit',
+              'tsc -p tsconfig.node.json --noEmit',
+            ],
+            dependsOn: [{ task: 'build', from: 'dependencies' }],
+            output: [],
+          },
+        },
+      },
       clearScreen: false,
       envPrefix: ['VITE_', 'TAURI_ENV_*'],
     }) as UserConfig,

@@ -50,9 +50,23 @@ describe('release channel configuration', () => {
     )
   })
 
-  it('does not cache package scripts with external side effects', async () => {
+  it('does not cache tasks with external side effects', async () => {
     const viteConfig = await readFile(join(rootDir, 'vite.config.ts'), 'utf-8')
-    expect(viteConfig).toContain('run: { cache: { tasks: true, scripts: false } }')
+    expect(viteConfig).toContain('cache: { tasks: true, scripts: false }')
+    for (const task of [
+      'branch:develop',
+      'branch:develop:dry-run',
+      'release',
+      'release:dry-run',
+      'release:preview',
+      'release:preview:dry-run',
+      'release:stable',
+      'release:stable:dry-run',
+      'set-ver',
+      'vp:install',
+    ]) {
+      expect(viteConfig).toMatch(new RegExp(`'${task}': \\{[^}]*cache: false`))
+    }
   })
 
   it('commits version changes for newly added workspace manifests', () => {

@@ -39,11 +39,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "scripts": {
-    "build": "vp build && vp pack",
-    "dev": "vp dev",
-    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
-  },
   "dependencies": {
     "@delta-comic/logger": "workspace:",
     "@tauri-apps/api": "catalog:",
