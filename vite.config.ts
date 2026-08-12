@@ -70,7 +70,7 @@ export default defineConfig({
         // Declarative route views are exercised through component tests, while the unit coverage
         // gate measures independent application logic and the stateful SFCs mounted by this suite.
         'packages/app/src/{App,AppSetup}.vue',
-        'packages/app/src/components/{listSearcher,home/mainPageSearchBar,plugin/index,plugin/PrebootRecoveryAlert}.vue',
+        'packages/app/src/components/{listSearcher,home/mainPageSearchBar,plugin/index,plugin/PluginPreloadRecoveryAlert}.vue',
         'packages/app/src/components/plugin/marketplace/{PluginMarketplaceCard,PluginMarketplaceFilters}.vue',
         'packages/db/lib/**/*.ts',
         'packages/downloader/lib/**/*.ts',

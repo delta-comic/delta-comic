@@ -90,7 +90,7 @@ const promptToRemember = (safe: boolean) => {
 }
 
 const boot = async (safe = false, pluginNames?: readonly string[], remembered = false) => {
-  if (!props.startupReady) return $message.warning(t('plugin.startup.prebootLoading'))
+  if (!props.startupReady) return $message.warning(t('plugin.startup.preloadLoading'))
   if (bootingSteps.value || isBooted.value) return $message.warning(t('plugin.startup.loading'))
   bootingSteps.value = undefined
   let watcher: ReturnType<typeof watch> | undefined

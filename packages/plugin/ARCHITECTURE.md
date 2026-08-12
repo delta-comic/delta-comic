@@ -62,10 +62,18 @@ reload, and unload behavior.
 *.builtin.ts --------> InternalPluginCandidateProvider --+
                                                           |
 archive + module port -> InstalledPluginCandidateProvider +-> collision check
-                                                             -> dependency plan
-                                                             -> serial capability pipeline
-                                                             -> PluginScope ownership
+                                                              -> dependency plan
+                                                              -> module + factory preload
+                                                              -> onPreboot scope
+                                                              -> serial normal capability pipeline
+                                                              -> normal scope
 ```
+
+Every plugin enabled at application startup is prepared before Vue mounts. Preparation loads its
+module, evaluates its factory once, and runs only `onPreboot`; declarative capabilities remain
+inactive. A later user selection reuses the prepared config and activates the plugin's normal part.
+Normal reloads dispose only the normal scope, so they do not rerun the factory or preload hook.
+Plugins installed, enabled, or updated after this startup snapshot require an application restart.
 
 Endpoint probes within one remote/resource group may run in parallel with independent abort
 signals. Plugin dependency levels and capability modules are deliberately activated serially so

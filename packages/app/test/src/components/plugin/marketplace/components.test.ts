@@ -1,5 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import type { PrebootRecovery } from '@delta-comic/plugin'
+import type { PluginPreloadRecovery } from '@delta-comic/plugin'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
@@ -125,7 +125,7 @@ import type {
 
 import PluginMarketplaceCard from '../../../../../src/components/plugin/marketplace/PluginMarketplaceCard.vue'
 import PluginMarketplaceFilters from '../../../../../src/components/plugin/marketplace/PluginMarketplaceFilters.vue'
-import PrebootRecoveryAlert from '../../../../../src/components/plugin/PrebootRecoveryAlert.vue'
+import PluginPreloadRecoveryAlert from '../../../../../src/components/plugin/PluginPreloadRecoveryAlert.vue'
 
 const marketplaceItem = (overrides: Partial<PluginMarketplaceItem> = {}): PluginMarketplaceItem => {
   const entry: PluginMarketplaceEntry = {
@@ -247,15 +247,15 @@ describe('PluginMarketplaceCard', () => {
   })
 })
 
-describe('PrebootRecoveryAlert', () => {
+describe('PluginPreloadRecoveryAlert', () => {
   it('shows the recovery reason and affected plugins and emits both recovery actions', async () => {
     const recovery = {
       plugins: ['reader', 'sync'],
-      reason: 'previous preboot crashed',
-    } as PrebootRecovery
-    const wrapper = mount(PrebootRecoveryAlert, { props: { recovery } })
+      reason: 'previous plugin preload crashed',
+    } as PluginPreloadRecovery
+    const wrapper = mount(PluginPreloadRecoveryAlert, { props: { recovery } })
 
-    expect(wrapper.text()).toContain('previous preboot crashed')
+    expect(wrapper.text()).toContain('previous plugin preload crashed')
     expect(wrapper.text()).toContain('plugin.recovery.affected:{"plugins":"reader, sync"}')
     await wrapper.get('button:not(.close)').trigger('click')
     await wrapper.get('.close').trigger('click')

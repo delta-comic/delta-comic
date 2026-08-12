@@ -20,7 +20,6 @@ const services = (overrides: Partial<PluginCapabilityServices> = {}): PluginCapa
   config: { register: vi.fn(), unregister: vi.fn() },
   contributions: new ContributionHub(),
   i18n: { register: vi.fn(), remove: vi.fn() },
-  phase: 'normal',
   ...overrides,
 })
 

@@ -7,7 +7,7 @@ import { useI18n } from 'vue-i18n'
 
 import App from './App.vue'
 import Plugin from './components/plugin/index.vue'
-import PrebootRecoveryAlert from './components/plugin/PrebootRecoveryAlert.vue'
+import PluginPreloadRecoveryAlert from './components/plugin/PluginPreloadRecoveryAlert.vue'
 import UpdateChecker from './components/updateChecker.vue'
 import { createPluginAuthGateway } from './features/pluginAuth/gateway'
 import { appLogger } from './logger'
@@ -24,11 +24,11 @@ configurePluginHost({ auth: createPluginAuthGateway(() => t('common.actions.conf
 const isBooted = shallowRef(false)
 const showContent = shallowRef(false)
 const startupReady = shallowRef(false)
-const prebootRecovery = shallowRef(pluginRuntime.readRecovery())
+const pluginPreloadRecovery = shallowRef(pluginRuntime.readRecovery())
 
-const dismissPrebootRecovery = () => {
+const dismissPluginPreloadRecovery = () => {
   pluginRuntime.clearRecovery()
-  prebootRecovery.value = null
+  pluginPreloadRecovery.value = null
 }
 
 onMounted(async () => {
@@ -82,10 +82,10 @@ onMounted(async () => {
     <App />
   </Suspense>
   <Plugin v-model:show="showContent" v-model:is-booted="isBooted" :startup-ready="startupReady" />
-  <PrebootRecoveryAlert
-    v-if="prebootRecovery"
-    :recovery="prebootRecovery"
-    @dismiss="dismissPrebootRecovery"
+  <PluginPreloadRecoveryAlert
+    v-if="pluginPreloadRecovery"
+    :recovery="pluginPreloadRecovery"
+    @dismiss="dismissPluginPreloadRecovery"
     @manage="showContent = true"
   />
   <UpdateChecker />

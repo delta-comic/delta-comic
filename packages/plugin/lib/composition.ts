@@ -39,6 +39,10 @@ export const pluginStore = new PluginStore(value =>
 export const pluginConfigStore = new ConfigStore()
 export const useConfig = () => pluginConfigStore
 
+export const preparePluginHost = async () => {
+  await pluginConfigStore.register(cfg).ready
+}
+
 export interface PluginHostServices {
   readonly auth?: PluginAuthGateway
 }
@@ -84,14 +88,12 @@ export const pluginInstaller = new PluginInstallService({
 })
 
 export const pluginRuntime = new PluginRuntime({
-  capabilities: (phase, app) =>
+  capabilities: () =>
     createDefaultCapabilities({
-      app,
       auth: pluginHostServices.auth,
       config: pluginConfigStore,
       contributions: pluginContributions,
       i18n: pluginI18n,
-      phase,
     }),
   environment: () => ({ platform: isTauri() ? 'tauri' : 'web' }),
   provider: candidateProvider,
@@ -106,6 +108,7 @@ export interface PluginInstallOptions {
 
 export const installPlugin = async (input: File | string, options: PluginInstallOptions = {}) => {
   const archive = await pluginInstaller.install(input, options.signal, options.report)
+  pluginRuntime.markRestartRequired(archive.pluginName)
   await pluginRuntime.refreshCandidates()
   return archive
 }
@@ -133,13 +136,7 @@ export const setPluginEnabled = async (plugin: string, enabled: boolean) => {
     if (!archive) throw new Error(`installed plugin not found: ${plugin}`)
     await pluginRepository.upsert({ ...archive, enable: enabled })
   }
-  await pluginRuntime.refreshCandidates()
-}
-
-export const setPluginKind = async (plugin: string, kind: 'normal' | 'preboot') => {
-  const archive = await pluginRepository.find(plugin)
-  if (!archive) throw new Error(`installed plugin not found: ${plugin}`)
-  await pluginRepository.upsert({ ...archive, meta: { ...archive.meta, kind } })
+  pluginRuntime.markRestartRequired(plugin)
   await pluginRuntime.refreshCandidates()
 }
 

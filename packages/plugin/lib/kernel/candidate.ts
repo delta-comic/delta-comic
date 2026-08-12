@@ -2,6 +2,8 @@ import type { PluginManifest } from '@delta-comic/model'
 
 import type { PluginConfigFactory } from '../api'
 
+import type { PluginScope } from './scope'
+
 export type PluginOrigin = 'builtin' | 'installed'
 
 export interface PluginManagementCapabilities {
@@ -12,6 +14,7 @@ export interface PluginManagementCapabilities {
 
 export interface LoadedPluginModule {
   readonly factory: PluginConfigFactory
+  activate?(scope: PluginScope): Promise<void> | void
   dispose?(): Promise<void> | void
 }
 

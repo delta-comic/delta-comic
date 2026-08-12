@@ -10,6 +10,5 @@ export interface PluginManifest {
   icon?: string
   require: { id: string; download?: string }[]
   entry?: { jsPath: string; cssPath?: string }
-  kind?: 'normal' | 'preboot'
   integrity?: { algorithm: 'blake3' | 'sha256'; digest: string }
 }
