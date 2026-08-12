@@ -26,6 +26,10 @@ export function taskProgress(task: DownloadTask): number {
   return Math.min(100, Math.max(0, (task.downloadedBytes / task.totalBytes) * 100))
 }
 
+export function taskProgressIsIndeterminate(task: DownloadTask): boolean {
+  return activeDownloadStatuses.has(task.status) && !task.totalBytes
+}
+
 export function taskEta(task: DownloadTask): number | undefined {
   if (!task.totalBytes || task.speedBytesPerSecond <= 0) return undefined
   return Math.max(0, (task.totalBytes - task.downloadedBytes) / task.speedBytesPerSecond)

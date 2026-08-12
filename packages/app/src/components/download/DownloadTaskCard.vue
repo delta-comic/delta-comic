@@ -10,6 +10,7 @@ import {
   taskDisplayName,
   taskEta,
   taskProgress,
+  taskProgressIsIndeterminate,
 } from '@/features/downloads/format'
 
 import DownloadTaskActions from './DownloadTaskActions.vue'
@@ -58,6 +59,7 @@ const statusType = computed(() => {
       </div>
       <NProgress
         :percentage="progress"
+        :processing="taskProgressIsIndeterminate(task)"
         :show-indicator="false"
         :status="task.status === 'failed' ? 'error' : undefined"
       />
