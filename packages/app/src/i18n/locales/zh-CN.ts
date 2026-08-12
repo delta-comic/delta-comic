@@ -341,6 +341,7 @@ const zhCN = {
         installing: '正在安装依赖插件 {id}',
       },
       downloading: '正在下载插件',
+      downloaded: '已下载 {downloaded} / {total}',
       downloadTitle: '下载插件：{input}',
       extracting: '正在解压插件',
       extractingPath: '正在解压：{path}',

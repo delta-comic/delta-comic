@@ -28,7 +28,7 @@ export class PluginInstallService {
     report({ phase: 'resolve', progress: 0 })
     const resolver = this.options.resolvers.find(candidate => candidate.matches(input))
     if (!resolver) throw new Error('no plugin source resolver accepts this input')
-    const source = await resolver.resolve(input, signal)
+    const source = await resolver.resolve(input, signal, report)
     report({ description: source.file.name, phase: 'resolve', progress: 100 })
 
     const codec = this.options.codecs.find(candidate => candidate.matches(source.file))

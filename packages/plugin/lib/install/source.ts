@@ -1,8 +1,49 @@
 import { Octokit } from '@octokit/rest'
 
 import { pluginCatalogIdFromInstallInput, type PluginInstallCatalog } from './catalog'
-import type { PluginInstallInput, PluginSourceResolver, ResolvedPluginSource } from './contracts'
+import type {
+  PluginInstallInput,
+  PluginInstallReporter,
+  PluginSourceResolver,
+  ResolvedPluginSource,
+} from './contracts'
 import { isPluginManifestCompatible, parsePluginManifest } from './manifest'
+
+const REPORT_INTERVAL = 250
+
+async function responseFile(
+  response: Response,
+  name: string,
+  report: PluginInstallReporter = () => {},
+): Promise<File> {
+  const totalHeader = response.headers.get('content-length')
+  const totalBytes = totalHeader ? Number(totalHeader) : undefined
+  const reader = response.body?.getReader()
+  if (!reader) return new File([await response.blob()], name)
+
+  const chunks: Uint8Array<ArrayBuffer>[] = []
+  let downloadedBytes = 0
+  let lastReport = 0
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    const chunk = new Uint8Array(value.byteLength)
+    chunk.set(value)
+    chunks.push(chunk)
+    downloadedBytes += value.byteLength
+    const now = performance.now()
+    if (now - lastReport < REPORT_INTERVAL) continue
+    lastReport = now
+    report({
+      downloadedBytes,
+      phase: 'resolve',
+      progress: totalBytes ? (downloadedBytes / totalBytes) * 100 : undefined,
+      totalBytes,
+    })
+  }
+  report({ downloadedBytes, phase: 'resolve', progress: 100, totalBytes })
+  return new File(chunks, name)
+}
 
 export class LocalFileSourceResolver implements PluginSourceResolver {
   public readonly id = 'local-file'
@@ -27,13 +68,14 @@ export class HttpSourceResolver implements PluginSourceResolver {
   public async resolve(
     input: PluginInstallInput,
     signal: AbortSignal,
+    report?: PluginInstallReporter,
   ): Promise<ResolvedPluginSource> {
     if (typeof input !== 'string') throw new TypeError('HTTP resolver requires a URL')
     const response = await fetch(input, { signal })
     if (!response.ok) throw new Error(`plugin download failed: ${response.status}`)
     const name = new URL(input).pathname.split('/').at(-1) || 'plugin.zip'
     return {
-      file: new File([await response.blob()], name),
+      file: await responseFile(response, name, report),
       installInput: input,
       resolverId: this.id,
     }
@@ -55,7 +97,11 @@ export class GitHubSourceResolver implements PluginSourceResolver {
     return typeof input === 'string' && /^gh:[^/]+\/[^/]+$/.test(input)
   }
 
-  public async resolve(input: PluginInstallInput, signal: AbortSignal) {
+  public async resolve(
+    input: PluginInstallInput,
+    signal: AbortSignal,
+    report?: PluginInstallReporter,
+  ) {
     if (typeof input !== 'string') throw new TypeError('GitHub resolver requires a repository')
     const [owner, repo] = input.slice(3).split('/') as [string, string]
     const octokit = new Octokit({ auth: this.options.token })
@@ -80,7 +126,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
         if (!packageResponse.ok)
           throw new Error(`plugin download failed: ${packageResponse.status}`)
         return {
-          file: new File([await packageResponse.blob()], packageAsset.name),
+          file: await responseFile(packageResponse, packageAsset.name, report),
           installInput: input,
           resolverId: this.id,
         }
@@ -102,7 +148,11 @@ export class MarketplaceSourceResolver implements PluginSourceResolver {
     return pluginCatalogIdFromInstallInput(input) !== undefined
   }
 
-  public async resolve(input: PluginInstallInput, signal: AbortSignal) {
+  public async resolve(
+    input: PluginInstallInput,
+    signal: AbortSignal,
+    report?: PluginInstallReporter,
+  ) {
     if (typeof input !== 'string') {
       throw new TypeError('marketplace resolver requires a plugin catalog id')
     }
@@ -112,7 +162,7 @@ export class MarketplaceSourceResolver implements PluginSourceResolver {
     const resolver = this.sources.find(source => source.matches(redirected))
     if (!resolver)
       throw new Error(`plugin catalog returned an unsupported install source: ${redirected}`)
-    const source = await resolver.resolve(redirected, signal)
+    const source = await resolver.resolve(redirected, signal, report)
     return { ...source, installInput: input, resolverId: this.id }
   }
 }
