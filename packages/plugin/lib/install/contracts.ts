@@ -14,7 +14,11 @@ export interface ResolvedPluginSource {
 export interface PluginSourceResolver {
   readonly id: string
   matches(input: PluginInstallInput): boolean
-  resolve(input: PluginInstallInput, signal: AbortSignal): Promise<ResolvedPluginSource>
+  resolve(
+    input: PluginInstallInput,
+    signal: AbortSignal,
+    report?: PluginInstallReporter,
+  ): Promise<ResolvedPluginSource>
 }
 
 export interface DecodedPluginPackage {
@@ -56,8 +60,10 @@ export interface PluginModuleReader {
 
 export interface PluginInstallProgress {
   readonly description?: string
+  readonly downloadedBytes?: number
   readonly phase: 'decode' | 'persist' | 'resolve'
   readonly progress?: number
+  readonly totalBytes?: number
 }
 
 export type PluginInstallReporter = (progress: PluginInstallProgress) => void

@@ -2,7 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import type { PluginInstallCatalog } from '../../../lib/install/catalog'
 import type { PluginSourceResolver } from '../../../lib/install/contracts'
-import { GitHubSourceResolver, MarketplaceSourceResolver } from '../../../lib/install/source'
+import {
+  GitHubSourceResolver,
+  HttpSourceResolver,
+  MarketplaceSourceResolver,
+} from '../../../lib/install/source'
 
 const octokit = vi.hoisted(() => ({ pages: [] as Array<{ data: Array<Record<string, unknown>> }> }))
 
@@ -54,6 +58,34 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+describe('HttpSourceResolver', () => {
+  it('reports streamed response bytes', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response('plugin', { headers: { 'content-length': String('plugin'.length) } }),
+      ),
+    )
+    const report = vi.fn()
+    const resolver = new HttpSourceResolver()
+
+    const resolved = await resolver.resolve(
+      'https://plugins.test/plugin.zip',
+      new AbortController().signal,
+      report,
+    )
+
+    expect(resolved.file.size).toBe(6)
+    expect(report).toHaveBeenLastCalledWith({
+      downloadedBytes: 6,
+      phase: 'resolve',
+      progress: 100,
+      totalBytes: 6,
+    })
+  })
+})
+
 describe('GitHubSourceResolver', () => {
   it.each([
     { expectedVersion: '1.0.0', includePrereleases: false },
@@ -75,11 +107,15 @@ describe('GitHubSourceResolver', () => {
         includePrereleases: () => includePrereleases,
       })
 
-      await resolver.resolve('gh:delta-comic/reader', new AbortController().signal)
+      const report = vi.fn()
+      await resolver.resolve('gh:delta-comic/reader', new AbortController().signal, report)
 
       expect(fetch).toHaveBeenLastCalledWith(
         `https://plugins.test/${expectedVersion}/plugin.zip`,
         expect.anything(),
+      )
+      expect(report).toHaveBeenLastCalledWith(
+        expect.objectContaining({ downloadedBytes: 6, phase: 'resolve', progress: 100 }),
       )
     },
   )
@@ -97,7 +133,7 @@ describe('MarketplaceSourceResolver', () => {
     const resolved = await resolver.resolve('ap:reader', signal)
 
     expect(catalog.resolveInstallInput).toHaveBeenCalledWith('reader', signal)
-    expect(source.resolve).toHaveBeenCalledWith('gh:delta-comic/reader', signal)
+    expect(source.resolve).toHaveBeenCalledWith('gh:delta-comic/reader', signal, undefined)
     expect(resolved).toMatchObject({ installInput: 'ap:reader', resolverId: 'marketplace' })
     expect(resolver.matches('ap:reader')).toBe(true)
     expect(resolver.matches('https://example.test/reader.zip')).toBe(false)
