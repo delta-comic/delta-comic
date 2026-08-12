@@ -1,24 +1,39 @@
-import { describe, expect, it } from 'vite-plus/test'
+import type { DownloadMessageBind } from '@delta-comic/ui'
+import { describe, expect, it, vi } from 'vite-plus/test'
 
-import { pluginInstallProgressPercentage } from '../../../../src/features/pluginInstall/progress'
+import { runPluginInstallPhases } from '../../../../src/features/pluginInstall/runPluginInstallPhases'
 
-describe('pluginInstallProgressPercentage', () => {
-  it.each([
-    ['resolve', 0, 0],
-    ['resolve', 50, 35],
-    ['resolve', 100, 70],
-    ['decode', 0, 70],
-    ['decode', 50, 80],
-    ['decode', 100, 90],
-    ['persist', 0, 90],
-    ['persist', 50, 95],
-    ['persist', 100, 100],
-  ] as const)('maps %s progress %s to %s', (phase, progress, expected) => {
-    expect(pluginInstallProgressPercentage({ phase, progress })).toBe(expected)
-  })
+describe('runPluginInstallPhases', () => {
+  it('reports install phases as mixed progress and loading entries', async () => {
+    const entries = new Map<string, { description: string; progress?: number }>()
+    const create = (progress: boolean) =>
+      vi.fn(async (title: string, run: (state: any) => Promise<unknown>) => {
+        const state = { description: '', retryable: false, ...(progress ? { progress: 0 } : {}) }
+        entries.set(title, state)
+        return await run(state)
+      })
+    const createProgress = create(true)
+    const createLoading = create(false)
+    const bind = { createLoading, createProgress } as DownloadMessageBind
 
-  it('clamps phase progress before weighting it', () => {
-    expect(pluginInstallProgressPercentage({ phase: 'resolve', progress: 150 })).toBe(70)
-    expect(pluginInstallProgressPercentage({ phase: 'persist', progress: -50 })).toBe(90)
+    await expect(
+      runPluginInstallPhases(
+        bind,
+        { decode: 'Decode', persist: 'Persist', resolve: 'Download' },
+        progress => `${progress.phase}:${progress.progress}`,
+        async ({ report }) => {
+          report?.({ phase: 'resolve', progress: 40 })
+          report?.({ phase: 'decode', progress: 50 })
+          report?.({ phase: 'persist', progress: 75 })
+          return 'installed'
+        },
+      ),
+    ).resolves.toBe('installed')
+
+    expect(createProgress.mock.calls.map(([title]) => title)).toEqual(['Download', 'Persist'])
+    expect(createLoading.mock.calls.map(([title]) => title)).toEqual(['Decode'])
+    expect(entries.get('Download')).toMatchObject({ description: 'resolve:40', progress: 40 })
+    expect(entries.get('Decode')).toEqual({ description: 'decode:50', retryable: false })
+    expect(entries.get('Persist')).toMatchObject({ description: 'persist:75', progress: 75 })
   })
 })
