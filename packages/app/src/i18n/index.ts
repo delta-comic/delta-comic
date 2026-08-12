@@ -1,15 +1,12 @@
 import { pluginI18n, type PluginI18nAdapter, type PluginLocaleMessages } from '@delta-comic/plugin'
 import { createI18n } from 'vue-i18n'
 
-import { resolveSystemLocale } from './locale'
 import { localeMessages } from './locales'
-
-export { resolveAppLocale, resolveSystemLocale } from './locale'
 
 export const i18n = createI18n({
   fallbackLocale: 'zh-CN',
   legacy: false,
-  locale: resolveSystemLocale(),
+  locale: 'zh-CN',
   messages: localeMessages,
 })
 
