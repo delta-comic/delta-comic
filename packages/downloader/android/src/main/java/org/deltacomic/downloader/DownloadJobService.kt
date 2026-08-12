@@ -35,7 +35,18 @@ class DownloadJobService : JobService() {
         activeJobs[params.jobId] = activeJob
         return try {
             activeJob.future = executor.submit {
-                val result = DownloadRuntime.run(this, taskId)
+                val result = DownloadRuntime.run(this, taskId) { snapshot ->
+                    mainHandler.post {
+                        if (activeJobs[params.jobId] === activeJob) {
+                            setNotification(
+                                params,
+                                params.jobId,
+                                DownloadRuntime.createNotification(this, taskId, snapshot),
+                                JOB_END_NOTIFICATION_POLICY_REMOVE
+                            )
+                        }
+                    }
+                }
                 mainHandler.post {
                     if (activeJobs[params.jobId] === activeJob) {
                         activeJobs.remove(params.jobId)

@@ -8,8 +8,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
+import com.fasterxml.jackson.databind.ObjectMapper
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 
 internal object DownloadRuntime {
     const val CHANNEL = "delta_download_transfers"
@@ -25,8 +27,16 @@ internal object DownloadRuntime {
     private val transferExecutor = Executors.newCachedThreadPool { runnable ->
         Thread(runnable, "delta-download-worker").apply { isDaemon = true }
     }
+    private val notificationExecutor = Executors.newScheduledThreadPool(1) { runnable ->
+        Thread(runnable, "delta-download-notification").apply { isDaemon = true }
+    }
+    private val objectMapper = ObjectMapper()
 
-    fun createNotification(context: Context, taskId: String): android.app.Notification {
+    fun createNotification(
+        context: Context,
+        taskId: String,
+        snapshot: TaskSnapshot? = taskSnapshot(taskId)
+    ): android.app.Notification {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(
             NotificationChannel(
@@ -40,7 +50,7 @@ internal object DownloadRuntime {
         val cancel = createControlPendingIntent(context, taskId, ControlAction.CANCEL)
         val builder = NotificationCompat.Builder(context, CHANNEL)
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setContentTitle(context.getString(R.string.download_notification_title))
+            .setContentTitle(snapshot?.title ?: context.getString(R.string.download_notification_title))
             .setContentText(context.getString(R.string.download_notification_progress))
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -52,7 +62,12 @@ internal object DownloadRuntime {
                 context.getString(R.string.download_cancel),
                 cancel
             )
-            .setProgress(0, 0, true)
+        val progress = snapshot?.let(::notificationProgress)
+        if (progress == null) {
+            builder.setProgress(0, 0, true)
+        } else {
+            builder.setProgress(progress.maximum, progress.current, false)
+        }
         launch?.let {
             builder.setContentIntent(
                 PendingIntent.getActivity(
@@ -75,8 +90,14 @@ internal object DownloadRuntime {
             .putString(CONFIG_DOWNLOAD_DIR, config.downloadDir)
             .commit()
 
-    fun run(context: Context, taskId: String): ExecutionResult {
+    fun run(context: Context, taskId: String, onProgress: (TaskSnapshot) -> Unit = {}): ExecutionResult {
         if (!ensureNativeEngine(context)) return ExecutionResult.RETRY
+        val notificationFuture = notificationExecutor.scheduleAtFixedRate(
+            { taskSnapshot(taskId)?.let(onProgress) },
+            0,
+            1,
+            TimeUnit.SECONDS
+        )
         return try {
             val directInstruction = NativeBridge.getSafDirectInstruction(taskId)
             if (directInstruction != null) {
@@ -95,7 +116,17 @@ internal object DownloadRuntime {
             executionResult(NativeBridge.completeSafExport(taskId, export.value!!))
         } catch (_: UnsatisfiedLinkError) {
             ExecutionResult.RETRY
+        } finally {
+            notificationFuture.cancel(false)
         }
+    }
+
+    private fun taskSnapshot(taskId: String): TaskSnapshot? = try {
+        NativeBridge.getTaskSnapshot(taskId)?.let { objectMapper.readValue(it, TaskSnapshot::class.java) }
+    } catch (_: Exception) {
+        null
+    } catch (_: UnsatisfiedLinkError) {
+        null
     }
 
     private fun runDirectSaf(context: Context, taskId: String, instructionJson: String): ExecutionResult? {
@@ -151,8 +182,12 @@ internal object DownloadRuntime {
         return executionResult(NativeBridge.completeSafExport(taskId, commit.value!!))
     }
 
-    fun runAsync(context: Context, taskId: String, onResult: (ExecutionResult) -> Unit): Future<*> =
-        transferExecutor.submit { onResult(run(context, taskId)) }
+    fun runAsync(
+        context: Context,
+        taskId: String,
+        onProgress: (TaskSnapshot) -> Unit,
+        onResult: (ExecutionResult) -> Unit
+    ): Future<*> = transferExecutor.submit { onResult(run(context, taskId, onProgress)) }
 
     fun dispatchControl(context: Context, taskId: String, action: ControlAction, onFinished: () -> Unit = {}) {
         controlExecutor.execute {
@@ -247,6 +282,7 @@ internal object NativeBridge {
     external fun initializeCredentialContext(context: Context): Int
     external fun bootstrap(databasePath: String, downloadDir: String): Int
     external fun runTask(taskId: String): Int
+    external fun getTaskSnapshot(taskId: String): String?
     external fun getSafDirectInstruction(taskId: String): String?
     external fun rememberDirectSaf(taskId: String, documentUri: String): Int
     external fun runTaskDirectSaf(taskId: String, fileDescriptor: Int, documentUri: String): Int
@@ -259,6 +295,16 @@ internal object NativeBridge {
     external fun pauseTask(taskId: String)
     external fun cancelTask(taskId: String)
     external fun systemStopTask(taskId: String)
+}
+
+internal data class TaskSnapshot(val title: String = "", val totalBytes: Long? = null, val downloadedBytes: Long = 0)
+
+internal data class NotificationProgress(val maximum: Int, val current: Int)
+
+internal fun notificationProgress(snapshot: TaskSnapshot): NotificationProgress? {
+    val total = snapshot.totalBytes?.takeIf { it > 0 } ?: return null
+    val current = snapshot.downloadedBytes.coerceIn(0, total)
+    return NotificationProgress(1000, ((current * 1000.0) / total).toInt().coerceIn(0, 1000))
 }
 
 internal fun initializeNativeEngine(initializeCredentialContext: () -> Int, bootstrap: () -> Int): Boolean {
