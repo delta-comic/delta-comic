@@ -98,6 +98,34 @@ describe('PluginInstallService', () => {
     expect(repository.upsert).not.toHaveBeenCalled()
   })
 
+  it('reports each installation phase', async () => {
+    const files = new MemoryPluginFileStore()
+    const repository: PluginArchiveRepository = {
+      find: async () => undefined,
+      list: async () => [],
+      remove: vi.fn(),
+      upsert: vi.fn(),
+    }
+    const service = new PluginInstallService({
+      codecs: [codec],
+      files,
+      repository,
+      resolvers: [resolver],
+    })
+    const report = vi.fn()
+
+    await service.install(new File([], 'plugin.zip'), undefined, report)
+
+    expect(report.mock.calls.map(([progress]) => progress)).toEqual([
+      { phase: 'resolve', progress: 0 },
+      { description: 'plugin.zip', phase: 'resolve', progress: 100 },
+      { description: 'zip', phase: 'decode', progress: 0 },
+      { description: 'example', phase: 'decode', progress: 100 },
+      { description: 'example', phase: 'persist', progress: 50 },
+      { description: 'example', phase: 'persist', progress: 100 },
+    ])
+  })
+
   it('restores files and metadata when uninstall persistence fails', async () => {
     const files = new MemoryPluginFileStore()
     await (

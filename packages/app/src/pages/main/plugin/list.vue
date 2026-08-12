@@ -9,7 +9,6 @@ import {
   type PluginCandidate,
   usePluginStore,
 } from '@delta-comic/plugin'
-import { createDownloadMessage } from '@delta-comic/ui'
 import { memoize } from 'es-toolkit'
 import type { DropdownOption } from 'naive-ui'
 import semver from 'semver'
@@ -18,6 +17,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import PluginIcon from '@/components/plugin/PluginIcon.vue'
+import { usePluginInstall } from '@/features/pluginInstall/usePluginInstall'
 import { Icons } from '@/icons'
 
 import pkg from '../../../../package.json'
@@ -26,6 +26,7 @@ const pluginListLogger = logger.scoped('app:plugin-list')
 
 const updating = shallowReactive(new Set<string>())
 const { t } = useI18n()
+const { runPluginInstall } = usePluginInstall()
 const router = useRouter()
 const openMarketplace = () => router.force.replace({ name: '/main/plugin/shop' })
 type ManagedPlugin = {
@@ -37,30 +38,22 @@ type ManagedPlugin = {
 }
 const updatePlugin = async (plugin: ManagedPlugin) => {
   if (updating.has(plugin.pluginName)) throw new Error(t('plugin.list.feedback.alreadyUpdating'))
-  return createDownloadMessage(
-    t('plugin.list.actions.updateFromSource'),
-    async ({ createLoading }) => {
-      updating.add(plugin.pluginName)
-      pluginListLogger.info('plugin update started', { plugin: plugin.pluginName })
-      try {
-        await createLoading(
-          t('plugin.list.feedback.updating', {
-            plugin: translatePluginText(plugin.meta.name.display ?? plugin.pluginName),
-          }),
-          async control => {
-            control.retryable = true
-            return updatePluginByName(plugin.pluginName)
-          },
-        )
-        pluginListLogger.info('plugin update completed', { plugin: plugin.pluginName })
-      } catch (error) {
-        pluginListLogger.error('plugin update failed', { plugin: plugin.pluginName }, error)
-        throw error
-      } finally {
-        updating.delete(plugin.pluginName)
-      }
-    },
-  )
+  updating.add(plugin.pluginName)
+  pluginListLogger.info('plugin update started', { plugin: plugin.pluginName })
+  try {
+    await runPluginInstall(
+      t('plugin.progress.updateTitle', {
+        plugin: translatePluginText(plugin.meta.name.display ?? plugin.pluginName),
+      }),
+      options => updatePluginByName(plugin.pluginName, options),
+    )
+    pluginListLogger.info('plugin update completed', { plugin: plugin.pluginName })
+  } catch (error) {
+    pluginListLogger.error('plugin update failed', { plugin: plugin.pluginName }, error)
+    throw error
+  } finally {
+    updating.delete(plugin.pluginName)
+  }
 }
 
 const checkIsSupport = memoize((supportCore: string) => semver.satisfies(pkg.version, supportCore))

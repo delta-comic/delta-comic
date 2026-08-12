@@ -6,8 +6,11 @@ import { useDialog, useMessage } from 'naive-ui'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { usePluginInstall } from '@/features/pluginInstall/usePluginInstall'
+
 const pluginInstallLogger = logger.scoped('app:plugin-install')
 const { t } = useI18n()
+const { runPluginInstall } = usePluginInstall()
 
 const inputUrl = ref('')
 const isAdding = ref(false)
@@ -35,7 +38,9 @@ const confirmAdd = async (url: string) => {
       },
     })
     pluginInstallLogger.info('plugin installation confirmed')
-    await installPlugin(url)
+    await runPluginInstall(t('plugin.progress.downloadTitle', { input: url }), options =>
+      installPlugin(url, options),
+    )
     pluginInstallLogger.info('plugin installation completed')
   } catch (error) {
     pluginInstallLogger.error('plugin installation failed', error)
@@ -60,7 +65,9 @@ const useUploadPlugin = () => {
       if (!file) throw new Error(t('plugin.install.errors.noFile'))
 
       pluginInstallLogger.info('local plugin installation started')
-      await installPlugin(file)
+      await runPluginInstall(t('plugin.progress.installTitle', { file: file.name }), options =>
+        installPlugin(file, options),
+      )
       pluginInstallLogger.info('local plugin installation completed')
     } catch (error) {
       pluginInstallLogger.error('local plugin installation failed', error)

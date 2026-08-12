@@ -4,6 +4,7 @@ import { useDialog, useMessage } from 'naive-ui'
 import { computed, onMounted, shallowReactive, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { usePluginInstall } from '@/features/pluginInstall/usePluginInstall'
 import {
   pluginMarketplaceInstallInput,
   pluginMarketplaceSourceUrl,
@@ -21,6 +22,7 @@ const selectedItem = shallowRef<PluginMarketplaceItem>()
 const detailsOpen = shallowRef(false)
 const installingIds = shallowReactive(new Set<string>())
 const marketplace = usePluginMarketplace({ coreVersion: pkg.version })
+const { runPluginInstall } = usePluginInstall()
 
 const filterModel = computed({ get: () => marketplace.filter.value, set: marketplace.setFilter })
 const queryModel = computed({ get: () => marketplace.query.value, set: marketplace.setQuery })
@@ -34,8 +36,17 @@ const runInstall = async (item: PluginMarketplaceItem) => {
   if (installingIds.has(item.listing.id)) return
   installingIds.add(item.listing.id)
   try {
-    if (item.installed) await updatePlugin(item.installed)
-    else await installPlugin(pluginMarketplaceInstallInput(item.listing))
+    const title = t(
+      item.installed ? 'plugin.progress.updateTitle' : 'plugin.progress.installTitle',
+      item.installed
+        ? { plugin: item.manifest?.name.display ?? item.listing.id }
+        : { file: item.manifest?.name.display ?? item.listing.id },
+    )
+    await runPluginInstall(title, options =>
+      item.installed
+        ? updatePlugin(item.installed, options)
+        : installPlugin(pluginMarketplaceInstallInput(item.listing), options),
+    )
     await marketplace.refreshInstalled()
     message.success(
       t(item.installed ? 'plugin.market.messages.updated' : 'plugin.market.messages.installed'),
