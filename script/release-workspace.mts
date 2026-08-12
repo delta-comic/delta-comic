@@ -13,7 +13,6 @@ interface WorkspaceManifest {
   peerDependencies?: DependencyBlock
   private?: boolean
   publishConfig?: { access?: string }
-  scripts?: Record<string, string>
   version?: string
 }
 
@@ -102,9 +101,6 @@ export class ReleaseWorkspace {
       }
       if (typeof manifest.version !== 'string' || !manifest.version) {
         throw new Error(`Publishable package ${manifest.name} must declare a version`)
-      }
-      if (typeof manifest.scripts?.build !== 'string') {
-        throw new Error(`Publishable package ${manifest.name} must declare a build script`)
       }
       if (manifest.publishConfig?.access !== 'public') {
         throw new Error(

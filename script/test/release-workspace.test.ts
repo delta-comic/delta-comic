@@ -45,14 +45,12 @@ describe('ReleaseWorkspace', () => {
     await writeManifest(cwd, 'consumer', {
       name: '@fixture/consumer',
       version: '1.0.0',
-      scripts: { build: 'vp pack' },
       peerDependencies: { '@fixture/core': 'workspace:*' },
       publishConfig: { access: 'public' },
     })
     await writeManifest(cwd, 'core', {
       name: '@fixture/core',
       version: '1.0.0',
-      scripts: { build: 'vp pack' },
       publishConfig: { access: 'public' },
     })
     await writeManifest(cwd, 'private-app', { name: 'private-app', private: true })
@@ -61,17 +59,13 @@ describe('ReleaseWorkspace', () => {
     expect(packages.map(pkg => pkg.name)).toEqual(['@fixture/core', '@fixture/consumer'])
   })
 
-  it('rejects a public package without a build before release', async () => {
+  it('rejects a public package without public publish access', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'delta-comic-release-workspace-'))
     fixtures.push(cwd)
-    await writeManifest(cwd, 'broken', {
-      name: '@fixture/broken',
-      version: '1.0.0',
-      publishConfig: { access: 'public' },
-    })
+    await writeManifest(cwd, 'broken', { name: '@fixture/broken', version: '1.0.0' })
 
     await expect(new ReleaseWorkspace(cwd).publishablePackages()).rejects.toThrow(
-      '@fixture/broken must declare a build script',
+      '@fixture/broken must set publishConfig.access to public',
     )
   })
 })

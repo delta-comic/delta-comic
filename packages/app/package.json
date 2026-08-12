@@ -3,16 +3,6 @@
   "version": "3.0.0-next.10",
   "private": true,
   "description": "阿赖耶识",
-  "scripts": {
-    "build:app": "export TRUE_BUILD_MAIN_APP=\"true\" && tauri android build",
-    "build:debug": "tauri android build --debug",
-    "build:local": "tauri build --debug",
-    "build:web": "vp run -t @delta-comic/runtime#build && vp build",
-    "dev": "tauri dev",
-    "dev:web": "vp run -t @delta-comic/runtime#build:dev && vp dev",
-    "tauri": "vp exec tauri",
-    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
-  },
   "dependencies": {
     "@delta-comic/db": "workspace:",
     "@delta-comic/downloader": "workspace:",

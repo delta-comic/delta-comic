@@ -10,6 +10,19 @@ export default defineConfig(({ mode }) => {
 
   return {
     root,
+    run: {
+      tasks: {
+        'build': {
+          command: 'vp build',
+          output: [{ pattern: 'packages/app/public/runtime/**', base: 'workspace' }],
+        },
+        'build:dev': {
+          command: 'vp build --mode development',
+          output: [{ pattern: 'packages/app/public/runtime/**', base: 'workspace' }],
+        },
+        'typecheck': { command: 'tsc -p tsconfig.json --noEmit', output: [] },
+      },
+    },
     plugins: [
       {
         name: 'delta-comic:validate-single-umd',

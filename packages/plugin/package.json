@@ -32,10 +32,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "scripts": {
-    "build": "vp pack",
-    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
-  },
   "dependencies": {
     "@delta-comic/downloader": "workspace:",
     "@delta-comic/logger": "workspace:",

@@ -129,9 +129,11 @@ describe('semantic-release monorepo plugin', () => {
     const writeOutput = vi
       .fn<(path: string, contents: string) => Promise<void>>()
       .mockResolvedValue()
+    const publishCommand = vi.fn<CommandRunner>().mockResolvedValue()
     const plugin = createReleasePlugin({
       resolvePublishablePackages,
       cleanPendingRelease,
+      publishCommand,
       removeEphemeralTag,
       synchronizeVersion,
       writeOutput,
@@ -152,6 +154,7 @@ describe('semantic-release monorepo plugin', () => {
     expect(synchronizeVersion).toHaveBeenCalledWith('3.0.0')
     expect(removeEphemeralTag).toHaveBeenCalledWith(context.env)
     expect(cleanPendingRelease).toHaveBeenCalledWith('3.0.0')
+    expect(publishCommand).toHaveBeenCalledTimes(publishablePackages.length)
   })
 
   it('builds every publishable package before publishing to npm and GitHub Packages', async () => {
@@ -231,7 +234,8 @@ describe('semantic-release monorepo plugin', () => {
   })
 
   it('requires the GitHub token while npm authentication uses OIDC', async () => {
-    const plugin = createReleasePlugin({ resolvePublishablePackages })
+    const publishCommand = vi.fn<CommandRunner>().mockResolvedValue()
+    const plugin = createReleasePlugin({ publishCommand, resolvePublishablePackages })
 
     await expect(
       plugin.verifyConditions({}, { env: {}, nextRelease: { version: '3.0.0' } }),
@@ -243,6 +247,7 @@ describe('semantic-release monorepo plugin', () => {
       ),
     ).resolves.toBeUndefined()
     expect(resolvePublishablePackages).toHaveBeenCalledOnce()
+    expect(publishCommand).toHaveBeenCalledTimes(publishablePackages.length)
   })
 
   it('validates release versions and skips GitHub output outside Actions', async () => {

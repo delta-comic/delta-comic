@@ -3,14 +3,6 @@
   "private": true,
   "description": "Cloudflare Pages admin panel for Delta Comic server.",
   "type": "module",
-  "scripts": {
-    "build": "vp build",
-    "deploy": "vp build && wrangler pages deploy dist --project-name=delta-comic-server-admin",
-    "dev": "vp dev",
-    "pages:preview": "wrangler pages dev dist --compatibility-date=2026-06-28",
-    "preview": "vp preview",
-    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
-  },
   "dependencies": {
     "@delta-comic/logger": "workspace:",
     "@delta-comic/server": "workspace:",

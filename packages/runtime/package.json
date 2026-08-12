@@ -4,11 +4,6 @@
   "private": true,
   "description": "Delta Comic 宿主与外部插件共享的预构建 UMD 运行时。",
   "type": "module",
-  "scripts": {
-    "build": "vp build",
-    "build:dev": "vp build --mode development",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
-  },
   "dependencies": {
     "@pinia/colada": "catalog:",
     "naive-ui": "catalog:",
