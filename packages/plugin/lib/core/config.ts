@@ -18,18 +18,6 @@ export const cfg = new ConfigPointer(
         { label: 'plugin.core.config.systemDefault', value: 'system' },
       ],
     },
-    language: {
-      type: 'radio',
-      defaultValue: 'system',
-      info: 'plugin.core.config.language.title',
-      comp: 'select',
-      selects: [
-        { label: 'plugin.core.config.language.zhCN', value: 'zh-CN' },
-        { label: 'plugin.core.config.language.zhTW', value: 'zh-TW' },
-        { label: 'plugin.core.config.language.enUS', value: 'en-US' },
-        { label: 'plugin.core.config.systemDefault', value: 'system' },
-      ],
-    },
     easilyTitle: {
       type: 'switch',
       defaultValue: false,

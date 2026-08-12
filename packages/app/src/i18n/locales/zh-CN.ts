@@ -443,7 +443,6 @@ const zhCN = {
       },
       githubToken: { placeholder: '仅用于提高 API 访问限额', title: 'GitHub Token' },
       installOverride: '安装源覆盖配置',
-      language: { enUS: 'English', title: '界面语言', zhCN: '简体中文', zhTW: '繁體中文（台灣）' },
       prereleaseUpdates: '接收预发布版本更新（可能不稳定）',
       recordHistory: '记录历史记录',
       showAiWorks: '展示 AI 作品',

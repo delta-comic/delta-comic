@@ -1,4 +1,4 @@
-import { Core, pluginRuntime, useConfig } from '@delta-comic/plugin'
+import { pluginRuntime, useConfig } from '@delta-comic/plugin'
 import {
   configureUiI18n,
   DcConfigProvider,
@@ -13,25 +13,21 @@ import {
   NMessageProvider,
   NDialogProvider,
   NLoadingBarProvider,
-  dateEnUS,
   dateZhCN,
-  dateZhTW,
-  enUS as naiveEnUS,
   zhCN as naiveZhCN,
-  zhTW as naiveZhTW,
   type GlobalThemeOverrides,
   darkTheme,
   lightTheme,
   NGlobalStyle,
 } from 'naive-ui'
 import { createPinia, setActivePinia } from 'pinia'
-import { computed, createApp, defineComponent, watch } from 'vue'
+import { createApp, defineComponent, watch } from 'vue'
 
 import '@/index.css'
 import { DataLoaderPlugin } from 'vue-router/experimental'
 
 import AppSetup from './AppSetup.vue'
-import { i18n, resolveAppLocale } from './i18n'
+import { i18n } from './i18n'
 import { appLogger } from './logger'
 import { initializePlatform } from './platform'
 import { router } from './router'
@@ -41,6 +37,7 @@ configureUiI18n((key: UiMessageKey, params?: UiMessageParams) =>
 )
 
 document.addEventListener('contextmenu', e => e.preventDefault())
+document.documentElement.lang = 'zh-CN'
 
 await initializePlatform().then(v => {
   appLogger.scoped('platform').info('platform initialized', { nativeInsets: v || undefined })
@@ -59,26 +56,7 @@ const app = createApp(
     const themeColor = Color('#fb7299').hex()
     const themeColorDark = Color(themeColor).darken(0.2).hex()
     const config = useConfig()
-    const locale = computed(() => resolveAppLocale(config.load(Core.cfg).data.value.language))
-    const naiveLocale = computed(() => {
-      switch (locale.value) {
-        case 'zh-CN':
-          return { dateLocale: dateZhCN, locale: naiveZhCN }
-        case 'zh-TW':
-          return { dateLocale: dateZhTW, locale: naiveZhTW }
-        default:
-          return { dateLocale: dateEnUS, locale: naiveEnUS }
-      }
-    })
-
-    watch(
-      locale,
-      value => {
-        i18n.global.locale.value = value
-        document.documentElement.lang = value
-      },
-      { immediate: true },
-    )
+    const naiveLocale = { dateLocale: dateZhCN, locale: naiveZhCN }
 
     const themeOverrides = reactiveComputed<GlobalThemeOverrides>(() => ({
       common: {
@@ -100,13 +78,13 @@ const app = createApp(
     )
     return () => (
       <NConfigProvider
-        locale={naiveLocale.value.locale}
-        dateLocale={naiveLocale.value.dateLocale}
+        locale={naiveLocale.locale}
+        dateLocale={naiveLocale.dateLocale}
         abstract
         theme={config.isDark ? darkTheme : lightTheme}
         themeOverrides={themeOverrides}
       >
-        <DcConfigProvider locale={locale.value} theme={config.isDark ? 'dark' : 'light'}>
+        <DcConfigProvider locale='zh-CN' theme={config.isDark ? 'dark' : 'light'}>
           <NGlobalStyle />
           <NLoadingBarProvider>
             <NDialogProvider>
