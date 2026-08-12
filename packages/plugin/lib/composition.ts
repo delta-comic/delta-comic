@@ -18,6 +18,7 @@ import {
   LocalFileSourceResolver,
   MarketplaceSourceResolver,
   type PluginCatalog,
+  type PluginInstallReporter,
   PluginInstallService,
   StoredPluginModuleReader,
   ZipPackageCodec,
@@ -98,21 +99,29 @@ export const pluginRuntime = new PluginRuntime({
   store: pluginStore,
 })
 
-export const installPlugin = async (input: File | string) => {
-  const archive = await pluginInstaller.install(input)
+export interface PluginInstallOptions {
+  readonly report?: PluginInstallReporter
+  readonly signal?: AbortSignal
+}
+
+export const installPlugin = async (input: File | string, options: PluginInstallOptions = {}) => {
+  const archive = await pluginInstaller.install(input, options.signal, options.report)
   await pluginRuntime.refreshCandidates()
   return archive
 }
 
-export const updatePlugin = async (archive: { installInput: string }) => {
+export const updatePlugin = async (
+  archive: { installInput: string },
+  options?: PluginInstallOptions,
+) => {
   if (!archive.installInput) throw new Error('plugin has no reusable install source')
-  return await installPlugin(archive.installInput)
+  return await installPlugin(archive.installInput, options)
 }
 
-export const updatePluginByName = async (plugin: string) => {
+export const updatePluginByName = async (plugin: string, options?: PluginInstallOptions) => {
   const archive = await pluginRepository.find(plugin)
   if (!archive) throw new Error(`installed plugin not found: ${plugin}`)
-  return await updatePlugin(archive)
+  return await updatePlugin(archive, options)
 }
 
 export const setPluginEnabled = async (plugin: string, enabled: boolean) => {
