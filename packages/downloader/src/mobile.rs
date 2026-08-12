@@ -311,6 +311,39 @@ pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_runTask(
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
+pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_getTaskSnapshot(
+  mut env: JNIEnv<'_>,
+  _receiver: JObject<'_>,
+  task_id: JString<'_>,
+) -> jstring {
+  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+    return std::ptr::null_mut();
+  };
+  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
+    return std::ptr::null_mut();
+  };
+  let task = match tauri::async_runtime::block_on(engine.repository.get_task(&task_id)) {
+    Ok(Some(task)) => task,
+    Ok(None) => return std::ptr::null_mut(),
+    Err(error) => {
+      tracing::error!("Android task snapshot lookup failed: {error}");
+      return std::ptr::null_mut();
+    }
+  };
+  let json = serde_json::json!({
+    "title": task.title,
+    "totalBytes": task.total_bytes,
+    "downloadedBytes": task.downloaded_bytes,
+  })
+  .to_string();
+  env
+    .new_string(json)
+    .map(JString::into_raw)
+    .unwrap_or(std::ptr::null_mut())
+}
+
+#[allow(non_snake_case)]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_getSafDirectInstruction(
   mut env: JNIEnv<'_>,
   _receiver: JObject<'_>,

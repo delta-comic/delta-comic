@@ -1,5 +1,6 @@
 package org.deltacomic.downloader
 
+import android.app.NotificationManager
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -37,7 +38,13 @@ class DownloadWorker(context: Context, params: WorkerParameters) : CoroutineWork
     }
 
     private suspend fun runCancellable(taskId: String): ExecutionResult = suspendCancellableCoroutine { continuation ->
-        val future = DownloadRuntime.runAsync(applicationContext, taskId) { result ->
+        val manager = applicationContext.getSystemService(NotificationManager::class.java)
+        val future = DownloadRuntime.runAsync(applicationContext, taskId, { snapshot ->
+            manager.notify(
+                stablePlatformId(taskId),
+                DownloadRuntime.createNotification(applicationContext, taskId, snapshot)
+            )
+        }) { result ->
             if (continuation.isActive) continuation.resume(result)
         }
         continuation.invokeOnCancellation {
