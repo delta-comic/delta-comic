@@ -7,6 +7,7 @@ import {
   taskDisplayName,
   taskEta,
   taskProgress,
+  taskProgressIsIndeterminate,
 } from '../../../../src/features/downloads/format'
 
 const task = {
@@ -34,6 +35,14 @@ describe('download formatters', () => {
     expect(taskEta(task)).toBe(6)
     expect(taskProgress({ ...task, downloadedBytes: 2048 })).toBe(100)
     expect(taskEta({ ...task, speedBytesPerSecond: 0 })).toBeUndefined()
+  })
+
+  it('marks only active tasks without totals as indeterminate', () => {
+    expect(taskProgressIsIndeterminate({ ...task, totalBytes: undefined })).toBe(true)
+    expect(taskProgressIsIndeterminate(task)).toBe(false)
+    expect(taskProgressIsIndeterminate({ ...task, status: 'paused', totalBytes: undefined })).toBe(
+      false,
+    )
   })
 
   it('falls back from blank titles to the destination filename', () => {

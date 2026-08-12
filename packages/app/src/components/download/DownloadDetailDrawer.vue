@@ -14,7 +14,13 @@ import { computed, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { DownloadTask, DownloadTaskDetail } from '@/features/downloads/downloaderClient'
-import { formatBytes, taskEta, taskProgress, formatDuration } from '@/features/downloads/format'
+import {
+  formatBytes,
+  formatDuration,
+  taskEta,
+  taskProgress,
+  taskProgressIsIndeterminate,
+} from '@/features/downloads/format'
 
 import DownloadTaskActions from './DownloadTaskActions.vue'
 
@@ -72,6 +78,7 @@ const eta = computed(() => (props.task ? formatDuration(taskEta(props.task)) : u
           <NProgress
             class="mt-4"
             :percentage="progress"
+            :processing="taskProgressIsIndeterminate(task)"
             :status="task.status === 'failed' ? 'error' : undefined"
           />
         </section>

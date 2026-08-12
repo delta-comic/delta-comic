@@ -5,7 +5,12 @@ import { computed, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { DownloadTask } from '@/features/downloads/downloaderClient'
-import { formatBytes, taskDisplayName, taskProgress } from '@/features/downloads/format'
+import {
+  formatBytes,
+  taskDisplayName,
+  taskProgress,
+  taskProgressIsIndeterminate,
+} from '@/features/downloads/format'
 
 import DownloadTaskActions from './DownloadTaskActions.vue'
 import DownloadTaskCard from './DownloadTaskCard.vue'
@@ -82,7 +87,11 @@ const empty = computed(() => props.tasks.length === 0)
               {{ t(`download.status.${item.data.status}`) }}
             </NTag>
             <div class="min-w-0">
-              <NProgress :percentage="taskProgress(item.data)" :show-indicator="false" />
+              <NProgress
+                :percentage="taskProgress(item.data)"
+                :processing="taskProgressIsIndeterminate(item.data)"
+                :show-indicator="false"
+              />
               <div class="mt-1 truncate text-[11px] text-(--dc-text-secondary)">
                 {{ formatBytes(item.data.downloadedBytes) }} /
                 {{ formatBytes(item.data.totalBytes) }}
