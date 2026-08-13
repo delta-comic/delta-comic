@@ -22,9 +22,14 @@ describe('runPluginInstallPhases', () => {
         { decode: 'Decode', persist: 'Persist', resolve: 'Download' },
         progress => `${progress.phase}:${progress.progress}`,
         async ({ report }) => {
+          expect(createProgress.mock.calls.map(([title]) => title)).toEqual(['Download'])
+          expect(createLoading).not.toHaveBeenCalled()
           report?.({ phase: 'resolve', progress: 40 })
           report?.({ phase: 'decode', progress: 50 })
+          expect(createProgress.mock.calls.map(([title]) => title)).toEqual(['Download'])
+          expect(createLoading.mock.calls.map(([title]) => title)).toEqual(['Decode'])
           report?.({ phase: 'persist', progress: 75 })
+          expect(createProgress.mock.calls.map(([title]) => title)).toEqual(['Download', 'Persist'])
           return 'installed'
         },
       ),
