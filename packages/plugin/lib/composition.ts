@@ -58,6 +58,9 @@ const pluginFiles = createDefaultPluginFileStore()
 const pluginRepository = new DatabasePluginArchiveRepository()
 const pluginReader = new StoredPluginModuleReader(pluginFiles)
 const internalPreferences = new LocalInternalPluginPreferences()
+const internalPluginIds = new Set(
+  internalPluginDefinitions.map(definition => definition.manifest.name.id),
+)
 const internalProvider = new InternalPluginCandidateProvider(
   internalPluginDefinitions,
   internalPreferences,
@@ -83,7 +86,7 @@ export const pluginInstaller = new PluginInstallService({
   codecs: [new ZipPackageCodec(), new DevScriptCodec()],
   files: pluginFiles,
   repository: pluginRepository,
-  reservedIds: new Set(internalPluginDefinitions.map(definition => definition.manifest.name.id)),
+  reservedIds: internalPluginIds,
   resolvers: [new LocalFileSourceResolver(), marketplaceSource, githubSource, httpSource],
 })
 
@@ -107,9 +110,18 @@ export interface PluginInstallOptions {
 }
 
 export const installPlugin = async (input: File | string, options: PluginInstallOptions = {}) => {
+  const installed = new Set([
+    ...internalPluginIds,
+    ...(await pluginRepository.list()).map(archive => archive.pluginName),
+  ])
   const archive = await pluginInstaller.install(input, options.signal, options.report)
-  pluginRuntime.markRestartRequired(archive.pluginName)
-  await pluginRuntime.refreshCandidates()
+  const candidates = await pluginRuntime.refreshCandidates()
+  for (const candidate of candidates) {
+    const plugin = candidate.manifest.name.id
+    if (plugin === archive.pluginName || !installed.has(plugin)) {
+      pluginRuntime.markRestartRequired(plugin)
+    }
+  }
   return archive
 }
 

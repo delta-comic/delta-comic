@@ -1,4 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
+import type { PluginManifest } from '@delta-comic/model'
 import { describe, expect, it, vi } from 'vitest'
 
 import { MemoryPluginFileStore } from '../../../lib/adapters'
@@ -9,7 +10,7 @@ import type {
 } from '../../../lib/install'
 import { PluginInstallService } from '../../../lib/install'
 
-const manifest = (version: string) => ({
+const manifest = (version: string): PluginManifest => ({
   apiVersion: 1 as const,
   author: 'test',
   description: 'test',
@@ -28,6 +29,12 @@ const archive = (version: string): PluginArchiveDB.Archive => ({
   pluginName: 'example',
 })
 
+const packageFor = (pluginManifest: PluginManifest) => ({
+  codecId: 'zip',
+  files: new Map([['index.mjs', new TextEncoder().encode(pluginManifest.name.id)]]),
+  manifest: pluginManifest,
+})
+
 const resolver: PluginSourceResolver = {
   id: 'local',
   matches: () => true,
@@ -40,11 +47,7 @@ const resolver: PluginSourceResolver = {
 
 const codec: PluginPackageCodec = {
   id: 'zip',
-  decode: async () => ({
-    codecId: 'zip',
-    files: new Map([['index.mjs', new TextEncoder().encode('new')]]),
-    manifest: manifest('2.0.0'),
-  }),
+  decode: async () => packageFor(manifest('2.0.0')),
   matches: () => true,
 }
 
@@ -124,6 +127,112 @@ describe('PluginInstallService', () => {
       { description: 'example', phase: 'persist', progress: 50 },
       { description: 'example', phase: 'persist', progress: 100 },
     ])
+  })
+
+  it('installs downloadable dependencies before the requested plugin', async () => {
+    const files = new MemoryPluginFileStore()
+    const current = new Map<string, PluginArchiveDB.Archive>()
+    const repository: PluginArchiveRepository = {
+      find: async plugin => current.get(plugin),
+      list: async () => [...current.values()],
+      remove: async plugin => {
+        current.delete(plugin)
+      },
+      upsert: async value => {
+        current.set(value.pluginName, value)
+      },
+    }
+    const packages = new Map([
+      ['ap:base', packageFor({ ...manifest('1.0.0'), name: { display: 'Base', id: 'base' } })],
+      [
+        'ap:shared',
+        packageFor({ ...manifest('1.0.0'), name: { display: 'Shared', id: 'shared' } }),
+      ],
+      [
+        'local',
+        packageFor({
+          ...manifest('2.0.0'),
+          name: { display: 'Example', id: 'example' },
+          require: [
+            { id: 'base', download: 'ap:base' },
+            { id: 'shared', download: 'ap:shared' },
+            { id: 'base', download: 'ap:base' },
+            { id: 'core', download: 'ap:core' },
+          ],
+        }),
+      ],
+    ])
+    const inputs: string[] = []
+    const source: PluginSourceResolver = {
+      id: 'catalog',
+      matches: input => typeof input === 'string',
+      resolve: async input => {
+        const key = String(input)
+        inputs.push(key)
+        return { file: new File([key], `${key}.zip`), installInput: key, resolverId: 'catalog' }
+      },
+    }
+    const packageCodec: PluginPackageCodec = {
+      id: 'zip',
+      matches: () => true,
+      decode: async file =>
+        packages.get(file.name.replace('.zip', '')) ?? packageFor(manifest('1')),
+    }
+    const service = new PluginInstallService({
+      codecs: [packageCodec],
+      files,
+      repository,
+      reservedIds: new Set(['core']),
+      resolvers: [source],
+    })
+
+    await service.install('local')
+
+    expect(inputs).toEqual(['local', 'ap:base', 'ap:shared'])
+    expect([...current.keys()]).toEqual(['base', 'shared', 'example'])
+  })
+
+  it('rejects a dependency package whose id differs from the declaration', async () => {
+    const files = new MemoryPluginFileStore()
+    const current = new Map<string, PluginArchiveDB.Archive>()
+    const repository: PluginArchiveRepository = {
+      find: async plugin => current.get(plugin),
+      list: async () => [],
+      remove: async plugin => {
+        current.delete(plugin)
+      },
+      upsert: async value => {
+        current.set(value.pluginName, value)
+      },
+    }
+    const packageCodec: PluginPackageCodec = {
+      id: 'zip',
+      matches: () => true,
+      decode: async file =>
+        packageFor(
+          file.name.startsWith('root')
+            ? { ...manifest('1.0.0'), require: [{ id: 'base', download: 'dependency' }] }
+            : { ...manifest('1.0.0'), name: { display: 'Other', id: 'other' } },
+        ),
+    }
+    const source: PluginSourceResolver = {
+      id: 'source',
+      matches: () => true,
+      resolve: async input => ({
+        file: new File([], `${input}.zip`),
+        installInput: String(input),
+        resolverId: 'source',
+      }),
+    }
+    const service = new PluginInstallService({
+      codecs: [packageCodec],
+      files,
+      repository,
+      resolvers: [source],
+    })
+
+    await expect(service.install('root')).rejects.toThrow('downloaded as "other"')
+    expect(current).toHaveLength(0)
   })
 
   it('restores files and metadata when uninstall persistence fails', async () => {

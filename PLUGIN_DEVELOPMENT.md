@@ -254,7 +254,9 @@ interface PluginManifest {
 
 路径必须是安全相对路径，不能是绝对路径、盘符路径，不能包含 `..` 或空字符。
 
-`require[].download` 目前只作为依赖下载提示保存，运行时依赖规划只读取 `id`，不会自动安装缺失依赖。
+`require[].download` 是依赖的安装语句，例如 `ap:xxx` 或 `gh:owner/repo`。安装插件时，宿主会通过现有
+下载源解析器自动下载并按依赖顺序安装声明了下载语句的缺失依赖；已安装的依赖不会重复安装。下载的
+插件 ID 必须与 `require[].id` 一致，否则安装会失败。
 
 ## 4. DCPluginConfig：插件真正贡献的内容
 
