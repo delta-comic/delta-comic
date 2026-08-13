@@ -11,7 +11,7 @@
     "core:window:allow-show",
     "core:window:allow-set-fullscreen",
     "clipboard-manager:allow-read-text",
-    "clipboard-manager:deny-write-text",
+    "clipboard-manager:allow-write-text",
     "fs:default",
     "fs:allow-localdata-write-recursive",
     "fs:allow-data-write-recursive",
