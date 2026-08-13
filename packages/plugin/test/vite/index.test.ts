@@ -117,12 +117,13 @@ describe('deltaComic vite plugin', () => {
     expect(result?.code).toContain('Promise.resolve(window.$$lib$$.DcDb)')
   })
 
-  it('forces a browser-safe single-file bundle with inlined assets', () => {
+  it('embeds assets without disabling JavaScript code splitting', () => {
     const config = getBuildPlugin().config?.({})
 
     expect(config.build.assetsInlineLimit).toBe(Number.POSITIVE_INFINITY)
     expect(config.build.cssCodeSplit).toBe(false)
-    expect(config.build.rollupOptions.output.inlineDynamicImports).toBe(true)
+    expect(config.build.rollupOptions).toBeUndefined()
+    expect(config.build.rolldownOptions).toBeUndefined()
   })
 
   it('emits plugin.zip and keeps manifest.json outside the archive', async () => {
