@@ -17,6 +17,12 @@ export interface PluginInstallServiceOptions {
   readonly resolvers: readonly PluginSourceResolver[]
 }
 
+interface PluginInstallContext {
+  readonly installing: Set<string>
+  readonly installed: Set<string>
+  readonly added: string[]
+}
+
 export class PluginInstallService {
   public constructor(private readonly options: PluginInstallServiceOptions) {}
 
@@ -24,6 +30,30 @@ export class PluginInstallService {
     input: PluginInstallInput,
     signal = new AbortController().signal,
     report: PluginInstallReporter = () => {},
+  ) {
+    const context: PluginInstallContext = { added: [], installed: new Set(), installing: new Set() }
+    try {
+      return await this.#install(input, signal, report, context)
+    } catch (error) {
+      const rollbackErrors: unknown[] = [error]
+      for (const plugin of [...context.added].reverse()) {
+        try {
+          await this.uninstall(plugin)
+        } catch (rollbackError) {
+          rollbackErrors.push(rollbackError)
+        }
+      }
+      if (rollbackErrors.length === 1) throw error
+      throw new AggregateError(rollbackErrors, 'failed to install plugin dependencies')
+    }
+  }
+
+  async #install(
+    input: PluginInstallInput,
+    signal: AbortSignal,
+    report: PluginInstallReporter,
+    context: PluginInstallContext,
+    expectedPlugin?: string,
   ) {
     report({ phase: 'resolve', progress: 0 })
     const resolver = this.options.resolvers.find(candidate => candidate.matches(input))
@@ -39,43 +69,72 @@ export class PluginInstallService {
     if (this.options.reservedIds?.has(plugin)) {
       throw new Error(`plugin id "${plugin}" is reserved by an internal plugin`)
     }
+    if (expectedPlugin && plugin !== expectedPlugin) {
+      throw new Error(`plugin dependency "${expectedPlugin}" downloaded as "${plugin}"`)
+    }
+    if (context.installing.has(plugin)) {
+      throw new Error(`plugin dependency cycle includes "${plugin}"`)
+    }
     report({ description: plugin, phase: 'decode', progress: 100 })
 
-    const previous = await this.options.repository.find(plugin)
-    const replacement = await this.options.files.replace(plugin, decoded.files)
-    const archive: PluginArchiveDB.Archive = {
-      displayName: decoded.manifest.name.display,
-      enable: previous?.enable ?? true,
-      installerName: source.resolverId,
-      installInput: source.installInput,
-      loaderName: decoded.codecId,
-      meta: decoded.manifest,
-      pluginName: plugin,
-    }
-
+    context.installing.add(plugin)
     try {
-      report({ description: plugin, phase: 'persist', progress: 50 })
-      await this.options.repository.upsert(archive)
-      await replacement.commit()
-      report({ description: plugin, phase: 'persist', progress: 100 })
-      return archive
-    } catch (error) {
-      const rollbackErrors: unknown[] = []
+      for (const dependency of decoded.manifest.require) {
+        if (
+          this.options.reservedIds?.has(dependency.id) ||
+          context.installed.has(dependency.id) ||
+          (await this.options.repository.find(dependency.id))
+        ) {
+          context.installed.add(dependency.id)
+          continue
+        }
+        if (!dependency.download) continue
+        await this.#install(dependency.download, signal, report, context, dependency.id)
+      }
+
+      const previous = await this.options.repository.find(plugin)
+      const replacement = await this.options.files.replace(plugin, decoded.files)
+      const archive: PluginArchiveDB.Archive = {
+        displayName: decoded.manifest.name.display,
+        enable: previous?.enable ?? true,
+        installerName: source.resolverId,
+        installInput: source.installInput,
+        loaderName: decoded.codecId,
+        meta: decoded.manifest,
+        pluginName: plugin,
+      }
+
       try {
-        await replacement.rollback()
-      } catch (rollbackError) {
-        rollbackErrors.push(rollbackError)
+        report({ description: plugin, phase: 'persist', progress: 50 })
+        await this.options.repository.upsert(archive)
+        await replacement.commit()
+        report({ description: plugin, phase: 'persist', progress: 100 })
+        context.installed.add(plugin)
+        if (!previous) context.added.push(plugin)
+        return archive
+      } catch (error) {
+        const rollbackErrors: unknown[] = []
+        try {
+          await replacement.rollback()
+        } catch (rollbackError) {
+          rollbackErrors.push(rollbackError)
+        }
+        try {
+          if (previous) await this.options.repository.upsert(previous)
+          else await this.options.repository.remove(plugin)
+        } catch (rollbackError) {
+          rollbackErrors.push(rollbackError)
+        }
+        if (rollbackErrors.length > 0) {
+          throw new AggregateError(
+            [error, ...rollbackErrors],
+            `failed to install plugin "${plugin}"`,
+          )
+        }
+        throw error
       }
-      try {
-        if (previous) await this.options.repository.upsert(previous)
-        else await this.options.repository.remove(plugin)
-      } catch (rollbackError) {
-        rollbackErrors.push(rollbackError)
-      }
-      if (rollbackErrors.length > 0) {
-        throw new AggregateError([error, ...rollbackErrors], `failed to install plugin "${plugin}"`)
-      }
-      throw error
+    } finally {
+      context.installing.delete(plugin)
     }
   }
 
