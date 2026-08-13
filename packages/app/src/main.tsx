@@ -38,6 +38,7 @@ configureUiI18n((key: UiMessageKey, params?: UiMessageParams) =>
 
 document.addEventListener('contextmenu', e => e.preventDefault())
 document.documentElement.lang = 'zh-CN'
+document.documentElement.setAttribute('autocapitalize', 'none')
 
 await initializePlatform().then(v => {
   appLogger.scoped('platform').info('platform initialized', { nativeInsets: v || undefined })
