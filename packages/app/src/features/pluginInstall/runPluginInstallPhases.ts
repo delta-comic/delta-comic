@@ -7,25 +7,33 @@ export async function runPluginInstallPhases<T>(
   describe: (progress: PluginInstallProgress) => string,
   operation: (options: PluginInstallOptions) => Promise<T>,
 ) {
-  const phases = {
-    resolve: createPhase(createProgress, titles.resolve),
-    decode: createPhase(createLoading, titles.decode),
-    persist: createPhase(createProgress, titles.persist),
+  const phases: Partial<Record<PluginInstallProgress['phase'], ReturnType<typeof createPhase>>> = {}
+  const create = (phase: PluginInstallProgress['phase']) => {
+    const entry = (phases[phase] = createPhase(
+      phase === 'decode' ? createLoading : createProgress,
+      titles[phase],
+    ))
+    return entry
   }
-  await Promise.all(Object.values(phases).map(phase => phase.ready))
+  let current = create('resolve')
+  await current.ready
 
   try {
     const result = await operation({
       report(progress) {
-        phases[progress.phase].update(describe(progress), progress.progress)
+        if (phases[progress.phase] === undefined) {
+          current.complete.resolve()
+          current = create(progress.phase)
+        }
+        current.update(describe(progress), progress.progress)
       },
     })
-    Object.values(phases).forEach(phase => phase.complete.resolve())
-    await Promise.all(Object.values(phases).map(phase => phase.line))
+    current.complete.resolve()
+    await Promise.all(Object.values(phases).map(phase => phase?.line))
     return result
   } catch (error) {
-    Object.values(phases).forEach(phase => phase.complete.reject(error))
-    await Promise.allSettled(Object.values(phases).map(phase => phase.line))
+    Object.values(phases).forEach(phase => phase?.complete.reject(error))
+    await Promise.allSettled(Object.values(phases).map(phase => phase?.line))
     throw error
   }
 }
