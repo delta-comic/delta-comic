@@ -154,7 +154,10 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
         </template>
         <template #header-extra>
           <span class="ml-2 font-light text-(--nui-text-color-3) italic">
-            {{ plugin.enable ? t('plugin.list.status.enabled') : t('plugin.list.status.disabled') }}
+            <!-- enable疑似被错误的设置，应用只会加载"未加载"的插件，日后修复 -->
+            {{
+              !plugin.enable ? t('plugin.list.status.enabled') : t('plugin.list.status.disabled')
+            }}
           </span>
           <NDropdown
             v-if="actionsFor(plugin).length > 0"

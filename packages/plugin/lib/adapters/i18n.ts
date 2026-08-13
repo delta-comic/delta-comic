@@ -1,3 +1,5 @@
+import { defaultsDeep } from 'es-toolkit/compat'
+
 import type { PluginLocaleMessage, PluginLocaleMessages } from '../api/i18n'
 
 export type { PluginLocaleMessage, PluginLocaleMessages } from '../api/i18n'
@@ -8,25 +10,6 @@ export interface PluginI18nAdapter {
 }
 
 const messageKeyPrefix = 'i18n:'
-
-const unsafeKeys = new Set(['__proto__', 'constructor', 'prototype'])
-
-const mergeMessages = (
-  target: PluginLocaleMessage,
-  source: PluginLocaleMessage | undefined,
-): PluginLocaleMessage => {
-  if (!source) return target
-  for (const [key, value] of Object.entries(source)) {
-    if (unsafeKeys.has(key)) continue
-    if (typeof value === 'string') {
-      target[key] = value
-      continue
-    }
-    const current = target[key]
-    target[key] = mergeMessages(typeof current === 'object' ? { ...current } : {}, value)
-  }
-  return target
-}
 
 export class PluginI18nRegistry {
   private adapter?: PluginI18nAdapter
@@ -40,10 +23,9 @@ export class PluginI18nRegistry {
   }
 
   public register(plugin: string, messages: PluginLocaleMessages) {
-    const previous = this.pluginMessages.get(plugin)
-    this.pluginMessages.delete(plugin)
-    this.pluginMessages.set(plugin, messages)
-    this.refresh(new Set([...Object.keys(previous ?? {}), ...Object.keys(messages)]))
+    const previous = this.pluginMessages.get(plugin) ?? {}
+    this.pluginMessages.set(plugin, defaultsDeep(messages, previous))
+    this.refresh(new Set([...Object.keys(previous), ...Object.keys(messages)]))
   }
 
   public remove(plugin: string) {
@@ -58,8 +40,8 @@ export class PluginI18nRegistry {
   }
 
   private compose(locale: string) {
-    const message = mergeMessages({}, this.baseMessages[locale])
-    for (const messages of this.pluginMessages.values()) mergeMessages(message, messages[locale])
+    const message = this.baseMessages[locale]
+    for (const messages of this.pluginMessages.values()) defaultsDeep(message, messages[locale])
     return message
   }
 
