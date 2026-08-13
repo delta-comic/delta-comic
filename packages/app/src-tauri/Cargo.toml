@@ -68,6 +68,9 @@ workspace = true
 [target.'cfg(target_os = "android")'.dependencies.tauri-plugin-webview-upgrade]
 workspace = true
 
+[target.'cfg(target_os = "macos")'.dependencies.objc2-foundation]
+workspace = true
+
 [dependencies.tauri-plugin-sql]
 workspace = true
 

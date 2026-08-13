@@ -21,6 +21,7 @@ version = "3.0.0-next.10"
 [workspace.dependencies]
 log = "0.4.33"
 mime_guess = "2.0.5"
+objc2-foundation = { version = "0.3.2", features = ["NSString", "NSUserDefaults"] }
 percent-encoding = "2.3.2"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
