@@ -20,6 +20,8 @@ ios = { level = "full", notes = "" }
 tauri-plugin = { workspace = true, features = ["build"] }
 
 [dependencies]
+mime_guess = { workspace = true }
+percent-encoding = { workspace = true }
 tracing = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

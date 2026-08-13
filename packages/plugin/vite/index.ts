@@ -66,7 +66,6 @@ export const deltaComic = (
             name: `$$lib$$.__DcPlugin__${meta.name.id.replace('-', '_')}__`,
             formats: ['es'],
           },
-          rollupOptions: { output: { inlineDynamicImports: true } },
         },
       })
     },

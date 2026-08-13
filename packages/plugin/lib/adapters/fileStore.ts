@@ -1,4 +1,4 @@
-import { isTauri } from '@tauri-apps/api/core'
+import { convertFileSrc, isTauri } from '@tauri-apps/api/core'
 
 import type { PluginFileReplacement, PluginFileStore } from '../install'
 import { safePluginPath } from '../install'
@@ -25,6 +25,15 @@ const mimeType = (path: string) =>
     svg: 'image/svg+xml',
     webp: 'image/webp',
   })[path.split('.').at(-1)?.toLowerCase() ?? ''] ?? 'application/octet-stream'
+
+export const createPluginProtocolUrl = (plugin: string, path: string) => {
+  const base = convertFileSrc('', 'plugin')
+  const encodedPath = safePluginPath(path, 'plugin protocol path')
+    .split('/')
+    .map(encodeURIComponent)
+    .join('/')
+  return `${base}${encodeURIComponent(plugin)}/${encodedPath}`
+}
 
 export class MemoryPluginFileStore implements PluginFileStore {
   readonly #files = new Map<string, Map<string, Uint8Array>>()
@@ -247,9 +256,7 @@ class TauriPluginFileBackend implements PluginFileBackend {
   }
 
   public async moduleUrl(plugin: string, path: string) {
-    const { convertFileSrc } = await import('@tauri-apps/api/core')
-    const { join } = await import('@tauri-apps/api/path')
-    return convertFileSrc(await join(await this.#root(plugin), path))
+    return createPluginProtocolUrl(plugin, path)
   }
 }
 
