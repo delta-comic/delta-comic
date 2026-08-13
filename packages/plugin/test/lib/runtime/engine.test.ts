@@ -159,4 +159,35 @@ describe('PluginRuntime', () => {
     expect(report.failures.every(value => value.phase === 'preload')).toBe(true)
     expect(dependentFactory).not.toHaveBeenCalled()
   })
+
+  it('reports invalid dependency graphs without rejecting startup', async () => {
+    const independentFactory = vi.fn(() => ({ name: 'independent' }))
+    const missingFactory = vi.fn(() => ({ name: 'missing-dependent' }))
+    const cyclicFactory = vi.fn(() => ({ name: 'cyclic-a' }))
+    const runtime = runtimeFor(() => [
+      candidate('independent', async () => ({ factory: independentFactory })),
+      candidate('missing-dependent', async () => ({ factory: missingFactory }), {
+        require: ['absent'],
+      }),
+      candidate('cyclic-a', async () => ({ factory: cyclicFactory }), { require: ['cyclic-b'] }),
+      candidate('cyclic-b', async () => ({ factory: cyclicFactory }), { require: ['cyclic-a'] }),
+    ])
+
+    const report = await runtime.preload({} as App)
+
+    expect(report.activated).toEqual(['independent'])
+    expect(report.failures.map(value => value.plugin)).toEqual([
+      'missing-dependent',
+      'cyclic-a',
+      'cyclic-b',
+    ])
+    expect(report.failures.map(value => String(value.error))).toEqual([
+      'Error: missing dependency: absent',
+      'Error: dependency cycle: cyclic-a -> cyclic-b -> cyclic-a',
+      'Error: dependency cycle: cyclic-a -> cyclic-b -> cyclic-a',
+    ])
+    expect(independentFactory).toHaveBeenCalledOnce()
+    expect(missingFactory).not.toHaveBeenCalled()
+    expect(cyclicFactory).not.toHaveBeenCalled()
+  })
 })

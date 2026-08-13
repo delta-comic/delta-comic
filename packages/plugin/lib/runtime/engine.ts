@@ -181,14 +181,22 @@ export class PluginRuntime {
   async #prepareEnabledPlugins(app: App): Promise<PluginRuntimeReport> {
     const candidates = (await this.refreshCandidates()).filter(candidate => candidate.enabled)
     const plan = planPluginDependencies(candidates)
-    this.#assertValidPlan(plan)
 
     const activated: string[] = []
-    const failures: PluginRuntimeFailure[] = []
-    const failed = new Set<string>()
+    const failures: PluginRuntimeFailure[] = plan.missing.map(({ dependency, plugin }) => ({
+      error: new Error(`missing dependency: ${dependency}`),
+      phase: 'preload',
+      plugin,
+    }))
+    for (const cycle of plan.cycles) {
+      const error = new Error(`dependency cycle: ${cycle.join(' -> ')}`)
+      for (const plugin of cycle.slice(0, -1)) failures.push({ error, phase: 'preload', plugin })
+    }
+    const failed = new Set(failures.map(value => value.plugin))
     for (const level of plan.levels) {
       for (const candidate of level) {
         const plugin = candidate.manifest.name.id
+        if (failed.has(plugin)) continue
         const blockedBy = candidate.manifest.require
           .map(value => value.id)
           .filter(dependency => failed.has(dependency))
