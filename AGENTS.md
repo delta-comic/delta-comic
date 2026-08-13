@@ -3,7 +3,8 @@
 ## 工具链
 
 - 使用 Vite+（`vp`），不要直接运行 `pnpm`、`vite`、`vitest`、`oxlint` 或 `oxfmt`
-  命令。仓库固定使用 Node `25.9.0`、pnpm `12.0.0-rc.3` 和 Rust `1.94.0`（2024 edition）。
+  命令。仓库固定使用 Node `25.9.0`、pnpm `12.0.0-rc.3` 和
+  `nightly-2026-08-12` Rust 工具链（MSRV `1.95.0`，2024 edition）。
 - 拉取依赖变更后运行 `vp install`。CI 使用 `vp install --frozen-lockfile`。
 - Vite+ 并非 Vite：工作区脚本通过 `vp run` 运行，例如
   `vp run --filter app dev:web`。本地 Vite+ 文档位于 `node_modules/vite-plus/docs`。
