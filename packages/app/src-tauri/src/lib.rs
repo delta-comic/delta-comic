@@ -8,6 +8,14 @@ use tauri::{
 };
 use tauri_plugin_downloader::DownloaderExt;
 
+#[cfg(target_os = "macos")]
+fn disable_automatic_capitalization() {
+  use objc2_foundation::{NSUserDefaults, ns_string};
+
+  NSUserDefaults::standardUserDefaults()
+    .setBool_forKey(false, ns_string!("NSAutomaticCapitalizationEnabled"));
+}
+
 #[cfg(desktop)]
 fn show_main_window(app: &tauri::AppHandle) {
   if let Some(window) = app.get_webview_window("main") {
@@ -51,6 +59,9 @@ fn setup_download_tray(app: &mut tauri::App) -> tauri::Result<()> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+  #[cfg(target_os = "macos")]
+  disable_automatic_capitalization();
+
   let builder = tauri_plugin_utils::init(
     tauri::Builder::default()
       .plugin(tauri_plugin_logger::init())

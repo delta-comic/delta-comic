@@ -1131,6 +1131,7 @@ dependencies = [
 name = "delta-comic"
 version = "3.0.0-next.10"
 dependencies = [
+ "objc2-foundation",
  "serde",
  "serde_json",
  "tauri",
