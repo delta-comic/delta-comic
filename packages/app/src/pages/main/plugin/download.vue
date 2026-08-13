@@ -18,25 +18,8 @@ const isAdding = ref(false)
 const $message = useMessage()
 const $dialog = useDialog()
 
-const confirmAdd = async (url: string) => {
-  if (isAdding.value) {
-    $message.warning(t('plugin.install.feedback.installing'))
-    return
-  }
-  isAdding.value = true
-
+const installFromUrl = async (url: string) => {
   try {
-    await $dialog.create({
-      type: 'info',
-      title: t('plugin.install.confirm.title'),
-      content: t('plugin.install.confirm.content', { source: url }),
-      onPositiveClick: () => {
-        return
-      },
-      onNegativeClick: () => {
-        isAdding.value = false
-      },
-    })
     pluginInstallLogger.info('plugin installation confirmed')
     await runPluginInstall(t('plugin.progress.downloadTitle', { input: url }), options =>
       installPlugin(url, options),
@@ -44,8 +27,25 @@ const confirmAdd = async (url: string) => {
     pluginInstallLogger.info('plugin installation completed')
   } catch (error) {
     pluginInstallLogger.error('plugin installation failed', error)
+  } finally {
+    isAdding.value = false
   }
-  isAdding.value = false
+}
+
+const confirmAdd = (url: string) => {
+  if (isAdding.value) {
+    $message.warning(t('plugin.install.feedback.installing'))
+    return
+  }
+  isAdding.value = true
+
+  $dialog.create({
+    type: 'info',
+    title: t('plugin.install.confirm.title'),
+    content: t('plugin.install.confirm.content', { source: url }),
+    onPositiveClick: () => installFromUrl(url),
+    onNegativeClick: () => (isAdding.value = false),
+  })
 }
 
 const upload = toReactive(useFileDialog({ accept: '', multiple: false }))
