@@ -43,6 +43,8 @@ const confirmAdd = (url: string) => {
     type: 'info',
     title: t('plugin.install.confirm.title'),
     content: t('plugin.install.confirm.content', { source: url }),
+    positiveText: t('common.actions.confirm'),
+    negativeText: t('common.actions.cancel'),
     onPositiveClick: () => installFromUrl(url),
     onNegativeClick: () => (isAdding.value = false),
   })
