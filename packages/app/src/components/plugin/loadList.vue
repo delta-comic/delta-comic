@@ -45,7 +45,7 @@ const getProgressLabel = ({ steps, progress }: PluginLoadingInfo) => {
       <DcCellGroup class="h-80 w-[80vw] shadow-2xl" inset>
         <TransitionGroup name="list" tag="div" class="size-full!">
           <!-- display toy item -->
-          <DcCell title="core" :label="t('plugin.loading.appContent')" center key="core">
+          <DcCell title="core" :label="$t('plugin.loading.appContent')" center key="core">
             <template #right-icon>
               <NSpin :size="25" />
             </template>
