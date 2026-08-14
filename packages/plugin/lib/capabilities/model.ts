@@ -18,7 +18,6 @@ export const createModelCapability = (services: PluginCapabilityServices): Capab
       register(pluginModelChannels.content, model.content)
       register(pluginModelChannels.expose, model.expose)
       register(pluginModelChannels.remote, model.remotes)
-      register(pluginModelChannels.resource, model.resource)
       register(pluginModelChannels.social, model.social)
       register(pluginModelChannels.special, model.special)
       register(pluginModelChannels.user, model.user)

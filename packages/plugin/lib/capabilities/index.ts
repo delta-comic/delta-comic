@@ -7,7 +7,6 @@ import { createI18nCapability } from './i18n'
 import { createLifecycleCapability } from './lifecycle'
 import { createModelCapability } from './model'
 import { createRemoteCapability } from './remote'
-import { createResourceCapability } from './resource'
 import type { PluginCapabilityServices } from './services'
 import { createSpecialCapability } from './special'
 import { createUserCapability } from './user'
@@ -20,7 +19,6 @@ export * from './i18n'
 export * from './lifecycle'
 export * from './model'
 export * from './remote'
-export * from './resource'
 export * from './services'
 export * from './special'
 export * from './user'
@@ -34,7 +32,6 @@ export const createDefaultCapabilities = (
   createModelCapability(services),
   createContentCapability(),
   createUserCapability(),
-  createResourceCapability(),
   createRemoteCapability(services),
   createAuthCapability(services),
   createSpecialCapability(),
