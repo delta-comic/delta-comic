@@ -1,4 +1,5 @@
 import { logger } from '@delta-comic/logger'
+import { cors as elysiaCors } from '@elysiajs/cors'
 import { openapi } from '@elysiajs/openapi'
 import { Elysia, t } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
@@ -11,7 +12,6 @@ import { authModule } from './modules/auth/auth.module'
 import { pluginsModule } from './modules/plugins/plugins.module'
 import { runScheduledPluginScripts } from './modules/plugins/plugins.script'
 import { syncModule } from './modules/sync/sync.module'
-import { cors } from './shared/http/cors'
 import { apiSuccessSchema, errorResponse, ok } from './shared/response'
 
 export { PluginDatabase } from './modules/plugins/plugins.database'
@@ -36,7 +36,15 @@ const moduleResponseSchema = t.Array(
 )
 
 export const app = new Elysia({ adapter: CloudflareAdapter, prefix: '/api' })
-  .use(cors)
+  .use(
+    elysiaCors({
+      allowedHeaders: ['content-type', 'authorization'],
+      maxAge: 86_400,
+      methods: ['DELETE', 'GET', 'PATCH', 'POST', 'OPTIONS'],
+      origin: true,
+      preflight: true,
+    }),
+  )
   .use(
     openapi({
       documentation: {
