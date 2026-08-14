@@ -62,7 +62,7 @@ export interface CallbackResult<T> {
 // user
 
 export interface UserAction {
-  call(author: UniItemAuthor): any
+  call(author: UniItemAuthor): unknown
   name: string
   id: string
   icon?: Component

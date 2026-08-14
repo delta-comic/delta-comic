@@ -21,7 +21,7 @@ const $props = withDefaults(
       isDarkMode?: boolean
     } & StyleProps
   >(),
-  { plugins: [] as any, config: {} as any },
+  { plugins: () => [], config: () => ({}) },
 )
 
 const md = computed(() => {

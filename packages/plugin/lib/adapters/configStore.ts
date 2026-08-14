@@ -22,7 +22,7 @@ export type PluginConfigLoader = <T extends ConfigPointer>(pointer: T) => Config
 
 const loadDatabaseConfig: PluginConfigLoader = pointer => {
   const store = useDbConfig(pointer.pluginName, pointer.config)
-  return { data: store as any, form: pointer.config, name: pointer.configName, ready: store.ready }
+  return { data: store, form: pointer.config, name: pointer.configName, ready: store.ready }
 }
 
 export class ConfigStore {

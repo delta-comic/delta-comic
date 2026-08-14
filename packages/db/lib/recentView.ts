@@ -3,6 +3,7 @@ import {
   useMutation,
   useQueryCache,
   useQuery as useColadaQuery,
+  type EntryKey,
 } from '@pinia/colada'
 import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
@@ -62,7 +63,7 @@ export const useRemove = defineMutation(() => {
 
 export const useQuery = <T>(
   query: (db: SelectQueryBuilder<DB, 'recentView', {}>) => Promise<T>,
-  otherKeys: any[] = [],
+  otherKeys: readonly unknown[] = [],
   initialData?: () => T,
 ) =>
   useColadaQuery({
@@ -70,7 +71,7 @@ export const useQuery = <T>(
       const { db } = await import('.')
       return await query(db.selectFrom('recentView'))
     },
-    key: () => [CommonQueryKey.common, QueryKey.item, query].concat(otherKeys),
+    key: () => [CommonQueryKey.common, QueryKey.item, query, ...otherKeys] as EntryKey,
     staleTime: 15000,
     refetchOnMount: 'always',
     initialData,

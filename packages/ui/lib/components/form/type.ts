@@ -1,8 +1,8 @@
-import type { FormConfigure, FormSingleResult } from '@delta-comic/model'
+import type { FormConfigure, FormDefaultValue, FormSingleConfigure } from '@delta-comic/model'
 
 export interface FormRowSlot<T extends FormConfigure, O extends (keyof T)[], K extends O[number]> {
-  config: T[K]
+  config: FormSingleConfigure
   path: K
-  modelValue: FormSingleResult<T[K]>
-  setModelValue(value: FormSingleResult<T[K]>): void
+  modelValue: FormDefaultValue[keyof FormDefaultValue]
+  setModelValue(value: FormDefaultValue[keyof FormDefaultValue]): void
 }

@@ -5,12 +5,9 @@ import {
   isNavigationFailure,
   NavigationFailureType,
   type _RouterClassic,
-  type RouteLocationAsPathGeneric,
-  type RouteLocationAsRelativeGeneric,
+  type RouteLocationRaw,
 } from 'vue-router'
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
-
-type RouteAim = string | RouteLocationAsRelativeGeneric | RouteLocationAsPathGeneric
 
 export const router = (window.$router = Object.assign(
   createRouter({ history: createWebHistory(), routes }),
@@ -25,8 +22,8 @@ router.beforeEach(to => {
   }
 })
 
-const $routerForceDo = async (mode: keyof typeof router.force, to: RouteAim) => {
-  const aim = router.resolve(to as any)
+const $routerForceDo = async (mode: keyof typeof router.force, to: RouteLocationRaw) => {
+  const aim = router.resolve(to)
   aim.query.force = 'true'
   let attempts = 0
   let r

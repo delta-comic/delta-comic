@@ -28,7 +28,9 @@ export const withTransition = async <T>(
   }
 }
 
-export async function countDb(sql: SelectQueryBuilder<DB, any, object>) {
+export async function countDb<TB extends keyof DB, O extends object>(
+  sql: SelectQueryBuilder<DB, TB, O>,
+) {
   const v = await sql.select(db => db.fn.countAll<number>().as('count')).executeTakeFirstOrThrow()
   return v.count
 }

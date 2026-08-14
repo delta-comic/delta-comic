@@ -152,7 +152,7 @@ export class Logger {
       }
       console[method] = proxy as (typeof console)[typeof method]
       restores.push(() => {
-        if (console[method] === proxy) console[method] = previous as never
+        if (console[method] === proxy) console[method] = previous as (typeof console)[typeof method]
       })
     }
     const restore = () => {

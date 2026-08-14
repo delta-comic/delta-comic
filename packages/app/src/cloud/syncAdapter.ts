@@ -1,3 +1,4 @@
+import type { DB, InsertObject, Kysely } from '@delta-comic/db'
 import { logger } from '@delta-comic/logger'
 import { syncCollectionNames, type SyncChange, type SyncCollection } from '@delta-comic/server'
 
@@ -62,20 +63,24 @@ export class DbCloudSyncAdapter {
     await DBUtils.withTransition(async trx => {
       for (const change of sorted) {
         if (change.action === 'delete') {
-          await this.deleteRemoteChange(trx as never, change)
+          await this.deleteRemoteChange(trx, change)
           continue
         }
-        if (change.data === undefined) continue
-        await (trx as any).replaceInto(change.collection).values(change.data).execute()
+        await this.upsertRemoteChange(trx, change)
       }
     }, db)
     syncAdapterLogger.info('remote sync changes applied', { changeCount: changes.length })
   }
 
-  private async deleteRemoteChange(
-    trx: { deleteFrom: (table: SyncCollection) => any },
-    change: SyncChange,
-  ): Promise<void> {
+  private async upsertRemoteChange(trx: Kysely<DB>, change: SyncChange): Promise<void> {
+    if (change.data === undefined) return
+    await trx
+      .replaceInto(change.collection)
+      .values(change.data as InsertObject<DB, SyncCollection>)
+      .execute()
+  }
+
+  private async deleteRemoteChange(trx: Kysely<DB>, change: SyncChange): Promise<void> {
     switch (change.collection) {
       case 'itemStore':
         await trx.deleteFrom('itemStore').where('key', '=', change.entityId).execute()

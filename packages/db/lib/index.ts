@@ -60,5 +60,7 @@ export const db = new Kysely<DB>({
 
 export * as DBUtils from './utils'
 
+export type { InsertObject, Kysely } from 'kysely'
+
 export * from './nativeStore'
 export { useConfig } from './config'

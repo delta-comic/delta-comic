@@ -54,9 +54,9 @@ export const createDownloadMessage = async <T,>(
       {
         title: string
         description: string
-        retry?: () => any
+        retry?: () => void
         progress?: number
-        pc: PromiseWithResolvers<any>
+        pc: { reject: (reason?: unknown) => void }
       } & ({ state: 'success' | undefined } | { state: 'error'; error: Error })
     >(),
   )
@@ -223,7 +223,7 @@ export const createDownloadMessage = async <T,>(
     duration: 0,
   })
 
-  const createLine = <T extends object, TResult extends PromiseLike<any>>(
+  const createLine = <T extends object, TResult extends PromiseLike<unknown>>(
     title: string,
     config: T,
     fn: (config: Reactive<{ description: string; retryable: boolean } & T>) => TResult,
@@ -256,11 +256,7 @@ export const createDownloadMessage = async <T,>(
       state.value = undefined
       _config.description = ''
       _config.retryable = false
-      for (const key in config) {
-        if (!Object.hasOwn(config, key)) continue
-        const element = config[key]
-        _config[key as keyof typeof _config] = element as any
-      }
+      Object.assign(_config, config)
       try {
         const v = await fn(_config)
         state.value = 'success'
