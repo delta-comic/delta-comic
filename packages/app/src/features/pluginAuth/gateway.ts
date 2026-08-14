@@ -1,10 +1,10 @@
 import type { PluginAuthGateway, User } from '@delta-comic/plugin'
-import { pluginI18n } from '@delta-comic/plugin'
 import { createForm } from '@delta-comic/ui'
 import { PageWebviewAuth } from '@delta-comic/utils'
 import { NSelect } from 'naive-ui'
 import { h, ref } from 'vue'
 
+import { translateText } from '@/i18n'
 import { localizeForm } from '@/i18n/pluginText'
 
 const raceAbort = <T>(operation: Promise<T>, signal: AbortSignal) => {
@@ -33,7 +33,7 @@ const chooseSelection = async (
     content: () =>
       h(NSelect, {
         'options': selections.map(selection => ({
-          label: pluginI18n.translateText(selection.name),
+          label: translateText(selection.name),
           value: selection.id,
         })),
         'value': value.value,

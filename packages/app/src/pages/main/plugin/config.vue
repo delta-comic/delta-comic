@@ -3,16 +3,16 @@ import { Core, useConfig } from '@delta-comic/plugin'
 import { NDynamicInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
-const cfg = useConfig().load(Core.cfg)
-const { t, te } = useI18n()
+import { translateText } from '@/i18n'
 
-const translateTitle = (title: string) => (te(title) ? t(title) : title)
+const cfg = useConfig().load(Core.cfg)
+const { t } = useI18n()
 </script>
 
 <template>
   <NScrollbar class="size-full">
     <div class="mb-2 ml-4 text-lg font-semibold">
-      {{ translateTitle(cfg.form.receivePerReleaseUpdate.info) }}
+      {{ translateText(cfg.form.receivePerReleaseUpdate.info) }}
     </div>
     <DcFormSwitch
       class="ml-6"
@@ -20,7 +20,7 @@ const translateTitle = (title: string) => (te(title) ? t(title) : title)
       v-model="cfg.data.value.receivePerReleaseUpdate"
     />
     <div class="mb-2 ml-4 text-lg font-semibold">
-      {{ translateTitle(cfg.form.installOverride.info) }}
+      {{ translateText(cfg.form.installOverride.info) }}
     </div>
     <NDynamicInput
       v-model:value="cfg.data.value.installOverride"

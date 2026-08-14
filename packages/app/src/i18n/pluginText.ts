@@ -1,5 +1,6 @@
 import type { FormConfigure, FormSingleConfigure } from '@delta-comic/model'
-import { pluginI18n } from '@delta-comic/plugin'
+
+import { translateText } from './index'
 
 /**
  * 本地化插件表单字段的展示文本（`info`、`placeholder`、`selects[].label` 与开关文案）。
@@ -7,8 +8,8 @@ import { pluginI18n } from '@delta-comic/plugin'
  */
 export const localizeFormConfig = (config: FormSingleConfigure): FormSingleConfigure => {
   const base = {
-    info: pluginI18n.translateText(config.info),
-    placeholder: config.placeholder ? pluginI18n.translateText(config.placeholder) : undefined,
+    info: translateText(config.info),
+    placeholder: config.placeholder ? translateText(config.placeholder) : undefined,
   }
   switch (config.type) {
     case 'radio':
@@ -16,17 +17,14 @@ export const localizeFormConfig = (config: FormSingleConfigure): FormSingleConfi
       return {
         ...config,
         ...base,
-        selects: config.selects.map(option => ({
-          ...option,
-          label: pluginI18n.translateText(option.label),
-        })),
+        selects: config.selects.map(option => ({ ...option, label: translateText(option.label) })),
       }
     case 'switch':
       return {
         ...config,
         ...base,
-        open: config.open ? pluginI18n.translateText(config.open) : undefined,
-        close: config.close ? pluginI18n.translateText(config.close) : undefined,
+        open: config.open ? translateText(config.open) : undefined,
+        close: config.close ? translateText(config.close) : undefined,
       }
     default:
       return { ...config, ...base }

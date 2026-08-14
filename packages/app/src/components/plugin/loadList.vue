@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { pluginI18n, usePluginStore, type PluginLoadingInfo } from '@delta-comic/plugin'
+import { usePluginStore, type PluginLoadingInfo } from '@delta-comic/plugin'
 import { createLoadingMessage, DcCell } from '@delta-comic/ui'
 import { motion } from 'motion-v'
 import { NButton, NSpin } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { translateText } from '@/i18n'
 
 const $props = defineProps<{ bootingSteps: Record<string, PluginLoadingInfo> }>()
 
@@ -27,7 +29,7 @@ const visibleSteps = computed(() =>
 const getProgressLabel = ({ steps, progress }: PluginLoadingInfo) => {
   const step = steps[progress.stepsIndex]
   const description = step
-    ? `${pluginI18n.translateText(step.name)}: ${pluginI18n.translateText(step.description)}`
+    ? `${translateText(step.name)}: ${translateText(step.description)}`
     : t('common.status.processing')
   if (progress.status !== 'error' || !progress.errorReason) return description
   return `${description}\n${progress.errorReason}`
