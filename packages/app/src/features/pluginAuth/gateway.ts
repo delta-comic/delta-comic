@@ -1,4 +1,5 @@
 import type { PluginAuthGateway, User } from '@delta-comic/plugin'
+import { pluginStore } from '@delta-comic/plugin'
 import { createForm } from '@delta-comic/ui'
 import { PageWebviewAuth } from '@delta-comic/utils'
 import { NSelect } from 'naive-ui'
@@ -59,7 +60,7 @@ const createAuthMethod = (plugin: string, signal: AbortSignal): User.Method => (
       closable: false,
       content: () => instance.comp,
       maskClosable: false,
-      title: plugin,
+      title: pluginStore.displayName(plugin),
     })
     try {
       return await raceAbort(instance.data, signal)
