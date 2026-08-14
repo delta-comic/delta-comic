@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { FormSingleConfigure } from '@delta-comic/model'
 import { useConfig } from '@delta-comic/plugin'
 import { DcCell, DcCellGroup } from '@delta-comic/ui'
 import { shallowRef } from 'vue'
@@ -8,29 +7,16 @@ import { useRouter } from 'vue-router'
 
 import LogReaderPanel from '@/components/logs/LogReaderPanel.vue'
 import PluginConfigField from '@/components/plugin/PluginConfigField.vue'
+import { localizeFormConfig, resolvePluginText } from '@/i18n/pluginText'
 import { isTauriRuntime } from '@/platform'
 
 const $router = useRouter()
 const config = useConfig()
-const { t, te } = useI18n()
+const { t } = useI18n()
 const showNativeLogs = isTauriRuntime()
 const showLogReader = shallowRef(false)
 
-const translateText = (value: string | undefined) => (value && te(value) ? t(value) : (value ?? ''))
-const localizeFormConfig = <T extends FormSingleConfigure>(config: T): T => {
-  const localized: FormSingleConfigure = {
-    ...config,
-    info: translateText(config.info),
-    placeholder: translateText(config.placeholder) || undefined,
-  }
-  if (localized.type === 'radio' || localized.type === 'checkbox') {
-    localized.selects = localized.selects.map(option => ({
-      ...option,
-      label: translateText(option.label),
-    }))
-  }
-  return localized as T
-}
+const translateText = (value: string | undefined) => (value ? resolvePluginText(value) : '')
 </script>
 
 <template>

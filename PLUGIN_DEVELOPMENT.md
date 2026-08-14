@@ -517,6 +517,11 @@ export default defineDeltaComicPlugin(() => ({
 只要声明 `user`，`auth` 和 `favourites` 就是必填项。鉴权在插件正常部分激活时执行，
 不会在预加载阶段触发。
 
+鉴权弹窗中的 `selections[].name` 与鉴权表单的 `info`、`placeholder`、`selects[].label`
+遵循 §4.2 的文本规则：既可以直接填写普通 i18n key（如 `example.auth.password`），也可以
+使用 `pluginMessageKey('example.someKey')`，宿主会在渲染时解析；不要在鉴权回调内假设其他
+任意字符串会被自动翻译。
+
 完整类型见 [`user.ts`](packages/plugin/lib/api/model/user.ts)。
 
 ### 5.5 Social
