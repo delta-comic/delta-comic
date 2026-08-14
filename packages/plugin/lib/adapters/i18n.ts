@@ -24,7 +24,8 @@ export class PluginI18nRegistry {
 
   public register(plugin: string, messages: PluginLocaleMessages) {
     const previous = this.pluginMessages.get(plugin) ?? {}
-    this.pluginMessages.set(plugin, defaultsDeep(messages, previous))
+    const merged: PluginLocaleMessages = defaultsDeep({}, messages, previous)
+    this.pluginMessages.set(plugin, merged)
     this.refresh(new Set([...Object.keys(previous), ...Object.keys(messages)]))
   }
 
@@ -40,7 +41,8 @@ export class PluginI18nRegistry {
   }
 
   private compose(locale: string) {
-    const message = this.baseMessages[locale]
+    const message: PluginLocaleMessage = {}
+    defaultsDeep(message, this.baseMessages[locale])
     for (const messages of this.pluginMessages.values()) defaultsDeep(message, messages[locale])
     return message
   }
