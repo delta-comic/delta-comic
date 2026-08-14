@@ -19,7 +19,7 @@ export interface TestGroupBase {
   /**
    * group-level default test
    */
-  test?: TestFunction
+  test: TestFunction
   allowNoConnected?: boolean
 }
 

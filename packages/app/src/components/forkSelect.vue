@@ -15,7 +15,7 @@ const { t } = useI18n()
       <div
         v-for="[plugin, value] in Object.entries(
           Object.groupBy(
-            Array.from(UniImage.fork.entries()).map(([key, { urls: forks }]) => {
+            Array.from(UniImage.fork.entries()).map(([key, forks]) => {
               const [plugin, namespace] = UniImage.fork.key.toJSON(key)
               return { plugin, namespace, forks, active: UniImage.precedenceFork.get(key)!, key }
             }),
