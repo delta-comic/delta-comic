@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 
-import { transform } from 'esbuild'
+import { transform } from '@swc/core'
 import { defineConfig } from 'vite-plus'
 import type { Plugin } from 'vitest/config'
 
@@ -10,14 +10,18 @@ const TS_FILE = /\.[cm]?tsx?$/
 
 /**
  * OXC/rolldown 目前只支持 legacy 装饰器降级，标准（Stage 3）装饰器会被原样保留。
- * 这里用 esbuild 将 lib/test 的 TS 源码中的标准装饰器降级为构造期初始化器语义，
- * 与`@field`/`@transform`的设计保持一致（一次性复制到自有可枚举数据属性）。
+ * 参照 Vite 官方迁移文档的 SWC Workaround，用`@swc/core`把标准装饰器降级为
+ * 2023-11 规范语义（构造期初始化器），与`@field`/`@transform`的设计保持一致。
  */
-async function lowerDecorators(code: string) {
+async function lowerDecorators(code: string, id: string) {
   const result = await transform(code, {
-    loader: 'ts',
-    target: 'es2022',
-    tsconfigRaw: { compilerOptions: { useDefineForClassFields: true } },
+    filename: id,
+    sourceMaps: true,
+    jsc: {
+      target: 'es2022',
+      parser: { syntax: 'typescript', decorators: true },
+      transform: { decoratorVersion: '2023-11', legacyDecorator: false, decoratorMetadata: false },
+    },
   })
   return { code: result.code, map: result.map }
 }
@@ -26,8 +30,8 @@ function lowerDecoratorsVite(): Plugin {
   return {
     name: 'delta-comic:lower-decorators',
     async transform(code, id) {
-      if (!TS_FILE.test(id)) return
-      return lowerDecorators(code)
+      if (!TS_FILE.test(id) || id.includes('node_modules')) return
+      return lowerDecorators(code, id)
     },
   }
 }
@@ -35,8 +39,8 @@ function lowerDecoratorsVite(): Plugin {
 const lowerDecoratorsRollup = {
   name: 'delta-comic:lower-decorators',
   async transform(code: string, id: string) {
-    if (!TS_FILE.test(id)) return
-    return lowerDecorators(code)
+    if (!TS_FILE.test(id) || id.includes('node_modules')) return
+    return lowerDecorators(code, id)
   },
 }
 
