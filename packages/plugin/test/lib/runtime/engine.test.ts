@@ -190,4 +190,145 @@ describe('PluginRuntime', () => {
     expect(missingFactory).not.toHaveBeenCalled()
     expect(cyclicFactory).not.toHaveBeenCalled()
   })
+
+  it('prepares and activates a plugin enabled after the normal boot', async () => {
+    const app = {} as App
+    const onPreboot = vi.fn()
+    const onBooted = vi.fn()
+    let laterEnabled = false
+    const runtime = runtimeFor(() => [
+      candidate('core', async () => ({ factory: () => ({ name: 'core' }) }), { canDisable: false }),
+      candidate(
+        'later',
+        async () => ({ factory: () => ({ hooks: { onBooted, onPreboot }, name: 'later' }) }),
+        { enabled: laterEnabled },
+      ),
+    ])
+
+    await runtime.preload(app)
+    await runtime.loadNormal().operation
+    laterEnabled = true
+    await runtime.refreshCandidates()
+
+    await runtime.enablePlugin('later')
+
+    expect(onPreboot).toHaveBeenCalledExactlyOnceWith({ app })
+    expect(onBooted).toHaveBeenCalledOnce()
+    expect(runtime.activeNormalPluginNames).toContain('later')
+  })
+
+  it('only prepares a plugin enabled before the normal boot', async () => {
+    const onPreboot = vi.fn()
+    const onBooted = vi.fn()
+    let laterEnabled = false
+    const runtime = runtimeFor(() => [
+      candidate(
+        'later',
+        async () => ({ factory: () => ({ hooks: { onBooted, onPreboot }, name: 'later' }) }),
+        { enabled: laterEnabled },
+      ),
+    ])
+
+    await runtime.preload({} as App)
+    laterEnabled = true
+    await runtime.refreshCandidates()
+
+    await runtime.enablePlugin('later')
+
+    expect(onPreboot).toHaveBeenCalledOnce()
+    expect(onBooted).not.toHaveBeenCalled()
+    expect(runtime.activeNormalPluginNames).not.toContain('later')
+  })
+
+  it('deactivates and unloads a plugin on dynamic disable', async () => {
+    const dispose = vi.fn()
+    const onUnload = vi.fn()
+    let laterEnabled = true
+    const runtime = runtimeFor(() => [
+      candidate('core', async () => ({ factory: () => ({ name: 'core' }) }), { canDisable: false }),
+      candidate(
+        'later',
+        async () => ({ dispose, factory: () => ({ hooks: { onUnload }, name: 'later' }) }),
+        { enabled: laterEnabled },
+      ),
+    ])
+
+    await runtime.preload({} as App)
+    await runtime.loadNormal().operation
+    laterEnabled = false
+    await runtime.refreshCandidates()
+
+    await runtime.disablePlugin('later')
+
+    expect(runtime.activeNormalPluginNames).not.toContain('later')
+    expect(onUnload).toHaveBeenCalledOnce()
+    expect(dispose).toHaveBeenCalledOnce()
+  })
+
+  it('refuses to disable a plugin that another prepared plugin requires', async () => {
+    const runtime = runtimeFor(() => [
+      candidate('dependency', async () => ({ factory: () => ({ name: 'dependency' }) })),
+      candidate('dependent', async () => ({ factory: () => ({ name: 'dependent' }) }), {
+        require: ['dependency'],
+      }),
+    ])
+
+    await runtime.preload({} as App)
+
+    await expect(runtime.disablePlugin('dependency')).rejects.toThrow('required by dependent')
+  })
+
+  it('refuses to enable a plugin whose required dependency is not prepared', async () => {
+    let laterEnabled = false
+    const runtime = runtimeFor(() => [
+      candidate('later', async () => ({ factory: () => ({ name: 'later' }) }), {
+        enabled: laterEnabled,
+        require: ['absent'],
+      }),
+    ])
+
+    await runtime.preload({} as App)
+    laterEnabled = true
+    await runtime.refreshCandidates()
+
+    await expect(runtime.enablePlugin('later')).rejects.toThrow(
+      'required plugins are not enabled: absent',
+    )
+  })
+
+  it('rolls back preparation when dynamic activation fails', async () => {
+    const cleanup = vi.fn()
+    const dispose = vi.fn()
+    let laterEnabled = false
+    const runtime = runtimeFor(() => [
+      candidate('core', async () => ({ factory: () => ({ name: 'core' }) }), { canDisable: false }),
+      candidate(
+        'later',
+        async () => ({
+          dispose,
+          factory: () => ({
+            hooks: {
+              onBooted: () => {
+                throw new Error('broken boot')
+              },
+              onPreboot: () => cleanup,
+            },
+            name: 'later',
+          }),
+        }),
+        { enabled: laterEnabled },
+      ),
+    ])
+
+    await runtime.preload({} as App)
+    await runtime.loadNormal().operation
+    laterEnabled = true
+    await runtime.refreshCandidates()
+
+    await expect(runtime.enablePlugin('later')).rejects.toThrow('broken boot')
+
+    expect(runtime.activeNormalPluginNames).not.toContain('later')
+    expect(cleanup).toHaveBeenCalledOnce()
+    expect(dispose).toHaveBeenCalledOnce()
+  })
 })

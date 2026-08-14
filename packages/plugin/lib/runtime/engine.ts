@@ -67,6 +67,12 @@ const recoveryKey = 'delta-comic:plugin-preload-recovery:v1'
 
 const errorText = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
+const joinErrorMessages = (errors: readonly unknown[]) =>
+  errors
+    .map(error => errorText(error))
+    .filter(Boolean)
+    .join('; ')
+
 const loadingInfo = (): PluginLoadingInfo => ({
   progress: { status: 'wait', stepsIndex: 0 },
   steps: [{ description: '', name: 'waiting' }],
@@ -76,6 +82,8 @@ export class PluginRuntime {
   readonly #activeNormal = new Map<string, PluginScope>()
   readonly #options: PluginRuntimeOptions
   readonly #prepared = new Map<string, PreparedPlugin>()
+  #app?: App
+  #booted = false
   #normalOperation?: Promise<PluginRuntimeReport>
   #preloadOperation?: Promise<PluginRuntimeReport>
   #preloadReport?: PluginRuntimeReport
@@ -95,6 +103,7 @@ export class PluginRuntime {
   public async preload(app: App) {
     if (this.#preloadReport) return this.#preloadReport
     if (this.#preloadOperation) return await this.#preloadOperation
+    this.#app = app
     const operation = this.#prepareEnabledPlugins(app)
     this.#preloadOperation = operation
     try {
@@ -134,6 +143,123 @@ export class PluginRuntime {
 
   public markRestartRequired(plugin: string) {
     this.restartRequired.add(plugin)
+  }
+
+  /** Prepare a plugin that was enabled after startup and activate it once normal parts are booted. */
+  public async enablePlugin(plugin: string) {
+    this.#assertReadyForToggle()
+    const candidate = this.store.candidates.get(plugin)
+    if (!candidate) throw new Error(`plugin "${plugin}" is not a known candidate`)
+    if (!candidate.enabled) throw new Error(`plugin "${plugin}" is not enabled`)
+    const existing = this.#prepared.get(plugin)
+    if (existing) {
+      if (this.#booted && !this.#activeNormal.has(plugin)) {
+        const result = await this.#activateNormal(existing)
+        if (result.error !== undefined) {
+          throw this.#activationFailure(plugin, result)
+        }
+      }
+      return
+    }
+
+    const missing = candidate.manifest.require
+      .map(dependency => dependency.id)
+      .filter(dependency => !this.#prepared.has(dependency))
+    if (missing.length > 0) {
+      throw new Error(
+        `cannot enable plugin "${plugin}": required plugins are not enabled: ${missing.join(', ')}`,
+      )
+    }
+
+    const app = this.#app
+    if (!app) throw new Error('plugins must be preloaded before enabling a plugin')
+    const scope = new PluginScope(plugin)
+    try {
+      const { config, module } = await this.#loadPlugin(candidate, scope)
+      const cleanup = await config.hooks?.onPreboot?.({ app })
+      if (cleanup) scope.defer(cleanup)
+      const prepared: PreparedPlugin = { candidate, config, module, scope }
+      this.#prepared.set(plugin, prepared)
+      if (this.#booted) {
+        const result = await this.#activateNormal(prepared)
+        if (result.error !== undefined) {
+          throw this.#activationFailure(plugin, result)
+        }
+      }
+    } catch (error) {
+      this.#prepared.delete(plugin)
+      const errors: unknown[] = this.#flattenErrors(error)
+      const disposeError = await scope.dispose(error).catch(caught => caught)
+      if (disposeError !== undefined) errors.push(...this.#flattenErrors(disposeError))
+      throw new AggregateError(
+        errors,
+        `failed to enable plugin "${plugin}": ${joinErrorMessages(errors)}`,
+      )
+    }
+  }
+
+  /** Deactivate and unload a plugin so disabling it takes effect without a restart. */
+  public async disablePlugin(plugin: string) {
+    this.#assertReadyForToggle()
+    const candidate = this.store.candidates.get(plugin)
+    if (!candidate) throw new Error(`plugin "${plugin}" is not a known candidate`)
+    if (!candidate.management.canDisable) throw new Error(`plugin "${plugin}" cannot be disabled`)
+    const dependents = [...this.#prepared.entries()]
+      .filter(([, prepared]) =>
+        prepared.candidate.manifest.require.some(dependency => dependency.id === plugin),
+      )
+      .map(([id]) => id)
+    if (dependents.length > 0) {
+      throw new Error(`cannot disable plugin "${plugin}": required by ${dependents.join(', ')}`)
+    }
+
+    const errors: unknown[] = []
+    const active = this.#activeNormal.get(plugin)
+    if (active) {
+      try {
+        await this.#deactivateNormal(plugin, active)
+      } catch (error) {
+        errors.push(error)
+      }
+    }
+    const prepared = this.#prepared.get(plugin)
+    if (prepared) {
+      this.#prepared.delete(plugin)
+      try {
+        await prepared.scope.dispose()
+      } catch (error) {
+        errors.push(error)
+      }
+    }
+    if (errors.length > 0) {
+      throw new AggregateError(
+        errors,
+        `failed to disable plugin "${plugin}": ${joinErrorMessages(errors)}`,
+      )
+    }
+  }
+
+  #assertReadyForToggle() {
+    if (!this.#preloadReport) {
+      throw new Error('plugins must be preloaded before enabling or disabling a plugin')
+    }
+    if (this.#normalOperation) throw new Error('plugin normal parts are currently loading')
+  }
+
+  #flattenErrors(error: unknown): unknown[] {
+    return error instanceof AggregateError ? [...error.errors] : [error]
+  }
+
+  #activationFailure(
+    plugin: string,
+    result: { error?: unknown; disposeError?: unknown },
+  ): AggregateError {
+    const errors = result.error === undefined ? [] : this.#flattenErrors(result.error)
+    if (result.disposeError !== undefined) errors.push(...this.#flattenErrors(result.disposeError))
+    return new AggregateError(
+      errors,
+      `failed to activate plugin "${plugin}": ${joinErrorMessages(errors)}`,
+    )
   }
 
   public async uninstall(plugin: string) {
@@ -263,36 +389,53 @@ export class PluginRuntime {
 
         const prepared = this.#prepared.get(plugin)
         if (!prepared) continue
-        const scope = new PluginScope(plugin)
-        try {
-          info.progress.status = 'process'
-          await prepared.module.activate?.(scope)
-          this.store.markLoading(plugin, prepared.config)
-          scope.defer(() => this.store.markUnloaded(plugin))
-          await new ActivationPipeline(this.#options.capabilities()).activate(prepared.config, {
-            owner: plugin,
-            report: update => {
-              const value = typeof update === 'string' ? { description: update } : update
-              info.steps[0] = { ...info.steps[0], ...value }
-            },
-            scope,
-            signal: scope.signal,
-          })
-          this.#activeNormal.set(plugin, scope)
-          this.store.markReady(plugin)
-          info.progress.status = 'done'
+        const result = await this.#activateNormal(prepared, info)
+        if (result.error === undefined) {
           activated.push(plugin)
-        } catch (error) {
-          info.progress = { errorReason: errorText(error), status: 'error', stepsIndex: 0 }
-          failures.push({ error, phase: 'normal', plugin })
-          failed.add(plugin)
-          await scope.dispose(error).catch(disposeError => {
-            failures.push({ error: disposeError, phase: 'normal', plugin })
-          })
+          continue
+        }
+        failures.push({ error: result.error, phase: 'normal', plugin })
+        failed.add(plugin)
+        if (result.disposeError !== undefined) {
+          failures.push({ error: result.disposeError, phase: 'normal', plugin })
         }
       }
     }
+    this.#booted = true
     return { activated, failures }
+  }
+
+  /** Run the normal activation pipeline for a prepared plugin on a fresh normal scope. */
+  async #activateNormal(
+    prepared: PreparedPlugin,
+    info?: PluginLoadingInfo,
+  ): Promise<{ error?: unknown; disposeError?: unknown }> {
+    const plugin = prepared.candidate.manifest.name.id
+    const scope = new PluginScope(plugin)
+    try {
+      if (info) info.progress.status = 'process'
+      await prepared.module.activate?.(scope)
+      this.store.markLoading(plugin, prepared.config)
+      scope.defer(() => this.store.markUnloaded(plugin))
+      await new ActivationPipeline(this.#options.capabilities()).activate(prepared.config, {
+        owner: plugin,
+        report: update => {
+          if (!info) return
+          const value = typeof update === 'string' ? { description: update } : update
+          info.steps[0] = { ...info.steps[0], ...value }
+        },
+        scope,
+        signal: scope.signal,
+      })
+      this.#activeNormal.set(plugin, scope)
+      this.store.markReady(plugin)
+      if (info) info.progress.status = 'done'
+      return {}
+    } catch (error) {
+      if (info) info.progress = { errorReason: errorText(error), status: 'error', stepsIndex: 0 }
+      const disposeError = await scope.dispose(error).catch(caught => caught)
+      return { error, disposeError }
+    }
   }
 
   async #loadPlugin(candidate: PluginCandidate, scope: PluginScope) {
