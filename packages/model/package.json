@@ -33,6 +33,7 @@
     "es-toolkit": "catalog:"
   },
   "devDependencies": {
+    "esbuild": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"

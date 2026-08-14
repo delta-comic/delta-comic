@@ -11,7 +11,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitReturns": false,
     "noImplicitAny": true,

@@ -1,6 +1,6 @@
 import { shallowReactive, type Component } from 'vue'
 
-import type { Metadata, Metadatable } from '@/struct'
+import { field, MetaStruct, transform, type Metadatable } from '../struct'
 
 import { UniImage } from './image'
 import type { UniResourceRaw } from './resource'
@@ -11,23 +11,15 @@ export interface UniUserRaw extends Metadatable {
   id: string
 }
 
-export abstract class UniUser {
+export abstract class UniUser extends MetaStruct<UniUserRaw> {
   public static userBase = shallowReactive(new Map<string, UniUser>())
   public static userEditorBase = shallowReactive(new Map<string, Component>())
   public static userCards = shallowReactive(new Map<string, UniUserCardComponent>())
 
-  constructor(v: UniUserRaw) {
-    if (v.avatar) this.avatar = UniImage.create(v.avatar)
-    this.name = v.name
-    this.id = v.id
-    this.$$plugin = v.$$plugin
-    this.$$meta = v.$$meta
-  }
-  public avatar?: UniImage
-  public name: string
-  public id: string
-  public $$plugin: string
-  public $$meta?: Metadata
+  @transform((v: UniResourceRaw | undefined) => v && UniImage.create(v))
+  avatar?: UniImage
+  @field name!: string
+  @field id!: string
   public abstract customUser: object
 }
 
