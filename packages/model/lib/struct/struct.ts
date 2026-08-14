@@ -18,6 +18,6 @@ export class Struct<TRaw extends object> {
   }
   public static toRaw<T extends object, TRaw = T extends Struct<infer TR> ? TR : T>(item: T): TRaw {
     if (item instanceof Struct) return item.toJSON()
-    return item as any
+    return item as T & TRaw
   }
 }

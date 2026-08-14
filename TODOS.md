@@ -38,9 +38,9 @@
 
 ### 一、`as unknown as` 强制转换
 
-- [ ] #1 `packages/model/lib/struct/struct.ts:21` `return item as any` → 重载签名 `toRaw(item: Struct<TRaw>): TRaw` + `toRaw<T extends object>(item: T): T`
-- [ ] #2 `packages/plugin/lib/kernel/contribution.ts:101` `as unknown as ContributionRegistry<T, Owners>` → 方法级泛型重构（破坏性）或单点收敛+注释；验证 56/69/76 行条件类型断言可删
-- [ ] #3 `packages/plugin/vite/index.ts:95` + `packages/server/app/shared/http/cors.ts:10` → 改用 vite 官方 `Plugin` 类型；cors 内联 `.use()` 验证或 `ReturnType<typeof elysiaCors>`
+- [x] #1 `packages/model/lib/struct/struct.ts:21` `return item as any` → 单点诚实断言 `item as T & TRaw`（tsgo 下 `as TRaw` 不可比）
+- [x] #2 `packages/plugin/lib/kernel/contribution.ts:101` `as unknown as` → 新增擦除接口 `AnyContributionRegistry`，创建/返回各一个单层 `as`（56/69/76 行条件断言保留，属于 per-owner 收窄设计）
+- [x] #3 `packages/plugin/vite/index.ts:95` + `packages/server/app/shared/http/cors.ts:10` → plugin 新增 `vite`(catalog) 依赖改用官方 `Plugin`/`PluginOption`；cors.ts 删除，内联 `.use(elysiaCors({...}))`
 
 ### 三、Module Augmentation 优化
 
