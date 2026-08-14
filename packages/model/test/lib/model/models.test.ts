@@ -79,9 +79,12 @@ describe('resource resolution', () => {
       async (path: string) => [`https://cdn.test/${path}`, true] as [string, boolean],
     )
     const unreachable = vi.fn(async (path: string) => [path, false] as [string, boolean])
-    UniResource.processInstances.set(['fixture', 'resize'], resize)
-    UniResource.processInstances.set(['fixture', 'cache'], cache)
-    UniResource.processInstances.set(['fixture', 'unreachable'], unreachable)
+    UniResource.processInstances.set(['fixture', 'resize'], { name: 'resize', call: resize })
+    UniResource.processInstances.set(['fixture', 'cache'], { name: 'cache', call: cache })
+    UniResource.processInstances.set(['fixture', 'unreachable'], {
+      name: 'unreachable',
+      call: unreachable,
+    })
     const resource = UniResource.create(
       rawResource('cover.jpg', ['missing', 'resize', { referenceName: 'cache' }, 'unreachable']),
     )
@@ -99,19 +102,15 @@ describe('resource resolution', () => {
   })
 
   it('honors ignoreExit and prefixes relative results with the selected fork', async () => {
-    UniResource.processInstances.set(
-      ['fixture', 'first'],
-      vi.fn(async () => ['processed.jpg', true] as [string, boolean]),
-    )
-    UniResource.processInstances.set(
-      ['fixture', 'second'],
-      vi.fn(async path => [`final/${path}`, false] as [string, boolean]),
-    )
-    UniResource.fork.set(['fixture', 'image'], {
-      test: vi.fn(),
-      type: 'image',
-      urls: ['https://a.test', 'https://b.test'],
+    UniResource.processInstances.set(['fixture', 'first'], {
+      name: 'first',
+      call: vi.fn(async () => ['processed.jpg', true] as [string, boolean]),
     })
+    UniResource.processInstances.set(['fixture', 'second'], {
+      name: 'second',
+      call: vi.fn(async path => [`final/${path}`, false] as [string, boolean]),
+    })
+    UniResource.fork.set(['fixture', 'image'], ['https://a.test', 'https://b.test'])
     UniResource.precedenceFork.set(['fixture', 'image'], 'https://b.test')
     const resource = UniResource.create(
       rawResource('cover.jpg', [{ ignoreExit: true, referenceName: 'first' }, 'second']),
@@ -122,11 +121,7 @@ describe('resource resolution', () => {
   })
 
   it('rotates through alternate forks and resets after exhausting all choices', () => {
-    UniResource.fork.set(['fixture', 'image'], {
-      test: vi.fn(),
-      type: 'image',
-      urls: ['https://a.test', 'https://b.test'],
-    })
+    UniResource.fork.set(['fixture', 'image'], ['https://a.test', 'https://b.test'])
     UniResource.precedenceFork.set(['fixture', 'image'], 'https://a.test')
     const resource = UniResource.create(rawResource())
 

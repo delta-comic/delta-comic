@@ -6,21 +6,15 @@ import { SourcedKeyMap, Struct, type Metadata, type Metadatable } from '../struc
 
 const resourceLogger = logger.scoped('model:resource')
 
-export type UniResourceProcessInstance = (
-  nowPath: string,
-  resource: UniResource,
-) => Promise<[path: string, exit: boolean]>
+export interface UniResourceProcessor {
+  name: string
+  call: (nowPath: string, resource: UniResource) => Promise<[path: string, exit: boolean]>
+}
 export interface UniResourceProcessStep {
   referenceName: string
   ignoreExit?: boolean
 }
 export type UniResourceProcessStep_ = UniResourceProcessStep | string
-
-export interface UniResourceType {
-  type: string
-  urls: string[]
-  test: (url: string, signal: AbortSignal) => PromiseLike<void>
-}
 export interface UniResourceRaw extends Metadatable {
   pathname: string
   type: string
@@ -29,18 +23,15 @@ export interface UniResourceRaw extends Metadatable {
 export class UniResource extends Struct<UniResourceRaw> implements UniResourceRaw {
   public static processInstances = SourcedKeyMap.createReactive<
     [plugin: string, referenceName: string],
-    UniResourceProcessInstance
+    UniResourceProcessor
   >()
 
-  public static fork = SourcedKeyMap.createReactive<
-    [plugin: string, type: string],
-    UniResourceType
-  >()
+  public static fork = SourcedKeyMap.createReactive<[plugin: string, type: string], string[]>()
+
   public static precedenceFork = SourcedKeyMap.createReactive<
     [plugin: string, type: string],
     string
   >()
-
   public static is(value: unknown): value is UniResource {
     return value instanceof this
   }
@@ -76,7 +67,7 @@ export class UniResource extends Struct<UniResourceRaw> implements UniResourceRa
       }
 
       // call
-      const result = await instance(resultPath, this)
+      const result = await instance.call(resultPath, this)
       resultPath = result[0]
       if (option.ignoreExit || !result[1]) continue
       break
@@ -86,7 +77,7 @@ export class UniResource extends Struct<UniResourceRaw> implements UniResourceRa
   }
   public omittedForks = shallowReactive(new Set<string>())
   public getThisFork() {
-    const all = new Set(UniResource.fork.get([this.$$plugin, this.type])?.urls ?? [])
+    const all = new Set(UniResource.fork.get([this.$$plugin, this.type]) ?? [])
     let fork: string | undefined
     if (isEmpty(this.omittedForks)) {
       fork = UniResource.precedenceFork.get([this.$$plugin, this.type])
@@ -101,7 +92,7 @@ export class UniResource extends Struct<UniResourceRaw> implements UniResourceRa
     return fork
   }
   public localChangeFork() {
-    const all = new Set(UniResource.fork.get([this.$$plugin, this.type])?.urls ?? [])
+    const all = new Set(UniResource.fork.get([this.$$plugin, this.type]) ?? [])
     this.omittedForks.add(this.getThisFork())
     const isChangedFail = isEmpty(all.difference(this.omittedForks))
     if (isChangedFail) this.omittedForks.clear()
