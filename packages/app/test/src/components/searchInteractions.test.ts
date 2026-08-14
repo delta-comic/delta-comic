@@ -26,7 +26,8 @@ await vi.hoisted(async () => {
         () =>
           h(tag, attrs, slots.default?.()),
     })
-  window.$$lib$$.Naive = { ...window.$$lib$$.Naive, NIcon: passthrough('NIcon', 'span') }
+  const lib = window.$$lib$$ as { Naive: Record<string, unknown> }
+  lib.Naive = { ...lib.Naive, NIcon: passthrough('NIcon', 'span') }
 })
 
 vi.mock('@delta-comic/db', () => ({ useNativeStore: () => history }))

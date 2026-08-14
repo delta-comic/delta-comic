@@ -23,8 +23,9 @@ await vi.hoisted(async () => {
           h(tag, attrs, [slots.icon?.(), slots.default?.()]),
     })
 
-  window.$$lib$$.Naive = {
-    ...window.$$lib$$.Naive,
+  const lib = window.$$lib$$ as { Naive: Record<string, unknown> }
+  lib.Naive = {
+    ...lib.Naive,
     NButton: passthrough('NButton', 'button'),
     NEmpty: passthrough('NEmpty'),
     NIcon: passthrough('NIcon', 'span'),

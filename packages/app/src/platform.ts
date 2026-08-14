@@ -11,7 +11,7 @@ export interface SafeAreaInsets {
 
 export const initializePlatform = async (): Promise<SafeAreaInsets | false> => {
   if (!isTauriRuntime()) {
-    window.$api.M3 = { getInsets: async () => false, setBarColor: async () => undefined }
+    window.$api.M3 = { getInsets: async () => false, setBarColor: async () => true }
     return false
   }
   const [{ CORSFetch }, { M3 }] = await Promise.all([

@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 const { isNavigationFailureMock } = await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
   await import('../../public/runtime/host-libraries.umd.js')
+  const lib = window.$$lib$$ as { VR: Record<string, unknown> }
   const isNavigationFailureMock = vi.fn((value: unknown) => value === 'aborted')
-  window.$$lib$$.VR = { ...window.$$lib$$.VR, isNavigationFailure: isNavigationFailureMock }
+  lib.VR = { ...lib.VR, isNavigationFailure: isNavigationFailureMock }
   return { isNavigationFailureMock }
 })
 

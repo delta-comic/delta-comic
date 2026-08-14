@@ -45,8 +45,9 @@ const {
 await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
   await import('../../public/runtime/host-libraries.umd.js')
-  window.$$lib$$.VR = {
-    ...window.$$lib$$.VR,
+  const lib = window.$$lib$$ as { VR: Record<string, unknown>; Naive: Record<string, unknown> }
+  lib.VR = {
+    ...lib.VR,
     RouterView: window.$$lib$$.Vue.defineComponent({
       name: 'RouterView',
       setup:
@@ -57,8 +58,8 @@ await vi.hoisted(async () => {
     useRoute: () => ({ fullPath: '/library?tab=recent', meta: { force: true } }),
     useRouter: () => router,
   }
-  window.$$lib$$.Naive = {
-    ...window.$$lib$$.Naive,
+  lib.Naive = {
+    ...lib.Naive,
     useDialog: () => dialog,
     useLoadingBar: () => ({ start: vi.fn() }),
     useMessage: () => message,
