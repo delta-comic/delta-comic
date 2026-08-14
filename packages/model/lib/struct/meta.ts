@@ -5,7 +5,7 @@ export interface Metadatable {
   $$meta?: Metadata
   $$plugin: string
 }
-export type Metadata = Record<string | number, any>
+export type Metadata = Record<string | number, unknown>
 
 /**
  * 带来源元数据（`Metadatable`）的结构化基类，`$$plugin`/`$$meta`由装饰器从原始数据复制

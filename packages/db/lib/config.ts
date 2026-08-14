@@ -42,7 +42,7 @@ const parseJson = <T>(value: unknown, fallback: T): T => {
   }
 }
 
-const upsertConfig = async (belongTo: string, form: any, data: unknown) => {
+const upsertConfig = async (belongTo: string, form: ConfigDescription, data: unknown) => {
   const { db } = await import('.')
   await db
     .replaceInto('config')

@@ -4,6 +4,7 @@ import {
   useMutation,
   useQueryCache,
   useQuery as useColadaQuery,
+  type EntryKey,
 } from '@pinia/colada'
 import type { JSONColumnType, Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
@@ -100,7 +101,7 @@ export const useToggleEnable = defineMutation(() => {
 
 export const useQuery = <T>(
   query: (db: SelectQueryBuilder<DB, 'plugin', {}>) => Promise<T>,
-  otherKeys: any[] = [],
+  otherKeys: readonly unknown[] = [],
   initialData?: () => T,
 ) =>
   useColadaQuery({
@@ -108,7 +109,7 @@ export const useQuery = <T>(
       const { db } = await import('.')
       return await query(db.selectFrom('plugin'))
     },
-    key: () => [CommonQueryKey.common, QueryKey.item, query].concat(otherKeys),
+    key: () => [CommonQueryKey.common, QueryKey.item, query, ...otherKeys] as EntryKey,
     staleTime: 15000,
     refetchOnMount: 'always',
     initialData,

@@ -52,13 +52,13 @@ export type UniItemCardComponent = Component<
     freeHeight?: boolean
     disabled?: boolean
     type?: 'default' | 'big' | 'small'
-    class?: any
-    style?: any
+    class?: string
+    style?: string | Record<string, string>
   },
-  any,
-  any,
-  any,
-  any,
+  {},
+  {},
+  {},
+  {},
   { click: [] },
   { default(): void; smallTopInfo(): void; cover(): void }
 >
@@ -90,9 +90,9 @@ export abstract class UniItem extends MetaStruct<UniItemRaw> implements UniItemR
 
   public static itemCards = SourcedKeyMap.createReactive<UniContentType, UniItemCardComponent>()
 
-  public abstract like(): Promise<any>
-  public abstract report(): Promise<any>
-  public abstract sendComment(text: string): Promise<any>
+  public abstract like(): Promise<unknown>
+  public abstract report(): Promise<unknown>
+  public abstract sendComment(text: string): Promise<unknown>
 
   public static is(value: unknown): value is UniItem {
     return value instanceof this

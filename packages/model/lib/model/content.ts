@@ -19,12 +19,12 @@ export type UniContentType = Exclude<UniContentType_, string>
 export type UniContentViewComponent = Component<{ page: UniContentPage; union?: item.UniItem }>
 export type UniContentLayoutComponent = Component<
   { page: UniContentPage },
-  any,
-  any,
-  any,
-  any,
-  any,
-  { view(args: { item?: item.UniItem }): any }
+  {},
+  {},
+  {},
+  {},
+  {},
+  { view(args: { item?: item.UniItem }): unknown }
 >
 
 export abstract class UniContentPage {

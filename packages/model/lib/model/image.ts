@@ -35,9 +35,9 @@ export class UniImage extends UniResource {
   public set aspect(v) {
     if (!v) return
     this.$$meta ??= {}
-    this.$$meta.aspect ??= {}
-    this.$$meta.aspect.width = v.width
-    this.$$meta.aspect.height = v.height
+    const aspect = (this.$$meta.aspect ??= {}) as Partial<UniImageAspect>
+    aspect.width = v.width
+    aspect.height = v.height
   }
 }
 export interface UniImageAspect {

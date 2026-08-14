@@ -9,7 +9,7 @@ export type UnwrapConfigPointer<T extends ConfigPointer> = T['_type']
 
 export class ConfigPointer<T extends ConfigDescription = ConfigDescription> {
   public readonly key: symbol
-  public readonly _type = {} as T
+  declare public readonly _type: T
 
   public constructor(
     public readonly pluginName: string,
