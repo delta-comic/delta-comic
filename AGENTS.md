@@ -82,3 +82,7 @@
   比如`createForm(form: FormRuls[]): FormInst`可以优化为`createForm<T extends FormRuls[]>(form: T): FormInst<T>`，
   这对于接下来的比如`FormResult<T>`就很有用，可以给出到字段级别的类型覆盖，而旧的方案很难做到。
 - 对于上一点的补充，对于一些全局类型，将来会由外部注册之类的情况，可以预先暴露`interface`，结合ts的Module Augmentation功能实现类型安全。
+- 不要滥用`as`断言，
+  假设对于`<T extends object>(arg: T): number`的函数签名，内部使用了断言`(arg as Struct<object>).toJSON()`，
+  这就导致了，若`arg`不是`Struct`，则代码会在运行时报错，所以，函数签名应当改为:
+  `<T extends Struct<object>>(arg: T): number`。
