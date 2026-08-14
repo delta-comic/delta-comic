@@ -1,4 +1,4 @@
-import { pluginI18n, pluginMessageKey, type User } from '@delta-comic/plugin'
+import { pluginI18n, type User } from '@delta-comic/plugin'
 import type { DialogOptions } from 'naive-ui'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import type { VNode } from 'vue'
@@ -20,6 +20,8 @@ vi.mock('@delta-comic/utils', () => ({
   SharedFunction: sharedFunction,
 }))
 
+// 加载宿主 i18n 实例，触发 pluginI18n.install 安装适配器。
+import '../../../../src/i18n'
 import { createPluginAuthGateway } from '../../../../src/features/pluginAuth/gateway'
 
 const fixtureMessages = {
@@ -58,7 +60,7 @@ describe('createPluginAuthGateway', () => {
     const auth: User.Auth = {
       default: async () => false,
       selections: [
-        { id: 'scan', name: pluginMessageKey('gateway-fixture.auth.scan'), call: scan },
+        { id: 'scan', name: pluginI18n.messageKey('gateway-fixture.auth.scan'), call: scan },
         { id: 'plain', name: 'gateway-fixture.auth.plain', call: vi.fn() },
         { id: 'raw', name: '原样展示', call: vi.fn() },
       ],
@@ -99,7 +101,7 @@ describe('createPluginAuthGateway', () => {
         channel: {
           type: 'radio',
           comp: 'radio',
-          info: pluginMessageKey('gateway-fixture.auth.channel'),
+          info: pluginI18n.messageKey('gateway-fixture.auth.channel'),
           selects: [{ label: 'gateway-fixture.auth.scan', value: 'scan' }],
         },
       })

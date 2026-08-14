@@ -389,7 +389,7 @@ export default defineDeltaComicPlugin(() => ({
 
 配置表单的 `info`、`placeholder`、`selects[].label` 和表单标题直接填写普通 i18n key，例如 `example.config.endpoint`。
 
-对于明确支持插件文本协议的宿主字段，可以使用 `pluginMessageKey('example.someKey')`；在插件自己的运行时回调中，可以调用 `pluginI18n.translate('example.someKey')`。不要假设所有任意字符串都会自动翻译。
+对于明确支持插件文本协议的宿主字段，可以使用 `pluginI18n.messageKey('example.someKey')`；在插件自己的运行时回调中，可以调用 `pluginI18n.translate('example.someKey')`。不要假设所有任意字符串都会自动翻译。
 
 ## 5. 模型能力参考
 
@@ -519,7 +519,7 @@ export default defineDeltaComicPlugin(() => ({
 
 鉴权弹窗中的 `selections[].name` 与鉴权表单的 `info`、`placeholder`、`selects[].label`
 遵循 §4.2 的文本规则：既可以直接填写普通 i18n key（如 `example.auth.password`），也可以
-使用 `pluginMessageKey('example.someKey')`，宿主会在渲染时解析；不要在鉴权回调内假设其他
+使用 `pluginI18n.messageKey('example.someKey')`，宿主会在渲染时解析；不要在鉴权回调内假设其他
 任意字符串会被自动翻译。
 
 完整类型见 [`user.ts`](packages/plugin/lib/api/model/user.ts)。

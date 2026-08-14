@@ -7,6 +7,8 @@ export type { PluginLocaleMessage, PluginLocaleMessages } from '../api/i18n'
 export interface PluginI18nAdapter {
   setLocaleMessage(locale: string, message: PluginLocaleMessage): void
   translate?(key: string, params?: Record<string, number | string>): string
+  /** 判断消息是否已注册，用于解析未加前缀的普通 i18n key。 */
+  has?(key: string): boolean
 }
 
 const messageKeyPrefix = 'i18n:'
@@ -36,8 +38,31 @@ export class PluginI18nRegistry {
     this.refresh(new Set(Object.keys(messages)))
   }
 
+  /**
+   * 立即翻译一个 i18n key，供插件在自己的运行时回调中使用；
+   * 未注册或没有适配器时返回 key 本身。
+   */
   public translate(key: string, params?: Record<string, number | string>) {
     return this.adapter?.translate?.(key, params) ?? key
+  }
+
+  /**
+   * 编码插件文本协议键，用于把可翻译文本嵌入宿主的普通字符串字段
+   * （如 `Selection.name`、`InitiativeItem.name`），由宿主在渲染时解码。
+   */
+  public messageKey(key: string) {
+    return `${messageKeyPrefix}${key}`
+  }
+
+  /**
+   * 解析插件提供的展示文本：`i18n:` 前缀走插件文本协议，
+   * 其余按普通 i18n key 查找，未注册时原样返回。
+   */
+  public translateText(value: string) {
+    if (value.startsWith(messageKeyPrefix))
+      return this.translate(value.slice(messageKeyPrefix.length))
+    if (this.adapter?.has?.(value)) return this.translate(value)
+    return value
   }
 
   private compose(locale: string) {
@@ -62,10 +87,3 @@ export class PluginI18nRegistry {
 }
 
 export const pluginI18n = new PluginI18nRegistry()
-
-export const pluginMessageKey = (key: string) => `${messageKeyPrefix}${key}`
-
-export const translatePluginText = (value: string) =>
-  value.startsWith(messageKeyPrefix)
-    ? pluginI18n.translate(value.slice(messageKeyPrefix.length))
-    : value

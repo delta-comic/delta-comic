@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { logger } from '@delta-comic/logger'
 import {
+  pluginI18n,
   pluginRuntime,
   setPluginEnabled,
-  translatePluginText,
   uninstallPlugin,
   updatePluginByName,
   type PluginCandidate,
@@ -43,7 +43,7 @@ const updatePlugin = async (plugin: ManagedPlugin) => {
   try {
     await runPluginInstall(
       t('plugin.progress.updateTitle', {
-        plugin: translatePluginText(plugin.meta.name.display ?? plugin.pluginName),
+        plugin: pluginI18n.translateText(plugin.meta.name.display ?? plugin.pluginName),
       }),
       options => updatePluginByName(plugin.pluginName, options),
     )
@@ -103,7 +103,7 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
   switch (key) {
     case 'toggle': {
       const enabled = !plugin.enable
-      const name = translatePluginText(plugin.meta.name.display ?? plugin.pluginName)
+      const name = pluginI18n.translateText(plugin.meta.name.display ?? plugin.pluginName)
       try {
         await setPluginEnabled(plugin.pluginName, enabled)
         window.$message.success(
@@ -157,7 +157,7 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
           <div class="flex min-w-0 items-center gap-2.5">
             <PluginIcon
               :icon="plugin.meta.icon"
-              :name="translatePluginText(plugin.meta.name.display ?? plugin.pluginName)"
+              :name="pluginI18n.translateText(plugin.meta.name.display ?? plugin.pluginName)"
               :plugin-id="plugin.pluginName"
               size="small"
             />
@@ -165,7 +165,7 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
               <span class="mr-0.5 font-thin italic">{{
                 isBuiltIn(plugin) ? t('plugin.list.kind.builtInPrefix') : ''
               }}</span>
-              {{ translatePluginText(plugin.meta.name.display ?? plugin.pluginName) }}
+              {{ pluginI18n.translateText(plugin.meta.name.display ?? plugin.pluginName) }}
             </span>
           </div>
         </template>
@@ -193,7 +193,7 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
           {{ semver.valid(semver.coerce(plugin.meta.version.plugin ?? 'v0')) }}
         </span>
         <span class="text-(--nui-text-color-3)">
-          {{ translatePluginText(plugin.meta.description) }}
+          {{ pluginI18n.translateText(plugin.meta.description) }}
         </span>
         <div class="w-full text-xs text-(--nui-text-color-disabled)">
           {{ t('plugin.list.supportCore', { version: plugin.meta.version.supportCore }) }}
