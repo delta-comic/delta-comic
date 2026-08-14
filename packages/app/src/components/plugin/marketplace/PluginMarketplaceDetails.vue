@@ -9,11 +9,12 @@ import {
   pluginMarketplaceSourceUrl,
   type PluginMarketplaceItem,
 } from '@/features/pluginMarketplace/model'
+import { formatDate } from '@/i18n'
 
 const props = defineProps<{ item?: PluginMarketplaceItem }>()
 const emit = defineEmits<{ install: []; openSource: [url: string] }>()
 const show = defineModel<boolean>('show', { required: true })
-const { locale, t } = useI18n()
+const { t } = useI18n()
 
 const title = computed(
   () =>
@@ -27,9 +28,7 @@ const installInput = computed(() =>
 const source = computed(() => (props.item ? pluginMarketplaceSourceUrl(props.item.listing) : ''))
 const publishedAt = computed(() => {
   const value = props.item?.listing.release?.publishedAt
-  return value
-    ? new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(new Date(value))
-    : undefined
+  return value ? formatDate(value, 'date') : undefined
 })
 const canInstall = computed(
   () =>
