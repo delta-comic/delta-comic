@@ -278,12 +278,15 @@ describe('PluginRuntime', () => {
     await expect(runtime.disablePlugin('dependency')).rejects.toThrow('required by dependent')
   })
 
-  it('refuses to enable a plugin whose required dependency is not prepared', async () => {
+  it('refuses to enable a plugin whose required dependency is disabled', async () => {
     let laterEnabled = false
     const runtime = runtimeFor(() => [
+      candidate('dependency', async () => ({ factory: () => ({ name: 'dependency' }) }), {
+        enabled: false,
+      }),
       candidate('later', async () => ({ factory: () => ({ name: 'later' }) }), {
         enabled: laterEnabled,
-        require: ['absent'],
+        require: ['dependency'],
       }),
     ])
 
@@ -292,8 +295,123 @@ describe('PluginRuntime', () => {
     await runtime.refreshCandidates()
 
     await expect(runtime.enablePlugin('later')).rejects.toThrow(
-      'required plugins are not enabled: absent',
+      'plugin "dependency" is not enabled',
     )
+  })
+
+  it('prepares enabled dependencies before the dependent plugin', async () => {
+    const events: string[] = []
+    let laterEnabled = false
+    let dependencyEnabled = false
+    const runtime = runtimeFor(() => [
+      candidate(
+        'dependency',
+        async () => ({
+          factory: () => ({
+            hooks: {
+              onPreboot: () => {
+                events.push('dependency')
+              },
+            },
+            name: 'dependency',
+          }),
+        }),
+        { enabled: dependencyEnabled },
+      ),
+      candidate(
+        'later',
+        async () => ({
+          factory: () => ({
+            hooks: {
+              onPreboot: () => {
+                events.push('later')
+              },
+            },
+            name: 'later',
+          }),
+        }),
+        { enabled: laterEnabled, require: ['dependency'] },
+      ),
+    ])
+
+    await runtime.preload({} as App)
+    laterEnabled = true
+    dependencyEnabled = true
+    await runtime.refreshCandidates()
+
+    await runtime.enablePlugin('later')
+
+    expect(events).toEqual(['dependency', 'later'])
+  })
+
+  it('reloads an updated plugin and its prepared dependents from the current files', async () => {
+    const app = {} as App
+    let dependencyGeneration = 0
+    let dependentGeneration = 0
+    const dependencyUnloads: number[] = []
+    const dependentUnloads: number[] = []
+    const runtime = runtimeFor(() => [
+      candidate('dependency', async () => ({
+        factory: () => ({
+          hooks: {
+            onPreboot: () => {
+              dependencyGeneration += 1
+            },
+            onUnload: () => {
+              dependencyUnloads.push(dependencyGeneration)
+            },
+          },
+          name: 'dependency',
+        }),
+      })),
+      candidate(
+        'dependent',
+        async () => ({
+          factory: () => ({
+            hooks: {
+              onPreboot: () => {
+                dependentGeneration += 1
+              },
+              onUnload: () => {
+                dependentUnloads.push(dependentGeneration)
+              },
+            },
+            name: 'dependent',
+          }),
+        }),
+        { require: ['dependency'] },
+      ),
+    ])
+
+    await runtime.preload(app)
+    await runtime.loadNormal().operation
+    expect(dependencyGeneration).toBe(1)
+    expect(dependentGeneration).toBe(1)
+
+    await runtime.reloadPlugin('dependency')
+
+    expect(dependencyGeneration).toBe(2)
+    expect(dependentGeneration).toBe(2)
+    expect(runtime.activeNormalPluginNames).toEqual(
+      expect.arrayContaining(['dependency', 'dependent']),
+    )
+    expect(dependencyUnloads).toEqual([1])
+    expect(dependentUnloads).toEqual([1])
+  })
+
+  it('keeps an updated plugin unloaded while it stays disabled', async () => {
+    let dependencyEnabled = false
+    const factory = vi.fn(() => ({ name: 'dependency' }))
+    const runtime = runtimeFor(() => [
+      candidate('dependency', async () => ({ factory }), { enabled: dependencyEnabled }),
+    ])
+
+    await runtime.preload({} as App)
+    await runtime.loadNormal().operation
+    await runtime.reloadPlugin('dependency')
+
+    expect(factory).not.toHaveBeenCalled()
+    expect(runtime.activeNormalPluginNames).not.toContain('dependency')
   })
 
   it('rolls back preparation when dynamic activation fails', async () => {

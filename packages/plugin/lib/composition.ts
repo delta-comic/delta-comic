@@ -115,12 +115,22 @@ export const installPlugin = async (input: File | string, options: PluginInstall
     ...(await pluginRepository.list()).map(archive => archive.pluginName),
   ])
   const archive = await pluginInstaller.install(input, options.signal, options.report)
-  const candidates = await pluginRuntime.refreshCandidates()
-  for (const candidate of candidates) {
-    const plugin = candidate.manifest.name.id
-    if (plugin === archive.pluginName || !installed.has(plugin)) {
-      pluginRuntime.markRestartRequired(plugin)
+  await pluginRuntime.refreshCandidates()
+  try {
+    // Files and metadata are already persisted; load the result immediately so installs and
+    // updates work without an application restart. reloadPlugin also reloads prepared dependents.
+    await pluginRuntime.reloadPlugin(archive.pluginName)
+  } catch (error) {
+    // Loading failed: keep a restart hint so a restart retries with the persisted state.
+    for (const candidate of pluginRuntime.store.candidates.values()) {
+      const plugin = candidate.manifest.name.id
+      if (plugin === archive.pluginName || !installed.has(plugin)) {
+        pluginRuntime.markRestartRequired(plugin)
+      }
     }
+    throw new Error(
+      `plugin installed but failed to start: ${error instanceof Error ? error.message : String(error)}`,
+    )
   }
   return archive
 }
