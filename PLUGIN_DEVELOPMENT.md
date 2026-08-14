@@ -697,8 +697,10 @@ export default defineDeltaComicPlugin(() => {
 宿主启动时会加载所有已启用插件的模块、执行 Factory，并调用各插件的 `onPreboot`；用户
 选择启动插件时，宿主复用同一份配置并激活其正常部分。正常部分重载不会再次执行 Factory、
 `onPreboot` 或其 cleanup。应用已经挂载后，启用或停用插件会立即生效：启用会补执行
-`onPreboot` 并激活正常部分，停用会按 LIFO 顺序释放正常部分与预加载 cleanup。只有新安装
-或更新的插件必须重启后才能启动。
+`onPreboot` 并激活正常部分，停用会按 LIFO 顺序释放正常部分与预加载 cleanup。安装或更新
+插件同样即时生效：宿主会卸载旧代码（连同其依赖者）并从新文件重新加载；只有插件加载
+失败时才需要重启重试。热重载依赖模块 URL 换版：Web 端每次生成新的 Blob URL，原生端在
+`plugin://` URL 上附加 `?v=<版本>` 破坏模块缓存。
 
 宿主自动回滚配置、i18n、贡献模型、内容注册项、资源注册项和插件 CSS。插件自行创建的
 正常部分副作用必须通过 `onUnload` 清理；预加载副作用必须通过 `onPreboot` 返回的 cleanup

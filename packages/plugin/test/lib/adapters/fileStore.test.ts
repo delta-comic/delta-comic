@@ -22,3 +22,29 @@ describe('plugin protocol URLs', () => {
     expect(() => createPluginProtocolUrl('layout', '../outside.js')).toThrow('safe relative path')
   })
 })
+
+describe('module URL versioning', () => {
+  it('busts the module cache after every file replacement and removal', async () => {
+    const { AtomicPluginFileStore } = await import('../../../lib/adapters/fileStore')
+    const backend = {
+      moduleUrl: vi.fn(async () => 'plugin://localhost/demo/index.mjs'),
+      read: vi.fn(),
+      replace: vi.fn(async () => undefined),
+      snapshot: vi.fn(async () => new Map<string, Uint8Array>()),
+    }
+    const store = new AtomicPluginFileStore(backend)
+
+    await expect(store.createModuleUrl('demo', 'index.mjs')).resolves.toBe(
+      'plugin://localhost/demo/index.mjs?v=0',
+    )
+    await store.replace('demo', new Map())
+    await expect(store.createModuleUrl('demo', 'index.mjs')).resolves.toBe(
+      'plugin://localhost/demo/index.mjs?v=1',
+    )
+    await store.remove('demo')
+    await store.replace('demo', new Map())
+    await expect(store.createModuleUrl('demo', 'index.mjs')).resolves.toBe(
+      'plugin://localhost/demo/index.mjs?v=3',
+    )
+  })
+})

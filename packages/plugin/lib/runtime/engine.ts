@@ -147,55 +147,98 @@ export class PluginRuntime {
 
   /** Prepare a plugin that was enabled after startup and activate it once normal parts are booted. */
   public async enablePlugin(plugin: string) {
+    await this.enablePlugins([plugin])
+  }
+
+  /**
+   * Prepare every given plugin, plus any enabled requirement that is not prepared yet, in
+   * dependency order, and activate their normal parts once the application is booted.
+   */
+  public async enablePlugins(plugins: readonly string[]) {
+    this.#assertReadyForToggle()
+    const targets = new Map<string, PluginCandidate>()
+    const visit = (plugin: string) => {
+      if (targets.has(plugin)) return
+      const candidate = this.store.candidates.get(plugin)
+      if (!candidate) throw new Error(`plugin "${plugin}" is not a known candidate`)
+      if (!candidate.enabled) throw new Error(`plugin "${plugin}" is not enabled`)
+      targets.set(plugin, candidate)
+      for (const dependency of candidate.manifest.require) visit(dependency.id)
+    }
+    for (const plugin of plugins) visit(plugin)
+
+    const plan = planPluginDependencies([...targets.values()])
+    if (plan.cycles.length > 0) {
+      const cycles = plan.cycles.map(cycle => cycle.join(' -> ')).join('; ')
+      throw new Error(`cannot enable plugins: dependency cycles: ${cycles}`)
+    }
+
+    for (const level of plan.levels) {
+      for (const candidate of level) {
+        const plugin = candidate.manifest.name.id
+        const prepared = this.#prepared.get(plugin)
+        if (prepared) {
+          if (this.#booted && !this.#activeNormal.has(plugin)) {
+            const result = await this.#activateNormal(prepared)
+            if (result.error !== undefined) throw this.#activationFailure(plugin, result)
+          }
+          continue
+        }
+        await this.#prepareAndActivate(candidate)
+      }
+    }
+  }
+
+  /**
+   * Unload a plugin together with its prepared dependents, then reload it from its current files
+   * so an install or update takes effect without an application restart.
+   */
+  public async reloadPlugin(plugin: string) {
     this.#assertReadyForToggle()
     const candidate = this.store.candidates.get(plugin)
     if (!candidate) throw new Error(`plugin "${plugin}" is not a known candidate`)
-    if (!candidate.enabled) throw new Error(`plugin "${plugin}" is not enabled`)
-    const existing = this.#prepared.get(plugin)
-    if (existing) {
-      if (this.#booted && !this.#activeNormal.has(plugin)) {
-        const result = await this.#activateNormal(existing)
-        if (result.error !== undefined) {
-          throw this.#activationFailure(plugin, result)
+
+    const affected: string[] = []
+    const visited = new Set<string>()
+    const collectDependents = (id: string) => {
+      if (visited.has(id)) return
+      visited.add(id)
+      for (const [name, prepared] of this.#prepared) {
+        if (prepared.candidate.manifest.require.some(dependency => dependency.id === id)) {
+          collectDependents(name)
         }
       }
-      return
+      if (id !== plugin) affected.push(id)
     }
+    collectDependents(plugin)
 
-    const missing = candidate.manifest.require
-      .map(dependency => dependency.id)
-      .filter(dependency => !this.#prepared.has(dependency))
-    if (missing.length > 0) {
-      throw new Error(
-        `cannot enable plugin "${plugin}": required plugins are not enabled: ${missing.join(', ')}`,
-      )
-    }
-
-    const app = this.#app
-    if (!app) throw new Error('plugins must be preloaded before enabling a plugin')
-    const scope = new PluginScope(plugin)
-    try {
-      const { config, module } = await this.#loadPlugin(candidate, scope)
-      const cleanup = await config.hooks?.onPreboot?.({ app })
-      if (cleanup) scope.defer(cleanup)
-      const prepared: PreparedPlugin = { candidate, config, module, scope }
-      this.#prepared.set(plugin, prepared)
-      if (this.#booted) {
-        const result = await this.#activateNormal(prepared)
-        if (result.error !== undefined) {
-          throw this.#activationFailure(plugin, result)
+    const errors: unknown[] = []
+    for (const id of [...affected, plugin]) {
+      const active = this.#activeNormal.get(id)
+      if (active) {
+        try {
+          await this.#deactivateNormal(id, active)
+        } catch (error) {
+          errors.push(error)
         }
       }
-    } catch (error) {
-      this.#prepared.delete(plugin)
-      const errors: unknown[] = this.#flattenErrors(error)
-      const disposeError = await scope.dispose(error).catch(caught => caught)
-      if (disposeError !== undefined) errors.push(...this.#flattenErrors(disposeError))
+      const prepared = this.#prepared.get(id)
+      if (prepared) {
+        this.#prepared.delete(id)
+        try {
+          await prepared.scope.dispose()
+        } catch (error) {
+          errors.push(error)
+        }
+      }
+    }
+    if (errors.length > 0) {
       throw new AggregateError(
         errors,
-        `failed to enable plugin "${plugin}": ${joinErrorMessages(errors)}`,
+        `failed to unload plugin "${plugin}": ${joinErrorMessages(errors)}`,
       )
     }
+    if (candidate.enabled) await this.enablePlugins([plugin, ...affected])
   }
 
   /** Deactivate and unload a plugin so disabling it takes effect without a restart. */
@@ -235,6 +278,33 @@ export class PluginRuntime {
       throw new AggregateError(
         errors,
         `failed to disable plugin "${plugin}": ${joinErrorMessages(errors)}`,
+      )
+    }
+  }
+
+  async #prepareAndActivate(candidate: PluginCandidate) {
+    const plugin = candidate.manifest.name.id
+    const app = this.#app
+    if (!app) throw new Error('plugins must be preloaded before enabling a plugin')
+    const scope = new PluginScope(plugin)
+    try {
+      const { config, module } = await this.#loadPlugin(candidate, scope)
+      const cleanup = await config.hooks?.onPreboot?.({ app })
+      if (cleanup) scope.defer(cleanup)
+      const prepared: PreparedPlugin = { candidate, config, module, scope }
+      this.#prepared.set(plugin, prepared)
+      if (this.#booted) {
+        const result = await this.#activateNormal(prepared)
+        if (result.error !== undefined) throw this.#activationFailure(plugin, result)
+      }
+    } catch (error) {
+      this.#prepared.delete(plugin)
+      const errors: unknown[] = this.#flattenErrors(error)
+      const disposeError = await scope.dispose(error).catch(caught => caught)
+      if (disposeError !== undefined) errors.push(...this.#flattenErrors(disposeError))
+      throw new AggregateError(
+        errors,
+        `failed to enable plugin "${plugin}": ${joinErrorMessages(errors)}`,
       )
     }
   }

@@ -261,11 +261,13 @@ class TauriPluginFileBackend implements PluginFileBackend {
 }
 
 export class AtomicPluginFileStore implements PluginFileStore {
+  readonly #moduleVersions = new Map<string, number>()
   readonly #urls = new Map<string, Set<string>>()
 
   public constructor(private readonly backend: PluginFileBackend) {}
 
   public async replace(plugin: string, files: PluginFiles) {
+    this.#moduleVersions.set(plugin, (this.#moduleVersions.get(plugin) ?? 0) + 1)
     const previous = await this.backend.snapshot(plugin)
     await this.backend.replace(plugin, files)
     let settled = false
@@ -282,6 +284,7 @@ export class AtomicPluginFileStore implements PluginFileStore {
   }
 
   public async remove(plugin: string) {
+    this.#moduleVersions.set(plugin, (this.#moduleVersions.get(plugin) ?? 0) + 1)
     this.release(plugin)
     await this.backend.replace(plugin, new Map())
   }
@@ -292,7 +295,12 @@ export class AtomicPluginFileStore implements PluginFileStore {
 
   public async createModuleUrl(plugin: string, path: string) {
     const safePath = safePluginPath(path, 'plugin module path')
-    if (this.backend.moduleUrl) return await this.backend.moduleUrl(plugin, safePath)
+    if (this.backend.moduleUrl) {
+      // The protocol URL is stable, so bust the module cache on every file replacement so a
+      // hot reload always evaluates the current files instead of the previously imported module.
+      const version = this.#moduleVersions.get(plugin) ?? 0
+      return `${await this.backend.moduleUrl(plugin, safePath)}?v=${version}`
+    }
     const bytes = await this.backend.read(plugin, safePath)
     const url = URL.createObjectURL(new Blob([Uint8Array.from(bytes)], { type: 'text/javascript' }))
     const urls = this.#urls.get(plugin) ?? new Set<string>()
