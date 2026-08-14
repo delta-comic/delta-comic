@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { translatePluginText, usePluginStore, type PluginLoadingInfo } from '@delta-comic/plugin'
+import { pluginI18n, usePluginStore, type PluginLoadingInfo } from '@delta-comic/plugin'
 import { createLoadingMessage, DcCell } from '@delta-comic/ui'
 import { motion } from 'motion-v'
 import { NButton, NSpin } from 'naive-ui'
@@ -27,7 +27,7 @@ const visibleSteps = computed(() =>
 const getProgressLabel = ({ steps, progress }: PluginLoadingInfo) => {
   const step = steps[progress.stepsIndex]
   const description = step
-    ? `${translatePluginText(step.name)}: ${translatePluginText(step.description)}`
+    ? `${pluginI18n.translateText(step.name)}: ${pluginI18n.translateText(step.description)}`
     : t('common.status.processing')
   if (progress.status !== 'error' || !progress.errorReason) return description
   return `${description}\n${progress.errorReason}`

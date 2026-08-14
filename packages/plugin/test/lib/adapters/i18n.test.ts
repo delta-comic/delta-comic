@@ -1,11 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import {
-  pluginI18n,
-  pluginMessageKey,
-  PluginI18nRegistry,
-  translatePluginText,
-} from '../../../lib/adapters/i18n'
+import { pluginI18n, PluginI18nRegistry } from '../../../lib/adapters/i18n'
 
 describe('PluginI18nRegistry', () => {
   it('merges plugin messages per locale without mutating base or plugin inputs', () => {
@@ -71,13 +66,40 @@ describe('PluginI18nRegistry', () => {
 })
 
 describe('plugin text protocol', () => {
-  it('translates `i18n:` prefixed keys through the adapter and passes through raw values', () => {
+  it('encodes and decodes `i18n:` prefixed keys and passes through raw values', () => {
+    const adapter = {
+      setLocaleMessage: vi.fn(),
+      translate: vi.fn((key: string) => `译:${key}`),
+      has: vi.fn(() => false),
+    }
+    pluginI18n.install(adapter, {})
+
+    expect(pluginI18n.messageKey('example.a')).toBe('i18n:example.a')
+    expect(pluginI18n.translateText(pluginI18n.messageKey('example.a'))).toBe('译:example.a')
+    expect(pluginI18n.translateText('普通文本')).toBe('普通文本')
+    expect(adapter.translate).toHaveBeenCalledWith('example.a', undefined)
+    expect(adapter.has).toHaveBeenCalledWith('普通文本')
+  })
+
+  it('resolves plain i18n keys that the adapter reports as registered', () => {
+    const adapter = {
+      setLocaleMessage: vi.fn(),
+      translate: vi.fn((key: string) => `译:${key}`),
+      has: vi.fn((key: string) => key === 'example.plain'),
+    }
+    pluginI18n.install(adapter, {})
+
+    expect(pluginI18n.translateText('example.plain')).toBe('译:example.plain')
+    expect(pluginI18n.translateText('example.missing')).toBe('example.missing')
+  })
+
+  it('skips the plain key lookup when the adapter does not implement has', () => {
     const adapter = { setLocaleMessage: vi.fn(), translate: vi.fn((key: string) => `译:${key}`) }
     pluginI18n.install(adapter, {})
 
-    expect(pluginMessageKey('example.a')).toBe('i18n:example.a')
-    expect(translatePluginText(pluginMessageKey('example.a'))).toBe('译:example.a')
-    expect(translatePluginText('普通文本')).toBe('普通文本')
-    expect(adapter.translate).toHaveBeenCalledWith('example.a', undefined)
+    expect(pluginI18n.translateText('example.plain')).toBe('example.plain')
+    expect(pluginI18n.translateText(pluginI18n.messageKey('example.plain'))).toBe(
+      '译:example.plain',
+    )
   })
 })

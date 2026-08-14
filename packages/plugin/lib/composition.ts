@@ -33,9 +33,7 @@ import {
 } from './runtime'
 
 export const pluginContributions = new ContributionHub()
-export const pluginStore = new PluginStore(value =>
-  value.startsWith('i18n:') ? pluginI18n.translate(value.slice('i18n:'.length)) : value,
-)
+export const pluginStore = new PluginStore(value => pluginI18n.translateText(value))
 export const pluginConfigStore = new ConfigStore()
 export const useConfig = () => pluginConfigStore
 
@@ -203,12 +201,6 @@ export const resolvePluginIconUrl = async (
   return await pluginFiles.createAssetUrl(plugin, icon)
 }
 
-export {
-  pluginI18n,
-  pluginMessageKey,
-  translatePluginText,
-  type PluginI18nAdapter,
-  type PluginLocaleMessages,
-} from './adapters'
+export { pluginI18n, type PluginI18nAdapter, type PluginLocaleMessages } from './adapters'
 
 export const usePluginStore = () => pluginStore

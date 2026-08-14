@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useConfig } from '@delta-comic/plugin'
+import { pluginI18n, useConfig } from '@delta-comic/plugin'
 import { DcCell, DcCellGroup } from '@delta-comic/ui'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router'
 
 import LogReaderPanel from '@/components/logs/LogReaderPanel.vue'
 import PluginConfigField from '@/components/plugin/PluginConfigField.vue'
-import { localizeFormConfig, resolvePluginText } from '@/i18n/pluginText'
+import { localizeFormConfig } from '@/i18n/pluginText'
 import { isTauriRuntime } from '@/platform'
 
 const $router = useRouter()
@@ -16,7 +16,7 @@ const { t } = useI18n()
 const showNativeLogs = isTauriRuntime()
 const showLogReader = shallowRef(false)
 
-const translateText = (value: string | undefined) => (value ? resolvePluginText(value) : '')
+const translateText = (value: string | undefined) => (value ? pluginI18n.translateText(value) : '')
 </script>
 
 <template>

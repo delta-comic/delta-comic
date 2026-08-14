@@ -18,6 +18,9 @@ const i18nAdapter: PluginI18nAdapter = {
   translate(key, params) {
     return i18n.global.t(key, params ?? {})
   },
+  has(key) {
+    return i18n.global.te(key)
+  },
 }
 
 pluginI18n.install(i18nAdapter, localeMessages)
