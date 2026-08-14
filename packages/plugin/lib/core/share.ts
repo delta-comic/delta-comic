@@ -15,7 +15,7 @@ export const tokenInit: Social.InitiativeItem = {
   filter: page => !!page.preload,
   icon: {},
   key: 'token',
-  name: pluginI18n.messageKey('plugin.share.copyToken'),
+  name: 'plugin.share.copyToken',
   async call(page) {
     const item = page.preload?.toJSON()
     if (!item) throw new Error('Not found preload in content. Maybe not fetch detail?')
@@ -39,7 +39,7 @@ export const nativeInit: Social.InitiativeItem = {
   filter: page => !!page.preload,
   icon: {},
   key: 'native',
-  name: pluginI18n.messageKey('plugin.share.native'),
+  name: 'plugin.share.native',
   async call(page) {
     const item = page.preload?.toJSON()
     if (!item) throw new Error('Not found preload in content. Maybe not fetch detail?')
@@ -64,7 +64,7 @@ export const nativeInit: Social.InitiativeItem = {
 
 export const tokenShare: Social.ShareToken = {
   key: 'token',
-  name: pluginI18n.messageKey('plugin.share.defaultToken'),
+  name: 'plugin.share.defaultToken',
   isMatched(chipboard) {
     return /^\[.+\]\(复制这条口令，打开Delta Comic\).+/.test(chipboard)
   },
