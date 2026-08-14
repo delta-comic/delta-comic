@@ -10,6 +10,5 @@
   "[markdown]": { "editor.defaultFormatter": "DavidAnson.vscode-markdownlint" },
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
-  "js/ts.experimental.useTsgo": false,
   "i18n-ally.localesPaths": ["packages/app/src/i18n", "packages/app/src/i18n/locales"]
 }
