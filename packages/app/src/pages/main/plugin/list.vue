@@ -101,9 +101,26 @@ const actionsFor = (plugin: ManagedPlugin): DropdownOption[] => {
 const handleAction = async (plugin: ManagedPlugin, key: string) => {
   pluginListLogger.debug('plugin action requested', { action: key, plugin: plugin.pluginName })
   switch (key) {
-    case 'toggle':
-      await setPluginEnabled(plugin.pluginName, !plugin.enable)
+    case 'toggle': {
+      const enabled = !plugin.enable
+      const name = translatePluginText(plugin.meta.name.display ?? plugin.pluginName)
+      try {
+        await setPluginEnabled(plugin.pluginName, enabled)
+        window.$message.success(
+          enabled
+            ? t('plugin.list.feedback.enabled', { plugin: name })
+            : t('plugin.list.feedback.disabled', { plugin: name }),
+        )
+      } catch (error) {
+        pluginListLogger.error(
+          'plugin toggle failed',
+          { plugin: plugin.pluginName, enabled },
+          error,
+        )
+        window.$message.error(error instanceof Error ? error.message : String(error))
+      }
       break
+    }
     case 'update':
       await updatePlugin(plugin)
       break

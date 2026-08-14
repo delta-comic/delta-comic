@@ -142,14 +142,43 @@ export const updatePluginByName = async (plugin: string, options?: PluginInstall
 export const setPluginEnabled = async (plugin: string, enabled: boolean) => {
   const candidate = pluginStore.candidates.get(plugin)
   if (!candidate?.management.canDisable) throw new Error(`plugin "${plugin}" cannot be disabled`)
-  if (candidate.origin === 'builtin') await internalPreferences.setEnabled(plugin, enabled)
-  else {
-    const archive = await pluginRepository.find(plugin)
-    if (!archive) throw new Error(`installed plugin not found: ${plugin}`)
-    await pluginRepository.upsert({ ...archive, enable: enabled })
+  const persist = async () => {
+    if (candidate.origin === 'builtin') await internalPreferences.setEnabled(plugin, enabled)
+    else {
+      const archive = await pluginRepository.find(plugin)
+      if (!archive) throw new Error(`installed plugin not found: ${plugin}`)
+      await pluginRepository.upsert({ ...archive, enable: enabled })
+    }
   }
-  pluginRuntime.markRestartRequired(plugin)
+  const restore = async () => {
+    if (candidate.origin === 'builtin')
+      await internalPreferences.setEnabled(plugin, candidate.enabled)
+    else {
+      const archive = await pluginRepository.find(plugin)
+      if (archive) await pluginRepository.upsert({ ...archive, enable: candidate.enabled })
+    }
+    await pluginRuntime.refreshCandidates()
+  }
+
+  if (enabled) {
+    await persist()
+    await pluginRuntime.refreshCandidates()
+    try {
+      await pluginRuntime.enablePlugin(plugin)
+    } catch (error) {
+      // Enabling failed; restore the persisted flag so the list matches the runtime state.
+      await restore()
+      throw error
+    }
+    pluginRuntime.restartRequired.delete(plugin)
+    return
+  }
+
+  // Disable validates (dependencies, management) and unloads first, then the flag is persisted.
+  await pluginRuntime.disablePlugin(plugin)
+  await persist()
   await pluginRuntime.refreshCandidates()
+  pluginRuntime.restartRequired.delete(plugin)
 }
 
 export const uninstallPlugin = async (plugin: string) => await pluginRuntime.uninstall(plugin)

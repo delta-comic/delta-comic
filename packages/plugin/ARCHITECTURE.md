@@ -73,7 +73,11 @@ Every plugin enabled at application startup is prepared before Vue mounts. Prepa
 module, evaluates its factory once, and runs only `onPreboot`; declarative capabilities remain
 inactive. A later user selection reuses the prepared config and activates the plugin's normal part.
 Normal reloads dispose only the normal scope, so they do not rerun the factory or preload hook.
-Plugins installed, enabled, or updated after this startup snapshot require an application restart.
+Plugins installed or updated after this startup snapshot require an application restart. Enabling
+or disabling a plugin applies immediately instead: `PluginRuntime.enablePlugin` prepares the
+candidate (and activates it once normal parts are booted), while `disablePlugin` deactivates and
+unloads it in LIFO order; both are orchestrated by `setPluginEnabled`, which persists the flag
+before enabling and after a successful disable.
 
 Endpoint probes within one remote/resource group may run in parallel with independent abort
 signals. Plugin dependency levels and capability modules are deliberately activated serially so

@@ -264,7 +264,12 @@ const zhCN = {
         updateFromSource: '从下载源更新',
       },
       empty: { action: '前往市场', description: '暂未安装插件' },
-      feedback: { alreadyUpdating: '插件已在更新', updating: '正在更新：{plugin}' },
+      feedback: {
+        alreadyUpdating: '插件已在更新',
+        disabled: '已停用插件：{plugin}',
+        enabled: '已启用插件：{plugin}',
+        updating: '正在更新：{plugin}',
+      },
       incompatible: '插件不支持当前核心版本',
       kind: { builtInPrefix: '内置' },
       restartRequired: '插件变更将在下次重启后生效',
