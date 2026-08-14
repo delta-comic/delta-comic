@@ -1,5 +1,5 @@
 import type { Remote } from '../model'
 
 export interface RemoteHooks {
-  onRemoteTestDone(group: Remote.TestGroup, remote: Remote.Definition | false): void
+  onRemoteTestDone(group: Remote.TestRemoteGroup, remote: Remote.Definition | false): void
 }

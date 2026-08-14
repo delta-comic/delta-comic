@@ -1,11 +1,8 @@
+import type { UniResourceProcessor } from '@delta-comic/model'
+
 export type RemoteModel = TestGroup[]
 
-export interface TestGroup {
-  name: string
-  test: TestFunction
-  remotes: Definition[]
-  allowNoConnected?: boolean
-}
+export type TestFunction = (url: string, signal: AbortSignal) => Promise<void>
 
 export interface Definition {
   name: string
@@ -16,4 +13,23 @@ export interface Definition {
   test?: TestFunction
 }
 
-export type TestFunction = (url: string, signal: AbortSignal) => Promise<void>
+export interface TestGroupBase {
+  name: string
+  remotes: Definition[]
+  /**
+   * group-level default test
+   */
+  test?: TestFunction
+  allowNoConnected?: boolean
+}
+
+export interface TestRemoteGroup extends TestGroupBase {
+  type: 'remote'
+}
+
+export interface TestResourceGroup extends TestGroupBase {
+  type: 'resource'
+  processors?: UniResourceProcessor[]
+}
+
+export type TestGroup = TestRemoteGroup | TestResourceGroup

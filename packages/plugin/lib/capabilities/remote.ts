@@ -1,11 +1,14 @@
+import { UniResource } from '@delta-comic/model'
+
 import type { Remote } from '../api'
 import { defineCapability, defineContributionChannel, type CapabilityModule } from '../kernel'
 
 import { selectFastestEndpoint } from './endpointProbe'
+import { bindRegistryValue } from './registryBinding'
 import type { PluginCapabilityServices } from './services'
 
 export interface RemoteSelection {
-  readonly group: Remote.TestGroup
+  readonly group: Remote.TestRemoteGroup
   readonly latencyMs?: number
   readonly remote: Remote.Definition | false
 }
@@ -35,7 +38,41 @@ export const createRemoteCapability = (services: PluginCapabilityServices): Capa
           context.signal,
         )
         if (!selected && !group.allowNoConnected) {
-          throw new Error(`no reachable endpoint for remote group "${group.name}"`)
+          if (group.type === 'remote') {
+            throw new Error(`no reachable endpoint for remote group "${group.name}"`)
+          }
+          throw new Error(`no reachable endpoint for resource "${group.name}"`)
+        }
+        if (group.type === 'resource') {
+          bindRegistryValue(
+            context.scope,
+            UniResource.fork,
+            [context.owner, group.name],
+            group.remotes.map(remote => remote.url),
+          )
+          if (selected) {
+            bindRegistryValue(
+              context.scope,
+              UniResource.precedenceFork,
+              [context.owner, group.name],
+              selected.url,
+            )
+          }
+          const processors = new Set<string>()
+          for (const processor of group.processors ?? []) {
+            if (!processor.name) throw new Error('resource process name cannot be empty')
+            if (processors.has(processor.name)) {
+              throw new Error(`duplicate resource process "${processor.name}"`)
+            }
+            processors.add(processor.name)
+            bindRegistryValue(
+              context.scope,
+              UniResource.processInstances,
+              [context.owner, processor.name],
+              processor,
+            )
+          }
+          continue
         }
         const selection: RemoteSelection = {
           group,
