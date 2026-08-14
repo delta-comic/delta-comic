@@ -4,6 +4,8 @@ import { PageWebviewAuth } from '@delta-comic/utils'
 import { NSelect } from 'naive-ui'
 import { h, ref } from 'vue'
 
+import { localizeForm, resolvePluginText } from '@/i18n/pluginText'
+
 const raceAbort = <T>(operation: Promise<T>, signal: AbortSignal) => {
   if (signal.aborted) return Promise.reject<T>(signal.reason)
   let removeAbortListener = () => {}
@@ -29,7 +31,10 @@ const chooseSelection = async (
     closable: false,
     content: () =>
       h(NSelect, {
-        'options': selections.map(selection => ({ label: selection.name, value: selection.id })),
+        'options': selections.map(selection => ({
+          label: resolvePluginText(selection.name),
+          value: selection.id,
+        })),
         'value': value.value,
         'onUpdate:value': next => (value.value = next),
       }),
@@ -48,7 +53,7 @@ const chooseSelection = async (
 const createAuthMethod = (plugin: string, signal: AbortSignal): User.Method => ({
   async form(form) {
     signal.throwIfAborted()
-    const instance = createForm(form)
+    const instance = createForm(localizeForm(form))
     const dialog = window.$dialog.create({
       closable: false,
       content: () => instance.comp,

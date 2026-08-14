@@ -67,6 +67,7 @@ await vi.hoisted(async () => {
 
 vi.mock('@delta-comic/plugin', () => ({
   configurePluginHost: vi.fn(),
+  pluginI18n: { install: vi.fn() },
   pluginRuntime,
   usePluginStore: () => ({
     modelEntries: (key: string) =>
@@ -123,6 +124,9 @@ vi.mock('naive-ui', () => ({
   useMessage: () => message,
 }))
 vi.mock('vue-i18n', () => ({
+  createI18n: () => ({
+    global: { setLocaleMessage: vi.fn(), t: (key: string) => key, te: () => false },
+  }),
   useI18n: () => ({
     t: (key: string, params?: Record<string, unknown>) =>
       params ? `${key}:${JSON.stringify(params)}` : key,
