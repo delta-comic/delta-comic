@@ -44,8 +44,8 @@
 
 ### 三、Module Augmentation 优化
 
-- [ ] #21 `packages/utils/lib/env.ts:20-21` `$api: Record<string, any>` → 暴露 `interface AppApiRegistry {}` 供 app 增强；`$$lib$$` 值 `any` → `unknown`
-- [ ] #22 合并重复的 `vue-router` TypesConfig 声明（`utils/lib/env.ts`、`ui/env.d.ts`、`app/src/env.d.ts`），utils 为唯一事实源
+- [x] #21 `packages/utils/lib/env.ts` → 暴露 `AppApiRegistry`/`AppLibRegistry` 可增强接口；app 端 Module Augmentation 注册 M3 与 10 个 UMD 库类型；`$$lib$$` 值类型 `any` → `unknown`（var.ts 保留 `??=` 初始化并单点 `as T`）
+- [x] #22 删除 ui/env.d.ts 与 app/src/env.d.ts 重复的 vue-router TypesConfig/RouterClassic 声明，utils 经 dist 输出为唯一事实源（app 保留 vue ComponentCustomProperties 与 vue-i18n）
 
 ### 五、测试代码批量清理（低优先，单独 PR）
 

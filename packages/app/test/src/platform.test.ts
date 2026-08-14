@@ -46,10 +46,10 @@ describe('web platform fallback', () => {
     await expect(initializePlatform()).resolves.toBe(false)
     const nativeUi = browserWindow.$api.M3 as {
       getInsets(): Promise<false>
-      setBarColor(): Promise<void>
+      setBarColor(): Promise<true>
     }
     await expect(nativeUi.getInsets()).resolves.toBe(false)
-    await expect(nativeUi.setBarColor()).resolves.toBeUndefined()
+    await expect(nativeUi.setBarColor()).resolves.toBe(true)
     await expect(setStatusBar('dark')).resolves.toBeUndefined()
   })
 
