@@ -28,28 +28,34 @@ describe('host model capabilities', () => {
     const scope = new PluginScope('reader')
     const contentPage = class {} as unknown as UniContentPageLike
     const itemCard = {} as UniItemCardComponent
-    const process = vi.fn(async path => [path, false] as [string, boolean])
+    const call = vi.fn(async path => [path, false] as [string, boolean])
+    const sign = { name: 'sign', call }
 
     const activated = await new ActivationPipeline(createDefaultCapabilities(services())).activate(
       {
         model: {
           content: { models: [{ ContentPage: contentPage, ItemCard: itemCard, name: 'comic' }] },
-          resource: {
-            process: { sign: process },
-            types: [{ test: async () => {}, type: 'image', urls: ['https://cdn.example'] }],
-          },
+          remotes: [
+            {
+              type: 'resource',
+              name: 'image',
+              test: async () => {},
+              remotes: [{ name: 'primary', url: 'https://cdn.example' }],
+              processors: [sign],
+            },
+          ],
         },
         name: 'reader',
       },
       { owner: 'reader', report: vi.fn(), scope, signal: scope.signal },
     )
 
-    expect(activated).toEqual(['model', 'content-bindings', 'resource'])
+    expect(activated).toEqual(['model', 'content-bindings', 'remote'])
     expect(UniContentPage.contentPages.get(['reader', 'comic'])).toBe(contentPage)
     expect(UniItem.itemCards.get(['reader', 'comic'])).toBe(itemCard)
-    expect(UniResource.fork.get(['reader', 'image'])?.urls).toEqual(['https://cdn.example'])
+    expect(UniResource.fork.get(['reader', 'image'])).toEqual(['https://cdn.example'])
     expect(UniResource.precedenceFork.get(['reader', 'image'])).toBe('https://cdn.example')
-    expect(UniResource.processInstances.get(['reader', 'sign'])).toBe(process)
+    expect(UniResource.processInstances.get(['reader', 'sign'])).toBe(sign)
 
     await scope.dispose()
 
@@ -59,6 +65,37 @@ describe('host model capabilities', () => {
     expect(UniResource.fork.has(['reader', 'image'])).toBe(false)
     expect(UniResource.precedenceFork.has(['reader', 'image'])).toBe(false)
     expect(UniResource.processInstances.has(['reader', 'sign'])).toBe(false)
+  })
+
+  it('keeps offline resource groups registered without a preferred fork', async () => {
+    const scope = new PluginScope('reader')
+
+    const activated = await new ActivationPipeline(createDefaultCapabilities(services())).activate(
+      {
+        model: {
+          remotes: [
+            {
+              allowNoConnected: true,
+              name: 'image',
+              type: 'resource',
+              remotes: [{ name: 'primary', url: 'https://unreachable.example' }],
+              test: async () => {
+                throw new Error('offline')
+              },
+            },
+          ],
+        },
+        name: 'reader',
+      },
+      { owner: 'reader', report: vi.fn(), scope, signal: scope.signal },
+    )
+
+    expect(activated).toEqual(['model', 'remote'])
+    expect(UniResource.fork.get(['reader', 'image'])).toEqual(['https://unreachable.example'])
+    expect(UniResource.precedenceFork.has(['reader', 'image'])).toBe(false)
+
+    await scope.dispose()
+    expect(UniResource.fork.has(['reader', 'image'])).toBe(false)
   })
 
   it('runs remote, auth, special, and user adapters in the fixed capability topology', async () => {
@@ -79,6 +116,7 @@ describe('host model capabilities', () => {
           remotes: [
             {
               name: 'main',
+              type: 'remote',
               remotes: [{ name: 'primary', url: 'https://api.example' }],
               test: async () => {},
             },

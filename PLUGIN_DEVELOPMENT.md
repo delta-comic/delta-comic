@@ -503,7 +503,7 @@ export default defineDeltaComicPlugin(() => ({
 }))
 ```
 
-每个 group 的 `name` 在同一插件内必须唯一；资源组的 `name` 即资源类型名。`test` 是组级默认
+每个 group 的 `name` 在同一插件内必须唯一；资源组的 `name` 即资源类型名。`test` 是组级必填
 探测，`remotes[].test` 可覆盖单个端点。默认情况下没有可用端点会让插件激活失败；确实允许
 离线时设置 `allowNoConnected: true`——此时 remote 组以 `false` 作为选中结果，resource 组
 保留 fork 但不设置优先来源，运行时解析该资源才会失败。
