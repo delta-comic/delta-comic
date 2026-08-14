@@ -63,6 +63,52 @@ describe('plugin candidate providers', () => {
     expect(candidates[1].management.canUninstall).toBe(true)
   })
 
+  it('maps the persisted enable flag to a strict boolean candidate state', async () => {
+    const factory = defineDeltaComicPlugin({ name: 'reader' })
+    const repository: PluginArchiveRepository = {
+      find: vi.fn(),
+      list: async () => [archive('enabled'), { ...archive('disabled'), enable: false }],
+      remove: vi.fn(),
+      upsert: vi.fn(),
+    }
+    const installed = new InstalledPluginCandidateProvider(repository, {
+      read: async () => ({ factory }),
+    })
+    const candidates = await installed.list(new AbortController().signal)
+
+    expect(candidates.map(candidate => [candidate.manifest.name.id, candidate.enabled])).toEqual([
+      ['enabled', true],
+      ['disabled', false],
+    ])
+  })
+
+  it('never treats a legacy non-boolean enable value as enabled', async () => {
+    const factory = defineDeltaComicPlugin({ name: 'reader' })
+    // The column is TEXT; simulate rows whose runtime value escaped boolean deserialization.
+    const repository: PluginArchiveRepository = {
+      find: vi.fn(),
+      list: async () => [
+        { ...archive('truthy-string'), enable: 'true' as never },
+        { ...archive('falsy-string'), enable: 'false' as never },
+        { ...archive('falsy-zero'), enable: 0 as never },
+        { ...archive('truthy-one'), enable: 1 as never },
+      ],
+      remove: vi.fn(),
+      upsert: vi.fn(),
+    }
+    const installed = new InstalledPluginCandidateProvider(repository, {
+      read: async () => ({ factory }),
+    })
+    const candidates = await installed.list(new AbortController().signal)
+
+    expect(candidates.map(candidate => [candidate.manifest.name.id, candidate.enabled])).toEqual([
+      ['truthy-string', true],
+      ['falsy-string', false],
+      ['falsy-zero', false],
+      ['truthy-one', true],
+    ])
+  })
+
   it('rejects collisions before dependency planning', async () => {
     const definition = defineInternalPlugin({
       factory: defineDeltaComicPlugin({ name: 'duplicate' }),
