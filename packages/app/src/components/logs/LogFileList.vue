@@ -3,15 +3,11 @@ import { NEmpty, NSpin } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 import { formatLogFileSize, type LogFileInfo } from '@/features/logs/model'
+import { formatDate } from '@/i18n'
 
 defineProps<{ files: readonly LogFileInfo[]; loading: boolean; selectedPath?: string }>()
 const emit = defineEmits<{ select: [path: string] }>()
-const { locale, t } = useI18n()
-
-const formatModifiedAt = (value: number) =>
-  new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }).format(
-    new Date(value),
-  )
+const { t } = useI18n()
 </script>
 
 <template>
@@ -43,7 +39,7 @@ const formatModifiedAt = (value: number) =>
           <span
             class="flex w-full items-center justify-between gap-2 text-[11px] text-(--dc-text-secondary)"
           >
-            <span class="truncate">{{ formatModifiedAt(file.modifiedAt) }}</span>
+            <span class="truncate">{{ formatDate(file.modifiedAt, 'dateTime') }}</span>
             <span class="shrink-0">{{ formatLogFileSize(file.size) }}</span>
           </span>
           <span v-if="file.archived" class="text-[11px] text-(--dc-text-tertiary)">

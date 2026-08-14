@@ -46,7 +46,7 @@ catalog:
   color: ^5.0.3
   commitlint-plugin-cspell: ^0.9.4
   cspell: ^10.0.1
-  dayjs: ^2.0.0-alpha.4
+  dayjs: ^1.11.21
   elysia: ^1.4.29
   es-toolkit: ^1.50.0
   jszip: ^3.10.1

@@ -11,7 +11,7 @@ vi.mock('@delta-comic/utils', () => ({
   SharedFunction: { call: vi.fn() },
 }))
 
-import { translateText } from '../../../src/i18n'
+import { formatDate, translateText } from '../../../src/i18n'
 
 const fixtureMessages = {
   'zh-CN': { 'i18n-fixture': { greeting: '你好', nested: { label: '插件标签' } } },
@@ -38,5 +38,18 @@ describe('translateText', () => {
     expect(translateText('')).toBe('')
     expect(translateText(null)).toBe('')
     expect(translateText(undefined)).toBe('')
+  })
+})
+
+describe('formatDate', () => {
+  it('formats localized date presets under the active locale', () => {
+    expect(formatDate(new Date(2026, 7, 14), 'date')).toBe('2026年8月14日')
+    expect(formatDate(new Date(2026, 7, 14, 9, 5), 'dateTime')).toBe('2026年8月14日 09:05')
+    expect(formatDate(new Date(2026, 7, 14), 'monthDay')).toBe('8月14日')
+    expect(formatDate(new Date(2026, 7, 14, 9, 5), 'time')).toBe('09:05')
+  })
+
+  it('returns an empty string for invalid values', () => {
+    expect(formatDate('not-a-date', 'date')).toBe('')
   })
 })

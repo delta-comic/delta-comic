@@ -99,6 +99,8 @@ vi.mock('vue-i18n', () => ({
   useI18n: () => ({ locale: { value: 'en-US' }, t: (key: string) => key }),
 }))
 
+vi.mock('@/i18n', () => ({ formatDate: () => 'formatted' }))
+
 import LogContentViewer from '../../../../src/components/logs/LogContentViewer.vue'
 import LogFileList from '../../../../src/components/logs/LogFileList.vue'
 import LogReaderPanel from '../../../../src/components/logs/LogReaderPanel.vue'

@@ -1,19 +1,14 @@
 import dayjs from 'dayjs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
-const locale = vi.hoisted(() => ({ value: 'en-US' }))
+await vi.hoisted(async () => {
+  // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
+  await import('../../../public/runtime/host-libraries.umd.js')
+})
 
-vi.mock('@/i18n', () => ({
-  i18n: {
-    global: {
-      locale,
-      t: (key: string) => {
-        if (key === 'date.today') return locale.value === 'zh-CN' ? '今天' : 'Today'
-        if (key === 'date.yesterday') return locale.value === 'zh-CN' ? '昨天' : 'Yesterday'
-        return key
-      },
-    },
-  },
+vi.mock('@delta-comic/utils', () => ({
+  PageWebviewAuth: class {},
+  SharedFunction: { call: vi.fn() },
 }))
 
 import { createDateString } from '../../../src/utils/date'
@@ -26,15 +21,16 @@ describe('createDateString', () => {
 
   afterEach(() => vi.useRealTimers())
 
-  it('recognizes yesterday across month boundaries', () => {
-    locale.value = 'en-US'
-
-    expect(createDateString(dayjs(new Date(2026, 1, 28, 8, 30)))).toContain('Yesterday')
+  it('labels today and yesterday dates', () => {
+    expect(createDateString(dayjs(new Date(2026, 2, 1, 8, 30)))).toBe('今天 08:30')
+    expect(createDateString(dayjs(new Date(2026, 1, 28, 8, 30)))).toBe('昨天 08:30')
   })
 
-  it('uses the active locale for relative dates', () => {
-    locale.value = 'zh-CN'
+  it('renders a compact month-day date within the current year', () => {
+    expect(createDateString(dayjs(new Date(2026, 6, 1, 10, 5)))).toBe('7月1日 10:05')
+  })
 
-    expect(createDateString(dayjs(new Date(2026, 2, 1, 8, 30)))).toContain('今天')
+  it('renders a full localized date outside the current year', () => {
+    expect(createDateString(dayjs(new Date(2025, 0, 5, 10, 0)))).toBe('2025年1月5日 10:00')
   })
 })
