@@ -2,7 +2,7 @@ import { logger } from '@delta-comic/logger'
 import { isEmpty, isString } from 'es-toolkit/compat'
 import { shallowReactive } from 'vue'
 
-import { SourcedKeyMap, Struct, type Metadata, type Metadatable } from '../struct'
+import { field, MetaStruct, SourcedKeyMap, transform, type Metadatable } from '../struct'
 
 const resourceLogger = logger.scoped('model:resource')
 
@@ -20,7 +20,7 @@ export interface UniResourceRaw extends Metadatable {
   type: string
   processSteps?: UniResourceProcessStep_[]
 }
-export class UniResource extends Struct<UniResourceRaw> implements UniResourceRaw {
+export class UniResource extends MetaStruct<UniResourceRaw> implements UniResourceRaw {
   public static processInstances = SourcedKeyMap.createReactive<
     [plugin: string, referenceName: string],
     UniResourceProcessor
@@ -38,21 +38,14 @@ export class UniResource extends Struct<UniResourceRaw> implements UniResourceRa
   public static create(v: UniResourceRaw): UniResource {
     return new this(v)
   }
-  protected constructor(v: UniResourceRaw) {
-    super(v)
-    this.$$plugin = v.$$plugin
-    this.$$meta = v.$$meta
-    this.pathname = v.pathname
-    this.type = v.type
-    this.processSteps = (v.processSteps ?? []).map<UniResourceProcessStep>(v =>
-      isString(v) ? { referenceName: v, ignoreExit: false } : v,
-    )
-  }
-  public type: string
-  public pathname: string
-  public processSteps: UniResourceProcessStep[]
-  public $$meta?: Metadata
-  public $$plugin: string
+  @field type!: string
+  @field pathname!: string
+  @transform((v: UniResourceProcessStep_[] | undefined) =>
+    (v ?? []).map<UniResourceProcessStep>(step =>
+      isString(step) ? { referenceName: step, ignoreExit: false } : step,
+    ),
+  )
+  processSteps!: UniResourceProcessStep[]
   public async getUrl(): Promise<string> {
     let resultPath = this.pathname
     for (const option of this.processSteps) {

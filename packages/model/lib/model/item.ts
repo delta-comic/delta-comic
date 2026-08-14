@@ -1,6 +1,6 @@
 import { type Component } from 'vue'
 
-import { SourcedKeyMap, Struct, type Metadatable } from '../struct'
+import { field, MetaStruct, SourcedKeyMap, transform, type Metadatable } from '../struct'
 
 import { UniContentPage, type UniContentType, type UniContentType_ } from './content'
 import { UniEp, type UniEpRaw } from './ep'
@@ -70,7 +70,7 @@ export type UniItemDescription =
   | { type: 'html'; content: string }
   | { type: 'text'; content: string }
 
-export abstract class UniItem extends Struct<UniItemRaw> implements UniItemRaw {
+export abstract class UniItem extends MetaStruct<UniItemRaw> implements UniItemRaw {
   public static itemTranslator = SourcedKeyMap.createReactive<
     [plugin: string, name: string],
     UniItemTranslator
@@ -97,56 +97,31 @@ export abstract class UniItem extends Struct<UniItemRaw> implements UniItemRaw {
   public static is(value: unknown): value is UniItem {
     return value instanceof this
   }
-  public cover: UniResourceRaw | image.UniImageRaw
+  @field cover!: UniResourceRaw | image.UniImageRaw
   public get $cover() {
     return image.UniImage.create(this.cover)
   }
-  public title: string
-  public id: string
-  public categories: UniItemCategory[]
-  public author: UniItemAuthor[]
-  public viewNumber?: number
-  public likeNumber?: number
-  public commentNumber?: number
-  public isLiked?: boolean
-  public description?: UniItemDescription
-  public updateTime?: number
-  public contentType: UniContentType
-  public length: string
-  public epLength: string
-  public $$plugin: string
-  public $$meta
-  public thisEp: UniEpRaw
-  public customIsSafe?: boolean
+  @field title!: string
+  @field id!: string
+  @field categories!: UniItemCategory[]
+  @field author!: UniItemAuthor[]
+  @field viewNumber?: number
+  @field likeNumber?: number
+  @field commentNumber?: number
+  @field isLiked?: boolean
+  @field description?: UniItemDescription
+  @field updateTime?: number
+  @transform((v: UniContentType_) => UniContentPage.contentPages.key.toJSON(v))
+  contentType!: UniContentType
+  @field length!: string
+  @field epLength!: string
+  @field thisEp!: UniEpRaw
+  @field customIsSafe?: boolean
   public get $thisEp() {
     return new UniEp(this.thisEp)
   }
-  constructor(v: UniItemRaw) {
-    super(v)
-    this.$$plugin = v.$$plugin
-    this.$$meta = v.$$meta
-
-    this.thisEp = v.thisEp
-    this.updateTime = v.updateTime
-    this.cover = v.cover
-    this.title = v.title
-    this.id = v.id
-    this.categories = v.categories
-    this.author = v.author
-    this.viewNumber = v.viewNumber
-    this.likeNumber = v.likeNumber
-    this.commentNumber = v.commentNumber
-    this.isLiked = v.isLiked
-    this.customIsAI = v.customIsAI
-    this.contentType = UniContentPage.contentPages.key.toJSON(v.contentType)
-    this.length = v.length
-    this.epLength = v.epLength
-    this.description = v.description
-    this.commentSendable = v.commentSendable
-    this.customIsSafe = v.customIsSafe
-  }
-  public commentSendable: boolean
-  public customIsAI?: boolean
+  @field commentSendable!: boolean
+  @field customIsAI?: boolean
   public get $isAi() {
     const check = (str: string) => /(^|[(（[\s【])ai[】)）\]\s]?/gi.test(str)
     return (
