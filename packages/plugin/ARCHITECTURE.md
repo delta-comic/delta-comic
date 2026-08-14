@@ -80,7 +80,7 @@ it in LIFO order, and `reloadPlugin` unloads a plugin together with its prepared
 loads the current files again. The persisted flag changes are orchestrated by `setPluginEnabled`,
 while `installPlugin` reloads the result of an install or update right away.
 
-Endpoint probes within one remote/resource group may run in parallel with independent abort
+Endpoint probes within one remote group may run in parallel with independent abort
 signals. Plugin dependency levels and capability modules are deliberately activated serially so
 registration and rollback order stays deterministic. Every mutable host registration must attach
 its inverse operation to `PluginScope`; unload and failed activation run those inverses in LIFO

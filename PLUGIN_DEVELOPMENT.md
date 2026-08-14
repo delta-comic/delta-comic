@@ -25,7 +25,7 @@ default factory(ConfigEnv)
    ↓
 DCPluginConfig
    ↓
-config → i18n → model → content → user → resource
+config → i18n → model → content → user
        → remote → auth → special → lifecycle
    ↓
 PluginScope 统一管理卸载和失败回滚
@@ -400,7 +400,6 @@ export default defineDeltaComicPlugin(() => ({
 ```ts
 interface PluginConfigModel {
   content?: ContentModel
-  resource?: ResourceModel
   remotes?: RemoteModel
   user?: UserModel
   social?: SocialModel
@@ -447,42 +446,20 @@ const search = new StreamQuery(
 
 完整类型定义见 [`content.ts`](packages/plugin/lib/api/model/content.ts)。
 
-### 5.2 Resource
+### 5.2 Remote 与 Resource 端点组
 
-`resource.types` 定义资源类型及候选根地址；激活时宿主并行探测地址，首个成功地址成为优先来源。没有可用地址会导致插件激活失败。
+`remotes` 声明一组等价服务端点，激活时宿主并行探测，首个成功端点成为优先来源。按 `type` 区分用途：
 
-```ts
-model: {
-  resource: {
-    types: [
-      {
-        type: 'image',
-        urls: ['https://cdn-a.example.com', 'https://cdn-b.example.com'],
-        async test(url, signal) {
-          const response = await fetch(`${url}/health`, { signal })
-          if (!response.ok) throw new Error(`unreachable: ${url}`)
-        },
-      },
-    ],
-    process: {
-      signed: async pathname => [`${pathname}?token=example`, false],
-    },
-  },
-}
-```
-
-同一插件内的资源 `type` 必须唯一。完整类型见 [`resource.ts`](packages/plugin/lib/api/model/resource.ts)。
-
-### 5.3 Remote
-
-`remotes` 用于从一组等价服务端点中选择首个可用端点。每个 group 名称必须唯一。
+- `remote` 组：选中端点通过 `onRemoteTestDone` 钩子交给插件，并注册到 `runtime:remote-selection` channel 供其他能力消费。
+- `resource` 组：候选地址注册为该资源类型的 fork，选中地址成为优先来源，供该类型资源的 pathname 解析使用；`processors` 声明路径处理器。
 
 ```ts
 import type { Remote } from '@delta-comic/plugin'
 
 let selectedApi: Remote.Definition | false = false
 
-const apiRemotes: Remote.TestGroup = {
+const apiRemotes: Remote.TestRemoteGroup = {
+  type: 'remote',
   name: 'main-api',
   remotes: [
     { name: 'primary', url: 'https://api.example.com' },
@@ -494,9 +471,30 @@ const apiRemotes: Remote.TestGroup = {
   },
 }
 
+const imageResources: Remote.TestResourceGroup = {
+  type: 'resource',
+  name: 'image',
+  remotes: [
+    { name: 'cdn-a', url: 'https://cdn-a.example.com' },
+    { name: 'cdn-b', url: 'https://cdn-b.example.com' },
+  ],
+  async test(url, signal) {
+    const response = await fetch(`${url}/health`, { signal })
+    if (!response.ok) throw new Error(`unreachable: ${url}`)
+  },
+  processors: [
+    {
+      name: 'signed',
+      async call(pathname) {
+        return [`${pathname}?token=example`, false]
+      },
+    },
+  ],
+}
+
 export default defineDeltaComicPlugin(() => ({
   name: manifest.name.id,
-  model: { remotes: [apiRemotes] },
+  model: { remotes: [apiRemotes, imageResources] },
   hooks: {
     onRemoteTestDone(group, remote) {
       if (group.name === 'main-api') selectedApi = remote
@@ -505,9 +503,14 @@ export default defineDeltaComicPlugin(() => ({
 }))
 ```
 
-默认情况下没有可用端点会让插件激活失败；确实允许离线时设置 `allowNoConnected: true`。
+每个 group 的 `name` 在同一插件内必须唯一；资源组的 `name` 即资源类型名。`test` 是组级默认
+探测，`remotes[].test` 可覆盖单个端点。默认情况下没有可用端点会让插件激活失败；确实允许
+离线时设置 `allowNoConnected: true`——此时 remote 组以 `false` 作为选中结果，resource 组
+保留 fork 但不设置优先来源，运行时解析该资源才会失败。
 
-### 5.4 User
+完整类型见 [`remote.ts`](packages/plugin/lib/api/model/remote.ts)。
+
+### 5.3 User
 
 `user` 用于声明：
 
@@ -525,7 +528,7 @@ export default defineDeltaComicPlugin(() => ({
 
 完整类型见 [`user.ts`](packages/plugin/lib/api/model/user.ts)。
 
-### 5.5 Social
+### 5.4 Social
 
 `social.share` 可以贡献主动分享动作和剪贴板口令监听器；`social.subscribe` 可以贡献订阅更新检查和作者内容分页查询。
 
@@ -551,7 +554,7 @@ model: {
 
 完整类型见 [`social.ts`](packages/plugin/lib/api/model/social.ts)。
 
-### 5.6 Special 与 Expose
+### 5.5 Special 与 Expose
 
 `special` 是串行启动步骤，可更新加载说明：
 
