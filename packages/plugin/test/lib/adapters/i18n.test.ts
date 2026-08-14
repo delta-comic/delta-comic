@@ -65,23 +65,8 @@ describe('PluginI18nRegistry', () => {
   })
 })
 
-describe('plugin text protocol', () => {
-  it('encodes and decodes `i18n:` prefixed keys and passes through raw values', () => {
-    const adapter = {
-      setLocaleMessage: vi.fn(),
-      translate: vi.fn((key: string) => `译:${key}`),
-      has: vi.fn(() => false),
-    }
-    pluginI18n.install(adapter, {})
-
-    expect(pluginI18n.messageKey('example.a')).toBe('i18n:example.a')
-    expect(pluginI18n.translateText(pluginI18n.messageKey('example.a'))).toBe('译:example.a')
-    expect(pluginI18n.translateText('普通文本')).toBe('普通文本')
-    expect(adapter.translate).toHaveBeenCalledWith('example.a', undefined)
-    expect(adapter.has).toHaveBeenCalledWith('普通文本')
-  })
-
-  it('resolves plain i18n keys that the adapter reports as registered', () => {
+describe('display text resolution', () => {
+  it('translates registered plain keys and passes through raw values', () => {
     const adapter = {
       setLocaleMessage: vi.fn(),
       translate: vi.fn((key: string) => `译:${key}`),
@@ -90,16 +75,26 @@ describe('plugin text protocol', () => {
     pluginI18n.install(adapter, {})
 
     expect(pluginI18n.translateText('example.plain')).toBe('译:example.plain')
+    expect(pluginI18n.translateText('普通文本')).toBe('普通文本')
     expect(pluginI18n.translateText('example.missing')).toBe('example.missing')
+    expect(adapter.translate).toHaveBeenCalledWith('example.plain', undefined)
+    expect(adapter.has).toHaveBeenCalledWith('普通文本')
   })
 
-  it('skips the plain key lookup when the adapter does not implement has', () => {
+  it('passes raw values through when the adapter does not implement has', () => {
     const adapter = { setLocaleMessage: vi.fn(), translate: vi.fn((key: string) => `译:${key}`) }
     pluginI18n.install(adapter, {})
 
     expect(pluginI18n.translateText('example.plain')).toBe('example.plain')
-    expect(pluginI18n.translateText(pluginI18n.messageKey('example.plain'))).toBe(
-      '译:example.plain',
-    )
+  })
+
+  it('translates immediately via translate without the has guard and falls back to the key', () => {
+    const adapter = { setLocaleMessage: vi.fn(), translate: vi.fn((key: string) => `译:${key}`) }
+    pluginI18n.install(adapter, {})
+
+    expect(pluginI18n.translate('example.plain')).toBe('译:example.plain')
+
+    const bare = new PluginI18nRegistry()
+    expect(bare.translate('example.plain')).toBe('example.plain')
   })
 })

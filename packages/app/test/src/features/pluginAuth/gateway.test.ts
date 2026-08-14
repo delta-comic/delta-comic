@@ -60,7 +60,7 @@ describe('createPluginAuthGateway', () => {
     const auth: User.Auth = {
       default: async () => false,
       selections: [
-        { id: 'scan', name: pluginI18n.messageKey('gateway-fixture.auth.scan'), call: scan },
+        { id: 'scan', name: 'gateway-fixture.auth.scan', call: scan },
         { id: 'plain', name: 'gateway-fixture.auth.plain', call: vi.fn() },
         { id: 'raw', name: '原样展示', call: vi.fn() },
       ],
@@ -101,7 +101,7 @@ describe('createPluginAuthGateway', () => {
         channel: {
           type: 'radio',
           comp: 'radio',
-          info: pluginI18n.messageKey('gateway-fixture.auth.channel'),
+          info: 'gateway-fixture.auth.channel',
           selects: [{ label: 'gateway-fixture.auth.scan', value: 'scan' }],
         },
       })
