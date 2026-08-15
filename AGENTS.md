@@ -77,12 +77,33 @@
 - 在做完任何的任务后都必须立刻提交保存进度，不是等多个任务完成后集中提交。
 - 当一项任务可能有库能实现时，最好由库实现，比如日期格式化由`dayjs`实现，这也要求了你在做事前应当从网络搜索已有实现，而不是重复造轮子。
 - 如果不是极端情况，绝对！绝对！不要使用强制类型转换，比如`xxx as unknown as ttt`，除非经过验证确实会报错且无法修复且逻辑正常！
-- 结合上一点，项目看中的就是"类型安全"，避免滥用`any`。
+- 结合上一点，项目看中的就是"类型安全"，避免滥用`any`，
+  但是如果为了省下一个语义正确逻辑无误的`any`就写很多的重复代码/使用很多`as`断言/机械的换为`unknown`，本质是过度设计，也应当避免。
   全部类型约束也是很重要的，最好实现端到端类型类型覆盖，
   比如`createForm(form: FormRuls[]): FormInst`可以优化为`createForm<T extends FormRuls[]>(form: T): FormInst<T>`，
   这对于接下来的比如`FormResult<T>`就很有用，可以给出到字段级别的类型覆盖，而旧的方案很难做到。
+  但是，不代表任何情况下泛型都是有用的，比如:
+  ```ts
+  async function countDb<TB extends keyof DB, O extends object>(
+    sql: SelectQueryBuilder<DB, TB, O>,
+  ) {
+    const v = await sql.select(db => db.fn.countAll<number>().as('count')).executeTakeFirstOrThrow()
+    return v.count
+  }
+  ```
+  很明显，`TB`和`O`都没有在后续和返回中起到任何必要的作用，所以这是过度设计，所以应当改为:
+  ```ts
+  async function countDb(
+    sql: SelectQueryBuilder<DB, keyof DB, object>,
+  ) {
+    const v = await sql.select(db => db.fn.countAll<number>().as('count')).executeTakeFirstOrThrow()
+    return v.count
+  }
+  ```
 - 对于上一点的补充，对于一些全局类型，将来会由外部注册之类的情况，可以预先暴露`interface`，结合ts的Module Augmentation功能实现类型安全。
 - 不要滥用`as`断言，
   假设对于`<T extends object>(arg: T): number`的函数签名，内部使用了断言`(arg as Struct<object>).toJSON()`，
   这就导致了，若`arg`不是`Struct`，则代码会在运行时报错，所以，函数签名应当改为:
   `<T extends Struct<object>>(arg: T): number`。
+- `as`断言不止`as any`，比如`(keys: readonly unknown[])=> [...static, ...keys] as EntryKey`，此时这种类型转换也不能保证正确，
+  应当改为`(keys: EntryKey[])=> [...foo, ...keys]`

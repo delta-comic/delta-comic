@@ -1,10 +1,5 @@
 <script setup lang="ts" generic="T extends FormConfigure, O extends (keyof T)[] = (keyof T)[]">
-import type {
-  FormConfigure,
-  FormDefaultValue,
-  FormResult,
-  FormSingleConfigure,
-} from '@delta-comic/model'
+import type { FormConfigure, FormDefaultValue, FormResult } from '@delta-comic/model'
 import { isArray } from 'es-toolkit/compat'
 import { NForm } from 'naive-ui'
 import { computed } from 'vue'
@@ -24,7 +19,7 @@ const result = defineModel<FormResult<T>>({ required: true })
 const formModel = computed(
   () => result.value as Record<string, FormDefaultValue[keyof FormDefaultValue]>,
 )
-const entries = Object.entries(props.configs) as [string, FormSingleConfigure][]
+const entries = Object.entries(props.configs)
 
 const slots = defineSlots<{
   row?<K extends O[number]>(args: FormRowSlot<T, O, K>): any

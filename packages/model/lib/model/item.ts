@@ -1,4 +1,6 @@
 import { type Component } from 'vue'
+import type { StyleValue } from 'vue'
+import type { ClassValue } from 'vue'
 
 import { field, MetaStruct, SourcedKeyMap, transform, type Metadatable } from '../struct'
 
@@ -52,8 +54,8 @@ export type UniItemCardComponent = Component<
     freeHeight?: boolean
     disabled?: boolean
     type?: 'default' | 'big' | 'small'
-    class?: string
-    style?: string | Record<string, string>
+    style?: StyleValue
+    class?: ClassValue
   },
   {},
   {},

@@ -29,17 +29,6 @@ export type ContributionValue<
 
 const contributionKey = (owner: string, id: string) => JSON.stringify([owner, id])
 
-/** Erased view of a registry, stored per channel key inside the hub. */
-interface AnyContributionRegistry {
-  readonly size: number
-  readonly entries: ReadonlyMap<string, Contribution<unknown>>
-  register(owner: string, id: string, value: unknown): () => boolean
-  get(owner: string, id: string): Contribution<unknown> | undefined
-  byOwner(owner: string): Contribution<unknown>[]
-  removeOwner(owner: string): void
-  values(): IterableIterator<Contribution<unknown>>
-}
-
 export class ContributionRegistry<T, Owners extends Record<keyof Owners, T> = Record<never, T>> {
   readonly #entries = shallowReactive(new Map<string, Contribution<T>>())
 
@@ -99,17 +88,17 @@ export class ContributionRegistry<T, Owners extends Record<keyof Owners, T> = Re
 }
 
 export class ContributionHub {
-  private readonly registries = new Map<string, AnyContributionRegistry>()
+  private readonly registries = new Map<string, ContributionRegistry<any, any>>()
 
   public channel<T, Owners extends Record<keyof Owners, T> = Record<never, T>>(
     channel: ContributionChannel<T, Owners>,
   ): ContributionRegistry<T, Owners> {
     let registry = this.registries.get(channel.key)
     if (!registry) {
-      registry = new ContributionRegistry<T, Owners>() as AnyContributionRegistry
+      registry = new ContributionRegistry<T, Owners>()
       this.registries.set(channel.key, registry)
     }
-    return registry as ContributionRegistry<T, Owners>
+    return registry //as ContributionRegistry<T, Owners>
   }
 
   public register<T, Owners extends Record<keyof Owners, T> = Record<never, T>>(
