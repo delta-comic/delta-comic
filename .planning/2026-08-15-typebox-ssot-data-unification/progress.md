@@ -81,3 +81,22 @@
 - 提交本次改动
 
 ---
+
+## Session 3: 2026-08-15 - Phase 1 生成器基础扩展
+
+### 已完成
+- `jsonColumn(typeName)`：为 JSON 列保留 TypeBox DSL 标记，并生成 `JSONColumnType<...>` Kysely 字段类型；SQL 侧映射为 SQLite `TEXT`。
+- `autoIncrement()`：支持 SQLite `INTEGER PRIMARY KEY AUTOINCREMENT`，并生成 Kysely `Generated<number>` 类型。
+- `TableIndex.unique`：支持生成 `CREATE UNIQUE INDEX`。
+- 将 `sync_entities`、`sync_changes`、`sync_ops`、`sync_terminal_cursors` 加入生成器语义对比测试，覆盖服务端 13 张表。
+
+### 验证
+- `vp run lib-build` 通过。
+- codegen 测试通过：23 tests。
+
+### 下一步
+- 抽取 13 张服务端表的生产 `.table.mts` SSOT 定义。
+- 扩展 `run.mts` 生成服务端 SQL 和 Kysely 类型产物。
+- 迁移服务端 Repository，并保留 D1 批处理/错误处理语义。
+
+---

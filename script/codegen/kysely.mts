@@ -1,7 +1,7 @@
 import { IsOptional, IsUnion } from 'typebox'
 import type { TSchema } from 'typebox'
 
-import type { TableSchema } from './schema.mts'
+import { isAutoIncrementColumn, isJsonColumn, type TableSchema } from './schema.mts'
 
 const pascalCase = (name: string): string =>
   name
@@ -20,6 +20,8 @@ const tsType = (schema: TSchema): string => {
 }
 
 const tsBaseType = (schema: TSchema): string => {
+  if (isAutoIncrementColumn(schema)) return 'Generated<number>'
+  if (isJsonColumn(schema)) return `JSONColumnType<${schema.typeName}>`
   if (isPrimitive(schema, 'string')) return 'string'
   if (isPrimitive(schema, 'integer') || isPrimitive(schema, 'number')) return 'number'
   if (isPrimitive(schema, 'boolean')) return 'number'

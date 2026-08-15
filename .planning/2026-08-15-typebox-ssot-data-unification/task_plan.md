@@ -4,10 +4,10 @@
 将 SQL schema、TypeScript 类型、服务端验证、客户端类型统一到 TypeBox SSOT，实现端到端类型安全和运行时验证，消除手动维护多层数据结构的复杂性。
 
 ## Next Step
-Phase 0 原型验证已完成（生成器 + 端到端 + 语义对比测试全通过）。等待用户确认进入 Phase 1（13 张服务端表迁移 + Repository 换 Kysely + JSON 列支持）。
+完成 Phase 1 的 SSOT 表定义和生成产物接入，然后迁移服务端 Repository 到 Kysely。
 
 ## Current Phase
-Phase 0（已完成）→ 待进入 Phase 1
+Phase 1（基础生成器扩展已完成，表定义与 Repository 迁移进行中）
 
 ## Phases
 
@@ -30,10 +30,10 @@ Phase 0（已完成）→ 待进入 Phase 1
 
 ### Phase 1: 服务端数据层迁移（2-3周）
 - [ ] 扩展代码生成器
-  - [ ] 支持 JSON 列（JSONColumnType）
+   - [x] 支持 JSON 列（JSONColumnType）
   - [ ] 支持外键约束
   - [ ] 支持复合主键
-  - [ ] 支持索引（单列、复合、UNIQUE）
+   - [x] 支持索引（单列、复合、UNIQUE）
 - [ ] 迁移服务端 13 张表
   - [ ] auth 模块（auth_users, auth_terminals, auth_sessions）
   - [ ] sync 模块（sync_entities, sync_changes, sync_ops, sync_terminal_cursors）

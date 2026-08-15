@@ -1,5 +1,34 @@
 import type { Static, TProperties, TSchema } from 'typebox'
 
+const JSON_COLUMN = Symbol('delta.comic.json-column')
+
+export interface JsonColumn {
+  readonly [JSON_COLUMN]: true
+  readonly type: 'object'
+  readonly typeName: string
+}
+
+export const isJsonColumn = (schema: TSchema): schema is JsonColumn =>
+  typeof schema === 'object' && schema !== null && JSON_COLUMN in schema
+
+export const jsonColumn = (typeName = 'unknown'): JsonColumn => ({
+  [JSON_COLUMN]: true,
+  type: 'object',
+  typeName,
+})
+
+const AUTOINCREMENT = Symbol('delta.comic.autoincrement')
+
+export interface AutoIncrementColumn extends TSchema {
+  readonly [AUTOINCREMENT]: true
+  readonly type: 'integer'
+}
+
+export const isAutoIncrementColumn = (schema: TSchema): schema is AutoIncrementColumn =>
+  typeof schema === 'object' && schema !== null && AUTOINCREMENT in schema
+
+export const autoIncrement = (): AutoIncrementColumn => ({ [AUTOINCREMENT]: true, type: 'integer' })
+
 export interface IndexColumn<TCols extends TProperties = TProperties> {
   column: keyof TCols & string
   order?: 'ASC' | 'DESC'
@@ -8,6 +37,7 @@ export interface IndexColumn<TCols extends TProperties = TProperties> {
 export interface TableIndex<TCols extends TProperties = TProperties> {
   name: string
   columns: readonly ((keyof TCols & string) | IndexColumn<TCols>)[]
+  unique?: boolean
 }
 
 export interface TableForeignKey {
@@ -43,5 +73,9 @@ type DbStatic<T extends TSchema> =
   undefined extends Static<T> ? Exclude<Static<T>, undefined> | null : Static<T>
 
 export type TableRow<T extends TableSchema> = {
-  [K in keyof T['columns']]: DbStatic<T['columns'][K]>
+  [K in keyof T['columns']]: T['columns'][K] extends JsonColumn
+    ? undefined extends Static<T['columns'][K]>
+      ? string | null
+      : string
+    : DbStatic<T['columns'][K]>
 }

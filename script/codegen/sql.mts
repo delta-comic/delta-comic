@@ -9,7 +9,7 @@ import {
 import { IsOptional, IsUnion } from 'typebox'
 import type { TSchema } from 'typebox'
 
-import type { TableSchema } from './schema.mts'
+import { isAutoIncrementColumn, type TableSchema } from './schema.mts'
 
 const unionValues = (schema: TSchema): readonly (string | number)[] | undefined => {
   if (!IsUnion(schema)) return undefined
@@ -72,8 +72,9 @@ const columnCallback =
   ): ((col: ColumnDefinitionBuilder) => ColumnDefinitionBuilder) =>
   col => {
     if (primaryKey) col = col.primaryKey()
+    if (isAutoIncrementColumn(schema)) col = col.autoIncrement()
     if (unique) col = col.unique()
-    if (!isNullable(schema)) col = col.notNull()
+    if (!isNullable(schema) && !isAutoIncrementColumn(schema)) col = col.notNull()
     const defaultValue = defaultLiteral(schema)
     if (defaultValue !== undefined) col = col.defaultTo(defaultValue)
     const check = checkExpression(name, schema)
@@ -134,6 +135,7 @@ export const generateTableSql = (table: TableSchema): string => {
 export const generateIndexSql = (table: TableSchema): string[] =>
   (table.meta.indexes ?? []).map(index => {
     let builder = db.schema.createIndex(index.name).ifNotExists().on(table.name)
+    if (index.unique) builder = builder.unique()
     for (const column of index.columns) {
       builder =
         typeof column === 'string'

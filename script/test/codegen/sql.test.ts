@@ -5,7 +5,7 @@ import { DatabaseSync } from 'node:sqlite'
 import { Type } from 'typebox'
 import { describe, expect, it } from 'vitest'
 
-import { defineTable, type TableSchema } from '../../codegen/schema.mts'
+import { autoIncrement, defineTable, jsonColumn, type TableSchema } from '../../codegen/schema.mts'
 import { generateIndexSql, generateTableSql } from '../../codegen/sql.mts'
 import { rootDir } from '../../set-version.mts'
 
@@ -289,10 +289,110 @@ const pluginScriptRunsTable = defineTable(
   },
 )
 
+const syncEntitiesTable = defineTable(
+  'sync_entities',
+  {
+    user_id: Type.String(),
+    collection: Type.String(),
+    entity_id: Type.String(),
+    data_json: Type.Optional(jsonColumn('SyncEntityData')),
+    data_hash: Type.String(),
+    version: Type.String(),
+    client_changed_at: Type.Integer(),
+    server_updated_at: Type.Integer(),
+    deleted_at: Type.Optional(Type.Integer()),
+    last_terminal_uuid: Type.String(),
+    last_op_id: Type.String(),
+  },
+  {
+    primaryKey: ['user_id', 'collection', 'entity_id'],
+    indexes: [{ name: 'idx_sync_entities_user_collection', columns: ['user_id', 'collection'] }],
+  },
+)
+
+const syncChangesTable = defineTable(
+  'sync_changes',
+  {
+    server_seq: autoIncrement(),
+    user_id: Type.String(),
+    collection: Type.String(),
+    entity_id: Type.String(),
+    action: Type.String(),
+    data_json: Type.Optional(jsonColumn('SyncChangeData')),
+    data_hash: Type.String(),
+    version: Type.String(),
+    client_changed_at: Type.Integer(),
+    server_changed_at: Type.Integer(),
+    deleted_at: Type.Optional(Type.Integer()),
+    origin_terminal_uuid: Type.String(),
+    origin_op_id: Type.String(),
+  },
+  {
+    primaryKey: ['server_seq'],
+    indexes: [
+      { name: 'idx_sync_changes_user_seq', columns: ['user_id', 'server_seq'] },
+      {
+        name: 'idx_sync_changes_user_collection_seq',
+        columns: ['user_id', 'collection', 'server_seq'],
+      },
+      {
+        name: 'idx_sync_changes_origin_op',
+        columns: ['user_id', 'origin_terminal_uuid', 'origin_op_id'],
+        unique: true,
+      },
+    ],
+  },
+)
+
+const syncOpsTable = defineTable(
+  'sync_ops',
+  {
+    user_id: Type.String(),
+    terminal_uuid: Type.String(),
+    op_id: Type.String(),
+    collection: Type.String(),
+    entity_id: Type.String(),
+    action: Type.String(),
+    data_hash: Type.String(),
+    base_version: Type.Optional(Type.String()),
+    result: Type.String(),
+    server_seq: Type.Optional(Type.Integer()),
+    entity_version: Type.Optional(Type.String()),
+    error_code: Type.Optional(Type.String()),
+    error_message: Type.Optional(Type.String()),
+    received_at: Type.Integer(),
+  },
+  {
+    primaryKey: ['user_id', 'terminal_uuid', 'op_id'],
+    indexes: [
+      {
+        name: 'idx_sync_ops_user_received',
+        columns: ['user_id', { column: 'received_at', order: 'DESC' }],
+      },
+    ],
+  },
+)
+
+const syncTerminalCursorsTable = defineTable(
+  'sync_terminal_cursors',
+  {
+    user_id: Type.String(),
+    terminal_uuid: Type.String(),
+    last_pulled_seq: Type.Integer({ default: 0 }),
+    last_pushed_at: Type.Optional(Type.Integer()),
+    last_seen_at: Type.Integer(),
+  },
+  { primaryKey: ['user_id', 'terminal_uuid'] },
+)
+
 const tables: readonly TableSchema[] = [
   authUsersTable,
   authTerminalsTable,
   authSessionsTable,
+  syncEntitiesTable,
+  syncChangesTable,
+  syncOpsTable,
+  syncTerminalCursorsTable,
   pluginRegistryTable,
   pluginInstallationsTable,
   pluginJobsTable,
@@ -307,6 +407,7 @@ const generatedSql = (table: TableSchema): string =>
 const runMigration = (db: DatabaseSync): void => {
   for (const name of [
     '0001_auth.sql',
+    '0002_sync.sql',
     '0003_server_plugins.sql',
     '0004_server_plugin_scripts.sql',
   ]) {
@@ -419,5 +520,42 @@ describe('sql codegen', () => {
         defineTable('bad', { value: { type: 'unknown' } as never }, { primaryKey: ['value'] }),
       ),
     ).toThrow(/Unsupported column schema/)
+  })
+
+  it('renders json columns as text', () => {
+    const table = defineTable(
+      'sync_entities',
+      { user_id: Type.String(), data_json: jsonColumn('SyncEntityData') },
+      { primaryKey: ['user_id'] },
+    )
+    expect(generateTableSql(table)).toContain('"data_json" text')
+  })
+
+  it('renders autoincrement primary key columns', () => {
+    const table = defineTable(
+      'sync_changes',
+      { server_seq: autoIncrement() },
+      { primaryKey: ['server_seq'] },
+    )
+    expect(generateTableSql(table)).toContain('"server_seq" integer primary key autoincrement')
+  })
+
+  it('renders unique indexes', () => {
+    const table = defineTable(
+      'sync_changes',
+      { user_id: Type.String(), origin_terminal_uuid: Type.String(), origin_op_id: Type.String() },
+      {
+        indexes: [
+          {
+            name: 'idx_sync_changes_origin_op',
+            columns: ['user_id', 'origin_terminal_uuid', 'origin_op_id'],
+            unique: true,
+          },
+        ],
+      },
+    )
+    expect(generateIndexSql(table)).toEqual([
+      'create unique index if not exists "idx_sync_changes_origin_op" on "sync_changes" ("user_id", "origin_terminal_uuid", "origin_op_id")',
+    ])
   })
 })
