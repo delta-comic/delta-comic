@@ -1,4 +1,4 @@
-import type { Static, TProperties, TSchema } from '@sinclair/typebox'
+import type { Static, TProperties, TSchema } from 'typebox'
 
 export interface IndexColumn<TCols extends TProperties = TProperties> {
   column: keyof TCols & string

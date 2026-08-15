@@ -305,6 +305,9 @@ catalogs:
     tlds:
       specifier: ^1.261.0
       version: 1.261.0
+    typebox:
+      specifier: ^1.3.14
+      version: 1.3.14
     unplugin-vue-components:
       specifier: 32.1.0
       version: 32.1.0
@@ -361,9 +364,6 @@ importers:
       '@semantic-release/release-notes-generator':
         specifier: ^14.1.1
         version: 14.1.1(semantic-release@25.0.7(supports-color@10.2.2)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))(supports-color@10.2.2)
-      '@sinclair/typebox':
-        specifier: 'catalog:'
-        version: 0.34.52
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 4.1.10(@vitest/browser@4.1.10)(vitest@4.1.10)
@@ -394,6 +394,9 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.3
+      typebox:
+        specifier: 'catalog:'
+        version: 1.3.14
       typescript:
         specifier: npm:typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2
         version: typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2
@@ -757,10 +760,10 @@ importers:
         version: link:../logger
       '@elysia/eden':
         specifier: 'catalog:'
-        version: 1.4.10(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
+        version: 1.4.10(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
       elysia:
         specifier: 'catalog:'
-        version: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
+        version: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
       ky:
         specifier: 'catalog:'
         version: 2.0.2
@@ -776,13 +779,13 @@ importers:
         version: 1.52.1(@voidzero-dev/vite-plus-core@0.2.9(@types/node@25.9.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)(yaml@2.9.0))(wrangler@4.123.0)
       '@elysiajs/bearer':
         specifier: 'catalog:'
-        version: 1.4.4(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
+        version: 1.4.4(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
       '@elysiajs/cors':
         specifier: 'catalog:'
-        version: 1.4.2(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
+        version: 1.4.2(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
       '@elysiajs/openapi':
         specifier: 'catalog:'
-        version: 1.4.15(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
+        version: 1.4.15(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
       '@sinclair/typebox':
         specifier: 'catalog:'
         version: 0.34.52
@@ -6633,6 +6636,9 @@ packages:
     resolution: {integrity: sha512-YGYEVz3Fm5iy/AybuA0oyNFq7H4CgQNfRp/qfe8nurE1kuCeNm3/vfm9X4Mtl+qLyaKJUh5xrFZwogr41SMjYA==}
     engines: {node: '>=20'}
 
+  typebox@1.3.14:
+    resolution: {integrity: sha512-uD3FHZb4St/7E7eY0YANSt+yZABDDlbeJbXhUU17x2GZLyHUiQ6+mxSpZhZtnJSjKy/7PZ49r7SDZHG4F3JsLw==}
+
   typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2:
     resolution: {integrity: sha512-scQFdHBhpFVsr9xmHDos+CCSQHcS0yVjL/4+RaUnfeQRJvrYtSsEpfyiseUmSmSdeKuVLPyQZDO+TcjdsOEsFQ==}
     engines: {node: '>=20.19'}
@@ -8269,21 +8275,21 @@ snapshots:
     dependencies:
       vue: 3.6.0-rc.4(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
 
-  '@elysia/eden@1.4.10(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))':
+  '@elysia/eden@1.4.10(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))':
     dependencies:
-      elysia: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
+      elysia: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
 
-  '@elysiajs/bearer@1.4.4(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))':
+  '@elysiajs/bearer@1.4.4(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))':
     dependencies:
-      elysia: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
+      elysia: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
 
-  '@elysiajs/cors@1.4.2(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))':
+  '@elysiajs/cors@1.4.2(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))':
     dependencies:
-      elysia: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
+      elysia: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
 
-  '@elysiajs/openapi@1.4.15(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))':
+  '@elysiajs/openapi@1.4.15(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))':
     dependencies:
-      elysia: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
+      elysia: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
 
   '@emnapi/core@1.10.0':
     dependencies:
@@ -10724,11 +10730,11 @@ snapshots:
 
   electron-to-chromium@1.5.405: {}
 
-  elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2)(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2):
+  elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2):
     dependencies:
       '@sinclair/typebox': 0.34.52
       cookie: 1.1.1
-      exact-mirror: 1.2.2
+      exact-mirror: 1.2.2(typebox@1.3.14)
       fast-decode-uri-component: 1.0.1
       file-type: 22.0.1(supports-color@10.2.2)
       memoirist: 0.4.0
@@ -10905,7 +10911,9 @@ snapshots:
 
   evtd@0.2.4: {}
 
-  exact-mirror@1.2.2: {}
+  exact-mirror@1.2.2(typebox@1.3.14):
+    optionalDependencies:
+      typebox: 1.3.14
 
   execa@8.0.1:
     dependencies:
@@ -12558,6 +12566,8 @@ snapshots:
   type-fest@5.8.0:
     dependencies:
       tagged-tag: 1.0.0
+
+  typebox@1.3.14: {}
 
   typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2:
     optionalDependencies:

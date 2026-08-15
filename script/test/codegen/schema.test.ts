@@ -1,4 +1,4 @@
-import { Type } from '@sinclair/typebox'
+import { Type } from 'typebox'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import { defineTable, type TableRow } from '../../codegen/schema.mts'

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 
-import { Type } from '@sinclair/typebox'
+import { Type } from 'typebox'
 import { describe, expect, it } from 'vitest'
 
 import { defineTable, type TableSchema } from '../../codegen/schema.mts'

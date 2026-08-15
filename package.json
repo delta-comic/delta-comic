@@ -24,7 +24,6 @@
     "@commitlint/config-conventional": "catalog:",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/release-notes-generator": "^14.1.1",
-    "@sinclair/typebox": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vue/test-utils": "catalog:",
     "commitlint-plugin-cspell": "catalog:",
@@ -35,6 +34,7 @@
     "oxlint-tsgolint": "catalog:",
     "semantic-release": "^25.0.7",
     "tailwindcss": "catalog:",
+    "typebox": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   },

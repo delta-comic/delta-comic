@@ -1,5 +1,3 @@
-import { TypeGuard } from '@sinclair/typebox'
-import type { TSchema } from '@sinclair/typebox'
 import {
   Kysely,
   SqliteDialect,
@@ -8,30 +6,35 @@ import {
   type CreateTableBuilder,
   type ForeignKeyConstraintBuilderCallback,
 } from 'kysely'
+import { IsOptional, IsUnion } from 'typebox'
+import type { TSchema } from 'typebox'
 
 import type { TableSchema } from './schema.mts'
 
 const unionValues = (schema: TSchema): readonly (string | number)[] | undefined => {
-  if (!TypeGuard.IsUnion(schema)) return undefined
+  if (!IsUnion(schema)) return undefined
   const values = (schema.anyOf ?? []).map(node => (node as { const?: unknown }).const)
   if (values.every(value => typeof value === 'string' || typeof value === 'number'))
     return values as readonly (string | number)[]
   return undefined
 }
 
+const isPrimitive = (schema: TSchema, type: 'string' | 'integer' | 'number' | 'boolean') =>
+  schema.type === type
+
 const sqliteType = (schema: TSchema): string => {
-  if (TypeGuard.IsString(schema)) return 'text'
-  if (TypeGuard.IsInteger(schema)) return 'integer'
-  if (TypeGuard.IsNumber(schema)) return 'real'
-  if (TypeGuard.IsBoolean(schema)) return 'integer'
+  if (isPrimitive(schema, 'string')) return 'text'
+  if (isPrimitive(schema, 'integer')) return 'integer'
+  if (isPrimitive(schema, 'number')) return 'real'
+  if (isPrimitive(schema, 'boolean')) return 'integer'
   const values = unionValues(schema)
   if (values !== undefined)
     return values.every(value => typeof value === 'number') ? 'integer' : 'text'
-  if (TypeGuard.IsObject(schema) || TypeGuard.IsArray(schema)) return 'text'
+  if (schema.type === 'object' || schema.type === 'array') return 'text'
   throw new Error(`Unsupported column schema for SQL generation: ${JSON.stringify(schema)}`)
 }
 
-const isNullable = (schema: TSchema): boolean => TypeGuard.IsOptional(schema)
+const isNullable = (schema: TSchema): boolean => IsOptional(schema)
 
 const defaultLiteral = (schema: TSchema): unknown => {
   const value = (schema as { default?: unknown }).default
@@ -41,7 +44,7 @@ const defaultLiteral = (schema: TSchema): unknown => {
 }
 
 const checkExpression = (name: string, schema: TSchema): string | undefined => {
-  if (TypeGuard.IsBoolean(schema)) return `${name} in (0, 1)`
+  if (isPrimitive(schema, 'boolean')) return `${name} in (0, 1)`
   const values = unionValues(schema)
   if (values !== undefined) {
     const rendered = values
@@ -49,7 +52,7 @@ const checkExpression = (name: string, schema: TSchema): string | undefined => {
       .join(', ')
     return `${name} in (${rendered})`
   }
-  if (TypeGuard.IsInteger(schema) || TypeGuard.IsNumber(schema)) {
+  if (isPrimitive(schema, 'integer') || isPrimitive(schema, 'number')) {
     const minimum = (schema as { minimum?: number }).minimum
     const maximum = (schema as { maximum?: number }).maximum
     if (minimum !== undefined && maximum !== undefined)
