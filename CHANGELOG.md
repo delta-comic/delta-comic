@@ -1,5 +1,79 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.11](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.10...3.0.0-next.11) (2026-08-15)
+
+
+### Bug Fixes
+
+* **app:** 修复插件安装确认弹窗 ([64d1736](https://github.com/delta-comic/delta-comic/commit/64d173696582fd71c6f9edddf8f2610c49455110))
+* **app:** 修复插件安装确认弹窗 ([beb5bff](https://github.com/delta-comic/delta-comic/commit/beb5bff52620d4bcf654d353754cb863298e2c1e))
+* **app:** 修复自动大写禁用逻辑 ([184341a](https://github.com/delta-comic/delta-comic/commit/184341a23b15765fbcea2d833b914061eb591f25))
+* **app:** 修复自动大写禁用逻辑 ([a1f91c7](https://github.com/delta-comic/delta-comic/commit/a1f91c7df02e91632cebfba76313ac4bdbffb52b))
+* **app:** 允许原生端写入剪贴板 ([ef9a84a](https://github.com/delta-comic/delta-comic/commit/ef9a84a8f85fc58f57759e27eeae7fea36722535))
+* **app:** 允许原生端写入剪贴板 ([09826cb](https://github.com/delta-comic/delta-comic/commit/09826cb40100ffcd26831bc707fa70eae117911d))
+* **app:** 展示未知总量下载状态 ([9827c06](https://github.com/delta-comic/delta-comic/commit/9827c0616d23c4a126d8d1e4bb192e39271dcb9f))
+* **app:** 展示未知总量下载状态 ([a6a6ef3](https://github.com/delta-comic/delta-comic/commit/a6a6ef3f375829bc87370f7687acb2271dfd1b78))
+* **app:** 恢复插件安装进度提示 ([3643d80](https://github.com/delta-comic/delta-comic/commit/3643d806971a486f0c1f2e4979a5149c2f3fe364))
+* **app:** 恢复插件安装进度提示 ([fe82500](https://github.com/delta-comic/delta-comic/commit/fe82500365b6ecea49d12d07697fc1fe5b707299))
+* **app:** 恢复插件更新反馈 ([9ad8764](https://github.com/delta-comic/delta-comic/commit/9ad8764b4f7a005abb18979560907748eed66a4d))
+* **app:** 恢复插件更新反馈 ([fb0923c](https://github.com/delta-comic/delta-comic/commit/fb0923c86611a1cf57bfccae6d3b76a22ce86b16))
+* **app:** 按阶段创建插件安装进度 ([a658897](https://github.com/delta-comic/delta-comic/commit/a658897fb5069dfec994e4f68b879d3ef742c7af))
+* **app:** 按阶段创建插件安装进度 ([49c42a2](https://github.com/delta-comic/delta-comic/commit/49c42a26e323ce3e4df9738ee2be0c2707715758))
+* **app:** 显示插件安装确认按钮 ([48157bb](https://github.com/delta-comic/delta-comic/commit/48157bbef6435eee9b3d544aa57eb7fcc9156f6a))
+* **app:** 显示插件安装确认按钮 ([b11b57f](https://github.com/delta-comic/delta-comic/commit/b11b57f2d6f0fa46da903b8c7c17978fc72716b8))
+* **app:** 禁用输入框自动大写 ([7bf3a01](https://github.com/delta-comic/delta-comic/commit/7bf3a01e6f129cc2b86384d71319d10e17bfec78))
+* **app:** 禁用输入框自动大写 ([24254a0](https://github.com/delta-comic/delta-comic/commit/24254a0c3cbe2f5886d9da5875225e938f2429ce))
+* **app:** 给enable打补丁，实质问题未解决 ([b895a74](https://github.com/delta-comic/delta-comic/commit/b895a749d0a76ec3af1418fd9e9995d84c4a90ac))
+* **app:** 给enable打补丁，实质问题未解决 ([cf2f6ab](https://github.com/delta-comic/delta-comic/commit/cf2f6ab114388230e53bcbcf111e4f04bc0f0ddc))
+* **app:** 鉴权弹窗解析插件文本协议键与普通 i18n 键 ([fbf362e](https://github.com/delta-comic/delta-comic/commit/fbf362e03035b809abf8300afbf27891b330c3c5))
+* **app:** 鉴权弹窗解析插件文本协议键与普通 i18n 键 ([2ea9318](https://github.com/delta-comic/delta-comic/commit/2ea9318e6d26557075cb30666426c730e62e8eb9))
+* **ci:** release 各平台构建跳过已下载的工作区产物 ([99ec2ed](https://github.com/delta-comic/delta-comic/commit/99ec2ed43713ac7f0376121ef058888cfac06466))
+* **downloader:** 实时发送 HTTP 下载进度 ([12e7c9c](https://github.com/delta-comic/delta-comic/commit/12e7c9c8fec7671db5063851268846741eb59ece))
+* **downloader:** 实时发送 HTTP 下载进度 ([75a181d](https://github.com/delta-comic/delta-comic/commit/75a181d26f88f86e42ec638f9cbf82ec607b5454))
+* **i18n:** 移除未实现的语言选项 ([23c8dc9](https://github.com/delta-comic/delta-comic/commit/23c8dc911779d4447089562924991a61d4621aec))
+* **i18n:** 移除未实现的语言选项 ([c04411b](https://github.com/delta-comic/delta-comic/commit/c04411b25e8025c485ac1cca5bb17585284523b3))
+* **plugin:** i18n 注册表合成不再突变宿主与插件消息 ([fb574b3](https://github.com/delta-comic/delta-comic/commit/fb574b3c5bc9dd022aa7792209268acc11eabac5))
+* **plugin:** i18n 注册表合成不再突变宿主与插件消息 ([cfe5e16](https://github.com/delta-comic/delta-comic/commit/cfe5e166a071f6d8fe611f89835f2ae47f909fd9))
+* **plugin:** 优先使用内置插件候选 ([5121387](https://github.com/delta-comic/delta-comic/commit/5121387e1b5872ea4f70c47bb7c05150e63d1167))
+* **plugin:** 优先使用内置插件候选 ([58adeae](https://github.com/delta-comic/delta-comic/commit/58adeae4012775b391197fc34c8d4e20701b1d00))
+* **plugin:** 修正插件启用状态并规范化布尔边界 ([8ba801a](https://github.com/delta-comic/delta-comic/commit/8ba801a9ff20cc8965d4e09b035e81d27152b329))
+* **plugin:** 修正插件启用状态并规范化布尔边界 ([5830c9c](https://github.com/delta-comic/delta-comic/commit/5830c9cca2f1c13a40950aaf491b4305fcafcc9f))
+* **plugin:** 支持接收插件预览版更新 ([0886fe3](https://github.com/delta-comic/delta-comic/commit/0886fe3a361ff91bbbe47eaf69ac6bdb2a28d22b))
+* **plugin:** 支持接收插件预览版更新 ([89c035a](https://github.com/delta-comic/delta-comic/commit/89c035a775a2d9bd852baaed5a8b0c77676b1852))
+* **plugin:** 自动下载插件依赖 ([a1f7d5a](https://github.com/delta-comic/delta-comic/commit/a1f7d5a6bc36c5cb7e471a9e061e05f25c62a17f))
+* **plugin:** 自动下载插件依赖 ([4479561](https://github.com/delta-comic/delta-comic/commit/4479561434760a9a294eda02c18ed3cbfcb32478))
+* **plugin:** 避免依赖异常阻塞应用启动 ([7e5f60d](https://github.com/delta-comic/delta-comic/commit/7e5f60da579c80dbafaf31dc821f7fc6cbcb7739))
+* **plugin:** 避免依赖异常阻塞应用启动 ([224b80f](https://github.com/delta-comic/delta-comic/commit/224b80f21e50c8962a29bc22b561dfc320adcc41))
+* **splash:** 开屏页没有vue实例问题 ([cb6d0c1](https://github.com/delta-comic/delta-comic/commit/cb6d0c1135f9418bf4da609e78f2e6a13765fb74))
+* **splash:** 开屏页没有vue实例问题 ([6b0856a](https://github.com/delta-comic/delta-comic/commit/6b0856aa17b3f8c11151bc3ac4f0752143d7d712))
+* **style:** 修复ai所写的过度设计 ([51b222d](https://github.com/delta-comic/delta-comic/commit/51b222def8fa70d1f28221f005d5651941df287d))
+* **ui:** 修复下载消息结算与进度边界 ([6507b7a](https://github.com/delta-comic/delta-comic/commit/6507b7a295df7676f61fab1aab724e9d0bdea2bc))
+* **ui:** 修复下载消息结算与进度边界 ([60830d4](https://github.com/delta-comic/delta-comic/commit/60830d40e881cb67be90f815ee2366fab669fa8e))
+
+
+### Features
+
+* **downloader:** 更新 Android 下载通知进度 ([e246fd3](https://github.com/delta-comic/delta-comic/commit/e246fd3cd062da4e25aa0e9b233ce42925d23269))
+* **downloader:** 更新 Android 下载通知进度 ([7c9ba05](https://github.com/delta-comic/delta-comic/commit/7c9ba0538f935b6963491d4f27c07e3968f999d9))
+* **logger:** 为终端日志等级添加颜色 ([8d1cf55](https://github.com/delta-comic/delta-comic/commit/8d1cf555534890521e1f9319c21e00f3bf489d57))
+* **logger:** 为终端日志等级添加颜色 ([567f4a4](https://github.com/delta-comic/delta-comic/commit/567f4a459cf995b166806e7bc9ccc45db29c555a))
+* **plugin:** 安装更新即用与插件热重载 ([e7ca2d1](https://github.com/delta-comic/delta-comic/commit/e7ca2d17d78ffad6c28b527c74b2ac6b09fd8e6a))
+* **plugin:** 安装更新即用与插件热重载 ([c6f7bbd](https://github.com/delta-comic/delta-comic/commit/c6f7bbd024a4705a705e63e643be99ed20ba54c1))
+* **plugin:** 报告插件下载字节进度 ([f34a645](https://github.com/delta-comic/delta-comic/commit/f34a645972e9acdbab5af93cc8f63e79739441fa))
+* **plugin:** 报告插件下载字节进度 ([a44c043](https://github.com/delta-comic/delta-comic/commit/a44c0439647d22ac6b6ce70c38efd3ba5bbd7375))
+* **plugin:** 支持动态启用与停用插件 ([6dcbd50](https://github.com/delta-comic/delta-comic/commit/6dcbd5043004f5b49d80ab406dd77fa939761531))
+* **plugin:** 支持动态启用与停用插件 ([2e9d62e](https://github.com/delta-comic/delta-comic/commit/2e9d62ec38fdfa39ac7552fed8d829c396fdee2a))
+* **plugin:** 支持多文件插件协议 ([e8b609d](https://github.com/delta-comic/delta-comic/commit/e8b609d314c4fc9844afe473d9fe8759653b4194))
+* **plugin:** 支持多文件插件协议 ([21e739a](https://github.com/delta-comic/delta-comic/commit/21e739a59e5a4ae00bfd145290c79d76a4d0be25))
+
+
+### Performance Improvements
+
+* **build:** 优化 Rust nightly 编译配置 ([e2a7651](https://github.com/delta-comic/delta-comic/commit/e2a7651b6ec319a6ff1e0930a596d93169cb8dd5))
+* **build:** 优化 Rust nightly 编译配置 ([8612442](https://github.com/delta-comic/delta-comic/commit/8612442d6ffd1d829b17f32b45db79c09eeee5ad))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.10](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.9...3.0.0-next.10) (2026-08-10)
 
 
