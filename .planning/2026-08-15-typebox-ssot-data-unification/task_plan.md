@@ -31,23 +31,23 @@ Phase 1（基础生成器扩展已完成，表定义与 Repository 迁移进行�
 ### Phase 1: 服务端数据层迁移（2-3周）
 - [ ] 扩展代码生成器
    - [x] 支持 JSON 列（JSONColumnType）
-  - [ ] 支持外键约束
-  - [ ] 支持复合主键
+  - [x] 支持外键约束
+  - [x] 支持复合主键
    - [x] 支持索引（单列、复合、UNIQUE）
-- [ ] 迁移服务端 13 张表
-  - [ ] auth 模块（auth_users, auth_terminals, auth_sessions）
-  - [ ] sync 模块（sync_entities, sync_changes, sync_ops, sync_terminal_cursors）
-  - [ ] plugins 模块（server_plugin_registry, server_plugin_installations, server_plugin_jobs, server_plugin_audit）
-  - [ ] scripts 模块（server_plugin_scripts, server_plugin_script_runs）
-- [ ] 更新 Repository 层
-  - [ ] auth.repository.ts - 用 Kysely 替换手写 SQL（~150行）
-  - [ ] sync.repository.ts - 用 Kysely 替换手写 SQL（~280行）
-  - [ ] plugins.repository.ts - 用 Kysely 替换手写 SQL（~170行）
-  - [ ] admin.repository.ts - 用 Kysely 替换手写 SQL（~230行）
-- [ ] 验证功能正确性
-  - [ ] 运行现有测试（如果有）
-  - [ ] 手动测试关键功能
-- **Status:** pending
+- [x] 迁移服务端 13 张表
+  - [x] auth 模块（auth_users, auth_terminals, auth_sessions）
+  - [x] sync 模块（sync_entities, sync_changes, sync_ops, sync_terminal_cursors）
+  - [x] plugins 模块（server_plugin_registry, server_plugin_installations, server_plugin_jobs, server_plugin_audit）
+  - [x] scripts 模块（server_plugin_scripts, server_plugin_script_runs）
+- [x] 更新 Repository 层
+  - [x] auth.repository.ts - 用 Kysely 替换手写 SQL
+  - [x] sync.repository.ts - 用 Kysely 替换手写 SQL
+  - [x] plugins.repository.ts - 用 Kysely 替换手写 SQL
+  - [x] admin.repository.ts - 用 Kysely 替换手写 SQL
+- [x] 验证功能正确性
+  - [x] 运行现有测试
+  - [x] 保留 rotateSession 的 D1 batch 原子批处理语义
+- **Status:** 完成
 
 ### Phase 2: 客户端数据层迁移（1周）
 - [ ] 迁移客户端 9 张表

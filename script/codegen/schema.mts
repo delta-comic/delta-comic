@@ -11,7 +11,7 @@ export interface JsonColumn {
 export const isJsonColumn = (schema: TSchema): schema is JsonColumn =>
   typeof schema === 'object' && schema !== null && JSON_COLUMN in schema
 
-export const jsonColumn = (typeName = 'unknown'): JsonColumn => ({
+export const jsonColumn = (typeName = 'object'): JsonColumn => ({
   [JSON_COLUMN]: true,
   type: 'object',
   typeName,

@@ -54,6 +54,7 @@ catalog:
   jszip: ^3.10.1
   ky: ^2.0.2
   kysely: ^0.30.0-beta.1
+  kysely-d1: ^0.4.0
   kysely-dialect-tauri: ^2.0.1
   kysely-plugin-serialize: ^0.8.2
   lightningcss: ^1.33.0

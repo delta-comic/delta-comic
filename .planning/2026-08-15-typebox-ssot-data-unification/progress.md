@@ -100,3 +100,25 @@
 - 迁移服务端 Repository，并保留 D1 批处理/错误处理语义。
 
 ---
+
+## Session 4: 2026-08-15 - Phase 1 服务端数据层迁移完成
+
+### 已完成
+- 新增 `script/codegen/server.table.mts`，作为 13 张服务端 D1 表的 TypeBox SSOT。
+- `run.mts` 支持表数组、完整 SQL（含索引）及 Kysely 类型导入，生成产物位于 `packages/server/app/infrastructure/d1/generated/`。
+- 新增 `createKysely()` 与 `ServerDatabase`，使用 `kysely-d1` 的 `D1Dialect`。
+- auth、sync、plugins、admin 四个 Repository 已迁移到 Kysely；`rotateSession` 保留 D1 `batch`，因为 `kysely-d1` 当前不支持事务。
+- 测试 recorder 已兼容 Kysely-D1 的 `all()` 执行契约，测试断言同步到 Kysely 生成 SQL。
+
+### 验证
+- `vp install` 通过并加入 `kysely-d1`。
+- server typecheck 通过。
+- server 测试通过：34 files / 157 tests。
+- codegen 测试通过：24 tests。
+- `vp check` 通过。
+
+### 下一步
+- Phase 2：迁移客户端 9 张表的 TypeBox SSOT，保留现有 Kysely 查询逻辑。
+- Phase 3：在 Repository 边界增加 TypeBox 运行时读写验证。
+
+---

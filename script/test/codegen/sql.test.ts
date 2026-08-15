@@ -385,7 +385,7 @@ const syncTerminalCursorsTable = defineTable(
   { primaryKey: ['user_id', 'terminal_uuid'] },
 )
 
-const tables: readonly TableSchema[] = [
+const tables = [
   authUsersTable,
   authTerminalsTable,
   authSessionsTable,

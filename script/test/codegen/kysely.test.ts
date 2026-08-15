@@ -50,4 +50,11 @@ describe('kysely codegen', () => {
     expect(source).toContain('export type NewAuthUser = Insertable<AuthUsersTable>')
     expect(source).toContain('export type AuthUserUpdate = Updateable<AuthUsersTable>')
   })
+
+  it('singularizes plural names ending in ies', () => {
+    const table = defineTable('sync_entities', { id: Type.String() }, { primaryKey: ['id'] })
+    expect(generateTableInterface(table)).toContain(
+      'export type SyncEntity = Selectable<SyncEntitiesTable>',
+    )
+  })
 })

@@ -9,7 +9,10 @@ const pascalCase = (name: string): string =>
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join('')
 
-const singularize = (name: string): string => (name.endsWith('s') ? name.slice(0, -1) : name)
+const singularize = (name: string): string => {
+  if (name.endsWith('ies')) return `${name.slice(0, -3)}y`
+  return name.endsWith('s') ? name.slice(0, -1) : name
+}
 
 const isPrimitive = (schema: TSchema, type: 'string' | 'integer' | 'number' | 'boolean') =>
   schema.type === type

@@ -16,6 +16,8 @@
     "@delta-comic/logger": "workspace:",
     "@elysia/eden": "catalog:",
     "ky": "catalog:",
+    "kysely": "catalog:",
+    "kysely-d1": "catalog:",
     "semver": "catalog:"
   },
   "devDependencies": {

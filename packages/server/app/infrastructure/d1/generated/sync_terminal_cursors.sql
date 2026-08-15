@@ -1,0 +1,1 @@
+create table if not exists "sync_terminal_cursors" ("user_id" text not null, "terminal_uuid" text not null, "last_pulled_seq" integer default 0 not null, "last_pushed_at" integer, "last_seen_at" integer not null, constraint "pk_sync_terminal_cursors" primary key ("user_id", "terminal_uuid"))

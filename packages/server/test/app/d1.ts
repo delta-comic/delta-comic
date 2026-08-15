@@ -5,6 +5,7 @@ export interface RecordedD1Statement {
 
 interface QueuedRunResult {
   changes?: number
+  last_row_id?: number | null
 }
 
 export class D1Recorder {
@@ -29,7 +30,26 @@ export class D1Recorder {
       const recorded: RecordedD1Statement = { sql, values: [] }
       this.statements.push(recorded)
       const statement = {
-        all: async () => ({ results: this.allResults.shift() ?? [] }),
+        all: async () => {
+          const normalizedSql = recorded.sql.trimStart().toLowerCase()
+          const isSelect =
+            normalizedSql.startsWith('select') || normalizedSql.includes(' returning ')
+          const results = isSelect
+            ? this.allResults.length > 0
+              ? (this.allResults.shift() ?? [])
+              : (() => {
+                  const firstResult = this.firstResults.shift()
+                  return firstResult === undefined ? [] : [firstResult]
+                })()
+            : []
+          return {
+            meta: {
+              changes: isSelect ? 0 : (this.runResults.shift()?.changes ?? 0),
+              last_row_id: null,
+            },
+            results,
+          }
+        },
         bind: (...values: unknown[]) => {
           recorded.values = values
           return statement

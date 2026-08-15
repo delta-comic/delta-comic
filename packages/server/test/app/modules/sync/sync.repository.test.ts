@@ -70,20 +70,20 @@ describe('SyncRepository', () => {
 
     expect(recorder.statements[0]?.values).toEqual(['user-1', 'terminal-1', 'op-1'])
     expect(recorder.statements[1]?.values).toEqual([
-      'user-1',
-      'terminal-1',
-      operation.opId,
-      operation.collection,
-      operation.entityId,
       operation.action,
-      operation.dataHash,
       operation.baseVersion,
-      'failed',
-      null,
+      operation.collection,
+      operation.dataHash,
+      operation.entityId,
       null,
       'SYNC_PROCESSING',
       'operation processing was interrupted before completion',
+      operation.opId,
       20,
+      'failed',
+      null,
+      'terminal-1',
+      'user-1',
     ])
   })
 
@@ -115,19 +115,29 @@ describe('SyncRepository', () => {
     })
 
     expect(recorder.statements[0]?.values).toEqual(['user-1', 'config', 'core'])
-    expect(recorder.statements[1]?.sql).toContain('ON CONFLICT(user_id, collection, entity_id)')
+    expect(recorder.statements[1]?.sql).toContain(
+      'on conflict ("user_id", "collection", "entity_id")',
+    )
     expect(recorder.statements[1]?.values).toEqual([
-      'user-1',
-      'config',
-      'core',
-      operation.dataJson,
+      operation.clientChangedAt,
+      operation.collection,
       operation.dataHash,
+      operation.dataJson,
+      null,
+      operation.entityId,
+      operation.opId,
+      'terminal-1',
+      30,
+      'user-1',
       operation.version,
       operation.clientChangedAt,
-      30,
+      operation.dataHash,
+      operation.dataJson,
       null,
+      operation.opId,
       'terminal-1',
-      'op-1',
+      30,
+      operation.version,
     ])
   })
 
@@ -148,18 +158,18 @@ describe('SyncRepository', () => {
     await expect(repository.insertChange(input)).resolves.toBe(0)
 
     expect(recorder.statements[0]?.values).toEqual([
-      'user-1',
-      operation.collection,
-      operation.entityId,
       operation.action,
-      operation.dataJson,
-      operation.dataHash,
-      operation.version,
       operation.clientChangedAt,
-      30,
+      operation.collection,
+      operation.dataHash,
+      operation.dataJson,
       null,
-      'terminal-1',
+      operation.entityId,
       operation.opId,
+      'terminal-1',
+      30,
+      'user-1',
+      operation.version,
     ])
     expect(recorder.statements[2]).toMatchObject({ values: ['user-1', 'terminal-1', 'op-1'] })
   })
@@ -183,11 +193,11 @@ describe('SyncRepository', () => {
     await expect(repository.latestSeq('missing')).resolves.toBe(0)
 
     expect(recorder.statements[0]?.values).toEqual([
-      'failed',
-      null,
       operation.version,
       'ERROR',
       'message',
+      'failed',
+      null,
       'user-1',
       'terminal-1',
       operation.opId,
@@ -216,8 +226,8 @@ describe('SyncRepository', () => {
       userId: 'user-1',
     })
 
-    expect(recorder.statements[0]?.sql).toContain('collection IN (?, ?)')
-    expect(recorder.statements[0]?.sql).toContain('origin_terminal_uuid <> ?')
+    expect(recorder.statements[0]?.sql).toContain('"collection" in (?, ?)')
+    expect(recorder.statements[0]?.sql).toContain('"origin_terminal_uuid" <> ?')
     expect(recorder.statements[0]?.values).toEqual([
       'user-1',
       3,
@@ -226,8 +236,8 @@ describe('SyncRepository', () => {
       'terminal-1',
       20,
     ])
-    expect(recorder.statements[1]?.sql).not.toContain('collection IN')
-    expect(recorder.statements[1]?.sql).not.toContain('origin_terminal_uuid <>')
+    expect(recorder.statements[1]?.sql).not.toContain('"collection" in')
+    expect(recorder.statements[1]?.sql).not.toContain('"origin_terminal_uuid" <>')
     expect(recorder.statements[1]?.values).toEqual(['user-1', 0, 5])
   })
 
@@ -247,8 +257,8 @@ describe('SyncRepository', () => {
       userId: 'user-1',
     })
 
-    expect(recorder.statements[0]?.values).toEqual(['user-1', 'terminal-1', 8, 40])
-    expect(recorder.statements[1]?.values).toEqual(['user-1', 'terminal-1', 50, 50])
+    expect(recorder.statements[0]?.values).toEqual([8, null, 40, 'terminal-1', 'user-1', 8, 40])
+    expect(recorder.statements[1]?.values).toEqual([0, 50, 50, 'terminal-1', 'user-1', 50, 50])
   })
 })
 

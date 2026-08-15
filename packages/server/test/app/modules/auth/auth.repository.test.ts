@@ -54,18 +54,18 @@ describe('AuthRepository', () => {
     await repository.createUser(user)
 
     expect(recorder.statements[0]).toMatchObject({ values: ['alice'] })
-    expect(recorder.statements[0]?.sql).toContain('WHERE login_name = ?')
+    expect(recorder.statements[0]?.sql).toContain('where "login_name" = ?')
     expect(recorder.statements[1]).toMatchObject({ values: [user.id] })
     expect(recorder.statements[2]).toMatchObject({
       values: [
+        user.created_at,
+        user.disabled_at,
         user.id,
         user.login_name,
+        user.password_alg,
         user.password_hash,
         user.password_salt,
-        user.password_alg,
-        user.created_at,
         user.updated_at,
-        user.disabled_at,
       ],
     })
   })
@@ -80,16 +80,21 @@ describe('AuthRepository', () => {
       terminal,
     )
 
-    expect(recorder.statements[0]?.sql).toContain('ON CONFLICT(user_id, terminal_uuid)')
+    expect(recorder.statements[0]?.sql).toContain('on conflict ("user_id", "terminal_uuid")')
     expect(recorder.statements[0]?.values).toEqual([
-      terminal.user_id,
-      terminal.terminal_uuid,
-      terminal.display_name,
-      terminal.platform,
       terminal.app_version,
       terminal.created_at,
+      terminal.display_name,
       terminal.last_seen_at,
+      terminal.platform,
       terminal.revoked_at,
+      terminal.terminal_uuid,
+      terminal.user_id,
+      terminal.app_version,
+      terminal.display_name,
+      terminal.last_seen_at,
+      terminal.platform,
+      null,
     ])
     expect(recorder.statements[1]?.values).toEqual([user.id, terminal.terminal_uuid])
   })
@@ -105,16 +110,16 @@ describe('AuthRepository', () => {
     await repository.revokeSession(session.id, 99)
 
     expect(recorder.statements[0]?.values).toEqual([
-      session.id,
-      session.user_id,
-      session.terminal_uuid,
-      session.access_token_hash,
-      session.refresh_token_hash,
-      session.created_at,
       session.access_expires_at,
+      session.access_token_hash,
+      session.created_at,
+      session.id,
       session.refresh_expires_at,
-      session.rotated_at,
+      session.refresh_token_hash,
       session.revoked_at,
+      session.rotated_at,
+      session.terminal_uuid,
+      session.user_id,
     ])
     expect(recorder.statements[1]).toMatchObject({ values: ['access-hash'] })
     expect(recorder.statements[2]).toMatchObject({ values: ['refresh-hash'] })

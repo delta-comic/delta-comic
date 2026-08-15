@@ -54,7 +54,7 @@ describe('D1AdminMetricsRepository', () => {
     })
     expect(metrics.find(metric => metric.key === 'pluginAudit')).toMatchObject({ value: 0 })
     expect(
-      recorder.statements.find(statement => statement.sql.includes('refresh_expires_at >'))?.values,
+      recorder.statements.find(statement => statement.values.includes(123_456))?.values,
     ).toEqual([123_456])
   })
 

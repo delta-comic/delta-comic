@@ -1,0 +1,4 @@
+create table if not exists "sync_changes" ("server_seq" integer primary key autoincrement, "user_id" text not null, "collection" text not null check (collection in ('itemStore', 'favouriteCard', 'favouriteItem', 'history', 'recentView', 'subscribe', 'config')), "entity_id" text not null, "action" text not null check (action in ('upsert', 'delete')), "data_json" text, "data_hash" text not null, "version" text not null, "client_changed_at" integer not null, "server_changed_at" integer not null, "deleted_at" integer, "origin_terminal_uuid" text not null, "origin_op_id" text not null);
+create index if not exists "idx_sync_changes_user_seq" on "sync_changes" ("user_id", "server_seq");
+create index if not exists "idx_sync_changes_user_collection_seq" on "sync_changes" ("user_id", "collection", "server_seq");
+create unique index if not exists "idx_sync_changes_origin_op" on "sync_changes" ("user_id", "origin_terminal_uuid", "origin_op_id")

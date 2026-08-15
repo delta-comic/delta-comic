@@ -1,0 +1,3 @@
+create table if not exists "server_plugin_jobs" ("id" text not null primary key, "plugin_id" text not null, "action" text not null check (action in ('configure', 'disable', 'enable', 'health', 'install', 'register', 'uninstall', 'update')), "status" text not null check (status in ('failed', 'queued', 'running', 'succeeded')), "result_json" text, "error_message" text, "created_at" integer not null, "started_at" integer, "completed_at" integer, "updated_at" integer not null);
+create index if not exists "idx_server_plugin_jobs_plugin_created" on "server_plugin_jobs" ("plugin_id", "created_at" desc);
+create index if not exists "idx_server_plugin_jobs_status_updated" on "server_plugin_jobs" ("status", "updated_at" desc)
