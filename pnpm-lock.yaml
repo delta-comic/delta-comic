@@ -782,6 +782,9 @@ importers:
       semver:
         specifier: 'catalog:'
         version: 7.8.5
+      typebox:
+        specifier: 'catalog:'
+        version: 1.3.14
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: 'catalog:'
