@@ -281,3 +281,26 @@ export interface AuthUsersTable {
 - [ ] 端到端测试通过
 - [ ] 性能无退化
 - [ ] 开发文档完整
+
+---
+
+## typebox 1.x 包迁移记录（2026-08-15）
+
+### 包名变更（skill 指导）
+- `@sinclair/typebox` 已弃用 → 新包名 `typebox`（当前 1.3.14）
+- 子路径：`typebox/compile`（Compile）、`typebox/value`（Value）、`typebox/guard`（JS 值守卫，非 schema 守卫）
+- catalog 增加 `typebox: ^1.3.14`，根 devDependencies 已切换
+
+### API 变更（codegen 已适配）
+| 0.34 | 1.x | 说明 |
+|------|-----|------|
+| `TypeGuard.IsString(schema)` 等 schema 级守卫 | **不存在**，改用 `schema.type === 'string'` | TSchema 的 `type` 字段：'string'/'integer'/'number'/'boolean'/'object'/'array' |
+| `TypeGuard.IsUnion(schema)` | 顶层 `IsUnion(schema)` | 仍从 `typebox` 主入口导出 |
+| `TypeGuard.IsOptional(schema)` | 顶层 `IsOptional(schema)` | `TOptional` 仍是交叉类型 `Type & { [OptionalKind] }`；JSON 形状无差异（Optional 信息在内部符号） |
+| `Static<TOptional<T>>` | 不变 | 仍为 `T \| undefined`，TableRow 推导逻辑无需改 |
+| `Type.UnionEnum` | 不存在（0.34 也没有） | 用 `Type.Union([...Type.Literal])`，schema 形状 `anyOf[].const` 兼容 |
+
+### 服务端（Phase 1 处理）
+- `packages/server/app/shared/response.ts`：`TSchema` 类型导入
+- `packages/server/app/modules/plugins/plugins.manifest.ts`：`Value` from '@sinclair/typebox/value'
+- Elysia 1.4.29 通过 `exact-mirror` 适配多 schema 库（pnpm store 已有 typebox 1.x 适配版），迁移时需验证 Elysia `t` 对象与新包 schema 的互操作
