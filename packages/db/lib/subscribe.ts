@@ -1,4 +1,4 @@
-import { SourcedValue, type SourcedKeyType, type UniItemAuthor } from '@delta-comic/model'
+import { SourcedValue, type SourcedKeyType } from '@delta-comic/model'
 import {
   defineMutation,
   useMutation,
@@ -6,7 +6,7 @@ import {
   useQuery as useColadaQuery,
   type EntryKey,
 } from '@pinia/colada'
-import type { Kysely, SelectQueryBuilder } from 'kysely'
+import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
 import type { SubscribeTable } from './generated/subscribe.table'
 import { CommonQueryKey, withTransition } from './utils'
@@ -18,7 +18,7 @@ export type Key_ = SourcedKeyType<typeof key>
 export type Key = Exclude<Key_, string>
 
 export type AuthorTable = Omit<SubscribeTable, 'itemKey' | 'author' | 'type'> & {
-  author: UniItemAuthor
+  author: Selectable<SubscribeTable>['author']
   itemKey: null
   type: 'author'
 }

@@ -11,7 +11,7 @@ import DcFormRadio from './DcFormRadio.vue'
 import DcFormString from './DcFormString.vue'
 import DcFormSwitch from './DcFormSwitch.vue'
 
-defineProps<{ config: T; path: string }>()
+defineProps<{ config: T; path: string | number | symbol }>()
 const store = defineModel<FormSingleResult<T>>({ required: true })
 const write = (value: FormDefaultValue[keyof FormDefaultValue]): void => {
   store.value = value as FormSingleResult<T>
@@ -19,7 +19,7 @@ const write = (value: FormDefaultValue[keyof FormDefaultValue]): void => {
 </script>
 
 <template>
-  <NFormItem :label="config.info" :path :required="config.required ?? true">
+  <NFormItem :label="config.info" :path="path as string" :required="config.required ?? true">
     <DcFormSwitch
       :config
       :model-value="store as FormDefaultValue['switch']"

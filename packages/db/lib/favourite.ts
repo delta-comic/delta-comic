@@ -5,7 +5,7 @@ import {
   useQuery as useColadaQuery,
   type EntryKey,
 } from '@pinia/colada'
-import type { Kysely, SelectQueryBuilder } from 'kysely'
+import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
 import type { FavouriteCardTable } from './generated/favourite_card.table'
 import type { FavouriteItemTable as GeneratedFavouriteItemTable } from './generated/favourite_item.table'
@@ -16,11 +16,11 @@ import type { DB } from '.'
 
 export type CardTable = FavouriteCardTable
 
-export type Card = CardTable
+export type Card = Selectable<CardTable>
 
 export type ItemTable = GeneratedFavouriteItemTable
 
-export type Item = ItemTable
+export type Item = Selectable<ItemTable>
 
 export enum QueryKey {
   item = 'db:favouriteItem:',

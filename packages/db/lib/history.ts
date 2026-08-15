@@ -6,7 +6,7 @@ import {
   useQuery as useColadaQuery,
   type EntryKey,
 } from '@pinia/colada'
-import type { Kysely, SelectQueryBuilder } from 'kysely'
+import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
 import type { HistoryTable } from './generated/history.table'
 import * as ItemStoreDB from './itemStore'
@@ -16,7 +16,7 @@ import type { DB } from '.'
 
 export type Table = HistoryTable
 
-export type Item = Table
+export type Item = Selectable<Table>
 
 export enum QueryKey {
   item = 'db:history:',

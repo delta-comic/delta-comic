@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends FormConfigure, O extends (keyof T)[] = (keyof T)[]">
-import type { FormConfigure, FormDefaultValue, FormResult } from '@delta-comic/model'
+import type { FormConfigure, FormResult } from '@delta-comic/model'
 import { isArray } from 'es-toolkit/compat'
 import { NForm } from 'naive-ui'
 import { computed } from 'vue'
@@ -16,10 +16,8 @@ const props = defineProps<{
   overrideRow?: boolean | O
 }>()
 const result = defineModel<FormResult<T>>({ required: true })
-const formModel = computed(
-  () => result.value as Record<string, FormDefaultValue[keyof FormDefaultValue]>,
-)
-const entries = Object.entries(props.configs)
+const formModel = computed(() => result.value)
+const entries = Object.entries(props.configs) as [keyof T, T[keyof T]][]
 
 const slots = defineSlots<{
   row?<K extends O[number]>(args: FormRowSlot<T, O, K>): any
@@ -40,7 +38,7 @@ const slots = defineSlots<{
         :config
         v-if="slots.row && (isArray(overrideRow) ? overrideRow.includes(path) : overrideRow)"
       />
-      <DcFormItem v-model="formModel[path]" :path :config v-else />
+      <DcFormItem v-model="formModel[path]" :path="path as string" :config v-else />
     </template>
     <slot name="bottom" :config="configs" />
   </NForm>
