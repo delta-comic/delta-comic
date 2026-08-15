@@ -8,10 +8,11 @@ export * as PluginArchiveDB from './plugin'
 import type * as HistoryDB from './history'
 export * as FavouriteDB from './favourite'
 import type * as ConfigDB from './config'
+import type { PluginTable } from './generated/plugin.table'
 import type * as ItemStoreDB from './itemStore'
 import type * as NativeStoreDB from './nativeStore'
+export type { PluginTable } from './generated/plugin.table'
 export * as HistoryDB from './history'
-import type * as PluginArchiveDB from './plugin'
 export * as ItemStoreDB from './itemStore'
 import type * as RecentDB from './recentView'
 export * as SubscribeDB from './subscribe'
@@ -26,7 +27,7 @@ export interface DB {
   history: HistoryDB.Table
   recentView: RecentDB.Table
   subscribe: SubscribeDB.Table
-  plugin: PluginArchiveDB.Table
+  plugin: PluginTable
   nativeStore: NativeStoreDB.Table
   config: ConfigDB.Table
 }

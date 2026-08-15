@@ -51,6 +51,22 @@
 
 ---
 
+## Session 5: 2026-08-15 - Phase 2 客户端数据层迁移完成
+
+### 已完成
+- 新增 `script/codegen/client.table.mts`，集中定义客户端 9 张表的 TypeBox schema。
+- 扩展 codegen 支持 CamelCasePlugin 的 snake_case 到 camelCase 类型映射，以及 JSON 列类型导入。
+- 生成 `packages/db/lib/generated/` 下的客户端 Kysely 表类型和 SQL 产物。
+- itemStore、favourite、history、recentView、subscribe、plugin、config、nativeStore 改为使用生成类型；DB 查询逻辑保持不变。
+
+### 验证
+- `@delta-comic/db` typecheck 通过。
+- 客户端数据库操作测试与 codegen 测试通过。
+- `vp check` 通过；`@delta-comic/db` typecheck、数据库操作测试和 codegen 测试通过。
+- 工作区 typecheck 仍受 `packages/ui/lib/components/form/components/DcForm.vue:35` 的既有泛型错误阻塞；全量测试另有 `packages/plugin` 文件协议超时和 `packages/db` nativeStore 环境时序失败，均不涉及本次迁移代码。
+
+---
+
 ## Session 2: 2026-08-15 - Phase 0 原型验证完成
 
 ### 生成器骨架完成（script/codegen/）

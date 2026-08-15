@@ -2,7 +2,7 @@ import { Type } from 'typebox'
 import { describe, expect, it } from 'vitest'
 
 import { generateTableInterface } from '../../codegen/kysely.mts'
-import { defineTable } from '../../codegen/schema.mts'
+import { defineTable, jsonColumn } from '../../codegen/schema.mts'
 
 const authUsersTable = defineTable(
   'auth_users',
@@ -29,9 +29,9 @@ describe('kysely codegen', () => {
     expect(source).toContain('  created_at: number')
   })
 
-  it('maps booleans to sqlite integers', () => {
+  it('maps booleans to boolean values', () => {
     const source = generateTableInterface(authUsersTable)
-    expect(source).toContain('  enabled: number')
+    expect(source).toContain('  enabled: boolean')
   })
 
   it('maps optional columns to null unions', () => {
@@ -56,5 +56,25 @@ describe('kysely codegen', () => {
     expect(generateTableInterface(table)).toContain(
       'export type SyncEntity = Selectable<SyncEntitiesTable>',
     )
+  })
+
+  it('converts snake case columns for CamelCasePlugin databases', () => {
+    const table = defineTable(
+      'recent_view',
+      { item_key: Type.String(), is_viewed: Type.Boolean() },
+      { primaryKey: ['item_key'] },
+      { kyselyCamelCase: true },
+    )
+    expect(generateTableInterface(table)).toContain('  itemKey: string')
+    expect(generateTableInterface(table)).toContain('  isViewed: boolean')
+  })
+
+  it('maps JSON columns to the declared imported model type', () => {
+    const table = defineTable(
+      'item_store',
+      { item: jsonColumn('UniItemRaw', '@delta-comic/model') },
+      { primaryKey: ['item'] },
+    )
+    expect(generateTableInterface(table)).toContain('  item: JSONColumnType<UniItemRaw>')
   })
 })

@@ -1,0 +1,2 @@
+create table if not exists "favourite_item" ("add_time" integer not null, "belong_to" integer not null, "item_key" text not null, constraint "pk_favourite_item" primary key ("add_time", "belong_to", "item_key"), constraint "uq_favourite_item_belong_to_item_key" unique ("belong_to", "item_key"));
+create index if not exists "favourite_item_belong_to_add_time" on "favourite_item" ("add_time" desc, "belong_to")

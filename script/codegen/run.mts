@@ -42,7 +42,22 @@ for (const table of tables) {
   const imports = ['Insertable', 'Selectable', 'Updateable']
   if (types.includes('Generated<')) imports.push('Generated')
   if (types.includes('JSONColumnType<')) imports.push('JSONColumnType')
-  await writeFile(typesPath, `import type { ${imports.join(', ')} } from 'kysely'\n\n${types}\n`)
+  const jsonImports = Object.values(table.columns)
+    .filter(value => typeof value === 'object' && value !== null && 'typeImport' in value)
+    .flatMap(value => {
+      if (!('typeName' in value) || !('typeImport' in value)) return []
+      const typeImport = value.typeImport
+      return typeof typeImport === 'string' ? [{ name: value.typeName, path: typeImport }] : []
+    })
+  const typeImports = new Map(jsonImports.map(value => [`${value.path}:${value.name}`, value]))
+  const importLines = [`import type { ${imports.join(', ')} } from 'kysely'`]
+  for (const group of new Set([...typeImports.values()].map(value => value.path))) {
+    const names = [...typeImports.values()]
+      .filter(value => value.path === group)
+      .map(value => value.name)
+    importLines.push(`import type { ${names.join(', ')} } from '${group}'`)
+  }
+  await writeFile(typesPath, `${importLines.join('\n')}\n\n${types}\n`)
   console.log(`generated ${sqlPath}`)
   console.log(`generated ${typesPath}`)
 }

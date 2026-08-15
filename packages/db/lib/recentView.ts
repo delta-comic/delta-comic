@@ -5,20 +5,16 @@ import {
   useQuery as useColadaQuery,
   type EntryKey,
 } from '@pinia/colada'
-import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
+import type { Kysely, SelectQueryBuilder } from 'kysely'
 
+import type { RecentViewTable } from './generated/recent_view.table'
 import * as ItemStoreDB from './itemStore'
 import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
 
-export interface Table {
-  /** @description primary key */
-  timestamp: number
-  itemKey: string
-  isViewed: boolean
-}
-export type Item = Selectable<Table>
+export type Table = RecentViewTable
+export type Item = Table
 
 export enum QueryKey {
   item = 'db:recentView:',

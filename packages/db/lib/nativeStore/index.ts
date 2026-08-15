@@ -2,13 +2,11 @@ import { logger } from '@delta-comic/logger'
 import { SourcedValue } from '@delta-comic/model'
 import { ref, toValue, watch, type MaybeRefOrGetter, type Ref } from 'vue'
 
+import type { NativeStoreTable } from '../generated/native_store.table'
+
 const nativeStoreLogger = logger.scoped('db:native-store')
 
-export interface Table {
-  namespace: string
-  key: string
-  value: string
-}
+export type Table = NativeStoreTable
 
 const saveKey = new SourcedValue<[namespace: string, key: string]>()
 

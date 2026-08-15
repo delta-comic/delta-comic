@@ -6,8 +6,9 @@ import {
   useQuery as useColadaQuery,
   type EntryKey,
 } from '@pinia/colada'
-import type { JSONColumnType, Kysely, Selectable, SelectQueryBuilder } from 'kysely'
+import type { Kysely, SelectQueryBuilder } from 'kysely'
 
+import type { SubscribeTable } from './generated/subscribe.table'
 import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
@@ -16,27 +17,21 @@ export const key = new SourcedValue<[plugin: string, label: string]>()
 export type Key_ = SourcedKeyType<typeof key>
 export type Key = Exclude<Key_, string>
 
-export interface AuthorTable {
-  author: JSONColumnType<UniItemAuthor>
+export type AuthorTable = Omit<SubscribeTable, 'itemKey' | 'author' | 'type'> & {
+  author: UniItemAuthor
   itemKey: null
   type: 'author'
-  /** @description primary key */
-  key: string
-  plugin: string
 }
-export type AuthorItem = Selectable<AuthorTable>
+export type AuthorItem = AuthorTable
 
-export interface EpTable {
+export type EpTable = Omit<SubscribeTable, 'itemKey' | 'author' | 'type'> & {
   author: null
   itemKey: string // not f key
   type: 'ep'
-  /** @description primary key */
-  key: string
-  plugin: string
 }
-export type EpItem = Selectable<EpTable>
+export type EpItem = EpTable
 
-export type Table = AuthorTable | EpTable
+export type Table = SubscribeTable
 export type Item = AuthorItem | EpItem
 
 export enum QueryKey {

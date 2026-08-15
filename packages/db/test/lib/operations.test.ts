@@ -165,8 +165,8 @@ describe('item and favourite mutations', () => {
     const card = { createAt: 1, description: 'desc', private: false, title: 'Reading' }
     await FavouriteDB.useCreateCard().createCard({ card, trx: trx as never })
     const query = vi.fn(async () => ['result'])
-    const itemQuery = FavouriteDB.useQueryItem(query as never, ['scope'], () => []) as any
-    const cardQuery = FavouriteDB.useQueryCard(query as never, ['scope'], () => []) as any
+    const itemQuery = FavouriteDB.useQueryItem(query as never, ['scope' as never], () => []) as any
+    const cardQuery = FavouriteDB.useQueryCard(query as never, ['scope' as never], () => []) as any
 
     expect(trx.calls.replaces).toEqual([{ table: 'favouriteCard', values: card }])
     expect(itemQuery.key()).toEqual([
@@ -197,7 +197,7 @@ describe('history and recent-view mutations', () => {
     expect(trx.calls.replaces.at(-1)).toEqual({
       table: 'history',
       values: {
-        ep: item,
+        ep: item.thisEp,
         itemKey: 'fixture:manga*item-1',
         timestamp: Date.parse('2026-07-14T08:00:00Z'),
       },
@@ -206,7 +206,7 @@ describe('history and recent-view mutations', () => {
       table: 'history',
       where: [['history.timestamp', 'is', [10, 20]]],
     })
-    const query = HistoryDB.useQuery(vi.fn() as never, ['reader']) as any
+    const query = HistoryDB.useQuery(vi.fn() as never, ['reader' as never]) as any
     expect(query.key()).toContain(HistoryDB.QueryKey.item)
   })
 

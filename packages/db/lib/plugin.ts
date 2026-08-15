@@ -6,27 +6,19 @@ import {
   useQuery as useColadaQuery,
   type EntryKey,
 } from '@pinia/colada'
-import type { JSONColumnType, Kysely, Selectable, SelectQueryBuilder } from 'kysely'
+import type { Kysely, SelectQueryBuilder } from 'kysely'
 
+import type { PluginTable } from './generated/plugin.table'
 import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
 
 export type Meta = PluginManifest
 
-export interface Table {
-  installerName: string
-  loaderName: string
-  /** @description primary key */
-  pluginName: string
-  meta: JSONColumnType<Meta>
-  enable: boolean
-  installInput: string
-  displayName: string
-}
+export type Table = Omit<PluginTable, 'meta' | 'enable'> & { meta: Meta; enable: boolean }
 
 /** @description Not Blue */
-export type Archive = Selectable<Table>
+export type Archive = Table
 
 export enum QueryKey {
   item = 'db:plugin:',

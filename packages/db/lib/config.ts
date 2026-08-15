@@ -3,16 +3,10 @@ import type { FormResult, FormSingleConfigure } from '@delta-comic/model'
 import { fromPairs } from 'es-toolkit/compat'
 import { ref, watch, type Ref } from 'vue'
 
+import type { ConfigTable } from './generated/config.table'
 const configLogger = logger.scoped('db:config')
 
-export interface Table {
-  /** @description config owner, usually plugin name */
-  belongTo: string
-  /** @description serialized form structure */
-  form: string
-  /** @description serialized config data */
-  data: string
-}
+export type Table = ConfigTable
 
 export type ConfigRef<T> = Ref<T> & { readonly ready: Promise<void> }
 

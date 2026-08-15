@@ -6,15 +6,17 @@ export interface JsonColumn {
   readonly [JSON_COLUMN]: true
   readonly type: 'object'
   readonly typeName: string
+  readonly typeImport?: string
 }
 
 export const isJsonColumn = (schema: TSchema): schema is JsonColumn =>
   typeof schema === 'object' && schema !== null && JSON_COLUMN in schema
 
-export const jsonColumn = (typeName = 'object'): JsonColumn => ({
+export const jsonColumn = (typeName = 'object', typeImport?: string): JsonColumn => ({
   [JSON_COLUMN]: true,
   type: 'object',
   typeName,
+  ...(typeImport ? { typeImport } : {}),
 })
 
 const AUTOINCREMENT = Symbol('delta.comic.autoincrement')
@@ -61,13 +63,15 @@ export interface TableSchema<
   name: TName
   columns: TCols
   meta: TableMeta<TCols>
+  kyselyCamelCase?: boolean
 }
 
 export const defineTable = <TName extends string, TCols extends TProperties>(
   name: TName,
   columns: TCols,
   meta: TableMeta<TCols>,
-): TableSchema<TName, TCols> => ({ name, columns, meta })
+  options?: Pick<TableSchema<TName, TCols>, 'kyselyCamelCase'>,
+): TableSchema<TName, TCols> => ({ name, columns, meta, ...options })
 
 type DbStatic<T extends TSchema> =
   undefined extends Static<T> ? Exclude<Static<T>, undefined> | null : Static<T>

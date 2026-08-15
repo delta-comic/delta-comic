@@ -50,21 +50,21 @@ Phase 1（基础生成器扩展已完成，表定义与 Repository 迁移进行�
 - **Status:** 完成
 
 ### Phase 2: 客户端数据层迁移（1周）
-- [ ] 迁移客户端 9 张表
-  - [ ] itemStore（包含 JSON 列 UniItemRaw）
-  - [ ] favouriteCard, favouriteItem
-  - [ ] history（包含 JSON 列 UniEpRaw）
-  - [ ] recentView
-  - [ ] subscribe（包含 JSON 列 UniItemAuthor）
-  - [ ] plugin（包含 JSON 列 Meta）
-  - [ ] config
-  - [ ] nativeStore
-- [ ] 保留现有 Kysely 查询逻辑
-  - [ ] 只替换类型定义，不改查询代码
-- [ ] 验证客户端功能
-  - [ ] 本地开发环境测试
-  - [ ] 检查类型推导正确性
-- **Status:** pending
+- [x] 迁移客户端 9 张表
+   - [x] itemStore（包含 JSON 列 UniItemRaw）
+   - [x] favouriteCard, favouriteItem
+   - [x] history（包含 JSON 列 UniEpRaw）
+   - [x] recentView
+   - [x] subscribe（包含 JSON 列 UniItemAuthor）
+   - [x] plugin（包含 JSON 列 Meta）
+   - [x] config
+   - [x] nativeStore
+- [x] 保留现有 Kysely 查询逻辑
+   - [x] 只替换类型定义，不改查询代码
+- [x] 验证客户端功能
+   - [x] 本地数据库操作测试
+   - [x] 检查类型推导正确性
+- **Status:** 完成
 
 ### Phase 3: 运行时验证集成（1周）
 - [ ] 服务端验证层
