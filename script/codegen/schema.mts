@@ -51,6 +51,7 @@ export interface TableForeignKey {
 }
 
 export interface TableMeta<TCols extends TProperties> {
+  description?: string
   primaryKey: readonly (keyof TCols & string)[]
   unique?: readonly (readonly (keyof TCols & string)[])[]
   indexes?: readonly TableIndex<TCols>[]
@@ -73,6 +74,64 @@ export const defineTable = <TName extends string, TCols extends TProperties>(
   meta: TableMeta<TCols>,
   options?: Pick<TableSchema<TName, TCols>, 'kyselyCamelCase'>,
 ): TableSchema<TName, TCols> => ({ name, columns, meta, ...options })
+
+const identifierPattern = /^[a-z][a-z0-9_]*$/
+
+const schemaError = (table: TableSchema, message: string): Error =>
+  new Error(`Invalid table schema "${table.name}": ${message}`)
+
+export const validateTableSchema = (table: TableSchema): void => {
+  if (!identifierPattern.test(table.name))
+    throw schemaError(table, 'table name must use lowercase snake_case')
+
+  const columns = Object.keys(table.columns)
+  if (columns.length === 0) throw schemaError(table, 'at least one column is required')
+
+  const assertColumns = (names: readonly string[], context: string): void => {
+    for (const name of names) {
+      if (!columns.includes(name))
+        throw schemaError(table, `${context} references unknown column "${name}"`)
+    }
+  }
+
+  if (table.meta.primaryKey !== undefined) {
+    if (table.meta.primaryKey.length === 0) throw schemaError(table, 'primaryKey must not be empty')
+    assertColumns(table.meta.primaryKey, 'primaryKey')
+  }
+
+  const names = new Set<string>()
+  for (const group of table.meta.unique ?? []) {
+    if (group.length === 0) throw schemaError(table, 'unique constraints must not be empty')
+    assertColumns(group, 'unique constraint')
+  }
+  for (const index of table.meta.indexes ?? []) {
+    if (!identifierPattern.test(index.name))
+      throw schemaError(table, `index name "${index.name}" must use lowercase snake_case`)
+    if (names.has(index.name)) throw schemaError(table, `duplicate index name "${index.name}"`)
+    names.add(index.name)
+    if (index.columns.length === 0) throw schemaError(table, `index "${index.name}" has no columns`)
+    assertColumns(
+      index.columns.map(column => (typeof column === 'string' ? column : column.column)),
+      `index "${index.name}"`,
+    )
+  }
+  for (const foreignKey of table.meta.foreignKeys ?? []) {
+    if (
+      foreignKey.columns.length === 0 ||
+      foreignKey.columns.length !== foreignKey.refColumns.length
+    )
+      throw schemaError(
+        table,
+        'foreign key columns and refColumns must have the same non-zero length',
+      )
+    assertColumns(foreignKey.columns, 'foreign key')
+    if (!identifierPattern.test(foreignKey.refTable))
+      throw schemaError(
+        table,
+        `foreign key table "${foreignKey.refTable}" must use lowercase snake_case`,
+      )
+  }
+}
 
 const databaseColumnSchema = (schema: TSchema): TSchema => {
   const base = schema.type === 'boolean' ? Type.Integer() : schema

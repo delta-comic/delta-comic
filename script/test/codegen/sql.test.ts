@@ -507,6 +507,15 @@ describe('sql codegen', () => {
     )
   })
 
+  it('escapes quotes in enum checks', () => {
+    const table = defineTable(
+      'quotes',
+      { value: Type.Union([Type.Literal("it's")]) },
+      { primaryKey: ['value'] },
+    )
+    expect(generateTableSql(table)).toContain("check (value in ('it''s'))")
+  })
+
   it('renders integer range checks as between', () => {
     const scripts = generateTableSql(pluginScriptsTable)
     expect(scripts).toContain(

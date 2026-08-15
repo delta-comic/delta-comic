@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 import { generateTableInterface } from './kysely.mts'
-import { generateRuntimeTableSchema } from './schema.mts'
+import { generateRuntimeTableSchema, validateTableSchema } from './schema.mts'
 import type { TableSchema } from './schema.mts'
 import { generateTableSqlFull } from './sql.mts'
 
@@ -15,13 +15,22 @@ const isTableSchema = (value: unknown): value is TableSchema =>
   typeof (value as TableSchema).meta === 'object'
 
 const [tableFile, outputDir] = process.argv.slice(2)
+const schemaExportName = tableFile?.includes('client.table')
+  ? 'clientRowSchemas'
+  : 'serverRowSchemas'
 
 if (!tableFile || !outputDir) {
   console.error('usage: node script/codegen/run.mts <table-file> <output-dir>')
   process.exit(1)
 }
 
-const module = await import(pathToFileURL(resolve(tableFile)).href)
+let module: Record<string, unknown>
+try {
+  module = await import(pathToFileURL(resolve(tableFile)).href)
+} catch (error) {
+  console.error(`failed to load table definitions from ${tableFile}:`, error)
+  process.exit(1)
+}
 const tables = Object.values(module).flatMap(value => {
   if (isTableSchema(value)) return [value]
   if (Array.isArray(value)) return value.filter(isTableSchema)
@@ -30,6 +39,18 @@ const tables = Object.values(module).flatMap(value => {
 
 if (tables.length === 0) {
   console.error(`no table definitions found in ${tableFile}`)
+  process.exit(1)
+}
+
+try {
+  const names = new Set<string>()
+  for (const table of tables) {
+    validateTableSchema(table)
+    if (names.has(table.name)) throw new Error(`duplicate table name "${table.name}"`)
+    names.add(table.name)
+  }
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error)
   process.exit(1)
 }
 
@@ -65,10 +86,10 @@ for (const table of tables) {
 
 const schemaPath = resolve(outputDir, 'schemas.ts')
 const schemaLines = tables.flatMap(table => [
-  `export const ${table.name.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())}RowSchema = ${JSON.stringify(generateRuntimeTableSchema(table))} as const`,
+  `/** Runtime SQLite row schema for ${table.name}. */\nexport const ${table.name.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())}RowSchema = ${JSON.stringify(generateRuntimeTableSchema(table))} as const`,
 ])
 await writeFile(
   schemaPath,
-  `import type { TSchema } from 'typebox'\n\n${schemaLines.join('\n')}\n\nexport const serverRowSchemas = {\n${tables.map(table => `  '${table.name}': ${table.name.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())}RowSchema,`).join('\n')}\n} satisfies Record<string, TSchema>\n`,
+  `import type { TSchema } from 'typebox'\n\n${schemaLines.join('\n\n')}\n\nexport const ${schemaExportName} = {\n${tables.map(table => `  '${table.name}': ${table.name.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())}RowSchema,`).join('\n')}\n} satisfies Record<string, TSchema>\n`,
 )
 console.log(`generated ${schemaPath}`)

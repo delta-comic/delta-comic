@@ -77,6 +77,27 @@
 
 ---
 
+## Session 7: 2026-08-15 - Phase 4 工具链优化与文档完成
+
+### 已完成
+- codegen 增加统一表定义校验：表名、列引用、主键、索引、唯一约束、外键长度和重复索引名会在生成前给出明确错误。
+- SQL 枚举值生成增加单引号转义，避免合法字符串生成无效 SQL；生成 SQL、Kysely 类型和运行时 schema 增加来源/用途注释。
+- 新增 `script/codegen/check.mts`，同时校验服务端和客户端所有生成产物，检测 schema 漂移。
+- Vite+ 增加 `codegen`、`codegen:all`、`codegen:check` 任务，staged 流程自动生成、格式化并检查一致性。
+- 新增 `docs/database-schema.md`，记录 Schema 规范、新表流程、迁移和故障排查指南。
+
+### 验证
+- `vp run codegen:all` 通过。
+- `vp run codegen:check` 通过。
+- `vp check --fix` 通过。
+- `vp test run script/test/codegen`：4 files / 33 tests 通过。
+- 服务端类型检查通过；数据库布尔列继续按 SQLite `INTEGER` 生成 Kysely `number`，运行时 schema 负责验证 `0/1`。
+
+### 下一步
+- Phase 5：运行服务端、客户端完整测试套件，处理全量类型检查与验收阶段发现的问题。
+
+---
+
 ## Session 5: 2026-08-15 - Phase 2 客户端数据层迁移完成
 
 ### 已完成

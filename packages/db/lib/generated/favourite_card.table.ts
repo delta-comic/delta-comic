@@ -3,7 +3,7 @@ import type { Insertable, Selectable, Updateable } from 'kysely'
 export interface FavouriteCardTable {
   createAt: number
   title: string
-  private: boolean
+  private: number
   description: string
 }
 

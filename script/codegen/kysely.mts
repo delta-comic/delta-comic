@@ -46,6 +46,7 @@ const tsBaseType = (schema: TSchema): string => {
 }
 
 export const generateTableInterface = (table: TableSchema): string => {
+  const description = table.meta.description ? [`/** ${table.meta.description} */`, ''] : []
   const interfaceName = `${pascalCase(table.name)}Table`
   const rowTypeName = singularize(pascalCase(table.name))
   const lines = Object.entries(table.columns).map(
@@ -53,8 +54,13 @@ export const generateTableInterface = (table: TableSchema): string => {
       `  ${table.kyselyCamelCase ? camelCase(name) : name}: ${tsType(schema as TSchema)}`,
   )
   return [
+    ...description,
     `export interface ${interfaceName} {`,
-    ...lines,
+    ...lines.map((line, index) => {
+      const schema = Object.values(table.columns)[index] as TSchema
+      const description = typeof schema.description === 'string' ? ` // ${schema.description}` : ''
+      return `${line}${description}`
+    }),
     '}',
     '',
     `export type ${rowTypeName} = Selectable<${interfaceName}>`,

@@ -1,7 +1,7 @@
 import { Type } from 'typebox'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
-import { defineTable, type TableRow } from '../../codegen/schema.mts'
+import { defineTable, type TableRow, validateTableSchema } from '../../codegen/schema.mts'
 
 const authUsersTable = defineTable(
   'auth_users',
@@ -48,5 +48,29 @@ describe('TableRow type derivation', () => {
       disabled_at: null,
     }
     expect(row.disabled_at).toBeNull()
+  })
+})
+
+describe('table validation', () => {
+  it('rejects metadata that references missing columns', () => {
+    const table = defineTable('users', { id: Type.String() }, { primaryKey: ['missing'] as never })
+    expect(() => validateTableSchema(table)).toThrow(
+      'primaryKey references unknown column "missing"',
+    )
+  })
+
+  it('rejects duplicate index names', () => {
+    const table = defineTable(
+      'users',
+      { id: Type.String() },
+      {
+        primaryKey: ['id'],
+        indexes: [
+          { name: 'users_id', columns: ['id'] },
+          { name: 'users_id', columns: ['id'] },
+        ],
+      },
+    )
+    expect(() => validateTableSchema(table)).toThrow('duplicate index name "users_id"')
   })
 })

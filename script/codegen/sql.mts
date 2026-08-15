@@ -9,7 +9,9 @@ import {
 import { IsOptional, IsUnion } from 'typebox'
 import type { TSchema } from 'typebox'
 
-import { isAutoIncrementColumn, type TableSchema } from './schema.mts'
+import { isAutoIncrementColumn, type TableSchema, validateTableSchema } from './schema.mts'
+
+const sqlLiteral = (value: string): string => `'${value.replaceAll("'", "''")}'`
 
 const unionValues = (schema: TSchema): readonly (string | number)[] | undefined => {
   if (!IsUnion(schema)) return undefined
@@ -48,7 +50,7 @@ const checkExpression = (name: string, schema: TSchema): string | undefined => {
   const values = unionValues(schema)
   if (values !== undefined) {
     const rendered = values
-      .map(value => (typeof value === 'string' ? `'${value}'` : `${value}`))
+      .map(value => (typeof value === 'string' ? sqlLiteral(value) : `${value}`))
       .join(', ')
     return `${name} in (${rendered})`
   }
@@ -93,8 +95,9 @@ const foreignKeyCallback =
 const db = new Kysely({ dialect: new SqliteDialect({ database: {} }) })
 
 export const generateTableSql = (table: TableSchema): string => {
+  validateTableSchema(table)
   const { columns, meta } = table
-  const primaryKey = meta.primaryKey
+  const primaryKey = meta.primaryKey ?? []
   const uniqueGroups = meta.unique ?? []
   const isSingleColumn = (group: readonly string[], name: string) =>
     group.length === 1 && group[0] === name
@@ -133,7 +136,7 @@ export const generateTableSql = (table: TableSchema): string => {
 }
 
 export const generateIndexSql = (table: TableSchema): string[] =>
-  (table.meta.indexes ?? []).map(index => {
+  (validateTableSchema(table), table.meta.indexes ?? []).map(index => {
     let builder = db.schema.createIndex(index.name).ifNotExists().on(table.name)
     if (index.unique) builder = builder.unique()
     for (const column of index.columns) {
@@ -148,6 +151,8 @@ export const generateIndexSql = (table: TableSchema): string[] =>
   })
 
 export const generateTableSqlFull = (table: TableSchema): string => {
+  validateTableSchema(table)
   const statements = [generateTableSql(table), ...generateIndexSql(table)]
-  return statements.join(';\n')
+  const description = table.meta.description ? `-- ${table.meta.description}\n` : ''
+  return `${description}${statements.join(';\n')}`
 }

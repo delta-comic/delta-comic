@@ -1,12 +1,12 @@
-import type { PluginManifest } from '@delta-comic/model'
 import type { Insertable, Selectable, Updateable, JSONColumnType } from 'kysely'
+import type { PluginManifest } from '@delta-comic/model'
 
 export interface PluginTable {
   installerName: string
   loaderName: string
   pluginName: string
   meta: JSONColumnType<PluginManifest>
-  enable: boolean
+  enable: number
   installInput: string
   displayName: string | null
 }

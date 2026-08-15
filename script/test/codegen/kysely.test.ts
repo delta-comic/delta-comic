@@ -29,9 +29,9 @@ describe('kysely codegen', () => {
     expect(source).toContain('  created_at: number')
   })
 
-  it('maps booleans to boolean values', () => {
+  it('maps booleans to SQLite integer values', () => {
     const source = generateTableInterface(authUsersTable)
-    expect(source).toContain('  enabled: boolean')
+    expect(source).toContain('  enabled: number')
   })
 
   it('maps optional columns to null unions', () => {
@@ -66,7 +66,7 @@ describe('kysely codegen', () => {
       { kyselyCamelCase: true },
     )
     expect(generateTableInterface(table)).toContain('  itemKey: string')
-    expect(generateTableInterface(table)).toContain('  isViewed: boolean')
+    expect(generateTableInterface(table)).toContain('  isViewed: number')
   })
 
   it('maps JSON columns to the declared imported model type', () => {

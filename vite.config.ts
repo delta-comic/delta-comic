@@ -12,7 +12,7 @@ const uiTailwindConfigPath = resolve(import.meta.dirname, 'packages/ui/src/index
 
 export default defineConfig({
   staged: {
-    '*': 'vp check --fix',
+    '*': 'vp run codegen:all && vp check --fix && vp run codegen:check',
     '*.{ts,tsx,mts,js,jsx,mjs,vue,html,md,json,yaml,toml}': 'vp exec cspell --no-must-find-files',
   },
   fmt: fmt as OxfmtConfig,
@@ -53,6 +53,17 @@ export default defineConfig({
       },
       'typecheck': { command: 'vp run -r typecheck', dependsOn: ['lib-build'], output: [] },
       'vp:install': { command: 'vp install', cache: false },
+      'codegen': {
+        command:
+          'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/app/infrastructure/d1/generated',
+        cache: false,
+      },
+      'codegen:all': {
+        command:
+          'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/app/infrastructure/d1/generated && node ./script/codegen/run.mts script/codegen/client.table.mts packages/db/lib/generated',
+        cache: false,
+      },
+      'codegen:check': { command: 'node ./script/codegen/check.mts', cache: false },
     },
   },
   test: {
