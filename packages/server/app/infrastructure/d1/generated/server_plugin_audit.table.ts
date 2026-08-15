@@ -4,15 +4,7 @@ export interface ServerPluginAuditTable {
   id: string
   plugin_id: string
   job_id: string
-  action:
-    | 'configure'
-    | 'disable'
-    | 'enable'
-    | 'health'
-    | 'install'
-    | 'register'
-    | 'uninstall'
-    | 'update'
+  action: 'configure' | 'disable' | 'enable' | 'health' | 'install' | 'register' | 'uninstall' | 'update'
   outcome: 'failed' | 'succeeded'
   actor_id: string
   detail_json: string | null

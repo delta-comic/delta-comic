@@ -2,14 +2,7 @@ import type { Insertable, Selectable, Updateable } from 'kysely'
 
 export interface SyncEntitiesTable {
   user_id: string
-  collection:
-    | 'itemStore'
-    | 'favouriteCard'
-    | 'favouriteItem'
-    | 'history'
-    | 'recentView'
-    | 'subscribe'
-    | 'config'
+  collection: 'itemStore' | 'favouriteCard' | 'favouriteItem' | 'history' | 'recentView' | 'subscribe' | 'config'
   entity_id: string
   data_json: string | null
   data_hash: string

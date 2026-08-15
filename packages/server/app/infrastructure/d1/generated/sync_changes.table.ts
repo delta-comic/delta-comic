@@ -3,14 +3,7 @@ import type { Insertable, Selectable, Updateable, Generated } from 'kysely'
 export interface SyncChangesTable {
   server_seq: Generated<number>
   user_id: string
-  collection:
-    | 'itemStore'
-    | 'favouriteCard'
-    | 'favouriteItem'
-    | 'history'
-    | 'recentView'
-    | 'subscribe'
-    | 'config'
+  collection: 'itemStore' | 'favouriteCard' | 'favouriteItem' | 'history' | 'recentView' | 'subscribe' | 'config'
   entity_id: string
   action: 'upsert' | 'delete'
   data_json: string | null

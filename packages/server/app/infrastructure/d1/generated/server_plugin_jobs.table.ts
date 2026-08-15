@@ -3,15 +3,7 @@ import type { Insertable, Selectable, Updateable } from 'kysely'
 export interface ServerPluginJobsTable {
   id: string
   plugin_id: string
-  action:
-    | 'configure'
-    | 'disable'
-    | 'enable'
-    | 'health'
-    | 'install'
-    | 'register'
-    | 'uninstall'
-    | 'update'
+  action: 'configure' | 'disable' | 'enable' | 'health' | 'install' | 'register' | 'uninstall' | 'update'
   status: 'failed' | 'queued' | 'running' | 'succeeded'
   result_json: string | null
   error_message: string | null

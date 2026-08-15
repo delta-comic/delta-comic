@@ -1,5 +1,5 @@
-import type { UniItemRaw } from '@delta-comic/model'
 import type { Insertable, Selectable, Updateable, JSONColumnType } from 'kysely'
+import type { UniItemRaw } from '@delta-comic/model'
 
 export interface ItemStoreTable {
   key: string

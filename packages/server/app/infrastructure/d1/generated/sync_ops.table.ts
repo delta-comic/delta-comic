@@ -4,14 +4,7 @@ export interface SyncOpsTable {
   user_id: string
   terminal_uuid: string
   op_id: string
-  collection:
-    | 'itemStore'
-    | 'favouriteCard'
-    | 'favouriteItem'
-    | 'history'
-    | 'recentView'
-    | 'subscribe'
-    | 'config'
+  collection: 'itemStore' | 'favouriteCard' | 'favouriteItem' | 'history' | 'recentView' | 'subscribe' | 'config'
   entity_id: string
   action: 'upsert' | 'delete'
   data_hash: string
