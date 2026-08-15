@@ -30,7 +30,7 @@ const tsBaseType = (schema: TSchema): string => {
   if (isJsonColumn(schema)) return `JSONColumnType<${schema.typeName}>`
   if (isPrimitive(schema, 'string')) return 'string'
   if (isPrimitive(schema, 'integer') || isPrimitive(schema, 'number')) return 'number'
-  if (isPrimitive(schema, 'boolean')) return 'boolean'
+  if (isPrimitive(schema, 'boolean')) return 'number'
   if (IsUnion(schema)) {
     const values = (schema.anyOf ?? []).map(node => (node as { const?: unknown }).const)
     if (values.every(value => typeof value === 'string'))

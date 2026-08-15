@@ -18,7 +18,8 @@
     "ky": "catalog:",
     "kysely": "catalog:",
     "kysely-d1": "catalog:",
-    "semver": "catalog:"
+    "semver": "catalog:",
+    "typebox": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:",

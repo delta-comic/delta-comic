@@ -1,4 +1,11 @@
+import {
+  serverPluginAuditRowSchema,
+  serverPluginInstallationsRowSchema,
+  serverPluginJobsRowSchema,
+  serverPluginRegistryRowSchema,
+} from '@/infrastructure/d1/generated/schemas'
 import { createKysely } from '@/infrastructure/d1/kysely'
+import { assertDatabaseRead, assertDatabaseWrite } from '@/infrastructure/d1/validation'
 
 import type {
   ServerPluginAuditRow,
@@ -21,6 +28,11 @@ export class ServerPluginRepository implements ServerPluginRepositoryContract {
       .selectAll()
       .orderBy('plugin_id', 'asc')
       .execute()
+      .then(rows =>
+        rows.map(row =>
+          assertDatabaseRead(serverPluginRegistryRowSchema, 'server_plugin_registry', row),
+        ),
+      )
   }
 
   async findRegistry(pluginId: string): Promise<ServerPluginRegistryRow | null> {
@@ -29,13 +41,17 @@ export class ServerPluginRepository implements ServerPluginRepositoryContract {
       .selectAll()
       .where('plugin_id', '=', pluginId)
       .executeTakeFirst()
-      .then(row => row ?? null)
+      .then(row =>
+        row
+          ? assertDatabaseRead(serverPluginRegistryRowSchema, 'server_plugin_registry', row)
+          : null,
+      )
   }
 
   async saveRegistry(row: ServerPluginRegistryRow): Promise<void> {
     await this.kysely
       .insertInto('server_plugin_registry')
-      .values(row)
+      .values(assertDatabaseWrite(serverPluginRegistryRowSchema, 'server_plugin_registry', row))
       .onConflict(oc =>
         oc
           .column('plugin_id')
@@ -62,6 +78,15 @@ export class ServerPluginRepository implements ServerPluginRepositoryContract {
       .selectAll()
       .orderBy('plugin_id', 'asc')
       .execute()
+      .then(rows =>
+        rows.map(row =>
+          assertDatabaseRead(
+            serverPluginInstallationsRowSchema,
+            'server_plugin_installations',
+            row,
+          ),
+        ),
+      )
   }
 
   async findInstallation(pluginId: string): Promise<ServerPluginInstallationRow | null> {
@@ -70,13 +95,23 @@ export class ServerPluginRepository implements ServerPluginRepositoryContract {
       .selectAll()
       .where('plugin_id', '=', pluginId)
       .executeTakeFirst()
-      .then(row => row ?? null)
+      .then(row =>
+        row
+          ? assertDatabaseRead(
+              serverPluginInstallationsRowSchema,
+              'server_plugin_installations',
+              row,
+            )
+          : null,
+      )
   }
 
   async saveInstallation(row: ServerPluginInstallationRow): Promise<void> {
     await this.kysely
       .insertInto('server_plugin_installations')
-      .values(row)
+      .values(
+        assertDatabaseWrite(serverPluginInstallationsRowSchema, 'server_plugin_installations', row),
+      )
       .onConflict(oc =>
         oc
           .column('plugin_id')
@@ -109,6 +144,9 @@ export class ServerPluginRepository implements ServerPluginRepositoryContract {
       .orderBy('id', 'desc')
       .limit(limit)
       .execute()
+      .then(rows =>
+        rows.map(row => assertDatabaseRead(serverPluginJobsRowSchema, 'server_plugin_jobs', row)),
+      )
   }
 
   async findJob(jobId: string): Promise<ServerPluginJobRow | null> {
@@ -117,13 +155,15 @@ export class ServerPluginRepository implements ServerPluginRepositoryContract {
       .selectAll()
       .where('id', '=', jobId)
       .executeTakeFirst()
-      .then(row => row ?? null)
+      .then(row =>
+        row ? assertDatabaseRead(serverPluginJobsRowSchema, 'server_plugin_jobs', row) : null,
+      )
   }
 
   async saveJob(row: ServerPluginJobRow): Promise<void> {
     await this.kysely
       .insertInto('server_plugin_jobs')
-      .values(row)
+      .values(assertDatabaseWrite(serverPluginJobsRowSchema, 'server_plugin_jobs', row))
       .onConflict(oc =>
         oc
           .column('id')
@@ -147,9 +187,15 @@ export class ServerPluginRepository implements ServerPluginRepositoryContract {
       .orderBy('id', 'desc')
       .limit(limit)
       .execute()
+      .then(rows =>
+        rows.map(row => assertDatabaseRead(serverPluginAuditRowSchema, 'server_plugin_audit', row)),
+      )
   }
 
   async saveAudit(row: ServerPluginAuditRow): Promise<void> {
-    await this.kysely.insertInto('server_plugin_audit').values(row).execute()
+    await this.kysely
+      .insertInto('server_plugin_audit')
+      .values(assertDatabaseWrite(serverPluginAuditRowSchema, 'server_plugin_audit', row))
+      .execute()
   }
 }

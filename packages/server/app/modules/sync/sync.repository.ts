@@ -1,6 +1,18 @@
 import { sql } from 'kysely'
 
+import {
+  syncChangesRowSchema,
+  syncEntitiesRowSchema,
+  syncOpsRowSchema,
+  syncTerminalCursorsRowSchema,
+} from '@/infrastructure/d1/generated/schemas'
 import { createKysely } from '@/infrastructure/d1/kysely'
+import {
+  assertDatabaseInsert,
+  assertDatabasePatch,
+  assertDatabaseRead,
+  assertDatabaseWrite,
+} from '@/infrastructure/d1/validation'
 
 import type {
   NormalizedSyncOperation,
@@ -33,7 +45,7 @@ export class SyncRepository {
       .where('terminal_uuid', '=', terminalUuid)
       .where('op_id', '=', opId)
       .executeTakeFirst()
-      .then(row => row ?? null)
+      .then(row => (row ? assertDatabaseRead(syncOpsRowSchema, 'sync_ops', row) : null))
   }
 
   async claimOperation(input: {
@@ -42,6 +54,23 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<boolean> {
+    const row = {
+      action: input.operation.action,
+      base_version: input.operation.baseVersion ?? null,
+      collection: input.operation.collection,
+      data_hash: input.operation.dataHash,
+      entity_id: input.operation.entityId,
+      entity_version: null,
+      error_code: PROCESSING_ERROR_CODE,
+      error_message: 'operation processing was interrupted before completion',
+      op_id: input.operation.opId,
+      received_at: input.receivedAt,
+      result: 'failed' as const,
+      server_seq: null,
+      terminal_uuid: input.terminalUuid,
+      user_id: input.userId,
+    }
+    assertDatabaseWrite(syncOpsRowSchema, 'sync_ops', row)
     const result = await this.kysely
       .insertInto('sync_ops')
       .values({
@@ -77,7 +106,7 @@ export class SyncRepository {
       .where('collection', '=', collection)
       .where('entity_id', '=', entityId)
       .executeTakeFirst()
-      .then(row => row ?? null)
+      .then(row => (row ? assertDatabaseRead(syncEntitiesRowSchema, 'sync_entities', row) : null))
   }
 
   async upsertEntity(input: {
@@ -87,6 +116,19 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<void> {
+    assertDatabaseWrite(syncEntitiesRowSchema, 'sync_entities', {
+      client_changed_at: input.operation.clientChangedAt,
+      collection: input.operation.collection,
+      data_hash: input.operation.dataHash,
+      data_json: input.operation.dataJson,
+      deleted_at: input.deletedAt,
+      entity_id: input.operation.entityId,
+      last_op_id: input.operation.opId,
+      last_terminal_uuid: input.terminalUuid,
+      server_updated_at: input.serverUpdatedAt,
+      user_id: input.userId,
+      version: input.operation.version,
+    })
     await this.kysely
       .insertInto('sync_entities')
       .values({
@@ -126,6 +168,25 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<number> {
+    assertDatabaseInsert(
+      syncChangesRowSchema,
+      'sync_changes',
+      {
+        action: input.operation.action,
+        client_changed_at: input.operation.clientChangedAt,
+        collection: input.operation.collection,
+        data_hash: input.operation.dataHash,
+        data_json: input.operation.dataJson,
+        deleted_at: input.deletedAt,
+        entity_id: input.operation.entityId,
+        origin_op_id: input.operation.opId,
+        origin_terminal_uuid: input.terminalUuid,
+        server_changed_at: input.serverChangedAt,
+        user_id: input.userId,
+        version: input.operation.version,
+      },
+      ['server_seq'],
+    )
     const inserted = await this.kysely
       .insertInto('sync_changes')
       .values({
@@ -166,6 +227,13 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<void> {
+    assertDatabasePatch(syncOpsRowSchema, 'sync_ops', {
+      entity_version: input.entityVersion,
+      error_code: input.errorCode ?? null,
+      error_message: input.errorMessage ?? null,
+      result: input.result,
+      server_seq: input.serverSeq,
+    })
     await this.kysely
       .updateTable('sync_ops')
       .set({
@@ -205,7 +273,8 @@ export class SyncRepository {
       .where('server_seq', '>', input.sinceSeq)
     if (input.collections.length > 0) query = query.where('collection', 'in', input.collections)
     if (!input.includeOwn) query = query.where('origin_terminal_uuid', '<>', input.terminalUuid)
-    return await query.orderBy('server_seq', 'asc').limit(input.limit).execute()
+    const rows = await query.orderBy('server_seq', 'asc').limit(input.limit).execute()
+    return rows.map(row => assertDatabaseRead(syncChangesRowSchema, 'sync_changes', row))
   }
 
   async upsertCursor(input: {
@@ -214,6 +283,13 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<void> {
+    assertDatabaseWrite(syncTerminalCursorsRowSchema, 'sync_terminal_cursors', {
+      last_pulled_seq: input.lastPulledSeq,
+      last_pushed_at: null,
+      last_seen_at: input.lastSeenAt,
+      terminal_uuid: input.terminalUuid,
+      user_id: input.userId,
+    })
     await this.kysely
       .insertInto('sync_terminal_cursors')
       .values({
@@ -236,6 +312,13 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<void> {
+    assertDatabaseWrite(syncTerminalCursorsRowSchema, 'sync_terminal_cursors', {
+      last_pulled_seq: 0,
+      last_pushed_at: input.lastPushedAt,
+      last_seen_at: input.lastPushedAt,
+      terminal_uuid: input.terminalUuid,
+      user_id: input.userId,
+    })
     await this.kysely
       .insertInto('sync_terminal_cursors')
       .values({

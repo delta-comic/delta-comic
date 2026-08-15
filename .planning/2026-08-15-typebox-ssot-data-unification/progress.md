@@ -51,6 +51,32 @@
 
 ---
 
+## Session 6: 2026-08-15 - Phase 3 运行时验证集成完成
+
+### 已完成
+- 扩展 codegen 输出 13 张服务端表的运行时行 schema，按 SQLite 数据库行形状处理 Optional/null 和布尔 INTEGER；移除 `auth_users.id` 不符合现有数据的 UUID format 约束。
+- 新增数据库验证 helper，统一读、写、patch、自增列 insert 的 TypeBox 校验，并缓存 `Compile` 结果；失败统一抛出 `DATABASE_SCHEMA_INVALID` AppError。
+- auth、sync、plugins、admin Repository 接入数据库读取和写入边界校验；保留 `rotateSession` D1 batch 原子语义。
+- Elysia 路由 schema 继续使用 `@sinclair/typebox`，数据库验证使用 `typebox` 1.x，避免两套 schema 类型互操作问题。
+
+### 验证
+- codegen 生成通过。
+- `vp check --fix` 通过。
+- server typecheck 通过。
+- 服务端测试通过：28 files / 129 tests。
+- 完整检查中构建、lint、检查和测试通过；工作区类型检查仍有客户端既有错误（`packages/app` favourite/subscribe 相关 26 errors），与本阶段服务端改动无关。
+
+### 错误与修复
+- codegen 首次生成汇总 schema 时遗漏 `IsUnion` 导入，补充后重新生成。
+- sync pull 测试夹具误用 `SyncOpRow`，改为完整 `SyncChangeRow`。
+- 自增 `server_seq` insert 校验排除生成列。
+- 管理审计测试夹具补齐数据库必填 `actor_id/job_id`。
+
+### 下一步
+- Phase 4：完善生成器边缘情况、pre-commit schema 一致性检查和开发文档。
+
+---
+
 ## Session 5: 2026-08-15 - Phase 2 客户端数据层迁移完成
 
 ### 已完成

@@ -1,4 +1,14 @@
+import {
+  authSessionsRowSchema,
+  authTerminalsRowSchema,
+  authUsersRowSchema,
+} from '@/infrastructure/d1/generated/schemas'
 import { createKysely } from '@/infrastructure/d1/kysely'
+import {
+  assertDatabasePatch,
+  assertDatabaseRead,
+  assertDatabaseWrite,
+} from '@/infrastructure/d1/validation'
 
 import type { AuthSessionRow, AuthTerminalRow, AuthUserRow } from './auth.types'
 
@@ -15,7 +25,7 @@ export class AuthRepository {
       .selectAll()
       .where('login_name', '=', loginName)
       .executeTakeFirst()
-      .then(row => row ?? null)
+      .then(row => (row ? assertDatabaseRead(authUsersRowSchema, 'auth_users', row) : null))
   }
 
   async findUserById(id: string): Promise<AuthUserRow | null> {
@@ -24,14 +34,18 @@ export class AuthRepository {
       .selectAll()
       .where('id', '=', id)
       .executeTakeFirst()
-      .then(row => row ?? null)
+      .then(row => (row ? assertDatabaseRead(authUsersRowSchema, 'auth_users', row) : null))
   }
 
   async createUser(row: AuthUserRow): Promise<void> {
-    await this.kysely.insertInto('auth_users').values(row).execute()
+    await this.kysely
+      .insertInto('auth_users')
+      .values(assertDatabaseWrite(authUsersRowSchema, 'auth_users', row))
+      .execute()
   }
 
   async upsertTerminal(row: AuthTerminalRow): Promise<void> {
+    assertDatabaseWrite(authTerminalsRowSchema, 'auth_terminals', row)
     await this.kysely
       .insertInto('auth_terminals')
       .values(row)
@@ -56,11 +70,14 @@ export class AuthRepository {
       .where('user_id', '=', userId)
       .where('terminal_uuid', '=', terminalUuid)
       .executeTakeFirst()
-      .then(row => row ?? null)
+      .then(row => (row ? assertDatabaseRead(authTerminalsRowSchema, 'auth_terminals', row) : null))
   }
 
   async createSession(row: AuthSessionRow): Promise<void> {
-    await this.kysely.insertInto('auth_sessions').values(row).execute()
+    await this.kysely
+      .insertInto('auth_sessions')
+      .values(assertDatabaseWrite(authSessionsRowSchema, 'auth_sessions', row))
+      .execute()
   }
 
   async findSessionByAccessTokenHash(accessTokenHash: string): Promise<AuthSessionRow | null> {
@@ -69,7 +86,7 @@ export class AuthRepository {
       .selectAll()
       .where('access_token_hash', '=', accessTokenHash)
       .executeTakeFirst()
-      .then(row => row ?? null)
+      .then(row => (row ? assertDatabaseRead(authSessionsRowSchema, 'auth_sessions', row) : null))
   }
 
   async findSessionByRefreshTokenHash(refreshTokenHash: string): Promise<AuthSessionRow | null> {
@@ -78,10 +95,11 @@ export class AuthRepository {
       .selectAll()
       .where('refresh_token_hash', '=', refreshTokenHash)
       .executeTakeFirst()
-      .then(row => row ?? null)
+      .then(row => (row ? assertDatabaseRead(authSessionsRowSchema, 'auth_sessions', row) : null))
   }
 
   async revokeSession(sessionId: string, revokedAt: number): Promise<void> {
+    assertDatabasePatch(authSessionsRowSchema, 'auth_sessions', { revoked_at: revokedAt })
     await this.kysely
       .updateTable('auth_sessions')
       .set({ revoked_at: revokedAt })
@@ -95,6 +113,11 @@ export class AuthRepository {
     oldRotatedAt: number,
     newSession: AuthSessionRow,
   ): Promise<void> {
+    assertDatabasePatch(authSessionsRowSchema, 'auth_sessions', {
+      rotated_at: oldRotatedAt,
+      revoked_at: oldRotatedAt,
+    })
+    assertDatabaseWrite(authSessionsRowSchema, 'auth_sessions', newSession)
     await this.db.batch([
       this.db
         .prepare(

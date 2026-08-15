@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 import { generateTableInterface } from './kysely.mts'
+import { generateRuntimeTableSchema } from './schema.mts'
 import type { TableSchema } from './schema.mts'
 import { generateTableSqlFull } from './sql.mts'
 
@@ -61,3 +62,13 @@ for (const table of tables) {
   console.log(`generated ${sqlPath}`)
   console.log(`generated ${typesPath}`)
 }
+
+const schemaPath = resolve(outputDir, 'schemas.ts')
+const schemaLines = tables.flatMap(table => [
+  `export const ${table.name.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())}RowSchema = ${JSON.stringify(generateRuntimeTableSchema(table))} as const`,
+])
+await writeFile(
+  schemaPath,
+  `import type { TSchema } from 'typebox'\n\n${schemaLines.join('\n')}\n\nexport const serverRowSchemas = {\n${tables.map(table => `  '${table.name}': ${table.name.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())}RowSchema,`).join('\n')}\n} satisfies Record<string, TSchema>\n`,
+)
+console.log(`generated ${schemaPath}`)

@@ -1,8 +1,10 @@
 import { logger } from '@delta-comic/logger'
 import { sql } from 'kysely'
 
+import { serverPluginAuditRowSchema } from '@/infrastructure/d1/generated/schemas'
 import { createKysely } from '@/infrastructure/d1/kysely'
 import type { ServerDatabase } from '@/infrastructure/d1/kysely'
+import { assertDatabaseRead } from '@/infrastructure/d1/validation'
 
 import type {
   AdminMetric,
@@ -154,7 +156,12 @@ export class D1AdminMetricsRepository implements AdminMetricsRepository {
         .orderBy('id', 'desc')
         .limit(safeLimit)
         .execute()
-      return { available: true, items: result.map(this.toPluginAudit) }
+      return {
+        available: true,
+        items: result
+          .map(row => assertDatabaseRead(serverPluginAuditRowSchema, 'server_plugin_audit', row))
+          .map(this.toPluginAudit),
+      }
     } catch (error) {
       logQueryFailure('recent_plugin_audit', error)
       return { available: false, issue: 'query_failed', items: [] }

@@ -39,7 +39,7 @@ const pluginJobStatus = Type.Union([
 const authUsersTable = defineTable(
   'auth_users',
   {
-    id: Type.String({ format: 'uuid' }),
+    id: Type.String(),
     login_name: Type.String({ minLength: 3, maxLength: 64 }),
     password_hash: Type.String(),
     password_salt: Type.String(),

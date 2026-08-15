@@ -1,3 +1,4 @@
+import { IsOptional, IsUnion, Type } from 'typebox'
 import type { Static, TProperties, TSchema } from 'typebox'
 
 const JSON_COLUMN = Symbol('delta.comic.json-column')
@@ -72,6 +73,42 @@ export const defineTable = <TName extends string, TCols extends TProperties>(
   meta: TableMeta<TCols>,
   options?: Pick<TableSchema<TName, TCols>, 'kyselyCamelCase'>,
 ): TableSchema<TName, TCols> => ({ name, columns, meta, ...options })
+
+const databaseColumnSchema = (schema: TSchema): TSchema => {
+  const base = schema.type === 'boolean' ? Type.Integer() : schema
+  return IsOptional(schema) ? Type.Union([base, Type.Null()]) : base
+}
+
+export const generateTableRowSchema = (table: TableSchema): TSchema =>
+  Type.Object(
+    Object.fromEntries(
+      Object.entries(table.columns).map(([name, schema]) => [name, databaseColumnSchema(schema)]),
+    ),
+  )
+
+const runtimeSchema = (schema: TSchema): Record<string, unknown> => {
+  if (isJsonColumn(schema)) return { type: 'string' }
+  if (isAutoIncrementColumn(schema)) return { type: 'integer' }
+  if (schema.type === 'boolean') return { type: 'integer' }
+  if (IsUnion(schema)) {
+    return { anyOf: (schema.anyOf ?? []).map(node => runtimeSchema(node)) }
+  }
+  return Object.fromEntries(
+    Object.entries(schema).filter(([key]) => key !== 'default' && !key.startsWith('~')),
+  )
+}
+
+export const generateRuntimeTableSchema = (table: TableSchema): Record<string, unknown> => ({
+  type: 'object',
+  properties: Object.fromEntries(
+    Object.entries(table.columns).map(([name, schema]) => [
+      name,
+      runtimeSchema(databaseColumnSchema(schema)),
+    ]),
+  ),
+  required: Object.keys(table.columns),
+  additionalProperties: false,
+})
 
 type DbStatic<T extends TSchema> =
   undefined extends Static<T> ? Exclude<Static<T>, undefined> | null : Static<T>

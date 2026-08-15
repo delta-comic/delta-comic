@@ -8,6 +8,7 @@ import {
 } from '../../../../app/modules/sync/sync.repository'
 import type {
   NormalizedSyncOperation,
+  SyncChangeRow,
   SyncEntityRow,
   SyncOpRow,
 } from '../../../../app/modules/sync/sync.types'
@@ -41,6 +42,22 @@ const opRow: SyncOpRow = {
   server_seq: 7,
   terminal_uuid: 'terminal-1',
   user_id: 'user-1',
+}
+
+const changeRow: SyncChangeRow = {
+  action: operation.action,
+  client_changed_at: operation.clientChangedAt,
+  collection: operation.collection,
+  data_hash: operation.dataHash,
+  data_json: operation.dataJson,
+  deleted_at: null,
+  entity_id: operation.entityId,
+  origin_op_id: operation.opId,
+  origin_terminal_uuid: 'terminal-1',
+  server_changed_at: 20,
+  server_seq: 7,
+  user_id: 'user-1',
+  version: operation.version,
 }
 
 describe('SyncRepository', () => {
@@ -206,7 +223,7 @@ describe('SyncRepository', () => {
 
   it('builds pull queries for collection and own-terminal filters', async () => {
     const recorder = new D1Recorder()
-    recorder.allResults.push([opRow], [])
+    recorder.allResults.push([changeRow], [])
     const repository = new SyncRepository(recorder.db)
 
     await repository.pullChanges({

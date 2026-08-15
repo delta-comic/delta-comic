@@ -4,10 +4,10 @@
 将 SQL schema、TypeScript 类型、服务端验证、客户端类型统一到 TypeBox SSOT，实现端到端类型安全和运行时验证，消除手动维护多层数据结构的复杂性。
 
 ## Next Step
-完成 Phase 1 的 SSOT 表定义和生成产物接入，然后迁移服务端 Repository 到 Kysely。
+进入 Phase 4：完善代码生成器边缘情况、生成注释，并补充 schema 一致性与开发文档。
 
 ## Current Phase
-Phase 1（基础生成器扩展已完成，表定义与 Repository 迁移进行中）
+Phase 4（运行时验证集成已完成）
 
 ## Phases
 
@@ -67,18 +67,18 @@ Phase 1（基础生成器扩展已完成，表定义与 Repository 迁移进行�
 - **Status:** 完成
 
 ### Phase 3: 运行时验证集成（1周）
-- [ ] 服务端验证层
-  - [ ] 在 Repository 层添加 TypeBox.Value.Check()
-  - [ ] 数据库读取后验证
-  - [ ] 数据库写入前验证
-  - [ ] 统一错误处理和响应格式
+- [x] 服务端验证层
+   - [x] 在 Repository 层添加 TypeBox.Value.Check()
+   - [x] 数据库读取后验证
+   - [x] 数据库写入前验证
+   - [x] 统一错误处理和响应格式
 - [ ] 客户端验证层（可选）
   - [ ] 在 Struct 类中集成验证
   - [ ] API 响应验证
-- [ ] 性能优化
-  - [ ] 验证缓存策略
-  - [ ] 关键路径性能测试
-- **Status:** pending
+- [x] 性能优化
+   - [x] 验证缓存策略
+   - [x] 关键路径性能测试
+- **Status:** complete
 
 ### Phase 4: 工具链优化与文档（3-5天）
 - [ ] 完善代码生成器

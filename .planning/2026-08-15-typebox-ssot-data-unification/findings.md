@@ -261,7 +261,13 @@ export interface AuthUsersTable {
 
 5. **是否需要双向同步（SQL → TypeBox）？**
    - 当前方案：单向（TypeBox → SQL）
-   - 理由：TypeBox 是 SSOT，SQL 只是生成产物
+    - 理由：TypeBox 是 SSOT，SQL 只是生成产物
+
+## Phase 3 运行时验证结论
+- TypeBox 1.x 的 `Value.Errors` 使用 `instancePath`，旧 `@sinclair/typebox/value` 使用 `path`；两套包不能在 Elysia schema 边界混用。
+- 数据库读取 schema 必须把 `Optional` 列转换为必需但可为 `null` 的字段，因为 SQLite 查询行总是带有列名。
+- 数据库写入需要区分完整 row、局部 update patch 和自增列 insert，统一 schema 直接复用会错误拒绝合法写入。
+- `Compile(schema)` 通过 `WeakMap` 缓存后用于高频 Repository 边界；错误详情只保留前 5 个字段错误。
 
 ---
 
