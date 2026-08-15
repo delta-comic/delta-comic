@@ -80,7 +80,7 @@ export const useRemove = defineMutation(() => {
 
 export const useQuery = <T>(
   query: (db: SelectQueryBuilder<DB, 'subscribe', {}>) => Promise<T>,
-  otherKeys: readonly unknown[] = [],
+  otherKeys: readonly EntryKey[] = [],
   initialData?: () => T,
 ) =>
   useColadaQuery({
@@ -88,7 +88,7 @@ export const useQuery = <T>(
       const { db } = await import('.')
       return await query(db.selectFrom('subscribe'))
     },
-    key: () => [CommonQueryKey.common, QueryKey.item, query, ...otherKeys] as EntryKey,
+    key: () => [CommonQueryKey.common, QueryKey.item, query, ...otherKeys],
     staleTime: 15000,
     refetchOnMount: 'always',
     initialData,

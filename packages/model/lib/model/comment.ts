@@ -36,8 +36,8 @@ export abstract class UniComment extends MetaStruct<UniCommentRaw> implements Un
   @field isTop!: boolean
   @field isLiked!: boolean
   @field reported!: boolean
-  public abstract like(signal?: AbortSignal): PromiseLike<boolean>
-  public abstract report(signal?: AbortSignal): PromiseLike<unknown>
-  public abstract sendComment(text: string, signal?: AbortSignal): PromiseLike<unknown>
+  public abstract like(signal?: AbortSignal): Promise<boolean>
+  public abstract report(signal?: AbortSignal): Promise<unknown>
+  public abstract sendComment(text: string, signal?: AbortSignal): Promise<unknown>
   public abstract fetchChildren: StreamQuery<UniComment>
 }

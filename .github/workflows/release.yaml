@@ -105,6 +105,7 @@ jobs:
     env:
       HUSKY: 0
       RELEASE_VERSION: ${{ needs.plan.outputs.version }}
+      DELTA_SKIP_LIB_BUILD: 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -252,6 +253,7 @@ jobs:
     env:
       HUSKY: 0
       RELEASE_VERSION: ${{ needs.plan.outputs.version }}
+      DELTA_SKIP_LIB_BUILD: 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
