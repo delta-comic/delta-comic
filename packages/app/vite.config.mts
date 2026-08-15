@@ -7,6 +7,9 @@ import type { UserConfig } from 'vite-plus'
 import { defineConfig, lazyPlugins } from 'vite-plus'
 
 const host = process.env.TAURI_DEV_HOST
+// Release CI builds the workspace libraries and the shared runtime once in the `plan` job and
+// downloads the artifacts into place; skip rebuilding them on each platform runner.
+const skipLibBuild = process.env.DELTA_SKIP_LIB_BUILD === 'true'
 
 export default defineConfig(
   () =>
@@ -101,7 +104,9 @@ export default defineConfig(
         tasks: {
           'build': {
             command: 'node -e ""',
-            dependsOn: [{ task: 'build', from: ['dependencies', 'devDependencies'] }],
+            dependsOn: skipLibBuild
+              ? []
+              : [{ task: 'build', from: ['dependencies', 'devDependencies'] }],
             output: [],
           },
           'build:app': { command: 'TRUE_BUILD_MAIN_APP=true tauri android build', cache: false },
@@ -109,7 +114,9 @@ export default defineConfig(
           'build:local': { command: 'tauri build --debug', cache: false },
           'build:web': {
             command: 'vp build',
-            dependsOn: [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build'],
+            dependsOn: skipLibBuild
+              ? []
+              : [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build'],
             output: ['dist/**'],
           },
           'dev': { command: 'tauri dev', cache: false },
