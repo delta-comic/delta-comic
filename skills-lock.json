@@ -43,6 +43,12 @@
       "skillPath": "elysia/SKILL.md",
       "computedHash": "55268e69a2c766ed67e56a0db57544f60cc52dba0c7f024a974baf965e525e1b"
     },
+    "kysely": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "kysely/SKILL.md",
+      "computedHash": "3adbe7431dc72cb2394f62d3aadaebd28202be8399c171c17e5a3593fb0b8dfc"
+    },
     "pinia": {
       "source": "antfu/skills",
       "sourceType": "github",
@@ -84,6 +90,12 @@
       "sourceType": "github",
       "skillPath": "skills/turnstile-spin/SKILL.md",
       "computedHash": "ec3868fef71e9ca926c177c4e2f8a5e234ae501bba4258746507ed095613bbb2"
+    },
+    "typebox": {
+      "source": "epicenterhq/epicenter",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/typebox/SKILL.md",
+      "computedHash": "7ad55f0f782ba7438e7685c1857d05c667bf16d7aa0e56152fae27f686fa7a60"
     },
     "vite": {
       "source": "antfu/skills",
