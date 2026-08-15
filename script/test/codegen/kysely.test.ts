@@ -43,4 +43,11 @@ describe('kysely codegen', () => {
     const table = defineTable('meta_table', { data: Type.Object({ v: Type.Number() }) }, {})
     expect(() => generateTableInterface(table)).toThrow(/JSON column types/)
   })
+
+  it('exports Selectable, Insertable and Updateable helper types', () => {
+    const source = generateTableInterface(authUsersTable)
+    expect(source).toContain('export type AuthUser = Selectable<AuthUsersTable>')
+    expect(source).toContain('export type NewAuthUser = Insertable<AuthUsersTable>')
+    expect(source).toContain('export type AuthUserUpdate = Updateable<AuthUsersTable>')
+  })
 })
