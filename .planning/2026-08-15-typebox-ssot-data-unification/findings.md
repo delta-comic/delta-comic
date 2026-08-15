@@ -1,0 +1,283 @@
+# Findings: TypeBox SSOT 数据归一化
+
+## 项目现状分析
+
+### 数据结构多层维护问题
+当前项目存在 6 层数据结构需要手动保持一致：
+1. SQL Schema（migrations/*.sql）
+2. 服务端 Row Types（*.types.ts）
+3. 服务端 API Schema（*.schemas.ts - TypeBox）
+4. 服务端 Repository（手写 SQL）
+5. 客户端 DB Types（Kysely 表接口）
+6. 业务模型类（Struct + 装饰器）
+
+**痛点：** 任何 schema 变更需要手动更新 6 个地方，容易出错且维护成本高。
+
+---
+
+## 技术栈现状
+
+### 服务端（packages/server）
+- **数据库：** Cloudflare D1（SQLite 兼容）
+- **验证：** Elysia + TypeBox（已在使用）
+- **查询：** 手写 SQL（通过 D1 Database API）
+- **表数量：** 13 张
+- **代码量：** ~822 行 Repository + ~400 行 Schemas
+
+### 客户端（packages/db）
+- **数据库：** Tauri SQLite / Web WASM SQLite
+- **查询构建器：** Kysely（已在使用）
+- **表数量：** 9 张
+- **代码量：** ~300 行类型定义 + 查询逻辑
+
+### Rust 侧（packages/downloader）
+- **数据库：** 独立 SQLite（与服务端完全隔离）
+- **ORM：** SQLx
+- **表数量：** 9 张（独立 schema）
+- **数据库 struct：** 7 个
+- **结论：** 不需要与 TypeScript 数据结构同步
+
+---
+
+## JSON 列使用分析
+
+### 服务端 D1（9 个 JSON 列）
+| 表 | JSON 列 | 用途 | 类型复杂度 |
+|---|---|---|---|
+| sync_entities | data_json | 同步实体数据 | 中 |
+| sync_changes | data_json | 同步变更数据 | 中 |
+| server_plugin_registry | manifest_json | 插件清单 | 高 |
+| server_plugin_registry | config_json | 插件配置 | 中 |
+| server_plugin_registry | last_health_json | 健康检查 | 低 |
+| server_plugin_jobs | result_json | 任务结果 | 中 |
+| server_plugin_audit | detail_json | 审计详情 | 低 |
+| server_plugin_script_runs | input_json | 脚本输入 | 中 |
+| server_plugin_script_runs | result_json | 脚本输出 | 中 |
+
+### 客户端 Kysely（4 个 JSON 列）
+| 表 | JSON 列 | 类型 | 用途 |
+|---|---|---|---|
+| itemStore | item | JSONColumnType\<UniItemRaw\> | 漫画条目数据 |
+| history | ep | JSONColumnType\<UniEpRaw\> | 章节数据 |
+| plugin | meta | JSONColumnType\<Meta\> | 插件元数据 |
+| subscribe | author | JSONColumnType\<UniItemAuthor\> | 作者信息 |
+
+**发现：** JSON 列占比高（服务端 69%，客户端 44%），TypeBox 天然支持 JSON Schema，比 Drizzle 更适合。
+
+---
+
+## 方案对比分析
+
+### 方案 1：TypeBox SSOT（推荐）
+**工作量：** 15-22 天（3-4 周）
+
+**优势：**
+1. ✅ 保留 Kysely - 客户端 ~300 行查询代码不动
+2. ✅ 保留 TypeBox - 服务端验证代码保留
+3. ✅ 增量迁移 - 可以逐模块迁移
+4. ✅ JSON 列友好 - TypeBox 是 JSON Schema 标准
+5. ✅ 运行时验证 - TypeBox.Value.Check() 内置
+6. ✅ 轻量级 - 适合 Cloudflare Workers
+
+**劣势：**
+1. ⚠️ 需要开发代码生成工具（一次性工作）
+2. ⚠️ Rust 代码生成需要额外脚本（但 Downloader 不需要）
+
+---
+
+### 方案 2：Drizzle ORM（不推荐）
+**工作量：** 27-38 天（5-7 周）
+
+**优势：**
+1. ✅ 最成熟的 TypeScript ORM
+2. ✅ 官方支持 Cloudflare D1
+3. ✅ 自动生成 migration
+4. ✅ 类型完全自动推导
+
+**劣势：**
+1. ❌ 推倒重来 - 客户端 + 服务端都要重构
+2. ❌ 放弃 Kysely - ~300 行查询代码需要重写
+3. ❌ 学习成本 - 团队需要学习新 API
+4. ❌ JSON 列复杂 - Drizzle 的 JSON 处理不如 TypeBox 直观
+5. ❌ 无法增量 - 要么全用 Drizzle，要么全用 Kysely
+6. ⚠️ 验证层 - 需要集成 Drizzle-Zod 或保留 TypeBox 双重验证
+
+---
+
+## 试点表选择：auth_users
+
+**为什么选这张表：**
+1. ✅ 结构简单 - 8 个字段，无外键
+2. ✅ 无 JSON 列 - 先验证基础类型
+3. ✅ 有现成 TypeBox schema - auth.schemas.ts 已定义部分字段
+4. ✅ 代表性强 - 典型的用户表结构
+5. ✅ 测试简单 - 可以快速验证端到端流程
+
+**auth_users 表结构：**
+```sql
+CREATE TABLE auth_users (
+  id TEXT PRIMARY KEY NOT NULL,
+  login_name TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  password_salt TEXT NOT NULL,
+  password_alg TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  disabled_at INTEGER
+);
+```
+
+**现有 TypeBox 定义（部分）：**
+```typescript
+// auth.schemas.ts 已有部分字段
+export const meResponseSchema = t.Object({
+  user: t.Object({ 
+    id: t.String(), 
+    loginName: t.String() 
+  }),
+  // ...
+})
+```
+
+---
+
+## 技术实现路径
+
+### TypeBox → SQL 生成器
+**核心逻辑：**
+```typescript
+TypeBox Schema
+  ↓
+解析 Type.* 定义
+  ↓
+映射到 SQL 类型
+  ↓
+生成 CREATE TABLE DDL
+```
+
+**类型映射表：**
+| TypeBox | SQL (SQLite) | 注释 |
+|---------|--------------|------|
+| Type.String() | TEXT | |
+| Type.Integer() | INTEGER | |
+| Type.Number() | REAL | |
+| Type.Boolean() | INTEGER | 0/1 |
+| Type.Optional() | NULL-able | |
+| Type.Object() | TEXT (JSON) | JSONColumnType |
+| Type.Array() | TEXT (JSON) | JSONColumnType |
+
+---
+
+### TypeBox → Kysely 生成器
+**核心逻辑：**
+```typescript
+TypeBox Schema
+  ↓
+解析字段定义
+  ↓
+生成 interface Table
+  ↓
+处理 Generated/Optional
+```
+
+**生成示例：**
+```typescript
+// 输入：TypeBox Schema
+const AuthUserSchema = Type.Object({
+  id: Type.String(),
+  login_name: Type.String(),
+  created_at: Type.Integer(),
+  disabled_at: Type.Optional(Type.Integer()),
+})
+
+// 输出：Kysely 类型
+export interface AuthUsersTable {
+  id: string
+  login_name: string
+  created_at: number
+  disabled_at: number | null
+}
+```
+
+---
+
+## 风险评估
+
+### 高风险项
+1. **JSON 列类型推导** - 复杂嵌套类型可能难以正确生成
+2. **外键约束** - 需要额外元数据标注
+3. **索引定义** - TypeBox 没有原生索引概念
+4. **Migration 兼容性** - 生成的 SQL 需要与现有 migration 兼容
+
+### 缓解措施
+1. **分阶段实现** - Phase 0 只处理基础类型
+2. **对比验证** - 生成的 SQL 与现有 migration 逐行对比
+3. **增量迁移** - 逐表迁移，出问题可回滚
+4. **保留手动 escape hatch** - 复杂类型可以手动标注
+
+---
+
+## 参考资料
+
+### TypeBox 核心 API
+- `Type.Object()` - 对象定义
+- `Type.String({ format, minLength, maxLength })` - 字符串约束
+- `Type.Integer()` - 整数
+- `Type.Optional()` - 可选字段
+- `Type.Static<typeof Schema>` - 类型推导
+- `Value.Check(Schema, data)` - 运行时验证
+
+### Kysely 核心类型
+- `Selectable<Table>` - 查询返回类型
+- `Insertable<Table>` - 插入类型
+- `Updateable<Table>` - 更新类型
+- `Generated<T>` - 自动生成字段（如主键）
+- `JSONColumnType<T>` - JSON 列类型
+
+### Cloudflare D1 限制
+- SQLite 3.x 语法
+- 不支持某些高级特性（如 GENERATED COLUMN）
+- 单次查询最大 1MB
+- 批量操作限制
+
+---
+
+## 待解决问题
+
+1. **外键约束如何在 TypeBox 中表达？**
+   - 方案：自定义 `Foreign()` 辅助函数
+   - 或：在生成器中通过额外配置指定
+
+2. **索引定义如何处理？**
+   - 方案：分离的索引配置文件
+   - 或：TypeBox schema 的 metadata 字段
+
+3. **复合主键如何处理？**
+   - 方案：在生成器中支持 `primaryKey: ['col1', 'col2']` 配置
+
+4. **Kysely Generated 类型如何自动推导？**
+   - 方案：识别主键字段自动加 Generated<>
+   - 或：通过 TypeBox metadata 标注
+
+5. **是否需要双向同步（SQL → TypeBox）？**
+   - 当前方案：单向（TypeBox → SQL）
+   - 理由：TypeBox 是 SSOT，SQL 只是生成产物
+
+---
+
+## 成功标准
+
+### Phase 0 成功标准
+- [ ] auth_users 的 TypeBox schema 完整定义
+- [ ] 生成的 SQL DDL 与现有 0001_auth.sql 一致
+- [ ] 生成的 Kysely 类型可用于查询
+- [ ] 用 Kysely 重写至少 1 个 auth.repository.ts 的查询
+- [ ] 类型推导正确（无 `any`，无类型断言）
+
+### 最终成功标准（Phase 5）
+- [ ] 所有 22 张表（服务端 13 + 客户端 9）迁移完成
+- [ ] 所有 Repository 层使用 Kysely（无手写 SQL）
+- [ ] 关键路径有运行时验证
+- [ ] 端到端测试通过
+- [ ] 性能无退化
+- [ ] 开发文档完整
