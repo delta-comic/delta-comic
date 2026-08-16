@@ -1,0 +1,2 @@
+create table if not exists "auth_terminals" ("user_id" text not null, "terminal_uuid" text not null, "display_name" text, "platform" text, "app_version" text, "created_at" integer not null, "last_seen_at" integer not null, "revoked_at" integer, constraint "pk_auth_terminals" primary key ("user_id", "terminal_uuid"), constraint "fk_auth_terminals_user_id" foreign key ("user_id") references "auth_users" ("id") on delete cascade);
+create index if not exists "idx_auth_terminals_user_last_seen" on "auth_terminals" ("user_id", "last_seen_at" desc)

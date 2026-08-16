@@ -1,4 +1,18 @@
-import { all, first, run } from '@/infrastructure/d1/database'
+import { sql } from 'kysely'
+
+import {
+  syncChangesRowSchema,
+  syncEntitiesRowSchema,
+  syncOpsRowSchema,
+  syncTerminalCursorsRowSchema,
+} from '@/infrastructure/d1/generated/schemas'
+import { createKysely } from '@/infrastructure/d1/kysely'
+import {
+  assertDatabaseInsert,
+  assertDatabasePatch,
+  assertDatabaseRead,
+  assertDatabaseWrite,
+} from '@/infrastructure/d1/validation'
 
 import type {
   NormalizedSyncOperation,
@@ -13,22 +27,25 @@ import type {
 const PROCESSING_ERROR_CODE = 'SYNC_PROCESSING'
 
 export class SyncRepository {
-  constructor(private readonly db: D1Database) {}
+  private readonly kysely
+
+  constructor(db: D1Database) {
+    this.kysely = createKysely(db)
+  }
 
   async findOperation(
     userId: string,
     terminalUuid: string,
     opId: string,
   ): Promise<SyncOpRow | null> {
-    return (await first(
-      this.db,
-      `SELECT * FROM sync_ops
-       WHERE user_id = ? AND terminal_uuid = ? AND op_id = ?
-       LIMIT 1`,
-      userId,
-      terminalUuid,
-      opId,
-    )) as SyncOpRow | null
+    return await this.kysely
+      .selectFrom('sync_ops')
+      .selectAll()
+      .where('user_id', '=', userId)
+      .where('terminal_uuid', '=', terminalUuid)
+      .where('op_id', '=', opId)
+      .executeTakeFirst()
+      .then(row => (row ? assertDatabaseRead(syncOpsRowSchema, 'sync_ops', row) : null))
   }
 
   async claimOperation(input: {
@@ -37,28 +54,44 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<boolean> {
-    const result = await run(
-      this.db,
-      `INSERT OR IGNORE INTO sync_ops
-       (user_id, terminal_uuid, op_id, collection, entity_id, action, data_hash,
-        base_version, result, server_seq, entity_version, error_code, error_message, received_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      input.userId,
-      input.terminalUuid,
-      input.operation.opId,
-      input.operation.collection,
-      input.operation.entityId,
-      input.operation.action,
-      input.operation.dataHash,
-      input.operation.baseVersion ?? null,
-      'failed',
-      null,
-      null,
-      PROCESSING_ERROR_CODE,
-      'operation processing was interrupted before completion',
-      input.receivedAt,
-    )
-    return (result.meta.changes ?? 0) > 0
+    const row = {
+      action: input.operation.action,
+      base_version: input.operation.baseVersion ?? null,
+      collection: input.operation.collection,
+      data_hash: input.operation.dataHash,
+      entity_id: input.operation.entityId,
+      entity_version: null,
+      error_code: PROCESSING_ERROR_CODE,
+      error_message: 'operation processing was interrupted before completion',
+      op_id: input.operation.opId,
+      received_at: input.receivedAt,
+      result: 'failed' as const,
+      server_seq: null,
+      terminal_uuid: input.terminalUuid,
+      user_id: input.userId,
+    }
+    assertDatabaseWrite(syncOpsRowSchema, 'sync_ops', row)
+    const result = await this.kysely
+      .insertInto('sync_ops')
+      .values({
+        action: input.operation.action,
+        base_version: input.operation.baseVersion ?? null,
+        collection: input.operation.collection,
+        data_hash: input.operation.dataHash,
+        entity_id: input.operation.entityId,
+        entity_version: null,
+        error_code: PROCESSING_ERROR_CODE,
+        error_message: 'operation processing was interrupted before completion',
+        op_id: input.operation.opId,
+        received_at: input.receivedAt,
+        result: 'failed',
+        server_seq: null,
+        terminal_uuid: input.terminalUuid,
+        user_id: input.userId,
+      })
+      .orIgnore()
+      .executeTakeFirst()
+    return Number(result.numInsertedOrUpdatedRows ?? 0) > 0
   }
 
   async findEntity(
@@ -66,15 +99,14 @@ export class SyncRepository {
     collection: SyncCollection,
     entityId: string,
   ): Promise<SyncEntityRow | null> {
-    return (await first(
-      this.db,
-      `SELECT * FROM sync_entities
-       WHERE user_id = ? AND collection = ? AND entity_id = ?
-       LIMIT 1`,
-      userId,
-      collection,
-      entityId,
-    )) as SyncEntityRow | null
+    return await this.kysely
+      .selectFrom('sync_entities')
+      .selectAll()
+      .where('user_id', '=', userId)
+      .where('collection', '=', collection)
+      .where('entity_id', '=', entityId)
+      .executeTakeFirst()
+      .then(row => (row ? assertDatabaseRead(syncEntitiesRowSchema, 'sync_entities', row) : null))
   }
 
   async upsertEntity(input: {
@@ -84,33 +116,49 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<void> {
-    await run(
-      this.db,
-      `INSERT INTO sync_entities
-       (user_id, collection, entity_id, data_json, data_hash, version, client_changed_at,
-        server_updated_at, deleted_at, last_terminal_uuid, last_op_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(user_id, collection, entity_id) DO UPDATE SET
-         data_json = excluded.data_json,
-         data_hash = excluded.data_hash,
-         version = excluded.version,
-         client_changed_at = excluded.client_changed_at,
-         server_updated_at = excluded.server_updated_at,
-         deleted_at = excluded.deleted_at,
-         last_terminal_uuid = excluded.last_terminal_uuid,
-         last_op_id = excluded.last_op_id`,
-      input.userId,
-      input.operation.collection,
-      input.operation.entityId,
-      input.operation.dataJson,
-      input.operation.dataHash,
-      input.operation.version,
-      input.operation.clientChangedAt,
-      input.serverUpdatedAt,
-      input.deletedAt,
-      input.terminalUuid,
-      input.operation.opId,
-    )
+    assertDatabaseWrite(syncEntitiesRowSchema, 'sync_entities', {
+      client_changed_at: input.operation.clientChangedAt,
+      collection: input.operation.collection,
+      data_hash: input.operation.dataHash,
+      data_json: input.operation.dataJson,
+      deleted_at: input.deletedAt,
+      entity_id: input.operation.entityId,
+      last_op_id: input.operation.opId,
+      last_terminal_uuid: input.terminalUuid,
+      server_updated_at: input.serverUpdatedAt,
+      user_id: input.userId,
+      version: input.operation.version,
+    })
+    await this.kysely
+      .insertInto('sync_entities')
+      .values({
+        client_changed_at: input.operation.clientChangedAt,
+        collection: input.operation.collection,
+        data_hash: input.operation.dataHash,
+        data_json: input.operation.dataJson,
+        deleted_at: input.deletedAt,
+        entity_id: input.operation.entityId,
+        last_op_id: input.operation.opId,
+        last_terminal_uuid: input.terminalUuid,
+        server_updated_at: input.serverUpdatedAt,
+        user_id: input.userId,
+        version: input.operation.version,
+      })
+      .onConflict(oc =>
+        oc
+          .columns(['user_id', 'collection', 'entity_id'])
+          .doUpdateSet({
+            client_changed_at: input.operation.clientChangedAt,
+            data_hash: input.operation.dataHash,
+            data_json: input.operation.dataJson,
+            deleted_at: input.deletedAt,
+            last_op_id: input.operation.opId,
+            last_terminal_uuid: input.terminalUuid,
+            server_updated_at: input.serverUpdatedAt,
+            version: input.operation.version,
+          }),
+      )
+      .execute()
   }
 
   async insertChange(input: {
@@ -120,36 +168,52 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<number> {
-    const inserted = await first<{ server_seq: number }>(
-      this.db,
-      `INSERT OR IGNORE INTO sync_changes
-       (user_id, collection, entity_id, action, data_json, data_hash, version,
-        client_changed_at, server_changed_at, deleted_at, origin_terminal_uuid, origin_op_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       RETURNING server_seq`,
-      input.userId,
-      input.operation.collection,
-      input.operation.entityId,
-      input.operation.action,
-      input.operation.dataJson,
-      input.operation.dataHash,
-      input.operation.version,
-      input.operation.clientChangedAt,
-      input.serverChangedAt,
-      input.deletedAt,
-      input.terminalUuid,
-      input.operation.opId,
+    assertDatabaseInsert(
+      syncChangesRowSchema,
+      'sync_changes',
+      {
+        action: input.operation.action,
+        client_changed_at: input.operation.clientChangedAt,
+        collection: input.operation.collection,
+        data_hash: input.operation.dataHash,
+        data_json: input.operation.dataJson,
+        deleted_at: input.deletedAt,
+        entity_id: input.operation.entityId,
+        origin_op_id: input.operation.opId,
+        origin_terminal_uuid: input.terminalUuid,
+        server_changed_at: input.serverChangedAt,
+        user_id: input.userId,
+        version: input.operation.version,
+      },
+      ['server_seq'],
     )
+    const inserted = await this.kysely
+      .insertInto('sync_changes')
+      .values({
+        action: input.operation.action,
+        client_changed_at: input.operation.clientChangedAt,
+        collection: input.operation.collection,
+        data_hash: input.operation.dataHash,
+        data_json: input.operation.dataJson,
+        deleted_at: input.deletedAt,
+        entity_id: input.operation.entityId,
+        origin_op_id: input.operation.opId,
+        origin_terminal_uuid: input.terminalUuid,
+        server_changed_at: input.serverChangedAt,
+        user_id: input.userId,
+        version: input.operation.version,
+      })
+      .orIgnore()
+      .returning('server_seq')
+      .executeTakeFirst()
     if (inserted) return inserted.server_seq
-    const existing = await first<{ server_seq: number }>(
-      this.db,
-      `SELECT server_seq FROM sync_changes
-       WHERE user_id = ? AND origin_terminal_uuid = ? AND origin_op_id = ?
-       LIMIT 1`,
-      input.userId,
-      input.terminalUuid,
-      input.operation.opId,
-    )
+    const existing = await this.kysely
+      .selectFrom('sync_changes')
+      .select('server_seq')
+      .where('user_id', '=', input.userId)
+      .where('origin_terminal_uuid', '=', input.terminalUuid)
+      .where('origin_op_id', '=', input.operation.opId)
+      .executeTakeFirst()
     return existing?.server_seq ?? 0
   }
 
@@ -163,28 +227,34 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<void> {
-    await run(
-      this.db,
-      `UPDATE sync_ops
-       SET result = ?, server_seq = ?, entity_version = ?, error_code = ?, error_message = ?
-       WHERE user_id = ? AND terminal_uuid = ? AND op_id = ?`,
-      input.result,
-      input.serverSeq,
-      input.entityVersion,
-      input.errorCode ?? null,
-      input.errorMessage ?? null,
-      input.userId,
-      input.terminalUuid,
-      input.opId,
-    )
+    assertDatabasePatch(syncOpsRowSchema, 'sync_ops', {
+      entity_version: input.entityVersion,
+      error_code: input.errorCode ?? null,
+      error_message: input.errorMessage ?? null,
+      result: input.result,
+      server_seq: input.serverSeq,
+    })
+    await this.kysely
+      .updateTable('sync_ops')
+      .set({
+        entity_version: input.entityVersion,
+        error_code: input.errorCode ?? null,
+        error_message: input.errorMessage ?? null,
+        result: input.result,
+        server_seq: input.serverSeq,
+      })
+      .where('user_id', '=', input.userId)
+      .where('terminal_uuid', '=', input.terminalUuid)
+      .where('op_id', '=', input.opId)
+      .execute()
   }
 
   async latestSeq(userId: string): Promise<number> {
-    const row = await first<{ latest_seq: number }>(
-      this.db,
-      'SELECT COALESCE(MAX(server_seq), 0) AS latest_seq FROM sync_changes WHERE user_id = ?',
-      userId,
-    )
+    const row = await this.kysely
+      .selectFrom('sync_changes')
+      .select(sql<number>`coalesce(max(server_seq), 0)`.as('latest_seq'))
+      .where('user_id', '=', userId)
+      .executeTakeFirst()
     return row?.latest_seq ?? 0
   }
 
@@ -196,26 +266,15 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<SyncChangeRow[]> {
-    const values: unknown[] = [input.userId, input.sinceSeq]
-    const clauses = ['user_id = ?', 'server_seq > ?']
-    if (input.collections.length > 0) {
-      clauses.push(`collection IN (${input.collections.map(() => '?').join(', ')})`)
-      values.push(...input.collections)
-    }
-    if (!input.includeOwn) {
-      clauses.push('origin_terminal_uuid <> ?')
-      values.push(input.terminalUuid)
-    }
-
-    return (await all(
-      this.db,
-      `SELECT * FROM sync_changes
-       WHERE ${clauses.join(' AND ')}
-       ORDER BY server_seq ASC
-       LIMIT ?`,
-      ...values,
-      input.limit,
-    )) as SyncChangeRow[]
+    let query = this.kysely
+      .selectFrom('sync_changes')
+      .selectAll()
+      .where('user_id', '=', input.userId)
+      .where('server_seq', '>', input.sinceSeq)
+    if (input.collections.length > 0) query = query.where('collection', 'in', input.collections)
+    if (!input.includeOwn) query = query.where('origin_terminal_uuid', '<>', input.terminalUuid)
+    const rows = await query.orderBy('server_seq', 'asc').limit(input.limit).execute()
+    return rows.map(row => assertDatabaseRead(syncChangesRowSchema, 'sync_changes', row))
   }
 
   async upsertCursor(input: {
@@ -224,19 +283,28 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<void> {
-    await run(
-      this.db,
-      `INSERT INTO sync_terminal_cursors
-       (user_id, terminal_uuid, last_pulled_seq, last_pushed_at, last_seen_at)
-       VALUES (?, ?, ?, NULL, ?)
-       ON CONFLICT(user_id, terminal_uuid) DO UPDATE SET
-         last_pulled_seq = excluded.last_pulled_seq,
-         last_seen_at = excluded.last_seen_at`,
-      input.userId,
-      input.terminalUuid,
-      input.lastPulledSeq,
-      input.lastSeenAt,
-    )
+    assertDatabaseWrite(syncTerminalCursorsRowSchema, 'sync_terminal_cursors', {
+      last_pulled_seq: input.lastPulledSeq,
+      last_pushed_at: null,
+      last_seen_at: input.lastSeenAt,
+      terminal_uuid: input.terminalUuid,
+      user_id: input.userId,
+    })
+    await this.kysely
+      .insertInto('sync_terminal_cursors')
+      .values({
+        last_pulled_seq: input.lastPulledSeq,
+        last_pushed_at: null,
+        last_seen_at: input.lastSeenAt,
+        terminal_uuid: input.terminalUuid,
+        user_id: input.userId,
+      })
+      .onConflict(oc =>
+        oc
+          .columns(['user_id', 'terminal_uuid'])
+          .doUpdateSet({ last_pulled_seq: input.lastPulledSeq, last_seen_at: input.lastSeenAt }),
+      )
+      .execute()
   }
 
   async markTerminalPushed(input: {
@@ -244,19 +312,28 @@ export class SyncRepository {
     terminalUuid: string
     userId: string
   }): Promise<void> {
-    await run(
-      this.db,
-      `INSERT INTO sync_terminal_cursors
-       (user_id, terminal_uuid, last_pulled_seq, last_pushed_at, last_seen_at)
-       VALUES (?, ?, 0, ?, ?)
-       ON CONFLICT(user_id, terminal_uuid) DO UPDATE SET
-         last_pushed_at = excluded.last_pushed_at,
-         last_seen_at = excluded.last_seen_at`,
-      input.userId,
-      input.terminalUuid,
-      input.lastPushedAt,
-      input.lastPushedAt,
-    )
+    assertDatabaseWrite(syncTerminalCursorsRowSchema, 'sync_terminal_cursors', {
+      last_pulled_seq: 0,
+      last_pushed_at: input.lastPushedAt,
+      last_seen_at: input.lastPushedAt,
+      terminal_uuid: input.terminalUuid,
+      user_id: input.userId,
+    })
+    await this.kysely
+      .insertInto('sync_terminal_cursors')
+      .values({
+        last_pulled_seq: 0,
+        last_pushed_at: input.lastPushedAt,
+        last_seen_at: input.lastPushedAt,
+        terminal_uuid: input.terminalUuid,
+        user_id: input.userId,
+      })
+      .onConflict(oc =>
+        oc
+          .columns(['user_id', 'terminal_uuid'])
+          .doUpdateSet({ last_pushed_at: input.lastPushedAt, last_seen_at: input.lastPushedAt }),
+      )
+      .execute()
   }
 }
 

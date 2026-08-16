@@ -1,0 +1,3 @@
+create table if not exists "server_plugin_audit" ("id" text not null primary key, "plugin_id" text not null, "job_id" text not null, "action" text not null check (action in ('configure', 'disable', 'enable', 'health', 'install', 'register', 'uninstall', 'update')), "outcome" text not null check (outcome in ('failed', 'succeeded')), "actor_id" text not null, "detail_json" text, "created_at" integer not null, constraint "fk_server_plugin_audit_job_id" foreign key ("job_id") references "server_plugin_jobs" ("id") on delete cascade);
+create index if not exists "idx_server_plugin_audit_created" on "server_plugin_audit" ("created_at" desc, "id" desc);
+create index if not exists "idx_server_plugin_audit_plugin_created" on "server_plugin_audit" ("plugin_id", "created_at" desc)

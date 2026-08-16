@@ -41,11 +41,13 @@ const trx = {
 
 vi.mock('@delta-comic/db', () => ({
   DBUtils: { withTransition },
+  assertWriteRow: (_table: string, value: unknown) => value,
   db: {
     selectFrom: vi.fn((collection: string) => ({
       selectAll: vi.fn(() => ({ execute: vi.fn(async () => snapshotRows.get(collection) ?? []) })),
     })),
   },
+  filterValidRowsFor: (_table: string, rows: unknown[]) => rows,
 }))
 
 import { DbCloudSyncAdapter } from '../../../src/cloud/syncAdapter'

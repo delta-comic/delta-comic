@@ -15,6 +15,7 @@
     "pnpm-lock.yaml",
     "skills-lock.json",
     ".agents",
+    ".planning",
     "target",
     ".codex",
     "AGENTS.md",

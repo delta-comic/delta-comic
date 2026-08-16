@@ -20,11 +20,13 @@ const $router = useRouter()
 const { t } = useI18n()
 
 const cardKey = computed(() => Number($route.params.id))
-const { state: cardState } = FavouriteDB.useQueryCard(
+const { state: cardState } = FavouriteDB.useQueryCard<FavouriteDB.Card | undefined>(
   db => db.where('createAt', '=', cardKey.value).selectAll().executeTakeFirst(),
-  [() => cardKey.value],
+  [cardKey],
 )
-const { state: itemsState } = FavouriteDB.useQueryItem(
+const { state: itemsState } = FavouriteDB.useQueryItem<
+  Array<FavouriteDB.Item & { item: import('@delta-comic/model').UniItemRaw; key: string }>
+>(
   db =>
     db
       .where('belongTo', '=', cardKey.value)
@@ -32,7 +34,7 @@ const { state: itemsState } = FavouriteDB.useQueryItem(
       .selectAll()
       .orderBy('addTime', 'desc')
       .execute(),
-  [() => cardKey.value],
+  [cardKey],
   () => [],
 )
 

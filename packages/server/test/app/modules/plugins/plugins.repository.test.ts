@@ -68,14 +68,18 @@ describe('ServerPluginRepository', () => {
     await repository.removeRegistry(registry.plugin_id)
 
     expect(recorder.statements[2]?.values).toEqual([
+      registry.manifest_json,
       registry.plugin_id,
+      registry.registered_at,
+      registry.source,
+      registry.trusted,
+      registry.updated_at,
       registry.manifest_json,
       registry.source,
       registry.trusted,
-      registry.registered_at,
       registry.updated_at,
     ])
-    expect(recorder.statements[2]?.sql).toContain('ON CONFLICT(plugin_id)')
+    expect(recorder.statements[2]?.sql).toContain('on conflict ("plugin_id")')
     expect(recorder.statements[3]?.values).toEqual([registry.plugin_id])
   })
 
@@ -91,18 +95,26 @@ describe('ServerPluginRepository', () => {
     await repository.removeInstallation(registry.plugin_id)
 
     expect(recorder.statements[2]?.values).toEqual([
-      installation.plugin_id,
-      installation.installed_version,
-      installation.desired_state,
-      installation.observed_state,
       installation.config_json,
+      installation.desired_state,
       installation.installed_at,
-      installation.updated_at,
+      installation.installed_version,
       installation.last_error,
-      installation.last_health_json,
       installation.last_health_at,
+      installation.last_health_json,
+      installation.observed_state,
+      installation.plugin_id,
+      installation.updated_at,
+      installation.config_json,
+      installation.desired_state,
+      installation.installed_version,
+      installation.last_error,
+      installation.last_health_at,
+      installation.last_health_json,
+      installation.observed_state,
+      installation.updated_at,
     ])
-    expect(recorder.statements[3]?.sql).toContain('DELETE FROM server_plugin_installations')
+    expect(recorder.statements[3]?.sql).toContain('delete from "server_plugin_installations"')
   })
 
   it('lists, finds, and saves operation jobs with an explicit limit', async () => {
@@ -117,15 +129,21 @@ describe('ServerPluginRepository', () => {
 
     expect(recorder.statements[0]?.values).toEqual([25])
     expect(recorder.statements[2]?.values).toEqual([
+      job.action,
+      job.completed_at,
+      job.created_at,
+      job.error_message,
       job.id,
       job.plugin_id,
-      job.action,
-      job.status,
       job.result_json,
-      job.error_message,
-      job.created_at,
       job.started_at,
+      job.status,
+      job.updated_at,
       job.completed_at,
+      job.error_message,
+      job.result_json,
+      job.started_at,
+      job.status,
       job.updated_at,
     ])
   })
@@ -140,14 +158,14 @@ describe('ServerPluginRepository', () => {
 
     expect(recorder.statements[0]?.values).toEqual([10])
     expect(recorder.statements[1]?.values).toEqual([
-      audit.id,
-      audit.plugin_id,
-      audit.job_id,
       audit.action,
-      audit.outcome,
       audit.actor_id,
-      audit.detail_json,
       audit.created_at,
+      audit.detail_json,
+      audit.id,
+      audit.job_id,
+      audit.outcome,
+      audit.plugin_id,
     ])
   })
 })

@@ -1,4 +1,4 @@
-import { db, type PluginArchiveDB } from '@delta-comic/db'
+import { db, validateReadRow, type PluginArchiveDB } from '@delta-comic/db'
 import { logger } from '@delta-comic/logger'
 import {
   pluginCatalog as defaultCatalog,
@@ -46,7 +46,8 @@ export const usePluginMarketplace = (options: UsePluginMarketplaceOptions) => {
   const hasMore = computed(() => nextPage.value !== null)
 
   const refreshInstalled = async () => {
-    installedPlugins.value = await db.selectFrom('plugin').selectAll().execute()
+    const rows = await db.selectFrom('plugin').selectAll().execute()
+    installedPlugins.value = rows.map(row => validateReadRow('plugin', row))
     marketplaceLogger.debug('installed plugin catalog refreshed', {
       count: installedPlugins.value.length,
     })

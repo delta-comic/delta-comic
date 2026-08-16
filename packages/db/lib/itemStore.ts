@@ -6,17 +6,14 @@ import {
   type UniItemRaw,
 } from '@delta-comic/model'
 import { defineMutation, useMutation, useQueryCache } from '@pinia/colada'
-import type { JSONColumnType, Kysely, Selectable } from 'kysely'
+import type { Kysely, Selectable } from 'kysely'
 
+import type { ItemStoreTable } from './generated/item_store.table'
 import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
 
-export interface Table {
-  /** @description primary key */
-  key: string
-  item: JSONColumnType<UniItemRaw>
-}
+export type Table = ItemStoreTable
 export type StorableItem = UniItem | UniItemRaw
 export type StoredItem = Selectable<Table>
 export const itemKey = new SourcedValue('*')

@@ -30,9 +30,11 @@
     "cspell": "catalog:",
     "eslint-plugin-tailwindcss": "catalog:",
     "happy-dom": "catalog:",
+    "kysely": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "semantic-release": "^25.0.7",
     "tailwindcss": "catalog:",
+    "typebox": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   },

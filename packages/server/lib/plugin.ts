@@ -124,10 +124,10 @@ export interface ServerPluginJob {
 export interface ServerPluginAuditEvent {
   id: string
   pluginId: string
-  jobId: string
+  jobId?: string
   action: ServerPluginAction
   outcome: 'failed' | 'succeeded'
-  actorId: string
+  actorId?: string
   createdAt: number
   detail?: Record<string, unknown>
 }

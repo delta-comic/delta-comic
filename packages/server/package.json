@@ -16,7 +16,10 @@
     "@delta-comic/logger": "workspace:",
     "@elysia/eden": "catalog:",
     "ky": "catalog:",
-    "semver": "catalog:"
+    "kysely": "catalog:",
+    "kysely-d1": "catalog:",
+    "semver": "catalog:",
+    "typebox": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:",

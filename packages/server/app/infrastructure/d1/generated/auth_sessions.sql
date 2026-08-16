@@ -1,0 +1,4 @@
+create table if not exists "auth_sessions" ("id" text not null primary key, "user_id" text not null, "terminal_uuid" text not null, "access_token_hash" text not null unique, "refresh_token_hash" text not null unique, "created_at" integer not null, "access_expires_at" integer not null, "refresh_expires_at" integer not null, "rotated_at" integer, "revoked_at" integer, constraint "fk_auth_sessions_user_id_terminal_uuid" foreign key ("user_id", "terminal_uuid") references "auth_terminals" ("user_id", "terminal_uuid") on delete cascade);
+create index if not exists "idx_auth_sessions_access_token_hash" on "auth_sessions" ("access_token_hash");
+create index if not exists "idx_auth_sessions_refresh_token_hash" on "auth_sessions" ("refresh_token_hash");
+create index if not exists "idx_auth_sessions_user_terminal" on "auth_sessions" ("user_id", "terminal_uuid")

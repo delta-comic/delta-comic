@@ -1,18 +1,20 @@
-import { db, type PluginArchiveDB } from '@delta-comic/db'
+import { assertWriteRow, db, validateReadRow, type PluginArchiveDB } from '@delta-comic/db'
 
 import type { PluginArchiveRepository } from './contracts'
 
 export class DatabasePluginArchiveRepository implements PluginArchiveRepository {
   public async find(plugin: string) {
-    return await db
+    const row = await db
       .selectFrom('plugin')
       .selectAll()
       .where('pluginName', '=', plugin)
       .executeTakeFirst()
+    return row ? validateReadRow('plugin', row) : undefined
   }
 
   public async list() {
-    return await db.selectFrom('plugin').selectAll().execute()
+    const rows = await db.selectFrom('plugin').selectAll().execute()
+    return rows.map(row => validateReadRow('plugin', row))
   }
 
   public async remove(plugin: string) {
@@ -20,9 +22,7 @@ export class DatabasePluginArchiveRepository implements PluginArchiveRepository 
   }
 
   public async upsert(archive: PluginArchiveDB.Archive) {
-    await db
-      .replaceInto('plugin')
-      .values({ ...archive, meta: JSON.stringify(archive.meta) })
-      .execute()
+    const row = assertWriteRow('plugin', { ...archive, meta: JSON.stringify(archive.meta) })
+    await db.replaceInto('plugin').values(row).execute()
   }
 }

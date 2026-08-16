@@ -1,4 +1,4 @@
-import { Struct, type UniEpRaw } from '@delta-comic/model'
+import { Struct } from '@delta-comic/model'
 import {
   defineMutation,
   useMutation,
@@ -6,19 +6,15 @@ import {
   useQuery as useColadaQuery,
   type EntryKey,
 } from '@pinia/colada'
-import type { JSONColumnType, Kysely, Selectable, SelectQueryBuilder } from 'kysely'
+import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
 
+import type { HistoryTable } from './generated/history.table'
 import * as ItemStoreDB from './itemStore'
 import { CommonQueryKey, withTransition } from './utils'
 
 import type { DB } from '.'
 
-export interface Table {
-  /** @description primary key */
-  timestamp: number
-  itemKey: string
-  ep: JSONColumnType<UniEpRaw>
-}
+export type Table = HistoryTable
 
 export type Item = Selectable<Table>
 
@@ -36,7 +32,7 @@ export const useUpsert = defineMutation(() => {
         const itemKey = await upsert({ item, trx })
         await trx
           .replaceInto('history')
-          .values({ itemKey, timestamp: Date.now(), ep: Struct.toRaw(item) })
+          .values({ itemKey, timestamp: Date.now(), ep: Struct.toRaw(item.thisEp) })
           .execute()
       }, trx),
     onSettled: () => {

@@ -54,7 +54,7 @@ describe('D1AdminMetricsRepository', () => {
     })
     expect(metrics.find(metric => metric.key === 'pluginAudit')).toMatchObject({ value: 0 })
     expect(
-      recorder.statements.find(statement => statement.sql.includes('refresh_expires_at >'))?.values,
+      recorder.statements.find(statement => statement.values.includes(123_456))?.values,
     ).toEqual([123_456])
   })
 
@@ -88,11 +88,11 @@ describe('D1AdminMetricsRepository', () => {
         },
         {
           action: 'health',
-          actor_id: null,
+          actor_id: 'system',
           created_at: 10,
           detail_json: '{broken',
           id: 'audit-2',
-          job_id: null,
+          job_id: 'job-2',
           outcome: 'failed',
           plugin_id: 'feature.sync',
         },
@@ -117,8 +117,10 @@ describe('D1AdminMetricsRepository', () => {
         },
         {
           action: 'health',
+          actorId: 'system',
           createdAt: 10,
           id: 'audit-2',
+          jobId: 'job-2',
           outcome: 'failed',
           pluginId: 'feature.sync',
         },
