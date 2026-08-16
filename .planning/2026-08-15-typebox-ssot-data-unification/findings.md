@@ -310,3 +310,11 @@ export interface AuthUsersTable {
 - `packages/server/app/shared/response.ts`：`TSchema` 类型导入
 - `packages/server/app/modules/plugins/plugins.manifest.ts`：`Value` from '@sinclair/typebox/value'
 - Elysia 1.4.29 通过 `exact-mirror` 适配多 schema 库（pnpm store 已有 typebox 1.x 适配版），迁移时需验证 Elysia `t` 对象与新包 schema 的互操作
+
+## Phase 5 基线（2026-08-16）
+- 工作树干净，P4 相关提交已落在当前分支。
+- 仓库要求使用 Vite+ `vp`；完整 Web 验证顺序为 `vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`。
+- P5 需区分迁移相关失败与既有 workspace 类型/环境失败，并把精确命令和结果写入 progress.md。
+- 客户端数据库适配器通过 `SerializePlugin` 将 SQLite 布尔列还原为 `boolean`；TypeBox schema 仍生成 SQLite `INTEGER`，Kysely 生成器增加表级 `kyselyBoolean` 选项保持业务类型与数据库类型分离。
+- 全 workspace typecheck 的现存阻塞集中在 `packages/app` favourite/subscribe 视图（26 errors），与 P5 触及的 codegen、packages/db 和 packages/server 无引用关系；该基线在 Phase 3/2 记录中已存在。
+- 性能回归只能建立当前基线：codegen 约 4.93s，consistency check 约 1.77s，关键 Repository/validation 测试约 2.72s；缺少 Phase 0 前的同机 benchmark，无法做严格前后百分比比较。

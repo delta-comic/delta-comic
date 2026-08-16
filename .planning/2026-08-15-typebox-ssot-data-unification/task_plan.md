@@ -4,10 +4,10 @@
 将 SQL schema、TypeScript 类型、服务端验证、客户端类型统一到 TypeBox SSOT，实现端到端类型安全和运行时验证，消除手动维护多层数据结构的复杂性。
 
 ## Next Step
-进入 Phase 5：全量测试与验收。
+运行 `vp run lib-build`，建立 Phase 5 的全量验证基线。
 
 ## Current Phase
-Phase 4（运行时验证集成已完成）
+Phase 5（全量测试与验收）
 
 ## Phases
 
@@ -97,18 +97,29 @@ Phase 4（运行时验证集成已完成）
 - **Status:** complete
 
 ### Phase 5: 全量测试与验收（1周）
-- [ ] 端到端测试
-  - [ ] 服务端完整测试套件
-  - [ ] 客户端完整测试套件
-  - [ ] 集成测试
-- [ ] 性能回归测试
-  - [ ] 对比迁移前后性能
-  - [ ] 验证无性能退化
-- [ ] 代码审查
-  - [ ] 所有 Repository 重构
-  - [ ] 类型定义正确性
-- [ ] 记录已知限制和未来改进
-- **Status:** pending
+- [x] 端到端测试
+   - [x] 服务端完整测试套件：`vp test run` 纳入 server 项目并通过
+   - [x] 客户端完整测试套件：`vp test run` 纳入 app/db 项目并通过
+   - [x] 集成测试：server route/repository 测试、D1 validation 测试和 client database operation 测试通过
+- [x] 性能回归测试
+   - [x] 建立迁移后基线：codegen 4.93s、consistency check 1.77s、关键 Repository/validation 测试 2.72s
+   - [x] 验证当前无新增性能异常；迁移前同机基准缺失，无法给出严格前后百分比
+- [x] 代码审查
+   - [x] 所有 Repository 重构：server auth/sync/plugins/admin repository 已检查并由完整测试覆盖
+   - [x] 类型定义正确性：server/db typecheck 通过；生成器布尔存储/API 类型边界已修复并测试
+- [x] 记录已知限制和未来改进：见下方 Phase 5 验收结论
+- **Status:** complete
+
+### Phase 5 执行记录
+- 基线工作树干净，最近提交为 codegen/P4 产物同步。
+- 验证顺序：构建库依赖、codegen 一致性、静态检查、工作区类型检查、全量测试、性能回归与代码审查。
+
+### Phase 5 验收结论
+- 全量测试通过：154 个测试文件、833 个测试；另有 codegen/db/repository focused suite 16 files / 83 tests 通过。
+- 静态质量通过：749 个文件格式正确、658 个文件无 lint 错误，`git diff --check` 通过。
+- 迁移相关类型检查通过：server、db、ui、server-admin 及其依赖包通过；workspace 仍有 `packages/app` favourite/subscribe 的既有 26 errors。
+- 集成覆盖使用仓库现有的 server HTTP route、D1 repository/validation 和 client database operation 测试；本项目没有独立浏览器 E2E harness，因此不虚构额外 E2E 结果。
+- 性能限制：当前只有迁移后基线，没有迁移前同机数据，不能证明严格的前后百分比无退化；后续应在固定 fixture 和环境下补充历史基准。
 
 ## Decisions Made
 | Decision | Rationale |
@@ -131,6 +142,9 @@ Phase 4（运行时验证集成已完成）
 | 测试定义与 migration 实际结构不符（sessions 列名 access_expires_at/refresh_expires_at/rotated_at、terminal_uuid 非可选、索引名、单列/复合 FK） | 逐一对照 0001_auth.sql 修正 |
 | Kysely `column('col', 'desc')` 方向参数不生效 | 使用 `'col desc'` 字符串语法（OrderedColumnName） |
 | `onDelete` 大写值（'CASCADE'）与 Kysely `OnModifyForeignAction`（小写）不兼容 | DSL 改为小写值，直接透传 |
+| codegen 产物在重新生成后未通过 `vp check` 格式检查 | 生成器写入 TypeScript 产物后调用 `vp fmt --write`，并复跑 codegen/check 验证 |
+| 客户端 SQLite 布尔列被生成成 number，和 `SerializePlugin` 暴露的 boolean API 冲突 | 增加 `kyselyBoolean` 表级选项，仅客户端业务表启用，数据库运行时 schema 继续校验 INTEGER |
+| 全 workspace typecheck 仍有 packages/app favourite/subscribe 26 个既有错误 | 记录为基线阻塞；迁移相关 packages/db/server 类型检查均通过，未扩大本阶段范围 |
 
 ## Statistics（基于代码分析）
 

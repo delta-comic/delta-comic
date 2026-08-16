@@ -69,6 +69,16 @@ describe('kysely codegen', () => {
     expect(generateTableInterface(table)).toContain('  isViewed: number')
   })
 
+  it('can preserve boolean types for adapters that serialize SQLite booleans', () => {
+    const table = defineTable(
+      'recent_view',
+      { is_viewed: Type.Boolean() },
+      { primaryKey: ['is_viewed'] },
+      { kyselyBoolean: true },
+    )
+    expect(generateTableInterface(table)).toContain('  is_viewed: boolean')
+  })
+
   it('maps JSON columns to the declared imported model type', () => {
     const table = defineTable(
       'item_store',

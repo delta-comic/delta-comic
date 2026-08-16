@@ -3,7 +3,7 @@ import type { Insertable, Selectable, Updateable } from 'kysely'
 export interface RecentViewTable {
   timestamp: number
   itemKey: string
-  isViewed: number
+  isViewed: boolean
 }
 
 export type RecentView = Selectable<RecentViewTable>

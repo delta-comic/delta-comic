@@ -98,6 +98,34 @@
 
 ---
 
+## Session 8: 2026-08-16 - Phase 5 全量验收开始
+
+### 基线
+- 读取并恢复 active plan，确认 Phase 0-4 已完成，Phase 5 尚未验收。
+- 当前工作树干净；P5 验证按仓库 AGENTS.md 规定使用 Vite+ `vp` 命令。
+
+### 当前执行顺序
+- `vp run lib-build`
+- `vp run codegen:all` 与 `vp run codegen:check`
+- `vp check`
+- `vp run -r typecheck`
+- `vp test run`
+- 关键路径性能回归与代码审查
+
+### 已完成验证
+- `vp run lib-build`：通过；8/12 任务命中缓存，所有库和应用构建成功。
+- `vp run codegen:all`：通过；服务端 13 张表、客户端 9 张表产物重新生成成功。
+- `vp run codegen:check`：通过；输出 `schema consistency check passed`。
+- 首次 `vp check` 发现 11 个生成 TypeScript 文件格式漂移；修复生成器后，重新生成并检查通过：749 个文件格式正确、658 个文件无 lint 错误。
+- `vp run -r typecheck` 首次发现客户端布尔列生成类型与 `SerializePlugin` 业务类型不一致；增加 `kyselyBoolean` 表选项并重新生成后，`@delta-comic/db` typecheck 通过。
+- 全工作区 `vp run -r typecheck` 仍被 `packages/app` 既有 favourite/subscribe 类型问题阻塞，共 26 errors；server、db、ui、server-admin 及其他工作区包类型检查通过，错误不涉及本次 P5 变更。
+- 全量测试 `vp test run`：154 个测试文件、833 个测试全部通过；Node 报告 `--localstorage-file` 无效路径 warning，但未导致失败。
+- 性能基线：全量 codegen 约 4.93s，codegen consistency check 约 1.77s；Repository/validation 关键测试 5 files / 23 tests 通过，测试执行约 2.72s。仓库没有迁移前同机基准，因此仅记录当前基线，不宣称精确性能提升。
+- 自检审查通过实现正确性：生成器格式化、`kyselyBoolean` 存储/API 类型分离、生成产物幂等性和 Repository 类型均无新增缺陷。
+- 根据审查结果补齐 Phase 5 验收结论：现有 route/repository/database 测试作为集成覆盖；明确无独立浏览器 E2E harness；记录迁移前性能基准缺失和 `packages/app` 既有 26 个类型错误作为已知限制。
+
+---
+
 ## Session 5: 2026-08-15 - Phase 2 客户端数据层迁移完成
 
 ### 已完成

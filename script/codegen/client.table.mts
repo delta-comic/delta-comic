@@ -30,7 +30,7 @@ const recentViewTable = defineTable(
     unique: [['item_key']],
     indexes: [{ name: 'recent_timestamp', columns: [{ column: 'timestamp', order: 'DESC' }] }],
   },
-  { kyselyCamelCase: true },
+  { kyselyCamelCase: true, kyselyBoolean: true },
 )
 
 const favouriteCardTable = defineTable(
@@ -50,7 +50,7 @@ const favouriteCardTable = defineTable(
       },
     ],
   },
-  { kyselyCamelCase: true },
+  { kyselyCamelCase: true, kyselyBoolean: true },
 )
 
 const favouriteItemTable = defineTable(
@@ -103,7 +103,7 @@ const pluginTable = defineTable(
       { name: 'plugin_plugin_name', columns: ['plugin_name'] },
     ],
   },
-  { kyselyCamelCase: true },
+  { kyselyCamelCase: true, kyselyBoolean: true },
 )
 
 const nativeStoreTable = defineTable(

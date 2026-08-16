@@ -66,13 +66,14 @@ export interface TableSchema<
   columns: TCols
   meta: TableMeta<TCols>
   kyselyCamelCase?: boolean
+  kyselyBoolean?: boolean
 }
 
 export const defineTable = <TName extends string, TCols extends TProperties>(
   name: TName,
   columns: TCols,
   meta: TableMeta<TCols>,
-  options?: Pick<TableSchema<TName, TCols>, 'kyselyCamelCase'>,
+  options?: Pick<TableSchema<TName, TCols>, 'kyselyCamelCase' | 'kyselyBoolean'>,
 ): TableSchema<TName, TCols> => ({ name, columns, meta, ...options })
 
 const identifierPattern = /^[a-z][a-z0-9_]*$/

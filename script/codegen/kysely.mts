@@ -20,9 +20,10 @@ const singularize = (name: string): string => {
 const isPrimitive = (schema: TSchema, type: 'string' | 'integer' | 'number' | 'boolean') =>
   schema.type === type
 
-const tsType = (schema: TSchema): string => {
+const tsType = (schema: TSchema, kyselyBoolean: boolean): string => {
   const base = tsBaseType(schema)
-  return IsOptional(schema) ? `${base} | null` : base
+  const type = kyselyBoolean && schema.type === 'boolean' ? 'boolean' : base
+  return IsOptional(schema) ? `${type} | null` : type
 }
 
 const tsBaseType = (schema: TSchema): string => {
@@ -51,7 +52,7 @@ export const generateTableInterface = (table: TableSchema): string => {
   const rowTypeName = singularize(pascalCase(table.name))
   const lines = Object.entries(table.columns).map(
     ([name, schema]) =>
-      `  ${table.kyselyCamelCase ? camelCase(name) : name}: ${tsType(schema as TSchema)}`,
+      `  ${table.kyselyCamelCase ? camelCase(name) : name}: ${tsType(schema as TSchema, table.kyselyBoolean === true)}`,
   )
   return [
     ...description,

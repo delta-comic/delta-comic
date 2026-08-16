@@ -1,10 +1,14 @@
+import { execFile } from 'node:child_process'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { promisify } from 'node:util'
 
 import { generateArtifacts } from './artifacts.mts'
 import type { TableSchema } from './schema.mts'
 import { validateTableSchema } from './schema.mts'
+
+const execFileAsync = promisify(execFile)
 
 const isTableSchema = (value: unknown): value is TableSchema =>
   typeof value === 'object' &&
@@ -56,8 +60,12 @@ try {
 await mkdir(outputDir, { recursive: true })
 
 const artifacts = generateArtifacts(tables, schemaExportName)
+const generatedTypeFiles: string[] = []
 for (const [file, content] of artifacts) {
   const filePath = resolve(outputDir, file)
   await writeFile(filePath, content)
+  if (file.endsWith('.ts')) generatedTypeFiles.push(filePath)
   console.log(`generated ${filePath}`)
 }
+
+await execFileAsync('vp', ['fmt', '--write', ...generatedTypeFiles], { stdio: 'inherit' })

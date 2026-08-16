@@ -1,5 +1,5 @@
-import type { Insertable, Selectable, Updateable, JSONColumnType } from 'kysely'
 import type { UniEpRaw } from '@delta-comic/model'
+import type { Insertable, Selectable, Updateable, JSONColumnType } from 'kysely'
 
 export interface HistoryTable {
   ep: JSONColumnType<UniEpRaw>

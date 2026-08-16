@@ -1,5 +1,5 @@
-import type { Insertable, Selectable, Updateable, JSONColumnType } from 'kysely'
 import type { UniItemAuthor } from '@delta-comic/model'
+import type { Insertable, Selectable, Updateable, JSONColumnType } from 'kysely'
 
 export interface SubscribeTable {
   itemKey: string | null
