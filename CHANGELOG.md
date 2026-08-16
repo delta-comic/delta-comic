@@ -1,5 +1,25 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.12](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.11...3.0.0-next.12) (2026-08-16)
+
+
+### Bug Fixes
+
+* **app:** 修复类型错误 ([a33232f](https://github.com/delta-comic/delta-comic/commit/a33232f626e145c53a9b305fc9cc47d02884b83f))
+* **db,ui:** 修复泛型类型和 JSONColumnType Selectable 映射 ([fc39223](https://github.com/delta-comic/delta-comic/commit/fc392230c746bf979b11719927ec14c2f12253fc))
+
+
+### Features
+
+* **codegen:** 完成 Phase 4 工具链优化 ([b4169fe](https://github.com/delta-comic/delta-comic/commit/b4169fea02f573670b492864e237460ac7f66272))
+* **codegen:** 实现 TypeBox 表定义 DSL 与 Kysely Schema Builder 驱动的 SQL 生成器 ([c83892b](https://github.com/delta-comic/delta-comic/commit/c83892b35efdb9735b4b522c331a26e40b60ae69))
+* **codegen:** 支持 DEFAULT/CHECK 约束生成并导出 Kysely Selectable 系列类型 ([f43aace](https://github.com/delta-comic/delta-comic/commit/f43aacebc27807f3a1e2836e99bf937b9bd2f612))
+* **codegen:** 支持服务端同步表结构 ([5ebb9cb](https://github.com/delta-comic/delta-comic/commit/5ebb9cbfa4d5231dbb54883379878bbe3b91e761))
+* **db:** 接入客户端数据库运行时校验 ([f0ea21e](https://github.com/delta-comic/delta-comic/commit/f0ea21efb04a2e3cfea4664f8412ae371986b154))
+* **server:** 集成 TypeBox 运行时数据验证 ([9ecc0c4](https://github.com/delta-comic/delta-comic/commit/9ecc0c4d5e6b1f47f49e599ce0129c825e21b034))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.11](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.10...3.0.0-next.11) (2026-08-15)
 
 
