@@ -83,7 +83,7 @@ const isShowAllList = shallowRef(false)
             class="flex h-full w-fit flex-col items-center justify-around"
             @click="select = sub.key"
           >
-            <template v-if="sub.type == 'author'">
+            <template v-if="sub.type == 'author' && sub.author">
               <DcAuthorIcon :size-spacing="12" :author="sub.author" />
               <div
                 class="mt-1 dc-clamp-2 w-18 text-center text-xs text-wrap text-(--dc-text-secondary)"
@@ -118,9 +118,9 @@ const isShowAllList = shallowRef(false)
           }
         "
       >
-        <DcVar :value="sub.author" v-if="sub.type == 'author'" v-slot="{ value: author }">
+        <DcVar :value="sub.author" v-if="sub.type == 'author' && sub.author" v-slot="{ value: author }">
           <div class="flex w-fit items-center dc-ellipsis pl-2 text-[16px] text-(--p-color)">
-            <DcAuthorIcon :size-spacing="8.5" :author class="mx-2" />
+            <DcAuthorIcon :size-spacing="8.5" :author="author" class="mx-2" />
             <div class="flex w-full flex-col text-nowrap">
               <div class="flex items-center text-(--nui-primary-color)">
                 {{ author.label }}

@@ -28,14 +28,14 @@ const temp = useTemp().$apply('favourite', () => ({ selectMode: 'pack' }))
 const searcher = useTemplateRef<InstanceType<typeof Searcher>>('searcher')
 const searchText = computed(() => searcher.value?.searchText ?? '')
 
-const { state: allFavouriteCardsState } = FavouriteDB.useQueryCard(
+const { state: allFavouriteCardsState } = FavouriteDB.useQueryCard<FavouriteDB.Card[]>(
   db =>
     db
       .selectAll()
       .where('title', 'like', `%${searchText.value}%`)
       .orderBy('createAt', 'desc')
       .execute(),
-  [() => searchText.value],
+  [searchText],
   () => [],
 )
 

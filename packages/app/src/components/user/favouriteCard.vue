@@ -13,7 +13,14 @@ const props = withDefaults(defineProps<{ isCardMode?: boolean; card: FavouriteDB
 const emit = defineEmits<{ open: []; play: [] }>()
 const { t } = useI18n()
 
-const { state: favouriteItems } = FavouriteDB.useQueryItem(
+const { state: favouriteItems } = FavouriteDB.useQueryItem<
+  Array<
+    FavouriteDB.Item & {
+      item: import('@delta-comic/model').UniItemRaw
+      key: string
+    }
+  >
+>(
   db =>
     db
       .where('belongTo', '=', props.card.createAt)
@@ -21,7 +28,7 @@ const { state: favouriteItems } = FavouriteDB.useQueryItem(
       .selectAll()
       .orderBy('addTime', 'desc')
       .execute(),
-  [() => props.card.createAt],
+  [props.card.createAt],
   () => [],
 )
 </script>

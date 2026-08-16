@@ -58,8 +58,8 @@ usePreventBack(isShow)
             :animate="{ scale: '100%', translateX: '0%', opacity: 1 }"
             class="absolute top-1 left-1 flex h-[calc(60px-(var(--spacing)*2))] w-fit max-w-[calc(100%-8px)] items-center gap-2 dc-ellipsis rounded-2xl bg-(--dc-background-2) px-3 text-nowrap"
           >
-            <DcAuthorIcon :size-spacing="10" :author="selectItem.author" />
-            <div class="text-lg font-semibold text-(--p-color)">{{ selectItem.author.label }}</div>
+            <DcAuthorIcon :size-spacing="10" :author="selectItem.author!" />
+            <div class="text-lg font-semibold text-(--p-color)">{{ selectItem.author!.label }}</div>
           </motion.div>
         </template>
       </DcState>
@@ -85,14 +85,14 @@ usePreventBack(isShow)
             v-for="author of getAuthors(subs)"
             :key="author.key"
             :name="author.key"
-            :tab="author.author.label"
+            :tab="author.author!.label"
             display-directive="show:lazy"
             class="size-full!"
           >
             <div
               class="dc-hairline-bottom flex h-10 w-full items-center rounded-t-2xl bg-(--dc-background-2) pl-3 text-base font-semibold"
             >
-              {{ t('subscription.authorActivity', { author: author.author.label }) }}
+              {{ t('subscription.authorActivity', { author: author.author!.label }) }}
               <NButton
                 text
                 circle

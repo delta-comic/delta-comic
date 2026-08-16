@@ -6,6 +6,8 @@ import {
   type EntryKey,
 } from '@pinia/colada'
 import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
+import type { MaybeRefOrGetter } from 'vue'
+import { toValue } from 'vue'
 
 import type { FavouriteCardTable } from './generated/favourite_card.table'
 import type { FavouriteItemTable as GeneratedFavouriteItemTable } from './generated/favourite_item.table'
@@ -108,7 +110,7 @@ export const useCreateCard = defineMutation(() => {
 
 export const useQueryItem = <T>(
   query: (db: SelectQueryBuilder<DB, 'favouriteItem', {}>) => Promise<T>,
-  otherKeys: readonly EntryKey[] = [],
+  otherKeys: MaybeRefOrGetter<EntryKey> = [],
   initialData?: () => T,
 ) =>
   useColadaQuery({
@@ -116,7 +118,7 @@ export const useQueryItem = <T>(
       const { db } = await import('.')
       return await query(db.selectFrom('favouriteItem'))
     },
-    key: () => [QueryKey.item, QueryKey.card, query, ...otherKeys],
+    key: () => [QueryKey.item, QueryKey.card, query, ...toValue(otherKeys)],
     staleTime: 15000,
     initialData,
     initialDataUpdatedAt: 0,
@@ -124,7 +126,7 @@ export const useQueryItem = <T>(
 
 export const useQueryCard = <T>(
   query: (db: SelectQueryBuilder<DB, 'favouriteCard', {}>) => Promise<T>,
-  otherKeys: readonly EntryKey[] = [],
+  otherKeys: MaybeRefOrGetter<EntryKey> = [],
   initialData?: () => T,
 ) =>
   useColadaQuery({
@@ -132,7 +134,7 @@ export const useQueryCard = <T>(
       const { db } = await import('.')
       return await query(db.selectFrom('favouriteCard'))
     },
-    key: () => [QueryKey.card, query, ...otherKeys],
+    key: () => [QueryKey.card, query, ...toValue(otherKeys)],
     staleTime: 15000,
     refetchOnMount: 'always',
     initialData,
