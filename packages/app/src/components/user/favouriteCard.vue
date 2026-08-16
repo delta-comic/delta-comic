@@ -14,12 +14,7 @@ const emit = defineEmits<{ open: []; play: [] }>()
 const { t } = useI18n()
 
 const { state: favouriteItems } = FavouriteDB.useQueryItem<
-  Array<
-    FavouriteDB.Item & {
-      item: import('@delta-comic/model').UniItemRaw
-      key: string
-    }
-  >
+  Array<FavouriteDB.Item & { item: import('@delta-comic/model').UniItemRaw; key: string }>
 >(
   db =>
     db

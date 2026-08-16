@@ -139,12 +139,47 @@ const databaseColumnSchema = (schema: TSchema): TSchema => {
   return IsOptional(schema) ? Type.Union([base, Type.Null()]) : base
 }
 
-export const generateTableRowSchema = (table: TableSchema): TSchema =>
-  Type.Object(
-    Object.fromEntries(
-      Object.entries(table.columns).map(([name, schema]) => [name, databaseColumnSchema(schema)]),
-    ),
+export const camelCase = (name: string): string =>
+  name.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
+
+const camelRuntimeValueSchema = (
+  schema: TSchema,
+  kyselyBoolean: boolean,
+): Record<string, unknown> => {
+  if (isJsonColumn(schema)) return { anyOf: [{ type: 'object' }, { type: 'string' }] }
+  if (isAutoIncrementColumn(schema)) return { type: 'integer' }
+  if (schema.type === 'boolean')
+    return kyselyBoolean
+      ? { anyOf: [{ type: 'boolean' }, { const: 0 }, { const: 1 }] }
+      : { type: 'integer' }
+  return runtimeSchema(schema)
+}
+
+const withNull = (schema: Record<string, unknown>): Record<string, unknown> => ({
+  anyOf: [...(Array.isArray(schema.anyOf) ? schema.anyOf : [schema]), { type: 'null' }],
+})
+
+/**
+ * Runtime row schema at the Kysely TS level: camelCase keys for `kyselyCamelCase`
+ * tables, booleans accepted as boolean/0/1, JSON columns accepted as object/string.
+ */
+export const generateCamelCaseRuntimeTableSchema = (
+  table: TableSchema,
+): Record<string, unknown> => {
+  const properties = Object.fromEntries(
+    Object.entries(table.columns).map(([name, schema]) => {
+      const key = table.kyselyCamelCase ? camelCase(name) : name
+      const value = camelRuntimeValueSchema(schema, table.kyselyBoolean === true)
+      return [key, IsOptional(schema) ? withNull(value) : value]
+    }),
   )
+  return {
+    type: 'object',
+    properties,
+    required: Object.keys(properties),
+    additionalProperties: false,
+  }
+}
 
 const runtimeSchema = (schema: TSchema): Record<string, unknown> => {
   if (isJsonColumn(schema)) return { type: 'string' }

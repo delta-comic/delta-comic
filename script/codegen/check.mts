@@ -3,7 +3,13 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 import { generateArtifacts } from './artifacts.mts'
-import { generateRuntimeTableSchema, type TableSchema, validateTableSchema } from './schema.mts'
+import {
+  camelCase,
+  generateCamelCaseRuntimeTableSchema,
+  generateRuntimeTableSchema,
+  type TableSchema,
+  validateTableSchema,
+} from './schema.mts'
 
 const root = resolve(import.meta.dirname, '../..')
 const definitions = [
@@ -46,6 +52,16 @@ for (const [definitionPath, outputDir] of definitions) {
         const expectedSchema = generateRuntimeTableSchema(table)
         if (JSON.stringify(actualSchemaMap[table.name]) !== JSON.stringify(expectedSchema))
           throw new Error(`generated file is stale: ${outputDir}/${file} (${table.name})`)
+        if (table.kyselyCamelCase !== true) continue
+        const camelMapName = `${schemaExportName.replace(/RowSchemas$/, '')}CamelRowSchemas`
+        const actualCamelMap = generatedModule[camelMapName] as Record<string, unknown> | undefined
+        if (!actualCamelMap) throw new Error(`generated file is stale: ${outputDir}/${file}`)
+        const expectedCamelSchema = generateCamelCaseRuntimeTableSchema(table)
+        if (
+          JSON.stringify(actualCamelMap[camelCase(table.name)]) !==
+          JSON.stringify(expectedCamelSchema)
+        )
+          throw new Error(`generated file is stale: ${outputDir}/${file} (${table.name} camelCase)`)
       }
     } else {
       const actualContent = await readFile(actualPath, 'utf8')

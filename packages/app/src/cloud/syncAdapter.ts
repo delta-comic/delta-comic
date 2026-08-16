@@ -1,4 +1,5 @@
 import type { DB, InsertObject, Kysely } from '@delta-comic/db'
+import { assertWriteRow, filterValidRowsFor } from '@delta-comic/db'
 import { logger } from '@delta-comic/logger'
 import { syncCollectionNames, type SyncChange, type SyncCollection } from '@delta-comic/server'
 
@@ -39,7 +40,10 @@ export class DbCloudSyncAdapter {
     const collections = await Promise.all(
       syncCollectionNames.map(
         async collection =>
-          [collection, await db.selectFrom(collection).selectAll().execute()] as const,
+          [
+            collection,
+            filterValidRowsFor(collection, await db.selectFrom(collection).selectAll().execute()),
+          ] as const,
       ),
     )
     const snapshot = Object.fromEntries(collections) as SnapshotCollections
@@ -74,10 +78,8 @@ export class DbCloudSyncAdapter {
 
   private async upsertRemoteChange(trx: Kysely<DB>, change: SyncChange): Promise<void> {
     if (change.data === undefined) return
-    await trx
-      .replaceInto(change.collection)
-      .values(change.data as InsertObject<DB, SyncCollection>)
-      .execute()
+    const data = assertWriteRow(change.collection, change.data) as InsertObject<DB, SyncCollection>
+    await trx.replaceInto(change.collection).values(data).execute()
   }
 
   private async deleteRemoteChange(trx: Kysely<DB>, change: SyncChange): Promise<void> {

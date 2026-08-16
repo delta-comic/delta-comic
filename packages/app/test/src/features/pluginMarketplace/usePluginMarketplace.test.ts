@@ -15,6 +15,7 @@ vi.mock('@delta-comic/db', () => ({
       selectAll: vi.fn(() => ({ execute: vi.fn(async () => [...installedRows]) })),
     })),
   },
+  validateReadRow: (_table: string, row: unknown) => row,
 }))
 
 vi.mock('@delta-comic/plugin', () => ({

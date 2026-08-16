@@ -19,6 +19,9 @@ export * as SubscribeDB from './subscribe'
 import type * as SubscribeDB from './subscribe'
 export * as RecentDB from './recentView'
 export * as ConfigDB from './config'
+import { WriteValidationPlugin } from './writeValidation'
+export { WriteValidationPlugin } from './writeValidation'
+export * from './validation'
 
 export interface DB {
   itemStore: ItemStoreDB.Table
@@ -56,7 +59,7 @@ const createDialect = async (): Promise<Dialect> => {
 
 export const db = new Kysely<DB>({
   dialect: await createDialect(),
-  plugins: [new CamelCasePlugin(), new SerializePlugin()],
+  plugins: [new WriteValidationPlugin(), new CamelCasePlugin(), new SerializePlugin()],
 })
 
 export * as DBUtils from './utils'

@@ -25,12 +25,7 @@ const { state: cardState } = FavouriteDB.useQueryCard<FavouriteDB.Card | undefin
   [cardKey],
 )
 const { state: itemsState } = FavouriteDB.useQueryItem<
-  Array<
-    FavouriteDB.Item & {
-      item: import('@delta-comic/model').UniItemRaw
-      key: string
-    }
-  >
+  Array<FavouriteDB.Item & { item: import('@delta-comic/model').UniItemRaw; key: string }>
 >(
   db =>
     db

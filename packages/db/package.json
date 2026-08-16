@@ -38,7 +38,8 @@
     "kysely-dialect-tauri": "catalog:",
     "kysely-plugin-serialize": "catalog:",
     "kysely-wasqlite-worker": "catalog:",
-    "mitt": "catalog:"
+    "mitt": "catalog:",
+    "typebox": "catalog:"
   },
   "devDependencies": {
     "typescript": "catalog:",

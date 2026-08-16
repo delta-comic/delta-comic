@@ -1,5 +1,10 @@
 import { generateTableInterface } from './kysely.mts'
-import { generateRuntimeTableSchema, type TableSchema } from './schema.mts'
+import {
+  camelCase,
+  generateCamelCaseRuntimeTableSchema,
+  generateRuntimeTableSchema,
+  type TableSchema,
+} from './schema.mts'
 import { generateTableSqlFull } from './sql.mts'
 
 export interface GeneratedArtifacts {
@@ -8,8 +13,7 @@ export interface GeneratedArtifacts {
   schemas: string
 }
 
-const camelCase = (name: string): string =>
-  name.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
+const camelCaseName = (name: string): string => camelCase(name)
 
 export const generateTableTypeFile = (table: TableSchema): string => {
   const source = generateTableInterface(table)
@@ -44,11 +48,23 @@ export const generateRuntimeSchemaFile = (
   tables: readonly TableSchema[],
   schemaExportName: string,
 ): string => {
-  const schemaLines = tables.map(
-    table =>
-      `/** Runtime SQLite row schema for ${table.name}. */\nexport const ${camelCase(table.name)}RowSchema = ${JSON.stringify(generateRuntimeTableSchema(table))} as const`,
-  )
-  return `import type { TSchema } from 'typebox'\n\n${schemaLines.join('\n\n')}\n\nexport const ${schemaExportName} = {\n${tables.map(table => `  '${table.name}': ${camelCase(table.name)}RowSchema,`).join('\n')}\n} satisfies Record<string, TSchema>`
+  const camelTables = tables.filter(table => table.kyselyCamelCase === true)
+  const lines: string[] = []
+  for (const table of tables) {
+    lines.push(
+      `/** Runtime SQLite row schema for ${table.name}. */\nexport const ${camelCaseName(table.name)}RowSchema = ${JSON.stringify(generateRuntimeTableSchema(table))} as const`,
+    )
+  }
+  for (const table of camelTables) {
+    lines.push(
+      `/** Runtime TS-level row schema for ${table.name} (camelCase keys). */\nexport const ${camelCaseName(table.name)}CamelRowSchema = ${JSON.stringify(generateCamelCaseRuntimeTableSchema(table))} as const`,
+    )
+  }
+  const camelMapName = `${schemaExportName.replace(/RowSchemas$/, '')}CamelRowSchemas`
+  const camelMap = camelTables.length
+    ? `\nexport const ${camelMapName} = {\n${camelTables.map(table => `  '${camelCaseName(table.name)}': ${camelCaseName(table.name)}CamelRowSchema,`).join('\n')}\n} satisfies Record<string, TSchema>`
+    : ''
+  return `import type { TSchema } from 'typebox'\n\n${lines.join('\n\n')}\n\nexport const ${schemaExportName} = {\n${tables.map(table => `  '${table.name}': ${camelCaseName(table.name)}RowSchema,`).join('\n')}\n} satisfies Record<string, TSchema>${camelMap}`
 }
 
 export const generateArtifacts = (

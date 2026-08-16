@@ -118,7 +118,11 @@ const isShowAllList = shallowRef(false)
           }
         "
       >
-        <DcVar :value="sub.author" v-if="sub.type == 'author' && sub.author" v-slot="{ value: author }">
+        <DcVar
+          :value="sub.author"
+          v-if="sub.type == 'author' && sub.author"
+          v-slot="{ value: author }"
+        >
           <div class="flex w-fit items-center dc-ellipsis pl-2 text-[16px] text-(--p-color)">
             <DcAuthorIcon :size-spacing="8.5" :author="author" class="mx-2" />
             <div class="flex w-full flex-col text-nowrap">
