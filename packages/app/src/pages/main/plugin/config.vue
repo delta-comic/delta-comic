@@ -20,6 +20,16 @@ const { t } = useI18n()
       v-model="cfg.data.value.receivePerReleaseUpdate"
     />
     <div class="mb-2 ml-4 text-lg font-semibold">
+      {{ translateText(cfg.form.githubToken.info) }}
+    </div>
+    <NInput
+      v-model:value="cfg.data.value.githubToken"
+      class="mb-4 ml-6 w-[calc(100%-var(--spacing)*12)]"
+      type="password"
+      show-password-on="click"
+      :placeholder="translateText(cfg.form.githubToken.placeholder)"
+    />
+    <div class="mb-2 ml-4 text-lg font-semibold">
       {{ translateText(cfg.form.installOverride.info) }}
     </div>
     <NDynamicInput
