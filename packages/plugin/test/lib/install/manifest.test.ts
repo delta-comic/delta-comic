@@ -21,7 +21,11 @@ describe('plugin manifest v1', () => {
           icon: 'https://example.test/icon.png',
         }),
       ),
-    ).toMatchObject({ apiVersion: 1, icon: 'https://example.test/icon.png' })
+    ).toMatchObject({
+      apiVersion: 1,
+      entry: { cssPath: 'assets/index.css', jsPath: 'index.mjs' },
+      icon: 'https://example.test/icon.png',
+    })
   })
 
   it('ignores the removed legacy plugin kind field', () => {
