@@ -100,6 +100,7 @@ export const pluginRuntime = new PluginRuntime({
   provider: candidateProvider,
   remove: plugin => pluginInstaller.uninstall(plugin),
   store: pluginStore,
+  services: { i18n: pluginI18n },
 })
 
 export interface PluginInstallOptions {

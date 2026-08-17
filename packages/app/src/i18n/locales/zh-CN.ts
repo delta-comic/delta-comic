@@ -439,22 +439,6 @@ const zhCN = {
     sourceLabel: '来源：{source}',
   },
   settings: {
-    core: {
-      cloud: {
-        enabled: '启用云服务',
-        serverUrl: '云服务地址',
-        serverUrlPlaceholder: '启用云服务后填写服务地址',
-      },
-      githubToken: { placeholder: '仅用于提高 API 访问限额', title: 'GitHub Token' },
-      installOverride: '安装源覆盖配置',
-      prereleaseUpdates: '接收预发布版本更新（可能不稳定）',
-      recordHistory: '记录历史记录',
-      showAiWorks: '展示 AI 作品',
-      simplifiedTitle: '简化标题（实验性功能）',
-      systemDefault: '跟随系统',
-      theme: { dark: '深色', light: '浅色', title: '外观模式' },
-      title: '核心',
-    },
     logs: {
       actions: { close: '关闭', export: '导出日志', refresh: '刷新' },
       content: {

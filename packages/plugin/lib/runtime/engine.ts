@@ -1,6 +1,6 @@
 import { markRaw, ref, shallowReactive, type App, type Raw, type Ref } from 'vue'
 
-import type { ConfigEnv, DCPluginConfig } from '../api'
+import type { ConfigEnv, DCPluginConfig, PluginLocaleMessages } from '../api'
 import {
   ActivationPipeline,
   planPluginDependencies,
@@ -54,6 +54,12 @@ export interface PluginRuntimeOptions {
   readonly provider: PluginCandidateProvider
   readonly remove: (plugin: string) => Promise<void>
   readonly store?: PluginStore
+  readonly services?: {
+    readonly i18n?: {
+      register(plugin: string, messages: PluginLocaleMessages): void
+      remove(plugin: string): void
+    }
+  }
 }
 
 interface PreparedPlugin {
@@ -411,6 +417,13 @@ export class PluginRuntime {
           const { config, module } = await this.#loadPlugin(candidate, scope)
           const cleanup = await config.hooks?.onPreboot?.({ app })
           if (cleanup) scope.defer(cleanup)
+
+          // Register i18n during preload so config forms and host UI can translate immediately.
+          if (this.#options.services?.i18n && config.i18n) {
+            this.#options.services.i18n.register(plugin, config.i18n)
+            scope.defer(() => this.#options.services!.i18n!.remove(plugin))
+          }
+
           this.#prepared.set(plugin, { candidate, config, module, scope })
           activated.push(plugin)
         } catch (error) {
