@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { Octokit } from '@octokit/rest'
 
 import { pluginCatalogIdFromInstallInput, type PluginInstallCatalog } from './catalog'
@@ -104,6 +105,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
   ) {
     if (typeof input !== 'string') throw new TypeError('GitHub resolver requires a repository')
     const [owner, repo] = input.slice(3).split('/') as [string, string]
+    logger.info('github use token : ', this.options.token)
     const octokit = new Octokit({ auth: this.options.token })
     const includePrereleases = this.options.includePrereleases?.() ?? false
     const pages = octokit.paginate.iterator(octokit.rest.repos.listReleases, {
@@ -122,6 +124,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
         if (!manifestResponse.ok) continue
         const manifest = parsePluginManifest(await manifestResponse.json())
         if (!isPluginManifestCompatible(manifest, this.options.coreVersion)) continue
+        logger.info('download plugin from github with response: ', packageAsset)
         const packageResponse = await fetch(packageAsset.browser_download_url, { signal })
         if (!packageResponse.ok)
           throw new Error(`plugin download failed: ${packageResponse.status}`)

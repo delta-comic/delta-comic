@@ -24,7 +24,7 @@ const { t } = useI18n()
     </div>
     <NInput
       v-model:value="cfg.data.value.githubToken"
-      class="mb-4 ml-6 w-[calc(100%-var(--spacing)*12)]"
+      class="mb-4 ml-6 w-[calc(100%-var(--spacing)*12)]!"
       type="password"
       show-password-on="click"
       :placeholder="translateText(cfg.form.githubToken.placeholder)"

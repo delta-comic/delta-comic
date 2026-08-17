@@ -133,7 +133,12 @@ watch(
 </script>
 
 <template>
-  <NDrawer v-model:show="show" placement="bottom" height="90vh">
+  <NDrawer
+    :show
+    @update:show="to => (show = to || !!bootingSteps)"
+    placement="bottom"
+    height="90vh"
+  >
     <NSpin :show="!!bootingSteps" class="relative size-full" contentClass="size-full">
       <div class="flex size-full flex-col overflow-hidden">
         <NMenu
