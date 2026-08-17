@@ -367,7 +367,7 @@ describe('plugin presentation', () => {
     })
     const wrapper = mount(InstallPlanDialog, {
       global: { stubs: naiveStubs },
-      props: { allPlugins: [dependency, target], plugin: target, show: true },
+      props: { allPlugins: [dependency, target], pending: false, plugin: target, show: true },
     })
 
     expect(wrapper.text()).toContain('已安装 2.0.0')
@@ -377,6 +377,19 @@ describe('plugin presentation', () => {
     const confirm = wrapper.findAll('button').find(button => button.text() === '确认安装')!
     await confirm.trigger('click')
     expect(wrapper.emitted('confirm')).toEqual([['target']])
-    expect(wrapper.emitted('update:show')).toEqual([[false]])
+    expect(wrapper.emitted('update:show')).toBeUndefined()
+  })
+
+  it('disables the plan confirmation while an action is pending', async () => {
+    const target = plugin('target')
+    const wrapper = mount(InstallPlanDialog, {
+      global: { stubs: naiveStubs },
+      props: { allPlugins: [], pending: true, plugin: target, show: true },
+    })
+
+    const confirm = wrapper.findAll('button').find(button => button.text() === '确认安装')!
+    expect(confirm.attributes('disabled')).toBeDefined()
+    await confirm.trigger('click')
+    expect(wrapper.emitted('confirm')).toBeUndefined()
   })
 })

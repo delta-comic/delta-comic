@@ -98,16 +98,31 @@ const requestAction = (plugin: ServerPluginSnapshotEntry, action: ServerPluginAc
     return
   }
   if (action === 'uninstall') {
-    dialog.warning({
+    let confirmed = false
+    const instance = dialog.warning({
       title: '确认卸载插件',
       content: `将停用并移除 ${plugin.manifest.name} 的安装与注册记录。存在已安装依赖方时服务端会拒绝操作。`,
       positiveText: '确认卸载',
       negativeText: '取消',
-      onPositiveClick: () => execute(plugin.manifest.id, 'uninstall'),
+      onPositiveClick: () => {
+        if (confirmed) return false
+        confirmed = true
+        instance.loading = true
+        instance.negativeButtonProps = { disabled: true }
+        instance.closable = false
+        instance.maskClosable = false
+        instance.closeOnEsc = false
+        return execute(plugin.manifest.id, 'uninstall')
+      },
     })
     return
   }
   void execute(plugin.manifest.id, action)
+}
+
+const onPlanConfirm = async (pluginId: string) => {
+  await execute(pluginId, planPlugin.value?.updateAvailable ? 'update' : 'install')
+  planOpen.value = false
 }
 
 onMounted(() => {
@@ -199,8 +214,9 @@ onMounted(() => {
     <InstallPlanDialog
       v-model:show="planOpen"
       :all-plugins="plugins"
+      :pending="planPlugin ? Boolean(pending[planPlugin.manifest.id]) : false"
       :plugin="planPlugin"
-      @confirm="pluginId => execute(pluginId, planPlugin?.updateAvailable ? 'update' : 'install')"
+      @confirm="onPlanConfirm"
     />
     <PluginDetailDrawer
       v-model:show="drawerOpen"

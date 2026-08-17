@@ -69,6 +69,13 @@ export const usePluginsStore = defineStore('serverPlugins', () => {
     action: ServerPluginAction,
     config?: ServerPluginConfig,
   ): Promise<ServerPluginJob | undefined> => {
+    if (pending.value[pluginId]) {
+      pluginsLogger.warn('plugin action skipped because one is already pending', {
+        action,
+        pluginId,
+      })
+      return undefined
+    }
     pluginsLogger.info('plugin action requested', { action, pluginId })
     setPending(pluginId, action)
     error.value = ''
