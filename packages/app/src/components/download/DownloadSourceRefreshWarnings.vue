@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import type { SourceRefreshWarning } from '@/features/downloads/sourceRefresh'
 import { Icons } from '@/icons'
 
-defineProps<{ warnings: readonly SourceRefreshWarning[] }>()
+defineProps<{ disabled?: boolean; warnings: readonly SourceRefreshWarning[] }>()
 const emit = defineEmits<{ confirm: [taskId: string]; retry: [taskId: string] }>()
 const { t } = useI18n()
 const retryableStatuses = new Set<SourceRefreshWarning['status']>([
@@ -46,6 +46,7 @@ const retryableStatuses = new Set<SourceRefreshWarning['status']>([
             v-if="warning.status === 'confirmation-required'"
             size="small"
             type="warning"
+            :disabled="disabled"
             @click="emit('confirm', warning.taskId)"
           >
             <template #icon
@@ -56,6 +57,7 @@ const retryableStatuses = new Set<SourceRefreshWarning['status']>([
           <NButton
             v-else-if="retryableStatuses.has(warning.status)"
             size="small"
+            :disabled="disabled"
             @click="emit('retry', warning.taskId)"
           >
             <template #icon

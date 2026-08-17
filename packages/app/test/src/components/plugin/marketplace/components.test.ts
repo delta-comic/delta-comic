@@ -182,7 +182,7 @@ describe('PluginMarketplaceFilters', () => {
 describe('PluginMarketplaceCard', () => {
   it('renders verified metadata and emits details/install from enabled actions', async () => {
     const wrapper = mount(PluginMarketplaceCard, {
-      props: { installing: false, item: marketplaceItem() },
+      props: { confirming: false, installing: false, item: marketplaceItem() },
     })
     const buttons = wrapper.findAll('button')
 
@@ -201,7 +201,7 @@ describe('PluginMarketplaceCard', () => {
 
   it('falls back to the plugin initial when its icon cannot load', async () => {
     const wrapper = mount(PluginMarketplaceCard, {
-      props: { installing: false, item: marketplaceItem() },
+      props: { confirming: false, installing: false, item: marketplaceItem() },
     })
     await flushPromises()
 
@@ -215,7 +215,9 @@ describe('PluginMarketplaceCard', () => {
     const item = marketplaceItem()
     item.manifest!.icon = 'assets/icon.png'
     item.installed = { meta: item.manifest, pluginName: 'reader' } as PluginArchiveDB.Archive
-    const wrapper = mount(PluginMarketplaceCard, { props: { installing: false, item } })
+    const wrapper = mount(PluginMarketplaceCard, {
+      props: { confirming: false, installing: false, item },
+    })
     await flushPromises()
 
     expect(wrapper.get('img').attributes('src')).toBe('blob:reader/assets/icon.png')
@@ -228,22 +230,44 @@ describe('PluginMarketplaceCard', () => {
       pluginName: 'reader',
     } as PluginArchiveDB.Archive
     const currentWrapper = mount(PluginMarketplaceCard, {
-      props: { installing: false, item: marketplaceItem({ installed, updateAvailable: false }) },
+      props: {
+        confirming: false,
+        installing: false,
+        item: marketplaceItem({ installed, updateAvailable: false }),
+      },
     })
     expect(currentWrapper.findAll('button')[1].attributes('disabled')).toBeDefined()
     expect(currentWrapper.text()).toContain('plugin.market.states.installed')
 
     const updateWrapper = mount(PluginMarketplaceCard, {
-      props: { installing: true, item: marketplaceItem({ installed, updateAvailable: true }) },
+      props: {
+        confirming: false,
+        installing: true,
+        item: marketplaceItem({ installed, updateAvailable: true }),
+      },
     })
     expect(updateWrapper.findAll('button')[1].attributes('disabled')).toBeUndefined()
     expect(updateWrapper.findAll('button')[1].attributes('data-loading')).toBe('true')
     expect(updateWrapper.text()).toContain('plugin.market.actions.update')
 
     const incompatibleWrapper = mount(PluginMarketplaceCard, {
-      props: { installing: false, item: marketplaceItem({ compatibility: 'incompatible' }) },
+      props: {
+        confirming: false,
+        installing: false,
+        item: marketplaceItem({ compatibility: 'incompatible' }),
+      },
     })
     expect(incompatibleWrapper.findAll('button')[1].attributes('disabled')).toBeDefined()
+  })
+
+  it('disables and loads the primary action while the install is being confirmed', () => {
+    const wrapper = mount(PluginMarketplaceCard, {
+      props: { confirming: true, installing: false, item: marketplaceItem() },
+    })
+    const button = wrapper.findAll('button')[1]
+
+    expect(button.attributes('disabled')).toBeDefined()
+    expect(button.attributes('data-loading')).toBe('true')
   })
 })
 

@@ -39,14 +39,26 @@ const confirmAdd = (url: string) => {
   }
   isAdding.value = true
 
-  $dialog.create({
+  let confirmed = false
+  const dialog = $dialog.create({
     type: 'info',
     title: t('plugin.install.confirm.title'),
     content: t('plugin.install.confirm.content', { source: url }),
     positiveText: t('common.actions.confirm'),
     negativeText: t('common.actions.cancel'),
-    onPositiveClick: () => installFromUrl(url),
-    onNegativeClick: () => (isAdding.value = false),
+    onPositiveClick: () => {
+      if (confirmed) return false
+      confirmed = true
+      dialog.loading = true
+      dialog.negativeButtonProps = { disabled: true }
+      dialog.closable = false
+      dialog.maskClosable = false
+      dialog.closeOnEsc = false
+      return installFromUrl(url)
+    },
+    onAfterLeave: () => {
+      isAdding.value = false
+    },
   })
 }
 

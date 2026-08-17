@@ -11,7 +11,7 @@ import {
 } from '@/features/pluginMarketplace/model'
 import { formatDate } from '@/i18n'
 
-const props = defineProps<{ item?: PluginMarketplaceItem }>()
+const props = defineProps<{ busy: boolean; item?: PluginMarketplaceItem }>()
 const emit = defineEmits<{ install: []; openSource: [url: string] }>()
 const show = defineModel<boolean>('show', { required: true })
 const { t } = useI18n()
@@ -105,7 +105,12 @@ const canInstall = computed(
         <NButton secondary @click="emit('openSource', source)">
           {{ t('plugin.market.actions.source') }}
         </NButton>
-        <NButton type="primary" :disabled="!canInstall" @click="emit('install')">
+        <NButton
+          type="primary"
+          :disabled="!canInstall || busy"
+          :loading="busy"
+          @click="emit('install')"
+        >
           {{
             item.updateAvailable
               ? t('plugin.market.actions.update')
