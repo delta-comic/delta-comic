@@ -1,4 +1,3 @@
-import { EventEmitter } from 'node:events'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 
 import type { PluginManifest } from '@delta-comic/model'
@@ -9,9 +8,7 @@ import {
   DEV_CSS_PATH,
   DEV_ENTRY_ID,
   DEV_ENTRY_PATH,
-  DEV_HMR_PATH,
   DEV_MANIFEST_PATH,
-  DEV_PLUGIN_HMR_EVENT,
   createDevEntryCode,
   createDevPlugin,
   createWireManifest,
@@ -33,7 +30,6 @@ type TestMiddleware = (req: IncomingMessage, res: ServerResponse, next: () => vo
 type FakeServer = {
   config: { root: string }
   middlewares: { use: ReturnType<typeof vi.fn> }
-  watcher: { on: ReturnType<typeof vi.fn> }
   moduleGraph: { getModuleById: ReturnType<typeof vi.fn> }
   transformRequest: ReturnType<typeof vi.fn>
 }
@@ -41,7 +37,6 @@ type FakeServer = {
 const createFakeServer = (): FakeServer => ({
   config: { root: '/project' },
   middlewares: { use: vi.fn() },
-  watcher: { on: vi.fn() },
   moduleGraph: { getModuleById: vi.fn() },
   transformRequest: vi.fn(),
 })
@@ -49,7 +44,10 @@ const createFakeServer = (): FakeServer => ({
 const registeredMiddleware = (server: FakeServer): TestMiddleware[] =>
   server.middlewares.use.mock.calls.map(call => call[0] as TestMiddleware)
 
-type TestDevPlugin = { configureServer(server: ViteDevServer): void }
+type TestDevPlugin = {
+  configureServer(server: ViteDevServer): void
+  transform(code: string, id: string): string | undefined
+}
 
 type FakeResponse = ServerResponse & { end: Mock; writeHead: Mock; write: Mock }
 
@@ -84,15 +82,67 @@ describe('createDevEntryCode', () => {
     expect(code).toContain(`export { default } from "/src/main.ts"`)
   })
 
-  it('embeds the plugin id and an HMR bridge onto the shared window', () => {
+  it('loads the Vite HMR client from the plugin dev server', () => {
     const code = createDevEntryCode(meta, '/src/main.ts')
 
-    expect(code).toContain(`const __deltaComicPluginId = "dev-plugin"`)
-    expect(code).toContain(
-      'new EventSource(new URL(import.meta.url).origin + "/__delta-comic__/hmr")',
+    expect(code).toContain(`import '/@vite/client'`)
+    expect(code).not.toContain('EventSource')
+    expect(code).not.toContain('delta-comic:plugin-hmr')
+  })
+
+  it('refreshes the independent stylesheet through native HMR', () => {
+    const code = createDevEntryCode(meta, '/src/main.ts')
+
+    expect(code).toContain('const __deltaComicCssPath = "/index.css"')
+    expect(code).toContain('new URL(__deltaComicCssPath, import.meta.url)')
+    expect(code).toContain('__deltaComicHot.accept("/src/main.ts", () => {})')
+    expect(code).toContain("__deltaComicHot.on('vite:afterUpdate'")
+    expect(code).toContain("__deltaComicHot.off('vite:afterUpdate'")
+  })
+})
+
+describe('CSS runtime transform', () => {
+  const viteCss = [
+    `const { updateStyle: __vite__updateStyle, removeStyle: __vite__removeStyle } = import.meta.hot._internal`,
+    `const __vite__id = "/src/style.css"`,
+    `const __vite__css = "body{}"`,
+    `__vite__updateStyle(__vite__id, __vite__css)`,
+    `import.meta.hot.accept()`,
+    `import.meta.hot.prune(() => __vite__removeStyle(__vite__id))`,
+  ].join('\n')
+
+  it('removes Vite style ownership while retaining HMR acceptance', () => {
+    const plugin = createDevPlugin(meta) as unknown as TestDevPlugin
+
+    const transformed = plugin.transform(viteCss, '/src/style.css')
+
+    expect(transformed).toContain('import.meta.hot.accept()')
+    expect(transformed).toContain('import.meta.hot.prune(() => {})')
+    expect(transformed).not.toContain('__vite__updateStyle')
+    expect(transformed).not.toContain('__vite__css')
+  })
+
+  it('strips compact CSS runtime output and preserves module exports', () => {
+    const plugin = createDevPlugin(meta) as unknown as TestDevPlugin
+    const transformed = plugin.transform(
+      'import { updateStyle as __vite__updateStyle, removeStyle as __vite__removeStyle } from "/@vite/client";const __vite__id = "/src/style.module.css";const __vite__css = ".foo{}";__vite__updateStyle(__vite__id, __vite__css);import.meta.hot.accept();import.meta.hot.prune(() => __vite__removeStyle(__vite__id));export default { foo: "_foo" }',
+      '/src/style.module.css',
     )
-    expect(code).toContain(`window.dispatchEvent(new CustomEvent("${DEV_PLUGIN_HMR_EVENT}"`)
-    expect(code).toContain('window.__deltaComicHmrSources ??= new Map()')
+
+    expect(transformed).toContain('import.meta.hot.accept()')
+    expect(transformed).toContain('export default { foo: "_foo" }')
+    expect(transformed).not.toContain('__vite__updateStyle')
+    expect(transformed).not.toContain('__vite__css')
+  })
+
+  it('recognizes Vue SFC styles without intercepting direct CSS reads', () => {
+    const plugin = createDevPlugin(meta) as unknown as TestDevPlugin
+
+    expect(plugin.transform(viteCss, '/src/App.vue?vue&type=style&index=0&scoped=true')).toContain(
+      'import.meta.hot.accept()',
+    )
+    expect(plugin.transform(viteCss, '/src/style.css?direct')).toBeUndefined()
+    expect(plugin.transform(viteCss, '/src/style.css?inline')).toBeUndefined()
   })
 })
 
@@ -101,8 +151,8 @@ describe('createDevPlugin middleware', () => {
     const server = createFakeServer()
     const plugin = createDevPlugin(meta) as unknown as TestDevPlugin
     plugin.configureServer(server as unknown as ViteDevServer)
-    const [manifest, entry, css, hmr] = registeredMiddleware(server)
-    return { server, manifest, entry, css, hmr }
+    const [manifest, entry, css] = registeredMiddleware(server)
+    return { server, manifest, entry, css }
   }
 
   it('serves the wire manifest with JSON and no-cache CORS headers', () => {
@@ -123,15 +173,14 @@ describe('createDevPlugin middleware', () => {
   })
 
   it('passes through requests for other paths', () => {
-    const { manifest, entry, css, hmr } = setup()
+    const { manifest, entry, css } = setup()
     const next = vi.fn()
 
     manifest(request('/other.js'), {} as ServerResponse, next)
     entry(request('/other.js'), {} as ServerResponse, next)
     css(request('/other.js'), {} as ServerResponse, next)
-    hmr(request('/other.js'), {} as ServerResponse, next)
 
-    expect(next).toHaveBeenCalledTimes(4)
+    expect(next).toHaveBeenCalledTimes(3)
   })
 
   it('serves the transformed dev entry as a no-cache module', async () => {
@@ -194,52 +243,5 @@ describe('createDevPlugin middleware', () => {
     await css(request(DEV_CSS_PATH, { host: 'localhost:5173' }), res, () => undefined)
 
     expect(res.end).toHaveBeenCalledWith('')
-  })
-
-  it('streams reload events over SSE when watched files change', () => {
-    vi.useFakeTimers()
-    try {
-      const { server, hmr } = setup()
-      const res = createFakeResponse()
-      const next = vi.fn()
-      const req = new EventEmitter() as unknown as IncomingMessage
-      Object.assign(req, {
-        url: DEV_HMR_PATH,
-        headers: { accept: 'text/event-stream' },
-        socket: { encrypted: false },
-      })
-
-      hmr(req, res, next)
-      expect(next).not.toHaveBeenCalled()
-      expect(res.writeHead).toHaveBeenCalledWith(
-        200,
-        expect.objectContaining({ 'Content-Type': 'text/event-stream' }),
-      )
-      expect(res.write).toHaveBeenCalledWith('retry: 1000\n\n')
-
-      const change = server.watcher.on.mock.calls.find(
-        call => call[0] === 'change',
-      )?.[1] as () => void
-      change()
-      vi.advanceTimersByTime(100)
-      expect(res.write).toHaveBeenLastCalledWith('event: reload\ndata: {}\n\n')
-      const writesAfterReload = res.write.mock.calls.length
-
-      req.emit('close')
-      change()
-      vi.advanceTimersByTime(100)
-      expect(res.write.mock.calls.length).toBe(writesAfterReload)
-    } finally {
-      vi.useRealTimers()
-    }
-  })
-
-  it('rejects non-SSE requests to the HMR endpoint', () => {
-    const { hmr } = setup()
-    const res = createFakeResponse()
-
-    hmr(request(DEV_HMR_PATH), res, () => undefined)
-
-    expect(res.writeHead).toHaveBeenCalledWith(406, expect.anything())
   })
 })

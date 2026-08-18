@@ -83,12 +83,16 @@ export class DevServerPluginModuleReader implements PluginModuleReader {
     if (port === undefined) {
       throw new Error(`development plugin has an invalid install source: ${archive.installInput}`)
     }
-    const version = (this.#versions.get(archive.pluginName) ?? 0) + 1
+    const previousVersion = this.#versions.get(archive.pluginName)
+    const version = (previousVersion ?? 0) + 1
     this.#versions.set(archive.pluginName, version)
     signal.throwIfAborted()
 
+    // Keep the first entry URL stable so its source modules share one native Vite HMR graph.
+    // Explicit plugin updates still get a fresh bootstrap URL after the first load.
+    const entryUrl = devServerUrl(port, DEV_ENTRY_PATH)
     const module = (await import(
-      /* @vite-ignore */ `${devServerUrl(port, DEV_ENTRY_PATH)}?v=${version}`
+      /* @vite-ignore */ previousVersion === undefined ? entryUrl : `${entryUrl}?v=${version}`
     )) as { default?: unknown }
     signal.throwIfAborted()
 

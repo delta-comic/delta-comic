@@ -86,8 +86,10 @@ entry and optional CSS paths without relying on the file store. This distinction
 install composition and does not enter the runtime dependency planner or activation pipeline.
 
 The composition root also owns host integrations for development reloads and relative icons. The
-Vite development entry emits `delta-comic:plugin-hmr`; the host debounces the event and calls
-`reloadPlugin`, while development icon paths resolve against the same localhost port. Runtime and
+Vite development entry loads the native `/@vite/client` bridge so source edits propagate through
+Vite's own HMR graph, and a small CSS bridge re-fetches the independent `/index.css` on
+`vite:afterUpdate` to update the host-owned plugin style in place; no window event or plugin-level
+reload is involved. Development icon paths resolve against the same localhost port. Runtime and
 plugin author contracts remain unaware of these transport details.
 
 Endpoint probes within one remote group may run in parallel with independent abort

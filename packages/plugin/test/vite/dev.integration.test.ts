@@ -4,17 +4,12 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import type { PluginManifest } from '@delta-comic/model'
+import vue from '@vitejs/plugin-vue'
 import type { InlineConfig } from 'vite'
 import { createServer } from 'vite'
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test'
 
-import {
-  DEV_CSS_PATH,
-  DEV_ENTRY_PATH,
-  DEV_HMR_PATH,
-  DEV_MANIFEST_PATH,
-  createDevPlugin,
-} from '../../vite/dev'
+import { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH, createDevPlugin } from '../../vite/dev'
 
 const meta: PluginManifest = {
   apiVersion: 1,
@@ -40,14 +35,19 @@ beforeAll(async () => {
   await mkdir(join(root, 'src'))
   await writeFile(
     join(root, 'src/main.ts'),
-    `import './style.css'\nexport default () => ({ name: 'dev-plugin' })\n`,
+    `import './style.css'\nimport styles from './style.module.css'\nimport App from './App.vue'\nexport const devComponents = { App, styles }\nexport default () => ({ name: 'dev-plugin' })\n`,
   )
   await writeFile(join(root, 'src/style.css'), 'body { color: red }\n')
+  await writeFile(join(root, 'src/style.module.css'), '.module { color: green }\n')
+  await writeFile(
+    join(root, 'src/App.vue'),
+    `<template><div class="app">Hello</div></template>\n<style scoped>.app { color: purple }</style>\n`,
+  )
   server = await createServer({
     root,
     logLevel: 'silent',
-    server: { middlewareMode: true, hmr: false },
-    plugins: [createDevPlugin(meta)],
+    server: { middlewareMode: true },
+    plugins: [vue(), createDevPlugin(meta)],
   } satisfies InlineConfig)
   base = await new Promise<string>((resolve, reject) => {
     const listener = createHttpServer(server.middlewares)
@@ -88,10 +88,11 @@ describe('deltaComic dev protocol', () => {
 
     expect(status).toBe(200)
     expect(headers.get('content-type')).toContain('javascript')
+    expect(text).toContain("import '/@vite/client'")
     expect(text).toContain('export { default } from "/src/main.ts"')
-    expect(text).toContain(
-      'new EventSource(new URL(import.meta.url).origin + "/__delta-comic__/hmr")',
-    )
+    expect(text).toContain('const __deltaComicCssPath = "/index.css"')
+    expect(text).toContain('new URL(__deltaComicCssPath, import.meta.url)')
+    expect(text).not.toContain('EventSource')
     expect(text).toContain('"dev-plugin"')
   })
 
@@ -103,11 +104,20 @@ describe('deltaComic dev protocol', () => {
   })
 
   it('collects CSS from the entry module graph', async () => {
+    // The host imports the entry before requesting the independent stylesheet. Warm the same
+    // dependency graph here so nested Vue style modules are available to the CSS endpoint.
+    await get('/src/main.ts')
+    await get('/src/style.module.css')
+    await get('/src/App.vue')
+    await get('/src/App.vue?vue&type=style&index=0&scoped=true&lang.css')
+
     const { status, text, headers } = await get(DEV_CSS_PATH)
 
     expect(status).toBe(200)
     expect(headers.get('content-type')).toContain('text/css')
     expect(text).toContain('color: red')
+    expect(text).toContain('color: green')
+    expect(text).toContain('color: purple')
   })
 
   it('reflects file changes without restart', async () => {
@@ -116,26 +126,34 @@ describe('deltaComic dev protocol', () => {
     await retry(async () => (await get(DEV_CSS_PATH)).text.includes('color: blue'))
   })
 
-  it('streams SSE reload events from the HMR endpoint', async () => {
-    const controller = new AbortController()
-    const stream = await fetch(`${base}${DEV_HMR_PATH}`, {
-      headers: { accept: 'text/event-stream' },
-      signal: controller.signal,
-    })
+  it('keeps Vite CSS modules in the graph without injecting a second style node', async () => {
+    const { status, text } = await get('/src/style.css')
 
-    expect(stream.status).toBe(200)
-    expect(stream.headers.get('content-type')).toContain('text/event-stream')
+    expect(status).toBe(200)
+    expect(text).toContain('import.meta.hot.accept()')
+    expect(text).toContain('import.meta.hot.prune(() => {})')
+    expect(text).not.toContain('__vite__updateStyle')
+    expect(text).not.toContain('__vite__css')
+  })
 
-    await writeFile(join(root, 'src/main.ts'), 'export default () => ({ name: "dev-plugin" })\n')
+  it('keeps CSS module exports while removing its Vite style runtime', async () => {
+    const { status, text } = await get('/src/style.module.css')
 
-    const chunks: string[] = []
-    const reader = stream.body!.getReader()
-    const decoder = new TextDecoder()
-    await retry(async () => {
-      const { value } = await reader.read()
-      if (value) chunks.push(decoder.decode(value))
-      return chunks.join('').includes('event: reload')
-    })
-    controller.abort()
+    expect(status).toBe(200)
+    expect(text).toContain('import.meta.hot')
+    expect(text).toContain('import.meta.hot.prune(() => {})')
+    expect(text).toContain('export default')
+    expect(text).not.toContain('__vite__updateStyle')
+    expect(text).not.toContain('__vite__css')
+  })
+
+  it('removes the Vite style runtime from Vue SFC styles', async () => {
+    const { status, text } = await get('/src/App.vue?vue&type=style&index=0&scoped=true&lang.css')
+
+    expect(status).toBe(200)
+    expect(text).toContain('import.meta.hot')
+    expect(text).toContain('import.meta.hot.prune(() => {})')
+    expect(text).not.toContain('__vite__updateStyle')
+    expect(text).not.toContain('__vite__css')
   })
 })

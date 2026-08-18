@@ -5,16 +5,10 @@ import type { PluginManifest } from '@delta-comic/model'
 import type { Connect, ModuleNode, Plugin, ViteDevServer } from 'vite'
 import { isCSSRequest, normalizePath } from 'vite'
 
-import {
-  DEV_CSS_PATH,
-  DEV_ENTRY_PATH,
-  DEV_HMR_PATH,
-  DEV_MANIFEST_PATH,
-  DEV_PLUGIN_HMR_EVENT,
-} from '../lib/install/dev'
+import { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH } from '../lib/install/dev'
 
 export const DEV_ENTRY_ID = '\0delta-comic:dev-entry'
-export { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_HMR_PATH, DEV_MANIFEST_PATH, DEV_PLUGIN_HMR_EVENT }
+export { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH }
 
 const NO_CACHE_HEADERS = {
   'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -24,6 +18,9 @@ const NO_CACHE_HEADERS = {
 
 const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*' } as const
 
+const VUE_STYLE_QUERY = /(?:^|[?&])vue&type=style(?:&|$)/
+const CSS_RUNTIME_BYPASS_QUERY = /(?:^|[?&])(?:direct|inline|raw|url)(?:&|$)/
+
 export const createWireManifest = (meta: PluginManifest) => ({
   ...meta,
   entry: { jsPath: 'index.js', cssPath: 'index.css' },
@@ -31,30 +28,76 @@ export const createWireManifest = (meta: PluginManifest) => ({
 
 export const createDevEntryCode = (meta: PluginManifest, entryUrl: string) =>
   [
+    `import '/@vite/client'`,
+    `const __deltaComicCssPath = ${JSON.stringify(DEV_CSS_PATH)}`,
+    `const __deltaComicUpdateStyle = async () => {`,
+    `  const __deltaComicDocument = globalThis.document`,
+    `  if (!__deltaComicDocument) return`,
+    `  try {`,
+    `    const __deltaComicResponse = await fetch(new URL(__deltaComicCssPath, import.meta.url), { cache: 'no-store' })`,
+    `    if (!__deltaComicResponse.ok) return`,
+    `    const __deltaComicCss = await __deltaComicResponse.text()`,
+    `    for (const __deltaComicStyle of __deltaComicDocument.head.querySelectorAll('style')) {`,
+    `      if (__deltaComicStyle.dataset.plugin === ${JSON.stringify(meta.name.id)}) __deltaComicStyle.textContent = __deltaComicCss`,
+    `    }`,
+    `  } catch {}`,
+    `}`,
+    `const __deltaComicHot = import.meta.hot`,
+    `if (__deltaComicHot) {`,
+    `  __deltaComicHot.accept(${JSON.stringify(entryUrl)}, () => {})`,
+    `  const __deltaComicAfterUpdate = () => { void __deltaComicUpdateStyle() }`,
+    `  __deltaComicHot.on('vite:afterUpdate', __deltaComicAfterUpdate)`,
+    `  __deltaComicHot.dispose(() => __deltaComicHot.off('vite:afterUpdate', __deltaComicAfterUpdate))`,
+    `}`,
     `export { default } from ${JSON.stringify(entryUrl)}`,
-    '',
-    `const __deltaComicPluginId = ${JSON.stringify(meta.name.id)}`,
-    'const __deltaComicHmrSources = (window.__deltaComicHmrSources ??= new Map())',
-    'if (!__deltaComicHmrSources.has(__deltaComicPluginId)) {',
-    `  const source = new EventSource(new URL(import.meta.url).origin + ${JSON.stringify(DEV_HMR_PATH)})`,
-    `  source.addEventListener('reload', () => {`,
-    `    window.dispatchEvent(new CustomEvent(${JSON.stringify(DEV_PLUGIN_HMR_EVENT)}, { detail: { pluginId: __deltaComicPluginId } }))`,
-    `  })`,
-    '  __deltaComicHmrSources.set(__deltaComicPluginId, source)',
-    '}',
   ].join('\n')
 
-const collectCssModules = (start: ModuleNode | undefined): ModuleNode[] => {
-  if (!start) return []
+const isCssModuleRequest = (id: string) => isCSSRequest(id) || VUE_STYLE_QUERY.test(id)
+
+const isDevCssRuntimeRequest = (id: string) =>
+  !CSS_RUNTIME_BYPASS_QUERY.test(id) && isCssModuleRequest(id)
+
+const stripViteCssRuntime = (code: string) => {
+  let stripped = code
+  const replacements: [RegExp, string][] = [
+    [
+      /import\s*\{\s*updateStyle\s+as\s+__vite__updateStyle(?:\s*,\s*removeStyle\s+as\s+__vite__removeStyle)?\s*\}\s*from\s*['"]\/@vite\/client['"]\s*;?/g,
+      '',
+    ],
+    [
+      /const\s*\{\s*updateStyle\s*:\s*__vite__updateStyle\s*,\s*removeStyle\s*:\s*__vite__removeStyle\s*\}\s*=\s*import\.meta\.hot\._internal\s*;?/g,
+      '',
+    ],
+    [/const\s+__vite__id\s*=\s*(['"])(?:\\.|(?!\1)[^\\])*\1\s*;?/g, ''],
+    [/const\s+__vite__css\s*=\s*(['"`])(?:\\.|(?!\1)[^\\])*\1\s*;?/g, ''],
+    [/__vite__updateStyle\(\s*__vite__id\s*,\s*__vite__css\s*\)\s*;?/g, ''],
+    [
+      /import\.meta\.hot\.prune\(\s*\(\)\s*=>\s*__vite__removeStyle\(\s*__vite__id\s*\)\s*\)\s*;?/g,
+      'import.meta.hot.prune(() => {})',
+    ],
+  ]
+  for (const [pattern, replacement] of replacements)
+    stripped = stripped.replace(pattern, replacement)
+  return stripped === code ? undefined : stripped
+}
+
+const collectCssModules = (
+  server: ViteDevServer,
+  starts: readonly (ModuleNode | undefined)[],
+): ModuleNode[] => {
   const seen = new Set<ModuleNode>()
-  const queue: ModuleNode[] = [start]
+  const queue: ModuleNode[] = starts.filter((node): node is ModuleNode => node !== undefined)
   const cssModules: ModuleNode[] = []
   while (queue.length > 0) {
     const node = queue.shift()
     if (!node || seen.has(node)) continue
     seen.add(node)
-    if (isCSSRequest(node.url)) cssModules.push(node)
+    if (isCssModuleRequest(node.url)) cssModules.push(node)
     for (const imported of node.importedModules) queue.push(imported)
+    // Vue SFC style modules share the component file but are not linked through
+    // importedModules, so discover them through the file-to-modules map.
+    const fileModules = node.file ? (server.moduleGraph.getModulesByFile?.(node.file) ?? []) : []
+    for (const fileModule of fileModules) queue.push(fileModule)
   }
   return cssModules
 }
@@ -62,8 +105,16 @@ const collectCssModules = (start: ModuleNode | undefined): ModuleNode[] => {
 const toOriginAbsoluteUrls = (css: string, origin: string) =>
   css.replace(/(url\(\s*(?:"|')?)\/(?!\/)/g, `$1${origin}/`)
 
-const collectDevCss = async (server: ViteDevServer, origin: string): Promise<string> => {
-  const modules = collectCssModules(server.moduleGraph.getModuleById(DEV_ENTRY_ID))
+const collectDevCss = async (
+  server: ViteDevServer,
+  origin: string,
+  entryUrl: string,
+): Promise<string> => {
+  const entryModule = await server.moduleGraph.getModuleByUrl?.(entryUrl)
+  const modules = collectCssModules(server, [
+    server.moduleGraph.getModuleById(DEV_ENTRY_ID),
+    entryModule,
+  ])
   const parts: string[] = []
   for (const module of modules) {
     const directUrl = `${module.url}${module.url.includes('?') ? '&' : '?'}direct`
@@ -96,46 +147,16 @@ const requestOrigin = (req: IncomingMessage) => {
   return `${secure ? 'https' : 'http'}://${req.headers.host}`
 }
 
-const createHmrMiddleware = (server: ViteDevServer): Connect.NextHandleFunction => {
-  const listeners = new Set<() => void>()
-  let timer: ReturnType<typeof setTimeout> | undefined
-  const broadcast = () => {
-    if (timer) clearTimeout(timer)
-    timer = setTimeout(() => {
-      timer = undefined
-      for (const send of listeners) send()
-    }, 100)
-  }
-  server.watcher.on('change', broadcast)
-  server.watcher.on('add', broadcast)
-  server.watcher.on('unlink', broadcast)
-
-  return (req, res, next) => {
-    const url = new URL(req.url ?? '/', 'http://localhost')
-    if (url.pathname !== DEV_HMR_PATH) return next()
-    if (req.headers.accept !== 'text/event-stream') {
-      sendError(res, 406, 'SSE connection required')
-      return
-    }
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      ...NO_CACHE_HEADERS,
-      ...CORS_HEADERS,
-      'Connection': 'keep-alive',
-    })
-    res.write('retry: 1000\n\n')
-    const send = () => res.write('event: reload\ndata: {}\n\n')
-    listeners.add(send)
-    req.on('close', () => listeners.delete(send))
-  }
-}
-
 export const createDevPlugin = (meta: PluginManifest): Plugin => {
   let server: ViteDevServer | undefined
   let entryUrl = '/src/main.ts'
 
   return {
     name: 'delta-comic:dev-server',
+    enforce: 'post',
+    config() {
+      return { server: { cors: true } }
+    },
     configureServer(devServer) {
       server = devServer
       const entrySource = meta.entry?.jsPath ?? 'src/main.ts'
@@ -175,7 +196,7 @@ export const createDevPlugin = (meta: PluginManifest): Plugin => {
         }
         if (!server) return next()
         try {
-          const css = await collectDevCss(server, requestOrigin(req))
+          const css = await collectDevCss(server, requestOrigin(req), entryUrl)
           res.writeHead(200, {
             'Content-Type': 'text/css; charset=utf-8',
             ...NO_CACHE_HEADERS,
@@ -186,12 +207,9 @@ export const createDevPlugin = (meta: PluginManifest): Plugin => {
           sendError(res, 500, error instanceof Error ? error.message : String(error))
         }
       }
-      const handleHmr = createHmrMiddleware(devServer)
-
       devServer.middlewares.use(handleManifest)
       devServer.middlewares.use(handleEntry)
       devServer.middlewares.use(handleCss)
-      devServer.middlewares.use(handleHmr)
     },
     resolveId(id) {
       if (id === DEV_ENTRY_ID) return DEV_ENTRY_ID
@@ -199,6 +217,10 @@ export const createDevPlugin = (meta: PluginManifest): Plugin => {
     load(id) {
       if (id !== DEV_ENTRY_ID || !server) return
       return createDevEntryCode(meta, entryUrl)
+    },
+    transform(code, id) {
+      if (!isDevCssRuntimeRequest(id)) return
+      return stripViteCssRuntime(code)
     },
   }
 }

@@ -1,4 +1,3 @@
-import { logger } from '@delta-comic/logger'
 import { isTauri } from '@tauri-apps/api/core'
 
 import {
@@ -14,7 +13,6 @@ import {
   DatabasePluginArchiveRepository,
   DevServerPluginModuleReader,
   DevServerSourceResolver,
-  DEV_PLUGIN_HMR_EVENT,
   DEV_SERVER_LOADER_ID,
   GitHubSourceResolver,
   HttpSourceResolver,
@@ -44,53 +42,8 @@ export const pluginStore = new PluginStore(value => pluginI18n.translateText(val
 export const pluginConfigStore = new ConfigStore()
 export const useConfig = () => pluginConfigStore
 
-const hmrTimers = new Map<string, ReturnType<typeof setTimeout>>()
-const hmrReloads = new Map<string, Promise<void>>()
-let hmrListenerInstalled = false
-
-const reloadPluginFromHmr = async (plugin: string) => {
-  const previous = hmrReloads.get(plugin) ?? Promise.resolve()
-  const current = previous
-    .catch(() => undefined)
-    .then(async () => {
-      try {
-        await pluginRuntime.reloadPlugin(plugin)
-      } catch (error) {
-        logger.error('failed to reload development plugin', plugin, error)
-      }
-    })
-  hmrReloads.set(plugin, current)
-  try {
-    await current
-  } finally {
-    if (hmrReloads.get(plugin) === current) hmrReloads.delete(plugin)
-  }
-}
-
-const installPluginHmrListener = () => {
-  if (hmrListenerInstalled || typeof window === 'undefined') return
-  hmrListenerInstalled = true
-  window.addEventListener(DEV_PLUGIN_HMR_EVENT, event => {
-    if (!(event instanceof CustomEvent)) return
-    const detail = event.detail
-    if (typeof detail !== 'object' || detail === null || !('pluginId' in detail)) return
-    const plugin = detail.pluginId
-    if (typeof plugin !== 'string' || plugin.length === 0) return
-    const previous = hmrTimers.get(plugin)
-    if (previous) clearTimeout(previous)
-    hmrTimers.set(
-      plugin,
-      setTimeout(() => {
-        hmrTimers.delete(plugin)
-        void reloadPluginFromHmr(plugin)
-      }, 100),
-    )
-  })
-}
-
 export const preparePluginHost = async () => {
   await pluginConfigStore.register(cfg).ready
-  installPluginHmrListener()
 }
 
 export interface PluginHostServices {
