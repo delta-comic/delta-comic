@@ -45,3 +45,20 @@
   userscript path but have no current TypeScript call sites.
 - Cleanup should happen only after the new development source is integrated and references are
   rechecked.
+
+## Phase 2: Vite dev protocol implementation (commit `d0009709`)
+
+- `packages/plugin/vite/dev.ts` exports `createDevPlugin` plus path/id/event constants.
+- Four fixed endpoints: `/manifest.json`, `/index.js`, `/index.css`, `/__delta-comic__/hmr`.
+- The virtual dev entry (`\0delta-comic:dev-entry`) re-exports the real entry and injects an
+  EventSource HMR stub that dispatches a window `delta-comic:plugin-hmr` custom event carrying the
+  plugin id.
+- This fork (`@voidzero-dev/vite-plus-core@0.2.9`) gotchas:
+  - `slash` is not exported; use `normalizePath`.
+  - CSS `ModuleNode.type` is `'js'`, so filter only with `isCSSRequest(node.url)`.
+  - Vite rewrites `new URL('<literal>', import.meta.url)`, so the HMR URL must be built as
+    `new URL(import.meta.url).origin + DEV_HMR_PATH` (no literal first argument).
+  - `?direct` on a CSS module URL returns raw compiled CSS.
+  - File changes invalidate the module graph server-side even in `middlewareMode`.
+  - `req.socket.encrypted` needs an `'encrypted' in req.socket` guard.
+- `vite-plugin-monkey` dependency removed from `packages/plugin/package.json`; lockfile refreshed.

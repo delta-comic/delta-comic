@@ -31,13 +31,21 @@ network and never written to the plugin file store.
 
 ### Phase 2: Implement the Vite development protocol
 
-**Status:** pending
+**Status:** complete (commit `d0009709`)
 
 - Remove `vite-plugin-monkey`.
 - Serve the fixed development resources with CORS and no-cache headers.
 - Preserve Vite transforms and the shared-host ABI.
 - Add focused protocol tests and update package dependencies.
 - Commit the Vite protocol change.
+
+Dev protocol endpoints served by `createDevPlugin` (packages/plugin/vite/dev.ts):
+- `/manifest.json` — fixed wire manifest (`entry: { jsPath: 'index.js', cssPath: 'index.css' }`).
+- `/index.js` — transformed virtual module that re-exports the real entry (`meta.entry?.jsPath`).
+- `/index.css` — BFS-collected CSS from the entry module graph, with asset URLs rewritten to the
+  dev origin.
+- `/__delta-comic__/hmr` — SSE endpoint; watcher `change|add|unlink` triggers a debounced
+  `reload` event; the injected module dispatches `delta-comic:plugin-hmr` on the window.
 
 ### Phase 3: Add persistent network-only development installation
 
@@ -77,4 +85,4 @@ network and never written to the plugin file store.
 
 ## Next Step
 
-Commit the verified manifest fix, then implement the Vite development protocol.
+Implement the persistent network-only `dev:<port>` installation path (Phase 3).

@@ -1,5 +1,13 @@
 # Progress
 
+## 2026-08-18
+
+- Committed Phase 2 (`d0009709`): custom Vite dev protocol serving `/manifest.json`, `/index.js`,
+  `/index.css`, and `/__delta-comic__/hmr`; removed `vite-plugin-monkey`.
+- Full validation chain passed: `vp check --fix` (668 files clean), `vp run lib-build`,
+  `vp run -r typecheck`, `vp test run` (160 files / 888 tests).
+- Starting Phase 3: persistent network-only `dev:<port>` installation.
+
 ## 2026-08-17
 
 - Inspected the Vite integration, install contracts and transaction, module readers, file stores,
@@ -19,3 +27,7 @@
 | Command | Result |
 | --- | --- |
 | `vp test run packages/plugin/test/lib/install/manifest.test.ts` | passed, 3 tests |
+| `vp check --fix` | passed, 668 files |
+| `vp run lib-build` | passed |
+| `vp run -r typecheck` | passed |
+| `vp test run` | passed, 160 files / 888 tests |
