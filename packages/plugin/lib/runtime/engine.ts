@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { markRaw, ref, shallowReactive, type App, type Raw, type Ref } from 'vue'
 
 import type { ConfigEnv, DCPluginConfig, PluginLocaleMessages } from '../api'
@@ -70,6 +71,7 @@ interface PreparedPlugin {
 }
 
 const recoveryKey = 'delta-comic:plugin-preload-recovery:v1'
+const runtimeLogger = logger.scoped('plugin:runtime')
 
 const errorText = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
@@ -352,7 +354,11 @@ export class PluginRuntime {
       this.#prepared.delete(plugin)
       await prepared.scope.dispose()
     } else {
-      await this.#runUninstallHook(candidate)
+      try {
+        await this.#runUninstallHook(candidate)
+      } catch (error) {
+        runtimeLogger.warn(`failed to run uninstall hook for plugin "${plugin}"`, error)
+      }
     }
     this.restartRequired.delete(plugin)
     await this.#options.remove(plugin)
