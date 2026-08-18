@@ -795,7 +795,7 @@ import { something } from '@delta-comic/plugin/lib/internal-file'
 vp dev
 ```
 
-serve 模式会通过 Delta Comic 开发协议提供固定的 `/manifest.json`、`/index.js` 和 `/index.css` 端点。以开发服务器实际端口安装，例如 `dev:6173`；客户端会持久化这个来源和 manifest，但不会把 JavaScript、CSS 或远程资源写入插件文件存储。应用启动、插件重新加载或开发服务器发出 HMR 事件时，客户端会重新从该端口读取资源。正式分发仍应使用 `plugin.zip`。
+serve 模式会通过 Delta Comic 开发协议提供固定的 `/manifest.json`、`/index.js` 和 `/index.css` 端点。以开发服务器实际端口安装，例如 `dev:6173`；客户端会持久化这个来源和 manifest，但不会把 JavaScript、CSS 或远程资源写入插件文件存储。入口会加载插件开发服务器自身的 `/@vite/client`，接入 Vite 原生 HMR：修改插件源码时由 Vite 推送更新，样式通过 `vite:afterUpdate` 重新读取 `/index.css` 并原地更新宿主持有的样式，无需整插件重载。应用启动或显式重新安装/更新时，客户端会重新从该端口读取资源。正式分发仍应使用 `plugin.zip`。
 
 ### 9.2 GitHub Release
 
