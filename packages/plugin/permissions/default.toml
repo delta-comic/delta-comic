@@ -11,10 +11,7 @@ to the native runtime.
 """
 
 permissions = [
-  "allow-decode-dev-meta",
   "allow-decode-zip-meta",
-  "allow-install-dev",
   "allow-install-zip",
-  "allow-prepare-dev-script",
   "allow-read-local-file",
 ]

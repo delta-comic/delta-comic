@@ -295,18 +295,6 @@
       "type": "string",
       "oneOf": [
         {
-          "description": "Enables the decode_dev_meta command without any pre-configured scope.",
-          "type": "string",
-          "const": "allow-decode-dev-meta",
-          "markdownDescription": "Enables the decode_dev_meta command without any pre-configured scope."
-        },
-        {
-          "description": "Denies the decode_dev_meta command without any pre-configured scope.",
-          "type": "string",
-          "const": "deny-decode-dev-meta",
-          "markdownDescription": "Denies the decode_dev_meta command without any pre-configured scope."
-        },
-        {
           "description": "Enables the decode_zip_meta command without any pre-configured scope.",
           "type": "string",
           "const": "allow-decode-zip-meta",
@@ -317,18 +305,6 @@
           "type": "string",
           "const": "deny-decode-zip-meta",
           "markdownDescription": "Denies the decode_zip_meta command without any pre-configured scope."
-        },
-        {
-          "description": "Enables the install_dev command without any pre-configured scope.",
-          "type": "string",
-          "const": "allow-install-dev",
-          "markdownDescription": "Enables the install_dev command without any pre-configured scope."
-        },
-        {
-          "description": "Denies the install_dev command without any pre-configured scope.",
-          "type": "string",
-          "const": "deny-install-dev",
-          "markdownDescription": "Denies the install_dev command without any pre-configured scope."
         },
         {
           "description": "Enables the install_zip command without any pre-configured scope.",
@@ -343,18 +319,6 @@
           "markdownDescription": "Denies the install_zip command without any pre-configured scope."
         },
         {
-          "description": "Enables the prepare_dev_script command without any pre-configured scope.",
-          "type": "string",
-          "const": "allow-prepare-dev-script",
-          "markdownDescription": "Enables the prepare_dev_script command without any pre-configured scope."
-        },
-        {
-          "description": "Denies the prepare_dev_script command without any pre-configured scope.",
-          "type": "string",
-          "const": "deny-prepare-dev-script",
-          "markdownDescription": "Denies the prepare_dev_script command without any pre-configured scope."
-        },
-        {
           "description": "Enables the read_local_file command without any pre-configured scope.",
           "type": "string",
           "const": "allow-read-local-file",
@@ -367,10 +331,10 @@
           "markdownDescription": "Denies the read_local_file command without any pre-configured scope."
         },
         {
-          "description": "Enables the Delta Comic plugin runtime integration.\n\n#### Granted Permissions\n\nAllows plugin installers and loaders to offload file-system heavy work\nto the native runtime.\n\n#### This default permission set includes:\n\n- `allow-decode-dev-meta`\n- `allow-decode-zip-meta`\n- `allow-install-dev`\n- `allow-install-zip`\n- `allow-prepare-dev-script`\n- `allow-read-local-file`",
+          "description": "Enables the Delta Comic plugin runtime integration.\n\n#### Granted Permissions\n\nAllows plugin installers and loaders to offload file-system heavy work\nto the native runtime.\n\n#### This default permission set includes:\n\n- `allow-decode-zip-meta`\n- `allow-install-zip`\n- `allow-read-local-file`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Enables the Delta Comic plugin runtime integration.\n\n#### Granted Permissions\n\nAllows plugin installers and loaders to offload file-system heavy work\nto the native runtime.\n\n#### This default permission set includes:\n\n- `allow-decode-dev-meta`\n- `allow-decode-zip-meta`\n- `allow-install-dev`\n- `allow-install-zip`\n- `allow-prepare-dev-script`\n- `allow-read-local-file`"
+          "markdownDescription": "Enables the Delta Comic plugin runtime integration.\n\n#### Granted Permissions\n\nAllows plugin installers and loaders to offload file-system heavy work\nto the native runtime.\n\n#### This default permission set includes:\n\n- `allow-decode-zip-meta`\n- `allow-install-zip`\n- `allow-read-local-file`"
         }
       ]
     }

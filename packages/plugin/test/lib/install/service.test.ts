@@ -52,6 +52,46 @@ const codec: PluginPackageCodec = {
 }
 
 describe('PluginInstallService', () => {
+  it('persists development metadata while clearing stored files', async () => {
+    const files = new MemoryPluginFileStore()
+    await (
+      await files.replace('example', new Map([['index.mjs', new TextEncoder().encode('old')]]))
+    ).commit()
+    const current = new Map<string, PluginArchiveDB.Archive>()
+    const repository: PluginArchiveRepository = {
+      find: async plugin => current.get(plugin),
+      list: async () => [...current.values()],
+      remove: async plugin => {
+        current.delete(plugin)
+      },
+      upsert: async value => {
+        current.set(value.pluginName, value)
+      },
+    }
+    const resolver: PluginSourceResolver = {
+      id: 'dev-server',
+      matches: input => input === 'dev:6173',
+      resolve: async () => ({
+        installInput: 'dev:6173',
+        package: { codecId: 'dev-server', files: new Map(), manifest: manifest('2.0.0') },
+        resolverId: 'dev-server',
+        storage: 'remote',
+      }),
+    }
+    const service = new PluginInstallService({
+      codecs: [],
+      files,
+      repository,
+      resolvers: [resolver],
+    })
+
+    const installed = await service.install('dev:6173')
+
+    expect(installed).toMatchObject({ installInput: 'dev:6173', loaderName: 'dev-server' })
+    await expect(files.read('example', 'index.mjs')).rejects.toThrow('not found')
+    expect(current.get('example')?.loaderName).toBe('dev-server')
+  })
+
   it('restores both files and metadata when persistence fails', async () => {
     const files = new MemoryPluginFileStore()
     await (

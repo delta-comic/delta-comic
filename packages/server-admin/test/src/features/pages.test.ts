@@ -9,10 +9,21 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick } from 'vue'
 import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 
-const naive = vi.hoisted(() => ({
-  dialog: { warning: vi.fn() },
-  message: { error: vi.fn(), success: vi.fn() },
-}))
+const naive = vi.hoisted(() => {
+  const instance: {
+    closable?: boolean
+    closeOnEsc?: boolean
+    loading?: boolean
+    maskClosable?: boolean
+    negativeButtonProps?: { disabled?: boolean }
+    onPositiveClick?: () => unknown
+  } = {}
+  const warning = vi.fn((options: { onPositiveClick?: () => unknown }) => {
+    instance.onPositiveClick = options.onPositiveClick
+    return instance
+  })
+  return { dialog: { warning }, instance, message: { error: vi.fn(), success: vi.fn() } }
+})
 
 vi.mock('naive-ui', async importOriginal => ({
   ...(await importOriginal<typeof import('naive-ui')>()),
@@ -445,11 +456,23 @@ describe('plugins page', () => {
     expect(wrapper.getComponent(PlanStub).props('show')).toBe(true)
     expect(wrapper.getComponent(PlanStub).props('plugin')).toEqual(snapshot.plugins[1])
 
+    const plan = wrapper.getComponent(PlanStub)
+    plan.vm.$emit('confirm', 'available')
+    await flushPromises()
+    expect(runAction).toHaveBeenCalledWith('available', 'install', undefined)
+    expect(wrapper.getComponent(PlanStub).props('show')).toBe(false)
+
     table.vm.$emit('action', snapshot.plugins[0], 'uninstall')
     expect(naive.dialog.warning).toHaveBeenCalledOnce()
-    const warning = naive.dialog.warning.mock.calls[0][0]
-    await warning.onPositiveClick()
+    await naive.instance.onPositiveClick?.()
     expect(runAction).toHaveBeenCalledWith('installed', 'uninstall', undefined)
+    expect(naive.instance.loading).toBe(true)
+    expect(naive.instance.negativeButtonProps).toEqual({ disabled: true })
+    expect(naive.instance.closable).toBe(false)
+    expect(naive.instance.maskClosable).toBe(false)
+    expect(naive.instance.closeOnEsc).toBe(false)
+    await naive.instance.onPositiveClick?.()
+    expect(runAction).toHaveBeenCalledTimes(2)
     expect(naive.message.success).toHaveBeenCalledWith('uninstall 操作已完成')
   })
 

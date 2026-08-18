@@ -61,7 +61,7 @@ reload, and unload behavior.
 ```text
 *.builtin.ts --------> InternalPluginCandidateProvider --+
                                                           |
-archive + module port -> InstalledPluginCandidateProvider +-> collision check
+archive -> module reader (stored files or dev-server network) -> InstalledPluginCandidateProvider +-> collision check
                                                               -> dependency plan
                                                               -> module + factory preload
                                                               -> onPreboot scope
@@ -80,6 +80,18 @@ it in LIFO order, and `reloadPlugin` unloads a plugin together with its prepared
 loads the current files again. The persisted flag changes are orchestrated by `setPluginEnabled`,
 while `installPlugin` reloads the result of an install or update right away.
 
+Installed archives select their module reader at candidate load time. ZIP archives use the stored
+file reader; `dev:<port>` archives use the development-server reader, which fetches the fixed
+entry and optional CSS paths without relying on the file store. This distinction is kept in the
+install composition and does not enter the runtime dependency planner or activation pipeline.
+
+The composition root also owns host integrations for development reloads and relative icons. The
+Vite development entry loads the native `/@vite/client` bridge so source edits propagate through
+Vite's own HMR graph, and a small CSS bridge re-fetches the independent `/index.css` on
+`vite:afterUpdate` to update the host-owned plugin style in place; no window event or plugin-level
+reload is involved. Development icon paths resolve against the same localhost port. Runtime and
+plugin author contracts remain unaware of these transport details.
+
 Endpoint probes within one remote group may run in parallel with independent abort
 signals. Plugin dependency levels and capability modules are deliberately activated serially so
 registration and rollback order stays deterministic. Every mutable host registration must attach
@@ -93,6 +105,7 @@ order.
 | Built-in plugin | Add one default-exporting `builtins/*.builtin.ts` definition | composition, runtime, installed loader |
 | Installed package format | Add a `PluginPackageCodec` and wire it in composition | candidate protocol, runtime, capabilities |
 | Download source | Add a `PluginSourceResolver` and wire it in composition | codecs, candidate protocol, runtime |
+| Development source | Add the `dev:<port>` resolver and network module reader in composition | runtime pipeline, ZIP codec, dependency planner |
 | Catalog provider | Add an adapter implementing `PluginCatalog` and wire it in composition | install resolver, runtime, application view model |
 | Business model | Add an API model plus one capability module; optionally add a typed contribution channel | candidate providers, dependency planner, runtime engine |
 | Host-only UI/platform operation | Add a narrow gateway interface and inject its host adapter | public plugin model, runtime kernel |

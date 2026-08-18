@@ -1,0 +1,6 @@
+- TypeScript monorepo using Vite+ (`vp`), not direct `pnpm`, `vite`, `vitest`, `oxlint`, or `oxfmt` commands.
+- Package manager: pnpm `12.0.0-rc.3`; Node `25.9.0`; Rust nightly `nightly-2026-08-12`, 2024 edition, MSRV `1.95.0`.
+- Frontend: Vue 3 Composition API, Vue JSX where applicable, Tailwind CSS; Tauri v2 native client.
+- Backend: Elysia on Cloudflare Workers; D1 migrations are explicit deployment steps.
+- Tests: Vitest through `vp test`; Rust tests through Cargo.
+- Shared database code uses Kysely; client runtime validation details are recorded in the project memory `db-validation`.

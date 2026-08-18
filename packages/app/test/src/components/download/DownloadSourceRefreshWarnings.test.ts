@@ -15,10 +15,11 @@ await vi.hoisted(async () => {
   const Button = defineComponent({
     name: 'NButton',
     emits: ['click'],
+    props: { disabled: Boolean },
     setup:
-      (_props, { emit, slots }) =>
+      (props, { emit, slots }) =>
       () =>
-        h('button', { onClick: () => emit('click') }, slots.default?.()),
+        h('button', { disabled: props.disabled, onClick: () => emit('click') }, slots.default?.()),
   })
   const Icon = defineComponent({
     name: 'NIcon',
@@ -108,5 +109,13 @@ describe('DownloadSourceRefreshWarnings', () => {
 
     expect(wrapper.get('.sm\\:flex-nowrap').classes()).toContain('flex-wrap')
     expect(wrapper.get('.sm\\:w-auto').classes()).toContain('w-full')
+  })
+
+  it('disables the actions while the download manager is mutating', () => {
+    const wrapper = mount(DownloadSourceRefreshWarnings, {
+      props: { disabled: true, warnings: [warning('confirmation-required')] },
+    })
+
+    expect(wrapper.get('button').attributes('disabled')).toBeDefined()
   })
 })

@@ -21,6 +21,7 @@ const message = useMessage()
 const selectedItem = shallowRef<PluginMarketplaceItem>()
 const detailsOpen = shallowRef(false)
 const installingIds = shallowReactive(new Set<string>())
+const confirmingIds = shallowReactive(new Set<string>())
 const marketplace = usePluginMarketplace({ coreVersion: pkg.version })
 const { runPluginInstall } = usePluginInstall()
 
@@ -34,6 +35,7 @@ const showDetails = (item: PluginMarketplaceItem) => {
 
 const runInstall = async (item: PluginMarketplaceItem) => {
   if (installingIds.has(item.listing.id)) return
+  confirmingIds.delete(item.listing.id)
   installingIds.add(item.listing.id)
   try {
     const title = t(
@@ -53,7 +55,6 @@ const runInstall = async (item: PluginMarketplaceItem) => {
     )
   } catch (error) {
     message.error(error instanceof Error ? error.message : String(error))
-    throw error
   } finally {
     installingIds.delete(item.listing.id)
   }
@@ -61,11 +62,14 @@ const runInstall = async (item: PluginMarketplaceItem) => {
 
 const confirmInstall = (item: PluginMarketplaceItem) => {
   if (item.compatibility === 'incompatible' || (item.installed && !item.updateAvailable)) return
+  if (installingIds.has(item.listing.id) || confirmingIds.has(item.listing.id)) return
+  confirmingIds.add(item.listing.id)
   const source = pluginMarketplaceSourceUrl(item.listing)
   const insecureNotice = source.startsWith('http:')
     ? `\n${t('plugin.market.security.insecure')}`
     : ''
-  dialog.warning({
+  let confirmed = false
+  const instance = dialog.warning({
     title: t(
       item.installed ? 'plugin.market.confirm.updateTitle' : 'plugin.market.confirm.installTitle',
     ),
@@ -74,9 +78,26 @@ const confirmInstall = (item: PluginMarketplaceItem) => {
       item.installed ? 'plugin.market.actions.update' : 'plugin.market.actions.install',
     ),
     negativeText: t('plugin.market.actions.cancel'),
-    onPositiveClick: () => runInstall(item),
+    onPositiveClick: () => {
+      if (confirmed) return false
+      confirmed = true
+      instance.loading = true
+      instance.negativeButtonProps = { disabled: true }
+      instance.closable = false
+      instance.maskClosable = false
+      instance.closeOnEsc = false
+      return runInstall(item)
+    },
+    onAfterLeave: () => {
+      confirmingIds.delete(item.listing.id)
+    },
   })
 }
+
+const detailsBusy = computed(() => {
+  const item = selectedItem.value
+  return item ? installingIds.has(item.listing.id) || confirmingIds.has(item.listing.id) : false
+})
 
 onMounted(() => void marketplace.refresh())
 </script>
@@ -95,6 +116,7 @@ onMounted(() => void marketplace.refresh())
     />
     <NScrollbar class="min-h-0! flex-1">
       <PluginMarketplaceList
+        :confirming-ids="confirmingIds"
         :error="marketplace.error.value"
         :has-more="marketplace.hasMore.value"
         :installing-ids="installingIds"
@@ -109,6 +131,7 @@ onMounted(() => void marketplace.refresh())
     </NScrollbar>
     <PluginMarketplaceDetails
       v-model:show="detailsOpen"
+      :busy="detailsBusy"
       :item="selectedItem"
       @install="selectedItem && confirmInstall(selectedItem)"
       @open-source="openExternal"

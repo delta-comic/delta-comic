@@ -220,7 +220,7 @@ vp build
 - `plugin.zip`：供客户端安装的完整插件包。
 - `manifest.json`：供 GitHub Release 和插件市场提前检查的独立 manifest。
 
-在 Delta Comic 的“插件 → 安装”页面选择 `plugin.zip`，重启应用后启动插件即可验证最小示例。
+在 Delta Comic 的“插件 → 安装”页面选择 `plugin.zip`，安装完成后客户端会立即尝试加载插件；也可以在插件列表中手动启用它。
 
 ## 3. Manifest 完整参考
 
@@ -787,7 +787,7 @@ import { something } from '@delta-comic/plugin/lib/internal-file'
 | HTTP(S) | `https://example.com/plugin.zip` | 下载后按 ZIP 解码 |
 | GitHub | `gh:owner/repository` | 查找最新的兼容稳定 Release |
 | 插件市场 | `ap:plugin-id` | 从 Catalog 定位真实 GitHub 或 HTTP 来源 |
-| 开发脚本 | `.js`、`.mjs`、`.user.js` | 从 `@description` 读取 manifest，仅用于开发 |
+| 开发服务器 | `dev:6173` | 从本机开发服务器读取 manifest、模块和 CSS，仅持久化来源元数据 |
 
 ### 9.1 开发服务器
 
@@ -795,7 +795,7 @@ import { something } from '@delta-comic/plugin/lib/internal-file'
 vp dev
 ```
 
-serve 模式使用 userscript 开发入口，并把 manifest 写入 `@description`。根据终端显示的开发地址安装生成的脚本，可以快速验证代码；正式分发仍应使用 `plugin.zip`。
+serve 模式会通过 Delta Comic 开发协议提供固定的 `/manifest.json`、`/index.js` 和 `/index.css` 端点。以开发服务器实际端口安装，例如 `dev:6173`；客户端会持久化这个来源和 manifest，但不会把 JavaScript、CSS 或远程资源写入插件文件存储。入口会加载插件开发服务器自身的 `/@vite/client`，接入 Vite 原生 HMR：修改插件源码时由 Vite 推送更新，样式通过 `vite:afterUpdate` 重新读取 `/index.css` 并原地更新宿主持有的样式，无需整插件重载。应用启动或显式重新安装/更新时，客户端会重新从该端口读取资源。正式分发仍应使用 `plugin.zip`。
 
 ### 9.2 GitHub Release
 

@@ -43,22 +43,6 @@ fn decode_zip_meta_value<R: Read + Seek>(zip: &mut ZipArchive<R>) -> Result<Valu
   serde_json::from_str(&text).map_err(|err| format!("failed to parse manifest.json: {err}"))
 }
 
-fn decode_dev_meta_value(code: &str) -> Result<Value, String> {
-  let key = "@description";
-  let begin = code
-    .find(key)
-    .map(|pos| pos + key.len())
-    .ok_or_else(|| "not found @description metadata".to_string())?;
-  let rest = &code[begin..];
-  let json_begin = rest
-    .find(|ch: char| !ch.is_whitespace())
-    .ok_or_else(|| "empty @description metadata".to_string())?;
-  let json_text = &rest[json_begin..];
-  let json_end = json_text.find("\n// @").unwrap_or(json_text.len());
-  serde_json::from_str(json_text[..json_end].trim())
-    .map_err(|err| format!("failed to parse @description metadata: {err}"))
-}
-
 fn plugin_id(meta: &Value) -> Result<&str, String> {
   let id = meta
     .get("name")
@@ -102,16 +86,6 @@ fn emit_progress<R: Runtime>(
   );
 }
 
-fn strip_port(input: &str) -> &str {
-  if let Some((host, port)) = input.rsplit_once(':')
-    && !port.is_empty()
-    && port.chars().all(|ch| ch.is_ascii_digit())
-  {
-    return host;
-  }
-  input
-}
-
 #[tauri::command]
 pub fn read_local_file(path: String) -> Result<LocalFile, String> {
   let path = Path::new(&path);
@@ -122,27 +96,6 @@ pub fn read_local_file(path: String) -> Result<LocalFile, String> {
     .to_string();
   let bytes = fs::read(path).map_err(|err| format!("failed to read local plugin file: {err}"))?;
   Ok(LocalFile { bytes, name })
-}
-
-#[tauri::command]
-pub fn prepare_dev_script(input: String, code: String) -> String {
-  let host = strip_port(&input);
-  code.replace("localhost", host).replace("127.0.0.1", host)
-}
-
-#[tauri::command]
-pub fn decode_dev_meta(code: String) -> Result<Value, String> {
-  decode_dev_meta_value(&code)
-}
-
-#[tauri::command]
-pub fn install_dev<R: Runtime>(app: AppHandle<R>, code: String) -> Result<Value, String> {
-  let meta = decode_dev_meta_value(&code)?;
-  let id = plugin_id(&meta)?;
-  let root = plugin_root(&app, id)?;
-  fs::create_dir_all(&root).map_err(|err| format!("failed to create plugin directory: {err}"))?;
-  fs::write(root.join("us.js"), code).map_err(|err| format!("failed to write us.js: {err}"))?;
-  Ok(meta)
 }
 
 #[tauri::command]

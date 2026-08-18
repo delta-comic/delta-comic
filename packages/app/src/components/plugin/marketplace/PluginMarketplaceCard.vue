@@ -6,7 +6,11 @@ import { useI18n } from 'vue-i18n'
 import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import type { PluginMarketplaceItem } from '@/features/pluginMarketplace/model'
 
-const props = defineProps<{ installing: boolean; item: PluginMarketplaceItem }>()
+const props = defineProps<{
+  confirming: boolean
+  installing: boolean
+  item: PluginMarketplaceItem
+}>()
 const emit = defineEmits<{ details: []; install: [] }>()
 const { t } = useI18n()
 
@@ -83,8 +87,8 @@ const compatibility = computed(() => ({
         </NButton>
         <NButton
           type="primary"
-          :disabled="actionDisabled"
-          :loading="installing"
+          :disabled="actionDisabled || confirming"
+          :loading="installing || confirming"
           @click="emit('install')"
         >
           {{ actionLabel }}

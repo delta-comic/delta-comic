@@ -5,6 +5,7 @@ import { computed } from 'vue'
 const show = defineModel<boolean>('show', { required: true })
 const props = defineProps<{
   allPlugins: ServerPluginSnapshotEntry[]
+  pending: boolean
   plugin?: ServerPluginSnapshotEntry
 }>()
 const emit = defineEmits<{ confirm: [pluginId: string] }>()
@@ -17,9 +18,8 @@ const dependencies = computed(() =>
 )
 
 const confirm = () => {
-  if (!props.plugin) return
+  if (!props.plugin || props.pending) return
   emit('confirm', props.plugin.manifest.id)
-  show.value = false
 }
 </script>
 
@@ -70,7 +70,9 @@ const confirm = () => {
     <template #footer>
       <NSpace justify="end"
         ><NButton @click="show = false">取消</NButton
-        ><NButton type="primary" @click="confirm">确认安装</NButton></NSpace
+        ><NButton type="primary" :disabled="pending" :loading="pending" @click="confirm"
+          >确认安装</NButton
+        ></NSpace
       >
     </template>
   </NModal>

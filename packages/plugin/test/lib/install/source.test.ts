@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import type { PluginInstallCatalog } from '../../../lib/install/catalog'
 import type { PluginSourceResolver } from '../../../lib/install/contracts'
 import {
+  DevServerSourceResolver,
   GitHubSourceResolver,
   HttpSourceResolver,
   MarketplaceSourceResolver,
@@ -76,13 +77,58 @@ describe('HttpSourceResolver', () => {
       report,
     )
 
-    expect(resolved.file.size).toBe(6)
+    expect(resolved.file?.size).toBe(6)
     expect(report).toHaveBeenLastCalledWith({
       downloadedBytes: 6,
       phase: 'resolve',
       progress: 100,
       totalBytes: 6,
     })
+  })
+})
+
+describe('DevServerSourceResolver', () => {
+  it('accepts strict dev ports and resolves the wire manifest without storing assets', async () => {
+    const fetch = vi.fn(async (input: string | URL | Request) => {
+      switch (String(input)) {
+        case 'http://localhost:6173/manifest.json':
+          return Response.json({
+            ...manifest('1.0.0'),
+            entry: { cssPath: 'src/style.css', jsPath: 'src/main.ts' },
+          })
+        case 'http://localhost:6173/index.js':
+          return new Response('export default () => ({ name: "reader" })')
+        case 'http://localhost:6173/index.css':
+          return new Response('.reader { color: red }')
+        default:
+          throw new Error(`unexpected request: ${String(input)}`)
+      }
+    })
+    vi.stubGlobal('fetch', fetch)
+    const resolver = new DevServerSourceResolver()
+
+    expect(resolver.matches('dev:6173')).toBe(true)
+    expect(resolver.matches('dev:1')).toBe(true)
+    expect(resolver.matches('dev:65535')).toBe(true)
+    expect(resolver.matches('dev:0')).toBe(false)
+    expect(resolver.matches('dev:65536')).toBe(false)
+    expect(resolver.matches('dev:6173/')).toBe(false)
+    expect(resolver.matches('dev:abc')).toBe(false)
+
+    const resolved = await resolver.resolve('dev:6173', new AbortController().signal)
+
+    expect(resolved).toMatchObject({
+      installInput: 'dev:6173',
+      resolverId: 'dev-server',
+      storage: 'remote',
+    })
+    expect(resolved.file).toBeUndefined()
+    expect(resolved.package).toMatchObject({ codecId: 'dev-server', files: new Map() })
+    expect(resolved.package?.manifest.entry).toEqual({
+      cssPath: 'src/style.css',
+      jsPath: 'src/main.ts',
+    })
+    expect(fetch).toHaveBeenCalledTimes(3)
   })
 })
 

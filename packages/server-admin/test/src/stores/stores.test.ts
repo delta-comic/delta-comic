@@ -317,6 +317,23 @@ describe('plugins store', () => {
     expect(store.pending).toEqual({})
   })
 
+  it('skips a duplicate action while one is pending for the same plugin', async () => {
+    const { client, store } = setupClient()
+    const pendingPost = Promise.withResolvers<ServerPluginJob>()
+    client.post.mockReturnValue(pendingPost.promise)
+    client.get.mockResolvedValue(pluginSnapshot())
+
+    const first = store.runAction('installed', 'enable')
+    const second = await store.runAction('installed', 'disable')
+    expect(second).toBeUndefined()
+    expect(store.pending['installed']).toBe('enable')
+
+    pendingPost.resolve(succeededJob('enable'))
+    await first
+    expect(client.post).toHaveBeenCalledOnce()
+    expect(store.pending).toEqual({})
+  })
+
   it('loads script state and run history together', async () => {
     const { client, store } = setupClient()
     client.get.mockResolvedValueOnce(script).mockResolvedValueOnce([scriptRun])

@@ -1,0 +1,6 @@
+- Standard Web completion gate: `vp run lib-build`, `vp check`, `vp run -r typecheck`, then `vp test run`.
+- For codegen changes, run the relevant codegen check before the standard gate.
+- Coverage: `vp test run --coverage`; root thresholds are 75% lines/functions/statements and 70% branches.
+- Rust changes additionally require `cargo fmt --all --check`, locked Clippy with `-D warnings`, and locked workspace tests with two test threads.
+- `packages/downloader/android` changes additionally require Gradle `ktlintCheck`, `lintDebug`, and `testDebugUnitTest` under the CI JDK 21/Android 36 setup.
+- Before finishing, inspect `git diff`/`git status`; per repository guidance, save each completed task immediately in a signed Conventional/Angular commit with Chinese description when committing is part of the task workflow.

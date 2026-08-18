@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { Octokit } from '@octokit/rest'
 
 import { pluginCatalogIdFromInstallInput, type PluginInstallCatalog } from './catalog'
@@ -7,6 +8,14 @@ import type {
   PluginSourceResolver,
   ResolvedPluginSource,
 } from './contracts'
+import {
+  DEV_CSS_PATH,
+  DEV_ENTRY_PATH,
+  DEV_MANIFEST_PATH,
+  DEV_SERVER_LOADER_ID,
+  devServerUrl,
+  parseDevServerPort,
+} from './dev'
 import { isPluginManifestCompatible, parsePluginManifest } from './manifest'
 
 const REPORT_INTERVAL = 250
@@ -82,6 +91,50 @@ export class HttpSourceResolver implements PluginSourceResolver {
   }
 }
 
+const fetchDevText = async (
+  url: string,
+  signal: AbortSignal,
+  optional = false,
+): Promise<string | undefined> => {
+  const response = await fetch(url, { cache: 'no-store', signal })
+  if (!response.ok) {
+    if (optional && response.status === 404) return undefined
+    throw new Error(`development plugin request failed: ${response.status}`)
+  }
+  return await response.text()
+}
+
+export class DevServerSourceResolver implements PluginSourceResolver {
+  public readonly id = DEV_SERVER_LOADER_ID
+
+  public matches(input: PluginInstallInput): input is string {
+    return typeof input === 'string' && parseDevServerPort(input) !== undefined
+  }
+
+  public async resolve(
+    input: PluginInstallInput,
+    signal: AbortSignal,
+  ): Promise<ResolvedPluginSource> {
+    if (typeof input !== 'string') throw new TypeError('development resolver requires dev:<port>')
+    const port = parseDevServerPort(input)
+    if (port === undefined) throw new TypeError('development resolver requires dev:<port>')
+
+    const manifestText = await fetchDevText(devServerUrl(port, DEV_MANIFEST_PATH), signal)
+    const manifest = parsePluginManifest(JSON.parse(manifestText ?? ''))
+    await fetchDevText(devServerUrl(port, DEV_ENTRY_PATH), signal)
+    if (manifest.entry?.cssPath !== undefined) {
+      await fetchDevText(devServerUrl(port, DEV_CSS_PATH), signal, true)
+    }
+
+    return {
+      installInput: input,
+      package: { codecId: this.id, files: new Map(), manifest },
+      resolverId: this.id,
+      storage: 'remote',
+    }
+  }
+}
+
 export interface GitHubSourceResolverOptions {
   readonly coreVersion: string
   readonly includePrereleases?: () => boolean
@@ -104,6 +157,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
   ) {
     if (typeof input !== 'string') throw new TypeError('GitHub resolver requires a repository')
     const [owner, repo] = input.slice(3).split('/') as [string, string]
+    logger.info('github use token : ', this.options.token)
     const octokit = new Octokit({ auth: this.options.token })
     const includePrereleases = this.options.includePrereleases?.() ?? false
     const pages = octokit.paginate.iterator(octokit.rest.repos.listReleases, {
@@ -122,6 +176,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
         if (!manifestResponse.ok) continue
         const manifest = parsePluginManifest(await manifestResponse.json())
         if (!isPluginManifestCompatible(manifest, this.options.coreVersion)) continue
+        logger.info('download plugin from github with response: ', packageAsset)
         const packageResponse = await fetch(packageAsset.browser_download_url, { signal })
         if (!packageResponse.ok)
           throw new Error(`plugin download failed: ${packageResponse.status}`)

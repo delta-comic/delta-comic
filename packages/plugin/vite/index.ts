@@ -3,7 +3,8 @@ import { exposeHostLibraries, extendsDepends } from '@delta-comic/utils/vite'
 import { merge } from 'es-toolkit'
 import JSZip from 'jszip'
 import type { Plugin, PluginOption } from 'vite'
-import monkey from 'vite-plugin-monkey'
+
+import { createDevPlugin } from './dev'
 
 export const deltaComic = (meta: PluginManifest, command: 'build' | 'serve'): PluginOption[] => {
   const externalGlobals = extendsDepends as Record<string, string>
@@ -64,18 +65,5 @@ export const deltaComic = (meta: PluginManifest, command: 'build' | 'serve'): Pl
   }
   const externals = exposeHostLibraries({ libraries: externalGlobals })
 
-  return [
-    sharedRuntimeGuard,
-    externals,
-    ...(isServer
-      ? [
-          monkey({
-            entry: meta.entry?.jsPath ?? 'src/main.ts',
-            userscript: { description: JSON.stringify(meta) },
-            build: { externalGlobals: isServer ? {} : externalGlobals },
-            server: { mountGmApi: false, open: false, prefix: '[DEV] ' },
-          }),
-        ]
-      : [plugin]),
-  ]
+  return [sharedRuntimeGuard, externals, ...(isServer ? [createDevPlugin(meta)] : [plugin])]
 }

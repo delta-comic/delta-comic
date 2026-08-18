@@ -1,0 +1,6 @@
+- Monorepo root: `packages/*`; publishable/shared packages include `db`, `downloader`, `logger`, `model`, `plugin`, `ui`, `utils`; private apps/services include `app`, `runtime`, `server`, `server-admin`.
+- Client app entry: `packages/app/src/main.tsx`; Tauri entry: `packages/app/src-tauri/src/main.rs`; server Worker entry: `packages/server/app/index.ts`; shared server API: `packages/server/lib/index.ts`.
+- `packages/server-admin` auto-discovers features from `src/features/*/feature.ts`; add feature modules instead of editing a central route list.
+- Plugin architecture is documented in `packages/plugin/ARCHITECTURE.md`; composition is the only layer that assembles capabilities/adapters, and package code must not self-import the package root.
+- Generated declarations must not be edited manually: `components.d.ts`, `typed-router.d.ts`, `packages/server/worker-configuration.d.ts`.
+- Read `mem:tech_stack` for tooling, `mem:suggested_commands` for commands, `mem:conventions` for implementation rules, and `mem:task_completion` for verification gates.

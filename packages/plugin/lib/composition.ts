@@ -11,7 +11,9 @@ import { createDefaultCapabilities, type PluginAuthGateway } from './capabilitie
 import { cfg } from './core/config'
 import {
   DatabasePluginArchiveRepository,
-  DevScriptCodec,
+  DevServerPluginModuleReader,
+  DevServerSourceResolver,
+  DEV_SERVER_LOADER_ID,
   GitHubSourceResolver,
   HttpSourceResolver,
   InstalledPluginCandidateProvider,
@@ -20,8 +22,11 @@ import {
   type PluginCatalog,
   type PluginInstallReporter,
   PluginInstallService,
+  safePluginPath,
   StoredPluginModuleReader,
   ZipPackageCodec,
+  devServerUrl,
+  parseDevServerPort,
 } from './install'
 import { ContributionHub } from './kernel'
 import {
@@ -54,7 +59,7 @@ export const configurePluginHost = (services: PluginHostServices) => {
 
 const pluginFiles = createDefaultPluginFileStore()
 const pluginRepository = new DatabasePluginArchiveRepository()
-const pluginReader = new StoredPluginModuleReader(pluginFiles)
+const pluginReaders = [new StoredPluginModuleReader(pluginFiles), new DevServerPluginModuleReader()]
 const internalPreferences = new LocalInternalPluginPreferences()
 const internalPluginIds = new Set(
   internalPluginDefinitions.map(definition => definition.manifest.name.id),
@@ -65,9 +70,10 @@ const internalProvider = new InternalPluginCandidateProvider(
 )
 const candidateProvider = new CompositePluginCandidateProvider([
   internalProvider,
-  new InstalledPluginCandidateProvider(pluginRepository, pluginReader),
+  new InstalledPluginCandidateProvider(pluginRepository, pluginReaders),
 ])
 
+const devSource = new DevServerSourceResolver()
 const httpSource = new HttpSourceResolver()
 const githubSource = new GitHubSourceResolver({
   coreVersion: corePluginDefinition.manifest.version.plugin,
@@ -81,11 +87,17 @@ const marketplaceSource = new MarketplaceSourceResolver(awesomeRegistry, [github
 export const pluginCatalog: PluginCatalog = awesomeRegistry
 
 export const pluginInstaller = new PluginInstallService({
-  codecs: [new ZipPackageCodec(), new DevScriptCodec()],
+  codecs: [new ZipPackageCodec()],
   files: pluginFiles,
   repository: pluginRepository,
   reservedIds: internalPluginIds,
-  resolvers: [new LocalFileSourceResolver(), marketplaceSource, githubSource, httpSource],
+  resolvers: [
+    new LocalFileSourceResolver(),
+    devSource,
+    marketplaceSource,
+    githubSource,
+    httpSource,
+  ],
 })
 
 export const pluginRuntime = new PluginRuntime({
@@ -100,6 +112,7 @@ export const pluginRuntime = new PluginRuntime({
   provider: candidateProvider,
   remove: plugin => pluginInstaller.uninstall(plugin),
   store: pluginStore,
+  services: { i18n: pluginI18n },
 })
 
 export interface PluginInstallOptions {
@@ -198,6 +211,14 @@ export const resolvePluginIconUrl = async (
   if (!icon) return undefined
   if (/^https?:\/\//i.test(icon)) return icon
   if (!plugin) throw new Error('a plugin id is required to resolve a local plugin icon')
+  const archive = await pluginRepository.find(plugin)
+  if (archive?.loaderName === DEV_SERVER_LOADER_ID) {
+    const port = parseDevServerPort(archive.installInput)
+    if (port === undefined) {
+      throw new Error(`development plugin has an invalid install source: ${archive.installInput}`)
+    }
+    return devServerUrl(port, `/${safePluginPath(icon, 'plugin icon path')}`)
+  }
   return await pluginFiles.createAssetUrl(plugin, icon)
 }
 

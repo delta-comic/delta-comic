@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import type { PluginMarketplaceItem } from '@/features/pluginMarketplace/model'
 
 defineProps<{
+  confirmingIds: ReadonlySet<string>
   error?: Error
   hasMore: boolean
   installingIds: ReadonlySet<string>
@@ -52,6 +53,7 @@ const { t } = useI18n()
           v-for="item in items"
           :key="item.listing.id"
           :item="item"
+          :confirming="confirmingIds.has(item.listing.id)"
           :installing="installingIds.has(item.listing.id)"
           @details="emit('details', item)"
           @install="emit('install', item)"

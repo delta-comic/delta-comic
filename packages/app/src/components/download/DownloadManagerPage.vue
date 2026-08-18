@@ -75,12 +75,22 @@ function confirmAction(
   task: DownloadTask,
   action: (id: string) => Promise<unknown>,
 ) {
-  dialog.warning({
+  let confirmed = false
+  const instance = dialog.warning({
     content,
     negativeText: t('common.actions.cancel'),
     positiveText: t('common.actions.confirm'),
     title: t('common.dialog.warning'),
-    onPositiveClick: () => perform(() => action(task.id)),
+    onPositiveClick: () => {
+      if (confirmed) return false
+      confirmed = true
+      instance.loading = true
+      instance.negativeButtonProps = { disabled: true }
+      instance.closable = false
+      instance.maskClosable = false
+      instance.closeOnEsc = false
+      return perform(() => action(task.id))
+    },
   })
 }
 
@@ -138,6 +148,7 @@ function performSelected(action: (task: DownloadTask) => Promise<unknown>) {
         {{ t('download.errors.loadFailed', { error }) }}
       </NAlert>
       <DownloadSourceRefreshWarnings
+        :disabled="mutating"
         :warnings="sourceRefreshWarnings"
         @confirm="id => perform(() => store.confirmSourceRefresh(id))"
         @retry="id => perform(() => store.retrySourceRefresh(id))"
