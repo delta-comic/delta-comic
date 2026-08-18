@@ -1,5 +1,26 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.13](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.12...3.0.0-next.13) (2026-08-18)
+
+
+### Bug Fixes
+
+* **app:** 修复了gh-token输入样式 ([9f6f772](https://github.com/delta-comic/delta-comic/commit/9f6f772253f069247ae6632e5163f595beed2aa1))
+* **app:** 插件下载确认期间禁用重复确认并加固同类下载弹窗 ([98f3da6](https://github.com/delta-comic/delta-comic/commit/98f3da62ace19905ec90f3211ef0d9c918bd70ea))
+* **plugin:** 修复插件 CSS 入口解析 ([872fb38](https://github.com/delta-comic/delta-comic/commit/872fb384cd10fecd3e8e773dcf3da2bc8de2955f))
+* **plugin:** 预启动阶段注册插件 i18n 并补齐 core 配置文案 ([f3887df](https://github.com/delta-comic/delta-comic/commit/f3887df1388232db1a937ae87b75ecac569ae6fe))
+* **server-admin:** 插件动作进行中禁用重复确认并锁定确认弹窗 ([2147442](https://github.com/delta-comic/delta-comic/commit/214744252233bf870365c2031598f1478850c2e9))
+
+
+### Features
+
+* **app:** 启动配置支持 GitHub Token ([e9145f2](https://github.com/delta-comic/delta-comic/commit/e9145f2aecb11a26b6d405fa949765284efbc69b))
+* **plugin:** 实现持久化开发服务器协议 ([0736f4f](https://github.com/delta-comic/delta-comic/commit/0736f4f0479b10e8946009b2e9f8858ceac72d51))
+* **plugin:** 开发服务器接入原生 Vite HMR ([6ad37d6](https://github.com/delta-comic/delta-comic/commit/6ad37d6f55c6b7af795a3e1b17f656626357223d))
+* **plugin:** 接入自定义 Vite 开发协议并移除 vite-plugin-monkey ([d000970](https://github.com/delta-comic/delta-comic/commit/d00097097dc30cccfe27d7e7f565b6def19a8943))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.12](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.11...3.0.0-next.12) (2026-08-16)
 
 
