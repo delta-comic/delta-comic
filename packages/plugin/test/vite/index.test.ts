@@ -1,10 +1,8 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import JSZip from 'jszip'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it } from 'vite-plus/test'
 
 import { deltaComic } from '../../vite/index'
-
-vi.mock('vite-plugin-monkey', () => ({ default: () => ({ name: 'vite-plugin-monkey' }) }))
 
 const meta: PluginArchiveDB.Meta = {
   apiVersion: 1,
