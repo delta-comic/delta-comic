@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/logger'
 import { isTauri } from '@tauri-apps/api/core'
 
 import {
@@ -11,7 +12,10 @@ import { createDefaultCapabilities, type PluginAuthGateway } from './capabilitie
 import { cfg } from './core/config'
 import {
   DatabasePluginArchiveRepository,
-  DevScriptCodec,
+  DevServerPluginModuleReader,
+  DevServerSourceResolver,
+  DEV_PLUGIN_HMR_EVENT,
+  DEV_SERVER_LOADER_ID,
   GitHubSourceResolver,
   HttpSourceResolver,
   InstalledPluginCandidateProvider,
@@ -20,8 +24,11 @@ import {
   type PluginCatalog,
   type PluginInstallReporter,
   PluginInstallService,
+  safePluginPath,
   StoredPluginModuleReader,
   ZipPackageCodec,
+  devServerUrl,
+  parseDevServerPort,
 } from './install'
 import { ContributionHub } from './kernel'
 import {
@@ -37,8 +44,53 @@ export const pluginStore = new PluginStore(value => pluginI18n.translateText(val
 export const pluginConfigStore = new ConfigStore()
 export const useConfig = () => pluginConfigStore
 
+const hmrTimers = new Map<string, ReturnType<typeof setTimeout>>()
+const hmrReloads = new Map<string, Promise<void>>()
+let hmrListenerInstalled = false
+
+const reloadPluginFromHmr = async (plugin: string) => {
+  const previous = hmrReloads.get(plugin) ?? Promise.resolve()
+  const current = previous
+    .catch(() => undefined)
+    .then(async () => {
+      try {
+        await pluginRuntime.reloadPlugin(plugin)
+      } catch (error) {
+        logger.error('failed to reload development plugin', plugin, error)
+      }
+    })
+  hmrReloads.set(plugin, current)
+  try {
+    await current
+  } finally {
+    if (hmrReloads.get(plugin) === current) hmrReloads.delete(plugin)
+  }
+}
+
+const installPluginHmrListener = () => {
+  if (hmrListenerInstalled || typeof window === 'undefined') return
+  hmrListenerInstalled = true
+  window.addEventListener(DEV_PLUGIN_HMR_EVENT, event => {
+    if (!(event instanceof CustomEvent)) return
+    const detail = event.detail
+    if (typeof detail !== 'object' || detail === null || !('pluginId' in detail)) return
+    const plugin = detail.pluginId
+    if (typeof plugin !== 'string' || plugin.length === 0) return
+    const previous = hmrTimers.get(plugin)
+    if (previous) clearTimeout(previous)
+    hmrTimers.set(
+      plugin,
+      setTimeout(() => {
+        hmrTimers.delete(plugin)
+        void reloadPluginFromHmr(plugin)
+      }, 100),
+    )
+  })
+}
+
 export const preparePluginHost = async () => {
   await pluginConfigStore.register(cfg).ready
+  installPluginHmrListener()
 }
 
 export interface PluginHostServices {
@@ -54,7 +106,7 @@ export const configurePluginHost = (services: PluginHostServices) => {
 
 const pluginFiles = createDefaultPluginFileStore()
 const pluginRepository = new DatabasePluginArchiveRepository()
-const pluginReader = new StoredPluginModuleReader(pluginFiles)
+const pluginReaders = [new StoredPluginModuleReader(pluginFiles), new DevServerPluginModuleReader()]
 const internalPreferences = new LocalInternalPluginPreferences()
 const internalPluginIds = new Set(
   internalPluginDefinitions.map(definition => definition.manifest.name.id),
@@ -65,9 +117,10 @@ const internalProvider = new InternalPluginCandidateProvider(
 )
 const candidateProvider = new CompositePluginCandidateProvider([
   internalProvider,
-  new InstalledPluginCandidateProvider(pluginRepository, pluginReader),
+  new InstalledPluginCandidateProvider(pluginRepository, pluginReaders),
 ])
 
+const devSource = new DevServerSourceResolver()
 const httpSource = new HttpSourceResolver()
 const githubSource = new GitHubSourceResolver({
   coreVersion: corePluginDefinition.manifest.version.plugin,
@@ -81,11 +134,17 @@ const marketplaceSource = new MarketplaceSourceResolver(awesomeRegistry, [github
 export const pluginCatalog: PluginCatalog = awesomeRegistry
 
 export const pluginInstaller = new PluginInstallService({
-  codecs: [new ZipPackageCodec(), new DevScriptCodec()],
+  codecs: [new ZipPackageCodec()],
   files: pluginFiles,
   repository: pluginRepository,
   reservedIds: internalPluginIds,
-  resolvers: [new LocalFileSourceResolver(), marketplaceSource, githubSource, httpSource],
+  resolvers: [
+    new LocalFileSourceResolver(),
+    devSource,
+    marketplaceSource,
+    githubSource,
+    httpSource,
+  ],
 })
 
 export const pluginRuntime = new PluginRuntime({
@@ -199,6 +258,14 @@ export const resolvePluginIconUrl = async (
   if (!icon) return undefined
   if (/^https?:\/\//i.test(icon)) return icon
   if (!plugin) throw new Error('a plugin id is required to resolve a local plugin icon')
+  const archive = await pluginRepository.find(plugin)
+  if (archive?.loaderName === DEV_SERVER_LOADER_ID) {
+    const port = parseDevServerPort(archive.installInput)
+    if (port === undefined) {
+      throw new Error(`development plugin has an invalid install source: ${archive.installInput}`)
+    }
+    return devServerUrl(port, `/${safePluginPath(icon, 'plugin icon path')}`)
+  }
   return await pluginFiles.createAssetUrl(plugin, icon)
 }
 

@@ -17,7 +17,7 @@ export class InstalledPluginCandidateProvider implements PluginCandidateProvider
 
   public constructor(
     private readonly repository: PluginArchiveRepository,
-    private readonly reader: PluginModuleReader,
+    private readonly readers: readonly PluginModuleReader[],
   ) {}
 
   public async list(signal: AbortSignal): Promise<PluginCandidate[]> {
@@ -25,8 +25,14 @@ export class InstalledPluginCandidateProvider implements PluginCandidateProvider
     signal.throwIfAborted()
     return archives.map(archive => ({
       enabled: toBoolean(archive.enable),
-      load: async loadSignal =>
-        await this.reader.read(archive.pluginName, archive.meta, loadSignal),
+      load: async loadSignal => {
+        const reader =
+          this.readers.find(candidate => candidate.matches?.(archive)) ??
+          this.readers.find(candidate => !candidate.matches) ??
+          this.readers[0]
+        if (!reader) throw new Error('no plugin module reader is configured')
+        return await reader.read(archive, loadSignal)
+      },
       management: {
         canDisable: true,
         canUninstall: true,

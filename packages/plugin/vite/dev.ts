@@ -5,12 +5,16 @@ import type { PluginManifest } from '@delta-comic/model'
 import type { Connect, ModuleNode, Plugin, ViteDevServer } from 'vite'
 import { isCSSRequest, normalizePath } from 'vite'
 
+import {
+  DEV_CSS_PATH,
+  DEV_ENTRY_PATH,
+  DEV_HMR_PATH,
+  DEV_MANIFEST_PATH,
+  DEV_PLUGIN_HMR_EVENT,
+} from '../lib/install/dev'
+
 export const DEV_ENTRY_ID = '\0delta-comic:dev-entry'
-export const DEV_MANIFEST_PATH = '/manifest.json'
-export const DEV_ENTRY_PATH = '/index.js'
-export const DEV_CSS_PATH = '/index.css'
-export const DEV_HMR_PATH = '/__delta-comic__/hmr'
-export const DEV_PLUGIN_HMR_EVENT = 'delta-comic:plugin-hmr'
+export { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_HMR_PATH, DEV_MANIFEST_PATH, DEV_PLUGIN_HMR_EVENT }
 
 const NO_CACHE_HEADERS = {
   'Cache-Control': 'no-cache, no-store, must-revalidate',

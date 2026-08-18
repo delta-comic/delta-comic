@@ -8,6 +8,14 @@ import type {
   PluginSourceResolver,
   ResolvedPluginSource,
 } from './contracts'
+import {
+  DEV_CSS_PATH,
+  DEV_ENTRY_PATH,
+  DEV_MANIFEST_PATH,
+  DEV_SERVER_LOADER_ID,
+  devServerUrl,
+  parseDevServerPort,
+} from './dev'
 import { isPluginManifestCompatible, parsePluginManifest } from './manifest'
 
 const REPORT_INTERVAL = 250
@@ -79,6 +87,50 @@ export class HttpSourceResolver implements PluginSourceResolver {
       file: await responseFile(response, name, report),
       installInput: input,
       resolverId: this.id,
+    }
+  }
+}
+
+const fetchDevText = async (
+  url: string,
+  signal: AbortSignal,
+  optional = false,
+): Promise<string | undefined> => {
+  const response = await fetch(url, { cache: 'no-store', signal })
+  if (!response.ok) {
+    if (optional && response.status === 404) return undefined
+    throw new Error(`development plugin request failed: ${response.status}`)
+  }
+  return await response.text()
+}
+
+export class DevServerSourceResolver implements PluginSourceResolver {
+  public readonly id = DEV_SERVER_LOADER_ID
+
+  public matches(input: PluginInstallInput): input is string {
+    return typeof input === 'string' && parseDevServerPort(input) !== undefined
+  }
+
+  public async resolve(
+    input: PluginInstallInput,
+    signal: AbortSignal,
+  ): Promise<ResolvedPluginSource> {
+    if (typeof input !== 'string') throw new TypeError('development resolver requires dev:<port>')
+    const port = parseDevServerPort(input)
+    if (port === undefined) throw new TypeError('development resolver requires dev:<port>')
+
+    const manifestText = await fetchDevText(devServerUrl(port, DEV_MANIFEST_PATH), signal)
+    const manifest = parsePluginManifest(JSON.parse(manifestText ?? ''))
+    await fetchDevText(devServerUrl(port, DEV_ENTRY_PATH), signal)
+    if (manifest.entry?.cssPath !== undefined) {
+      await fetchDevText(devServerUrl(port, DEV_CSS_PATH), signal, true)
+    }
+
+    return {
+      installInput: input,
+      package: { codecId: this.id, files: new Map(), manifest },
+      resolverId: this.id,
+      storage: 'remote',
     }
   }
 }

@@ -13,11 +13,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
       protocol::handle(context.app_handle(), request)
     })
     .invoke_handler(tauri::generate_handler![
-      commands::decode_dev_meta,
       commands::decode_zip_meta,
-      commands::install_dev,
       commands::install_zip,
-      commands::prepare_dev_script,
       commands::read_local_file,
     ])
     .setup(|_app, _api| {

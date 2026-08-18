@@ -46,9 +46,10 @@ describe('plugin candidate providers', () => {
       upsert: vi.fn(),
     }
     const reader: PluginModuleReader = {
+      id: 'stored',
       read: async () => ({ factory: defineDeltaComicPlugin({ name: 'reader' }) }),
     }
-    const installed = new InstalledPluginCandidateProvider(repository, reader)
+    const installed = new InstalledPluginCandidateProvider(repository, [reader])
     const candidates = await new CompositePluginCandidateProvider([internal, installed]).list(
       new AbortController().signal,
     )
@@ -71,9 +72,9 @@ describe('plugin candidate providers', () => {
       remove: vi.fn(),
       upsert: vi.fn(),
     }
-    const installed = new InstalledPluginCandidateProvider(repository, {
-      read: async () => ({ factory }),
-    })
+    const installed = new InstalledPluginCandidateProvider(repository, [
+      { id: 'stored', read: async () => ({ factory }) },
+    ])
     const candidates = await installed.list(new AbortController().signal)
 
     expect(candidates.map(candidate => [candidate.manifest.name.id, candidate.enabled])).toEqual([
@@ -96,9 +97,9 @@ describe('plugin candidate providers', () => {
       remove: vi.fn(),
       upsert: vi.fn(),
     }
-    const installed = new InstalledPluginCandidateProvider(repository, {
-      read: async () => ({ factory }),
-    })
+    const installed = new InstalledPluginCandidateProvider(repository, [
+      { id: 'stored', read: async () => ({ factory }) },
+    ])
     const candidates = await installed.list(new AbortController().signal)
 
     expect(candidates.map(candidate => [candidate.manifest.name.id, candidate.enabled])).toEqual([
@@ -142,9 +143,9 @@ describe('plugin candidate providers', () => {
       remove: vi.fn(),
       upsert: vi.fn(),
     }
-    const installed = new InstalledPluginCandidateProvider(repository, {
-      read: async () => ({ factory: defineDeltaComicPlugin({ name: 'core' }) }),
-    })
+    const installed = new InstalledPluginCandidateProvider(repository, [
+      { id: 'stored', read: async () => ({ factory: defineDeltaComicPlugin({ name: 'core' }) }) },
+    ])
 
     const candidates = await new CompositePluginCandidateProvider([installed, internal]).list(
       new AbortController().signal,

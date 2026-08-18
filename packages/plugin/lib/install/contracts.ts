@@ -6,9 +6,11 @@ import type { LoadedPluginModule } from '../kernel'
 export type PluginInstallInput = File | string
 
 export interface ResolvedPluginSource {
-  readonly file: File
+  readonly file?: File
   readonly installInput: string
+  readonly package?: DecodedPluginPackage
   readonly resolverId: string
+  readonly storage?: 'archive' | 'remote'
 }
 
 export interface PluginSourceResolver {
@@ -55,7 +57,9 @@ export interface PluginArchiveRepository {
 }
 
 export interface PluginModuleReader {
-  read(plugin: string, manifest: PluginManifest, signal: AbortSignal): Promise<LoadedPluginModule>
+  readonly id: string
+  matches?(archive: PluginArchiveDB.Archive): boolean
+  read(archive: PluginArchiveDB.Archive, signal: AbortSignal): Promise<LoadedPluginModule>
 }
 
 export interface PluginInstallProgress {

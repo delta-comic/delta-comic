@@ -41,31 +41,3 @@ export class ZipPackageCodec implements PluginPackageCodec {
     return { codecId: this.id, files, manifest }
   }
 }
-
-const description = '@description'
-
-export class DevScriptCodec implements PluginPackageCodec {
-  public readonly id = 'dev-script'
-
-  public matches(file: File) {
-    return /\.(?:js|mjs|user\.js)$/i.test(file.name)
-  }
-
-  public async decode(file: File, signal: AbortSignal): Promise<DecodedPluginPackage> {
-    const bytes = new Uint8Array(await file.arrayBuffer())
-    if (signal.aborted) throw signal.reason
-    const code = new TextDecoder().decode(bytes)
-    const start = code.indexOf(description)
-    if (start < 0) throw new Error('development plugin does not contain @description metadata')
-    const [line] = code
-      .slice(start + description.length)
-      .trimStart()
-      .split(/\r?\n/, 1)
-    const manifest = await withIntegrity(parsePluginManifest(JSON.parse(line)), bytes)
-    return {
-      codecId: this.id,
-      files: new Map([['index.mjs', bytes]]),
-      manifest: { ...manifest, entry: { ...manifest.entry, jsPath: 'index.mjs' } },
-    }
-  }
-}
