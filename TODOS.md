@@ -1,52 +1,57 @@
-# 任务清单
+# Delta Comic — 开发进度与规划
 
-你现在着手完成以下内容，不分先后。你自己决定工作顺序
+> 目标：重构 `packages/plugin`，废弃 `vite-plugin-monkey`，实现自定义 Vite 开发协议
+> （`index.js` / `index.css` / `manifest.json`）+ 持久化的 `dev:<port>` 网络安装适配器。
 
-此外，你可以**任意的**添加依赖和增删monorepo
+## 已完成
 
-适当的用git提交(不推送)保存分割工作进度
+| 阶段 | 提交 | 说明 | 状态 |
+| --- | --- | --- | --- |
+| Phase 1 | `872fb384` | 修复插件 manifest CSS 入口解析 | ✅ |
+| Phase 2 | `d0009709` | 自定义 Vite 开发协议 + 移除 vite-plugin-monkey | ✅ |
+| 进度记录 | `c5951691` | 规划文件（task_plan/findings/progress）落盘 | ✅ |
 
-你可以切分子任务来更好的规划进度
+Phase 2 产物：`packages/plugin/vite/dev.ts`（200 行）+ `dev.test.ts` + `dev.integration.test.ts`
++ `index.ts`/`package.json`/`pnpm-lock.yaml` 修改。完整验证链通过（888 tests）。
 
-该清单内容位于`项目根目录/TODOS.md`
+## 当前阶段：Phase 3（实现中）
 
----
+**目标**：持久化 `dev:<port>` 网络安装（元数据入库，代码/CSS 仅网络加载，`require` 走标准递归安装）。
 
-## TS 类型约束治理（按 AGENTS.md 最后几条规则）
+**已确认设计**（架构探索完毕，待实现）：
 
-按「二 → 一 → 三」顺序完成：先零破坏小修，再做破坏性小改，最后评估破坏性重构。
+1. **`contracts.ts`**
+   - `ResolvedPluginSource` 增 `package?: DecodedPluginPackage`、`storage?: 'archive' | 'remote'`
+   - `PluginModuleReader` 改为 `read(archive: PluginArchiveDB.Archive, signal)` + `id` + 可选 `matches?(archive)`
+   - 导出 `DEV_SERVER_LOADER_ID = 'dev-server'` 等常量
 
-### 二、生产代码中的 `as any` / 裸 `any`
+2. **`source.ts`**：新增 `DevServerSourceResolver`
+   - `id = 'dev-server'`，`matches` 匹配 `/^dev:(\d+)$/`（port 1-65535）
+   - `resolve`：fetch `http://localhost:<port>/manifest.json` → `parsePluginManifest`
+     → 再取 `index.js`（+ `index.css` 若 `manifest.entry.cssPath`）→ 文本
+   - 返回 `{ package: { codecId: 'dev-server', files: 空 Map, manifest }, installInput, resolverId, storage: 'remote' }`
 
-- [x] #4 `packages/db/lib/config.ts:45` `upsertConfig(..., form: any)` → `form: ConfigDescription`
-- [x] #5 `packages/db/lib/{favourite,history,plugin,recentView,subscribe}.ts` `otherKeys: any[]` → colada `Key[]`（5 处）
-- [x] #6 `packages/db/lib/utils.ts:31` `countDb(SelectQueryBuilder<DB, any, object>)` → `SelectQueryBuilder<DB, keyof DB, object>`
-- [x] #7 `packages/ui/src/router.ts:29` `router.resolve(to as any)` → `to: RouteLocationRaw`
-- [x] #8 `packages/ui/lib/message/download.tsx:262` 循环赋值 → `Object.assign(_config, config)`；`PromiseWithResolvers<any>`(L59) 收窄
-- [x] #9 `packages/app/src/cloud/syncAdapter.ts:65,69` `(trx as never)`/`(trx as any)` → `switch (change.collection)` 分发，`deleteRemoteChange` 参数改 `Kysely<DB>`
-- [x] #10 `packages/model/lib/model/{item,comment}.ts` `Promise<any>`/`PromiseLike<any>` → `Promise<unknown>`/`PromiseLike<unknown>`
-- [x] #11 `packages/model/lib/model/item.ts:55-56` `class?: any; style?: any` → 精确类型；`content.ts:22-27` Component 的 `any` → `{}`，`view(): any` → `unknown`
-- [x] #12 `packages/model/lib/struct/meta.ts:8` `Metadata = Record<string|number, any>` → `Record<string|number, unknown>`（检查 `$$meta` 读取侧）
-- [x] #13 `packages/model/lib/struct/store.ts:68` `forEach(thisArg?: any)` → `unknown`
-- [x] #14 `packages/plugin/lib/api/model/user.ts:65` `call(author): any` → `unknown`
-- [x] #15 `packages/plugin/lib/adapters/configStore.ts:25` `data: store as any` → 验证泛型链路后删断言，必要时单断言收敛
-- [x] #16 `packages/ui/lib/components/DcMarkdown/index.vue:24` `{ plugins: [] as any, config: {} as any }` → 直接删
-- [x] #17 `packages/ui/lib/components/form/components/DcForm.vue:19,37` `Record<string, any>`/`config as any` → `FormDefaultValue[keyof FormDefaultValue]` 等精确类型
-- [x] #18 `packages/ui/lib/components/form/components/DcFormItem.vue:16` `ModelRef<any>` → 用推导类型或 `ModelRef<FormSingleResult<T>>`
-- [x] #19 `packages/logger/lib/logger.ts:155` `previous as never` → `as (typeof console)[typeof method]`
-- [x] #20 `packages/plugin/lib/api/config.ts:12` 幽灵字段 `_type = {} as T` → `declare readonly _type: T`
+3. **`service.ts`**
+   - `source.package` 存在时跳过 codec 步骤
+   - `storage === 'remote'` 时 `files.replace(plugin, new Map())` 清空文件（元数据仍 upsert）
+   - `loaderName = source.package?.codecId ?? decoded.codecId`
 
-### 一、`as unknown as` 强制转换
+4. **`moduleReader.ts`**：新增 `DevServerPluginModuleReader`
+   - `matches` 匹配 `archive.loaderName === 'dev-server'`
+   - 按 `installInput` 端口 import `http://localhost:<port>/index.js?v=<每插件计数>`
+   - fetch CSS 文本，样式注入复用 Stored 逻辑；CSS 404 容忍
 
-- [x] #1 `packages/model/lib/struct/struct.ts:21` `return item as any` → 单点诚实断言 `item as T & TRaw`（tsgo 下 `as TRaw` 不可比）
-- [x] #2 `packages/plugin/lib/kernel/contribution.ts:101` `as unknown as` → 新增擦除接口 `AnyContributionRegistry`，创建/返回各一个单层 `as`（56/69/76 行条件断言保留，属于 per-owner 收窄设计）
-- [x] #3 `packages/plugin/vite/index.ts:95` + `packages/server/app/shared/http/cors.ts:10` → plugin 新增 `vite`(catalog) 依赖改用官方 `Plugin`/`PluginOption`；cors.ts 删除，内联 `.use(elysiaCors({...}))`
+5. **`candidateProvider.ts`**：`InstalledPluginCandidateProvider` 接受 `readonly PluginModuleReader[]`
+   - 路由：`find(r => r.matches?.(archive)) ?? find(r => !r.matches) ?? readers[0]`
 
-### 三、Module Augmentation 优化
+6. **`composition.ts`**：`resolvers` 加 `DevServerSourceResolver`；`InstalledPluginCandidateProvider`
+   改为接收 `[StoredPluginModuleReader, DevServerPluginModuleReader]`
 
-- [x] #21 `packages/utils/lib/env.ts` → 暴露 `AppApiRegistry`/`AppLibRegistry` 可增强接口；app 端 Module Augmentation 注册 M3 与 10 个 UMD 库类型；`$$lib$$` 值类型 `any` → `unknown`（var.ts 保留 `??=` 初始化并单点 `as T`）
-- [x] #22 删除 ui/env.d.ts 与 app/src/env.d.ts 重复的 vue-router TypesConfig/RouterClassic 声明，utils 经 dist 输出为唯一事实源（app 保留 vue ComponentCustomProperties 与 vue-i18n）
+**验证**：`vp run lib-build` → `vp check --fix` → `vp run -r typecheck` → `vp test run`
 
-### 五、测试代码批量清理（低优先，单独 PR）
+## 后续规划（Phase 4 / 5）
 
-- [ ] #23 `db/test/lib/operations.test.ts`（~30 处 `as never`）、`ui/test`、`server/test` 的 mock：类型化 mock 工厂 + `vi.fn<T>()`，单断言替代 `as unknown as`
+- Phase 4：composition 接线（HMR host 监听 `delta-comic:plugin-hmr` + debounce + `reloadPlugin`；
+  `resolvePluginIconUrl` 对 dev 相对图标按 dev base URL 解析；移除 DevScriptCodec + userscript
+  Rust 命令；更新 `PLUGIN_DEVELOPMENT.md` §9/§9.1 + `ARCHITECTURE.md`）
+- Phase 5：全链路验证 + 提交
