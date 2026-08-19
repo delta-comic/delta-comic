@@ -33,7 +33,7 @@ export const deltaComic = (meta: PluginManifest, command: 'build' | 'serve'): Pl
           assetsInlineLimit: Number.POSITIVE_INFINITY,
           cssCodeSplit: false,
           lib: {
-            entry: './src/main.ts',
+            entry: meta.entry?.jsPath ?? './src/main.ts',
             fileName: 'index',
             cssFileName: 'index',
             name: `$$lib$$.__DcPlugin__${meta.name.id.replace('-', '_')}__`,

@@ -133,7 +133,7 @@ export const manifest = {
   description: '一个最小的 Delta Comic 插件',
   require: [],
   entry: {
-    jsPath: 'index.mjs',
+    jsPath: 'src/main.ts',
   },
 } satisfies PluginManifest
 ```
@@ -248,8 +248,8 @@ interface PluginManifest {
 | `author`、`description` | 非空文本 |
 | `icon` | 插件包内相对路径，或无用户名、密码的 HTTP(S) URL |
 | `require` | 插件依赖；依赖会先激活，缺失、循环或激活失败会阻止当前插件 |
-| `entry.jsPath` | 包内 ESM 入口；省略时默认为 `index.mjs` |
-| `entry.cssPath` | 可选 CSS 文件；激活时注入，卸载时自动移除 |
+| `entry.jsPath` | 本地开发源入口（相对项目根）；dev 模式用它作为开发源入口，生产构建也以它为构建入口；省略时默认为 `src/main.ts` |
+| `entry.cssPath` | 可选本地源 CSS 入口（相对项目根）；有 CSS 产物时注入，无产物时自动跳过 |
 | `integrity` | 安装器会根据实际包内容生成 SHA-256 完整性信息，普通作者无需手写 |
 
 路径必须是安全相对路径，不能是绝对路径、盘符路径，不能包含 `..` 或空字符。
@@ -885,13 +885,13 @@ Remote 或 Resource 的所有测试都失败或超时。测试函数应在成功
 
 ### CSS 没有加载
 
-如果构建产生 `index.css`，manifest 必须声明：
+构建产生 `index.css` 时，客户端会自动尝试注入该产物；没有 CSS 产物时则静默跳过，无需在 manifest 中额外声明 `entry.cssPath`。
+
+如果需要指定本地源 CSS 入口（dev 模式下由开发服务器聚合），可在 manifest 中声明：
 
 ```ts
-entry: { jsPath: 'index.mjs', cssPath: 'index.css' }
+entry: { jsPath: 'src/main.ts', cssPath: 'src/style.css' }
 ```
-
-如果没有 CSS 产物，不要填写 `cssPath`，否则激活时会因为文件不存在而失败。
 
 ## 12. 安全边界
 

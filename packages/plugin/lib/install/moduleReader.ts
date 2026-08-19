@@ -41,9 +41,7 @@ export class StoredPluginModuleReader implements PluginModuleReader {
     signal: AbortSignal,
   ): Promise<LoadedPluginModule> {
     const plugin = archive.pluginName
-    const manifest = archive.meta
-    const entry = manifest.entry?.jsPath ?? 'index.mjs'
-    const url = await this.files.createModuleUrl(plugin, entry)
+    const url = await this.files.createModuleUrl(plugin, 'index.mjs')
     if (signal.aborted) {
       this.files.release(plugin)
       throw signal.reason
@@ -51,9 +49,12 @@ export class StoredPluginModuleReader implements PluginModuleReader {
     try {
       const module = (await import(/* @vite-ignore */ url)) as { default?: unknown }
       signal.throwIfAborted()
-      const styleText = manifest.entry?.cssPath
-        ? new TextDecoder().decode(await this.files.read(plugin, manifest.entry.cssPath))
-        : undefined
+      let styleText: string | undefined
+      try {
+        styleText = new TextDecoder().decode(await this.files.read(plugin, 'index.css'))
+      } catch {
+        styleText = undefined
+      }
       signal.throwIfAborted()
       return {
         activate: styleActivator(plugin, styleText),
@@ -97,13 +98,10 @@ export class DevServerPluginModuleReader implements PluginModuleReader {
     signal.throwIfAborted()
 
     let styleText: string | undefined
-    if (archive.meta.entry?.cssPath !== undefined) {
-      const response = await fetch(devServerUrl(port, DEV_CSS_PATH), { cache: 'no-store', signal })
-      if (response.status !== 404) {
-        if (!response.ok)
-          throw new Error(`development plugin CSS request failed: ${response.status}`)
-        styleText = await response.text()
-      }
+    const response = await fetch(devServerUrl(port, DEV_CSS_PATH), { cache: 'no-store', signal })
+    if (response.status !== 404) {
+      if (!response.ok) throw new Error(`development plugin CSS request failed: ${response.status}`)
+      styleText = await response.text()
     }
     signal.throwIfAborted()
     return {
