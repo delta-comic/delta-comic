@@ -1,5 +1,15 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.14](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.13...3.0.0-next.14) (2026-08-19)
+
+
+### Bug Fixes
+
+* **plugin:** 允许删除损坏插件 ([35d64fb](https://github.com/delta-comic/delta-comic/commit/35d64fba5452fd073a25b4e83d0300b00f227e0b))
+* **plugin:** 统一 entry.jsPath 为本地开发源入口并修复 dev 插件 500 ([5acfc9a](https://github.com/delta-comic/delta-comic/commit/5acfc9aca48edc9a9249ef975238216e0ddd8ea2))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.13](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.12...3.0.0-next.13) (2026-08-18)
 
 
