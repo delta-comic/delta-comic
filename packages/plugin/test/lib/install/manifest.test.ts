@@ -17,13 +17,13 @@ describe('plugin manifest v1', () => {
     expect(
       parsePluginManifest(
         manifest({
-          entry: { cssPath: 'assets/index.css', jsPath: 'index.mjs' },
+          entry: { cssPath: 'src/style.css', jsPath: 'src/main.ts' },
           icon: 'https://example.test/icon.png',
         }),
       ),
     ).toMatchObject({
       apiVersion: 1,
-      entry: { cssPath: 'assets/index.css', jsPath: 'index.mjs' },
+      entry: { cssPath: 'src/style.css', jsPath: 'src/main.ts' },
       icon: 'https://example.test/icon.png',
     })
   })

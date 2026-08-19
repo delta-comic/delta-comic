@@ -12,7 +12,7 @@ const meta: PluginArchiveDB.Meta = {
   description: 'test plugin',
   icon: 'assets/icon.svg',
   require: [],
-  entry: { jsPath: 'index.mjs', cssPath: 'index.css' },
+  entry: { jsPath: 'src/main.ts', cssPath: 'src/style.css' },
 }
 
 type TestAssetSource = string | Uint8Array

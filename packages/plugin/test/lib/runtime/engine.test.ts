@@ -30,8 +30,9 @@ const candidate = (
   origin: 'installed',
 })
 
-const runtimeFor = (list: () => readonly PluginCandidate[]) =>
-  new PluginRuntime({
+const runtimeFor = (list: () => readonly PluginCandidate[]) => {
+  const remove = vi.fn()
+  const runtime = new PluginRuntime({
     capabilities: () =>
       createDefaultCapabilities({
         config: { register: vi.fn(), unregister: vi.fn() },
@@ -40,8 +41,10 @@ const runtimeFor = (list: () => readonly PluginCandidate[]) =>
       }),
     environment: () => ({ platform: 'web' }),
     provider: { id: 'test', list: async () => list() } satisfies PluginCandidateProvider,
-    remove: vi.fn(),
+    remove,
   })
+  return Object.assign(runtime, { remove })
+}
 
 describe('PluginRuntime', () => {
   it('preloads every enabled plugin but activates only selected normal parts', async () => {
@@ -297,6 +300,19 @@ describe('PluginRuntime', () => {
     await expect(runtime.enablePlugin('later')).rejects.toThrow(
       'plugin "dependency" is not enabled',
     )
+  })
+
+  it('uninstalls a plugin when its entry cannot be loaded for the uninstall hook', async () => {
+    const runtime = runtimeFor(() => [
+      candidate('broken', async () => {
+        throw new TypeError('plugin entry has no default factory: broken')
+      }),
+    ])
+
+    await runtime.preload({} as App)
+    await runtime.uninstall('broken')
+
+    expect(runtime.remove).toHaveBeenCalledExactlyOnceWith('broken')
   })
 
   it('prepares enabled dependencies before the dependent plugin', async () => {
