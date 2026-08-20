@@ -10,10 +10,16 @@ import type { PluginCapabilityServices } from './services'
 const resolveGroup = async (
   group: Remote.TestGroup,
   signal: AbortSignal,
-): Promise<Remote.ResolvedTestGroup> => ({
-  ...group,
-  remotes: typeof group.remotes === 'function' ? await group.remotes(signal) : group.remotes,
-})
+): Promise<Remote.ResolvedTestGroup> => {
+  const sources = typeof group.remotes === 'function' ? [group.remotes] : group.remotes
+  const remotes = (
+    await Promise.all(
+      sources.map(source => (typeof source === 'function' ? source(signal) : source)),
+    )
+  ).flat()
+
+  return { ...group, remotes }
+}
 
 export interface RemoteSelection {
   readonly group: Remote.ResolvedTestRemoteGroup

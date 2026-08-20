@@ -6,6 +6,8 @@ export type TestFunction = (url: string, signal: AbortSignal) => Promise<void>
 
 export type RemoteListProvider = (signal: AbortSignal) => Promise<Definition[]>
 
+export type RemoteSource = Definition | RemoteListProvider
+
 export interface Definition {
   name: string
   url: string
@@ -17,7 +19,7 @@ export interface Definition {
 
 export interface TestGroupBase {
   name: string
-  remotes: Definition[] | RemoteListProvider
+  remotes: RemoteSource[] | RemoteListProvider
   /**
    * group-level default test
    */

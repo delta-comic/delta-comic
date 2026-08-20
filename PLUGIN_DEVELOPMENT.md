@@ -448,8 +448,9 @@ const search = new StreamQuery(
 
 ### 5.2 Remote 与 Resource 端点组
 
-`remotes` 声明一组等价服务端点，或接收 `AbortSignal` 并返回端点列表的异步 provider。激活时宿主先获取
-列表，再并行探测列表中的端点，首个成功端点成为优先来源。按 `type` 区分用途：
+`remotes` 可以声明静态端点、异步 provider，或在同一个数组中混合二者。provider 接收 `AbortSignal` 并返回
+端点列表。激活时宿主先获取所有 provider 的列表，再并行探测合并后的端点，首个成功端点成为优先来源。按
+`type` 区分用途：
 
 - `remote` 组：选中端点通过 `onRemoteTestDone` 钩子交给插件，并注册到 `runtime:remote-selection` channel 供其他能力消费。
 - `resource` 组：候选地址注册为该资源类型的 fork，选中地址成为优先来源，供该类型资源的 pathname 解析使用；`processors` 声明路径处理器。
@@ -518,8 +519,9 @@ export default defineDeltaComicPlugin(() => ({
 ```
 
 每个 group 的 `name` 在同一插件内必须唯一；资源组的 `name` 即资源类型名。`test` 是组级必填
-探测，`remotes[].test` 可覆盖单个端点。动态 provider 必须返回同样的 `Definition[]`，并接收宿主传入的
-`AbortSignal`。默认情况下没有可用端点会让插件激活失败；确实允许
+探测，`Definition.test` 可覆盖单个端点。`remotes` 可以是 `Definition[]`、异步 provider，或
+`Array<Definition | RemoteListProvider>`；数组中的静态端点和动态 provider 可以共存。动态 provider 必须返回
+同样的 `Definition[]`，并接收宿主传入的 `AbortSignal`。默认情况下没有可用端点会让插件激活失败；确实允许
 离线时设置 `allowNoConnected: true`——此时 remote 组以 `false` 作为选中结果，resource 组
 保留 fork 但不设置优先来源，运行时解析该资源才会失败。
 

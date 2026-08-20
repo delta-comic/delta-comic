@@ -101,11 +101,19 @@ describe('host model capabilities', () => {
   it('loads a remote list before probing each listed endpoint', async () => {
     const scope = new PluginScope('directory')
     const calls: string[] = []
+    const staticTest = vi.fn(async () => {
+      calls.push('static')
+      throw new Error('offline')
+    })
     const primaryTest = vi.fn(async () => {})
     const groupTest = vi.fn(async () => {})
     const remotes = [
       { name: 'primary', url: 'https://api.example', test: primaryTest },
       { name: 'backup', url: 'https://backup.example' },
+    ]
+    const resolvedRemotes = [
+      { name: 'static', url: 'https://static.example', test: staticTest },
+      ...remotes,
     ]
     const getRemotes = vi.fn(async (signal: AbortSignal) => {
       calls.push('list')
@@ -125,7 +133,17 @@ describe('host model capabilities', () => {
       {
         hooks: { onRemoteTestDone },
         model: {
-          remotes: [{ name: 'main', type: 'remote', remotes: getRemotes, test: groupTest }],
+          remotes: [
+            {
+              name: 'main',
+              type: 'remote',
+              remotes: [
+                { name: 'static', url: 'https://static.example', test: staticTest },
+                getRemotes,
+              ],
+              test: groupTest,
+            },
+          ],
         },
         name: 'directory',
       },
@@ -134,18 +152,19 @@ describe('host model capabilities', () => {
 
     expect(getRemotes).toHaveBeenCalledOnce()
     expect(calls[0]).toBe('list')
+    expect(calls).toContain('static')
     expect(calls).toContain('primary')
     expect(calls).toContain('backup')
     expect(primaryTest).toHaveBeenCalledWith('https://api.example', expect.any(AbortSignal))
     expect(groupTest).toHaveBeenCalledWith('https://backup.example', expect.any(AbortSignal))
     expect(onRemoteTestDone).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'main', remotes }),
+      expect.objectContaining({ name: 'main', remotes: resolvedRemotes }),
       expect.objectContaining({ name: 'primary' }),
     )
     expect(
       contributions.channel(pluginRemoteSelectionChannel).get('directory', 'main')?.value.group
         .remotes,
-    ).toBe(remotes)
+    ).toEqual(resolvedRemotes)
 
     await scope.dispose()
   })
