@@ -4,6 +4,8 @@ export type RemoteModel = TestGroup[]
 
 export type TestFunction = (url: string, signal: AbortSignal) => Promise<void>
 
+export type RemoteListProvider = (signal: AbortSignal) => Promise<Definition[]>
+
 export interface Definition {
   name: string
   url: string
@@ -15,7 +17,7 @@ export interface Definition {
 
 export interface TestGroupBase {
   name: string
-  remotes: Definition[]
+  remotes: Definition[] | RemoteListProvider
   /**
    * group-level default test
    */
@@ -33,3 +35,18 @@ export interface TestResourceGroup extends TestGroupBase {
 }
 
 export type TestGroup = TestRemoteGroup | TestResourceGroup
+
+export interface ResolvedTestGroupBase extends Omit<TestGroupBase, 'remotes'> {
+  remotes: Definition[]
+}
+
+export interface ResolvedTestRemoteGroup extends ResolvedTestGroupBase {
+  type: 'remote'
+}
+
+export interface ResolvedTestResourceGroup extends ResolvedTestGroupBase {
+  type: 'resource'
+  processors?: UniResourceProcessor[]
+}
+
+export type ResolvedTestGroup = ResolvedTestRemoteGroup | ResolvedTestResourceGroup

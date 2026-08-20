@@ -7,8 +7,16 @@ import { selectFastestEndpoint } from './endpointProbe'
 import { bindRegistryValue } from './registryBinding'
 import type { PluginCapabilityServices } from './services'
 
+const resolveGroup = async (
+  group: Remote.TestGroup,
+  signal: AbortSignal,
+): Promise<Remote.ResolvedTestGroup> => ({
+  ...group,
+  remotes: typeof group.remotes === 'function' ? await group.remotes(signal) : group.remotes,
+})
+
 export interface RemoteSelection {
-  readonly group: Remote.TestRemoteGroup
+  readonly group: Remote.ResolvedTestRemoteGroup
   readonly latencyMs?: number
   readonly remote: Remote.Definition | false
 }
@@ -24,11 +32,14 @@ export const createRemoteCapability = (services: PluginCapabilityServices): Capa
       config.model?.remotes ? { hooks: config.hooks, remotes: config.model.remotes } : undefined,
     async activate({ hooks, remotes }, context) {
       const groups = new Set<string>()
-      for (const group of remotes) {
-        if (!group.name) throw new Error('remote group name cannot be empty')
-        if (groups.has(group.name)) throw new Error(`duplicate remote group "${group.name}"`)
-        groups.add(group.name)
-        context.report({ name: 'remote', description: `probing ${group.name}` })
+      for (const sourceGroup of remotes) {
+        if (!sourceGroup.name) throw new Error('remote group name cannot be empty')
+        if (groups.has(sourceGroup.name)) {
+          throw new Error(`duplicate remote group "${sourceGroup.name}"`)
+        }
+        groups.add(sourceGroup.name)
+        context.report({ name: 'remote', description: `probing ${sourceGroup.name}` })
+        const group = await resolveGroup(sourceGroup, context.signal)
         const selected = await selectFastestEndpoint(
           group.remotes.map(remote => ({
             test: remote.test ?? group.test,
