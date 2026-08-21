@@ -184,8 +184,8 @@ import { defineConfig } from 'vite-plus'
 
 import { manifest } from './src/manifest'
 
-export default defineConfig(({ command }) => ({
-  plugins: deltaComic(manifest, command),
+export default defineConfig(() => ({
+  plugins: deltaComic(manifest),
 }))
 ```
 
@@ -202,8 +202,8 @@ import { defineConfig } from 'vite-plus'
 
 import { manifest } from './src/manifest'
 
-export default defineConfig(({ command }) => ({
-  plugins: [vue(), ...deltaComic(manifest, command)],
+export default defineConfig(() => ({
+  plugins: [vue(), ...deltaComic(manifest)],
 }))
 ```
 
