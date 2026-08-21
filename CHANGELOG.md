@@ -1,5 +1,20 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.15](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.14...3.0.0-next.15) (2026-08-21)
+
+
+### Bug Fixes
+
+* **plugin:** 支持静态动态远端共存 ([f3dcea7](https://github.com/delta-comic/delta-comic/commit/f3dcea7ebb4f582269f5ec33380388d2b23b11f6))
+* **plugin:** 测试模式跳过共享运行时检查 ([ddb8d69](https://github.com/delta-comic/delta-comic/commit/ddb8d69ae7e08d7f97c239ee14e3b03e3414c9a8))
+
+
+### Features
+
+* **plugin:** 支持动态获取远端列表 ([2ffa92a](https://github.com/delta-comic/delta-comic/commit/2ffa92a932e8052c38d3700f6317a4ab7d7efd79))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.14](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.13...3.0.0-next.14) (2026-08-19)
 
 
