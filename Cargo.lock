@@ -1129,7 +1129,7 @@ dependencies = [
 
 [[package]]
 name = "delta-comic"
-version = "3.0.0-next.14"
+version = "3.0.0-next.15"
 dependencies = [
  "objc2-foundation",
  "serde",
@@ -6081,7 +6081,7 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-db"
-version = "3.0.0-next.14"
+version = "3.0.0-next.15"
 dependencies = [
  "percent-encoding",
  "tauri",
@@ -6092,7 +6092,7 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-downloader"
-version = "3.0.0-next.14"
+version = "3.0.0-next.15"
 dependencies = [
  "android-native-keyring-store",
  "apple-native-keyring-store",
@@ -6156,7 +6156,7 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-logger"
-version = "3.0.0-next.14"
+version = "3.0.0-next.15"
 dependencies = [
  "chrono",
  "flate2",
@@ -6202,7 +6202,7 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-plugin"
-version = "3.0.0-next.14"
+version = "3.0.0-next.15"
 dependencies = [
  "mime_guess",
  "percent-encoding",
@@ -6257,7 +6257,7 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-utils"
-version = "3.0.0-next.14"
+version = "3.0.0-next.15"
 dependencies = [
  "mime_guess",
  "percent-encoding",
