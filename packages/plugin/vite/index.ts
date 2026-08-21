@@ -9,10 +9,16 @@ import { createDevPlugin } from './dev'
 export const deltaComic = (meta: PluginManifest, command: 'build' | 'serve'): PluginOption[] => {
   const externalGlobals = extendsDepends as Record<string, string>
   const isServer = command == 'serve'
+  let mode: string | undefined
   const sharedRuntimeGuard: Plugin = {
     name: 'delta-comic-shared-runtime-guard',
     enforce: 'pre',
+    configResolved(config) {
+      mode = config.mode
+    },
     resolveId(source) {
+      if (mode == 'test') return
+
       if (Object.hasOwn(externalGlobals, source)) return
 
       const externalRoot = Object.keys(externalGlobals).find(root => source.startsWith(`${root}/`))

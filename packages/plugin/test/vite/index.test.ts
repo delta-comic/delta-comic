@@ -32,6 +32,7 @@ type TestDeltaComicPlugin = {
   name: string
   enforce?: 'post' | 'pre'
   config?(config: unknown): any
+  configResolved?(config: { mode: string }): void
   resolveId?(source: string): void
   transform?(
     this: TestTransformContext,
@@ -96,6 +97,14 @@ describe('deltaComic vite plugin', () => {
     expect(() => guard.resolveId?.('@vue/runtime-core')).toThrow(
       'Import "vue" so the plugin reuses the host instance',
     )
+  })
+
+  it('skips shared runtime checks in test mode', () => {
+    const guard = getSharedRuntimeGuard()
+    guard.configResolved?.({ mode: 'test' })
+
+    expect(guard.resolveId?.('vue/dist/vue.esm-bundler.js')).toBeUndefined()
+    expect(guard.resolveId?.('@vue/runtime-core')).toBeUndefined()
   })
 
   it('rewrites plugin static and dynamic imports to the host ABI', async () => {
