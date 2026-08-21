@@ -98,6 +98,115 @@ describe('host model capabilities', () => {
     expect(UniResource.fork.has(['reader', 'image'])).toBe(false)
   })
 
+  it('loads a remote list before probing each listed endpoint', async () => {
+    const scope = new PluginScope('directory')
+    const calls: string[] = []
+    const staticTest = vi.fn(async () => {
+      calls.push('static')
+      throw new Error('offline')
+    })
+    const primaryTest = vi.fn(async () => {})
+    const groupTest = vi.fn(async () => {})
+    const remotes = [
+      { name: 'primary', url: 'https://api.example', test: primaryTest },
+      { name: 'backup', url: 'https://backup.example' },
+    ]
+    const resolvedRemotes = [
+      { name: 'static', url: 'https://static.example', test: staticTest },
+      ...remotes,
+    ]
+    const getRemotes = vi.fn(async (signal: AbortSignal) => {
+      calls.push('list')
+      expect(signal).toBe(scope.signal)
+      return remotes
+    })
+    primaryTest.mockImplementation(async () => {
+      calls.push('primary')
+    })
+    groupTest.mockImplementation(async () => {
+      calls.push('backup')
+    })
+    const onRemoteTestDone = vi.fn()
+    const contributions = new ContributionHub()
+
+    await new ActivationPipeline(createDefaultCapabilities(services({ contributions }))).activate(
+      {
+        hooks: { onRemoteTestDone },
+        model: {
+          remotes: [
+            {
+              name: 'main',
+              type: 'remote',
+              remotes: [
+                { name: 'static', url: 'https://static.example', test: staticTest },
+                getRemotes,
+              ],
+              test: groupTest,
+            },
+          ],
+        },
+        name: 'directory',
+      },
+      { owner: 'directory', report: vi.fn(), scope, signal: scope.signal },
+    )
+
+    expect(getRemotes).toHaveBeenCalledOnce()
+    expect(calls[0]).toBe('list')
+    expect(calls).toContain('static')
+    expect(calls).toContain('primary')
+    expect(calls).toContain('backup')
+    expect(primaryTest).toHaveBeenCalledWith('https://api.example', expect.any(AbortSignal))
+    expect(groupTest).toHaveBeenCalledWith('https://backup.example', expect.any(AbortSignal))
+    expect(onRemoteTestDone).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'main', remotes: resolvedRemotes }),
+      expect.objectContaining({ name: 'primary' }),
+    )
+    expect(
+      contributions.channel(pluginRemoteSelectionChannel).get('directory', 'main')?.value.group
+        .remotes,
+    ).toEqual(resolvedRemotes)
+
+    await scope.dispose()
+  })
+
+  it('binds dynamically loaded resource endpoints and the selected fork', async () => {
+    const scope = new PluginScope('reader')
+    const remotes = [
+      { name: 'primary', url: 'https://cdn.example' },
+      { name: 'backup', url: 'https://backup-cdn.example' },
+    ]
+    const getRemotes = vi.fn(async () => remotes)
+
+    await new ActivationPipeline(createDefaultCapabilities(services())).activate(
+      {
+        model: {
+          remotes: [
+            {
+              type: 'resource',
+              name: 'image',
+              remotes: getRemotes,
+              test: async url => {
+                if (url === 'https://cdn.example') return
+                throw new Error('offline')
+              },
+            },
+          ],
+        },
+        name: 'reader',
+      },
+      { owner: 'reader', report: vi.fn(), scope, signal: scope.signal },
+    )
+
+    expect(getRemotes).toHaveBeenCalledOnce()
+    expect(UniResource.fork.get(['reader', 'image'])).toEqual([
+      'https://cdn.example',
+      'https://backup-cdn.example',
+    ])
+    expect(UniResource.precedenceFork.get(['reader', 'image'])).toBe('https://cdn.example')
+
+    await scope.dispose()
+  })
+
   it('runs remote, auth, special, and user adapters in the fixed capability topology', async () => {
     const auth = { default: vi.fn(async () => true), selections: [] }
     const authenticate = vi.fn(async () => {})

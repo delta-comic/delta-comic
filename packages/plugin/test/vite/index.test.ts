@@ -31,7 +31,9 @@ type TestTransformContext = { error(message: string): never }
 type TestDeltaComicPlugin = {
   name: string
   enforce?: 'post' | 'pre'
+  apply?: 'build' | 'serve'
   config?(config: unknown): any
+  configResolved?(config: { mode: string }): void
   resolveId?(source: string): void
   transform?(
     this: TestTransformContext,
@@ -51,14 +53,14 @@ const isDeltaComicPlugin = (plugin: unknown): plugin is TestDeltaComicPlugin =>
   (plugin as { name?: unknown }).name == 'delta-comic-helper'
 
 const getBuildPlugin = (): TestDeltaComicPlugin => {
-  const plugin = deltaComic(meta, 'build').flat() as unknown[]
+  const plugin = deltaComic(meta).flat() as unknown[]
   const buildPlugin = plugin.find(isDeltaComicPlugin)
   if (!buildPlugin) throw new Error('delta-comic-helper not found')
   return buildPlugin
 }
 
 const getSharedRuntimeGuard = (): TestDeltaComicPlugin => {
-  const plugins = deltaComic(meta, 'build').flat() as unknown[]
+  const plugins = deltaComic(meta).flat() as unknown[]
   const guard = plugins.find(
     plugin =>
       Boolean(plugin) &&
@@ -70,7 +72,7 @@ const getSharedRuntimeGuard = (): TestDeltaComicPlugin => {
 }
 
 const getSharedRuntimeExternals = (): TestDeltaComicPlugin => {
-  const plugins = deltaComic(meta, 'build').flat() as unknown[]
+  const plugins = deltaComic(meta).flat() as unknown[]
   const externals = plugins.find(
     plugin =>
       Boolean(plugin) &&
@@ -96,6 +98,14 @@ describe('deltaComic vite plugin', () => {
     expect(() => guard.resolveId?.('@vue/runtime-core')).toThrow(
       'Import "vue" so the plugin reuses the host instance',
     )
+  })
+
+  it('skips shared runtime checks in test mode', () => {
+    const guard = getSharedRuntimeGuard()
+    guard.configResolved?.({ mode: 'test' })
+
+    expect(guard.resolveId?.('vue/dist/vue.esm-bundler.js')).toBeUndefined()
+    expect(guard.resolveId?.('@vue/runtime-core')).toBeUndefined()
   })
 
   it('rewrites plugin static and dynamic imports to the host ABI', async () => {
@@ -146,6 +156,7 @@ describe('deltaComic vite plugin', () => {
     const manifestFile = emitted.find(file => file.fileName == 'manifest.json')
 
     expect(plugin.enforce).toBe('post')
+    expect(plugin.apply).toBe('build')
     expect(archiveFile?.source).toBeInstanceOf(Uint8Array)
     expect(manifestFile?.source).toBe(manifest)
 

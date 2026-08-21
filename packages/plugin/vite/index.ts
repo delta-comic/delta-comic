@@ -6,13 +6,18 @@ import type { Plugin, PluginOption } from 'vite'
 
 import { createDevPlugin } from './dev'
 
-export const deltaComic = (meta: PluginManifest, command: 'build' | 'serve'): PluginOption[] => {
+export const deltaComic = (meta: PluginManifest): PluginOption[] => {
   const externalGlobals = extendsDepends as Record<string, string>
-  const isServer = command == 'serve'
+  let mode: string | undefined
   const sharedRuntimeGuard: Plugin = {
     name: 'delta-comic-shared-runtime-guard',
     enforce: 'pre',
+    configResolved(config) {
+      mode = config.mode
+    },
     resolveId(source) {
+      if (mode == 'test') return
+
       if (Object.hasOwn(externalGlobals, source)) return
 
       const externalRoot = Object.keys(externalGlobals).find(root => source.startsWith(`${root}/`))
@@ -27,6 +32,7 @@ export const deltaComic = (meta: PluginManifest, command: 'build' | 'serve'): Pl
   const plugin: Plugin = {
     name: 'delta-comic-helper',
     enforce: 'post',
+    apply: 'build',
     config(config) {
       return merge(config, {
         build: {
@@ -64,6 +70,8 @@ export const deltaComic = (meta: PluginManifest, command: 'build' | 'serve'): Pl
     },
   }
   const externals = exposeHostLibraries({ libraries: externalGlobals })
+  const devPlugin = createDevPlugin(meta)
+  devPlugin.apply = 'serve'
 
-  return [sharedRuntimeGuard, externals, ...(isServer ? [createDevPlugin(meta)] : [plugin])]
+  return [sharedRuntimeGuard, externals, plugin, devPlugin]
 }

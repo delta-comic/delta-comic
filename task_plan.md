@@ -31,7 +31,7 @@ This turn is planning only. No source implementation is included in this plan up
   channel.
 - Source HMR must never call `pluginRuntime.reloadPlugin()`. That method remains available for
   explicit plugin updates and lifecycle operations, but is removed from the file-watcher path.
-- The plugin's Vite config continues to own `@vitejs/plugin-vue`; `deltaComic(..., 'serve')` does
+- The plugin's Vite config continues to own `@vitejs/plugin-vue`; `deltaComic(...)` does
   not silently add Vue support.
 - `/index.css` remains independently fetched and activated by the host. A dedicated native-HMR
   bridge may refetch and replace that style, but it must not inject a competing userscript-style
