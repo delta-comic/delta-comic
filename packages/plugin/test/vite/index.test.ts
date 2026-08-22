@@ -32,8 +32,8 @@ type TestDeltaComicPlugin = {
   name: string
   enforce?: 'post' | 'pre'
   apply?: 'build' | 'serve'
-  config?(config: unknown): any
   configResolved?(config: { mode: string }): void
+  config?(config: unknown): any
   resolveId?(source: string): void
   transform?(
     this: TestTransformContext,

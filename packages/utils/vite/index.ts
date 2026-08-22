@@ -63,7 +63,9 @@ interface SharedRuntimePlugin {
     this: SharedRuntimePluginContext,
     code: string,
     id: string,
-  ) => Promise<{ code: string; map: ReturnType<MagicString['generateMap']> } | undefined>
+  ) =>
+    | Promise<{ code: string; map: ReturnType<MagicString['generateMap']> } | undefined>
+    | undefined
   generateBundle: (this: SharedRuntimePluginContext) => void
 }
 
