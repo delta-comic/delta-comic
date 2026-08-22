@@ -56,14 +56,17 @@ interface SharedRuntimePluginContext {
 interface SharedRuntimePlugin {
   name: string
   enforce: 'post'
-  config: () => { optimizeDeps: { exclude: string[] } }
+  configResolved?: (config: { mode: string }) => void
+  config: () => { optimizeDeps: { exclude: string[] } } | undefined
   resolveId?: (id: string) => string | undefined
   load?: (id: string) => string | undefined
   transform: (
     this: SharedRuntimePluginContext,
     code: string,
     id: string,
-  ) => Promise<{ code: string; map: ReturnType<MagicString['generateMap']> } | undefined>
+  ) =>
+    | Promise<{ code: string; map: ReturnType<MagicString['generateMap']> } | undefined>
+    | undefined
   generateBundle: (this: SharedRuntimePluginContext) => void
 }
 
@@ -196,17 +199,29 @@ const assertNoBundledRuntime = (context: SharedRuntimePluginContext) => {
 /** Rewrites imports to read the namespace objects installed by the prebuilt UMD file. */
 export const externalizeSharedRuntime = (
   libraries: Record<string, string> = extendsDepends,
-): SharedRuntimePlugin => ({
-  name: 'delta-comic:shared-runtime-externals',
-  enforce: 'post',
-  config: () => ({ optimizeDeps: { exclude: Object.keys(libraries) } }),
-  transform(code, id) {
-    return transformSharedRuntimeImports(this, code, id, libraries)
-  },
-  generateBundle() {
-    assertNoBundledRuntime(this)
-  },
-})
+): SharedRuntimePlugin => {
+  let mode: string | undefined
+
+  return {
+    name: 'delta-comic:shared-runtime-externals',
+    enforce: 'post',
+    configResolved(config) {
+      mode = config.mode
+    },
+    config: () => {
+      if (mode == 'test') return
+      return { optimizeDeps: { exclude: Object.keys(libraries) } }
+    },
+    transform(code, id) {
+      if (mode == 'test') return
+      return transformSharedRuntimeImports(this, code, id, libraries)
+    },
+    generateBundle() {
+      if (mode == 'test') return
+      assertNoBundledRuntime(this)
+    },
+  }
+}
 
 /**
  * Makes the host consume the prebuilt UMD runtime and exposes host-owned ESM modules to plugins.
@@ -222,18 +237,28 @@ export const exposeHostLibraries = ({
   if (!entry) return externalizeSharedRuntime(libraries)
 
   const normalizedEntry = normalizeModuleId(entry)
+  let mode: string | undefined
 
   return {
     name: 'delta-comic:host-libraries',
     enforce: 'post',
-    config: () => ({ optimizeDeps: { exclude: Object.keys(umdDepends) } }),
+    configResolved(config) {
+      mode = config.mode
+    },
+    config: () => {
+      if (mode == 'test') return
+      return { optimizeDeps: { exclude: Object.keys(umdDepends) } }
+    },
     resolveId(id) {
+      if (mode == 'test') return
       if (id === HOST_LIBRARIES_MODULE_ID) return RESOLVED_HOST_LIBRARIES_MODULE_ID
     },
     load(id) {
+      if (mode == 'test') return
       if (id === RESOLVED_HOST_LIBRARIES_MODULE_ID) return createHostLibrariesModule()
     },
     transform(code, id) {
+      if (mode == 'test') return
       const prefix =
         normalizeModuleId(id) === normalizedEntry
           ? `import ${JSON.stringify(HOST_LIBRARIES_MODULE_ID)}\n`
@@ -241,6 +266,7 @@ export const exposeHostLibraries = ({
       return transformSharedRuntimeImports(this, code, id, umdDepends, prefix)
     },
     generateBundle() {
+      if (mode == 'test') return
       assertNoBundledRuntime(this)
     },
   }
