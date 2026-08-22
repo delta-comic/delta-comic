@@ -1,5 +1,15 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.16](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.15...3.0.0-next.16) (2026-08-22)
+
+
+### Bug Fixes
+
+* **test:** 修复共享运行时测试兼容性 ([e0bf9ef](https://github.com/delta-comic/delta-comic/commit/e0bf9efefbee56d3df0dda5588e33d2c9f758c1f))
+* **test:** 测试模式注入共享运行时 ([a1a3ca5](https://github.com/delta-comic/delta-comic/commit/a1a3ca5642e97a6cc4bb8684648ecb36b3dee874))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.15](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.14...3.0.0-next.15) (2026-08-21)
 
 
