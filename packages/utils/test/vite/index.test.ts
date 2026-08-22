@@ -177,6 +177,24 @@ describe('host external libraries', () => {
     expect(result?.code).toBe('const api = window.Custom.api\n')
   })
 
+  it('disables the shared runtime bridge in test mode', async () => {
+    const plugins = [
+      externalizeSharedRuntime(),
+      exposeHostLibraries({ entry: '/repo/src/main.ts' }),
+    ]
+
+    for (const plugin of plugins) {
+      plugin.configResolved?.({ mode: 'test' })
+      expect(plugin.config()).toBeUndefined()
+      expect(plugin.resolveId?.(virtualModuleId)).toBeUndefined()
+      expect(plugin.load?.(`\0${virtualModuleId}`)).toBeUndefined()
+      expect(
+        plugin.transform.call(context, `import { ref } from 'vue'`, '/repo/src/main.ts'),
+      ).toBeUndefined()
+      expect(() => plugin.generateBundle.call(context)).not.toThrow()
+    }
+  })
+
   it('returns undefined for unmatched virtual ids and dynamic expressions', async () => {
     const plugin = exposeHostLibraries({ entry: '/repo/src/main.ts' })
 

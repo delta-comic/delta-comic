@@ -120,6 +120,7 @@ vi.mock('motion-v', () => ({
   },
 }))
 vi.mock('naive-ui', () => ({
+  ...window.$$lib$$.Naive,
   useDialog: () => dialog,
   useLoadingBar: () => ({ start: vi.fn() }),
   useMessage: () => message,
@@ -134,6 +135,7 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 vi.mock('vue-router', () => ({
+  ...window.$$lib$$.VR,
   useRoute: () => ({ fullPath: '/library?tab=recent', meta: { force: true } }),
   useRouter: () => router,
 }))
