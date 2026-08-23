@@ -80,9 +80,9 @@ gh:delta-comic/delta-comic-plugin-cosav
 
 <a href="https://www.star-history.com/?repos=delta-comic%2Fdelta-comic&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&theme=dark&legend=top-left&sealed_token=8PCtrXiRP9wJM66RfINprAim9FlJkf2gN7LKTuLB1F9N9moxOxCon5xxqyaufAoKtkViEw8XtJsGm_h6Kilx5p0-DlIHs3g0rM3e6myklWwEPYUb8B9Ul7Y05GRNi65AYqQMnpR-WvtogMZ2FespkVOHC890yKm40v4GQamhQiNdouaDMCwMWL38PgeN" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left&sealed_token=8PCtrXiRP9wJM66RfINprAim9FlJkf2gN7LKTuLB1F9N9moxOxCon5xxqyaufAoKtkViEw8XtJsGm_h6Kilx5p0-DlIHs3g0rM3e6myklWwEPYUb8B9Ul7Y05GRNi65AYqQMnpR-WvtogMZ2FespkVOHC890yKm40v4GQamhQiNdouaDMCwMWL38PgeN" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left&sealed_token=8PCtrXiRP9wJM66RfINprAim9FlJkf2gN7LKTuLB1F9N9moxOxCon5xxqyaufAoKtkViEw8XtJsGm_h6Kilx5p0-DlIHs3g0rM3e6myklWwEPYUb8B9Ul7Y05GRNi65AYqQMnpR-WvtogMZ2FespkVOHC890yKm40v4GQamhQiNdouaDMCwMWL38PgeN" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&theme=dark&legend=top-left&sealed_token=gkWSt2ts4b0iVW9i6eAfXBjw4HaTmEiVNcUc_9GLDRe1EW0v58M3PesVRrTELMuzqZy3b9p2h9JjkzvZGEaOF62b86CgQLoXLLtybjcVF0WBrWkK4Ee9CAhFjGy-ffC1FZ7wRJpWClZf2bQAFs_C7e8LP7X1oiQLuUTa1Ab7okVrmTLHthw-UazedsFx" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left&sealed_token=gkWSt2ts4b0iVW9i6eAfXBjw4HaTmEiVNcUc_9GLDRe1EW0v58M3PesVRrTELMuzqZy3b9p2h9JjkzvZGEaOF62b86CgQLoXLLtybjcVF0WBrWkK4Ee9CAhFjGy-ffC1FZ7wRJpWClZf2bQAFs_C7e8LP7X1oiQLuUTa1Ab7okVrmTLHthw-UazedsFx" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=delta-comic/delta-comic&type=date&legend=top-left&sealed_token=gkWSt2ts4b0iVW9i6eAfXBjw4HaTmEiVNcUc_9GLDRe1EW0v58M3PesVRrTELMuzqZy3b9p2h9JjkzvZGEaOF62b86CgQLoXLLtybjcVF0WBrWkK4Ee9CAhFjGy-ffC1FZ7wRJpWClZf2bQAFs_C7e8LP7X1oiQLuUTa1Ab7okVrmTLHthw-UazedsFx" />
  </picture>
 </a>
 
@@ -110,5 +110,3 @@ gh:delta-comic/delta-comic-plugin-cosav
 tauri + vue3 + tailwindcss4
 
 维护者请参阅[分支与发布流程](docs/release-workflow.md)。
-
-插件开发者请参阅[插件开发指南](PLUGIN_DEVELOPMENT.md)
