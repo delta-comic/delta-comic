@@ -1,5 +1,14 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.17](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.16...3.0.0-next.17) (2026-08-23)
+
+
+### Bug Fixes
+
+* **plugin:** 修复 expose 模块扩展类型推导 ([a717814](https://github.com/delta-comic/delta-comic/commit/a71781490569774a10b48bd348bddc821cf5ddbf))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.16](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.15...3.0.0-next.16) (2026-08-22)
 
 
