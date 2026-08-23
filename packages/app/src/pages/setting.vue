@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useConfig } from '@delta-comic/plugin'
 import { DcCell, DcCellGroup } from '@delta-comic/ui'
+import { useDialog, useMessage } from 'naive-ui'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import LogReaderPanel from '@/components/logs/LogReaderPanel.vue'
 import PluginConfigField from '@/components/plugin/PluginConfigField.vue'
+import { pluginStartupMemory } from '@/features/pluginStartup/PluginStartupMemory'
 import { translateText } from '@/i18n'
 import { localizeFormConfig } from '@/i18n/pluginText'
 import { isTauriRuntime } from '@/platform'
@@ -14,8 +16,23 @@ import { isTauriRuntime } from '@/platform'
 const $router = useRouter()
 const config = useConfig()
 const { t } = useI18n()
+const dialog = useDialog()
+const message = useMessage()
 const showNativeLogs = isTauriRuntime()
 const showLogReader = shallowRef(false)
+
+const confirmClearPluginStartup = () => {
+  dialog.warning({
+    title: t('settings.pluginStartup.confirmTitle'),
+    content: t('settings.pluginStartup.confirmContent'),
+    positiveText: t('common.actions.confirm'),
+    negativeText: t('common.actions.cancel'),
+    onPositiveClick: () => {
+      pluginStartupMemory.clear()
+      message.success(t('settings.pluginStartup.cleared'))
+    },
+  })
+}
 </script>
 
 <template>
@@ -45,6 +62,17 @@ const showLogReader = shallowRef(false)
             @update:model-value="store[name] = $event"
           />
         </template>
+      </DcCellGroup>
+      <DcCellGroup :title="t('settings.pluginStartup.sectionTitle')">
+        <DcCell
+          center
+          :title="t('settings.pluginStartup.clear')"
+          :label="t('settings.pluginStartup.description')"
+        >
+          <NButton secondary type="warning" @click="confirmClearPluginStartup">
+            {{ t('settings.pluginStartup.clear') }}
+          </NButton>
+        </DcCell>
       </DcCellGroup>
       <DcCellGroup v-if="showNativeLogs" :title="t('settings.logs.sectionTitle')">
         <DcCell center clickable :title="t('settings.logs.open')" @click="showLogReader = true">
