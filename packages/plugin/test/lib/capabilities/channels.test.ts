@@ -4,7 +4,7 @@ import type { ExposeModel } from '../../../lib/api'
 import { pluginModelChannels } from '../../../lib/capabilities/channels'
 import { ContributionHub, type Contribution } from '../../../lib/kernel/contribution'
 
-interface ReaderExpose extends ExposeModel {
+interface ReaderExpose {
   readonly version: 1
   refresh(): Promise<void>
 }
