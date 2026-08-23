@@ -19,6 +19,7 @@ import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import { usePluginInstall } from '@/features/pluginInstall/usePluginInstall'
 import { translateText } from '@/i18n'
 import { Icons } from '@/icons'
+import { isTauriRuntime, openPluginDirectory } from '@/platform'
 
 import pkg from '../../../../package.json'
 
@@ -77,6 +78,7 @@ const plugins = computed<ManagedPlugin[]>(() =>
   })),
 )
 const isBuiltIn = (plugin: ManagedPlugin) => plugin.origin === 'builtin'
+const canOpenLocally = (plugin: ManagedPlugin) => isTauriRuntime() && !isBuiltIn(plugin)
 const actionsFor = (plugin: ManagedPlugin): DropdownOption[] => {
   const actions: DropdownOption[] = plugin.management.canDisable
     ? [
@@ -94,6 +96,9 @@ const actionsFor = (plugin: ManagedPlugin): DropdownOption[] => {
       label: t('plugin.list.actions.updateFromSource'),
       disabled: updating.has(plugin.pluginName),
     })
+  }
+  if (canOpenLocally(plugin)) {
+    installedActions.unshift({ key: 'open-local', label: t('plugin.list.actions.openLocal') })
   }
   return actions.concat(installedActions)
 }
@@ -127,6 +132,10 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
     case 'remove':
       await uninstallPlugin(plugin.pluginName)
       pluginListLogger.info('plugin removed', { plugin: plugin.pluginName })
+      break
+    case 'open-local':
+      await openPluginDirectory(plugin.pluginName)
+      break
   }
 }
 </script>

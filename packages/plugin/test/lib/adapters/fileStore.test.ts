@@ -1,8 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const convertFileSrc = vi.fn(() => 'plugin://localhost/')
+const appLocalDataDir = vi.fn(async () => '/app/local-data')
+const join = vi.fn(async (...parts: string[]) => parts.join('/'))
 
 vi.mock('@tauri-apps/api/core', () => ({ convertFileSrc, isTauri: () => false }))
+vi.mock('@tauri-apps/api/path', () => ({ appLocalDataDir, join }))
 
 describe('plugin protocol URLs', () => {
   beforeEach(() => convertFileSrc.mockClear())
@@ -20,6 +23,16 @@ describe('plugin protocol URLs', () => {
     const { createPluginProtocolUrl } = await import('../../../lib/adapters/fileStore')
 
     expect(() => createPluginProtocolUrl('layout', '../outside.js')).toThrow('safe relative path')
+  })
+})
+
+describe('Tauri plugin roots', () => {
+  it('uses the same app-local plugin root as the filesystem backend', async () => {
+    const { getTauriPluginRoot } = await import('../../../lib/adapters/fileStore')
+
+    await expect(getTauriPluginRoot('reader')).resolves.toBe('/app/local-data/plugin/reader')
+    expect(appLocalDataDir).toHaveBeenCalledOnce()
+    expect(join).toHaveBeenCalledWith('/app/local-data', 'plugin', 'reader')
   })
 })
 

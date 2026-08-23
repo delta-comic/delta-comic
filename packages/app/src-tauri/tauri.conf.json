@@ -44,7 +44,10 @@
     },
     "withGlobalTauri": false
   },
-  "plugins": { "sql": { "preload": ["sqlite:app.db"] } },
+  "plugins": {
+    "shell": { "open": "^(https?://|file://|/|[A-Za-z]:[\\\\/]).*" },
+    "sql": { "preload": ["sqlite:app.db"] }
+  },
   "bundle": {
     "active": true,
     "targets": "all",

@@ -1,3 +1,4 @@
+import { getTauriPluginRoot } from '@delta-comic/plugin'
 import { isTauri } from '@tauri-apps/api/core'
 
 export const isTauriRuntime = isTauri
@@ -49,6 +50,12 @@ export const openExternal = async (url: string) => {
     return
   }
   window.open(url, '_blank', 'noopener,noreferrer')
+}
+
+export const openPluginDirectory = async (plugin: string) => {
+  if (!isTauriRuntime()) return
+  const { open } = await import('@tauri-apps/plugin-shell')
+  await open(await getTauriPluginRoot(plugin))
 }
 
 export const setStatusBar = async (mode: 'dark' | 'light') => {
