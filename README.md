@@ -110,5 +110,3 @@ gh:delta-comic/delta-comic-plugin-cosav
 tauri + vue3 + tailwindcss4
 
 维护者请参阅[分支与发布流程](docs/release-workflow.md)。
-
-插件开发者请参阅[插件开发指南](PLUGIN_DEVELOPMENT.md)
