@@ -39,7 +39,7 @@ export const deltaComic = (meta: PluginManifest): PluginOption[] => {
           assetsInlineLimit: Number.POSITIVE_INFINITY,
           cssCodeSplit: false,
           lib: {
-            entry: meta.entry?.jsPath ?? './src/main.ts',
+            entry: './src/main.ts',
             fileName: 'index',
             cssFileName: 'index',
             name: `$$lib$$.__DcPlugin__${meta.name.id.replace('-', '_')}__`,

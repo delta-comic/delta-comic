@@ -18,7 +18,6 @@ const meta: PluginManifest = {
   author: 'delta',
   description: 'dev plugin',
   require: [],
-  entry: { jsPath: 'src/main.ts' },
 }
 
 let root: string
@@ -35,9 +34,9 @@ beforeAll(async () => {
   await mkdir(join(root, 'src'))
   await writeFile(
     join(root, 'src/main.ts'),
-    `import './style.css'\nimport styles from './style.module.css'\nimport App from './App.vue'\nexport const devComponents = { App, styles }\nexport default () => ({ name: 'dev-plugin' })\n`,
+    `import './index.css'\nimport styles from './style.module.css'\nimport App from './App.vue'\nexport const devComponents = { App, styles }\nexport default () => ({ name: 'dev-plugin' })\n`,
   )
-  await writeFile(join(root, 'src/style.css'), 'body { color: red }\n')
+  await writeFile(join(root, 'src/index.css'), 'body { color: red }\n')
   await writeFile(join(root, 'src/style.module.css'), '.module { color: green }\n')
   await writeFile(
     join(root, 'src/App.vue'),
@@ -80,7 +79,7 @@ describe('deltaComic dev protocol', () => {
     expect(status).toBe(200)
     expect(headers.get('access-control-allow-origin')).toBe('*')
     expect(headers.get('cache-control')).toContain('no-cache')
-    expect(JSON.parse(text).entry).toEqual({ jsPath: 'index.js', cssPath: 'index.css' })
+    expect(JSON.parse(text).entry).toBeUndefined()
   })
 
   it('serves the transformed dev entry module', async () => {
@@ -121,13 +120,13 @@ describe('deltaComic dev protocol', () => {
   })
 
   it('reflects file changes without restart', async () => {
-    await writeFile(join(root, 'src/style.css'), 'body { color: blue }\n')
+    await writeFile(join(root, 'src/index.css'), 'body { color: blue }\n')
 
     await retry(async () => (await get(DEV_CSS_PATH)).text.includes('color: blue'))
   })
 
   it('keeps Vite CSS modules in the graph without injecting a second style node', async () => {
-    const { status, text } = await get('/src/style.css')
+    const { status, text } = await get('/src/index.css')
 
     expect(status).toBe(200)
     expect(text).toContain('import.meta.hot.accept()')

@@ -122,9 +122,7 @@ export class DevServerSourceResolver implements PluginSourceResolver {
     const manifestText = await fetchDevText(devServerUrl(port, DEV_MANIFEST_PATH), signal)
     const manifest = parsePluginManifest(JSON.parse(manifestText ?? ''))
     await fetchDevText(devServerUrl(port, DEV_ENTRY_PATH), signal)
-    if (manifest.entry?.cssPath !== undefined) {
-      await fetchDevText(devServerUrl(port, DEV_CSS_PATH), signal, true)
-    }
+    await fetchDevText(devServerUrl(port, DEV_CSS_PATH), signal, true)
 
     return {
       installInput: input,

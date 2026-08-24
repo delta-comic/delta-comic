@@ -1,17 +1,27 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
-const { corsInit, getInsets, isTauri, m3SetBarColor, nativeOpen, nativeReadText, nativeWriteText } =
-  vi.hoisted(() => ({
-    corsInit: vi.fn(),
-    getInsets: vi.fn(),
-    isTauri: vi.fn(),
-    m3SetBarColor: vi.fn(),
-    nativeOpen: vi.fn(),
-    nativeReadText: vi.fn(),
-    nativeWriteText: vi.fn(),
-  }))
+const {
+  corsInit,
+  getInsets,
+  getTauriPluginRoot,
+  isTauri,
+  m3SetBarColor,
+  nativeOpen,
+  nativeReadText,
+  nativeWriteText,
+} = vi.hoisted(() => ({
+  corsInit: vi.fn(),
+  getInsets: vi.fn(),
+  getTauriPluginRoot: vi.fn(async (plugin: string) => `/app/local-data/plugin/${plugin}`),
+  isTauri: vi.fn(),
+  m3SetBarColor: vi.fn(),
+  nativeOpen: vi.fn(),
+  nativeReadText: vi.fn(),
+  nativeWriteText: vi.fn(),
+}))
 
 vi.mock('@tauri-apps/api/core', () => ({ isTauri }))
+vi.mock('@delta-comic/plugin', () => ({ getTauriPluginRoot }))
 vi.mock('tauri-plugin-better-cors-fetch', () => ({ CORSFetch: { init: corsInit } }))
 vi.mock('tauri-plugin-m3', () => ({ M3: { getInsets, setBarColor: m3SetBarColor } }))
 vi.mock('@tauri-apps/plugin-clipboard-manager', () => ({
@@ -23,6 +33,7 @@ vi.mock('@tauri-apps/plugin-shell', () => ({ open: nativeOpen }))
 import {
   initializePlatform,
   isTauriRuntime,
+  openPluginDirectory,
   openExternal,
   readClipboardText,
   setStatusBar,
@@ -63,6 +74,7 @@ describe('web platform fallback', () => {
     await writeClipboardText('next value')
     await expect(readClipboardText()).resolves.toBe('clipboard value')
     await openExternal('https://example.test/source')
+    await openPluginDirectory('reader')
 
     expect(writeText).toHaveBeenCalledExactlyOnceWith('next value')
     expect(readText).toHaveBeenCalledOnce()
@@ -74,6 +86,7 @@ describe('web platform fallback', () => {
     expect(nativeWriteText).not.toHaveBeenCalled()
     expect(nativeReadText).not.toHaveBeenCalled()
     expect(nativeOpen).not.toHaveBeenCalled()
+    expect(getTauriPluginRoot).not.toHaveBeenCalled()
   })
 
   it('initializes and delegates all native operations in a Tauri runtime', async () => {
@@ -94,10 +107,14 @@ describe('web platform fallback', () => {
     await writeClipboardText('native value')
     await expect(readClipboardText()).resolves.toBe('native clipboard')
     await openExternal('https://example.test/native')
+    await openPluginDirectory('reader')
     await setStatusBar('light')
 
     expect(nativeWriteText).toHaveBeenCalledExactlyOnceWith('native value')
-    expect(nativeOpen).toHaveBeenCalledExactlyOnceWith('https://example.test/native')
+    expect(nativeOpen).toHaveBeenNthCalledWith(1, 'https://example.test/native')
+    expect(nativeOpen).toHaveBeenNthCalledWith(2, '/app/local-data/plugin/reader')
+    expect(getTauriPluginRoot).toHaveBeenCalledOnce()
+    expect(getTauriPluginRoot).toHaveBeenCalledWith('reader')
     expect(m3SetBarColor).toHaveBeenCalledExactlyOnceWith('light')
   })
 })

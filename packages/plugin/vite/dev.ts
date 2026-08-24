@@ -21,10 +21,7 @@ const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*' } as const
 const VUE_STYLE_QUERY = /(?:^|[?&])vue&type=style(?:&|$)/
 const CSS_RUNTIME_BYPASS_QUERY = /(?:^|[?&])(?:direct|inline|raw|url)(?:&|$)/
 
-export const createWireManifest = (meta: PluginManifest) => ({
-  ...meta,
-  entry: { jsPath: 'index.js', cssPath: 'index.css' },
-})
+export const createWireManifest = (meta: PluginManifest) => ({ ...meta })
 
 export const createDevEntryCode = (meta: PluginManifest, entryUrl: string) =>
   [
@@ -159,8 +156,7 @@ export const createDevPlugin = (meta: PluginManifest): Plugin => {
     },
     configureServer(devServer) {
       server = devServer
-      const entrySource = meta.entry?.jsPath ?? 'src/main.ts'
-      const entryFile = resolve(devServer.config.root, entrySource)
+      const entryFile = resolve(devServer.config.root, 'src/main.ts')
       entryUrl = `/${normalizePath(relative(devServer.config.root, entryFile))}`
 
       const handleManifest: Connect.NextHandleFunction = (req, res, next) => {

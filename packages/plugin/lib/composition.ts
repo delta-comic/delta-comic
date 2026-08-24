@@ -222,6 +222,11 @@ export const resolvePluginIconUrl = async (
   return await pluginFiles.createAssetUrl(plugin, icon)
 }
 
-export { pluginI18n, type PluginI18nAdapter, type PluginLocaleMessages } from './adapters'
+export {
+  getTauriPluginRoot,
+  pluginI18n,
+  type PluginI18nAdapter,
+  type PluginLocaleMessages,
+} from './adapters'
 
 export const usePluginStore = () => pluginStore

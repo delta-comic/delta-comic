@@ -92,9 +92,8 @@ export class DevServerPluginModuleReader implements PluginModuleReader {
     // Keep the first entry URL stable so its source modules share one native Vite HMR graph.
     // Explicit plugin updates still get a fresh bootstrap URL after the first load.
     const entryUrl = devServerUrl(port, DEV_ENTRY_PATH)
-    const module = (await import(
-      /* @vite-ignore */ previousVersion === undefined ? entryUrl : `${entryUrl}?v=${version}`
-    )) as { default?: unknown }
+    const moduleUrl = previousVersion === undefined ? entryUrl : `${entryUrl}?v=${version}`
+    const module = (await import(/* @vite-ignore */ moduleUrl)) as { default?: unknown }
     signal.throwIfAborted()
 
     let styleText: string | undefined

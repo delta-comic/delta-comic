@@ -1,7 +1,7 @@
 # Delta Comic — 开发进度与规划
 
 > 目标：重构 `packages/plugin`，废弃 `vite-plugin-monkey`，实现自定义 Vite 开发协议
-> （`index.js` / `index.css` / `manifest.json`）+ 持久化的 `dev:<port>` 网络安装适配器。
+> （`index.mjs` / `index.css` / `manifest.json`）+ 持久化的 `dev:<port>` 网络安装适配器。
 
 ## 已完成
 
@@ -28,7 +28,7 @@ Phase 2 产物：`packages/plugin/vite/dev.ts`（200 行）+ `dev.test.ts` + `de
 2. **`source.ts`**：新增 `DevServerSourceResolver`
    - `id = 'dev-server'`，`matches` 匹配 `/^dev:(\d+)$/`（port 1-65535）
    - `resolve`：fetch `http://localhost:<port>/manifest.json` → `parsePluginManifest`
-     → 再取 `index.js`（+ `index.css` 若 `manifest.entry.cssPath`）→ 文本
+     → 再取 `index.mjs`（+ 可选 `index.css`）→ 文本
    - 返回 `{ package: { codecId: 'dev-server', files: 空 Map, manifest }, installInput, resolverId, storage: 'remote' }`
 
 3. **`service.ts`**
@@ -38,7 +38,7 @@ Phase 2 产物：`packages/plugin/vite/dev.ts`（200 行）+ `dev.test.ts` + `de
 
 4. **`moduleReader.ts`**：新增 `DevServerPluginModuleReader`
    - `matches` 匹配 `archive.loaderName === 'dev-server'`
-   - 按 `installInput` 端口 import `http://localhost:<port>/index.js?v=<每插件计数>`
+   - 按 `installInput` 端口 import `http://localhost:<port>/index.mjs?v=<每插件计数>`
    - fetch CSS 文本，样式注入复用 Stored 逻辑；CSS 404 容忍
 
 5. **`candidateProvider.ts`**：`InstalledPluginCandidateProvider` 接受 `readonly PluginModuleReader[]`

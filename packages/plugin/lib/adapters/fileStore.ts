@@ -5,6 +5,11 @@ import { safePluginPath } from '../install'
 
 type PluginFiles = ReadonlyMap<string, Uint8Array>
 
+export const getTauriPluginRoot = async (plugin: string) => {
+  const { appLocalDataDir, join } = await import('@tauri-apps/api/path')
+  return await join(await appLocalDataDir(), 'plugin', plugin)
+}
+
 interface PluginFileBackend {
   read(plugin: string, path: string): Promise<Uint8Array>
   snapshot(plugin: string): Promise<Map<string, Uint8Array>>
@@ -181,8 +186,7 @@ class IndexedDbPluginFileBackend implements PluginFileBackend {
 
 class TauriPluginFileBackend implements PluginFileBackend {
   async #root(plugin: string) {
-    const { appLocalDataDir, join } = await import('@tauri-apps/api/path')
-    return await join(await appLocalDataDir(), 'plugin', plugin)
+    return await getTauriPluginRoot(plugin)
   }
 
   public async read(plugin: string, path: string) {

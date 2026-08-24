@@ -97,15 +97,6 @@ export const parsePluginManifest = (value: unknown): PluginManifest => {
   }
 
   if (manifest.icon !== undefined) result.icon = pluginIcon(manifest.icon)
-  if (manifest.entry !== undefined) {
-    const entry = record(manifest.entry, 'manifest.entry')
-    result.entry = {
-      jsPath: safePluginPath(entry.jsPath, 'manifest.entry.jsPath'),
-      ...(entry.cssPath === undefined
-        ? {}
-        : { cssPath: safePluginPath(entry.cssPath, 'manifest.entry.cssPath') }),
-    }
-  }
   if (manifest.integrity !== undefined) {
     const integrity = record(manifest.integrity, 'manifest.integrity')
     if (integrity.algorithm !== 'blake3' && integrity.algorithm !== 'sha256') {

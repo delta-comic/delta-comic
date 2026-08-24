@@ -12,7 +12,6 @@ const meta: PluginArchiveDB.Meta = {
   description: 'test plugin',
   icon: 'assets/icon.svg',
   require: [],
-  entry: { jsPath: 'src/main.ts', cssPath: 'src/style.css' },
 }
 
 type TestAssetSource = string | Uint8Array
@@ -125,9 +124,12 @@ describe('deltaComic vite plugin', () => {
     expect(result?.code).toContain('Promise.resolve(window.$$lib$$.DcDb)')
   })
 
-  it('embeds assets without disabling JavaScript code splitting', () => {
+  it('uses fixed source and output entry paths while retaining code splitting', () => {
     const config = getBuildPlugin().config?.({})
 
+    expect(config.build.lib.entry).toBe('./src/main.ts')
+    expect(config.build.lib.fileName).toBe('index')
+    expect(config.build.lib.cssFileName).toBe('index')
     expect(config.build.assetsInlineLimit).toBe(Number.POSITIVE_INFINITY)
     expect(config.build.cssCodeSplit).toBe(false)
     expect(config.build.rollupOptions).toBeUndefined()
