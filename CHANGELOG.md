@@ -1,5 +1,14 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.19](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.18...3.0.0-next.19) (2026-08-24)
+
+
+### Features
+
+* **plugin:** 固定插件入口扩展名 ([af59764](https://github.com/delta-comic/delta-comic/commit/af5976478685924dc5f12350ec1b42aa8b2f2ae9))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.18](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.17...3.0.0-next.18) (2026-08-24)
 
 
