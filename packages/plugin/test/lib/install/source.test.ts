@@ -92,11 +92,8 @@ describe('DevServerSourceResolver', () => {
     const fetch = vi.fn(async (input: string | URL | Request) => {
       switch (String(input)) {
         case 'http://localhost:6173/manifest.json':
-          return Response.json({
-            ...manifest('1.0.0'),
-            entry: { cssPath: 'src/style.css', jsPath: 'src/main.ts' },
-          })
-        case 'http://localhost:6173/index.js':
+          return Response.json({ ...manifest('1.0.0') })
+        case 'http://localhost:6173/index.mjs':
           return new Response('export default () => ({ name: "reader" })')
         case 'http://localhost:6173/index.css':
           return new Response('.reader { color: red }')
@@ -124,10 +121,6 @@ describe('DevServerSourceResolver', () => {
     })
     expect(resolved.file).toBeUndefined()
     expect(resolved.package).toMatchObject({ codecId: 'dev-server', files: new Map() })
-    expect(resolved.package?.manifest.entry).toEqual({
-      cssPath: 'src/style.css',
-      jsPath: 'src/main.ts',
-    })
     expect(fetch).toHaveBeenCalledTimes(3)
   })
 })

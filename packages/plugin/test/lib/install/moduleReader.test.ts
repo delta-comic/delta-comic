@@ -68,7 +68,7 @@ describe('StoredPluginModuleReader', () => {
     const append = vi.fn()
     vi.stubGlobal('document', { createElement: vi.fn(() => style), head: { append } })
     const loaded = await new StoredPluginModuleReader(files).read(
-      archive('reader', { ...manifest, entry: { cssPath: 'index.css', jsPath: 'index.mjs' } }),
+      archive('reader'),
       new AbortController().signal,
     )
 

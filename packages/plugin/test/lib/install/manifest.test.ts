@@ -13,7 +13,7 @@ const manifest = (overrides: Record<string, unknown> = {}) => ({
 })
 
 describe('plugin manifest v1', () => {
-  it('accepts safe entries and credential-free remote icons', () => {
+  it('ignores removed entry fields and accepts credential-free remote icons', () => {
     expect(
       parsePluginManifest(
         manifest({
@@ -21,22 +21,18 @@ describe('plugin manifest v1', () => {
           icon: 'https://example.test/icon.png',
         }),
       ),
-    ).toMatchObject({
-      apiVersion: 1,
-      entry: { cssPath: 'src/style.css', jsPath: 'src/main.ts' },
-      icon: 'https://example.test/icon.png',
-    })
+    ).toMatchObject({ apiVersion: 1, icon: 'https://example.test/icon.png' })
+    expect(
+      parsePluginManifest(manifest({ entry: { jsPath: '../outside.mjs' } })),
+    ).not.toHaveProperty('entry')
   })
 
   it('ignores the removed legacy plugin kind field', () => {
     expect(parsePluginManifest(manifest({ kind: 'preboot' }))).not.toHaveProperty('kind')
   })
 
-  it('rejects unsupported protocol versions and traversal paths', () => {
+  it('rejects unsupported protocol versions and unsafe identifiers', () => {
     expect(() => parsePluginManifest(manifest({ apiVersion: 0 }))).toThrow(PluginManifestError)
-    expect(() => parsePluginManifest(manifest({ entry: { jsPath: '../outside.mjs' } }))).toThrow(
-      'safe relative path',
-    )
     expect(() =>
       parsePluginManifest(manifest({ name: { display: 'Unsafe', id: 'unsafe:name' } })),
     ).toThrow('portable')

@@ -22,7 +22,6 @@ const meta: PluginManifest = {
   description: 'dev plugin',
   icon: 'assets/icon.svg',
   require: [],
-  entry: { jsPath: 'src/main.ts' },
 }
 
 type TestMiddleware = (req: IncomingMessage, res: ServerResponse, next: () => void) => void
@@ -67,11 +66,11 @@ const cssModule = (url: string): ModuleNode =>
   ({ url, type: 'css', importedModules: new Set() }) as unknown as ModuleNode
 
 describe('createWireManifest', () => {
-  it('exposes the fixed development entry paths', () => {
+  it('does not expose removed entry metadata', () => {
     const wire = createWireManifest(meta)
 
     expect(wire.name.id).toBe('dev-plugin')
-    expect(wire.entry).toEqual({ jsPath: 'index.js', cssPath: 'index.css' })
+    expect(wire).not.toHaveProperty('entry')
   })
 })
 
@@ -169,7 +168,7 @@ describe('createDevPlugin middleware', () => {
       }),
     )
     const body = JSON.parse(res.end.mock.calls[0][0] as string)
-    expect(body.entry).toEqual({ jsPath: 'index.js', cssPath: 'index.css' })
+    expect(body).not.toHaveProperty('entry')
   })
 
   it('passes through requests for other paths', () => {

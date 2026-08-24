@@ -1,7 +1,7 @@
 export const DEV_SERVER_LOADER_ID = 'dev-server'
 export const DEV_SERVER_SOURCE_PREFIX = 'dev:'
 export const DEV_MANIFEST_PATH = '/manifest.json'
-export const DEV_ENTRY_PATH = '/index.js'
+export const DEV_ENTRY_PATH = '/index.mjs'
 export const DEV_CSS_PATH = '/index.css'
 
 export const parseDevServerPort = (input: string): number | undefined => {

@@ -9,6 +9,5 @@ export interface PluginManifest {
   /** An HTTP(S) URL or a path relative to the installed plugin root. */
   icon?: string
   require: { id: string; download?: string }[]
-  entry?: { jsPath: string; cssPath?: string }
   integrity?: { algorithm: 'blake3' | 'sha256'; digest: string }
 }
