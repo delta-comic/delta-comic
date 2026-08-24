@@ -40,24 +40,24 @@ describe('module URL versioning', () => {
   it('busts the module cache after every file replacement and removal', async () => {
     const { AtomicPluginFileStore } = await import('../../../lib/adapters/fileStore')
     const backend = {
-      moduleUrl: vi.fn(async () => 'plugin://localhost/demo/index.mjs'),
+      moduleUrl: vi.fn(async () => 'plugin://localhost/demo/index.js'),
       read: vi.fn(),
       replace: vi.fn(async () => undefined),
       snapshot: vi.fn(async () => new Map<string, Uint8Array>()),
     }
     const store = new AtomicPluginFileStore(backend)
 
-    await expect(store.createModuleUrl('demo', 'index.mjs')).resolves.toBe(
-      'plugin://localhost/demo/index.mjs?v=0',
+    await expect(store.createModuleUrl('demo', 'index.js')).resolves.toBe(
+      'plugin://localhost/demo/index.js?v=0',
     )
     await store.replace('demo', new Map())
-    await expect(store.createModuleUrl('demo', 'index.mjs')).resolves.toBe(
-      'plugin://localhost/demo/index.mjs?v=1',
+    await expect(store.createModuleUrl('demo', 'index.js')).resolves.toBe(
+      'plugin://localhost/demo/index.js?v=1',
     )
     await store.remove('demo')
     await store.replace('demo', new Map())
-    await expect(store.createModuleUrl('demo', 'index.mjs')).resolves.toBe(
-      'plugin://localhost/demo/index.mjs?v=3',
+    await expect(store.createModuleUrl('demo', 'index.js')).resolves.toBe(
+      'plugin://localhost/demo/index.js?v=3',
     )
   })
 })

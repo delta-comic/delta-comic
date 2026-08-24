@@ -140,7 +140,7 @@ describe('deltaComic vite plugin', () => {
     const plugin = getBuildPlugin()
     const emitted: TestEmittedFile[] = []
     const bundle = {
-      'index.mjs': { type: 'chunk', fileName: 'index.mjs', code: 'export default 1' },
+      'index.js': { type: 'chunk', fileName: 'index.js', code: 'export default 1' },
       'index.css': { type: 'asset', fileName: 'index.css', source: 'body{}' },
       'assets/icon.svg': { type: 'asset', fileName: 'assets/icon.svg', source: '<svg></svg>' },
     } satisfies TestOutputBundle
@@ -164,7 +164,7 @@ describe('deltaComic vite plugin', () => {
 
     const zip = await JSZip.loadAsync(archiveFile?.source as Uint8Array)
     await expect(zip.file('manifest.json')?.async('string')).resolves.toBe(manifest)
-    await expect(zip.file('index.mjs')?.async('string')).resolves.toBe('export default 1')
+    await expect(zip.file('index.js')?.async('string')).resolves.toBe('export default 1')
     await expect(zip.file('index.css')?.async('string')).resolves.toBe('body{}')
     await expect(zip.file('assets/icon.svg')?.async('string')).resolves.toBe('<svg></svg>')
   })
