@@ -1,5 +1,21 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.18](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.17...3.0.0-next.18) (2026-08-24)
+
+
+### Bug Fixes
+
+* **plugin:** 修复开发插件动态导入警告 ([602d1d3](https://github.com/delta-comic/delta-comic/commit/602d1d350f08eba2f70ae4d95c49203b374de66d))
+
+
+### Features
+
+* **app:** 添加插件本地打开入口 ([4171d0e](https://github.com/delta-comic/delta-comic/commit/4171d0e090ba1ed7d9f85f67270f5a6ec42a1d45))
+* **app:** 添加自动启动内容清除入口 ([b241bb0](https://github.com/delta-comic/delta-comic/commit/b241bb0dda94efdcaf86b0311cc847076986dcaf))
+* **plugin:** 固定插件入口文件 ([b05e1f8](https://github.com/delta-comic/delta-comic/commit/b05e1f8ca653d88a1a73f9dc447dc57b13d1ede7))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.17](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.16...3.0.0-next.17) (2026-08-23)
 
 

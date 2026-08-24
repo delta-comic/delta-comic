@@ -1,7 +1,7 @@
 [package]
 name = "delta-comic"
 description = "阿赖耶识"
-version = "3.0.0-next.17"
+version = "3.0.0-next.18"
 
 [package.authors]
 workspace = true
