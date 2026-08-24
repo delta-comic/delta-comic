@@ -41,7 +41,7 @@ export class StoredPluginModuleReader implements PluginModuleReader {
     signal: AbortSignal,
   ): Promise<LoadedPluginModule> {
     const plugin = archive.pluginName
-    const url = await this.files.createModuleUrl(plugin, 'index.mjs')
+    const url = await this.files.createModuleUrl(plugin, 'index.js')
     if (signal.aborted) {
       this.files.release(plugin)
       throw signal.reason

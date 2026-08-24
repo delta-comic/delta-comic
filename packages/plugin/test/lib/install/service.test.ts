@@ -31,7 +31,7 @@ const archive = (version: string): PluginArchiveDB.Archive => ({
 
 const packageFor = (pluginManifest: PluginManifest) => ({
   codecId: 'zip',
-  files: new Map([['index.mjs', new TextEncoder().encode(pluginManifest.name.id)]]),
+  files: new Map([['index.js', new TextEncoder().encode(pluginManifest.name.id)]]),
   manifest: pluginManifest,
 })
 
@@ -55,7 +55,7 @@ describe('PluginInstallService', () => {
   it('persists development metadata while clearing stored files', async () => {
     const files = new MemoryPluginFileStore()
     await (
-      await files.replace('example', new Map([['index.mjs', new TextEncoder().encode('old')]]))
+      await files.replace('example', new Map([['index.js', new TextEncoder().encode('old')]]))
     ).commit()
     const current = new Map<string, PluginArchiveDB.Archive>()
     const repository: PluginArchiveRepository = {
@@ -88,14 +88,14 @@ describe('PluginInstallService', () => {
     const installed = await service.install('dev:6173')
 
     expect(installed).toMatchObject({ installInput: 'dev:6173', loaderName: 'dev-server' })
-    await expect(files.read('example', 'index.mjs')).rejects.toThrow('not found')
+    await expect(files.read('example', 'index.js')).rejects.toThrow('not found')
     expect(current.get('example')?.loaderName).toBe('dev-server')
   })
 
   it('restores both files and metadata when persistence fails', async () => {
     const files = new MemoryPluginFileStore()
     await (
-      await files.replace('example', new Map([['index.mjs', new TextEncoder().encode('old')]]))
+      await files.replace('example', new Map([['index.js', new TextEncoder().encode('old')]]))
     ).commit()
     let current = archive('1.0.0')
     const repository: PluginArchiveRepository = {
@@ -117,7 +117,7 @@ describe('PluginInstallService', () => {
     await expect(service.install(new File([], 'plugin.zip'))).rejects.toThrow(
       'database unavailable',
     )
-    expect(new TextDecoder().decode(await files.read('example', 'index.mjs'))).toBe('old')
+    expect(new TextDecoder().decode(await files.read('example', 'index.js'))).toBe('old')
     expect(current.meta.version.plugin).toBe('1.0.0')
   })
 
@@ -278,7 +278,7 @@ describe('PluginInstallService', () => {
   it('restores files and metadata when uninstall persistence fails', async () => {
     const files = new MemoryPluginFileStore()
     await (
-      await files.replace('example', new Map([['index.mjs', new TextEncoder().encode('old')]]))
+      await files.replace('example', new Map([['index.js', new TextEncoder().encode('old')]]))
     ).commit()
     let current: PluginArchiveDB.Archive | undefined = archive('1.0.0')
     const repository: PluginArchiveRepository = {
@@ -300,7 +300,7 @@ describe('PluginInstallService', () => {
     })
 
     await expect(service.uninstall('example')).rejects.toThrow('database unavailable')
-    expect(new TextDecoder().decode(await files.read('example', 'index.mjs'))).toBe('old')
+    expect(new TextDecoder().decode(await files.read('example', 'index.js'))).toBe('old')
     expect(current?.meta.version.plugin).toBe('1.0.0')
   })
 })

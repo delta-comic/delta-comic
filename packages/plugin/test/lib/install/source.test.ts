@@ -93,7 +93,7 @@ describe('DevServerSourceResolver', () => {
       switch (String(input)) {
         case 'http://localhost:6173/manifest.json':
           return Response.json({ ...manifest('1.0.0') })
-        case 'http://localhost:6173/index.mjs':
+        case 'http://localhost:6173/index.js':
           return new Response('export default () => ({ name: "reader" })')
         case 'http://localhost:6173/index.css':
           return new Response('.reader { color: red }')
