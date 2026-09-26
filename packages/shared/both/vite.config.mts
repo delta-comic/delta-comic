@@ -2,7 +2,13 @@ import { defineConfig } from 'vite-plus'
 
 export default defineConfig({
   pack: {
-    entry: ['./lib/index.ts', './lib/manifest.ts', './lib/diagnostic.ts'],
+    entry: [
+      './lib/index.ts',
+      './lib/manifest.ts',
+      './lib/diagnostic.ts',
+      './lib/artifact.ts',
+      './lib/runtime.ts',
+    ],
     sourcemap: true,
     dts: { tsconfig: './tsconfig.json' },
   },

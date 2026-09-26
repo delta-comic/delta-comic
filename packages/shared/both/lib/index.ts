@@ -19,3 +19,5 @@ export {
 
 export * from './manifest.js'
 export * from './diagnostic.js'
+export * from './artifact.js'
+export * from './runtime.js'

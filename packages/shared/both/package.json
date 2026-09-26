@@ -19,6 +19,14 @@
     "./diagnostic": {
       "types": "./dist/lib/diagnostic.d.mts",
       "import": "./dist/lib/diagnostic.mjs"
+    },
+    "./artifact": {
+      "types": "./dist/lib/artifact.d.mts",
+      "import": "./dist/lib/artifact.mjs"
+    },
+    "./runtime": {
+      "types": "./dist/lib/runtime.d.mts",
+      "import": "./dist/lib/runtime.mjs"
     }
   },
   "dependencies": {

@@ -17,10 +17,10 @@
 
 ## 当前状态
 
-- 当前阶段：方案比较与逐段设计确认。
-- 代码实现：尚未开始，尚未获批准。
-- 设计 spec：尚未撰写；待方案比较和逐段设计批准之后创建。
-- 下一个动作：提出 2–3 个整体重构方案及推荐方案。
+- 当前阶段：阶段 5 实施，公共协议已完成。
+- 代码实现：both 公共 Manifest、artifact 校验、诊断记录器和 Cordis runtime harness 已完成并通过专项验证。
+- 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
+- 下一个动作：实现 client/server 最小 SDK/runtime 与示例。
 
 ### 2026-09-26 — 40 项架构决策确认
 
@@ -52,6 +52,14 @@
 - 用户要求 **Loader 和模块依赖处理更多基于 Cordis**：Delta Comic Loader 只负责读取 artifact 与解析 Manifest，依赖解析/激活顺序/循环检测/卸载由 Cordis 自动处理；Manifest dependencies 用于安装时校验，运行时由 Cordis inject 决定。
 - 已更新 `findings.md` 补充 Cordis-first Loader 与依赖策略。
 - 设计进度：第 1-3 章已获批准；第 4 章（Cordis/Loader/Manifest）已按 Cordis-first 原则重写，等待展示完整版并获批准后继续第 5 章。
+
+### 2026-09-26 — 阶段 40A 公共协议实现
+
+- 扩展 `@delta-comic/both` Manifest：协议版本、依赖、资源完整性、导入图、平台和入口类型。
+- 新增 artifact 校验：规范化相对路径、验证资源声明、导入图、重复文件、缺失文件和 SHA-256 integrity。
+- 新增有容量上限的 `DiagnosticRecorder`、诊断快照和 `CordisRuntime` mount/unmount/dispose harness。
+- 修复 Web-only TypeScript 兼容性：移除 Node Buffer 依赖，适配当前 TypeBox 错误集合 API 和 Web Crypto 类型。
+- `vp run --filter @delta-comic/both typecheck`、专项测试（4/4）和 `git diff --check` 通过。
 
 ## 验证
 
