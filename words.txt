@@ -17,6 +17,7 @@ codegen
 autoincrement
 AUTOINCREMENT
 colada
+cordis
 cosav
 daterange
 datetimerange
@@ -86,6 +87,7 @@ rustls
 sdkmanager
 serde
 sider
+specta
 splited
 staticlib
 Swatinem
