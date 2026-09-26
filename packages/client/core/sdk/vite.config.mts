@@ -21,7 +21,13 @@ const decoratorPlugin: Plugin = { name: 'delta-comic:lower-decorators', transfor
 export default defineConfig({
   plugins: [decoratorPlugin],
   pack: {
-    entry: ['./lib/index.ts', './lib/manifest.ts', './lib/runtime.ts', './lib/ui.ts'],
+    entry: [
+      './lib/index.ts',
+      './lib/manifest.ts',
+      './lib/runtime.ts',
+      './lib/ui.ts',
+      './lib/network.ts',
+    ],
     sourcemap: true,
     dts: { tsconfig: './tsconfig.json' },
     plugins: [decoratorPlugin],

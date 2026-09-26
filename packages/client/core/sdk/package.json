@@ -25,6 +25,10 @@
     "./ui": {
       "types": "./dist/ui.d.mts",
       "import": "./dist/ui.mjs"
+    },
+    "./network": {
+      "types": "./dist/network.d.mts",
+      "import": "./dist/network.mjs"
     }
   },
   "publishConfig": {

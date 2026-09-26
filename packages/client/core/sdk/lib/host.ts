@@ -3,6 +3,7 @@ import type { Kysely } from 'kysely'
 import type { Component } from 'vue'
 
 import type { ClientDownloader } from './downloader.js'
+import type { ClientNetwork } from './network.js'
 
 export interface ClientDatabase<DB extends object> {
   readonly db: Kysely<DB>
@@ -93,4 +94,5 @@ export interface ClientHost<DB extends object = Record<string, never>> {
   readonly store: ClientStore
   readonly ui: ClientUi
   readonly downloader?: ClientDownloader
+  readonly network: ClientNetwork
 }

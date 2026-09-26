@@ -36,6 +36,19 @@ export interface DiagnosticRecorderOptions {
   id?: () => string
 }
 
+export interface DiagnosticReplayEvent {
+  readonly level: DiagnosticRecord['level']
+  readonly message: string
+  readonly details?: Record<string, unknown>
+  readonly timestampOffset: number
+}
+
+export interface DiagnosticHarnessArchive {
+  readonly version: 1
+  readonly snapshot: DiagnosticSnapshot
+  readonly replay: readonly DiagnosticReplayEvent[]
+}
+
 export type DiagnosticOperation<T> = () => T | PromiseLike<T>
 
 const isPromiseLike = <T>(value: T | PromiseLike<T>): value is PromiseLike<T> =>
@@ -153,4 +166,63 @@ export class DiagnosticRecorder {
       ...(metrics === undefined ? {} : { metrics }),
     }
   }
+}
+
+export class DiagnosticHarness {
+  public constructor(private readonly recorder: DiagnosticRecorder) {}
+
+  public capture(
+    plugins: readonly DiagnosticPluginSnapshot[] = [],
+    metrics?: SystemMetrics,
+  ): DiagnosticHarnessArchive {
+    const snapshot = this.recorder.snapshot(plugins, metrics)
+    const firstTimestamp = snapshot.records[0]?.timestamp ?? snapshot.capturedAt
+    return {
+      version: 1,
+      snapshot,
+      replay: snapshot.records.map(record => ({
+        level: record.level,
+        message: record.message,
+        ...(record.details === undefined ? {} : { details: record.details }),
+        timestampOffset: record.timestamp - firstTimestamp,
+      })),
+    }
+  }
+
+  public export(archive: DiagnosticHarnessArchive): string {
+    return JSON.stringify(archive)
+  }
+
+  public import(serialized: string): DiagnosticHarnessArchive {
+    const value: unknown = JSON.parse(serialized)
+    if (!isDiagnosticHarnessArchive(value)) throw new TypeError('Invalid diagnostic archive')
+    return value
+  }
+
+  public async replay(
+    archive: DiagnosticHarnessArchive,
+    dispatch: (event: DiagnosticReplayEvent, index: number) => void | Promise<void>,
+  ): Promise<void> {
+    if (!isDiagnosticHarnessArchive(archive)) throw new TypeError('Invalid diagnostic archive')
+    for (const [index, event] of archive.replay.entries()) await dispatch(event, index)
+  }
+}
+
+const isDiagnosticHarnessArchive = (value: unknown): value is DiagnosticHarnessArchive => {
+  if (typeof value !== 'object' || value === null) return false
+  const archive = value as Partial<DiagnosticHarnessArchive>
+  return (
+    archive.version === 1 &&
+    typeof archive.snapshot === 'object' &&
+    archive.snapshot !== null &&
+    Array.isArray(archive.snapshot.records) &&
+    Array.isArray(archive.replay) &&
+    archive.replay.every(
+      event =>
+        typeof event === 'object' &&
+        event !== null &&
+        typeof event.message === 'string' &&
+        typeof event.timestampOffset === 'number',
+    )
+  )
 }

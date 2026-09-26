@@ -6,6 +6,7 @@ import { defineComponent } from 'vue'
 import {
   ClientRuntime,
   createClientDownloader,
+  createClientNetwork,
   type ClientDatabase,
   type Context,
 } from '../lib/index.js'
@@ -102,5 +103,21 @@ describe('client SDK', () => {
     expect(environmentRegistry.forKey('test-environment')).toHaveLength(1)
     await runtime.dispose()
     expect(environmentRegistry.forKey('test-environment')).toHaveLength(0)
+  })
+
+  it('provides an injectable network transport with diagnostics', async () => {
+    const diagnostics = new DiagnosticRecorder({ source: 'network-test' })
+    const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe('https://example.test/items')
+      expect(init?.method).toBe('GET')
+      return new Response('ok', { status: 200 })
+    })
+    const network = createClientNetwork(diagnostics, 'network', { transport: { fetch } })
+    const response = await network.get('https://example.test/items')
+    expect(response.status).toBe(200)
+    expect(fetch).toHaveBeenCalledOnce()
+    expect(diagnostics.list().map(record => record.message)).toEqual([
+      'client network request completed',
+    ])
   })
 })

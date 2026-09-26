@@ -69,10 +69,10 @@
 - 6A：将新 Artifact/Manifest 接入现有安装文件与模块读取边界。complete（`b33ab532`）
 - 6B：公开构建并发布 `@delta-comic/server`，补齐 SDK 的产物测试。complete（`e9a83b1e`）
 - 6C：接入 Tauri command 的 specta 类型生成，并纳入 Rust/TypeScript 验证。complete（`127dd91b`）
-- 6D：完成客户端/服务端宿主迁移、诊断 harness、UI/网络/下载器能力迁移。
+- 6D：完成客户端/服务端宿主迁移、诊断 harness、UI/网络/下载器能力迁移。已完成下载器、UI EnvironmentRegistry、诊断 harness 和客户端网络 transport；真实路由/导航/命令宿主、服务端旧业务迁移仍未完成。
 - 6E：完成 Worker dispatcher、D1 migration、发布/市场、应用/admin 重组与部署文档。
 - 每个子阶段必须有实现、测试、规划状态和签名提交；未实现事项保持未勾选。
 
 ## Next Step
 
-  阶段 6D：推进诊断 harness、网络宿主和服务端宿主迁移；UI environment owner 生命周期与下载器宿主已完成，routes/nav/commands 和其余迁移保持未完成。
+  阶段 6D：继续迁移真实 UI 路由/导航/命令宿主与服务端现有业务能力；已提交诊断 harness 和客户端网络 transport，routes/nav/commands、服务端宿主迁移及阶段 6E 保持未完成。

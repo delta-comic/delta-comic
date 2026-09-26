@@ -15,6 +15,7 @@ import {
   type ClientStore,
   type ClientUi,
 } from './host.js'
+import { createClientNetwork, type ClientNetwork } from './network.js'
 import { createClientUi } from './ui.js'
 
 export interface ClientRuntimeOptions<DB extends object = Record<string, never>> {
@@ -24,6 +25,7 @@ export interface ClientRuntimeOptions<DB extends object = Record<string, never>>
   store?: ClientStore
   ui?: ClientUi
   downloader?: ClientDownloader
+  network?: ClientNetwork
 }
 
 const defaultStore = (): ClientStore => {
@@ -63,6 +65,7 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
         createClientDownloader(this.#runtime.diagnostics, options.pluginId, {
           key: `plugin:${options.pluginId}`,
         }),
+      network: options.network ?? createClientNetwork(this.#runtime.diagnostics, options.pluginId),
     }
   }
 

@@ -20,7 +20,7 @@
 - 当前阶段：阶段 6D 实施，客户端下载器与 UI EnvironmentRegistry owner 生命周期已接入，正在进入诊断 harness 和网络宿主能力。
 - 代码实现：both 公共 Manifest、artifact 校验、诊断记录器和 Cordis runtime harness 已完成并通过专项验证。
 - 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
-- 下一个动作：提交 UI EnvironmentRegistry owner 生命周期适配，然后实现诊断 harness 和网络宿主能力。
+- 下一个动作：提交诊断 harness 与客户端网络 transport，然后继续真实 UI 路由/导航/命令宿主和服务端业务迁移。
 
 ### 2026-09-26 — 阶段 6A Artifact Loader 接入
 
@@ -53,6 +53,14 @@
 - UI 新增 `./environment` 公共出口，library build 生成独立 environment 入口并保持既有 `./style.css` 对应 `dist/index.css`。
 - 客户端 SDK 新增 `./ui` 出口和 UI 生命周期测试；客户端专项测试 4/4、UI/client typecheck 与 `vp check --fix` 通过。
 - routes、导航项和 command 的真实宿主注册仍待迁移；诊断 harness、网络宿主、服务端宿主迁移和阶段 6E 保持未完成。
+
+### 2026-09-26 — 阶段 6D 诊断 harness 与客户端网络宿主
+
+- `@delta-comic/both` 新增 `DiagnosticHarness`，支持快照归档、JSON 导入/导出和按记录顺序 replay；保留诊断记录容量边界，并校验导入归档版本与基本结构。
+- `@delta-comic/client` 新增可注入 `ClientNetworkTransport` 的网络服务，默认使用宿主 `fetch`，GET/POST/request 统一经过 `withDiagnostic`，插件可替换 transport 以适配 Tauri 或测试环境。
+- ClientHost/ClientRuntime 注入网络服务，新增 `./network` 公开出口；专项测试覆盖网络 transport 和请求诊断。
+- both/client 专项验证共 11 个测试通过，typecheck 与 `vp check --fix` 通过。
+- 真实诊断面板、事件总线快照、事件回放执行器、UI 路由/导航/命令宿主和服务端业务迁移仍保持未完成。
 
 ### 2026-09-26 — 40 项架构决策确认
 

@@ -4,6 +4,7 @@ import {
   Context,
   CordisRuntime,
   diagnostic,
+  DiagnosticHarness,
   DiagnosticRecorder,
   Service,
   sha256Integrity,
@@ -60,6 +61,24 @@ describe('@delta-comic/both cordis integration', () => {
     recorder.record('error', 'three')
     expect(recorder.list().map(record => record.message)).toEqual(['two', 'three'])
     expect(recorder.snapshot().runtime).toBe('test')
+  })
+
+  it('captures, exports, imports, and replays diagnostic records', async () => {
+    const recorder = new DiagnosticRecorder({
+      source: 'harness',
+      id: () => 'record-1',
+      now: () => 10,
+    })
+    recorder.record('info', 'started', { step: 1 })
+    const harness = new DiagnosticHarness(recorder)
+    const archive = harness.capture()
+    const imported = harness.import(harness.export(archive))
+    const replayed: string[] = []
+    await harness.replay(imported, event => {
+      replayed.push(event.message)
+    })
+    expect(replayed).toEqual(['started'])
+    expect(imported.replay[0]?.timestampOffset).toBe(0)
   })
 
   it('traces decorated methods without mixing logging into business logic', () => {
