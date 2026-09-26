@@ -169,6 +169,13 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - **Rust 二进制优化**：使用 `lld` 链接器加速构建，strip symbols、LTO 优化。
 - WebView 使用系统 JS 引擎（V8/JavaScriptCore），无字节码编译 API，主要优化点在减少 IPC 调用和二进制传输。
 
+## 补充决策：网络插件内化
+
+- **`tauri-plugin-better-cors-fetch` 内化到项目**：当前外部依赖（版本 1.8.0），需内化到 `packages/network` 进行定制。
+- 内化路径：`packages/network`（Rust crate + npm 包），与 `db`/`downloader`/`logger`/`plugin` 同级。
+- 保留现有功能：multipart、blocking、CORS bypass。
+- 定制方向：与 Cordis 集成、诊断日志、请求拦截/重试/缓存、插件 API 暴露。
+
 ## 补充决策：类型系统与 specta
 
 - **specta 是整个架构的类型基础设施**，不只是 Tauri IPC 的配角，而是实现"单一类型源派生多端类型"的核心工具。
