@@ -1,6 +1,7 @@
 import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
+import { transform } from '@swc/core'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
 import type { UserConfig } from 'vite-plus'
@@ -10,58 +11,83 @@ const host = process.env.TAURI_DEV_HOST
 // Release CI builds the workspace libraries and the shared runtime once in the `plan` job and
 // downloads the artifacts into place; skip rebuilding them on each platform runner.
 const skipLibBuild = process.env.DELTA_SKIP_LIB_BUILD === 'true'
+const decoratorPlugin = {
+  name: 'delta-comic:lower-decorators',
+  async transform(code: string, id: string) {
+    if (!/\.[cm]?tsx?$/.test(id) || id.includes('node_modules')) return
+    const result = await transform(code, {
+      filename: id,
+      sourceMaps: true,
+      jsc: {
+        target: 'es2022',
+        parser: { syntax: 'typescript', decorators: true },
+        transform: {
+          decoratorVersion: '2023-11',
+          legacyDecorator: false,
+          decoratorMetadata: false,
+        },
+      },
+    })
+    return { code: result.code, map: result.map }
+  },
+}
 
 export default defineConfig(
   () =>
     ({
-      plugins: lazyPlugins(async () => {
-        const [
-          { exposeHostLibraries },
-          { default: tailwindcss },
-          { default: legacy },
-          { default: vue },
-          { default: vueJsx },
-          { default: MotionResolver },
-          { NaiveUiResolver },
-          { default: Components },
-          { default: vueDevTools },
-          { default: wasm },
-          { default: VueRouter },
-          { DeltaComicUiResolver },
-        ] = await Promise.all([
-          import('@delta-comic/utils/vite'),
-          import('@tailwindcss/vite'),
-          import('@vitejs/plugin-legacy'),
-          import('@vitejs/plugin-vue'),
-          import('@vitejs/plugin-vue-jsx'),
-          import('motion-v/resolver'),
-          import('unplugin-vue-components/resolvers'),
-          import('unplugin-vue-components/vite'),
-          import('vite-plugin-vue-devtools'),
-          import('vite-plugin-wasm'),
-          import('vue-router/vite'),
-          import('@delta-comic/ui/vite'),
-        ])
+      plugins: [
+        decoratorPlugin as any,
+        lazyPlugins(async () => {
+          const [
+            { exposeHostLibraries },
+            { default: tailwindcss },
+            { default: legacy },
+            { default: vue },
+            { default: vueJsx },
+            { default: MotionResolver },
+            { NaiveUiResolver },
+            { default: Components },
+            { default: vueDevTools },
+            { default: wasm },
+            { default: VueRouter },
+            { DeltaComicUiResolver },
+          ] = await Promise.all([
+            import('@delta-comic/utils/vite'),
+            import('@tailwindcss/vite'),
+            import('@vitejs/plugin-legacy'),
+            import('@vitejs/plugin-vue'),
+            import('@vitejs/plugin-vue-jsx'),
+            import('motion-v/resolver'),
+            import('unplugin-vue-components/resolvers'),
+            import('unplugin-vue-components/vite'),
+            import('vite-plugin-vue-devtools'),
+            import('vite-plugin-wasm'),
+            import('vue-router/vite'),
+            import('@delta-comic/ui/vite'),
+          ])
 
-        return [
-          // @ts-ignore
-          wasm(),
-          legacy({ targets: ['ie >= 11'], renderModernChunks: false }),
-          VueRouter({ dts: 'typed-router.d.ts' }),
-          vueDevTools(),
-          vue({
-            template: { compilerOptions: { isCustomElement: tag => tag.startsWith('media-') } },
-          }),
-          vueJsx(),
-          Components({
-            dts: true,
-            resolvers: [MotionResolver(), NaiveUiResolver(), DeltaComicUiResolver()],
-            dtsTsx: false,
-          }),
-          tailwindcss(),
-          exposeHostLibraries({ entry: fileURLToPath(new URL('./src/main.tsx', import.meta.url)) }),
-        ]
-      }),
+          return [
+            // @ts-ignore
+            wasm(),
+            legacy({ targets: ['ie >= 11'], renderModernChunks: false }),
+            VueRouter({ dts: 'typed-router.d.ts' }),
+            vueDevTools(),
+            vue({
+              template: { compilerOptions: { isCustomElement: tag => tag.startsWith('media-') } },
+            }),
+            vueJsx(),
+            Components({
+              dts: true,
+              resolvers: [MotionResolver(), NaiveUiResolver(), DeltaComicUiResolver()],
+              dtsTsx: false,
+            }),
+            tailwindcss(),
+            exposeHostLibraries({
+              entry: fileURLToPath(new URL('./src/main.tsx', import.meta.url)),
+            }),
+          ]
+        }),
+      ],
       resolve: {
         alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
         extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],

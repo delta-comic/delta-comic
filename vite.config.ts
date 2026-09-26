@@ -112,6 +112,7 @@ export default defineConfig({
     projects: [
       { test: { name: 'root', environment: 'node', include: ['script/test/**/*.test.ts'] } },
       'packages/shared/both',
+      'packages/client/core/sdk',
       'packages/app',
       'packages/db',
       'packages/downloader',

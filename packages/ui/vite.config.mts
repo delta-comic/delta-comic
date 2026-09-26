@@ -20,7 +20,7 @@ const isExternal = (id: string) =>
   externalDepends.some(dep => id === dep || id.startsWith(`${dep}/`))
 
 export default defineConfig(({ command }) => ({
-  plugins: lazyPlugins(async () => {
+  plugins: lazyPlugins((async () => {
     const [
       { default: tailwindcss },
       { default: vue },
@@ -50,7 +50,7 @@ export default defineConfig(({ command }) => ({
           ]
         : []),
     ]
-  }),
+  }) as any),
   resolve: {
     alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) },
     extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],

@@ -35,7 +35,7 @@
 - 按仓库约定签名提交 spec，并请用户审核；收到用户批准之前不进入实施计划。
 
 ### 阶段 5：制定实施计划并按阶段实施
-- **状态：** in_progress
+ - **状态：** complete
 - 仅在用户批准 spec 后制定可执行的分阶段实施计划。
 - 按阶段执行，每个阶段完成后立即验证并签名提交保存进度。
 - 遵循 `AGENTS.md` 的 Vite+、Rust、依赖、格式、测试、i18n 及发布约定，并记录用户特别确认的例外。
@@ -65,4 +65,4 @@
 
 ## Next Step
 
-完成 @delta-comic/client 与 @delta-comic/server 的最小 Cordis SDK/runtime、示例和测试，然后运行全仓验证。
+ 阶段 40A 已完成：提交公共协议与诊断 runtime，完成 client/server SDK、Cordis runtime、typed host API、artifact/migration/dispatch 示例、SWC 装饰器配置和专项测试；下一步执行全仓验证并提交 SDK 阶段。

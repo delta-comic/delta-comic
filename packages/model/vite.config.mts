@@ -45,11 +45,11 @@ const lowerDecoratorsRollup = {
 }
 
 export default defineConfig({
-  plugins: [lowerDecoratorsVite()],
+  plugins: [lowerDecoratorsVite() as any],
   pack: {
     entry: './lib/index.ts',
     dts: { tsconfig: './tsconfig.app.json' },
-    plugins: [lowerDecoratorsRollup],
+    plugins: [lowerDecoratorsRollup as any],
   },
   root,
   run: {

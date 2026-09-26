@@ -4,6 +4,12 @@
 > **状态**: 设计定稿  
 > **日期**: 2026-09-26
 
+> **实现基线**：阶段 40A 已落地。现行 TypeScript API 以
+> `packages/shared/both`、`packages/client/core/sdk` 和 `packages/server/lib` 为准。
+> 本文早期第 5、6 章保留设计推导与迁移背景；其中出现的 `useDB()`、`useStore()`、
+> `useDiagnostics()` 以及位置参数式 `registerRoute()` 属于历史伪代码，实际插件应使用
+> `ctx.client`、`ctx.server` 和本文件第 12 章的 typed API。
+
 ## 摘要
 
 Delta Comic 插件系统重构方案，采用 Cordis 作为统一的客户端/服务端插件框架，specta 作为类型基础设施，实现跨端一致的插件生命周期管理、类型安全的 API、AI 友好的诊断系统与最小侵入式的架构演进。
@@ -13,6 +19,162 @@ Delta Comic 插件系统重构方案，采用 Cordis 作为统一的客户端/�
 - 服务端：Cloudflare Workers (WfP) + D1 + Cordis + Kysely
 - 类型系统：specta + tauri-specta（单一类型源派生多端类型）
 - 日志：tslog (客户端) + pino (服务端)
+
+---
+
+## 第 12 章：阶段 40A 实现基线与示例
+
+本章是当前代码的实现索引，覆盖已完成的公共协议、客户端 SDK、服务端 SDK、装饰器
+诊断与验证方式。后续迁移完整 UI、下载器、同步服务和 WfP 平台适配时，必须保持本章
+定义的边界。
+
+### 12.1 公共包 `@delta-comic/both`
+
+`packages/shared/both` 是平台无关的协议包，统一 re-export 上游 `cordis` 的核心类型，
+并提供以下模块：
+
+| 模块 | 当前职责 |
+|---|---|
+| `manifest` | `PluginManifestSchema`、依赖、入口类型、资源路径、MIME、SHA-256 integrity、imports 和 platform |
+| `artifact` | 安全相对路径、资源图、重复/缺失文件、入口和 integrity 校验 |
+| `diagnostic` | 有容量上限的 `DiagnosticRecorder`、`DiagnosticSnapshot`、`withDiagnostic` 和 `@diagnostic` |
+| `runtime` | `CordisRuntime` 的 mount、unmount、list、snapshot、dispose harness |
+
+Manifest 的入口默认是 ESM module：
+
+```ts
+const manifest = {
+  protocolVersion: 1,
+  id: 'demo.client',
+  name: 'Demo client plugin',
+  version: '1.0.0',
+  entry: 'index.js',
+  entryType: 'plugin',
+  resources: [{
+    path: 'index.js',
+    mimeType: 'text/javascript',
+    integrity: 'sha256-<base64>',
+    imports: [],
+    platform: 'client',
+  }],
+}
+```
+
+`validateArtifact()` 在动态 import 前完成 manifest 与文件集合校验。路径必须是安全的
+相对路径；入口必须存在且被资源声明覆盖；每个声明资源必须有文件和匹配的 SHA-256
+摘要；imports 必须指向 artifact 内已有资源。模块加载仍由宿主使用 Blob URL 与
+`import()` 完成，宿主提供的 Cordis、SDK 和 UI 包在构建阶段 externalize、运行时注册。
+
+### 12.2 诊断与装饰器
+
+`DiagnosticRecorder` 保存有限数量的结构化记录，快照同时包含运行时、插件状态和记录。
+同步/异步边界统一使用 `withDiagnostic()`；可声明为方法横切关注点的操作使用装饰器，
+让业务方法保持处理逻辑：
+
+```ts
+class Service {
+  readonly diagnostics = new DiagnosticRecorder({ source: 'demo' })
+
+  @diagnostic('demo/load')
+  async load() {
+    return fetch('/items')
+  }
+}
+```
+
+Vite/Vitest/pack 均通过 `@swc/core` 的 TypeScript parser 和 `decoratorVersion:
+'2023-11'` 转换装饰器语法。装饰器转换配置位于 both、client SDK 和 server 的 Vite
+配置中，确保源码测试、声明构建和生产 bundle 使用相同语义。对象闭包、接口实现和
+第三方回调没有 class method 装饰器边界时，继续使用 `withDiagnostic()`。
+
+### 12.3 客户端 SDK
+
+`@delta-comic/client` 位于 `packages/client/core/sdk`。每个插件由一个
+`ClientRuntime` 持有，runtime 创建 `CordisRuntime`，注入 `client` service，再挂载
+Cordis plugin 或 plugin set：
+
+```ts
+const runtime = new ClientRuntime({
+  pluginId: 'demo.client',
+  database,
+})
+
+await runtime.mount('demo', {
+  inject: ['client'],
+  apply(ctx) {
+    ctx.client.store.set('ready', true)
+    ctx.client.ui.registerRoute({
+      path: '/plugins/demo.client/home',
+      title: 'Demo',
+      navigation: true,
+    })
+  },
+})
+```
+
+`ClientHost` 暴露 typed `db`、`store` 和 `ui`。数据库查询通过
+`ClientDatabase.query<Result>()`，store 通过泛型 `get/set`，所有宿主边界操作自动接入
+诊断记录。UI 注册函数返回 disposer，随 Cordis fiber 卸载。`runtime.snapshot()` 返回
+统一快照，`unmount()` 和 `dispose()` 释放插件及其作用域。
+
+### 12.4 服务端 SDK
+
+当前 `@delta-comic/server` 由已有 `packages/server` 承载，以兼容现有 Worker 入口；SDK
+入口通过包根、`@delta-comic/server/manifest` 和 `@delta-comic/server/runtime` 暴露。
+每个安装实例由独立 `ServerRuntime` 创建，注入 `server` service：
+
+```ts
+const runtime = new ServerRuntime({
+  pluginId: 'demo.server',
+  installationId: 'installation-1',
+  db,
+  identity,
+})
+
+await runtime.mount('demo', {
+  inject: ['server'],
+  apply(ctx) {
+    ctx.server.registerRoute({
+      method: 'GET',
+      path: '/plugins/demo.server/health',
+      public: true,
+      handler: ({ request }, db) => new Response('ok'),
+    })
+    ctx.server.registerCron('*/5 * * * *', async context => {})
+    ctx.server.registerQueue('refresh', async context => {})
+    ctx.server.registerMigration({ id: '001-init', up: async db => {} })
+  },
+})
+```
+
+`dispatch()` 按 method/path 查找路由，并在 handler 前执行公开性和 permission 检查：
+缺路由返回 404，缺少身份返回 401，缺少权限返回 403。`runCron()`、`runQueue()` 和
+`migrate()` 都由 runtime 统一记录诊断；migration 按注册顺序执行，失败会保留失败记录
+并停止当前迁移流程。D1 绑定、会话身份和 WfP 动态 dispatch 由后续平台 Worker 适配层
+注入，SDK 不持有平台全局状态。
+
+### 12.5 Manifest、权限和隔离边界
+
+- 客户端 Manifest 使用 `platforms: ['desktop' | 'android']` 与客户端路由扩展。
+- 服务端 Manifest 使用 typed routes、crons、queues 和 migration 声明。
+- Manifest dependencies 负责安装期校验；运行时激活顺序由 Cordis `inject` 和 Service
+  可用性决定。
+- 客户端插件在可信 Tauri 进程内运行；服务端插件通过安装实例、Worker 和 D1 边界隔离。
+- 服务端身份由宿主验证并注入，插件 handler 只读取 `ServerRequestContext.identity`。
+- 资源 integrity 是 artifact 完整性校验，不等同于发布者签名；签名策略仍属于后续发布层。
+
+### 12.6 阶段 40A 验证矩阵
+
+| 层级 | 验证 |
+|---|---|
+| 公共协议 | both typecheck、artifact/diagnostic/runtime 专项测试 |
+| 客户端 | client typecheck/build、Cordis injection、DB/store 诊断测试 |
+| 服务端 | server app/node typecheck/build、route/cron/queue/migration 测试 |
+| 装饰器 | SWC 转换后的 both/client/server 测试与 pack bundle |
+| 全仓 | `vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run` |
+
+阶段 40A 的交付边界到此为止；完整能力迁移按第 10、11 章的 package family、Rust
+specta 生成链、Tauri 宿主和 Cloudflare 平台适配继续拆分提交。
 
 ---
 
@@ -2642,4 +2804,3 @@ Delta Comic 插件系统通过 **Cordis 统一生命周期**、**specta 单一�
 - tslog 5.x（客户端日志）+ pino 9.x（服务端日志）
 - Vue 3.6 RC + Vapor（实验性编译模式）
 - Cloudflare Workers + D1 + WfP（服务端运行时）
-

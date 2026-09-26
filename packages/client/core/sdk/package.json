@@ -1,11 +1,13 @@
 {
-  "name": "@delta-comic/both",
+  "name": "@delta-comic/client",
   "version": "3.0.0-next.19",
+  "description": "Delta Comic client plugin SDK",
   "files": [
     "dist"
   ],
   "type": "module",
   "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "exports": {
     ".": {
@@ -16,14 +18,6 @@
       "types": "./dist/manifest.d.mts",
       "import": "./dist/manifest.mjs"
     },
-    "./diagnostic": {
-      "types": "./dist/diagnostic.d.mts",
-      "import": "./dist/diagnostic.mjs"
-    },
-    "./artifact": {
-      "types": "./dist/artifact.d.mts",
-      "import": "./dist/artifact.mjs"
-    },
     "./runtime": {
       "types": "./dist/runtime.d.mts",
       "import": "./dist/runtime.mjs"
@@ -33,11 +27,14 @@
     "access": "public"
   },
   "dependencies": {
+    "@delta-comic/both": "workspace:",
     "cordis": "catalog:",
+    "kysely": "catalog:",
     "typebox": "catalog:"
   },
   "devDependencies": {
     "@swc/core": "catalog:",
+    "typescript": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
   }

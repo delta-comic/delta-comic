@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   Context,
   CordisRuntime,
+  diagnostic,
   DiagnosticRecorder,
   Service,
   sha256Integrity,
@@ -22,6 +23,20 @@ class DummyService extends Service {
 
   ping() {
     return 'pong'
+  }
+}
+
+class TracedService {
+  public readonly diagnostics = new DiagnosticRecorder({ source: 'traced-service' })
+
+  @diagnostic('demo/ping')
+  ping(value: string) {
+    return value.toUpperCase()
+  }
+
+  @diagnostic('demo/fail')
+  fail(): never {
+    throw new Error('expected failure')
   }
 }
 
@@ -45,6 +60,16 @@ describe('@delta-comic/both cordis integration', () => {
     recorder.record('error', 'three')
     expect(recorder.list().map(record => record.message)).toEqual(['two', 'three'])
     expect(recorder.snapshot().runtime).toBe('test')
+  })
+
+  it('traces decorated methods without mixing logging into business logic', () => {
+    const service = new TracedService()
+    expect(service.ping('ok')).toBe('OK')
+    expect(() => service.fail()).toThrow('expected failure')
+    expect(service.diagnostics.list().map(record => record.message)).toEqual([
+      'demo/ping completed',
+      'demo/fail failed',
+    ])
   })
 
   it('validates declared artifact resources', async () => {

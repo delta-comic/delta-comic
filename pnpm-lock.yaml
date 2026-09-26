@@ -409,6 +409,9 @@ importers:
 
   packages/app:
     dependencies:
+      '@delta-comic/both':
+        specifier: 'workspace:'
+        version: link:../shared/both
       '@delta-comic/db':
         specifier: 'workspace:'
         version: link:../db
@@ -491,6 +494,9 @@ importers:
       '@delta-comic/runtime':
         specifier: 'workspace:'
         version: link:../runtime
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.16.0
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.3.3(@voidzero-dev/vite-plus-core@0.3.1(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)(yaml@2.9.0))
@@ -545,6 +551,34 @@ importers:
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.9(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
+
+  packages/client/core/sdk:
+    dependencies:
+      '@delta-comic/both':
+        specifier: 'workspace:'
+        version: link:../../../shared/both
+      cordis:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.10
+      kysely:
+        specifier: 'catalog:'
+        version: 0.30.0-beta.1
+      typebox:
+        specifier: 'catalog:'
+        version: 1.3.14
+    devDependencies:
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.16.0
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.2.9(@types/node@26.1.0)(@vitest/coverage-v8@4.1.10)(@voidzero-dev/vite-plus-core@0.3.1(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(happy-dom@20.11.2)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)(yaml@2.9.0)
+      vitest:
+        specifier: 4.1.10
+        version: 4.1.10(@types/node@26.1.0)(@vitest/browser-preview@4.1.10)(@vitest/coverage-v8@4.1.10)(@voidzero-dev/vite-plus-core@0.3.1(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)(yaml@2.9.0))(happy-dom@20.11.2)
 
   packages/db:
     dependencies:
@@ -761,12 +795,18 @@ importers:
 
   packages/server:
     dependencies:
+      '@delta-comic/both':
+        specifier: 'workspace:'
+        version: link:../shared/both
       '@delta-comic/logger':
         specifier: 'workspace:'
         version: link:../logger
       '@elysia/eden':
         specifier: 'catalog:'
         version: 1.4.10(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
+      cordis:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.10
       elysia:
         specifier: 'catalog:'
         version: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.14))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
@@ -804,6 +844,9 @@ importers:
       '@sinclair/typebox':
         specifier: 'catalog:'
         version: 0.34.52
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.16.0
       '@types/node':
         specifier: 'catalog:'
         version: 25.9.0
@@ -905,6 +948,9 @@ importers:
         specifier: 'catalog:'
         version: 1.3.14
     devDependencies:
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.16.0
       vite-plus:
         specifier: 'catalog:'
         version: 0.2.9(@types/node@26.1.0)(@vitest/coverage-v8@4.1.10)(@voidzero-dev/vite-plus-core@0.3.1(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(happy-dom@20.11.2)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)(yaml@2.9.0)

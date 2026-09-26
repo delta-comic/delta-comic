@@ -45,17 +45,17 @@ describe('semantic-release command runner', () => {
     expect(mocks.spawn).toHaveBeenNthCalledWith(
       1,
       'vp',
-      ['run', '--filter', '@delta-comic/logger', '--fail-if-no-match', 'build'],
+      ['run', '--filter', '@delta-comic/both', '--fail-if-no-match', 'build'],
       expect.objectContaining({ stdio: 'inherit' }),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      4,
+      6,
       'vp',
       ['run', '--filter', '@delta-comic/downloader', '--fail-if-no-match', 'build'],
       expect.objectContaining({ stdio: 'inherit' }),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      8,
+      10,
       'vp',
       [
         'pm',
@@ -72,7 +72,7 @@ describe('semantic-release command runner', () => {
       expect.objectContaining({ stdio: 'inherit' }),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      9,
+      11,
       'vp',
       [
         'pm',
@@ -91,8 +91,8 @@ describe('semantic-release command runner', () => {
   })
 
   it.each([
-    [1, 'Command failed (1): vp run --filter @delta-comic/logger --fail-if-no-match build'],
-    [null, 'Command failed (1): vp run --filter @delta-comic/logger --fail-if-no-match build'],
+    [1, 'Command failed (1): vp run --filter @delta-comic/both --fail-if-no-match build'],
+    [null, 'Command failed (1): vp run --filter @delta-comic/both --fail-if-no-match build'],
   ] as const)('reports non-zero command status %s', async (status, message) => {
     mocks.statuses = [status]
     const { publish } = await import('../semantic-release-plugin.mts')

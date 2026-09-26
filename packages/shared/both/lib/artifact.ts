@@ -56,7 +56,10 @@ const toBase64 = (bytes: Uint8Array) => {
     const third = bytes[index + 2]
     result += alphabet[first >> 2]
     result += alphabet[((first & 3) << 4) | (second === undefined ? 0 : second >> 4)]
-    result += second === undefined ? '=' : alphabet[((second & 15) << 2) | (third === undefined ? 0 : third >> 6)]
+    result +=
+      second === undefined
+        ? '='
+        : alphabet[((second & 15) << 2) | (third === undefined ? 0 : third >> 6)]
     result += third === undefined ? '=' : alphabet[third & 63]
   }
   return result

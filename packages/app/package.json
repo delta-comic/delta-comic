@@ -4,6 +4,7 @@
   "private": true,
   "description": "阿赖耶识",
   "dependencies": {
+    "@delta-comic/both": "workspace:",
     "@delta-comic/db": "workspace:",
     "@delta-comic/downloader": "workspace:",
     "@delta-comic/logger": "workspace:",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@delta-comic/runtime": "workspace:",
+    "@swc/core": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tauri-apps/cli": "catalog:",
     "@types/semver": "catalog:",

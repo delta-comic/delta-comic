@@ -2,6 +2,7 @@ import { Context, type Fiber, type Plugin } from 'cordis'
 
 import {
   DiagnosticRecorder,
+  diagnostic,
   type DiagnosticPluginSnapshot,
   type DiagnosticSnapshot,
 } from './diagnostic.js'
@@ -39,6 +40,7 @@ export class CordisRuntime {
     }
   }
 
+  @diagnostic('runtime plugin unmount')
   public async unmount(id: string): Promise<void> {
     const fiber = this.#fibers.get(id)
     if (!fiber) return

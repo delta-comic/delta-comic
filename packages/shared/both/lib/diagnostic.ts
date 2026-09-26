@@ -36,6 +36,72 @@ export interface DiagnosticRecorderOptions {
   id?: () => string
 }
 
+export type DiagnosticOperation<T> = () => T | PromiseLike<T>
+
+const isPromiseLike = <T>(value: T | PromiseLike<T>): value is PromiseLike<T> =>
+  typeof value === 'object' && value !== null && 'then' in value && typeof value.then === 'function'
+
+const describeError = (error: unknown) => (error instanceof Error ? error.message : String(error))
+
+export function withDiagnostic<T>(
+  diagnostics: DiagnosticRecorder,
+  event: string,
+  operation: () => Promise<T>,
+  details?: Record<string, unknown>,
+): Promise<T>
+export function withDiagnostic<T>(
+  diagnostics: DiagnosticRecorder,
+  event: string,
+  operation: () => T,
+  details?: Record<string, unknown>,
+): T
+export function withDiagnostic<T>(
+  diagnostics: DiagnosticRecorder,
+  event: string,
+  operation: DiagnosticOperation<T>,
+  details?: Record<string, unknown>,
+): T | PromiseLike<T> {
+  const startedAt = Date.now()
+  const complete = (result: T) => {
+    diagnostics.record('debug', `${event} completed`, {
+      ...details,
+      durationMs: Date.now() - startedAt,
+    })
+    return result
+  }
+  const fail = (error: unknown): never => {
+    diagnostics.record('error', `${event} failed`, {
+      ...details,
+      durationMs: Date.now() - startedAt,
+      error: describeError(error),
+    })
+    throw error
+  }
+
+  try {
+    const result = operation()
+    return isPromiseLike(result) ? result.then(complete, fail) : complete(result)
+  } catch (error) {
+    return fail(error)
+  }
+}
+
+export interface DiagnosticTarget {
+  readonly diagnostics: DiagnosticRecorder
+}
+
+export const diagnostic = (event?: string) => {
+  return function <This extends DiagnosticTarget, Args extends unknown[], Result>(
+    method: (this: This, ...args: Args) => Result,
+    context: ClassMethodDecoratorContext<This, (this: This, ...args: Args) => Result>,
+  ) {
+    const name = event ?? String(context.name)
+    return function (this: This, ...args: Args): Result {
+      return withDiagnostic(this.diagnostics, name, () => method.call(this, ...args))
+    }
+  }
+}
+
 export class DiagnosticRecorder {
   readonly #records: DiagnosticRecord[] = []
   readonly #capacity: number

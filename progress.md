@@ -61,6 +61,15 @@
 - 修复 Web-only TypeScript 兼容性：移除 Node Buffer 依赖，适配当前 TypeBox 错误集合 API 和 Web Crypto 类型。
 - `vp run --filter @delta-comic/both typecheck`、专项测试（4/4）和 `git diff --check` 通过。
 
+### 2026-09-26 — 阶段 40A client/server SDK 与装饰器
+
+- 新增 `@delta-comic/client`：ClientRuntime、typed database/store/UI host、Cordis injection、客户端 Manifest 和边界诊断。
+- 扩展 `@delta-comic/server`：ServerRuntime、typed route/cron/queue/migration host、身份检查、dispatch 和 migration 诊断。
+- 将 `@diagnostic` 应用于 runtime 生命周期、路由和任务边界；业务方法继续使用声明式横切追踪，闭包边界使用 `withDiagnostic`。
+- both/client/server 的 Vite 测试与 pack 配置均接入 `@swc/core` TypeScript decorator transform，恢复真实 decorator 语法测试。
+- 专项验证：3 个测试文件、8 个测试通过；both/client/server typecheck 通过；both/client/server build 通过。
+- ARCHITECTURE.md 新增第 12 章实现基线、API 示例、权限/隔离边界和 40A 验证矩阵，并标明早期伪 API 的历史性质。
+
 ## 验证
 
 - 本次仅创建规划文档，未运行应用检查/测试。

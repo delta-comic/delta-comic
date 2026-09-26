@@ -10,11 +10,21 @@
     ".": {
       "types": "./lib/index.ts",
       "import": "./lib/index.ts"
+    },
+    "./manifest": {
+      "types": "./lib/serverManifest.ts",
+      "import": "./lib/serverManifest.ts"
+    },
+    "./runtime": {
+      "types": "./lib/serverRuntime.ts",
+      "import": "./lib/serverRuntime.ts"
     }
   },
   "dependencies": {
+    "@delta-comic/both": "workspace:",
     "@delta-comic/logger": "workspace:",
     "@elysia/eden": "catalog:",
+    "cordis": "catalog:",
     "ky": "catalog:",
     "kysely": "catalog:",
     "kysely-d1": "catalog:",
@@ -27,6 +37,7 @@
     "@elysiajs/cors": "catalog:",
     "@elysiajs/openapi": "catalog:",
     "@sinclair/typebox": "catalog:",
+    "@swc/core": "catalog:",
     "@types/node": "catalog:",
     "@types/semver": "catalog:",
     "typescript": "catalog:",
