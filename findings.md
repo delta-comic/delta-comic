@@ -162,6 +162,13 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 其他依赖也优先 latest/next/canary channel，拥抱新特性和性能优化。
 - 插件作者需跟随宿主依赖版本，不保证向后兼容旧版本依赖。
 
+## 补充决策：Tauri 性能优化
+
+- **Custom Protocol 传输二进制数据**：图片/下载内容等二进制通过 `tauri://` 自定义协议传输，避免 JSON 序列化/base64 编码（阻塞 JS 线程）。
+- **树摇优化 + 代码分割**：Vite 默认支持，确保 `package.json` 正确配置 `sideEffects`，可减少 50-70% bundle 大小。
+- **Rust 二进制优化**：使用 `lld` 链接器加速构建，strip symbols、LTO 优化。
+- WebView 使用系统 JS 引擎（V8/JavaScriptCore），无字节码编译 API，主要优化点在减少 IPC 调用和二进制传输。
+
 ## 补充决策：类型系统与 specta
 
 - **specta 是整个架构的类型基础设施**，不只是 Tauri IPC 的配角，而是实现"单一类型源派生多端类型"的核心工具。
