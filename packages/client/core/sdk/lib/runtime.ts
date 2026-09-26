@@ -6,6 +6,7 @@ import {
   type Plugin,
 } from '@delta-comic/both'
 
+import { createClientDownloader, type ClientDownloader } from './downloader.js'
 import {
   instrumentClientDatabase,
   instrumentClientStore,
@@ -21,6 +22,7 @@ export interface ClientRuntimeOptions<DB extends object = Record<string, never>>
   database: ClientDatabase<DB>
   store?: ClientStore
   ui?: ClientUi
+  downloader?: ClientDownloader
 }
 
 const defaultStore = (): ClientStore => {
@@ -46,6 +48,7 @@ const defaultUi = (): ClientUi => {
 export class ClientRuntime<DB extends object = Record<string, never>> {
   readonly #runtime: CordisRuntime
   readonly #host: ClientHost<DB>
+  readonly #ownsDownloader: boolean
   #hostMounted = false
 
   public constructor(options: ClientRuntimeOptions<DB>) {
@@ -53,6 +56,7 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
       source: `client:${options.pluginId}`,
       context: options.context,
     })
+    this.#ownsDownloader = options.downloader === undefined
     this.#host = {
       pluginId: options.pluginId,
       diagnostics: this.#runtime.diagnostics,
@@ -63,6 +67,11 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
         options.pluginId,
       ),
       ui: options.ui ?? defaultUi(),
+      downloader:
+        options.downloader ??
+        createClientDownloader(this.#runtime.diagnostics, options.pluginId, {
+          key: `plugin:${options.pluginId}`,
+        }),
     }
   }
 
@@ -97,8 +106,12 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
   }
 
   @diagnostic('client runtime dispose')
-  public dispose(): Promise<void> {
-    return this.#runtime.dispose()
+  public async dispose(): Promise<void> {
+    try {
+      await this.#runtime.dispose()
+    } finally {
+      if (this.#ownsDownloader) this.#host.downloader?.dispose()
+    }
   }
 }
 

@@ -1,6 +1,8 @@
 import { withDiagnostic, type DiagnosticRecorder } from '@delta-comic/both'
 import type { Kysely } from 'kysely'
 
+import type { ClientDownloader } from './downloader.js'
+
 export interface ClientDatabase<DB extends object> {
   readonly db: Kysely<DB>
   query<Result>(name: string, operation: (db: Kysely<DB>) => Promise<Result>): Promise<Result>
@@ -83,4 +85,5 @@ export interface ClientHost<DB extends object = Record<string, never>> {
   readonly db: ClientDatabase<DB>
   readonly store: ClientStore
   readonly ui: ClientUi
+  readonly downloader?: ClientDownloader
 }

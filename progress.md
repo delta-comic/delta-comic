@@ -17,10 +17,10 @@
 
 ## 当前状态
 
-- 当前阶段：阶段 6C 实施，Tauri Specta command 类型生成已完成，正在提交前验证。
+- 当前阶段：阶段 6D 实施，客户端下载器已接入 ClientHost，正在进入 UI 生命周期接入。
 - 代码实现：both 公共 Manifest、artifact 校验、诊断记录器和 Cordis runtime harness 已完成并通过专项验证。
 - 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
-- 下一个动作：完成 6C 提交后，开始 6D 宿主迁移和诊断 harness。
+- 下一个动作：验证并提交下载器宿主接入，然后接入 UI EnvironmentRegistry 的 owner 生命周期。
 
 ### 2026-09-26 — 阶段 6A Artifact Loader 接入
 

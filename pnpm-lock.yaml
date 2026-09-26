@@ -557,6 +557,9 @@ importers:
       '@delta-comic/both':
         specifier: 'workspace:'
         version: link:../../../shared/both
+      '@delta-comic/downloader':
+        specifier: 'workspace:'
+        version: link:../../../downloader
       cordis:
         specifier: 'catalog:'
         version: 4.0.0-rc.10

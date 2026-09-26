@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@delta-comic/both": "workspace:",
+    "@delta-comic/downloader": "workspace:",
     "cordis": "catalog:",
     "kysely": "catalog:",
     "typebox": "catalog:"

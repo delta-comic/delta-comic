@@ -75,4 +75,4 @@
 
 ## Next Step
 
-  阶段 6D：完成 client/server 宿主迁移、诊断 harness、UI、网络和下载器能力迁移。
+  阶段 6D：验证并提交下载器宿主接入，然后接入 UI EnvironmentRegistry 的 owner 生命周期。
