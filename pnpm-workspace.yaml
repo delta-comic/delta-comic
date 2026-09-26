@@ -1,5 +1,7 @@
 packages:
   - packages/*
+  - packages/*/*
+  - apps/*
 
 allowBuilds:
   '@swc/core': true
@@ -10,6 +12,10 @@ allowBuilds:
   workerd: true
 
 catalog:
+  cordis: ^4.0.0-rc.10
+  tslog: ^5.0.0-alpha.5
+  pino: ^9.6.0
+  '@types/pino': ^7.0.5
   '@elysia/eden': '^1.4.10'
   '@swc/core': ^1.16.0
   vue-tsc: ^3.3.9

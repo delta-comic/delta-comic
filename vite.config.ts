@@ -111,6 +111,7 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
     projects: [
       { test: { name: 'root', environment: 'node', include: ['script/test/**/*.test.ts'] } },
+      'packages/shared/both',
       'packages/app',
       'packages/db',
       'packages/downloader',

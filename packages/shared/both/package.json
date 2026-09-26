@@ -1,0 +1,32 @@
+{
+  "name": "@delta-comic/both",
+  "version": "1.0.0",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/lib/index.mjs",
+  "types": "./dist/lib/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/lib/index.d.mts",
+      "import": "./dist/lib/index.mjs"
+    },
+    "./manifest": {
+      "types": "./dist/lib/manifest.d.mts",
+      "import": "./dist/lib/manifest.mjs"
+    },
+    "./diagnostic": {
+      "types": "./dist/lib/diagnostic.d.mts",
+      "import": "./dist/lib/diagnostic.mjs"
+    }
+  },
+  "dependencies": {
+    "cordis": "catalog:",
+    "typebox": "catalog:"
+  },
+  "devDependencies": {
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}
