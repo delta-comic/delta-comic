@@ -1,4 +1,4 @@
-<!-- cspell:ignore deepseek Cordis subrequest -->
+<!-- cspell:ignore deepseek Cordis subrequest specta -->
 
 # Delta Comic 全仓重构：研究与需求发现
 
@@ -141,6 +141,12 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 宿主通过全局模块注册方式 (window/globalThis) 提供 externalized SDK/Cordis/UI 库。
 - Manifest 完整声明资源依赖图 (包括 dynamic chunk)。
 - 内置/外部插件统一构建合约。
+
+## 补充决策：Tauri IPC 类型安全
+
+- **采用 specta + tauri-specta**：Rust 命令定义通过 specta 自动生成 TypeScript 类型绑定，实现端到端类型安全的 Tauri IPC 调用。
+- Rust 端使用 `#[specta::specta]` 标注命令，构建时生成前端 TS 绑定文件。
+- 前端通过生成的类型化 `invoke` 调用，参数/返回值完全类型检查。
 
 ## 剩余未决问题
 

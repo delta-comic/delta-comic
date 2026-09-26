@@ -1,4 +1,4 @@
-<!-- cspell:ignore Cordis deepseek subrequest -->
+<!-- cspell:ignore Cordis deepseek subrequest specta -->
 
 # Delta Comic 架构重构规划进度
 
@@ -44,6 +44,13 @@
 - 新增未决问题：宿主全局模块注册的具体 API 形态 (window 直接挂载 vs 模块加载器)。
 - 已更新 `findings.md` 补充决策章节和剩余未决问题。
 - 下一步：提交本次更新，继续方案 A 的详细设计。
+
+### 2026-09-26 — Tauri IPC 类型安全方案确认
+
+- 用户确认采用 **specta + tauri-specta** 实现 Tauri IPC 端到端类型安全。
+- Rust 命令通过 `#[specta::specta]` 标注，构建时自动生成 TypeScript 类型绑定。
+- 已更新 `findings.md` 补充 specta 决策。
+- 设计进度：第 1 章（目标/非目标/不变量）已获批准；第 2 章（运行时拓扑/信任边界）已展示并补充 specta，等待批准后继续第 3 章。
 
 ## 验证
 
