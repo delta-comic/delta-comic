@@ -33,7 +33,17 @@
   - 放弃多语言，全部文案硬编码，不区分外部/内置插件 (37)。
   - 先完成 SDK/runtime/示例/校验/诊断，再迁移完整能力 (40A)。
 - 已将 40 项决策追加到 `findings.md`，更新 `task_plan.md` 阶段 2 状态为 complete，并更新 Next Step。
-- 下一步：提交本次规划更新，然后提出 2–3 个整体重构方案。
+### 2026-09-26 — 模块加载细节补充确认 (9-12)
+
+- 用户补充确认了第 9-12 项模块加载机制决策：
+  - 9C: 保留现有 Blob URL + dynamic import，不引入虚拟模块解析。
+  - 10 (修改版 D): 平台 SDK/Cordis/UI 库由插件构建时 externalize，运行时宿主注册为全局模块；其他依赖插件自行打包。
+  - 11A: Manifest 完整声明资源依赖图 (path/mimeType/integrity/imports/platform)。
+  - 12A: 内置/外部插件统一 SDK/Manifest/Loader 合约；内置源码参与宿主构建，外部产出 artifact。
+- 用户明确宿主提供 SDK 的方式为"构建时 externalize + 运行时宿主注册全局模块"。
+- 新增未决问题：宿主全局模块注册的具体 API 形态 (window 直接挂载 vs 模块加载器)。
+- 已更新 `findings.md` 补充决策章节和剩余未决问题。
+- 下一步：提交本次更新，继续方案 A 的详细设计。
 
 ## 验证
 

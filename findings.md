@@ -90,10 +90,10 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 
 7. **客户端入口** (7A): 客户端插件默认导出 Cordis plugin/plugin set，manifest 声明入口类型。
 8. **服务端入口** (8A): 服务端插件默认导出 Cordis plugin/plugin set，Worker runtime 注入服务。
-9. **模块加载方案** (9C): 用户质疑虚拟模块方案；确认现有 Blob URL + dynamic import 方案 (StoredPluginModuleReader 创建 blob URL、DevServerPluginModuleReader 直接 import Vite dev server) 可继续使用，暂不强制虚拟模块。
-10. **待定** (10): 依赖第 9 项决策后再讨论。
-11. **待定** (11): 依赖第 9 项决策后再讨论。
-12. **待定** (12): 依赖第 9 项决策后再讨论。
+9. **模块加载方案** (9C): 用户质疑虚拟模块方案；确认现有 Blob URL + dynamic import 方案 (StoredPluginModuleReader 创建 blob URL、DevServerPluginModuleReader 直接 import Vite dev server) 可继续使用，不引入虚拟模块解析层。
+10. **宿主 external 版本协商** (10: 修改版 D): 按依赖类型分别制定规则——平台 SDK (@delta-comic/*) 和 Cordis 由插件构建时 externalize，运行时宿主注册为全局模块；UI 库 (Vue/Naive UI) 客户端插件 externalize、宿主注册；其他依赖插件自行打包。
+11. **资源依赖声明** (11A): 每个资源 (包括 dynamic import chunk) 在 Manifest 声明 path、mimeType、integrity (SHA-256)、imports (依赖资源列表)、可选 platform 条件；构建工具生成完整资源清单。
+12. **内置与外部插件构建** (12A): 同一套 SDK/Manifest/Loader 合约；内置插件源码直接参与宿主构建 (Vite monorepo)；外部插件产出 ESM bundle + Manifest + 资源清单 ZIP。
 
 ### 13–18: 客户端 API
 
@@ -134,9 +134,18 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 39. **依赖统一升级** (39A): workspace/Tauri/Rust/Cloudflare/构建链统一升级并锁定，分阶段验证。
 40. **分阶段实施** (40A): 先完成 both/client/server SDK、最小 Cordis runtime、客户端/服务端示例、artifact 校验、诊断快照，再迁移完整能力。
 
+## 补充决策：模块加载细节 (9-12)
+
+用户后续补充确认了模块加载机制的 4 项细节 (9C-12)：
+- 保留现有 Blob URL + dynamic import，不引入虚拟模块。
+- 宿主通过全局模块注册方式 (window/globalThis) 提供 externalized SDK/Cordis/UI 库。
+- Manifest 完整声明资源依赖图 (包括 dynamic chunk)。
+- 内置/外部插件统一构建合约。
+
 ## 剩余未决问题
 
-1. 客户端完整数据库/store 插件直访 API 的稳定性、事务/表访问接口、插件数据命名空间、数据库迁移/权限与诊断语义。
+1. 宿主全局模块注册的具体 API 形态：是 `window['@delta-comic/client']` 直接挂载导出对象，还是通过 `System.register` 或其他模块加载器？需确认浏览器/Worker 两端的统一机制。
+2. 客户端完整数据库/store 插件直访 API 的稳定性、事务/表访问接口、插件数据命名空间、数据库迁移/权限与诊断语义。
 2. Cordis loader 模型 (Entry/EntryTree、依赖、分组、注入、配置验证、并发/顺序启动、事件派发) 及服务端/客户端差异。
 3. Tauri mobile 能力差异：下载器原生桥接、文件/网络/权限/后台任务、插件 HMR/debug 仅开发模式或设备端均可用。
 4. 服务端 Worker 路由 handler 细节、HTTP methods/path matching/middleware、权限声明、登录验证上下文、CORS/请求体/响应限制。
