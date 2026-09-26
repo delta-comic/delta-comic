@@ -45,12 +45,14 @@
 - 已更新 `findings.md` 补充决策章节和剩余未决问题。
 - 下一步：提交本次更新，继续方案 A 的详细设计。
 
-### 2026-09-26 — Tauri IPC 类型安全方案确认
+### 2026-09-26 — 类型系统与 specta 架构定位
 
-- 用户确认采用 **specta + tauri-specta** 实现 Tauri IPC 端到端类型安全。
-- Rust 命令通过 `#[specta::specta]` 标注，构建时自动生成 TypeScript 类型绑定。
-- 已更新 `findings.md` 补充 specta 决策。
-- 设计进度：第 1 章（目标/非目标/不变量）已获批准；第 2 章（运行时拓扑/信任边界）已展示并补充 specta，等待批准后继续第 3 章。
+- 用户确认 **specta 是整个架构的类型基础设施**，不只是 Tauri IPC 工具，而是实现"单一类型源派生多端类型"的核心。
+- **单一类型源派生策略**：Rust 定义一次 → 自动生成 TypeScript/JSON Schema/OpenAPI，避免手动同步跨语言类型。
+- 应用场景：Tauri IPC 类型安全、跨端模型统一（Manifest/Config）、Manifest/配置校验（JSON Schema）。
+- 用户要求在第 2 章添加专门一节"2.4 类型系统与 specta"说明派生策略。
+- 已更新 `findings.md` 补充完整的 specta 架构定位。
+- 设计进度：第 1 章已获批准；第 2 章已展示拓扑/信任边界/specta，正在补充 2.4 节后等待批准。
 
 ## 验证
 

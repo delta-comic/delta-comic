@@ -142,11 +142,15 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - Manifest 完整声明资源依赖图 (包括 dynamic chunk)。
 - 内置/外部插件统一构建合约。
 
-## 补充决策：Tauri IPC 类型安全
+## 补充决策：类型系统与 specta
 
-- **采用 specta + tauri-specta**：Rust 命令定义通过 specta 自动生成 TypeScript 类型绑定，实现端到端类型安全的 Tauri IPC 调用。
-- Rust 端使用 `#[specta::specta]` 标注命令，构建时生成前端 TS 绑定文件。
-- 前端通过生成的类型化 `invoke` 调用，参数/返回值完全类型检查。
+- **specta 是整个架构的类型基础设施**，不只是 Tauri IPC 的配角，而是实现"单一类型源派生多端类型"的核心工具。
+- **单一类型源派生策略**：Rust 定义一次（struct/enum + `#[derive(specta::Type)]`），自动生成 TypeScript/JSON Schema/OpenAPI 等目标类型，避免手动同步跨语言定义。
+- **具体应用场景**：
+  1. Tauri IPC 类型安全：Rust 命令通过 `#[specta::specta]` 生成 TS 绑定，前端 `invoke` 端到端类型检查。
+  2. 跨端模型统一：PluginManifest/PluginConfig 等共享模型在 Rust 定义，派生供前端/Worker/admin 使用。
+  3. Manifest/配置校验：从 Rust 类型生成 JSON Schema，用于安装时校验插件 artifact。
+- 保证客户端/服务端/配置/文档的类型一致性，消除跨边界运行时类型错误。
 
 ## 剩余未决问题
 
