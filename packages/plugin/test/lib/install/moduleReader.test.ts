@@ -3,8 +3,31 @@ import type { PluginManifest } from '@delta-comic/model'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { PluginFileReplacement, PluginFileStore } from '../../../lib/install'
-import { DevServerPluginModuleReader, StoredPluginModuleReader } from '../../../lib/install'
+import {
+  CordisArtifactModuleReader,
+  DevServerPluginModuleReader,
+  StoredPluginModuleReader,
+} from '../../../lib/install'
 import { PluginScope } from '../../../lib/kernel'
+
+const artifactManifest = async (entryType: 'plugin' | 'plugin-set' = 'plugin') => {
+  const source = 'export default () => ({ name: "cordis-reader" })'
+  const integrity = await import('@delta-comic/both/artifact').then(({ sha256Integrity }) =>
+    sha256Integrity(new TextEncoder().encode(source)),
+  )
+  return {
+    manifest: {
+      protocolVersion: 1 as const,
+      id: 'cordis-reader',
+      name: 'Cordis Reader',
+      version: '1.0.0',
+      entry: 'index.js',
+      entryType,
+      resources: [{ path: 'index.js', mimeType: 'text/javascript', integrity, imports: [] }],
+    },
+    source,
+  }
+}
 
 const manifest: PluginManifest = {
   apiVersion: 1 as const,
@@ -87,5 +110,50 @@ describe('StoredPluginModuleReader', () => {
     const reader = new DevServerPluginModuleReader()
     expect(reader.matches?.({ ...archive('reader'), loaderName: 'dev-server' })).toBe(true)
     expect(reader.matches?.(archive('reader'))).toBe(false)
+  })
+
+  it('loads and releases a shared Cordis artifact', async () => {
+    const { manifest, source } = await artifactManifest()
+    const release = vi.fn()
+    const replacement = { commit: vi.fn(), rollback: vi.fn() }
+    const files: PluginFileStore = {
+      createAssetUrl: vi.fn(),
+      createModuleUrl: async () =>
+        `data:text/javascript,${encodeURIComponent(`${source}\n//# ${crypto.randomUUID()}`)}`,
+      read: vi.fn(),
+      release,
+      remove: vi.fn(),
+      replace: vi.fn(async () => replacement),
+    }
+    const loaded = await new CordisArtifactModuleReader(files).read({
+      manifest,
+      files: [{ path: 'index.js', bytes: new TextEncoder().encode(source) }],
+    })
+
+    expect(loaded.manifest.id).toBe('cordis-reader')
+    expect(typeof loaded.entry).toBe('function')
+    expect(replacement.commit).toHaveBeenCalledOnce()
+    loaded.dispose?.()
+    expect(release).toHaveBeenCalledWith('cordis-reader')
+  })
+
+  it('rejects a plugin set with a single plugin entry', async () => {
+    const { manifest, source } = await artifactManifest('plugin-set')
+    const files: PluginFileStore = {
+      createAssetUrl: vi.fn(),
+      createModuleUrl: async () =>
+        `data:text/javascript,${encodeURIComponent(`${source}\n//# ${crypto.randomUUID()}`)}`,
+      read: vi.fn(),
+      release: vi.fn(),
+      remove: vi.fn(),
+      replace: vi.fn(async () => ({ commit: vi.fn(), rollback: vi.fn() })),
+    }
+
+    await expect(
+      new CordisArtifactModuleReader(files).read({
+        manifest,
+        files: [{ path: 'index.js', bytes: new TextEncoder().encode(source) }],
+      }),
+    ).rejects.toThrow('plugin set')
   })
 })

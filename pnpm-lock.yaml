@@ -697,6 +697,9 @@ importers:
 
   packages/plugin:
     dependencies:
+      '@delta-comic/both':
+        specifier: 'workspace:'
+        version: link:../shared/both
       '@delta-comic/db':
         specifier: workspace:*
         version: link:../db

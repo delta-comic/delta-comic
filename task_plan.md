@@ -35,7 +35,7 @@
 - 按仓库约定签名提交 spec，并请用户审核；收到用户批准之前不进入实施计划。
 
 ### 阶段 5：制定实施计划并按阶段实施
- - **状态：** complete
+  - **状态：** in_progress
 - 仅在用户批准 spec 后制定可执行的分阶段实施计划。
 - 按阶段执行，每个阶段完成后立即验证并签名提交保存进度。
 - 遵循 `AGENTS.md` 的 Vite+、Rust、依赖、格式、测试、i18n 及发布约定，并记录用户特别确认的例外。
@@ -63,6 +63,16 @@
 |---|---|---|
 | 初次调用 planning-with-files 技能时仓库内不存在规划文件 | 1 | 新建根目录规划文件，作为本任务唯一的持久规划来源 |
 
+## 阶段 6：完成剩余架构清单
+
+- **状态：** in_progress
+- 6A：将新 Artifact/Manifest 接入现有安装文件与模块读取边界。
+- 6B：公开构建并发布 `@delta-comic/server`，补齐 SDK 的产物测试。
+- 6C：接入 Tauri command 的 specta 类型生成，并纳入 Rust/TypeScript 验证。
+- 6D：完成客户端/服务端宿主迁移、诊断 harness、UI/网络/下载器能力迁移。
+- 6E：完成 Worker dispatcher、D1 migration、发布/市场、应用/admin 重组与部署文档。
+- 每个子阶段必须有实现、测试、规划状态和签名提交；未实现事项保持未勾选。
+
 ## Next Step
 
- 阶段 40A 已完成：提交公共协议与诊断 runtime，完成 client/server SDK、Cordis runtime、typed host API、artifact/migration/dispatch 示例、SWC 装饰器配置和专项测试；下一步执行全仓验证并提交 SDK 阶段。
+  阶段 6A：为新协议增加独立 Cordis ArtifactModuleReader，复用现有 Blob URL + dynamic import 文件存储，并补充安全路径、entryType 与 disposal 测试。

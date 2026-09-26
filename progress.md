@@ -17,10 +17,17 @@
 
 ## 当前状态
 
-- 当前阶段：阶段 5 实施，公共协议已完成。
+- 当前阶段：阶段 6A 实施，新 Artifact Loader 接入已完成。
 - 代码实现：both 公共 Manifest、artifact 校验、诊断记录器和 Cordis runtime harness 已完成并通过专项验证。
 - 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
 - 下一个动作：实现 client/server 最小 SDK/runtime 与示例。
+
+### 2026-09-26 — 阶段 6A Artifact Loader 接入
+
+- 新增 `CordisArtifactModuleReader`，使用共享 `@delta-comic/both/artifact` 校验 Manifest、资源依赖图、路径和 SHA-256 完整性。
+- 复用现有 `PluginFileStore` 的 Blob URL + dynamic import 和资源释放边界，保留旧配置工厂 Loader 的独立行为。
+- 对 `plugin` 与 `plugin-set` 入口执行运行时形状校验，并覆盖提交、释放、错误和入口类型测试。
+- `@delta-comic/plugin` 接入 `@delta-comic/both` 依赖；插件 typecheck 与 module reader 测试（6/6）通过。
 
 ### 2026-09-26 — 40 项架构决策确认
 

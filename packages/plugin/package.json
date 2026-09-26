@@ -33,6 +33,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@delta-comic/both": "workspace:",
     "@delta-comic/downloader": "workspace:",
     "@delta-comic/logger": "workspace:",
     "@octokit/rest": "catalog:",
