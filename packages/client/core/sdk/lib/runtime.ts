@@ -15,6 +15,7 @@ import {
   type ClientStore,
   type ClientUi,
 } from './host.js'
+import { createClientUi } from './ui.js'
 
 export interface ClientRuntimeOptions<DB extends object = Record<string, never>> {
   pluginId: string
@@ -33,16 +34,6 @@ const defaultStore = (): ClientStore => {
     delete: key => values.delete(key),
     keys: () => [...values.keys()],
   }
-}
-
-const defaultUi = (): ClientUi => {
-  const disposers = new Set<() => void>()
-  const register = (): (() => void) => {
-    const disposer = () => void disposers.delete(disposer)
-    disposers.add(disposer)
-    return disposer
-  }
-  return { registerRoute: register, registerNavItem: register, registerCommand: register }
 }
 
 export class ClientRuntime<DB extends object = Record<string, never>> {
@@ -66,7 +57,7 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
         this.#runtime.diagnostics,
         options.pluginId,
       ),
-      ui: options.ui ?? defaultUi(),
+      ui: options.ui ?? createClientUi(options.pluginId),
       downloader:
         options.downloader ??
         createClientDownloader(this.#runtime.diagnostics, options.pluginId, {
@@ -111,6 +102,7 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
       await this.#runtime.dispose()
     } finally {
       if (this.#ownsDownloader) this.#host.downloader?.dispose()
+      this.#host.ui.dispose?.()
     }
   }
 }

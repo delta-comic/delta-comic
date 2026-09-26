@@ -560,6 +560,9 @@ importers:
       '@delta-comic/downloader':
         specifier: 'workspace:'
         version: link:../../../downloader
+      '@delta-comic/ui':
+        specifier: 'workspace:'
+        version: link:../../../ui
       cordis:
         specifier: 'catalog:'
         version: 4.0.0-rc.10
@@ -582,6 +585,9 @@ importers:
       vitest:
         specifier: 4.1.10
         version: 4.1.10(@types/node@26.1.0)(@vitest/browser-preview@4.1.10)(@vitest/coverage-v8@4.1.10)(@voidzero-dev/vite-plus-core@0.3.1(@types/node@26.1.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)(yaml@2.9.0))(happy-dom@20.11.2)
+      vue:
+        specifier: 'catalog:'
+        version: 3.6.0-rc.4(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
 
   packages/db:
     dependencies:

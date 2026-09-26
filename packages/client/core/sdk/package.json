@@ -21,6 +21,10 @@
     "./runtime": {
       "types": "./dist/runtime.d.mts",
       "import": "./dist/runtime.mjs"
+    },
+    "./ui": {
+      "types": "./dist/ui.d.mts",
+      "import": "./dist/ui.mjs"
     }
   },
   "publishConfig": {
@@ -29,6 +33,7 @@
   "dependencies": {
     "@delta-comic/both": "workspace:",
     "@delta-comic/downloader": "workspace:",
+    "@delta-comic/ui": "workspace:",
     "cordis": "catalog:",
     "kysely": "catalog:",
     "typebox": "catalog:"
@@ -37,6 +42,10 @@
     "@swc/core": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "vue": "catalog:"
+  },
+  "peerDependencies": {
+    "vue": "catalog:"
   }
 }

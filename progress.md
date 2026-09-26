@@ -17,10 +17,10 @@
 
 ## 当前状态
 
-- 当前阶段：阶段 6D 实施，客户端下载器已接入 ClientHost，正在进入 UI 生命周期接入。
+- 当前阶段：阶段 6D 实施，客户端下载器与 UI EnvironmentRegistry owner 生命周期已接入，正在进入诊断 harness 和网络宿主能力。
 - 代码实现：both 公共 Manifest、artifact 校验、诊断记录器和 Cordis runtime harness 已完成并通过专项验证。
 - 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
-- 下一个动作：验证并提交下载器宿主接入，然后接入 UI EnvironmentRegistry 的 owner 生命周期。
+- 下一个动作：提交 UI EnvironmentRegistry owner 生命周期适配，然后实现诊断 harness 和网络宿主能力。
 
 ### 2026-09-26 — 阶段 6A Artifact Loader 接入
 
@@ -44,6 +44,15 @@
 - 使用 `Builder`、`collect_commands!` 与 `#[specta::specta]`，debug 构建和 Rust 单元测试都会生成 `packages/app/src/bindings.ts`。
 - 将生成绑定纳入 app 源码，后续宿主迁移可直接通过 `commands.getRuntimePlatform()` 调用。
 - `cargo check -p delta-comic --locked`、`cargo fmt --all --check` 和绑定导出单元测试通过。
+
+### 2026-09-26 — 阶段 6D 下载器与 UI 宿主接入
+
+- 客户端 SDK 新增 `ClientDownloader`，复用现有 Downloader 的任务、设置、下载、凭证和事件 API，并在命令边界统一写入诊断记录。
+- ClientRuntime 为每个插件提供独立 downloader key；外部注入的 downloader 由调用方管理，SDK 自建实例随 runtime dispose 释放。
+- ClientUi 接入 `@delta-comic/ui` 的 EnvironmentRegistry，以插件 ID 作为 owner；显式 disposer 和 runtime dispose 都会清理环境注册。
+- UI 新增 `./environment` 公共出口，library build 生成独立 environment 入口并保持既有 `./style.css` 对应 `dist/index.css`。
+- 客户端 SDK 新增 `./ui` 出口和 UI 生命周期测试；客户端专项测试 4/4、UI/client typecheck 与 `vp check --fix` 通过。
+- routes、导航项和 command 的真实宿主注册仍待迁移；诊断 harness、网络宿主、服务端宿主迁移和阶段 6E 保持未完成。
 
 ### 2026-09-26 — 40 项架构决策确认
 

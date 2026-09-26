@@ -66,7 +66,11 @@ export default defineConfig(({ command }) => ({
   server: {},
   // builds
   build: {
-    lib: { entry: 'lib/index.ts', fileName: 'index', formats: ['es'] },
+    lib: {
+      entry: { index: 'lib/index.ts', environment: 'lib/environment.ts' },
+      formats: ['es'],
+      cssFileName: 'index',
+    },
     sourcemap: true,
     rolldownOptions: {
       external: isExternal,

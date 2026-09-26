@@ -1,5 +1,7 @@
 import { DiagnosticRecorder } from '@delta-comic/both'
+import { environmentRegistry } from '@delta-comic/ui/environment'
 import { describe, expect, it, vi } from 'vitest'
+import { defineComponent } from 'vue'
 
 import {
   ClientRuntime,
@@ -73,5 +75,32 @@ describe('client SDK', () => {
       'client downloader get settings completed',
     ])
     downloader.dispose()
+  })
+
+  it('removes plugin environment registrations during runtime disposal', async () => {
+    const runtime = new ClientRuntime({ pluginId: 'environment', database })
+    const component = defineComponent({ template: '<div />' })
+    let removeEnvironment: (() => void) | undefined
+
+    await runtime.mount('consumer', {
+      inject: ['client'],
+      apply(ctx: Context) {
+        removeEnvironment = ctx.client.ui.registerEnvironment('test-environment', component)
+      },
+    })
+
+    expect(environmentRegistry.forKey('test-environment')).toHaveLength(1)
+    removeEnvironment?.()
+    expect(environmentRegistry.forKey('test-environment')).toHaveLength(0)
+
+    await runtime.mount('second-consumer', {
+      inject: ['client'],
+      apply(ctx: Context) {
+        ctx.client.ui.registerEnvironment('test-environment', component)
+      },
+    })
+    expect(environmentRegistry.forKey('test-environment')).toHaveLength(1)
+    await runtime.dispose()
+    expect(environmentRegistry.forKey('test-environment')).toHaveLength(0)
   })
 })

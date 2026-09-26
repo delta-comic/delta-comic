@@ -1,5 +1,6 @@
 import { withDiagnostic, type DiagnosticRecorder } from '@delta-comic/both'
 import type { Kysely } from 'kysely'
+import type { Component } from 'vue'
 
 import type { ClientDownloader } from './downloader.js'
 
@@ -77,6 +78,12 @@ export interface ClientUi {
   registerRoute(route: ClientRouteRegistration): () => void
   registerNavItem(item: ClientRouteRegistration): () => void
   registerCommand(id: string, handler: () => void | Promise<void>): () => void
+  registerEnvironment(
+    key: string,
+    component: Component,
+    condition?: (args: Record<string, unknown>) => boolean | Promise<boolean>,
+  ): () => void
+  dispose?(): void
 }
 
 export interface ClientHost<DB extends object = Record<string, never>> {

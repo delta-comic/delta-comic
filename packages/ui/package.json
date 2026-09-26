@@ -34,7 +34,11 @@
       "types": "./tailwind/index.ts",
       "import": "./tailwind/index.ts"
     },
-    "./style.css": "./dist/index.css"
+    "./style.css": "./dist/index.css",
+    "./environment": {
+      "types": "./dist/environment.d.ts",
+      "import": "./dist/environment.js"
+    }
   },
   "publishConfig": {
     "access": "public"
