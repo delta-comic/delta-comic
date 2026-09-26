@@ -75,24 +75,80 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 需要考虑最小 runtime harness、事件记录/回放、确定性复现、包 README/边界/配置/排错入口、小模块/明确入口/低隐式行为。
 - 采集与隐私需在包设计和运行时统一定义：元数据常态采集，payload 默认隐私保护。
 
-## 未决问题（下一轮集中询问）
+## 已确认的 40 项架构决策
 
-1. `@delta-comic/both` 最终职责边界及平台子协议组织：核心字段、通用类型、Cordis re-export、diagnostics/IDs 是否全部进入；两个 SDK 要直接 re-export 到什么程度。
-2. Manifest 的规范化序列化、协议版本、平台声明、依赖/兼容版本、permission 声明字段、资源清单、路由/任务声明的精确结构；client/server 插件包能否合并一个 manifest（目前各端 lifecycle 独立，需确认是同一 manifest 的双可选扩展还是独立 manifests 共用基础 schema）。
-3. `delta-comic:` loader module resolution、跨 bundle external dependencies（Vue、Cordis、Naive UI、宿主 API）的 canonical specifier、运行时模块/版本协商和缓存/授权边界。
-4. 客户端完整数据库/store 插件直访 API 的稳定性、事务/表访问接口、插件数据命名空间、数据库迁移/权限与诊断语义。
-5. Cordis loader 模型（Entry/EntryTree、依赖、分组、注入、配置验证、并发/顺序启动、事件派发）及服务端/客户端差异。
-6. Tauri mobile 能力差异：下载器原生桥接、文件/网络/权限/后台任务、插件 HMR/debug 仅开发模式或设备端均可用。
-7. 服务端 Worker 路由 handler、HTTP methods/path matching/middleware、权限声明、登录验证上下文、CORS/请求体/响应限制。
-8. 服务端 Cron/队列/后台任务、D1 migration transactional/idempotence、插件的 fetch-to-self/子请求、secrets 与不可变绑定注入规则。
-9. Workers for Platforms/D1 额度：每用户实例上限、数据库尺寸、CPU/subrequest/请求并发/存储、平台总体容量与超限策略；需依据 Cloudflare 当前官方文档做技术校验。
-10. 目录/ZIP 安装归档的精确布局、资源路径/动态 chunk 加载、路径遍历防护、MIME 支持和平台/架构变体。
-11. Git release artifact 与市场格式、更新策略（版本选择/兼容约束/更新失败恢复）、私有源身份凭证存储和拉取策略。
-12. 内置插件与外部插件的源码/构建/类型共享方式，生成插件模板、第三方开发工具/CLI、宿主发布时 runtime externalization 和可测试 harness。
-13. AI 诊断面板/事件回放的保存位置、保留期、调试时 payload 捕获的显式开关/权限、用户数据访问审计策略。
-14. 应用/服务端/admin 的新 package families、目标支持环境、哪些目前非用户可见的功能应保留或删除。
-15. 依赖升级范围（workspace dependencies、Tauri/Rust crates、移动端插件、构建工具、Cloudflare bindings）和升级版本锁定/可复现规则。
-16. 用户硬编码文案例外的精确边界，以及现有 AGENTS i18n 约定需要如何在设计/后续项目文档中明确该例外。
+### 1–6: 包与协议
+
+1. **@delta-comic/both 职责** (1A): 导出 Cordis 公共 API、核心 Manifest schema、ID/诊断/版本声明等平台无关内容。
+2. **Cordis 依赖统一** (2A): @delta-comic/both 依赖并统一 re-export Cordis，三个公共包锁定同一 Cordis 版本。
+3. **Manifest 文件拆分** (3B): client/server 各自独立 Manifest 文件，共用 schema 基础类型。
+4. **两端独立构建** (4A): 客户端与服务端分别构建/安装/升级，允许同一 pluginId 语义关联。
+5. **生命周期独立** (5A): 两端生命周期完全独立，可选通过 integrationId/links 字段表达关联关系。
+6. **协议版本检查** (6A): Manifest 携带 protocolVersion，SDK 声明支持范围，安装前兼容性检查。
+
+### 7–12: 模块与构建
+
+7. **客户端入口** (7A): 客户端插件默认导出 Cordis plugin/plugin set，manifest 声明入口类型。
+8. **服务端入口** (8A): 服务端插件默认导出 Cordis plugin/plugin set，Worker runtime 注入服务。
+9. **模块加载方案** (9C): 用户质疑虚拟模块方案；确认现有 Blob URL + dynamic import 方案 (StoredPluginModuleReader 创建 blob URL、DevServerPluginModuleReader 直接 import Vite dev server) 可继续使用，暂不强制虚拟模块。
+10. **待定** (10): 依赖第 9 项决策后再讨论。
+11. **待定** (11): 依赖第 9 项决策后再讨论。
+12. **待定** (12): 依赖第 9 项决策后再讨论。
+
+### 13–18: 客户端 API
+
+13. **UI 扩展注册** (13A): 插件通过 service API 注册 UI，组件由 Vue API 提供。
+14. **路由与导航** (14A): 插件声明 route，宿主生成 /plugins/{pluginId}/... 及导航项。
+15. **数据库/store 全量访问** (15A): 通过 typed API 暴露全部表/store，每次调用接入诊断链。
+16. **双模式数据存储** (16D): 同时支持 plugin-scoped namespace/API (宿主管理) 与插件自建表+迁移。
+17. **双模式配置** (17C): 支持宿主托管配置与插件自管配置，宿主配置可映射为插件服务。
+18. **停用语义** (18A): 停用时停止 fiber、卸载 UI、保留数据，支持重启。
+
+### 19–26: 服务端
+
+19. **默认鉴权路由** (19A): 默认路由要求宿主会话并注入身份，Manifest 可声明公开路由。
+20. **路由声明与实现** (20A): Manifest 声明 method/path/权限，插件通过 typed router service 提供 handler。
+21. **任务声明与调度** (21A): Manifest 声明 cron/queue/job，插件提供 typed handler，平台调度。
+22. **迁移携带与执行** (22A): artifact 携带有序 SQL migration 与版本表，Worker runtime 切换前执行。
+23. **迁移状态追踪** (23A): 安装实例记录 migration id、日志、错误、版本，支持重试/修复。
+24. **配置来源** (24B): 所有配置由 Manifest 默认值提供 (非用户配置+secret service)。
+25. **资源配额声明** (25A): 平台定义基础上限，Manifest 可声明所需，安装时校验。
+26. **超限处理** (26A): 超限时当前请求/job 失败并产生诊断，平台保留安装实例。
+
+### 27–35: 安装/诊断
+
+27. **产物布局** (27B): 布局自由，Manifest 完整列出路径 (非固定布局)。
+29. **版本选择** (29A): 按 semver/protocol/capability/变体选择候选版本。
+30. **来源凭证** (30: A+C): 宿主保存来源级凭证引用 (A) + Manifest 自带访问凭证 (C)。
+31. **诊断数据持久化** (31A): 内存保留近期，本地持久化摘要；服务端保存服务端摘要；用户补充"为减轻服务器压力，非主动不上传"。
+32. **诊断采集粒度** (32B): 默认完整记录 (非默认元数据+脱敏 payload)。
+33. **诊断可见性** (33B): 插件可读全局注册表和其他插件诊断 (非只读自身)。
+34. **运维操作** (34A): 提供重启/停用/重试迁移/切换版本/导出诊断/删除等明确操作。
+35. **宿主日志权限** (35: A 内容 B 权限): 插件读取自身结构化日志/trace/错误 (A 的内容范围)，宿主日志脱敏引用暴露 (B 的权限约束)。
+
+### 36–40: 应用/文案/发布
+
+36. **跨端依赖** (36A): 允许协议工具/跨端类型/跨端插件依赖 both；平台插件分别依赖对应包。
+37. **i18n 全局例外** (37: 自定义): 用户指定"不加入 i18n，只硬编码，不需要列出语言"，意为放弃多语言、全部硬编码，不区分外部/内置 (与之前 37A 仅外部插件例外不同，此次明确全局例外)。
+38. **UI/player 导出路径** (38A): layout/player/model 从 @delta-comic/client/ui、/player、/model、/layout 等稳定子路径导出。
+39. **依赖统一升级** (39A): workspace/Tauri/Rust/Cloudflare/构建链统一升级并锁定，分阶段验证。
+40. **分阶段实施** (40A): 先完成 both/client/server SDK、最小 Cordis runtime、客户端/服务端示例、artifact 校验、诊断快照，再迁移完整能力。
+
+## 剩余未决问题
+
+1. 客户端完整数据库/store 插件直访 API 的稳定性、事务/表访问接口、插件数据命名空间、数据库迁移/权限与诊断语义。
+2. Cordis loader 模型 (Entry/EntryTree、依赖、分组、注入、配置验证、并发/顺序启动、事件派发) 及服务端/客户端差异。
+3. Tauri mobile 能力差异：下载器原生桥接、文件/网络/权限/后台任务、插件 HMR/debug 仅开发模式或设备端均可用。
+4. 服务端 Worker 路由 handler 细节、HTTP methods/path matching/middleware、权限声明、登录验证上下文、CORS/请求体/响应限制。
+5. 服务端 Cron/队列/后台任务细节、D1 migration transactional/idempotence、插件的 fetch-to-self/子请求、secrets 与不可变绑定注入规则。
+6. Workers for Platforms/D1 额度：每用户实例上限、数据库尺寸、CPU/subrequest/请求并发/存储、平台总体容量与超限策略；需依据 Cloudflare 当前官方文档做技术校验。
+7. 目录/ZIP 安装归档的精确布局、资源路径/动态 chunk 加载、路径遍历防护、MIME 支持和平台/架构变体。
+8. Git release artifact 与市场格式、更新策略 (版本选择/兼容约束/更新失败恢复)、私有源身份凭证存储和拉取策略。
+9. 内置插件与外部插件的源码/构建/类型共享方式，生成插件模板、第三方开发工具/CLI、宿主发布时 runtime externalization 和可测试 harness。
+10. AI 诊断面板/事件回放的保存位置、保留期、调试时 payload 捕获的显式开关/权限、用户数据访问审计策略。
+11. 应用/服务端/admin 的新 package families、目标支持环境、哪些目前非用户可见的功能应保留或删除。
+12. 依赖升级范围 (workspace dependencies、Tauri/Rust crates、移动端插件、构建工具、Cloudflare bindings) 和升级版本锁定/可复现规则。
+13. i18n 全局例外的精确边界 (是否覆盖所有 UI 文案、错误消息、日志)，以及现有 AGENTS i18n 约定需要如何在设计/后续项目文档中明确该例外。
 
 ## 设计大纲（草案）
 

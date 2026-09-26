@@ -17,9 +17,10 @@
 - 每轮允许以普通对话表格集中询问多个高影响问题；禁止调用 OpenCode ask question/question 工具。
 
 ### 阶段 2：完成能力盘点和需求确认
-- **状态：** in_progress
+- **状态：** complete
 - 确认 client/server/both 公共 SDK、Cordis host integration、插件包/manifest/runtime 协议、客户端 UI/layout/player/model、服务端 Worker/D1/API/资源与配额、AI 调试、应用/admin 与数据范围。
-- 依据用户答案更新 `findings.md` 和 `progress.md`，未明确事项不得擅自变成硬性要求。
+- 用户通过 40 项架构决策批量确认了包协议、模块加载、客户端/服务端 API、安装/诊断、应用/文案/发布等核心需求。
+- 已将 40 项决策追加到 `findings.md` 的"已确认的 40 项架构决策"章节，并更新剩余未决问题清单。
 
 ### 阶段 3：比较架构方案并分段获得批准
 - **状态：** pending
@@ -64,4 +65,4 @@
 
 ## Next Step
 
-准备一张集中问题表，优先确认 SDK/Manifest 包依赖关系、Cordis Loader 与虚拟模块协议、客户端扩展 API、服务端安装/权限/资源上限和 D1 生命周期等剩余关键需求，并将答案写入 findings/progress。
+提出 2–3 个整体重构方案，说明边界、依赖、迁移/发布与风险取舍，给出推荐方案；随后按设计章节分段呈现设计并获用户批准。
