@@ -67,12 +67,12 @@
 
 - **状态：** in_progress
 - 6A：将新 Artifact/Manifest 接入现有安装文件与模块读取边界。complete（`b33ab532`）
-- 6B：公开构建并发布 `@delta-comic/server`，补齐 SDK 的产物测试。complete（待提交）
-- 6C：接入 Tauri command 的 specta 类型生成，并纳入 Rust/TypeScript 验证。
+- 6B：公开构建并发布 `@delta-comic/server`，补齐 SDK 的产物测试。complete（`e9a83b1e`）
+- 6C：接入 Tauri command 的 specta 类型生成，并纳入 Rust/TypeScript 验证。complete（待提交）
 - 6D：完成客户端/服务端宿主迁移、诊断 harness、UI/网络/下载器能力迁移。
 - 6E：完成 Worker dispatcher、D1 migration、发布/市场、应用/admin 重组与部署文档。
 - 每个子阶段必须有实现、测试、规划状态和签名提交；未实现事项保持未勾选。
 
 ## Next Step
 
-  阶段 6C：为 Tauri commands 接入 specta 类型生成，并完成 Rust/TypeScript 绑定验证。
+  阶段 6D：完成 client/server 宿主迁移、诊断 harness、UI、网络和下载器能力迁移。

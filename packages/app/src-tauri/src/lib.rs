@@ -1,4 +1,27 @@
 use tauri_plugin_aptabase::EventTracker;
+use tauri_specta::{Builder, collect_commands};
+
+#[tauri::command]
+#[specta::specta]
+fn get_runtime_platform() -> String {
+  if cfg!(target_os = "android") {
+    "android".to_string()
+  } else if cfg!(target_os = "ios") {
+    "ios".to_string()
+  } else if cfg!(target_os = "windows") {
+    "windows".to_string()
+  } else if cfg!(target_os = "macos") {
+    "macos".to_string()
+  } else if cfg!(target_os = "linux") {
+    "linux".to_string()
+  } else {
+    "unknown".to_string()
+  }
+}
+
+fn specta_builder() -> Builder<tauri::Wry> {
+  Builder::<tauri::Wry>::new().commands(collect_commands![get_runtime_platform])
+}
 
 #[cfg(desktop)]
 use tauri::{
@@ -62,8 +85,18 @@ pub fn run() {
   #[cfg(target_os = "macos")]
   disable_automatic_capitalization();
 
+  let specta_builder = specta_builder();
+  #[cfg(debug_assertions)]
+  specta_builder
+    .export(
+      specta_typescript::Typescript::default(),
+      concat!(env!("CARGO_MANIFEST_DIR"), "/../src/bindings.ts"),
+    )
+    .expect("failed to export Tauri command bindings");
+
   let builder = tauri_plugin_utils::init(
     tauri::Builder::default()
+      .invoke_handler(specta_builder.invoke_handler())
       .plugin(tauri_plugin_logger::init())
       .plugin(tauri_plugin_fs::init()),
   );
@@ -139,4 +172,19 @@ _____   _________________ ____        __________________ _____   ______
   }
 
   tracing::info!(target: "app::lifecycle", "application exited");
+}
+
+#[cfg(test)]
+mod tests {
+  use super::specta_builder;
+
+  #[test]
+  fn exports_tauri_command_bindings() {
+    specta_builder()
+      .export(
+        specta_typescript::Typescript::default(),
+        concat!(env!("CARGO_MANIFEST_DIR"), "/../src/bindings.ts"),
+      )
+      .expect("failed to export Tauri command bindings");
+  }
 }

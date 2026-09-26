@@ -17,10 +17,10 @@
 
 ## 当前状态
 
-- 当前阶段：阶段 6C 准备，Server SDK 发布构建已完成。
+- 当前阶段：阶段 6C 实施，Tauri Specta command 类型生成已完成，正在提交前验证。
 - 代码实现：both 公共 Manifest、artifact 校验、诊断记录器和 Cordis runtime harness 已完成并通过专项验证。
 - 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
-- 下一个动作：提交 6B 后接入 Tauri Specta command 类型生成。
+- 下一个动作：完成 6C 提交后，开始 6D 宿主迁移和诊断 harness。
 
 ### 2026-09-26 — 阶段 6A Artifact Loader 接入
 
@@ -37,6 +37,13 @@
 - `vp -C packages/server pack` 成功生成 SDK 与 Worker ESM/声明文件；server typecheck、SDK/release专项测试（4/4）及 `vp check --fix` 通过。
 - Worker pack 检查提示 `cloudflare:workers` 为平台提供的 external import；正式 Worker 部署仍由 Cloudflare Vite plugin 构建。
 - `vp check`、递归 typecheck、server/release 专项测试和 lib-build 均通过，6B 已具备提交条件。
+
+### 2026-09-26 — 阶段 6C Tauri Specta 类型生成
+
+- 为 Tauri 应用接入 `specta`、`specta-typescript` 和 `tauri-specta`，新增 `get_runtime_platform` typed command。
+- 使用 `Builder`、`collect_commands!` 与 `#[specta::specta]`，debug 构建和 Rust 单元测试都会生成 `packages/app/src/bindings.ts`。
+- 将生成绑定纳入 app 源码，后续宿主迁移可直接通过 `commands.getRuntimePlatform()` 调用。
+- `cargo check -p delta-comic --locked`、`cargo fmt --all --check` 和绑定导出单元测试通过。
 
 ### 2026-09-26 — 40 项架构决策确认
 

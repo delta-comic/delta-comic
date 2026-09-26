@@ -25,6 +25,8 @@ objc2-foundation = { version = "0.3.2", features = ["NSString", "NSUserDefaults"
 percent-encoding = "2.3.2"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
+specta = "=2.0.0-rc.25"
+specta-typescript = "0.0.12"
 tauri = "2.11.5"
 tauri-build = "2.6.3"
 tauri-plugin = "2.6.3"
@@ -46,6 +48,7 @@ tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", br
 ] }
 tauri-plugin-utils = { path = "packages/utils" }
 tauri-runtime-wry = "2.11.4"
+tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript", "javascript"] }
 tokio = "1.53.1"
 tracing = "0.1.44"
 tracing-subscriber = "0.3.23"
