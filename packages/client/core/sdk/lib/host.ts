@@ -87,6 +87,12 @@ export interface ClientUi {
   dispose?(): void
 }
 
+export interface ClientUiRegistrars {
+  readonly route?: (route: ClientRouteRegistration, owner: string) => () => void
+  readonly navItem?: (item: ClientRouteRegistration, owner: string) => () => void
+  readonly command?: (id: string, handler: () => void | Promise<void>, owner: string) => () => void
+}
+
 export interface ClientHost<DB extends object = Record<string, never>> {
   readonly pluginId: string
   readonly diagnostics: DiagnosticRecorder

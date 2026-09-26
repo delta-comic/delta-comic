@@ -14,6 +14,7 @@ import {
   type ClientHost,
   type ClientStore,
   type ClientUi,
+  type ClientUiRegistrars,
 } from './host.js'
 import { createClientNetwork, type ClientNetwork } from './network.js'
 import { createClientUi } from './ui.js'
@@ -24,6 +25,7 @@ export interface ClientRuntimeOptions<DB extends object = Record<string, never>>
   database: ClientDatabase<DB>
   store?: ClientStore
   ui?: ClientUi
+  uiRegistrars?: ClientUiRegistrars
   downloader?: ClientDownloader
   network?: ClientNetwork
 }
@@ -59,7 +61,7 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
         this.#runtime.diagnostics,
         options.pluginId,
       ),
-      ui: options.ui ?? createClientUi(options.pluginId),
+      ui: options.ui ?? createClientUi(options.pluginId, options.uiRegistrars),
       downloader:
         options.downloader ??
         createClientDownloader(this.#runtime.diagnostics, options.pluginId, {

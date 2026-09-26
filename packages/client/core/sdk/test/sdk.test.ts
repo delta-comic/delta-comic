@@ -31,6 +31,33 @@ describe('client SDK', () => {
     await runtime.dispose()
   })
 
+  it('delegates UI registrations to injectable host registrars', async () => {
+    const removed: string[] = []
+    const runtime = new ClientRuntime({
+      pluginId: 'registrars',
+      database,
+      uiRegistrars: {
+        route: route => () => removed.push(`route:${route.path}`),
+        navItem: item => () => removed.push(`nav:${item.path}`),
+        command: id => () => removed.push(`command:${id}`),
+      },
+    })
+    await runtime.mount('consumer', {
+      inject: ['client'],
+      apply(ctx: Context) {
+        ctx.client.ui.registerRoute({ path: '/plugins/registrars', title: 'Registrars' })
+        ctx.client.ui.registerNavItem({ path: '/plugins/registrars', title: 'Registrars' })
+        ctx.client.ui.registerCommand('registrars.refresh', () => undefined)
+      },
+    })
+    await runtime.dispose()
+    expect(removed).toEqual([
+      'route:/plugins/registrars',
+      'nav:/plugins/registrars',
+      'command:registrars.refresh',
+    ])
+  })
+
   it('records database and store operations through host boundaries', async () => {
     const runtime = new ClientRuntime({ pluginId: 'diagnostics', database })
     await runtime.mount('consumer', {

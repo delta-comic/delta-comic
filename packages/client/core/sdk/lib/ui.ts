@@ -1,9 +1,9 @@
 import { environmentRegistry } from '@delta-comic/ui/environment'
 import type { Component } from 'vue'
 
-import type { ClientUi } from './host.js'
+import type { ClientRouteRegistration, ClientUi, ClientUiRegistrars } from './host.js'
 
-export const createClientUi = (owner: string): ClientUi => {
+export const createClientUi = (owner: string, registrars: ClientUiRegistrars = {}): ClientUi => {
   const disposers = new Set<() => void>()
   const register = (disposer: () => void) => {
     disposers.add(disposer)
@@ -14,9 +14,12 @@ export const createClientUi = (owner: string): ClientUi => {
   }
 
   return {
-    registerRoute: () => register(() => undefined),
-    registerNavItem: () => register(() => undefined),
-    registerCommand: () => register(() => undefined),
+    registerRoute: (route: ClientRouteRegistration) =>
+      register(registrars.route?.(route, owner) ?? (() => undefined)),
+    registerNavItem: (item: ClientRouteRegistration) =>
+      register(registrars.navItem?.(item, owner) ?? (() => undefined)),
+    registerCommand: (id, handler) =>
+      register(registrars.command?.(id, handler, owner) ?? (() => undefined)),
     registerEnvironment: (key, component: Component, condition) =>
       register(environmentRegistry.register(key, component, condition, owner)),
     dispose: () => {
