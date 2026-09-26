@@ -159,6 +159,12 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - **Manifest dependencies 字段用于安装时校验**：确保依赖插件已安装且版本兼容，不参与运行时加载顺序（运行时由 Cordis inject 决定）。
 - 客户端与服务端统一使用 Cordis Context/Registry/Service/Events，插件代码无需区分平台差异的依赖管理逻辑。
 
+## 架构原则：文件职责单一化
+
+- **多拆分文件，一个文件职责清晰单一**，避免写出过大文件（如单文件超 300 行、单一模块包含多个不相关职责）。
+- 按功能/职责拆分模块，每个文件应有明确的单一目的（一个 Service、一个 API 集合、一个类型定义文件）。
+- 优先小而聚焦的模块，便于理解、测试、维护和 AI 调试。
+
 ## 剩余未决问题
 
 1. 宿主全局模块注册的具体 API 形态：是 `window['@delta-comic/client']` 直接挂载导出对象，还是通过 `System.register` 或其他模块加载器？需确认浏览器/Worker 两端的统一机制。
