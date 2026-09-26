@@ -155,6 +155,13 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 插件也通过 Kysely API 访问数据库，宿主提供 typed DB instance。
 - 数据库迁移使用 Kysely Migrator 或等价工具，避免手写 DDL 字符串。
 
+## 补充决策：依赖版本策略
+
+- **包都走前沿路线**，使用最新 RC/beta/canary 版本，不考虑插件适配问题或生态稳定性。
+- **Vue 使用 RC 版本和 Vapor 模式**：采用 Vue 3.5+ RC 最新版本，启用 Vapor 编译模式（实验性）。
+- 其他依赖也优先 latest/next/canary channel，拥抱新特性和性能优化。
+- 插件作者需跟随宿主依赖版本，不保证向后兼容旧版本依赖。
+
 ## 补充决策：类型系统与 specta
 
 - **specta 是整个架构的类型基础设施**，不只是 Tauri IPC 的配角，而是实现"单一类型源派生多端类型"的核心工具。
