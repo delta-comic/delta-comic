@@ -152,6 +152,13 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
   3. Manifest/配置校验：从 Rust 类型生成 JSON Schema，用于安装时校验插件 artifact。
 - 保证客户端/服务端/配置/文档的类型一致性，消除跨边界运行时类型错误。
 
+## 补充决策：Cordis-first Loader 与依赖策略
+
+- **插件间依赖通过 Cordis Context 与 TypeScript Module Augmentation**：插件 A 通过 Cordis Service 暴露能力并扩展 Context 接口，插件 B 通过 `export const inject` 声明依赖，TypeScript 类型安全由模块扩展保证。
+- **Loader 基于 Cordis 机制**：Delta Comic Loader 只负责从 artifact 读取代码、解析 Manifest 元数据，将插件模块交给 Cordis Registry；依赖解析、激活顺序、循环检测、卸载清理全部由 Cordis 自动处理。
+- **Manifest dependencies 字段用于安装时校验**：确保依赖插件已安装且版本兼容，不参与运行时加载顺序（运行时由 Cordis inject 决定）。
+- 客户端与服务端统一使用 Cordis Context/Registry/Service/Events，插件代码无需区分平台差异的依赖管理逻辑。
+
 ## 剩余未决问题
 
 1. 宿主全局模块注册的具体 API 形态：是 `window['@delta-comic/client']` 直接挂载导出对象，还是通过 `System.register` 或其他模块加载器？需确认浏览器/Worker 两端的统一机制。

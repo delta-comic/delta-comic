@@ -45,14 +45,13 @@
 - 已更新 `findings.md` 补充决策章节和剩余未决问题。
 - 下一步：提交本次更新，继续方案 A 的详细设计。
 
-### 2026-09-26 — 类型系统与 specta 架构定位
+### 2026-09-26 — 类型系统与 Cordis-first Loader 策略
 
-- 用户确认 **specta 是整个架构的类型基础设施**，不只是 Tauri IPC 工具，而是实现"单一类型源派生多端类型"的核心。
-- **单一类型源派生策略**：Rust 定义一次 → 自动生成 TypeScript/JSON Schema/OpenAPI，避免手动同步跨语言类型。
-- 应用场景：Tauri IPC 类型安全、跨端模型统一（Manifest/Config）、Manifest/配置校验（JSON Schema）。
-- 用户要求在第 2 章添加专门一节"2.4 类型系统与 specta"说明派生策略。
-- 已更新 `findings.md` 补充完整的 specta 架构定位。
-- 设计进度：第 1 章已获批准；第 2 章已展示拓扑/信任边界/specta，正在补充 2.4 节后等待批准。
+- 用户确认 **specta 是整个架构的类型基础设施**，单一类型源派生多端类型。
+- 用户澄清 **插件间依赖应通过 Cordis Context 与 TS 模块扩展定义类型**，而不是直接依赖其他插件实现；Service 暴露能力，`inject` 声明依赖，TypeScript Module Augmentation 扩展 Context 接口。
+- 用户要求 **Loader 和模块依赖处理更多基于 Cordis**：Delta Comic Loader 只负责读取 artifact 与解析 Manifest，依赖解析/激活顺序/循环检测/卸载由 Cordis 自动处理；Manifest dependencies 用于安装时校验，运行时由 Cordis inject 决定。
+- 已更新 `findings.md` 补充 Cordis-first Loader 与依赖策略。
+- 设计进度：第 1-3 章已获批准；第 4 章（Cordis/Loader/Manifest）已按 Cordis-first 原则重写，等待展示完整版并获批准后继续第 5 章。
 
 ## 验证
 
