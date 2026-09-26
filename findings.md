@@ -142,6 +142,12 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - Manifest 完整声明资源依赖图 (包括 dynamic chunk)。
 - 内置/外部插件统一构建合约。
 
+## 补充决策：移动端平台范围
+
+- **只支持 Android**，不考虑 iOS 开发。
+- 移动端采用 Tauri 移动端方案（Android WebView + Rust 后端）。
+- WebView 能力：Chrome 内核，要求 Android 7+。
+
 ## 补充决策：类型系统与 specta
 
 - **specta 是整个架构的类型基础设施**，不只是 Tauri IPC 的配角，而是实现"单一类型源派生多端类型"的核心工具。
