@@ -1,24 +1,34 @@
 {
   "name": "@delta-comic/server",
-  "private": true,
+  "version": "3.0.0-next.19",
   "description": "南天门直梯",
+  "files": [
+    "dist"
+  ],
   "type": "module",
-  "main": "./lib/index.ts",
-  "module": "./lib/index.ts",
-  "types": "./lib/index.ts",
+  "main": "./dist/lib/index.mjs",
+  "module": "./dist/lib/index.mjs",
+  "types": "./dist/lib/index.d.mts",
   "exports": {
     ".": {
-      "types": "./lib/index.ts",
-      "import": "./lib/index.ts"
+      "types": "./dist/lib/index.d.mts",
+      "import": "./dist/lib/index.mjs"
+    },
+    "./app": {
+      "types": "./dist/app/index.d.mts",
+      "import": "./dist/app/index.mjs"
     },
     "./manifest": {
-      "types": "./lib/serverManifest.ts",
-      "import": "./lib/serverManifest.ts"
+      "types": "./dist/lib/serverManifest.d.mts",
+      "import": "./dist/lib/serverManifest.mjs"
     },
     "./runtime": {
-      "types": "./lib/serverRuntime.ts",
-      "import": "./lib/serverRuntime.ts"
+      "types": "./dist/lib/serverRuntime.d.mts",
+      "import": "./dist/lib/serverRuntime.mjs"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@delta-comic/both": "workspace:",

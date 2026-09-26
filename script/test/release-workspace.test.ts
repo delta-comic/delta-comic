@@ -33,11 +33,12 @@ describe('ReleaseWorkspace', () => {
       '@delta-comic/utils',
       '@delta-comic/ui',
       '@delta-comic/plugin',
+      '@delta-comic/server',
     ])
     expect(packages.map(pkg => pkg.path).toSorted()).toEqual(
       jsonVersionPaths
         .filter(path =>
-          /^packages\/(?:client\/core\/sdk|db|downloader|logger|model|plugin|shared\/both|ui|utils)\//.test(
+          /^packages\/(?:client\/core\/sdk|db|downloader|logger|model|plugin|server|shared\/both|ui|utils)\//.test(
             path,
           ),
         )

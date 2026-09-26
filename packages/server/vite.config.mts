@@ -23,11 +23,13 @@ export default defineConfig({
   pack: [
     {
       entry: './app/index.ts',
+      outDir: './dist/app',
       dts: { tsconfig: './tsconfig.app.json' },
       plugins: [decoratorPlugin as any],
     },
     {
-      entry: './lib/index.ts',
+      entry: ['./lib/index.ts', './lib/serverManifest.ts', './lib/serverRuntime.ts'],
+      outDir: './dist/lib',
       dts: { tsconfig: './tsconfig.lib.json' },
       plugins: [decoratorPlugin as any],
     },
@@ -48,7 +50,7 @@ export default defineConfig({
   run: {
     tasks: {
       'build': {
-        command: 'vp build',
+        command: 'vp pack && vp build',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         output: ['dist/**'],
       },

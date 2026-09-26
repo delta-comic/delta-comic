@@ -17,10 +17,10 @@
 
 ## 当前状态
 
-- 当前阶段：阶段 6A 实施，新 Artifact Loader 接入已完成。
+- 当前阶段：阶段 6C 准备，Server SDK 发布构建已完成。
 - 代码实现：both 公共 Manifest、artifact 校验、诊断记录器和 Cordis runtime harness 已完成并通过专项验证。
 - 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
-- 下一个动作：实现 client/server 最小 SDK/runtime 与示例。
+- 下一个动作：提交 6B 后接入 Tauri Specta command 类型生成。
 
 ### 2026-09-26 — 阶段 6A Artifact Loader 接入
 
@@ -28,6 +28,15 @@
 - 复用现有 `PluginFileStore` 的 Blob URL + dynamic import 和资源释放边界，保留旧配置工厂 Loader 的独立行为。
 - 对 `plugin` 与 `plugin-set` 入口执行运行时形状校验，并覆盖提交、释放、错误和入口类型测试。
 - `@delta-comic/plugin` 接入 `@delta-comic/both` 依赖；插件 typecheck 与 module reader 测试（6/6）通过。
+
+### 2026-09-26 — 阶段 6B Server SDK 发布构建
+
+- 将 `@delta-comic/server` 设为公开版本包，exports 指向 dist，并公开 Worker app、Manifest 和 runtime 子路径。
+- 分离 pack 产物目录：SDK 输出到 `dist/lib`，Worker bundle 输出到 `dist/app`，防止 SDK 清理/打包覆盖部署产物。
+- 将 server package纳入版本同步，并更新 release workspace 的公开包清单测试。
+- `vp -C packages/server pack` 成功生成 SDK 与 Worker ESM/声明文件；server typecheck、SDK/release专项测试（4/4）及 `vp check --fix` 通过。
+- Worker pack 检查提示 `cloudflare:workers` 为平台提供的 external import；正式 Worker 部署仍由 Cloudflare Vite plugin 构建。
+- `vp check`、递归 typecheck、server/release 专项测试和 lib-build 均通过，6B 已具备提交条件。
 
 ### 2026-09-26 — 40 项架构决策确认
 

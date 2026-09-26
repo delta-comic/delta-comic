@@ -12,6 +12,7 @@ export const jsonVersionPaths = [
   'packages/logger/package.json',
   'packages/model/package.json',
   'packages/plugin/package.json',
+  'packages/server/package.json',
   'packages/shared/both/package.json',
   'packages/ui/package.json',
   'packages/utils/package.json',
