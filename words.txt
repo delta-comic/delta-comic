@@ -103,6 +103,7 @@ tlds
 topbar
 tsgo
 tsgolint
+tslog
 typebox
 UIDT
 unplugin

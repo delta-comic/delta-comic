@@ -165,6 +165,14 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 按功能/职责拆分模块，每个文件应有明确的单一目的（一个 Service、一个 API 集合、一个类型定义文件）。
 - 优先小而聚焦的模块，便于理解、测试、维护和 AI 调试。
 
+## 架构原则：优先使用成熟库
+
+- **优先找库而不是造轮子**，特别是基础设施功能（日志、序列化、验证、HTTP 客户端等）。
+- 选择标准：活跃维护、TypeScript 支持、性能良好、社区认可。
+- **日志库选择**：
+  - 客户端：**tslog**（v5），支持浏览器 + Node.js + Deno，TypeScript 原生，结构化 JSON 输出
+  - 服务端：**pino**，Worker 环境高性能，JSON 结构化日志，生态成熟
+
 ## 剩余未决问题
 
 1. 宿主全局模块注册的具体 API 形态：是 `window['@delta-comic/client']` 直接挂载导出对象，还是通过 `System.register` 或其他模块加载器？需确认浏览器/Worker 两端的统一机制。
