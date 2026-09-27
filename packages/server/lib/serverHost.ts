@@ -1,5 +1,7 @@
-import type { DiagnosticRecorder } from '@delta-comic/both'
+import { withDiagnostic, type DiagnosticRecorder } from '@delta-comic/both'
 import type { Kysely } from 'kysely'
+
+import type { ServerPluginHost } from './plugin'
 
 export interface ServerIdentity {
   readonly userId: string
@@ -41,8 +43,21 @@ export interface ServerHost<DB extends object = Record<string, never>> {
   readonly installationId: string
   readonly db: Kysely<DB>
   readonly diagnostics: DiagnosticRecorder
+  readonly legacyPluginHost?: ServerPluginHost
   registerRoute(route: ServerRouteRegistration<DB>): () => void
   registerCron(schedule: string, handler: (context: ServerTaskContext<DB>) => unknown): () => void
   registerQueue(name: string, handler: (context: ServerTaskContext<DB>) => unknown): () => void
   registerMigration(migration: ServerMigration<DB>): () => void
 }
+
+export const createServerPluginHostAdapter = (
+  diagnostics: DiagnosticRecorder,
+  host: ServerPluginHost,
+): ServerPluginHost => ({
+  probeDatabase: () =>
+    withDiagnostic(diagnostics, 'server legacy plugin probe database', () => host.probeDatabase()),
+  readMetric: metric =>
+    withDiagnostic(diagnostics, 'server legacy plugin read metric', () => host.readMetric(metric), {
+      metric,
+    }),
+})

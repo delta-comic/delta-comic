@@ -7,6 +7,8 @@ import {
 } from '@delta-comic/both'
 import type { Kysely } from 'kysely'
 
+import type { ServerPluginHost } from './plugin'
+import { createServerPluginHostAdapter } from './serverHost'
 import type {
   ServerHost,
   ServerMigration,
@@ -22,6 +24,7 @@ export interface ServerRuntimeOptions<DB extends object = Record<string, never>>
   db: Kysely<DB>
   identity?: ServerIdentity
   context?: Context
+  legacyPluginHost?: ServerPluginHost
 }
 
 export class ServerRuntime<DB extends object = Record<string, never>> {
@@ -48,6 +51,14 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
       installationId: options.installationId,
       db: options.db,
       diagnostics: this.#runtime.diagnostics,
+      ...(options.legacyPluginHost
+        ? {
+            legacyPluginHost: createServerPluginHostAdapter(
+              this.#runtime.diagnostics,
+              options.legacyPluginHost,
+            ),
+          }
+        : {}),
       registerRoute: route => this.register(this.#routes, route),
       registerCron: (schedule, handler) => {
         const key = `${schedule}:${this.#crons.size}`
