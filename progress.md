@@ -204,3 +204,17 @@
 - `@delta-comic/server` 增加 `createPluginCatalogHandler`，公开 GET 目录读取，PUT 写入通过宿主注入的授权回调保护。
 - handler 校验请求路径、HTTP 方法和完整目录协议，返回明确的 404、405、401 与 400 响应，并复用任意 `PluginCatalogStore`。
 - 测试覆盖公开读取、授权写入、非法目录和无关路径；真实 Worker 路由组合、发布身份系统、R2 binding 配置、发布工作流、应用/admin 重组和部署文档仍未完成。
+
+## 2026-09-27：6E 市场目录部署边界
+
+- 新增 `docs/plugin-marketplace-deployment.md`，记录 R2 bucket 创建、`PLUGIN_CATALOG` binding、`SERVER_ADMIN_TOKEN` secret、Worker 部署和发布端点检查命令。
+- `packages/server/wrangler.jsonc` 增加可选 R2 binding 示例注释；未配置 binding 时，目录路由继续保持关闭。
+- 文档明确当前目录通过 R2 `catalog/index.json` 保存，发布器使用一次 load/save；CAS、发布者身份、artifact 上传、WfP provisioning、D1 per-installation 自动创建、app/admin 管理界面和完整 CI/CD 仍未完成。
+
+## 2026-09-27：免费账号 Worker 部署边界
+
+- Wrangler 生产配置移除 `worker_loaders`，部署使用 Vite 生成的 `dist/delta_comic_server/wrangler.json`，保留 alias 在 Vite 构建阶段解析。
+- 动态旧插件脚本在缺少 Workers for Platforms loader 时使用明确的 unavailable loader 并记录失败结果；目录、发布、SQL migration、静态 Cordis runtime 和现有 API 继续可用。
+- 已创建免费 D1 `delta-comic-server-db`，远程应用现有四组迁移，并将真实 database ID 写入 Wrangler 配置。
+- 使用 Vite 生成配置完成真实 Worker 部署，地址为 `https://delta-comic-server.wenxig.workers.dev`。`/api/health/live` 返回 200；未配置 R2 binding 时，目录读取和发布路径按预期返回 404，目录功能保持关闭。
+- 免费账号采用单 Worker 静态宿主降级；Workers for Platforms 动态脚本、per-installation 自动隔离和配额能力保持未完成。

@@ -11,13 +11,15 @@
   },
   "upload_source_maps": true,
   "version_metadata": { "binding": "CF_VERSION_METADATA" },
-  "worker_loaders": [{ "binding": "PLUGIN_LOADER" }],
+  // Enable this binding per deployment environment after creating the R2 bucket.
+  // The catalog routes remain unavailable while the binding is absent.
+  // "r2_buckets": [{ "binding": "PLUGIN_CATALOG", "bucket_name": "delta-comic-plugin-catalog" }],
   "triggers": { "crons": ["0 * * * *"] },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "delta-comic-server-db",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "b8871c90-303d-4d4b-8e87-5ff436baccd6",
       "migrations_dir": "migrations",
     },
   ],

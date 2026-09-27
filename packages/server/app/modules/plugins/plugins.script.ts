@@ -189,6 +189,12 @@ export class CloudflarePluginSandboxLoader implements PluginSandboxLoader {
   }
 }
 
+export class UnavailablePluginSandboxLoader implements PluginSandboxLoader {
+  async load(_code: WorkerLoaderWorkerCode, _request: Request): Promise<Response> {
+    throw new Error('Dynamic plugin scripts require a paid Workers for Platforms plan')
+  }
+}
+
 export class DynamicWorkerPluginRunner {
   constructor(
     private readonly loader: PluginSandboxLoader,
@@ -383,18 +389,21 @@ export class ServerPluginScriptService {
 }
 
 export const createPluginScriptService = (
-  env: Pick<Env, 'DB' | 'PLUGIN_LOADER'>,
+  env: Pick<Env, 'DB'> & Partial<Pick<Env, 'PLUGIN_LOADER'>>,
   ctx: ExecutionContext,
 ) =>
   new ServerPluginScriptService(
     new ServerPluginScriptRepository(env.DB),
-    new DynamicWorkerPluginRunner(new CloudflarePluginSandboxLoader(env.PLUGIN_LOADER), () =>
-      ctx.exports.PluginDatabase({}),
+    new DynamicWorkerPluginRunner(
+      env.PLUGIN_LOADER
+        ? new CloudflarePluginSandboxLoader(env.PLUGIN_LOADER)
+        : new UnavailablePluginSandboxLoader(),
+      () => ctx.exports.PluginDatabase({}),
     ),
   )
 
 export const runScheduledPluginScripts = (
-  env: Pick<Env, 'DB' | 'PLUGIN_LOADER'>,
+  env: Pick<Env, 'DB'> & Partial<Pick<Env, 'PLUGIN_LOADER'>>,
   ctx: ExecutionContext,
   scheduledTime: number,
   cron: string,
