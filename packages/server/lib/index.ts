@@ -15,6 +15,7 @@ export * from './catalogStore'
 export * from './catalogHandler'
 export * from './serverDispatcher'
 export * from './serverMigrations'
+export * from './catalogPublishHandler'
 export { ServerCronSchema, ServerPluginManifestSchema, ServerRouteSchema } from './serverManifest'
 export type {
   ServerCron,

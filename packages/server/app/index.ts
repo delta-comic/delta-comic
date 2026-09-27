@@ -5,6 +5,7 @@ import { Elysia, t } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
 
 import { createPluginCatalogHandler } from '../lib/catalogHandler'
+import { createPluginCatalogPublishHandler } from '../lib/catalogPublishHandler'
 import { createR2PluginCatalogStore } from '../lib/catalogStore'
 import { serverModules } from '../lib/config'
 import { createServerWorkerAdapter } from '../lib/serverAdapter'
@@ -109,6 +110,7 @@ export type App = typeof app
 const compiled = app.compile()
 
 const catalogPath = '/plugins/catalog/index.json'
+const publishPath = '/plugins/catalog/releases'
 
 const catalogHandler = (env: AppEnv) => {
   if (!env.PLUGIN_CATALOG) return undefined
@@ -129,6 +131,26 @@ const catalogHandler = (env: AppEnv) => {
   })
 }
 
+const catalogPublishHandler = (env: AppEnv) => {
+  if (!env.PLUGIN_CATALOG) return undefined
+  const store = createR2PluginCatalogStore({
+    get: key => env.PLUGIN_CATALOG!.get(key),
+    async put(key, value, options) {
+      await env.PLUGIN_CATALOG!.put(key, value, options)
+    },
+  })
+  return createPluginCatalogPublishHandler({
+    store,
+    publishPath,
+    authorizeWrite: async request => {
+      const expected = env.SERVER_ADMIN_TOKEN
+      const provided = request.headers.get('authorization')
+      if (!expected || !provided?.startsWith('Bearer ')) return false
+      return constantTimeTokenEqual(provided.slice('Bearer '.length), expected)
+    },
+  })
+}
+
 const workerAdapter = createServerWorkerAdapter<AppEnv>({
   fetch(request, env, ctx) {
     serverLogger.debug('request received', {
@@ -138,6 +160,10 @@ const workerAdapter = createServerWorkerAdapter<AppEnv>({
     bindRuntime(request, { ctx, env })
     const catalog = catalogHandler(env)
     if (catalog && new URL(request.url).pathname === catalogPath) return catalog.fetch(request)
+    const publisher = catalogPublishHandler(env)
+    if (publisher && new URL(request.url).pathname.startsWith(publishPath)) {
+      return publisher.fetch(request)
+    }
     return compiled.fetch(request)
   },
   scheduled(controller, env, ctx) {

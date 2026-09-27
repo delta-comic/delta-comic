@@ -193,6 +193,12 @@
 - 发布器校验 HTTPS 发布元数据、插件条目归属、重复版本和撤回目标，并以一次目录保存写回每次领域更新。
 - 并发 CAS、发布者身份、签名凭证、artifact 上传、完整市场工作流、应用/admin 重组和部署文档仍未完成。
 
+## 2026-09-27：6E 受授权市场发布端点
+
+- 新增 `createPluginCatalogPublishHandler`，提供发布版本和撤回版本的 POST 端点，复用共享发布器与目录存储。
+- 发布端点校验 release/metadata/yank payload，并通过宿主授权回调保护；Worker 入口可以复用 `SERVER_ADMIN_TOKEN` 和可选 R2 catalog binding。
+- artifact 上传、发布者账户、并发 CAS、签名凭证、完整市场管理后台、应用/admin 重组和部署文档仍未完成。
+
 ## 2026-09-27：6E 市场目录 HTTP handler 边界
 
 - `@delta-comic/server` 增加 `createPluginCatalogHandler`，公开 GET 目录读取，PUT 写入通过宿主注入的授权回调保护。
