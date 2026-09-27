@@ -175,3 +175,8 @@
 
 - `@delta-comic/both/releaseStore` 增加目录索引的内存存储与注入 fetch 的 HTTPS JSON 读写适配器。
 - 适配器负责 HTTP 状态处理和 TypeBox 协议解析；认证、签名、R2/D1 持久化与发布工作流仍未实现。
+
+## 2026-09-27：6E R2 目录索引适配器
+
+- `@delta-comic/server` 增加 `createR2PluginCatalogStore`，使用 R2 object `get/put` 读写 JSON 目录索引并复用共享 TypeBox 校验。
+- 适配器已通过无对象、读写和 content-type 测试；Worker binding、认证发布接口、版本原子更新和管理后台仍未接入。
