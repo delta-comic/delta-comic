@@ -6,6 +6,9 @@ import {
   diagnostic,
   DiagnosticHarness,
   DiagnosticRecorder,
+  findPluginRelease,
+  parsePluginCatalogIndex,
+  parsePluginRelease,
   Service,
   sha256Integrity,
   validateArtifact,
@@ -116,6 +119,35 @@ describe('@delta-comic/both cordis integration', () => {
     await expect(
       validateArtifact({ ...artifact, files: [{ path: '../index.js', bytes }] }),
     ).rejects.toThrow('unsafe relative path')
+  })
+
+  it('validates release metadata and resolves a non-yanked catalog release', () => {
+    const release = parsePluginRelease({
+      pluginId: 'demo',
+      version: '1.0.0',
+      manifestUrl: 'https://plugins.example/demo/1.0.0/manifest.json',
+      artifacts: [
+        {
+          platform: 'desktop',
+          url: 'https://plugins.example/demo/1.0.0/desktop.zip',
+          mimeType: 'application/zip',
+          size: 42,
+          integrity: 'sha256-YWJj',
+        },
+      ],
+      publishedAt: '2026-09-27T00:00:00Z',
+    })
+    const index = parsePluginCatalogIndex({
+      protocolVersion: 1,
+      generatedAt: '2026-09-27T00:00:00Z',
+      entries: [
+        { pluginId: 'demo', name: 'Demo', releases: [{ ...release, yanked: true }, release] },
+      ],
+    })
+    expect(findPluginRelease(index, 'demo')?.version).toBe('1.0.0')
+    expect(() =>
+      parsePluginRelease({ ...release, manifestUrl: 'http://insecure.test/manifest' }),
+    ).toThrow('invalid plugin release')
   })
 
   it('mounts and snapshots a Cordis runtime', async () => {

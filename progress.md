@@ -165,3 +165,8 @@
 - 本次仅创建规划文档，未运行应用检查/测试。
 - 创建前确认仓库工作区干净，仓库根目录不存在 `task_plan.md`、`findings.md`、`progress.md` 或 `.planning` 规划文件。
 - 提交前 hook 自动验证 codegen、`vp check --fix`、codegen check 与 cspell 全部通过。
+## 2026-09-27：6E Artifact 发布元数据边界
+
+- `@delta-comic/both/release` 增加 HTTPS 发布 artifact、版本、目录条目的 TypeBox 协议、解析器和非撤回版本查找函数。
+- 协议覆盖平台、下载 URL、Manifest URL、大小、SHA-256 完整性、发布时间和撤回标记；没有引入签名凭证或远程存储实现。
+- 下一步实现目录索引的读取/存储适配器，并继续保留市场服务、应用/admin 重组和部署文档为未完成事项。

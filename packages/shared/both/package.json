@@ -27,6 +27,10 @@
     "./runtime": {
       "types": "./dist/runtime.d.mts",
       "import": "./dist/runtime.mjs"
+    },
+    "./release": {
+      "types": "./dist/release.d.mts",
+      "import": "./dist/release.mjs"
     }
   },
   "publishConfig": {
