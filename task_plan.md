@@ -71,8 +71,9 @@
 - 6C：接入 Tauri command 的 specta 类型生成，并纳入 Rust/TypeScript 验证。complete（`127dd91b`）
 - 6D：完成客户端/服务端宿主迁移、诊断 harness、UI/网络/下载器能力迁移。已完成下载器、UI EnvironmentRegistry、诊断 harness、客户端网络 transport、UI registrar 接口、app 路由/导航/command 接线、Worker fetch/scheduled 诊断适配器，以及旧 D1 插件宿主到新 ServerRuntime 的桥接工厂；旧 StaticPluginExecutor 全量迁移仍未完成。
 - 6E：完成 Worker dispatcher、D1 migration、发布/市场、应用/admin 重组与部署文档。已增加 artifact migration 声明与 ServerRuntime ID 核对/执行边界、Worker fetch/scheduled dispatcher 边界、按 plugin/installation 记录并幂等执行 SQL migration 的 runner，以及市场目录协议、内存/HTTP/R2 存储、HTTP handler、发布器、受授权发布/撤回端点和部署运维边界；发布者身份、并发 CAS、签名凭证、artifact 上传、完整发布工作流、应用/admin 重组与完整部署流水线仍未完成。
+- 6F：完成 workspace 目录稳定化。complete：workspace 仅保留 `packages/*/*/*`，13 个现有包已落位到 client/server/shared 能力域，lockfile、symlink、构建入口、测试项目和 operational 路径已同步；市场管理界面保持暂停。
 - 每个子阶段必须有实现、测试、规划状态和签名提交；未实现事项保持未勾选。
 
 ## Next Step
 
-  阶段 6E：继续实现免费账号可用的单 Worker 发布与宿主能力；当前已移除生产配置中的 `worker_loaders`，保留动态旧插件脚本的明确降级错误，市场发布者身份、并发版本控制、artifact 上传、app/admin 重组与完整部署流水线保持未完成。
+  阶段 6G：按 Cordis 能力边界拆分细粒度 plugin monorepo；先建立协议、manifest、artifact、loader、install、runtime、Vite adapter 等独立包，再逐步迁移兼容聚合包。市场管理界面保持暂停，6E 未完成事项继续保留未完成状态。

@@ -24,12 +24,12 @@
     ".vscode",
     "*.md",
     "**/worker-configuration.d.ts",
-    "packages/ui/lib/components/DcPullRefresh.vue",
+    "packages/client/ui/ui/lib/components/DcPullRefresh.vue",
     "**/_lib/**"
   ],
   "overrides": [
     {
-      "files": ["packages/app/**/*", "packages/ui/**/*"],
+      "files": ["packages/client/app/app/**/*", "packages/client/ui/ui/**/*"],
       "jsPlugins": ["eslint-plugin-tailwindcss"],
       "rules": {
         "tailwindcss/classnames-order": "warn",

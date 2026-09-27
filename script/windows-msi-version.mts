@@ -42,7 +42,7 @@ export function toWindowsMsiVersion(version: string) {
 }
 
 export async function writeWindowsMsiConfig(version: string, cwd = rootDir) {
-  const target = join(cwd, 'packages/app/src-tauri/tauri.windows.conf.json')
+  const target = join(cwd, 'packages/client/app/app/src-tauri/tauri.windows.conf.json')
   await mkdir(join(target, '..'), { recursive: true })
   await writeFile(
     target,

@@ -10,7 +10,7 @@
 vp exec wrangler r2 bucket create delta-comic-plugin-catalog
 ```
 
-在 `packages/server/wrangler.jsonc` 的 `r2_buckets` 中添加 binding：
+在 `packages/server/core/server/wrangler.jsonc` 的 `r2_buckets` 中添加 binding：
 
 ```jsonc
 {
@@ -46,7 +46,7 @@ vp exec wrangler secret put SERVER_ADMIN_TOKEN
 
 ```sh
 vp run --filter @delta-comic/server build
-vp -C packages/server exec wrangler deploy --config dist/delta_comic_server/wrangler.json
+vp -C packages/server/core/server exec wrangler deploy --config dist/delta_comic_server/wrangler.json
 ```
 
 当前免费账号部署采用单 Worker 模式。`worker_loaders` 未加入生产配置，插件路由、目录发布、SQL migration 和静态 Cordis runtime 可以正常使用；依赖 Workers for Platforms 的动态旧插件脚本在该部署模式下会记录清晰错误，应用的其他定时任务仍继续运行。

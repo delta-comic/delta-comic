@@ -70,7 +70,7 @@ describe('release channel configuration', () => {
   })
 
   it('commits version changes for newly added workspace manifests', () => {
-    expect(versionAssetPaths).toContain('packages/*/package.json')
+    expect(versionAssetPaths).toContain('packages/*/*/*/package.json')
     expect(
       releaseConfig.plugins.map(plugin => (Array.isArray(plugin) ? plugin[0] : plugin)),
     ).not.toContain('@semantic-release/git')

@@ -13,8 +13,11 @@ import {
 
 const root = resolve(import.meta.dirname, '../..')
 const definitions = [
-  ['script/codegen/server.table.mts', 'packages/server/app/infrastructure/d1/generated'],
-  ['script/codegen/client.table.mts', 'packages/db/lib/generated'],
+  [
+    'script/codegen/server.table.mts',
+    'packages/server/core/server/app/infrastructure/d1/generated',
+  ],
+  ['script/codegen/client.table.mts', 'packages/client/data/db/lib/generated'],
 ] as const
 
 const isTableSchema = (value: unknown): value is TableSchema =>

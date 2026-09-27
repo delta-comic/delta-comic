@@ -51,11 +51,11 @@ describe('semantic-release command runner', () => {
     expect(mocks.spawn).toHaveBeenNthCalledWith(
       6,
       'vp',
-      ['run', '--filter', '@delta-comic/downloader', '--fail-if-no-match', 'build'],
+      ['run', '--filter', '@delta-comic/ui', '--fail-if-no-match', 'build'],
       expect.objectContaining({ stdio: 'inherit' }),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      10,
+      11,
       'vp',
       [
         'pm',
@@ -72,7 +72,7 @@ describe('semantic-release command runner', () => {
       expect.objectContaining({ stdio: 'inherit' }),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      11,
+      12,
       'vp',
       [
         'pm',

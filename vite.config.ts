@@ -8,7 +8,7 @@ import fmt from './.oxfmtrc.json' with { type: 'json' }
 import lint from './.oxlintrc.json' with { type: 'json' }
 
 const lintConfig = lint as OxlintConfig
-const uiTailwindConfigPath = resolve(import.meta.dirname, 'packages/ui/src/index.css')
+const uiTailwindConfigPath = resolve(import.meta.dirname, 'packages/client/ui/ui/src/index.css')
 
 export default defineConfig({
   staged: {
@@ -55,12 +55,12 @@ export default defineConfig({
       'vp:install': { command: 'vp install', cache: false },
       'codegen': {
         command:
-          'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/app/infrastructure/d1/generated',
+          'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/core/server/app/infrastructure/d1/generated',
         cache: false,
       },
       'codegen:all': {
         command:
-          'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/app/infrastructure/d1/generated && node ./script/codegen/run.mts script/codegen/client.table.mts packages/db/lib/generated',
+          'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/core/server/app/infrastructure/d1/generated && node ./script/codegen/run.mts script/codegen/client.table.mts packages/client/data/db/lib/generated',
         cache: false,
       },
       'codegen:check': { command: 'node ./script/codegen/check.mts', cache: false },
@@ -77,52 +77,52 @@ export default defineConfig({
       reportsDirectory: './coverage',
       include: [
         'script/**/*.{ts,mts}',
-        'packages/app/src/**/*.{ts,tsx}',
+        'packages/client/app/app/src/**/*.{ts,tsx}',
         // Declarative route views are exercised through component tests, while the unit coverage
         // gate measures independent application logic and the stateful SFCs mounted by this suite.
-        'packages/app/src/{App,AppSetup}.vue',
-        'packages/app/src/components/{listSearcher,home/mainPageSearchBar,plugin/index,plugin/PluginPreloadRecoveryAlert}.vue',
-        'packages/app/src/components/plugin/marketplace/{PluginMarketplaceCard,PluginMarketplaceFilters}.vue',
-        'packages/db/lib/**/*.ts',
-        'packages/downloader/lib/**/*.ts',
-        'packages/logger/lib/**/*.ts',
-        'packages/model/lib/**/*.ts',
-        'packages/plugin/{lib,vite}/**/*.ts',
-        'packages/server/{app,lib}/**/*.ts',
-        'packages/server-admin/src/**/*.{ts,tsx,vue}',
-        'packages/ui/{lib,vite}/**/*.{ts,tsx,vue}',
-        'packages/utils/{lib,vite}/**/*.ts',
+        'packages/client/app/app/src/{App,AppSetup}.vue',
+        'packages/client/app/app/src/components/{listSearcher,home/mainPageSearchBar,plugin/index,plugin/PluginPreloadRecoveryAlert}.vue',
+        'packages/client/app/app/src/components/plugin/marketplace/{PluginMarketplaceCard,PluginMarketplaceFilters}.vue',
+        'packages/client/data/db/lib/**/*.ts',
+        'packages/client/platform/downloader/lib/**/*.ts',
+        'packages/shared/core/logger/lib/**/*.ts',
+        'packages/shared/core/model/lib/**/*.ts',
+        'packages/shared/plugin/plugin/{lib,vite}/**/*.ts',
+        'packages/server/core/server/{app,lib}/**/*.ts',
+        'packages/server/admin/server-admin/src/**/*.{ts,tsx,vue}',
+        'packages/client/ui/ui/{lib,vite}/**/*.{ts,tsx,vue}',
+        'packages/shared/core/utils/{lib,vite}/**/*.ts',
       ],
       exclude: [
         '**/*.{test,spec}.{ts,tsx,mts}',
         '**/*.d.ts',
         '**/*.types.ts',
         '**/{test,__tests__}/**',
-        'packages/app/src/icons.tsx',
-        'packages/app/src/i18n/locales/schema.ts',
-        'packages/app/src/main.tsx',
-        'packages/server/app/index.ts',
-        'packages/server-admin/src/main.ts',
-        'packages/server-admin/src/shared/{api,components}/types.ts',
-        'packages/ui/lib/components/form/type.ts',
+        'packages/client/app/app/src/icons.tsx',
+        'packages/client/app/app/src/i18n/locales/schema.ts',
+        'packages/client/app/app/src/main.tsx',
+        'packages/server/core/server/app/index.ts',
+        'packages/server/admin/server-admin/src/main.ts',
+        'packages/server/admin/server-admin/src/shared/{api,components}/types.ts',
+        'packages/client/ui/ui/lib/components/form/type.ts',
       ],
       thresholds: { lines: 75, functions: 75, branches: 70, statements: 75 },
     },
     exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
     projects: [
       { test: { name: 'root', environment: 'node', include: ['script/test/**/*.test.ts'] } },
-      'packages/shared/both',
+      'packages/shared/core/both',
       'packages/client/core/sdk',
-      'packages/app',
-      'packages/db',
-      'packages/downloader',
-      'packages/logger',
-      'packages/model',
-      'packages/plugin',
-      'packages/server',
-      'packages/server-admin',
-      'packages/ui',
-      'packages/utils',
+      'packages/client/app/app',
+      'packages/client/data/db',
+      'packages/client/platform/downloader',
+      'packages/shared/core/logger',
+      'packages/shared/core/model',
+      'packages/shared/plugin/plugin',
+      'packages/server/core/server',
+      'packages/server/admin/server-admin',
+      'packages/client/ui/ui',
+      'packages/shared/core/utils',
     ],
   },
 })

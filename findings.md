@@ -32,7 +32,9 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - `@delta-comic/client` 是外部客户端插件开发 SDK；`@delta-comic/server` 是外部服务端插件开发 SDK。
 - 当前考虑的包依赖图：`client -> both`、`server -> both`；跨端扩展可以依赖 `both`，客户端插件依赖 client，服务端插件依赖 server。
 - 客户端和服务端插件彼此独立：各自 pluginId/version/lifecycle，不因共用核心协议而自动成对安装/部署。
-- 初步包路径提议：`packages/client/core/sdk`、`packages/server/core/sdk`（公共包物理目录与 family 分组尚待总体设计确认）。
+- 已确认包路径采用 `packages/*/*/*`，当前公开 SDK 位于 `packages/client/core/sdk` 与 `packages/server/core/server`；能力域继续按 client/server/shared family 组织。
+- 目录稳定化已完成：workspace 只使用 `packages/*/*/*`，当前 13 个包分别位于 `client/app/app`、`client/core/{runtime,sdk}`、`client/data/db`、`client/platform/downloader`、`client/ui/ui`、`server/admin/server-admin`、`server/core/server`、`shared/core/{both,logger,model,utils}`、`shared/plugin/plugin`。后续新包必须落入三级路径，并以实际能力命名第二、三级目录。
+- 参考 DeepSeek Harness 的组织方式，后续 Cordis 拆分按独立包边界推进：协议、Manifest、Artifact、Loader、Install、Runtime、Vite adapter、release 与平台宿主分别拥有独立 package contract；聚合包只承担兼容导出和组合，不承载多个无关生命周期。
 
 ## 公共协议与客户端插件
 

@@ -4,22 +4,22 @@ import { pathToFileURL } from 'node:url'
 
 export const jsonVersionPaths = [
   'package.json',
-  'packages/app/package.json',
+  'packages/client/app/app/package.json',
   'packages/client/core/sdk/package.json',
-  'packages/app/src-tauri/tauri.conf.json',
-  'packages/db/package.json',
-  'packages/downloader/package.json',
-  'packages/logger/package.json',
-  'packages/model/package.json',
-  'packages/plugin/package.json',
-  'packages/server/package.json',
-  'packages/shared/both/package.json',
-  'packages/ui/package.json',
-  'packages/utils/package.json',
+  'packages/client/app/app/src-tauri/tauri.conf.json',
+  'packages/client/data/db/package.json',
+  'packages/client/platform/downloader/package.json',
+  'packages/shared/core/logger/package.json',
+  'packages/shared/core/model/package.json',
+  'packages/shared/plugin/plugin/package.json',
+  'packages/server/core/server/package.json',
+  'packages/shared/core/both/package.json',
+  'packages/client/ui/ui/package.json',
+  'packages/shared/core/utils/package.json',
 ] as const
 
 export const cargoTomlVersionPaths = [
-  ['packages/app/src-tauri/Cargo.toml', 'package'],
+  ['packages/client/app/app/src-tauri/Cargo.toml', 'package'],
   ['Cargo.toml', 'workspace.package'],
 ] as const
 
@@ -34,7 +34,7 @@ export const cargoLockPackageNames = [
 
 export const versionAssetPaths = [
   ...jsonVersionPaths,
-  'packages/*/package.json',
+  'packages/*/*/*/package.json',
   ...cargoTomlVersionPaths.map(([path]) => path),
   'Cargo.lock',
 ] as const

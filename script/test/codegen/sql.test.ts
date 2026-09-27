@@ -411,7 +411,7 @@ const runMigration = (db: DatabaseSync): void => {
     '0003_server_plugins.sql',
     '0004_server_plugin_scripts.sql',
   ]) {
-    db.exec(readFileSync(join(rootDir, 'packages/server/migrations', name), 'utf8'))
+    db.exec(readFileSync(join(rootDir, 'packages/server/core/server/migrations', name), 'utf8'))
   }
 }
 

@@ -76,15 +76,15 @@ jobs:
         with:
           name: workspace-libraries
           path: |
-            packages/app/public/runtime
-            packages/db/dist
-            packages/downloader/dist
-            packages/logger/dist
-            packages/model/dist
-            packages/plugin/dist
-            packages/ui/dist
-            packages/ui/dist-vite
-            packages/utils/dist
+            packages/client/app/app/public/runtime
+            packages/client/data/db/dist
+            packages/client/platform/downloader/dist
+            packages/shared/core/logger/dist
+            packages/shared/core/model/dist
+            packages/shared/plugin/plugin/dist
+            packages/client/ui/ui/dist
+            packages/client/ui/ui/dist-vite
+            packages/shared/core/utils/dist
           if-no-files-found: error
           retention-days: 1
 
@@ -165,10 +165,10 @@ jobs:
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> "$GITHUB_PATH"
           echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
-          cd packages/app
+          cd packages/client/app/app
           pnpm tauri android init --ci --skip-targets-install
       - name: Make Gradle wrapper executable
-        run: chmod +x ./packages/app/src-tauri/gen/android/gradlew
+        run: chmod +x ./packages/client/app/app/src-tauri/gen/android/gradlew
 
       - name: Build Android App
         id: build
@@ -177,7 +177,7 @@ jobs:
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
-          cd packages/app
+          cd packages/client/app/app
           pnpm tauri android build --ci --target aarch64 armv7
       - name: Restore Android keystore
         env:
@@ -190,7 +190,7 @@ jobs:
             echo "Android keystore is unexpectedly small ($FILESIZE bytes)." >&2
             exit 1
           fi
-          cat > ./packages/app/src-tauri/gen/android/keystore.properties <<EOF
+          cat > ./packages/client/app/app/src-tauri/gen/android/keystore.properties <<EOF
           storeFile=$RUNNER_TEMP/keystore.p12
           storePassword=$KEYSTORE_PASS
           keyPassword=$KEYSTORE_PASS
@@ -205,7 +205,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           set -euo pipefail
-          APK_SRC='./packages/app/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk'
+          APK_SRC='./packages/client/app/app/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk'
           if [ ! -f "$APK_SRC" ]; then
             echo "APK not found at $APK_SRC" >&2
             exit 1
@@ -298,7 +298,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         with:
           args: ${{ matrix.args }}
-          projectPath: packages/app
+          projectPath: packages/client/app/app
           retryAttempts: 0
           uploadWorkflowArtifacts: true
           workflowArtifactNamePattern: release-desktop-[platform]-[arch]-[bundle]

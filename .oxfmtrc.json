@@ -21,7 +21,7 @@
   "sortTailwindcss": {
     "preserveDuplicates": true,
     "preserveWhitespace": true,
-    "stylesheet": "./packages/app/src/index.css",
+    "stylesheet": "./packages/client/app/app/src/index.css",
     "attributes": ["overlayClass", ":class", "Class"],
     "functions": ["twMerge", "cn"]
   },

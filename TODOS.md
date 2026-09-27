@@ -1,6 +1,6 @@
 # Delta Comic — 开发进度与规划
 
-> 目标：重构 `packages/plugin`，废弃 `vite-plugin-monkey`，实现自定义 Vite 开发协议
+> 目标：重构 `packages/shared/plugin/plugin`，废弃 `vite-plugin-monkey`，实现自定义 Vite 开发协议
 > （`index.js` / `index.css` / `manifest.json`）+ 持久化的 `dev:<port>` 网络安装适配器。
 
 ## 已完成
@@ -11,7 +11,7 @@
 | Phase 2 | `d0009709` | 自定义 Vite 开发协议 + 移除 vite-plugin-monkey | ✅ |
 | 进度记录 | `c5951691` | 规划文件（task_plan/findings/progress）落盘 | ✅ |
 
-Phase 2 产物：`packages/plugin/vite/dev.ts`（200 行）+ `dev.test.ts` + `dev.integration.test.ts`
+Phase 2 产物：`packages/shared/plugin/plugin/vite/dev.ts`（200 行）+ `dev.test.ts` + `dev.integration.test.ts`
 + `index.ts`/`package.json`/`pnpm-lock.yaml` 修改。完整验证链通过（888 tests）。
 
 ## 当前阶段：Phase 3（实现中）

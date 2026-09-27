@@ -5,7 +5,7 @@
 > **日期**: 2026-09-26
 
 > **实现基线**：阶段 40A 已落地。现行 TypeScript API 以
-> `packages/shared/both`、`packages/client/core/sdk` 和 `packages/server/lib` 为准。
+> `packages/shared/core/both`、`packages/client/core/sdk` 和 `packages/server/core/server/lib` 为准。
 > 本文早期第 5、6 章保留设计推导与迁移背景；其中出现的 `useDB()`、`useStore()`、
 > `useDiagnostics()` 以及位置参数式 `registerRoute()` 属于历史伪代码，实际插件应使用
 > `ctx.client`、`ctx.server` 和本文件第 12 章的 typed API。
@@ -30,7 +30,7 @@ Delta Comic 插件系统重构方案，采用 Cordis 作为统一的客户端/�
 
 ### 12.1 公共包 `@delta-comic/both`
 
-`packages/shared/both` 是平台无关的协议包，统一 re-export 上游 `cordis` 的核心类型，
+`packages/shared/core/both` 是平台无关的协议包，统一 re-export 上游 `cordis` 的核心类型，
 并提供以下模块：
 
 | 模块 | 当前职责 |
@@ -119,7 +119,7 @@ await runtime.mount('demo', {
 
 ### 12.4 服务端 SDK
 
-当前 `@delta-comic/server` 由已有 `packages/server` 承载，以兼容现有 Worker 入口；SDK
+当前 `@delta-comic/server` 由已有 `packages/server/core/server` 承载，以兼容现有 Worker 入口；SDK
 入口通过包根、`@delta-comic/server/manifest` 和 `@delta-comic/server/runtime` 暴露。
 每个安装实例由独立 `ServerRuntime` 创建，注入 `server` service：
 
@@ -364,7 +364,7 @@ packages/
     └── utils/                → 通用工具
 
 apps/
-├── desktop/                  → Tauri 桌面应用（原 packages/app）
+├── desktop/                  → Tauri 桌面应用（原 packages/client/app/app）
 └── mobile/                   → Tauri Android 应用
 ```
 
@@ -372,9 +372,9 @@ apps/
 
 | 包名 | 路径 | 职责 | 依赖 |
 |------|------|------|------|
-| `@delta-comic/both` | `packages/shared/both` | Cordis API、Manifest schema、ID/诊断协议 | `cordis` (re-export) |
+| `@delta-comic/both` | `packages/shared/core/both` | Cordis API、Manifest schema、ID/诊断协议 | `cordis` (re-export) |
 | `@delta-comic/client` | `packages/client/core/sdk` | 客户端插件 SDK、扩展点 API、UI/layout/player/model 导出 | `@delta-comic/both` |
-| `@delta-comic/server` | `packages/server/core/sdk` | 服务端插件 SDK、Worker 服务 API | `@delta-comic/both` |
+| `@delta-comic/server` | `packages/server/core/server` | 服务端插件 SDK、Worker 服务 API | `@delta-comic/both` |
 
 ### 3.3 包职责边界
 
@@ -1031,7 +1031,7 @@ export { registerRoute, registerCron, registerQueue } from './extensions'
 #### 平台 Worker 入口
 
 ```typescript
-// packages/server/platform/dispatcher.ts
+// packages/server/core/server/platform/dispatcher.ts
 interface Env {
   PLUGIN_WORKERS: WorkersNamespace
   PLATFORM_DB: D1Database
@@ -2187,7 +2187,7 @@ logger.info('Content fetched', {
 #### 服务端日志配置
 
 ```typescript
-// packages/server/core/diagnostics/logger.ts
+// packages/server/core/server/core/diagnostics/logger.ts
 import pino from 'pino'
 
 export function createPluginLogger(pluginId: string, installationId: string) {
@@ -2359,13 +2359,13 @@ export async function createMinimalRuntime(options: {
 
 ```
 当前：
-packages/app/              → 桌面 + Web 客户端混合
+packages/client/app/app/              → 桌面 + Web 客户端混合
 
 目标：
 apps/desktop/              → Tauri 桌面应用（macOS/Windows/Linux）
 apps/mobile/               → Tauri Android 应用
-packages/server/           → Worker 服务端
-packages/server-admin/     → 独立 Vue 管理后台应用
+packages/server/core/server/           → Worker 服务端
+packages/server/admin/server-admin/     → 独立 Vue 管理后台应用
 ```
 
 ### 10.2 保留功能映射
@@ -2739,7 +2739,7 @@ export class NetworkService extends Service {
 
 ### 阶段 1：基础设施（2 周）
 
-- [ ] 创建 workspace 结构（packages/client、packages/server、packages/shared）
+- [ ] 创建 workspace 结构（packages/client、packages/server/core/server、packages/shared）
 - [ ] 配置 specta + tauri-specta 类型生成
 - [ ] 集成 Cordis（统一 re-export @delta-comic/both）
 - [ ] 配置 Kysely + 迁移工具
@@ -2770,7 +2770,7 @@ export class NetworkService extends Service {
 
 ### 阶段 5：应用重组与数据迁移（2 周）
 
-- [ ] 创建 apps/desktop（迁移 packages/app）
+- [ ] 创建 apps/desktop（迁移 packages/client/app/app）
 - [ ] 创建 apps/mobile（Android 适配）
 - [ ] 数据库迁移（Kysely Migrator）
 - [ ] 下载器接入 Cordis

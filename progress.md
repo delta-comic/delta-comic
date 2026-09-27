@@ -34,14 +34,14 @@
 - 将 `@delta-comic/server` 设为公开版本包，exports 指向 dist，并公开 Worker app、Manifest 和 runtime 子路径。
 - 分离 pack 产物目录：SDK 输出到 `dist/lib`，Worker bundle 输出到 `dist/app`，防止 SDK 清理/打包覆盖部署产物。
 - 将 server package纳入版本同步，并更新 release workspace 的公开包清单测试。
-- `vp -C packages/server pack` 成功生成 SDK 与 Worker ESM/声明文件；server typecheck、SDK/release专项测试（4/4）及 `vp check --fix` 通过。
+- `vp -C packages/server/core/server pack` 成功生成 SDK 与 Worker ESM/声明文件；server typecheck、SDK/release专项测试（4/4）及 `vp check --fix` 通过。
 - Worker pack 检查提示 `cloudflare:workers` 为平台提供的 external import；正式 Worker 部署仍由 Cloudflare Vite plugin 构建。
 - `vp check`、递归 typecheck、server/release 专项测试和 lib-build 均通过，6B 已具备提交条件。
 
 ### 2026-09-26 — 阶段 6C Tauri Specta 类型生成
 
 - 为 Tauri 应用接入 `specta`、`specta-typescript` 和 `tauri-specta`，新增 `get_runtime_platform` typed command。
-- 使用 `Builder`、`collect_commands!` 与 `#[specta::specta]`，debug 构建和 Rust 单元测试都会生成 `packages/app/src/bindings.ts`。
+- 使用 `Builder`、`collect_commands!` 与 `#[specta::specta]`，debug 构建和 Rust 单元测试都会生成 `packages/client/app/app/src/bindings.ts`。
 - 将生成绑定纳入 app 源码，后续宿主迁移可直接通过 `commands.getRuntimePlatform()` 调用。
 - `cargo check -p delta-comic --locked`、`cargo fmt --all --check` 和绑定导出单元测试通过。
 
@@ -208,7 +208,7 @@
 ## 2026-09-27：6E 市场目录部署边界
 
 - 新增 `docs/plugin-marketplace-deployment.md`，记录 R2 bucket 创建、`PLUGIN_CATALOG` binding、`SERVER_ADMIN_TOKEN` secret、Worker 部署和发布端点检查命令。
-- `packages/server/wrangler.jsonc` 增加可选 R2 binding 示例注释；未配置 binding 时，目录路由继续保持关闭。
+- `packages/server/core/server/wrangler.jsonc` 增加可选 R2 binding 示例注释；未配置 binding 时，目录路由继续保持关闭。
 - 文档明确当前目录通过 R2 `catalog/index.json` 保存，发布器使用一次 load/save；CAS、发布者身份、artifact 上传、WfP provisioning、D1 per-installation 自动创建、app/admin 管理界面和完整 CI/CD 仍未完成。
 
 ## 2026-09-27：免费账号 Worker 部署边界
@@ -218,3 +218,11 @@
 - 已创建免费 D1 `delta-comic-server-db`，远程应用现有四组迁移，并将真实 database ID 写入 Wrangler 配置。
 - 使用 Vite 生成配置完成真实 Worker 部署，地址为 `https://delta-comic-server.wenxig.workers.dev`。`/api/health/live` 返回 200；未配置 R2 binding 时，目录读取和发布路径按预期返回 404，目录功能保持关闭。
 - 免费账号采用单 Worker 静态宿主降级；Workers for Platforms 动态脚本、per-installation 自动隔离和配额能力保持未完成。
+
+## 2026-09-27：workspace 目录稳定化
+
+- workspace 收敛为唯一 `packages/*/*/*` pattern，移除旧一级 package 路径和 `apps/*` workspace 入口。
+- 13 个现有包已按 client、server、shared 能力域完成三级路径落位，pnpm lockfile workspace links、包内 symlink、TypeScript/Vite/Cargo/测试与发布脚本引用已同步。
+- 修复迁移后的全局 API 初始化和 AppNavigation 测试隔离；runtime UMD 产物生成于 `packages/client/app/app/public/runtime/host-libraries.umd.js`。
+- 验证通过：`vp install`、`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`（171 files / 934 tests）、`vp run codegen:check`、`git diff --check`。
+- 当前阶段完成目录稳定化，Cordis 极细粒度包拆分进入下一阶段；市场管理界面保持暂停。

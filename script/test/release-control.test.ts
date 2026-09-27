@@ -23,13 +23,13 @@ const publishablePackages: PublishableWorkspacePackage[] = [
   {
     dependencies: [],
     name: '@delta-comic/model',
-    path: 'packages/model/package.json',
+    path: 'packages/shared/core/model/package.json',
     version: '3.0.0',
   },
   {
     dependencies: ['@delta-comic/model'],
     name: '@delta-comic/ui',
-    path: 'packages/ui/package.json',
+    path: 'packages/client/ui/ui/package.json',
     version: '3.0.0',
   },
 ]
