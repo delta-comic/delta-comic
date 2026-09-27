@@ -91,6 +91,12 @@
 - 增加 runtime factory 测试；服务端 typecheck、专项测试和 lint 通过后提交。
 - WfP 动态 dispatcher、D1 per-installation migration、市场发布、诊断面板和 app/admin 重组仍未完成。
 
+### 2026-09-26 — 阶段 6E Artifact migration 执行边界
+
+- `ServerRuntime.migrateArtifact` 接收 server artifact manifest，核对 Manifest 声明的 migration ID 与 Cordis/ServerHost 已注册的 typed migration。
+- 核对通过后按注册顺序执行 migration，并复用现有诊断记录；声明缺失或多余 migration 时明确失败。
+- SQL 文件解析、artifact 资源加载、D1 per-installation/schema 生命周期和 Worker dispatcher 仍未完成。
+
 ### 2026-09-26 — 40 项架构决策确认
 
 - 用户批量确认了 40 项架构设计决策，涵盖包与协议 (1–6)、模块与构建 (7–12)、客户端 API (13–18)、服务端 (19–26)、安装/诊断 (27–35)、应用/文案/发布 (36–40)。

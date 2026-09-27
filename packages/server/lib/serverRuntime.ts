@@ -17,6 +17,7 @@ import type {
   ServerTaskContext,
   ServerIdentity,
 } from './serverHost'
+import type { ServerPluginArtifactManifest } from './serverManifest'
 
 export interface ServerRuntimeOptions<DB extends object = Record<string, never>> {
   pluginId: string
@@ -128,7 +129,21 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
   }
 
   @diagnostic('server migration')
-  public async migrate(): Promise<void> {
+  public async migrate(declaredMigrationIds?: readonly string[]): Promise<void> {
+    if (declaredMigrationIds !== undefined) {
+      const registeredMigrationIds = new Set(this.#migrations.keys())
+      const undeclared = [...registeredMigrationIds].filter(
+        migrationId => !declaredMigrationIds.includes(migrationId),
+      )
+      const missing = declaredMigrationIds.filter(
+        migrationId => !registeredMigrationIds.has(migrationId),
+      )
+      if (undeclared.length > 0 || missing.length > 0) {
+        throw new Error(
+          `artifact migration mismatch (undeclared: ${undeclared.join(', ') || 'none'}; missing: ${missing.join(', ') || 'none'})`,
+        )
+      }
+    }
     for (const migration of this.#migrations.values()) {
       const startedAt = Date.now()
       try {
@@ -145,6 +160,10 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
         throw error
       }
     }
+  }
+
+  public migrateArtifact(manifest: ServerPluginArtifactManifest): Promise<void> {
+    return this.migrate(manifest.migrations)
   }
 
   @diagnostic('server plugin mount')

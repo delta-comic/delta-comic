@@ -26,6 +26,21 @@ describe('server SDK', () => {
     expect(runtime.routes).toHaveLength(1)
     expect(runtime.migrations).toHaveLength(1)
     await expect(
+      runtime.migrateArtifact({
+        protocolVersion: 1,
+        id: 'demo',
+        name: 'Demo',
+        version: '1.0.0',
+        entry: './index.js',
+        entryType: 'plugin',
+        resources: [],
+        routes: [],
+        crons: [],
+        queues: [],
+        migrations: ['001-init'],
+      }),
+    ).resolves.toBeUndefined()
+    await expect(
       runtime.dispatch(new Request('https://example.test/health')),
     ).resolves.toHaveProperty('status', 401)
     await expect(
