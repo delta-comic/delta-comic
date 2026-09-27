@@ -17,10 +17,10 @@
 
 ## 当前状态
 
-- 当前阶段：阶段 6D 实施，客户端下载器与 UI EnvironmentRegistry owner 生命周期已接入，正在进入诊断 harness 和网络宿主能力。
+- 当前阶段：阶段 6E 实施，Worker dispatcher 已接入 runtime 解析与 fetch/scheduled 分发边界，正在进入 SQL artifact 加载与 D1 per-installation 生命周期。
 - 代码实现：both 公共 Manifest、artifact 校验、诊断记录器和 Cordis runtime harness 已完成并通过专项验证。
 - 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
-- 下一个动作：迁移服务端现有业务到 ServerHost，然后继续阶段 6E 的 Worker/D1、市场发布、应用/admin 重组与部署文档。
+- 下一个动作：实现 SQL artifact migration 加载与 D1 per-installation 生命周期；市场发布、应用/admin 重组与部署文档继续保持未完成。
 
 ### 2026-09-26 — 阶段 6A Artifact Loader 接入
 
@@ -96,6 +96,13 @@
 - `ServerRuntime.migrateArtifact` 接收 server artifact manifest，核对 Manifest 声明的 migration ID 与 Cordis/ServerHost 已注册的 typed migration。
 - 核对通过后按注册顺序执行 migration，并复用现有诊断记录；声明缺失或多余 migration 时明确失败。
 - SQL 文件解析、artifact 资源加载、D1 per-installation/schema 生命周期和 Worker dispatcher 仍未完成。
+
+### 2026-09-27 — 阶段 6E Worker dispatcher 边界
+
+- 新增 `ServerWorkerDispatcher`，由宿主解析请求对应的 `ServerRuntime`，再将 fetch 请求交给 runtime 的 typed route dispatch。
+- scheduled 事件根据 cron 表达式筛选已解析的 installation runtimes，并复用 `ServerRuntime.runCron`；dispatcher 自身记录 fetch/scheduled 诊断。
+- 该边界保留现有 Elysia/旧插件控制面，不创建虚假的 D1 隔离；SQL artifact 加载、D1 per-installation 生命周期、市场发布、应用/admin 重组和部署文档仍未完成。
+- server typecheck、dispatcher/SDK 专项测试（2 个文件、4 个测试）和 `vp check --fix` 通过。
 
 ### 2026-09-26 — 40 项架构决策确认
 

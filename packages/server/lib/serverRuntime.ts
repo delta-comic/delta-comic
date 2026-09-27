@@ -99,6 +99,10 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
     return [...this.#migrations.values()]
   }
 
+  public get crons(): readonly { schedule: string }[] {
+    return [...this.#crons.values()].map(({ schedule }) => ({ schedule }))
+  }
+
   @diagnostic('server route dispatch')
   public async dispatch(request: Request): Promise<Response> {
     const url = new URL(request.url)
