@@ -4,6 +4,8 @@ import { openapi } from '@elysiajs/openapi'
 import { Elysia, t } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
 
+import { createPluginCatalogHandler } from '../lib/catalogHandler'
+import { createR2PluginCatalogStore } from '../lib/catalogStore'
 import { serverModules } from '../lib/config'
 import { createServerWorkerAdapter } from '../lib/serverAdapter'
 
@@ -13,6 +15,7 @@ import { authModule } from './modules/auth/auth.module'
 import { pluginsModule } from './modules/plugins/plugins.module'
 import { runScheduledPluginScripts } from './modules/plugins/plugins.script'
 import { syncModule } from './modules/sync/sync.module'
+import { constantTimeTokenEqual } from './shared/http/adminGuard'
 import { apiSuccessSchema, errorResponse, ok } from './shared/response'
 
 export { PluginDatabase } from './modules/plugins/plugins.database'
@@ -105,6 +108,27 @@ export type App = typeof app
 
 const compiled = app.compile()
 
+const catalogPath = '/plugins/catalog/index.json'
+
+const catalogHandler = (env: AppEnv) => {
+  if (!env.PLUGIN_CATALOG) return undefined
+  return createPluginCatalogHandler({
+    store: createR2PluginCatalogStore({
+      get: key => env.PLUGIN_CATALOG!.get(key),
+      async put(key, value, options) {
+        await env.PLUGIN_CATALOG!.put(key, value, options)
+      },
+    }),
+    pathname: catalogPath,
+    authorizeWrite: async request => {
+      const expected = env.SERVER_ADMIN_TOKEN
+      const provided = request.headers.get('authorization')
+      if (!expected || !provided?.startsWith('Bearer ')) return false
+      return constantTimeTokenEqual(provided.slice('Bearer '.length), expected)
+    },
+  })
+}
+
 const workerAdapter = createServerWorkerAdapter<AppEnv>({
   fetch(request, env, ctx) {
     serverLogger.debug('request received', {
@@ -112,6 +136,8 @@ const workerAdapter = createServerWorkerAdapter<AppEnv>({
       path: new URL(request.url).pathname,
     })
     bindRuntime(request, { ctx, env })
+    const catalog = catalogHandler(env)
+    if (catalog && new URL(request.url).pathname === catalogPath) return catalog.fetch(request)
     return compiled.fetch(request)
   },
   scheduled(controller, env, ctx) {

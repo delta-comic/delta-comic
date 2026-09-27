@@ -19,6 +19,18 @@ const createEnv = (overrides: Partial<AppEnv> = {}): AppEnv => ({
   ...overrides,
 })
 
+const createCatalog = () => {
+  let stored: string | undefined
+  return {
+    async get() {
+      return stored ? { text: async () => stored } : null
+    },
+    async put(_key: string, value: string) {
+      stored = value
+    },
+  } as unknown as R2Bucket
+}
+
 const request = (path: string, init?: RequestInit) =>
   new Request(`https://delta.example${path}`, init)
 
@@ -70,5 +82,28 @@ describe('server Elysia app', () => {
     expect(response.status).toBe(200)
     expect(payload.info?.title).toBe('Delta Comic Server API')
     expect(payload.paths).toHaveProperty('/api/health')
+  })
+
+  it('serves and protects the optional plugin catalog binding', async () => {
+    const env = createEnv({ PLUGIN_CATALOG: createCatalog(), SERVER_ADMIN_TOKEN: 'catalog-secret' })
+    const catalogRequest = (init?: RequestInit) =>
+      fetchWorker('/plugins/catalog/index.json', init, env)
+
+    await expect(catalogRequest()).resolves.toMatchObject({ status: 404 })
+    await expect(
+      catalogRequest({
+        body: JSON.stringify({ protocolVersion: 1, generatedAt: 'now', entries: [] }),
+        headers: { 'content-type': 'application/json' },
+        method: 'PUT',
+      }),
+    ).resolves.toMatchObject({ status: 401 })
+    await expect(
+      catalogRequest({
+        body: JSON.stringify({ protocolVersion: 1, generatedAt: 'now', entries: [] }),
+        headers: { 'authorization': 'Bearer catalog-secret', 'content-type': 'application/json' },
+        method: 'PUT',
+      }),
+    ).resolves.toMatchObject({ status: 200 })
+    await expect(catalogRequest()).resolves.toMatchObject({ status: 200 })
   })
 })

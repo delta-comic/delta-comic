@@ -75,4 +75,4 @@
 
 ## Next Step
 
-  阶段 6E：继续接入市场目录 HTTP handler 与真实 Worker 路由；当前已完成发布协议、内存/HTTP/R2 存储和写入授权边界，市场发布工作流、应用/admin 重组与部署文档保持未完成。
+  阶段 6E：继续实现 Artifact 市场发布工作流与真实发布者管理；当前已完成目录 HTTP handler 和可选 R2 Worker 接线，发布流程、版本原子更新、应用/admin 重组与部署文档保持未完成。
