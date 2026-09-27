@@ -1,4 +1,4 @@
-import { PluginManifestSchema } from '@delta-comic/both/manifest'
+import { PluginManifestSchema } from '@delta-comic/plugin-manifest'
 import { Type, type Static } from 'typebox'
 
 export const ClientRouteSchema = Type.Object({

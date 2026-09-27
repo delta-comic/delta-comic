@@ -17,9 +17,7 @@ export {
   type Events,
 } from 'cordis'
 
-export * from './manifest.js'
 export * from './diagnostic.js'
-export * from './artifact.js'
 export * from './runtime.js'
 export * from './release.js'
 export * from './releaseStore.js'

@@ -1,9 +1,9 @@
-import type { PluginManifest } from '@delta-comic/both'
 import {
   validateArtifact,
   type ArtifactFile,
   type PluginArtifact,
-} from '@delta-comic/both/artifact'
+} from '@delta-comic/plugin-artifact'
+import type { PluginManifest } from '@delta-comic/plugin-manifest'
 
 import type { PluginFileReplacement, PluginFileStore } from './contracts'
 

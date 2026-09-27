@@ -26,6 +26,7 @@ describe('ReleaseWorkspace', () => {
     expect(packages.map(pkg => pkg.name)).toEqual([
       '@delta-comic/both',
       '@delta-comic/downloader',
+      '@delta-comic/plugin-manifest',
       '@delta-comic/logger',
       '@delta-comic/model',
       '@delta-comic/utils',
@@ -33,12 +34,14 @@ describe('ReleaseWorkspace', () => {
       '@delta-comic/client',
       '@delta-comic/db',
       '@delta-comic/server',
+      '@delta-comic/plugin-api',
+      '@delta-comic/plugin-artifact',
       '@delta-comic/plugin',
     ])
     expect(packages.map(pkg => pkg.path).toSorted()).toEqual(
       jsonVersionPaths
         .filter(path =>
-          /^packages\/(?:client\/(?:core\/sdk|data\/db|platform\/downloader|ui\/ui)|server\/core\/server|shared\/(?:core\/(?:both|logger|model|utils)|plugin\/plugin))\//.test(
+          /^packages\/(?:client\/(?:core\/sdk|data\/db|platform\/downloader|ui\/ui)|server\/core\/server|shared\/(?:core\/(?:both|logger|model|utils)|plugin\/(?:plugin|manifest|artifact|api)))\//.test(
             path,
           ),
         )

@@ -23,9 +23,7 @@ export default defineConfig({
   pack: {
     entry: [
       './lib/index.ts',
-      './lib/manifest.ts',
       './lib/diagnostic.ts',
-      './lib/artifact.ts',
       './lib/runtime.ts',
       './lib/release.ts',
       './lib/releaseStore.ts',

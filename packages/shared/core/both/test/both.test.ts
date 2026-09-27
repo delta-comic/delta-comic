@@ -13,8 +13,6 @@ import {
   createMemoryPluginCatalogStore,
   createPluginReleasePublisher,
   Service,
-  sha256Integrity,
-  validateArtifact,
 } from '../lib/index.js'
 
 declare module 'cordis' {
@@ -95,33 +93,6 @@ describe('@delta-comic/both cordis integration', () => {
       'demo/ping completed',
       'demo/fail failed',
     ])
-  })
-
-  it('validates declared artifact resources', async () => {
-    const bytes = new TextEncoder().encode('export default () => undefined')
-    const artifact = {
-      manifest: {
-        protocolVersion: 1 as const,
-        id: 'demo',
-        name: 'Demo',
-        version: '1.0.0',
-        entry: 'index.js',
-        entryType: 'plugin' as const,
-        resources: [
-          {
-            path: 'index.js',
-            mimeType: 'text/javascript',
-            integrity: await sha256Integrity(bytes),
-            imports: [],
-          },
-        ],
-      },
-      files: [{ path: 'index.js', bytes }],
-    }
-    await expect(validateArtifact(artifact)).resolves.toMatchObject({ entry: { path: 'index.js' } })
-    await expect(
-      validateArtifact({ ...artifact, files: [{ path: '../index.js', bytes }] }),
-    ).rejects.toThrow('unsafe relative path')
   })
 
   it('validates release metadata and resolves a non-yanked catalog release', () => {

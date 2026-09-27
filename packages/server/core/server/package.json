@@ -33,6 +33,7 @@
   "dependencies": {
     "@delta-comic/both": "workspace:",
     "@delta-comic/logger": "workspace:",
+    "@delta-comic/plugin-manifest": "workspace:",
     "@elysia/eden": "catalog:",
     "cordis": "catalog:",
     "ky": "catalog:",

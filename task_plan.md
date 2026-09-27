@@ -76,4 +76,4 @@
 
 ## Next Step
 
-  阶段 6G：按 Cordis 能力边界拆分细粒度 plugin monorepo；先建立协议、manifest、artifact、loader、install、runtime、Vite adapter 等独立包，再逐步迁移兼容聚合包。市场管理界面保持暂停，6E 未完成事项继续保留未完成状态。
+  阶段 6G：按 Cordis 能力边界拆分细粒度 plugin monorepo；协议、manifest、artifact、loader、install、runtime、Vite adapter 等独立包按批次推进。第一批 `@delta-comic/plugin-manifest`、`@delta-comic/plugin-artifact`、`@delta-comic/plugin-api` 已实现，正在完成发布测试更新与阶段提交。市场管理界面保持暂停，6E 未完成事项继续保留未完成状态。

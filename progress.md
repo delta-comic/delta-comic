@@ -226,3 +226,10 @@
 - 修复迁移后的全局 API 初始化和 AppNavigation 测试隔离；runtime UMD 产物生成于 `packages/client/app/app/public/runtime/host-libraries.umd.js`。
 - 验证通过：`vp install`、`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`（171 files / 934 tests）、`vp run codegen:check`、`git diff --check`。
 - 当前阶段完成目录稳定化，Cordis 极细粒度包拆分进入下一阶段；市场管理界面保持暂停。
+
+## 2026-09-27：阶段 6G 第一批协议包拆分
+
+- 新增公开包 `@delta-comic/plugin-manifest`、`@delta-comic/plugin-artifact` 和 `@delta-comic/plugin-api`，分别承载 Manifest 协议、artifact 校验和 platform-neutral plugin contract。
+- client/server SDK 与现有 artifact reader 已切换到新包；`@delta-comic/both` 移除 Manifest 与 artifact 实现及对应导出，旧导入路径全量清理。
+- 新包专项测试、`vp run lib-build`、`vp check --fix`、递归 typecheck 已通过；发布 workspace 测试同步覆盖新增公开包和构建顺序。
+- loader、install、runtime、Vite adapter、聚合包后续迁移及市场管理界面仍保持未完成/暂停。

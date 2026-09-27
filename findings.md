@@ -245,3 +245,9 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 
 - 进入设计定稿前，根据 Cloudflare 当前官方文档验证 Workers for Platforms 动态 dispatch、D1 per-isolate/每实例绑定、Worker 资源限制、队列/cron 等本项目选用产品的当前能力及限制。
 - 对 Cordis、Loader、Vite/Rollup/Tauri/Cloudflare SDK 的 API 讨论必须按当前版本查阅对应官方文档或代码，不以预训练知识作为最终实现规范。
+
+## 2026-09-27：阶段 6G 第一批协议包
+
+- Manifest、artifact 和 platform-neutral plugin API 已从 `@delta-comic/both` 拆分为独立公开包：`@delta-comic/plugin-manifest`、`@delta-comic/plugin-artifact`、`@delta-comic/plugin-api`。
+- 现有 client SDK、server SDK 和 artifact reader 已迁移到新包；`@delta-comic/both/manifest` 与 `@delta-comic/both/artifact` 路径已移除。
+- 发布 workspace 测试需要覆盖三个新包及其按依赖拓扑排序的构建顺序；loader、install、runtime、Vite adapter 等后续 6G 包继续保留为未完成事项。

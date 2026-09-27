@@ -37,25 +37,30 @@ beforeEach(() => {
 
 describe('semantic-release command runner', () => {
   it('runs ordered package builds and recursive publish through inherited stdio', async () => {
-    mocks.statuses = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    mocks.statuses = Array.from({ length: 15 }, () => 0)
     const { publish } = await import('../semantic-release-plugin.mts')
 
     await publish({}, { env: {}, nextRelease: { version: workspaceVersion } })
 
-    expect(mocks.spawn).toHaveBeenNthCalledWith(
-      1,
-      'vp',
-      ['run', '--filter', '@delta-comic/both', '--fail-if-no-match', 'build'],
-      expect.objectContaining({ stdio: 'inherit' }),
+    expect(mocks.spawn.mock.calls.slice(0, 13).map(([command, args]) => [command, args])).toEqual(
+      [
+        '@delta-comic/both',
+        '@delta-comic/downloader',
+        '@delta-comic/plugin-manifest',
+        '@delta-comic/logger',
+        '@delta-comic/model',
+        '@delta-comic/utils',
+        '@delta-comic/ui',
+        '@delta-comic/client',
+        '@delta-comic/db',
+        '@delta-comic/server',
+        '@delta-comic/plugin-api',
+        '@delta-comic/plugin-artifact',
+        '@delta-comic/plugin',
+      ].map(name => ['vp', ['run', '--filter', name, '--fail-if-no-match', 'build']]),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      6,
-      'vp',
-      ['run', '--filter', '@delta-comic/ui', '--fail-if-no-match', 'build'],
-      expect.objectContaining({ stdio: 'inherit' }),
-    )
-    expect(mocks.spawn).toHaveBeenNthCalledWith(
-      11,
+      14,
       'vp',
       [
         'pm',
@@ -72,7 +77,7 @@ describe('semantic-release command runner', () => {
       expect.objectContaining({ stdio: 'inherit' }),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      12,
+      15,
       'vp',
       [
         'pm',

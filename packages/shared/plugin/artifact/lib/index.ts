@@ -1,4 +1,8 @@
-import { parsePluginManifest, type PluginManifest, type PluginResource } from './manifest.js'
+import {
+  parsePluginManifest,
+  type PluginManifest,
+  type PluginResource,
+} from '@delta-comic/plugin-manifest'
 
 export interface ArtifactFile {
   path: string
@@ -31,9 +35,8 @@ const normalizePath = (path: string) => {
     normalized.includes('\0') ||
     /^[a-z]:($|\/)/i.test(normalized) ||
     normalized.split('/').some(segment => segment === '..')
-  ) {
+  )
     throw new ArtifactValidationError(`unsafe relative path: ${path}`)
-  }
   const result = normalized
     .split('/')
     .filter(segment => segment && segment !== '.')
@@ -96,13 +99,11 @@ export const validateArtifact = async (
   const manifest = parsePluginManifest(artifact.manifest)
   const resources = validateResourceGraph(manifest)
   const files = new Map<string, ArtifactFile>()
-
   for (const file of artifact.files) {
     const path = normalizePath(file.path)
     if (files.has(path)) throw new ArtifactValidationError(`duplicate file: ${path}`)
     files.set(path, { path, bytes: file.bytes })
   }
-
   for (const [path, resource] of resources) {
     const file = files.get(path)
     if (!file) throw new ArtifactValidationError(`resource is missing: ${path}`)
@@ -110,7 +111,6 @@ export const validateArtifact = async (
       throw new ArtifactValidationError(`integrity mismatch: ${path}`)
     }
   }
-
   const entry = files.get(normalizePath(manifest.entry))
   if (!entry) throw new ArtifactValidationError(`entry is missing: ${manifest.entry}`)
   return { manifest, files: [...files.values()], entry }

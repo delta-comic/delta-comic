@@ -12,17 +12,9 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     },
-    "./manifest": {
-      "types": "./dist/manifest.d.mts",
-      "import": "./dist/manifest.mjs"
-    },
     "./diagnostic": {
       "types": "./dist/diagnostic.d.mts",
       "import": "./dist/diagnostic.mjs"
-    },
-    "./artifact": {
-      "types": "./dist/artifact.d.mts",
-      "import": "./dist/artifact.mjs"
     },
     "./runtime": {
       "types": "./dist/runtime.d.mts",

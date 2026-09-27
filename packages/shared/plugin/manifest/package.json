@@ -1,0 +1,27 @@
+{
+  "name": "@delta-comic/plugin-manifest",
+  "version": "3.0.0-next.19",
+  "description": "Cordis plugin manifest protocol",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "typebox": "catalog:"
+  },
+  "devDependencies": {
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}

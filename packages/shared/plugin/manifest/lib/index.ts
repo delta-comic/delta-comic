@@ -46,10 +46,3 @@ export const parsePluginManifest = (value: unknown): PluginManifest => {
   }
   return value
 }
-
-export interface PluginDefinition {
-  id: string
-  manifest: PluginManifest
-  status: 'active' | 'inactive' | 'error'
-  error?: string
-}

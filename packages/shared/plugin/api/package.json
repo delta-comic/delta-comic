@@ -1,0 +1,28 @@
+{
+  "name": "@delta-comic/plugin-api",
+  "version": "3.0.0-next.19",
+  "description": "Platform-neutral Cordis plugin contract",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@delta-comic/plugin-manifest": "workspace:",
+    "cordis": "catalog:"
+  },
+  "devDependencies": {
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}

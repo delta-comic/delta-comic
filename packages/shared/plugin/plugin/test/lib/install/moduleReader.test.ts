@@ -12,7 +12,7 @@ import { PluginScope } from '../../../lib/kernel'
 
 const artifactManifest = async (entryType: 'plugin' | 'plugin-set' = 'plugin') => {
   const source = 'export default () => ({ name: "cordis-reader" })'
-  const integrity = await import('@delta-comic/both/artifact').then(({ sha256Integrity }) =>
+  const integrity = await import('@delta-comic/plugin-artifact').then(({ sha256Integrity }) =>
     sha256Integrity(new TextEncoder().encode(source)),
   )
   return {
