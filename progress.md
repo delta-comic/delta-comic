@@ -20,7 +20,7 @@
 - 当前阶段：阶段 6D 实施，客户端下载器与 UI EnvironmentRegistry owner 生命周期已接入，正在进入诊断 harness 和网络宿主能力。
 - 代码实现：both 公共 Manifest、artifact 校验、诊断记录器和 Cordis runtime harness 已完成并通过专项验证。
 - 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
-- 下一个动作：将 app 的 Vue Router、导航及命令注册器接入 ClientRuntime，然后继续服务端业务迁移。
+- 下一个动作：迁移服务端现有业务到 ServerHost，然后继续阶段 6E 的 Worker/D1、市场发布、应用/admin 重组与部署文档。
 
 ### 2026-09-26 — 阶段 6A Artifact Loader 接入
 
@@ -68,6 +68,14 @@
 - `createClientUi` 将插件注册委托给宿主 registrar，并统一保留 disposer；runtime dispose 会撤销全部外部注册。
 - 测试覆盖三个注册类别以及 dispose 清理顺序；client typecheck、专项测试（6/6）和 `vp check --fix` 通过。
 - app 的 Vue Router/导航/command 具体 adapter 尚未接线；此接口阶段不计作 app UI 迁移完成。
+
+### 2026-09-26 — 阶段 6D app UI 宿主接线
+
+- app 新增 `clientHost`，将 ClientRuntime 的 route、navigation 和 command registrar 接入 Vue Router、响应式导航注册表和宿主 command registry。
+- 插件路由统一归档到 `/plugins/{pluginId}/...`，并通过 owner 生成稳定 route name；插件导航项随 runtime disposer 清理。
+- 主导航根据当前 pathname 高亮插件页面；command ID 冲突会显式报错，避免覆盖其他插件注册。
+- app/client typecheck、路由与 Client SDK 专项测试、`vp check --fix` 通过。
+- 真实 command palette 视图、旧 plugin runtime 全量迁移和服务端业务迁移仍未完成。
 
 ### 2026-09-26 — 40 项架构决策确认
 

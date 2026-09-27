@@ -27,6 +27,7 @@ import '@/index.css'
 import { DataLoaderPlugin } from 'vue-router/experimental'
 
 import AppSetup from './AppSetup.vue'
+import { appClientRuntime, disposeAppClientRuntime } from './clientHost'
 import { i18n } from './i18n'
 import { appLogger } from './logger'
 import { initializePlatform } from './platform'
@@ -51,6 +52,7 @@ await initializePlatform().then(v => {
 const pinia = createPinia()
 setActivePinia(pinia)
 await preparePluginHost()
+await appClientRuntime.mount('app-host', () => {})
 
 const app = createApp(
   defineComponent(() => {
@@ -126,3 +128,5 @@ document.head.appendChild(meta)
 
 app.mount('#app')
 appLogger.info('frontend application mounted')
+
+window.addEventListener('beforeunload', () => void disposeAppClientRuntime())

@@ -5,7 +5,8 @@ import { useRoute } from 'vue-router'
 import AppNavigation from '@/components/navigation/AppNavigation.vue'
 const route = useRoute<'/main'>()
 const isStandalonePage = computed(() => route.name === '/main/search')
-const name = computed(() => {
+const activeNavigation = computed(() => {
+  if (route.path.startsWith('/plugins/')) return route.path
   switch (route.name) {
     case '/main/home':
     case '/main/home/[id]':
@@ -37,7 +38,11 @@ const showForkSelect = shallowRef(false)
       'desktop:grid-cols-[var(--dc-desktop-navigation-width)_minmax(0,1fr)]': !isStandalonePage,
     }"
   >
-    <AppNavigation v-if="!isStandalonePage" :active="name" @create="showForkSelect = true" />
+    <AppNavigation
+      v-if="!isStandalonePage"
+      :active="activeNavigation"
+      @create="showForkSelect = true"
+    />
     <main
       class="overflow-hidden desktop:h-full desktop:min-w-0 desktop:bg-dc-page desktop:[&>*]:mx-auto desktop:[&>*]:max-w-[1600px]"
       :class="

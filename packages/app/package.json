@@ -5,6 +5,7 @@
   "description": "阿赖耶识",
   "dependencies": {
     "@delta-comic/both": "workspace:",
+    "@delta-comic/client": "workspace:",
     "@delta-comic/db": "workspace:",
     "@delta-comic/downloader": "workspace:",
     "@delta-comic/logger": "workspace:",

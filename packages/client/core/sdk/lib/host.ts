@@ -72,7 +72,8 @@ export interface ClientRouteRegistration {
   path: string
   title: string
   navigation?: boolean
-  component?: unknown
+  component?: Component
+  icon?: Component
 }
 
 export interface ClientUi {

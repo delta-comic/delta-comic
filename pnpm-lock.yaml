@@ -412,6 +412,9 @@ importers:
       '@delta-comic/both':
         specifier: 'workspace:'
         version: link:../shared/both
+      '@delta-comic/client':
+        specifier: 'workspace:'
+        version: link:../client/core/sdk
       '@delta-comic/db':
         specifier: 'workspace:'
         version: link:../db

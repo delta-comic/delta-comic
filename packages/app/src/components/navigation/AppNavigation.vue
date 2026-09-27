@@ -2,6 +2,7 @@
 import { computed, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { appNavigation } from '@/clientHost'
 import { Icons } from '@/icons'
 
 import AppNavigationItem from './AppNavigationItem.vue'
@@ -11,7 +12,7 @@ defineEmits<{ create: [] }>()
 const { t } = useI18n()
 
 const items = computed<
-  Array<{ className: string; icon: Component; key: string; label: string; to: string }>
+  Array<{ className: string; icon?: Component; key: string; label: string; to: string }>
 >(() => [
   {
     className: 'col-start-1 desktop:row-start-2',
@@ -41,6 +42,15 @@ const items = computed<
     label: t('navigation.user'),
     to: '/main/user',
   },
+  ...appNavigation
+    .filter(({ item }) => item.navigation)
+    .map(({ item, owner }) => ({
+      className: 'col-start-1 desktop:row-start-7',
+      icon: item.icon,
+      key: `${owner}:${item.path}`,
+      label: item.title,
+      to: item.path,
+    })),
 ])
 </script>
 
@@ -58,7 +68,7 @@ const items = computed<
     <AppNavigationItem
       v-for="item in items"
       :key="item.key"
-      :active="active === item.key"
+      :active="active === item.key || active === item.to || active.startsWith(`${item.to}/`)"
       :icon="item.icon"
       :label="item.label"
       :to="item.to"

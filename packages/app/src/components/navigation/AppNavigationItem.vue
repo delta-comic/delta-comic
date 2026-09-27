@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 
-defineProps<{ active: boolean; icon: Component; label: string; to: string }>()
+defineProps<{ active: boolean; icon?: Component; label: string; to: string }>()
 </script>
 
 <template>
@@ -18,7 +18,7 @@ defineProps<{ active: boolean; icon: Component; label: string; to: string }>()
       :class="{ '-translate-y-px scale-[1.06]': active }"
       size="26"
     >
-      <component :is="icon" />
+      <component v-if="icon" :is="icon" />
     </NIcon>
     <span class="max-w-full dc-ellipsis text-xs leading-none">{{ label }}</span>
   </RouterLink>
