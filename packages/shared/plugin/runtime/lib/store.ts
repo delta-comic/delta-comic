@@ -1,12 +1,13 @@
-import { shallowReactive, type Raw } from 'vue'
+import type { PluginConfig } from '@delta-comic/plugin-api'
+import type { PluginCandidate } from '@delta-comic/plugin-kernel'
+import { shallowReactive } from 'vue'
 
-import type { DCPluginConfig } from '../api'
-import type { PluginCandidate } from '../kernel'
+type PluginModel = NonNullable<PluginConfig['model']>
 
 export class PluginStore {
   private readonly candidateEntries = shallowReactive(new Map<string, PluginCandidate>())
-  private readonly loadingEntries = shallowReactive(new Map<string, Raw<DCPluginConfig>>())
-  private readonly pluginEntries = shallowReactive(new Map<string, Raw<DCPluginConfig>>())
+  private readonly loadingEntries = shallowReactive(new Map<string, PluginConfig<DCPluginConfig>>())
+  private readonly pluginEntries = shallowReactive(new Map<string, PluginConfig<DCPluginConfig>>())
   private readonly readyEntries = shallowReactive(new Set<string>())
 
   public constructor(private readonly translateText: (value: string) => string = value => value) {}
@@ -15,11 +16,11 @@ export class PluginStore {
     return this.candidateEntries
   }
 
-  public get loading(): ReadonlyMap<string, Raw<DCPluginConfig>> {
+  public get loading(): ReadonlyMap<string, PluginConfig<DCPluginConfig>> {
     return this.loadingEntries
   }
 
-  public get plugins(): ReadonlyMap<string, Raw<DCPluginConfig>> {
+  public get plugins(): ReadonlyMap<string, PluginConfig<DCPluginConfig>> {
     return this.pluginEntries
   }
 
@@ -30,11 +31,11 @@ export class PluginStore {
   public replaceCandidates(candidates: readonly PluginCandidate[]) {
     this.candidateEntries.clear()
     for (const candidate of candidates) {
-      this.candidateEntries.set(candidate.manifest.name.id, candidate)
+      this.candidateEntries.set(candidate.manifest.id, candidate)
     }
   }
 
-  public markLoading(plugin: string, config: Raw<DCPluginConfig>) {
+  public markLoading(plugin: string, config: PluginConfig<DCPluginConfig>) {
     this.readyEntries.delete(plugin)
     this.loadingEntries.set(plugin, config)
     this.pluginEntries.delete(plugin)
@@ -59,14 +60,13 @@ export class PluginStore {
   }
 
   public displayName(plugin: string) {
-    return this.translateText(this.candidateEntries.get(plugin)?.manifest.name.display ?? plugin)
+    return this.translateText(this.candidateEntries.get(plugin)?.manifest.name ?? plugin)
   }
 
-  public modelEntries<K extends keyof NonNullable<DCPluginConfig['model']>>(key: K) {
-    type Model = NonNullable<NonNullable<DCPluginConfig['model']>[K]>
+  public modelEntries<K extends keyof PluginModel>(key: K): [string, PluginModel[K]][] {
     return [...this.pluginEntries].flatMap(([plugin, config]) => {
       const model = config.model?.[key]
-      return model === undefined ? [] : ([[plugin, model]] as [string, Model][])
+      return model === undefined ? [] : [[plugin, model]]
     })
   }
 }

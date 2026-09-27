@@ -1,18 +1,23 @@
+import type { PluginConfig } from '@delta-comic/plugin-api'
+import { defineInternalPlugin } from '@delta-comic/plugin-kernel'
+
 import pkg from '../../package.json'
-import { DELTA_COMIC_PLUGIN_API_VERSION } from '../api'
 import CorePlugin from '../core'
-import { defineInternalPlugin } from '../kernel'
 
 export const corePluginDefinition = defineInternalPlugin({
   canDisable: false,
-  factory: CorePlugin,
+  factory: environment =>
+    CorePlugin({ platform: environment.platform === 'tauri' ? 'tauri' : 'web' }) as PluginConfig,
   manifest: {
-    apiVersion: DELTA_COMIC_PLUGIN_API_VERSION,
+    protocolVersion: 1,
+    id: 'core',
+    name: 'core',
+    entry: 'core',
+    entryType: 'plugin',
+    resources: [],
     author: 'Delta Comic',
     description: 'Delta Comic host capabilities',
-    name: { display: 'core', id: 'core' },
-    require: [],
-    version: { plugin: pkg.version, supportCore: '*' },
+    version: pkg.version,
   },
 })
 

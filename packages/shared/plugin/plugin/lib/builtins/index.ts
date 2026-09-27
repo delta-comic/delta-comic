@@ -1,4 +1,4 @@
-import type { InternalPluginDefinition } from '../kernel'
+import type { InternalPluginDefinition } from '@delta-comic/plugin-kernel'
 
 export * from './core.builtin'
 

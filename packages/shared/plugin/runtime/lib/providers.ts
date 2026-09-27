@@ -1,4 +1,8 @@
-import type { InternalPluginDefinition, PluginCandidate, PluginCandidateProvider } from '../kernel'
+import type {
+  InternalPluginDefinition,
+  PluginCandidate,
+  PluginCandidateProvider,
+} from '@delta-comic/plugin-kernel'
 
 const defaultStorage = () => {
   try {
@@ -52,7 +56,7 @@ export class InternalPluginCandidateProvider implements PluginCandidateProvider 
           definition.canDisable === false
             ? true
             : await this.preferences.enabled(
-                definition.manifest.name.id,
+                definition.manifest.id,
                 definition.enabledByDefault ?? true,
               ),
         load: async () => ({ factory: definition.factory }),
@@ -80,7 +84,7 @@ export class CompositePluginCandidateProvider implements PluginCandidateProvider
     ).flat()
     const owners = new Map<string, PluginCandidate>()
     for (const candidate of candidates) {
-      const id = candidate.manifest.name.id
+      const id = candidate.manifest.id
       const previous = owners.get(id)
       if (previous) {
         if (previous.origin === 'builtin' && candidate.origin === 'installed') continue

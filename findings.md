@@ -251,3 +251,59 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - Manifest、artifact 和 platform-neutral plugin API 已从 `@delta-comic/both` 拆分为独立公开包：`@delta-comic/plugin-manifest`、`@delta-comic/plugin-artifact`、`@delta-comic/plugin-api`。
 - 现有 client SDK、server SDK 和 artifact reader 已迁移到新包；`@delta-comic/both/manifest` 与 `@delta-comic/both/artifact` 路径已移除。
 - 发布 workspace 测试需要覆盖三个新包及其按依赖拓扑排序的构建顺序；loader、install、runtime、Vite adapter 等后续 6G 包继续保留为未完成事项。
+
+## 2026-09-27：阶段 6G 拆包设计结论
+
+- 目标公开包为 `@delta-comic/plugin-kernel`、`@delta-comic/plugin-loader`、`@delta-comic/plugin-runtime`、`@delta-comic/plugin-install`、`@delta-comic/plugin-vite`，现有 `@delta-comic/plugin` 收敛为聚合与 concrete composition 包。
+- Kernel 负责 source-agnostic candidate/provider/dependency/capability/contribution/scope；Loader 负责模块加载契约与通用 helper；Runtime 负责生命周期引擎；Install 负责 provider-neutral 安装端口和流程；Vite 包负责构建、ZIP、host externals 与原生 HMR/CSS bridge。
+- Runtime 不依赖 install、数据库或 Tauri；具体 DB、市场、文件存储和宿主服务 adapter 保留在 composition。所有包禁止反向依赖聚合包，入口文件保持 export-only，concrete assembly 集中于 composition。
+
+## 2026-09-27：6G 实施计划核查
+
+- 当前聚合包构建入口同时打包 `lib/index.ts` 与 `vite/index.ts`，应用 `@` alias 指向 `lib`；新包需各自维护独立 Vite+ pack/typecheck/test 配置，并在 workspace build 拓扑中声明依赖。
+- Kernel 与 Runtime 的 index 已是纯 re-export，适合按目录整体迁移；聚合包暂时保留原入口，待新包构建稳定后改为依赖新包并集中 concrete assembly。
+- 当前实施计划分为 Kernel/Loader、Runtime、Install、Vite、聚合包收敛和最终验证六阶段；每阶段记录专项构建、类型检查与测试结果。
+
+## 2026-09-27：6G-1 Kernel/Loader 实施边界
+
+- Kernel 的 candidate 类型需要脱离旧聚合 API/model 依赖，改用新 Manifest 包与 platform-neutral config contract；实现保持 source-agnostic。
+- Loader 提供 `LoadedPluginModule` 与 `PluginModuleReader` 契约及通用模块读取类型；具体 ZIP stored reader、dev-server reader 和文件存储仍留在 Install/composition。
+- 新包入口仅 re-export；旧 `@delta-comic/plugin` 实现暂时保留，待 Kernel/Loader 专项构建、类型检查和测试通过后再迁移后续 Runtime。
+
+## 2026-09-27：6G-1 类型边界确认
+
+- 新 `@delta-comic/plugin-api` 当前只提供 Cordis plugin contract，因此补充中性的 `PluginConfig`、`PluginConfigEnvironment` 和 `PluginConfigFactory`，供 Kernel/Runtime 共享。
+- Loader 以 `PluginScopeLike` 结构契约描述激活阶段所需的 `defer` 能力，避免 Loader 反向依赖聚合包；Kernel candidate 使用 Loader 的 `LoadedPluginModule` 类型。
+- Kernel candidate 改用 `@delta-comic/plugin-manifest` 的 `PluginManifest`，具体存储、网络和来源 reader 继续留在 Install 阶段。
+
+## 2026-09-27：6G-1 Kernel/Loader 源码核查
+
+- `candidate.ts` 的迁移依赖可压缩为三条公共边界：`@delta-comic/plugin-manifest` 提供 `PluginManifest`，`@delta-comic/plugin-api` 提供中性 `PluginConfigFactory`，`@delta-comic/plugin-loader` 提供 `LoadedPluginModule`。
+- `capability.ts` 的激活管线只需要中性插件配置、`PluginScope` 和 `AbortSignal`；`contribution.ts`、`dependency.ts`、`scope.ts` 均可保持来源无关。
+- 旧聚合包中的 Kernel 文件继续保留，首阶段新包采用独立源码与测试；完成专项验证后再由 Runtime/Install 迁移调用方，避免提前破坏聚合包构建。
+
+## 2026-09-27：6G-1 Manifest 字段迁移
+
+- 新 Kernel dependency planner 使用 `manifest.id` 与 `manifest.dependencies`，对应新 Manifest 协议；旧 `name.id` 与 `require` 仅属于待迁移聚合实现。
+- Kernel/Loader 首阶段保留旧聚合源码，独立包先完成等价行为和新协议字段测试，再切换后续 Runtime/Install 调用方。
+
+## 2026-09-27：6G-1 构建任务拓扑
+
+- Vite+ 的 `run.tasks` 已提供新包的 `build` 与 `typecheck` 任务，package scripts 不能重复声明同名任务；Kernel/Loader 的重复 `build` 与 `typecheck` scripts 已移除。
+- Loader 类型检查依赖 `@delta-comic/plugin-api` 的 dist 声明产物，专项验证需先构建 API，再构建或检查下游包；API 的任务图已声明依赖构建。
+- Kernel 类型检查发现新包迁移时需显式将 `Map.delete` 包装为 `void` disposer，测试中的 `Array.push` 也需使用块体避免返回 number；两处已按 `PluginDisposer` 契约修正。
+
+## 2026-09-27：6G-2 Runtime 实施边界
+
+- Runtime 独立包迁移 `engine`、`providers`、`store`，依赖收敛到 `@delta-comic/plugin-api`、`@delta-comic/plugin-kernel`、`@delta-comic/plugin-loader`、Vue 和 logger。
+- 新 Manifest 使用 `id` 与 `dependencies`；Runtime display name 使用 Manifest 的字符串 `name`。Install、数据库、Tauri、文件存储和市场适配器继续留在聚合包 composition。
+- Runtime 的 config、i18n、hooks 通过 API 中性类型表达，保留聚合包后续适配现有宿主配置的边界。
+- 根级 `vp test run` 当前只加载既有 workspace 的测试项目，新 Kernel/Loader 测试路径被根配置排除；专项测试应通过各新包的 Vite+ `test` 任务执行。
+
+## 2026-09-27：6G-2 Runtime 完成与聚合接线
+
+- `@delta-comic/plugin-runtime` 已完成 engine、providers、store 迁移；包内 `runtime/test/index.test.ts` 的 4 个测试通过，Runtime build 与 `vp check --fix` 通过。
+- 聚合 composition 通过 `runtimeAdapter.ts` 适配现有 Install 的 legacy manifest、module reader 和 capabilities：legacy `name.id`/`version.plugin`/`require` 映射到新 Manifest 的 `id`/`version`/`dependencies`，旧 scope/config 在 adapter 边界转换；Install 内部协议保持原状，后续迁移仍待执行。
+- `core.builtin.ts`、builtins 导出和 InstalledPluginCandidateProvider 已切换到新 Kernel/Runtime 契约；聚合包继续负责 concrete assembly，并通过 `@delta-comic/plugin-runtime` 对外导出 Runtime。
+- 旧聚合 Runtime engine/providers/store 源码及对应三组测试已删除，新 Runtime 测试作为规范测试；聚合 plugin typecheck、plugin build、选定 capability/install/architecture 测试和全仓 `vp run lib-build` 均通过。聚合 package 没有独立 `test` task，因此使用 `vp test run` 指定既有相关测试文件。
+- tsgo-backed Runtime standalone typecheck 仍报告 12 个与当前源码不一致的陈旧 `PluginConfig<DCPluginConfig>`/`DCPluginConfig` 诊断；listFiles、当前源码、dist 声明、symlink 和 tsconfig 均已核对，作为工具链限制记录，不改变正确 Runtime 源码。

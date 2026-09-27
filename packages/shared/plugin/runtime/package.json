@@ -1,0 +1,28 @@
+{
+  "name": "@delta-comic/plugin-runtime",
+  "version": "3.0.0-next.19",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "@delta-comic/logger": "workspace:*",
+    "@delta-comic/plugin-api": "workspace:*",
+    "@delta-comic/plugin-kernel": "workspace:*",
+    "@delta-comic/plugin-loader": "workspace:*",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,4 +1,6 @@
-import type { PluginCandidate, PluginCandidateProvider } from '../kernel'
+import type { PluginCandidate, PluginCandidateProvider } from '@delta-comic/plugin-kernel'
+
+import { toRuntimeCandidate } from '../composition/runtimeAdapter'
 
 import type { PluginArchiveRepository, PluginModuleReader } from './contracts'
 
@@ -8,9 +10,6 @@ import type { PluginArchiveRepository, PluginModuleReader } from './contracts'
  * guaranteed at runtime. Normalize it so a legacy string/number (`'false'`, `'0'`, `1`, ...) can
  * never be mistaken for `true` by the runtime's truthiness check.
  */
-const toBoolean = (value: unknown): boolean =>
-  value === true || value === 'true' || value === 1 || value === '1'
-
 /** Normalize persisted archives into the same candidate protocol used by internal plugins. */
 export class InstalledPluginCandidateProvider implements PluginCandidateProvider {
   public readonly id = 'installed'
@@ -23,23 +22,13 @@ export class InstalledPluginCandidateProvider implements PluginCandidateProvider
   public async list(signal: AbortSignal): Promise<PluginCandidate[]> {
     const archives = await this.repository.list()
     signal.throwIfAborted()
-    return archives.map(archive => ({
-      enabled: toBoolean(archive.enable),
-      load: async loadSignal => {
-        const reader =
-          this.readers.find(candidate => candidate.matches?.(archive)) ??
-          this.readers.find(candidate => !candidate.matches) ??
-          this.readers[0]
-        if (!reader) throw new Error('no plugin module reader is configured')
-        return await reader.read(archive, loadSignal)
-      },
-      management: {
-        canDisable: true,
-        canUninstall: true,
-        canUpdate: archive.installInput.length > 0,
-      },
-      manifest: archive.meta,
-      origin: 'installed',
-    }))
+    return archives.map(archive => {
+      const reader =
+        this.readers.find(candidate => candidate.matches?.(archive)) ??
+        this.readers.find(candidate => !candidate.matches) ??
+        this.readers[0]
+      if (!reader) throw new Error('no plugin module reader is configured')
+      return toRuntimeCandidate(archive, reader)
+    })
   }
 }

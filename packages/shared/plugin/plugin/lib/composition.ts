@@ -1,3 +1,10 @@
+import {
+  CompositePluginCandidateProvider,
+  InternalPluginCandidateProvider,
+  LocalInternalPluginPreferences,
+  PluginRuntime,
+  PluginStore,
+} from '@delta-comic/plugin-runtime'
 import { isTauri } from '@tauri-apps/api/core'
 
 import {
@@ -8,6 +15,7 @@ import {
 } from './adapters'
 import { corePluginDefinition, internalPluginDefinitions } from './builtins'
 import { createDefaultCapabilities, type PluginAuthGateway } from './capabilities'
+import { adaptLegacyCapabilities } from './composition/runtimeAdapter'
 import { cfg } from './core/config'
 import {
   DatabasePluginArchiveRepository,
@@ -29,13 +37,6 @@ import {
   parseDevServerPort,
 } from './install'
 import { ContributionHub } from './kernel'
-import {
-  CompositePluginCandidateProvider,
-  InternalPluginCandidateProvider,
-  LocalInternalPluginPreferences,
-  PluginRuntime,
-  PluginStore,
-} from './runtime'
 
 export const pluginContributions = new ContributionHub()
 export const pluginStore = new PluginStore(value => pluginI18n.translateText(value))
@@ -62,7 +63,7 @@ const pluginRepository = new DatabasePluginArchiveRepository()
 const pluginReaders = [new StoredPluginModuleReader(pluginFiles), new DevServerPluginModuleReader()]
 const internalPreferences = new LocalInternalPluginPreferences()
 const internalPluginIds = new Set(
-  internalPluginDefinitions.map(definition => definition.manifest.name.id),
+  internalPluginDefinitions.map(definition => definition.manifest.id),
 )
 const internalProvider = new InternalPluginCandidateProvider(
   internalPluginDefinitions,
@@ -76,7 +77,7 @@ const candidateProvider = new CompositePluginCandidateProvider([
 const devSource = new DevServerSourceResolver()
 const httpSource = new HttpSourceResolver()
 const githubSource = new GitHubSourceResolver({
-  coreVersion: corePluginDefinition.manifest.version.plugin,
+  coreVersion: corePluginDefinition.manifest.version,
   includePrereleases: () =>
     pluginConfigStore.has(cfg) &&
     pluginConfigStore.load(cfg).data.value.receivePerReleaseUpdate === true,
@@ -102,12 +103,14 @@ export const pluginInstaller = new PluginInstallService({
 
 export const pluginRuntime = new PluginRuntime({
   capabilities: () =>
-    createDefaultCapabilities({
-      auth: pluginHostServices.auth,
-      config: pluginConfigStore,
-      contributions: pluginContributions,
-      i18n: pluginI18n,
-    }),
+    adaptLegacyCapabilities(
+      createDefaultCapabilities({
+        auth: pluginHostServices.auth,
+        config: pluginConfigStore,
+        contributions: pluginContributions,
+        i18n: pluginI18n,
+      }),
+    ),
   environment: () => ({ platform: isTauri() ? 'tauri' : 'web' }),
   provider: candidateProvider,
   remove: plugin => pluginInstaller.uninstall(plugin),
@@ -134,7 +137,7 @@ export const installPlugin = async (input: File | string, options: PluginInstall
   } catch (error) {
     // Loading failed: keep a restart hint so a restart retries with the persisted state.
     for (const candidate of pluginRuntime.store.candidates.values()) {
-      const plugin = candidate.manifest.name.id
+      const plugin = candidate.manifest.id
       if (plugin === archive.pluginName || !installed.has(plugin)) {
         pluginRuntime.markRestartRequired(plugin)
       }

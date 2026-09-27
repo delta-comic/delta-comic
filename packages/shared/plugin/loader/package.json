@@ -1,0 +1,25 @@
+{
+  "name": "@delta-comic/plugin-loader",
+  "version": "3.0.0-next.19",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "@delta-comic/plugin-api": "workspace:*",
+    "@delta-comic/plugin-manifest": "workspace:*"
+  },
+  "devDependencies": {
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}

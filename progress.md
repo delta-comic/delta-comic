@@ -233,3 +233,31 @@
 - client/server SDK 与现有 artifact reader 已切换到新包；`@delta-comic/both` 移除 Manifest 与 artifact 实现及对应导出，旧导入路径全量清理。
 - 新包专项测试、`vp run lib-build`、`vp check --fix`、递归 typecheck 已通过；发布 workspace 测试同步覆盖新增公开包和构建顺序。
 - loader、install、runtime、Vite adapter、聚合包后续迁移及市场管理界面仍保持未完成/暂停。
+
+## 2026-09-27：阶段 6G 拆包设计
+
+- 完成并自审 `docs/superpowers/specs/2026-09-27-plugin-6g-package-split-design.md`，明确 Kernel、Loader、Runtime、Install、Vite Adapter 与聚合包的职责、依赖方向、迁移顺序和验收矩阵。
+- 设计已通过签名提交 `5980936f docs(plugin): 记录6G拆包设计`；用户授权继续实施，无需再次审批设计决策。
+- 下一步进入实施计划阶段，先迁移 source-agnostic Kernel 与 Loader contracts，再逐步迁移 Runtime、Install、Vite 和聚合包。
+
+## 2026-09-27：6G-1 Kernel/Loader 开始
+
+- 进入 Kernel/Loader 第一阶段，计划下沉 Kernel 的 candidate、capability、contribution、dependency、scope 与 Loader 的模块加载契约。
+- Kernel 将使用新 Manifest 与中性配置类型，Loader 仅承载 `LoadedPluginModule`、`PluginModuleReader` 等契约；具体来源 reader 继续由 Install/composition 负责。
+- 首次专项验证发现 Vite+ `run.tasks` 与 package scripts 同名会阻止任务图加载，已移除 Kernel/Loader 的重复 `build`、`typecheck` scripts；两包 build 已通过。
+- Loader typecheck 暴露 API dist 声明尚未生成的顺序问题，后续按 API → Loader → Kernel 顺序执行专项验证。
+- API 构建完成；Kernel 类型检查发现并修复 `Map.delete` 与测试 `Array.push` 的 disposer 返回值类型问题。
+- Kernel/Loader build 与 typecheck 已通过；根级测试入口未发现新包测试，后续改用各新包的 Vite+ test 任务验证。
+
+## 2026-09-27：6G-2 Runtime 开始
+
+- 6G-1 Kernel/Loader 已完成专项构建、类型检查和包内测试，实施计划进入 Runtime 阶段。
+- Runtime 将迁移生命周期引擎、候选 provider 与响应式 store，改用新 Manifest 的 `id`/`dependencies` 字段，并保持 preload、normal activation、reload、enable、disable、uninstall 和 recovery 行为。
+
+## 2026-09-27：6G-2 Runtime 完成
+
+- 完成 `@delta-comic/plugin-runtime` 的 engine/providers/store 拆分，新增 4 个 Runtime 行为测试；Runtime test、build 和检查均通过。
+- 完成聚合 composition 接线：新增 legacy Install reader/manifest/capability adapter，内置插件改用新 Kernel 定义，聚合入口导出新 Runtime；`vp run --filter '@delta-comic/plugin' typecheck`、plugin build 和 `vp run lib-build` 通过。
+- 删除旧聚合 Runtime 实现及 engine/providers/store 测试；聚合包没有独立 test task，使用指定 capability/install/architecture 测试验证，3 files / 15 tests 通过。
+- Runtime standalone typecheck 的 12 个 tsgo 陈旧诊断已记录为工具链限制；当前 Runtime 源码和依赖解析路径已核对。
+- 当前进度停止在 Runtime；6G-3 Install、6G-4 Vite Adapter 与完整聚合收敛保持 pending。

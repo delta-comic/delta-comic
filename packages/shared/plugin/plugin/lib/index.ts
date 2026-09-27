@@ -3,6 +3,6 @@ export * from './capabilities'
 export * from './composition'
 export * from './install'
 export * from './kernel'
-export * from './runtime'
+export * from '@delta-comic/plugin-runtime'
 
 export * as Core from './core'

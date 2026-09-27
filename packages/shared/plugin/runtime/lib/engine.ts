@@ -1,16 +1,19 @@
 import { logger } from '@delta-comic/logger'
-import { markRaw, ref, shallowReactive, type App, type Raw, type Ref } from 'vue'
-
-import type { ConfigEnv, DCPluginConfig, PluginLocaleMessages } from '../api'
+import type {
+  PluginConfig,
+  PluginConfigEnvironment,
+  PluginLocaleMessages,
+} from '@delta-comic/plugin-api'
 import {
   ActivationPipeline,
   planPluginDependencies,
   PluginScope,
   type CapabilityModule,
-  type LoadedPluginModule,
   type PluginCandidate,
   type PluginCandidateProvider,
-} from '../kernel'
+} from '@delta-comic/plugin-kernel'
+import type { LoadedPluginModule } from '@delta-comic/plugin-loader'
+import { markRaw, ref, shallowReactive, type App, type Ref } from 'vue'
 
 import { PluginStore } from './store'
 
@@ -51,7 +54,7 @@ export interface PluginPreloadRecovery {
 
 export interface PluginRuntimeOptions {
   readonly capabilities: () => readonly CapabilityModule[]
-  readonly environment: () => ConfigEnv
+  readonly environment: () => PluginConfigEnvironment
   readonly provider: PluginCandidateProvider
   readonly remove: (plugin: string) => Promise<void>
   readonly store?: PluginStore
@@ -65,7 +68,7 @@ export interface PluginRuntimeOptions {
 
 interface PreparedPlugin {
   readonly candidate: PluginCandidate
-  readonly config: Raw<DCPluginConfig>
+  readonly config: PluginConfig<DCPluginConfig>
   readonly module: LoadedPluginModule
   readonly scope: PluginScope
 }
@@ -171,7 +174,7 @@ export class PluginRuntime {
       if (!candidate) throw new Error(`plugin "${plugin}" is not a known candidate`)
       if (!candidate.enabled) throw new Error(`plugin "${plugin}" is not enabled`)
       targets.set(plugin, candidate)
-      for (const dependency of candidate.manifest.require) visit(dependency.id)
+      for (const dependency of candidate.manifest.dependencies ?? []) visit(dependency.id)
     }
     for (const plugin of plugins) visit(plugin)
 
@@ -183,7 +186,7 @@ export class PluginRuntime {
 
     for (const level of plan.levels) {
       for (const candidate of level) {
-        const plugin = candidate.manifest.name.id
+        const plugin = candidate.manifest.id
         const prepared = this.#prepared.get(plugin)
         if (prepared) {
           if (this.#booted && !this.#activeNormal.has(plugin)) {
@@ -212,7 +215,7 @@ export class PluginRuntime {
       if (visited.has(id)) return
       visited.add(id)
       for (const [name, prepared] of this.#prepared) {
-        if (prepared.candidate.manifest.require.some(dependency => dependency.id === id)) {
+        if (prepared.candidate.manifest.dependencies?.some(dependency => dependency.id === id)) {
           collectDependents(name)
         }
       }
@@ -257,7 +260,7 @@ export class PluginRuntime {
     if (!candidate.management.canDisable) throw new Error(`plugin "${plugin}" cannot be disabled`)
     const dependents = [...this.#prepared.entries()]
       .filter(([, prepared]) =>
-        prepared.candidate.manifest.require.some(dependency => dependency.id === plugin),
+        prepared.candidate.manifest.dependencies?.some(dependency => dependency.id === plugin),
       )
       .map(([id]) => id)
     if (dependents.length > 0) {
@@ -291,7 +294,7 @@ export class PluginRuntime {
   }
 
   async #prepareAndActivate(candidate: PluginCandidate) {
-    const plugin = candidate.manifest.name.id
+    const plugin = candidate.manifest.id
     const app = this.#app
     if (!app) throw new Error('plugins must be preloaded before enabling a plugin')
     const scope = new PluginScope(plugin)
@@ -308,7 +311,7 @@ export class PluginRuntime {
     } catch (error) {
       this.#prepared.delete(plugin)
       const errors: unknown[] = this.#flattenErrors(error)
-      const disposeError = await scope.dispose(error).catch(caught => caught)
+      const disposeError = await scope.dispose().catch(caught => caught)
       if (disposeError !== undefined) errors.push(...this.#flattenErrors(disposeError))
       throw new AggregateError(
         errors,
@@ -391,10 +394,10 @@ export class PluginRuntime {
     const plan = planPluginDependencies(candidates)
 
     const activated: string[] = []
-    const failures: PluginRuntimeFailure[] = plan.missing.map(({ dependency, plugin }) => ({
-      error: new Error(`missing dependency: ${dependency}`),
+    const failures: PluginRuntimeFailure[] = plan.missing.map(({ dependencyId, pluginId }) => ({
+      error: new Error(`missing dependency: ${dependencyId}`),
       phase: 'preload',
-      plugin,
+      plugin: pluginId,
     }))
     for (const cycle of plan.cycles) {
       const error = new Error(`dependency cycle: ${cycle.join(' -> ')}`)
@@ -403,9 +406,9 @@ export class PluginRuntime {
     const failed = new Set(failures.map(value => value.plugin))
     for (const level of plan.levels) {
       for (const candidate of level) {
-        const plugin = candidate.manifest.name.id
+        const plugin = candidate.manifest.id
         if (failed.has(plugin)) continue
-        const blockedBy = candidate.manifest.require
+        const blockedBy = (candidate.manifest.dependencies ?? [])
           .map(value => value.id)
           .filter(dependency => failed.has(dependency))
         if (blockedBy.length > 0) {
@@ -435,7 +438,7 @@ export class PluginRuntime {
         } catch (error) {
           failures.push({ error, phase: 'preload', plugin })
           failed.add(plugin)
-          await scope.dispose(error).catch(disposeError => {
+          await scope.dispose().catch(disposeError => {
             failures.push({ error: disposeError, phase: 'preload', plugin })
           })
         }
@@ -451,7 +454,7 @@ export class PluginRuntime {
     const candidates = [...this.#prepared.values()].map(value => value.candidate)
     const mandatory = candidates
       .filter(candidate => !candidate.management.canDisable)
-      .map(candidate => candidate.manifest.name.id)
+      .map(candidate => candidate.manifest.id)
     const chosen = selected
       ? this.#selectWithDependencies(candidates, [...mandatory, ...selected])
       : candidates
@@ -463,9 +466,9 @@ export class PluginRuntime {
     const failed = new Set<string>()
     for (const level of plan.levels) {
       for (const candidate of level) {
-        const plugin = candidate.manifest.name.id
+        const plugin = candidate.manifest.id
         const info = (progress.value[plugin] = loadingInfo())
-        const blockedBy = candidate.manifest.require
+        const blockedBy = (candidate.manifest.dependencies ?? [])
           .map(value => value.id)
           .filter(dependency => failed.has(dependency))
         if (blockedBy.length > 0) {
@@ -499,7 +502,7 @@ export class PluginRuntime {
     prepared: PreparedPlugin,
     info?: PluginLoadingInfo,
   ): Promise<{ error?: unknown; disposeError?: unknown }> {
-    const plugin = prepared.candidate.manifest.name.id
+    const plugin = prepared.candidate.manifest.id
     const scope = new PluginScope(plugin)
     try {
       if (info) info.progress.status = 'process'
@@ -522,13 +525,13 @@ export class PluginRuntime {
       return {}
     } catch (error) {
       if (info) info.progress = { errorReason: errorText(error), status: 'error', stepsIndex: 0 }
-      const disposeError = await scope.dispose(error).catch(caught => caught)
+      const disposeError = await scope.dispose().catch(caught => caught)
       return { error, disposeError }
     }
   }
 
   async #loadPlugin(candidate: PluginCandidate, scope: PluginScope) {
-    const plugin = candidate.manifest.name.id
+    const plugin = candidate.manifest.id
     const loaded: LoadedPluginModule = await candidate.load(scope.signal)
     if (loaded.dispose) scope.defer(loaded.dispose)
     const config = markRaw(loaded.factory(this.#options.environment()))
@@ -537,7 +540,7 @@ export class PluginRuntime {
   }
 
   async #runUninstallHook(candidate: PluginCandidate) {
-    const plugin = candidate.manifest.name.id
+    const plugin = candidate.manifest.id
     const scope = new PluginScope(plugin)
     try {
       const { config } = await this.#loadPlugin(candidate, scope)
@@ -549,7 +552,9 @@ export class PluginRuntime {
 
   #assertValidPlan(plan: ReturnType<typeof planPluginDependencies>) {
     if (plan.missing.length === 0 && plan.cycles.length === 0) return
-    const missing = plan.missing.map(value => `${value.plugin} -> ${value.dependency}`).join(', ')
+    const missing = plan.missing
+      .map(value => `${value.pluginId} -> ${value.dependencyId}`)
+      .join(', ')
     const cycles = plan.cycles.map(value => value.join(' -> ')).join(', ')
     throw new Error(
       [missing && `missing: ${missing}`, cycles && `cycles: ${cycles}`].filter(Boolean).join('; '),
@@ -557,12 +562,12 @@ export class PluginRuntime {
   }
 
   #selectWithDependencies(candidates: readonly PluginCandidate[], selected: readonly string[]) {
-    const byId = new Map(candidates.map(candidate => [candidate.manifest.name.id, candidate]))
+    const byId = new Map(candidates.map(candidate => [candidate.manifest.id, candidate]))
     const result = new Map<string, PluginCandidate>()
     const visit = (plugin: string) => {
       const candidate = byId.get(plugin)
       if (!candidate || result.has(plugin)) return
-      for (const dependency of candidate.manifest.require) visit(dependency.id)
+      for (const dependency of candidate.manifest.dependencies ?? []) visit(dependency.id)
       result.set(plugin, candidate)
     }
     for (const plugin of selected) visit(plugin)
