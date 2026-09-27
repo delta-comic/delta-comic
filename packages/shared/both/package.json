@@ -35,6 +35,10 @@
     "./release-store": {
       "types": "./dist/releaseStore.d.mts",
       "import": "./dist/releaseStore.mjs"
+    },
+    "./release-publisher": {
+      "types": "./dist/releasePublisher.d.mts",
+      "import": "./dist/releasePublisher.mjs"
     }
   },
   "publishConfig": {

@@ -11,6 +11,7 @@ import {
   parsePluginRelease,
   createHttpPluginCatalogStore,
   createMemoryPluginCatalogStore,
+  createPluginReleasePublisher,
   Service,
   sha256Integrity,
   validateArtifact,
@@ -175,6 +176,33 @@ describe('@delta-comic/both cordis integration', () => {
     await http.save({ protocolVersion: 1, generatedAt: 'now', entries: [] })
     expect(requests[0]?.headers).toMatchObject({ accept: 'application/json' })
     expect(requests[1]?.method).toBe('PUT')
+  })
+
+  it('publishes and yanks releases with one catalog save per update', async () => {
+    const store = createMemoryPluginCatalogStore()
+    const publisher = createPluginReleasePublisher(store)
+    const release = parsePluginRelease({
+      pluginId: 'publisher-demo',
+      version: '1.0.0',
+      manifestUrl: 'https://plugins.example/publisher-demo/1.0.0/manifest.json',
+      artifacts: [
+        {
+          platform: 'desktop',
+          url: 'https://plugins.example/publisher-demo/1.0.0/desktop.zip',
+          mimeType: 'application/zip',
+          size: 1,
+          integrity: 'sha256-YQ==',
+        },
+      ],
+      publishedAt: '2026-09-27T00:00:00Z',
+    })
+
+    await publisher.publish(release, { name: 'Publisher demo' })
+    await expect(publisher.publish(release, { name: 'Publisher demo' })).rejects.toThrow(
+      'release already exists',
+    )
+    await publisher.yank('publisher-demo', '1.0.0')
+    expect(findPluginRelease((await store.load())!, 'publisher-demo')).toBeUndefined()
   })
 
   it('mounts and snapshots a Cordis runtime', async () => {

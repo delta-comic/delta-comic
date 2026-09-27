@@ -187,6 +187,12 @@
 - Worker 可选使用 `PLUGIN_CATALOG` R2 binding，在 `/plugins/catalog/index.json` 提供目录读写；写入使用 `SERVER_ADMIN_TOKEN` Bearer token 的常量时间比较。
 - 测试覆盖 handler 状态边界和 Worker R2 binding 接线；完整市场发布工作流、发布者身份管理、版本原子更新、app/admin 重组和部署文档仍未完成。
 
+## 2026-09-27：6E 市场发布器领域边界
+
+- `@delta-comic/both/release-publisher` 新增 `createPluginReleasePublisher`，通过共享 `PluginCatalogStore` 发布新版本和撤回已发布版本。
+- 发布器校验 HTTPS 发布元数据、插件条目归属、重复版本和撤回目标，并以一次目录保存写回每次领域更新。
+- 并发 CAS、发布者身份、签名凭证、artifact 上传、完整市场工作流、应用/admin 重组和部署文档仍未完成。
+
 ## 2026-09-27：6E 市场目录 HTTP handler 边界
 
 - `@delta-comic/server` 增加 `createPluginCatalogHandler`，公开 GET 目录读取，PUT 写入通过宿主注入的授权回调保护。

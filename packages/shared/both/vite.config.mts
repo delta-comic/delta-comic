@@ -29,6 +29,7 @@ export default defineConfig({
       './lib/runtime.ts',
       './lib/release.ts',
       './lib/releaseStore.ts',
+      './lib/releasePublisher.ts',
     ],
     sourcemap: true,
     dts: { tsconfig: './tsconfig.json' },
