@@ -12,7 +12,7 @@ import {
   createDevEntryCode,
   createDevPlugin,
   createWireManifest,
-} from '../../vite/dev'
+} from '../lib/dev'
 
 const meta: PluginManifest = {
   apiVersion: 1,

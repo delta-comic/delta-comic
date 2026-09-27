@@ -1,8 +1,34 @@
+import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginCandidate, PluginCandidateProvider } from '@delta-comic/plugin-kernel'
-
-import { toRuntimeCandidate } from '../composition/runtimeAdapter'
+import type { LoadedPluginModule } from '@delta-comic/plugin-loader'
+import type { PluginManifest } from '@delta-comic/plugin-manifest'
 
 import type { PluginArchiveRepository, PluginModuleReader } from './contracts'
+
+const toRuntimeManifest = (manifest: PluginArchiveDB.Archive['meta']): PluginManifest => ({
+  protocolVersion: 1,
+  id: manifest.name.id,
+  name: manifest.name.display,
+  version: manifest.version.plugin,
+  author: manifest.author,
+  description: manifest.description,
+  entry: 'index.js',
+  entryType: 'plugin',
+  dependencies: manifest.require.map(dependency => ({
+    id: dependency.id,
+    ...(dependency.download ? { version: dependency.download } : {}),
+  })),
+  resources: [],
+})
+
+const toRuntimeModule = (
+  module: Awaited<ReturnType<PluginModuleReader['read']>>,
+): LoadedPluginModule => ({
+  factory: environment =>
+    module.factory({ platform: environment.platform === 'tauri' ? 'tauri' : 'web' }),
+  activate: module.activate,
+  dispose: module.dispose,
+})
 
 /**
  * The persisted `enable` flag is stored in a `TEXT` column. `kysely-plugin-serialize` normally
@@ -28,7 +54,17 @@ export class InstalledPluginCandidateProvider implements PluginCandidateProvider
         this.readers.find(candidate => !candidate.matches) ??
         this.readers[0]
       if (!reader) throw new Error('no plugin module reader is configured')
-      return toRuntimeCandidate(archive, reader)
+      return {
+        enabled: archive.enable,
+        management: {
+          canDisable: true,
+          canUninstall: true,
+          canUpdate: archive.installInput.length > 0,
+        },
+        manifest: toRuntimeManifest(archive.meta),
+        origin: 'installed' as const,
+        load: async loadSignal => toRuntimeModule(await reader.read(archive, loadSignal)),
+      }
     })
   }
 }

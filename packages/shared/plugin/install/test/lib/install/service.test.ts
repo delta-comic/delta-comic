@@ -2,13 +2,13 @@ import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/model'
 import { describe, expect, it, vi } from 'vitest'
 
-import { MemoryPluginFileStore } from '../../../lib/adapters'
+import { MemoryPluginFileStore } from '../../../../plugin/lib/adapters'
 import type {
   PluginArchiveRepository,
   PluginPackageCodec,
   PluginSourceResolver,
-} from '../../../lib/install'
-import { PluginInstallService } from '../../../lib/install'
+} from '../../../lib'
+import { PluginInstallService } from '../../../lib'
 
 const manifest = (version: string): PluginManifest => ({
   apiVersion: 1 as const,

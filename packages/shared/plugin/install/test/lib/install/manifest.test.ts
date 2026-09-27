@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parsePluginManifest, PluginManifestError } from '../../../lib/install'
+import { parsePluginManifest, PluginManifestError } from '../../../lib'
 
 const manifest = (overrides: Record<string, unknown> = {}) => ({
   apiVersion: 1,

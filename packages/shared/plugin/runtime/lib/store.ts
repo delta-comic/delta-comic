@@ -6,8 +6,8 @@ type PluginModel = NonNullable<PluginConfig['model']>
 
 export class PluginStore {
   private readonly candidateEntries = shallowReactive(new Map<string, PluginCandidate>())
-  private readonly loadingEntries = shallowReactive(new Map<string, PluginConfig<DCPluginConfig>>())
-  private readonly pluginEntries = shallowReactive(new Map<string, PluginConfig<DCPluginConfig>>())
+  private readonly loadingEntries = shallowReactive(new Map<string, PluginConfig>())
+  private readonly pluginEntries = shallowReactive(new Map<string, PluginConfig>())
   private readonly readyEntries = shallowReactive(new Set<string>())
 
   public constructor(private readonly translateText: (value: string) => string = value => value) {}
@@ -16,11 +16,11 @@ export class PluginStore {
     return this.candidateEntries
   }
 
-  public get loading(): ReadonlyMap<string, PluginConfig<DCPluginConfig>> {
+  public get loading(): ReadonlyMap<string, PluginConfig> {
     return this.loadingEntries
   }
 
-  public get plugins(): ReadonlyMap<string, PluginConfig<DCPluginConfig>> {
+  public get plugins(): ReadonlyMap<string, PluginConfig> {
     return this.pluginEntries
   }
 
@@ -35,7 +35,7 @@ export class PluginStore {
     }
   }
 
-  public markLoading(plugin: string, config: PluginConfig<DCPluginConfig>) {
+  public markLoading(plugin: string, config: PluginConfig) {
     this.readyEntries.delete(plugin)
     this.loadingEntries.set(plugin, config)
     this.pluginEntries.delete(plugin)

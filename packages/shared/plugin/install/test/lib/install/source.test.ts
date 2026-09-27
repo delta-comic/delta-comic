@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 
-import type { PluginInstallCatalog } from '../../../lib/install/catalog'
-import type { PluginSourceResolver } from '../../../lib/install/contracts'
+import type { PluginInstallCatalog } from '../../../lib/catalog'
+import type { PluginSourceResolver } from '../../../lib/contracts'
 import {
   DevServerSourceResolver,
   GitHubSourceResolver,
   HttpSourceResolver,
   MarketplaceSourceResolver,
-} from '../../../lib/install/source'
+} from '../../../lib/source'
 
 const octokit = vi.hoisted(() => ({ pages: [] as Array<{ data: Array<Record<string, unknown>> }> }))
 

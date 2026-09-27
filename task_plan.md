@@ -76,19 +76,20 @@
 
 ## Next Step
 
-  阶段 6G：Runtime 已完成并停止在此阶段；Install、Vite Adapter 和市场管理界面保持 pending，后续再继续。
+  阶段 6G Install 与 Vite Adapter 已完成；后续继续处理 6D/6E 的完整旧宿主迁移、发布身份/CAS、WfP provisioning、应用/admin 重组和完整部署流水线。
 
 ## 阶段 6G 实施计划
 
 1. **Kernel/Loader 基础包（complete）**：创建三级 workspace 包与独立构建入口；迁移 kernel 全部 source-agnostic 类型、依赖规划、capability pipeline、contribution hub、scope；将 `LoadedPluginModule` 与 `PluginModuleReader` 迁移到 loader，更新 API/Manifest 类型引用与测试。专项构建、类型检查和包内测试已通过。
 2. **Runtime 包（complete）**：迁移 engine/providers/store；将 runtime 依赖收敛到 api、kernel、loader 与必要的 Vue/logger peer；更新 Runtime 测试和聚合包导入。聚合 composition 已通过边界 adapter 接入旧 Install reader 与 capabilities，旧聚合 Runtime 实现及测试已删除。
-3. **Install 包**：迁移 contracts/service/source/codec/moduleReader/candidateProvider；将 DB repository、Tauri 文件存储、市场和应用服务 adapter 留在聚合包 composition；统一 plugin-manifest/plugin-artifact 运行时校验。
-4. **Vite Adapter 包**：迁移 Vite build/dev 实现与测试；仅依赖 manifest、install/loader contracts、Vite 和通用构建工具，保持 native HMR、CSS bridge、SFC style BFS、ZIP 产物行为。
-5. **聚合包收敛（Runtime 部分 complete）**：调整 composition 的 concrete imports，保留 capabilities、builtins、adapters 与对外聚合导出；Runtime 迁移后的旧源码和测试已删除，Install/Vite 迁移与完整聚合收敛保持 pending。
-6. **验证与提交**：每个阶段独立运行专项测试/build/typecheck；最终运行 `vp install`、`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`、`vp run codegen:check`、`git diff --check`，更新规划文件并签名提交。
+3. **Install 包（complete）**：迁移 contracts/service/source/codec/moduleReader/candidateProvider/artifactReader；数据库 archive repository、Tauri 文件存储和市场 client 留在聚合包 adapters/composition；Install build/typecheck 与 24 个专项测试通过。
+4. **Vite Adapter 包（complete）**：迁移 Vite build/dev 实现与测试；保留 native HMR、CSS bridge、SFC style BFS、CORS/no-store 和 ZIP 产物行为；Vite build/typecheck 与 26 个专项测试通过。
+5. **聚合包收敛（complete）**：composition 改用新 Install/Vite 包，聚合入口 re-export 新包，旧 `lib/install` 与 `vite` 源码和测试已删除。
+6. **验证与提交（Install/Vite slice complete）**：已运行 `vp install`、`vp run lib-build`、专项 build/typecheck/test、聚合包测试、release workspace 测试、semantic release command 测试和 `git diff --check`；全仓 `vp check`、递归 typecheck、全量测试和 codegen 检查留待 6D/6E 后续清单。
 
 ## Errors Encountered
 
 | Error | Attempt | Resolution |
 |---|---|---|
 | `writing-plans` 技能不在当前可用技能列表 | 1 | 按已批准 6G spec 在本文件记录等价的分阶段实施计划，继续执行既定流程 |
+| app `vue-tsc` 报告旧 `DCPluginConfig` model/hooks 字段缺失 | 1 | 聚合包已恢复可解析；记录为 6D 旧宿主类型迁移遗留，不扩大本次 6G Install/Vite 包拆分范围 |

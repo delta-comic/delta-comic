@@ -37,12 +37,12 @@ beforeEach(() => {
 
 describe('semantic-release command runner', () => {
   it('runs ordered package builds and recursive publish through inherited stdio', async () => {
-    mocks.statuses = Array.from({ length: 15 }, () => 0)
+    mocks.statuses = Array.from({ length: 20 }, () => 0)
     const { publish } = await import('../semantic-release-plugin.mts')
 
     await publish({}, { env: {}, nextRelease: { version: workspaceVersion } })
 
-    expect(mocks.spawn.mock.calls.slice(0, 13).map(([command, args]) => [command, args])).toEqual(
+    expect(mocks.spawn.mock.calls.slice(0, 18).map(([command, args]) => [command, args])).toEqual(
       [
         '@delta-comic/both',
         '@delta-comic/downloader',
@@ -56,11 +56,16 @@ describe('semantic-release command runner', () => {
         '@delta-comic/server',
         '@delta-comic/plugin-api',
         '@delta-comic/plugin-artifact',
+        '@delta-comic/plugin-loader',
+        '@delta-comic/plugin-kernel',
+        '@delta-comic/plugin-install',
+        '@delta-comic/plugin-runtime',
+        '@delta-comic/plugin-vite',
         '@delta-comic/plugin',
       ].map(name => ['vp', ['run', '--filter', name, '--fail-if-no-match', 'build']]),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      14,
+      19,
       'vp',
       [
         'pm',
@@ -77,7 +82,7 @@ describe('semantic-release command runner', () => {
       expect.objectContaining({ stdio: 'inherit' }),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      15,
+      20,
       'vp',
       [
         'pm',

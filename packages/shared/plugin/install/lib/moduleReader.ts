@@ -1,7 +1,6 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-
-import type { PluginConfigFactory } from '../api'
-import type { LoadedPluginModule } from '../kernel'
+import type { PluginConfigFactory } from '@delta-comic/plugin-api'
+import type { LoadedPluginModule, PluginScopeLike } from '@delta-comic/plugin-loader'
 
 import type { PluginFileStore, PluginModuleReader } from './contracts'
 import {
@@ -22,7 +21,7 @@ const asFactory = (value: unknown, plugin: string): PluginConfigFactory => {
 const styleActivator = (plugin: string, styleText: string | undefined) =>
   styleText === undefined
     ? undefined
-    : (scope: import('../kernel').PluginScope) => {
+    : (scope: PluginScopeLike) => {
         if (typeof document === 'undefined') return
         const style = document.createElement('style')
         style.dataset.plugin = plugin

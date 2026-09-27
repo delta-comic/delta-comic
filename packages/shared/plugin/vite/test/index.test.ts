@@ -2,7 +2,7 @@ import type { PluginArchiveDB } from '@delta-comic/db'
 import JSZip from 'jszip'
 import { describe, expect, it } from 'vite-plus/test'
 
-import { deltaComic } from '../../vite/index'
+import { deltaComic } from '../lib/plugin'
 
 const meta: PluginArchiveDB.Meta = {
   apiVersion: 1,

@@ -1,7 +1,6 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/model'
-
-import type { LoadedPluginModule } from '../kernel'
+import type { LoadedPluginModule } from '@delta-comic/plugin-loader'
 
 export type PluginInstallInput = File | string
 

@@ -1,14 +1,14 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/model'
+import { PluginScope } from '@delta-comic/plugin-kernel'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { PluginFileReplacement, PluginFileStore } from '../../../lib/install'
+import type { PluginFileReplacement, PluginFileStore } from '../../../lib'
 import {
   CordisArtifactModuleReader,
   DevServerPluginModuleReader,
   StoredPluginModuleReader,
-} from '../../../lib/install'
-import { PluginScope } from '../../../lib/kernel'
+} from '../../../lib'
 
 const artifactManifest = async (entryType: 'plugin' | 'plugin-set' = 'plugin') => {
   const source = 'export default () => ({ name: "cordis-reader" })'

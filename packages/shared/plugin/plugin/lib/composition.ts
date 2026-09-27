@@ -1,24 +1,4 @@
 import {
-  CompositePluginCandidateProvider,
-  InternalPluginCandidateProvider,
-  LocalInternalPluginPreferences,
-  PluginRuntime,
-  PluginStore,
-} from '@delta-comic/plugin-runtime'
-import { isTauri } from '@tauri-apps/api/core'
-
-import {
-  AwesomeRegistryClient,
-  ConfigStore,
-  createDefaultPluginFileStore,
-  pluginI18n,
-} from './adapters'
-import { corePluginDefinition, internalPluginDefinitions } from './builtins'
-import { createDefaultCapabilities, type PluginAuthGateway } from './capabilities'
-import { adaptLegacyCapabilities } from './composition/runtimeAdapter'
-import { cfg } from './core/config'
-import {
-  DatabasePluginArchiveRepository,
   DevServerPluginModuleReader,
   DevServerSourceResolver,
   DEV_SERVER_LOADER_ID,
@@ -35,7 +15,27 @@ import {
   ZipPackageCodec,
   devServerUrl,
   parseDevServerPort,
-} from './install'
+} from '@delta-comic/plugin-install'
+import {
+  CompositePluginCandidateProvider,
+  InternalPluginCandidateProvider,
+  LocalInternalPluginPreferences,
+  PluginRuntime,
+  PluginStore,
+} from '@delta-comic/plugin-runtime'
+import { isTauri } from '@tauri-apps/api/core'
+
+import {
+  AwesomeRegistryClient,
+  ConfigStore,
+  createDefaultPluginFileStore,
+  pluginI18n,
+} from './adapters'
+import { DatabasePluginArchiveRepository } from './adapters/pluginRepository'
+import { corePluginDefinition, internalPluginDefinitions } from './builtins'
+import { createDefaultCapabilities, type PluginAuthGateway } from './capabilities'
+import { adaptLegacyCapabilities } from './composition/runtimeAdapter'
+import { cfg } from './core/config'
 import { ContributionHub } from './kernel'
 
 export const pluginContributions = new ContributionHub()

@@ -9,7 +9,7 @@ import type { InlineConfig } from 'vite'
 import { createServer } from 'vite'
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test'
 
-import { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH, createDevPlugin } from '../../vite/dev'
+import { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH, createDevPlugin } from '../lib/dev'
 
 const meta: PluginManifest = {
   apiVersion: 1,

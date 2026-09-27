@@ -68,7 +68,7 @@ export interface PluginRuntimeOptions {
 
 interface PreparedPlugin {
   readonly candidate: PluginCandidate
-  readonly config: PluginConfig<DCPluginConfig>
+  readonly config: PluginConfig
   readonly module: LoadedPluginModule
   readonly scope: PluginScope
 }

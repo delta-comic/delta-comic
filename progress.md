@@ -17,10 +17,19 @@
 
 ## 当前状态
 
-- 当前阶段：阶段 6E 实施，Worker dispatcher 已接入 runtime 解析与 fetch/scheduled 分发边界，正在进入 SQL artifact 加载与 D1 per-installation 生命周期。
+- 当前阶段：阶段 6G Install/Vite 迁移已完成；阶段 6D/6E 的完整旧宿主迁移、市场发布身份/CAS、WfP provisioning、应用/admin 重组和完整部署流水线仍在待办清单。
 - 代码实现：both 公共 Manifest、artifact 校验、诊断记录器和 Cordis runtime harness 已完成并通过专项验证。
 - 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
-- 下一个动作：实现 SQL artifact migration 加载与 D1 per-installation 生命周期；市场发布、应用/admin 重组与部署文档继续保持未完成。
+- 下一个动作：继续实现 6D/6E 的完整旧宿主迁移、市场发布身份/CAS、WfP provisioning、应用/admin 重组和完整部署流水线。
+
+### 2026-09-27 — 阶段 6G Install 与 Vite Adapter
+
+- 新增 `@delta-comic/plugin-install`，迁移 Install contracts、service、source resolver、ZIP codec、stored/dev module reader、candidate provider、artifact reader 和 marketplace ports。
+- 新增 `@delta-comic/plugin-vite`，迁移构建与开发适配器，保留原生 Vite HMR、CSS bridge、Vue SFC style 聚合、CORS/no-store endpoint 和 ZIP 产物行为。
+- 聚合 `@delta-comic/plugin` 的 composition 改用新 Install/Vite 包；数据库 archive repository 保留在聚合 adapters，旧 `lib/install` 与 `vite` 源码及测试已移除。
+- 发布工作区和版本同步清单纳入 `plugin-loader`、`plugin-kernel`、`plugin-install`、`plugin-runtime`、`plugin-vite`，并为新公共包补齐 `publishConfig.access`。
+- 验证通过：Install build/typecheck/24 tests，Vite build/typecheck/26 tests，plugin aggregate 13 files/40 tests，release workspace 3 tests，semantic release command 4 tests，`git diff --check`。
+- 阶段 6D/6E 的完整旧宿主迁移、发布身份/CAS、WfP provisioning、应用/admin 重组和完整部署流水线仍未完成。
 
 ### 2026-09-26 — 阶段 6A Artifact Loader 接入
 

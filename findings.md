@@ -307,3 +307,10 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - `core.builtin.ts`、builtins 导出和 InstalledPluginCandidateProvider 已切换到新 Kernel/Runtime 契约；聚合包继续负责 concrete assembly，并通过 `@delta-comic/plugin-runtime` 对外导出 Runtime。
 - 旧聚合 Runtime engine/providers/store 源码及对应三组测试已删除，新 Runtime 测试作为规范测试；聚合 plugin typecheck、plugin build、选定 capability/install/architecture 测试和全仓 `vp run lib-build` 均通过。聚合 package 没有独立 `test` task，因此使用 `vp test run` 指定既有相关测试文件。
 - tsgo-backed Runtime standalone typecheck 仍报告 12 个与当前源码不一致的陈旧 `PluginConfig<DCPluginConfig>`/`DCPluginConfig` 诊断；listFiles、当前源码、dist 声明、symlink 和 tsconfig 均已核对，作为工具链限制记录，不改变正确 Runtime 源码。
+
+## 2026-09-27：6G-3 Install 与 Vite 包边界
+
+- `@delta-comic/plugin-install` 承载安装服务、来源 resolver、ZIP codec、stored/dev module reader、candidate provider、artifact reader 和安装协议；数据库 archive repository、Tauri 文件存储与市场 client 仍由聚合 composition 注入。
+- `@delta-comic/plugin-vite` 承载构建和开发服务器适配器，依赖 Install 的 dev 协议常量与通用构建工具，不依赖 Runtime、数据库或应用服务。
+- 聚合 `@delta-comic/plugin` 通过新包导出 Install/Vite，删除旧 `lib/install`、`vite` 实现和对应测试，发布工作区与版本同步路径已纳入五个新增公共包。
+- Install 专项 24 测试、Vite 专项 26 测试、聚合插件 40 测试、发布工作区 3 测试和 semantic release command 4 测试通过。

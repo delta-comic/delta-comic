@@ -1,7 +1,6 @@
+import type { PluginFileReplacement, PluginFileStore } from '@delta-comic/plugin-install'
+import { safePluginPath } from '@delta-comic/plugin-install'
 import { convertFileSrc, isTauri } from '@tauri-apps/api/core'
-
-import type { PluginFileReplacement, PluginFileStore } from '../install'
-import { safePluginPath } from '../install'
 
 type PluginFiles = ReadonlyMap<string, Uint8Array>
 

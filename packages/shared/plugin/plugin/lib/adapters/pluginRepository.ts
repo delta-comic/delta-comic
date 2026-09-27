@@ -1,6 +1,5 @@
 import { assertWriteRow, db, validateReadRow, type PluginArchiveDB } from '@delta-comic/db'
-
-import type { PluginArchiveRepository } from './contracts'
+import type { PluginArchiveRepository } from '@delta-comic/plugin-install'
 
 export class DatabasePluginArchiveRepository implements PluginArchiveRepository {
   public async find(plugin: string) {

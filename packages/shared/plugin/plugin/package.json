@@ -16,17 +16,17 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/lib/index.mjs",
-  "module": "./dist/lib/index.mjs",
-  "types": "./dist/lib/index.d.mts",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
-      "types": "./dist/lib/index.d.mts",
-      "import": "./dist/lib/index.mjs"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
     },
     "./vite": {
-      "types": "./dist/vite/index.d.mts",
-      "import": "./dist/vite/index.mjs"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
     }
   },
   "publishConfig": {
@@ -38,10 +38,12 @@
     "@delta-comic/logger": "workspace:",
     "@delta-comic/plugin-api": "workspace:",
     "@delta-comic/plugin-artifact": "workspace:",
+    "@delta-comic/plugin-install": "workspace:",
     "@delta-comic/plugin-kernel": "workspace:",
     "@delta-comic/plugin-loader": "workspace:",
     "@delta-comic/plugin-manifest": "workspace:",
     "@delta-comic/plugin-runtime": "workspace:",
+    "@delta-comic/plugin-vite": "workspace:",
     "@octokit/rest": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-fs": "catalog:",

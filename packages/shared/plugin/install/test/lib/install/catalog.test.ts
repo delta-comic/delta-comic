@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
 
-import {
-  pluginCatalogIdFromInstallInput,
-  pluginCatalogInstallInput,
-} from '../../../lib/install/catalog'
+import { pluginCatalogIdFromInstallInput, pluginCatalogInstallInput } from '../../../lib/catalog'
 
 describe('plugin catalog install input', () => {
   it('round-trips portable catalog plugin ids', () => {

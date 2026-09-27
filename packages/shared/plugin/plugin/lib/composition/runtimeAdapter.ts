@@ -1,5 +1,6 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginConfig } from '@delta-comic/plugin-api'
+import type { PluginModuleReader } from '@delta-comic/plugin-install'
 import type {
   CapabilityModule as RuntimeCapabilityModule,
   PluginCandidate,
@@ -8,7 +9,6 @@ import type { LoadedPluginModule } from '@delta-comic/plugin-loader'
 import type { PluginManifest } from '@delta-comic/plugin-manifest'
 
 import type { DCPluginConfig } from '../api'
-import type { PluginModuleReader } from '../install'
 import type { CapabilityModule as LegacyCapabilityModule } from '../kernel'
 import type { PluginScope as LegacyPluginScope } from '../kernel'
 
