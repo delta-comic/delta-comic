@@ -180,3 +180,9 @@
 
 - `@delta-comic/server` 增加 `createR2PluginCatalogStore`，使用 R2 object `get/put` 读写 JSON 目录索引并复用共享 TypeBox 校验。
 - 适配器已通过无对象、读写和 content-type 测试；Worker binding、认证发布接口、版本原子更新和管理后台仍未接入。
+
+## 2026-09-27：6E 市场目录 HTTP handler 边界
+
+- `@delta-comic/server` 增加 `createPluginCatalogHandler`，公开 GET 目录读取，PUT 写入通过宿主注入的授权回调保护。
+- handler 校验请求路径、HTTP 方法和完整目录协议，返回明确的 404、405、401 与 400 响应，并复用任意 `PluginCatalogStore`。
+- 测试覆盖公开读取、授权写入、非法目录和无关路径；真实 Worker 路由组合、发布身份系统、R2 binding 配置、发布工作流、应用/admin 重组和部署文档仍未完成。
