@@ -104,6 +104,14 @@
 - 该边界保留现有 Elysia/旧插件控制面，不创建虚假的 D1 隔离；SQL artifact 加载、D1 per-installation 生命周期、市场发布、应用/admin 重组和部署文档仍未完成。
 - server typecheck、dispatcher/SDK 专项测试（2 个文件、4 个测试）和 `vp check --fix` 通过。
 
+### 2026-09-27 — 阶段 6E SQL artifact migration runner
+
+- Server Manifest 新增可选 `migrationResources`，把 migration ID 映射到 artifact 内的 SQL 文件路径。
+- 新增 `applyServerSqlMigrations` 与 `ServerRuntime.migrateSqlArtifact`，按 `pluginId + installationId + migrationId` 建立 D1 记录，重复执行会跳过已应用 migration。
+- runner 校验声明与资源一一对应、校验 SQL 文件存在，并在执行 SQL 后写入应用时间；测试覆盖首次应用、幂等重跑和声明不完整错误。
+- server typecheck、dispatcher/SDK/migration 专项测试（3 个文件、6 个测试）和 `vp check --fix` 通过。
+- SQL runner 已形成 D1 生命周期边界；正式 artifact 存储下载、WfP runtime provisioning、市场发布、应用/admin 重组与部署文档仍未完成。
+
 ### 2026-09-26 — 40 项架构决策确认
 
 - 用户批量确认了 40 项架构设计决策，涵盖包与协议 (1–6)、模块与构建 (7–12)、客户端 API (13–18)、服务端 (19–26)、安装/诊断 (27–35)、应用/文案/发布 (36–40)。

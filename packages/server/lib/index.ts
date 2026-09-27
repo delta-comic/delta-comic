@@ -12,8 +12,14 @@ export * from './plugin'
 export * from './serverHost'
 export * from './serverAdapter'
 export * from './serverDispatcher'
+export * from './serverMigrations'
 export { ServerCronSchema, ServerPluginManifestSchema, ServerRouteSchema } from './serverManifest'
-export type { ServerCron, ServerPluginArtifactManifest, ServerRoute } from './serverManifest'
+export type {
+  ServerCron,
+  ServerMigrationResource,
+  ServerPluginArtifactManifest,
+  ServerRoute,
+} from './serverManifest'
 export * from './serverRuntime'
 export * from './storage'
 export * from './sync'

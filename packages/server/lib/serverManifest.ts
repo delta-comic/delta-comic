@@ -19,6 +19,12 @@ export const ServerCronSchema = Type.Object({
   id: Type.String({ minLength: 1 }),
 })
 
+export const ServerMigrationResourceSchema = Type.Object({
+  id: Type.String({ minLength: 1 }),
+  path: Type.String({ minLength: 1 }),
+  downPath: Type.Optional(Type.String({ minLength: 1 })),
+})
+
 export const ServerPluginManifestSchema = Type.Intersect([
   PluginManifestSchema,
   Type.Object({
@@ -26,9 +32,11 @@ export const ServerPluginManifestSchema = Type.Intersect([
     crons: Type.Array(ServerCronSchema),
     queues: Type.Array(Type.String({ minLength: 1 })),
     migrations: Type.Array(Type.String({ minLength: 1 })),
+    migrationResources: Type.Optional(Type.Array(ServerMigrationResourceSchema)),
   }),
 ])
 
 export type ServerRoute = Static<typeof ServerRouteSchema>
 export type ServerCron = Static<typeof ServerCronSchema>
+export type ServerMigrationResource = Static<typeof ServerMigrationResourceSchema>
 export type ServerPluginArtifactManifest = Static<typeof ServerPluginManifestSchema>
