@@ -9,6 +9,8 @@ import {
   findPluginRelease,
   parsePluginCatalogIndex,
   parsePluginRelease,
+  createHttpPluginCatalogStore,
+  createMemoryPluginCatalogStore,
   Service,
   sha256Integrity,
   validateArtifact,
@@ -148,6 +150,31 @@ describe('@delta-comic/both cordis integration', () => {
     expect(() =>
       parsePluginRelease({ ...release, manifestUrl: 'http://insecure.test/manifest' }),
     ).toThrow('invalid plugin release')
+  })
+
+  it('reads and writes catalog indexes through injected stores', async () => {
+    const memory = createMemoryPluginCatalogStore()
+    await memory.save({ protocolVersion: 1, generatedAt: 'now', entries: [] })
+    await expect(memory.load()).resolves.toMatchObject({ entries: [] })
+
+    const requests: RequestInit[] = []
+    const http = createHttpPluginCatalogStore(
+      'https://plugins.example/catalog.json',
+      async (_url, init) => {
+        requests.push(init ?? {})
+        return {
+          ok: true,
+          status: 200,
+          async json() {
+            return { protocolVersion: 1, generatedAt: 'now', entries: [] }
+          },
+        }
+      },
+    )
+    await expect(http.load()).resolves.toMatchObject({ entries: [] })
+    await http.save({ protocolVersion: 1, generatedAt: 'now', entries: [] })
+    expect(requests[0]?.headers).toMatchObject({ accept: 'application/json' })
+    expect(requests[1]?.method).toBe('PUT')
   })
 
   it('mounts and snapshots a Cordis runtime', async () => {

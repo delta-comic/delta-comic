@@ -170,3 +170,8 @@
 - `@delta-comic/both/release` 增加 HTTPS 发布 artifact、版本、目录条目的 TypeBox 协议、解析器和非撤回版本查找函数。
 - 协议覆盖平台、下载 URL、Manifest URL、大小、SHA-256 完整性、发布时间和撤回标记；没有引入签名凭证或远程存储实现。
 - 下一步实现目录索引的读取/存储适配器，并继续保留市场服务、应用/admin 重组和部署文档为未完成事项。
+
+## 2026-09-27：6E Artifact 目录存储适配器
+
+- `@delta-comic/both/releaseStore` 增加目录索引的内存存储与注入 fetch 的 HTTPS JSON 读写适配器。
+- 适配器负责 HTTP 状态处理和 TypeBox 协议解析；认证、签名、R2/D1 持久化与发布工作流仍未实现。
