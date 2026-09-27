@@ -1,6 +1,8 @@
 import { first } from '@/infrastructure/d1/database'
+import { createKysely, type ServerDatabase } from '@/infrastructure/d1/kysely'
 
 import type { ServerPluginHost, ServerPluginHostMetric } from '../../../lib/plugin'
+import { ServerRuntime, type ServerRuntimeOptions } from '../../../lib/serverRuntime'
 
 const metricSql = {
   'auth.activeSessions': `SELECT COUNT(*) AS value
@@ -33,3 +35,18 @@ export class D1ServerPluginHost implements ServerPluginHost {
     return Number(row?.value ?? 0)
   }
 }
+
+export type AppServerRuntimeOptions = Omit<
+  ServerRuntimeOptions<ServerDatabase>,
+  'db' | 'legacyPluginHost'
+>
+
+export const createAppServerRuntime = (
+  database: D1Database,
+  options: AppServerRuntimeOptions,
+): ServerRuntime<ServerDatabase> =>
+  new ServerRuntime({
+    ...options,
+    db: createKysely(database),
+    legacyPluginHost: new D1ServerPluginHost(database),
+  })

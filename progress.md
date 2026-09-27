@@ -84,6 +84,13 @@
 - 增加 fetch/scheduled 适配器测试，并从公开 `@delta-comic/server` SDK 导出适配器。
 - 服务端旧业务到 `ServerHost` 的迁移、WfP 动态 dispatcher、D1 per-installation 与阶段 6E 仍未完成。
 
+### 2026-09-26 — 阶段 6D D1 ServerRuntime bridge
+
+- 新增 app 内部 `createAppServerRuntime` 工厂，使用现有 `createKysely` 和 `D1ServerPluginHost` 构造带 typed DB、诊断和 legacy host bridge 的新 `ServerRuntime`。
+- 保留现有 `StaticPluginExecutor`、Elysia 路由组合和插件控制面；本阶段提供真实切换入口，不宣称旧工厂插件已完成 Cordis 迁移。
+- 增加 runtime factory 测试；服务端 typecheck、专项测试和 lint 通过后提交。
+- WfP 动态 dispatcher、D1 per-installation migration、市场发布、诊断面板和 app/admin 重组仍未完成。
+
 ### 2026-09-26 — 40 项架构决策确认
 
 - 用户批量确认了 40 项架构设计决策，涵盖包与协议 (1–6)、模块与构建 (7–12)、客户端 API (13–18)、服务端 (19–26)、安装/诊断 (27–35)、应用/文案/发布 (36–40)。
