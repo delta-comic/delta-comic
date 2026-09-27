@@ -5,6 +5,7 @@ import { Elysia, t } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
 
 import { serverModules } from '../lib/config'
+import { createServerWorkerAdapter } from '../lib/serverAdapter'
 
 import { bindRuntime, type AppEnv } from './env'
 import { adminModule } from './modules/admin/admin.module'
@@ -104,9 +105,8 @@ export type App = typeof app
 
 const compiled = app.compile()
 
-export default {
-  ...compiled,
-  fetch(request: Request, env: AppEnv, ctx: ExecutionContext) {
+const workerAdapter = createServerWorkerAdapter<AppEnv>({
+  fetch(request, env, ctx) {
     serverLogger.debug('request received', {
       method: request.method,
       path: new URL(request.url).pathname,
@@ -114,8 +114,16 @@ export default {
     bindRuntime(request, { ctx, env })
     return compiled.fetch(request)
   },
-  scheduled(controller: ScheduledController, env: AppEnv, ctx: ExecutionContext) {
+  scheduled(controller, env, ctx) {
     serverLogger.info('scheduled plugin run started', { cron: controller.cron })
     ctx.waitUntil(runScheduledPluginScripts(env, ctx, controller.scheduledTime, controller.cron))
   },
+})
+
+export default {
+  ...compiled,
+  fetch: workerAdapter.fetch,
+  scheduled: workerAdapter.scheduled,
 } satisfies ExportedHandler<AppEnv>
+
+export const workerDiagnostics = workerAdapter.diagnostics

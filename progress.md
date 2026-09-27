@@ -77,6 +77,13 @@
 - app/client typecheck、路由与 Client SDK 专项测试、`vp check --fix` 通过。
 - 真实 command palette 视图、旧 plugin runtime 全量迁移和服务端业务迁移仍未完成。
 
+### 2026-09-26 — 阶段 6D 服务端 Worker 诊断适配器
+
+- 新增 `ServerWorkerAdapter`，在现有 Elysia/Cloudflare Worker fetch 与 scheduled 边界统一记录成功、失败和耗时诊断。
+- Worker 入口继续保留现有模块组合、运行时绑定和 scheduled plugin script runner；适配器仅负责生命周期观测与可注入 `DiagnosticRecorder`。
+- 增加 fetch/scheduled 适配器测试，并从公开 `@delta-comic/server` SDK 导出适配器。
+- 服务端旧业务到 `ServerHost` 的迁移、WfP 动态 dispatcher、D1 per-installation 与阶段 6E 仍未完成。
+
 ### 2026-09-26 — 40 项架构决策确认
 
 - 用户批量确认了 40 项架构设计决策，涵盖包与协议 (1–6)、模块与构建 (7–12)、客户端 API (13–18)、服务端 (19–26)、安装/诊断 (27–35)、应用/文案/发布 (36–40)。
