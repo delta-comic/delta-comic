@@ -351,3 +351,16 @@
 - 管理面板测试地址统一使用可解析的 `https://example.com`；运行指标页面注入离线 API 响应，测试退出时无悬挂网络请求。
 - `vp check --fix`、`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp run codegen:check` 通过；管理面板定向测试 3 files / 42 tests 通过，页面测试无 AbortError 输出。
 - 全量测试最终通过 164 files / 883 tests；输出无 DNS 错误与 AbortError，重命名变更已完成验收。
+
+## 2026-10-01：阶段 10 实施
+
+- 增加 desktop/Android host profile 和 specta runtime platform 接线，新增 profile 专项测试。
+- 添加 plugin_diagnostic_log schema、生成 SQL/类型、native/Web 迁移、typed repository、DiagnosticRecorder sink 与应用写入接线。
+- 服务端继续使用现有 auth、sync、server plugin D1 migrations 与 Kysely 类型；下载器和 network transport 的平台边界已记录在架构基线。
+- `vp fmt --check`、`vp lint`、`vp run lib-build`、`vp check`、递归 typecheck、全量测试（165 files / 886 tests）、codegen check、Rust fmt/clippy/test 和 diff check 全部通过。
+
+## 2026-10-01：阶段 11 验收
+
+- workspace catalog 更新至已核对的 Vue `3.6.0-rc.10`、Kysely `0.30.0-beta.2`、tslog `5.2.0`、pino `10.3.1`，`vp install` 成功并更新锁文件。
+- 发布协同基于 `script/release-workspace.mts`、`script/set-version.mts` 与 `release:dry-run` 工作流，架构文档已与真实入口同步。
+- 第 10、11 章实现与验收完成，待签名提交保存进度。

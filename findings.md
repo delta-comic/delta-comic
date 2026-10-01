@@ -336,6 +336,12 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - `new PluginStore()` 默认模型为 object，`keyof object` 为 never；两处 expose 查询测试需指定包含 expose 的模型类型。对象被后续传入 markLoading 时，已创建的 store 的泛型不会随调用改变。
 - 公开 modelEntries 重载保留键到值的精确类型，实现接收 PropertyKey 并通过 Reflect.get 读取、标注 unknown、过滤 undefined。宿主模型接口继续保持现有约束。
 
+## 2026-10-01：第 10/11 章实施前核查
+
+- `ARCHITECTURE.md` 第 10 章描述的是目标边界：Tauri 桌面/Android 应用、Worker 服务端、独立 admin、客户端诊断表与服务端平台表、下载器宿主接入和 Android 能力分支；其中示例代码含有伪 API 与不符合当前类型约束的 `any`，不能直接照搬。
+- 当前真实应用仍位于 `packages/client/app/app`，已同时包含 `src-tauri`、Vue 页面、插件功能和测试；server 位于 `packages/server/core/server`，admin 位于 `packages/server/admin/panel`。仓库没有 `apps/desktop` 或 `apps/mobile` 目录。
+- 第 11 章要求依赖升级、统一发布、版本协议、验证流程和网络插件内化。当前仓库已存在多个 `@delta-comic/*` 公共包及 Vite+ 任务，必须先核对实际 package scripts、锁文件和发布脚本，再决定可落地范围。
+
 ## 2026-10-01：阶段 6E Cloudflare 边界验证
 
 - Workers for Platforms 的 `DispatchNamespace.get(name, bindings, options)` 接受每次 dispatch 的绑定和资源限制；`CloudflareDispatchWorkerProvisioner` 将 `PLUGIN_ID`、`INSTALLATION_ID` 和 manifest limits 传入对应 installation worker。
@@ -344,3 +350,7 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - R2 Workers API 的条件写入通过 `onlyIf: Headers` 表达，`If-None-Match: *` 用于 artifact 首次上传，条件失败返回 `null`；重复 artifact 由 HTTP handler 转换为 409。
 - 管理端 `AdminApiClient` 使用 `{ ok, data }` envelope，诊断快照接口已统一该响应格式，避免页面读取时绕过管理 API 契约。
 - 生产发布工作流由 `.github/workflows/server-deploy.yaml` 固化验证、远程迁移、Worker 部署和可选 Pages 部署；WfP、R2 bucket 与 secret 仍由部署环境配置。
+
+- 第 10 章当前采用单一 Tauri 应用共享 desktop/Android 入口；原生下载器已有 Android SAF/UIDT/WorkManager 和 desktop 编译分支，Cloudflare auth_users/auth_sessions 已有 Kysely typed repository 与 0001_auth migration。
+- 客户端新增诊断表沿用 TypeBox schema codegen；Rust 迁移通过 include_str 消费生成 SQL。持久化按插件保留 100 条，应用按顺序写入并报告失败。
+- 2026-10-01 从 npm/crates 元数据核对依赖：Vue 当前 RC 为 3.6.0-rc.10，Cordis rc.10，Kysely beta.2，tslog 5.2.0，pino 10.3.1；Tauri 3 仍为 alpha，因此保持 Tauri 2.11.x 与 specta 2.0.0-rc.25。

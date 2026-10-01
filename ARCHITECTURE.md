@@ -2537,6 +2537,25 @@ if (isMobile()) {
 }
 ```
 
+### 10.6 当前实现基线（阶段 10）
+
+仓库的 Vite+ workspace 固定使用 `packages/*/*/*`，应用宿主继续位于
+`packages/client/app/app`，服务端位于 `packages/server/core/server`，管理后台位于
+`packages/server/admin/panel`。应用入口通过 Tauri specta 的 `get_runtime_platform` 命令解析
+`desktop`/`android`，Web 运行时根据 user agent 选择对应 profile；profile 明确存储、下载、窗口
+和后台任务能力，Android 使用单窗口策略，桌面端保留多窗口能力。
+
+客户端诊断数据使用 codegen 的 `plugin_diagnostic_log` 表，表结构源自
+`script/codegen/client.table.mts`，Web schema 与 Tauri SQL migration 共用同一字段契约。应用的
+`DiagnosticRecorder` 通过异步 sink 串行写入日志，按插件保留最近 100 条记录；写入失败记录到宿主
+logger，运行时调用继续完成。服务端认证、同步和插件管理继续使用现有 `auth_*`、`sync_*`、
+`server_plugin_*` 表及对应 D1 migration，Kysely 类型从 `script/codegen/server.table.mts` 生成。
+
+下载器保留 `@delta-comic/downloader` 的宿主边界：桌面使用本地目录与后台任务，Android 使用
+SAF/WorkManager/UIDT 适配，应用插件通过 `ClientRuntime` 注入的 downloader service 访问它。
+共享客户端 network API 继续以 transport 注入，Tauri 初始化后由 better-cors-fetch 提供原生请求
+能力，Web 使用 Fetch API。
+
 ---
 
 ## 第 11 章：依赖升级、发布/版本协同与验证策略
@@ -2584,13 +2603,16 @@ export default defineConfig({
 
 #### 统一发布
 
-三个公开包（`@delta-comic/both`、`@delta-comic/client`、`@delta-comic/server`）**统一版本号**，同时发布：
+所有可发布 workspace 包**统一版本号**，由 release workspace 按依赖拓扑提供发布顺序：
 
 ```bash
-vp run set-ver -- 3.0.0
-vp run publish --dry-run
-vp run publish
+vp run --no-cache release:dry-run
+node ./script/set-version.mts 3.0.0
+vp run lib-build
 ```
+
+实际发布由 `.github/workflows/release.yaml` 的 semantic-release job 执行；本地 dry-run 只解析
+版本计划，不会写入仓库或发布包。
 
 #### apiVersion 协议
 
@@ -2732,6 +2754,17 @@ export class NetworkService extends Service {
   }
 }
 ```
+
+### 11.6 当前实现基线（阶段 11）
+
+workspace catalog 已锁定当前可复现工具链：Vue `3.6.0-rc.10`、Cordis `4.0.0-rc.10`、
+Kysely `0.30.0-beta.2`、TypeScript native bridge、Vite Plus 与 Tauri 2.11.x。Tauri 3 仍处于
+alpha，移动端继续沿用现有 Tauri Android 构建流程。
+
+所有可发布 workspace 包由 `script/release-workspace.mts` 自动发现、按依赖拓扑排序并校验公开
+publish config；`script/set-version.mts` 同步 npm、Tauri、Cargo.toml 和 Cargo.lock 版本。发布前
+验证入口固定为 `vp install --frozen`、`vp run lib-build`、`vp check`、递归 typecheck、测试、
+codegen check、Rust fmt/clippy/test 和 `git diff --check`，分支发布命令先执行 dry-run。
 
 ---
 

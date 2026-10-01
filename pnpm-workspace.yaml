@@ -11,8 +11,8 @@ allowBuilds:
 
 catalog:
   cordis: ^4.0.0-rc.10
-  tslog: ^5.0.0-alpha.5
-  pino: ^9.6.0
+  tslog: ^5.2.0
+  pino: ^10.3.1
   '@types/pino': ^7.0.5
   '@elysia/eden': '^1.4.10'
   '@swc/core': ^1.16.0
@@ -57,7 +57,7 @@ catalog:
   es-toolkit: ^1.50.0
   jszip: ^3.10.1
   ky: ^2.0.2
-  kysely: ^0.30.0-beta.1
+  kysely: ^0.30.0-beta.2
   kysely-d1: ^0.4.0
   kysely-dialect-tauri: ^2.0.1
   kysely-plugin-serialize: ^0.8.2
@@ -91,7 +91,7 @@ catalog:
   vite-plugin-wasm: ^3.6.0
   vite-plus: ^0.2.9
   vitest: 4.1.10
-  vue: ^3.6.0-rc.4
+  vue: ^3.6.0-rc.10
   vue-i18n: ^12.0.0-alpha.4
   vue-component-type-helpers: ^3.3.9
   vue-router: ^5.2.0

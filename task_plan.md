@@ -108,6 +108,28 @@
 
 阶段 8、9 已完成；管理面板已更名并完成无网络悬挂请求的测试修复。下一步提交最终验收记录。
 
+## 阶段 10：应用/server/admin 重组及数据模型
+
+- **状态：** complete
+- 在现有 `packages/*/*/*` workspace 约束内完成应用 host profile（桌面/Android）、下载器平台边界、客户端诊断持久化模型与现有 server auth 数据模型的明确接线。
+- 保持当前 Tauri 应用、Worker server、独立 admin 的包边界；为迁移后的能力补充可执行类型、迁移、仓储和专项测试。
+
+### 阶段 10 子阶段
+
+1. **Host profile 与移动端接线**：complete
+2. **客户端诊断数据模型与仓储**：complete
+3. **服务端现有 auth/sync/plugin 模型核对与文档**：complete
+4. **阶段 10 验证与签名提交**：complete
+
+## 阶段 11：依赖、发布协同与验收策略
+
+- **状态：** complete
+- 核对 workspace catalog 的前沿依赖版本、统一版本同步脚本、Manifest/API 兼容检查、发布 dry-run 与完整验证入口；补齐缺少的自动化检查并在不破坏当前预发布依赖策略的前提下完成验收。
+
+## Next Step
+
+第 10、11 章实现、文档、构建、类型、测试和发布协同验收均已完成。
+
 ## 阶段 7 决策
 
 - 现行协议使用 `@delta-comic/plugin-manifest` 的 `protocolVersion/id/entry/resources`，旧 `@delta-comic/model` Manifest 只在现有数据库/宿主适配边界保留。
@@ -176,6 +198,7 @@
 | Worker provisioner 既有断言仍使用 subrequest 50 | 1 | 更新测试契约为第 8 章默认配额 CPU 50、内存 128、subrequest 10 |
 | 全量测试输出 `getaddrinfo ENOTFOUND server.example` | 1 | 该输出来自既有网络失败场景；164 个测试文件、883 个用例均通过 |
 | 提交钩子 cspell 报告 `getaddrinfo` 与 `ENOTFOUND` 未收录 | 1 | 在规划文件局部 cspell 标记中登记错误码后重试提交 |
+| app typecheck 无法解析新测试的 `vitest` 导入 | 1 | 按仓库 Vite+ 约定改用 `vite-plus/test`，避免引入未声明的直接 runner 依赖 |
 
 ## 6G 过渡设计清理
 
