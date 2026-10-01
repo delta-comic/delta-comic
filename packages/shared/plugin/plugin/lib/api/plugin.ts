@@ -1,3 +1,4 @@
+import type { PluginConfig as RuntimePluginConfig } from '@delta-comic/plugin-api'
 import { isFunction } from 'es-toolkit'
 
 import type { ConfigPointer } from './config'
@@ -6,7 +7,7 @@ import type { PluginConfigHooks } from './hook'
 import type { PluginLocaleMessages } from './i18n'
 import type { PluginConfigModel } from './model'
 
-export interface DCPluginConfig {
+export interface DCPluginConfig extends RuntimePluginConfig<PluginConfigModel, PluginConfigHooks> {
   /** Stable plugin id. It must equal the candidate manifest id. */
   name: string
   /** At most one declarative configuration form can be contributed by a plugin. */

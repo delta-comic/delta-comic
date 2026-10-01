@@ -52,12 +52,12 @@ export interface PluginPreloadRecovery {
   reason: string
 }
 
-export interface PluginRuntimeOptions {
-  readonly capabilities: () => readonly CapabilityModule[]
+export interface PluginRuntimeOptions<TConfig extends PluginConfig = PluginConfig> {
+  readonly capabilities: () => readonly CapabilityModule<TConfig>[]
   readonly environment: () => PluginConfigEnvironment
-  readonly provider: PluginCandidateProvider
+  readonly provider: PluginCandidateProvider<TConfig>
   readonly remove: (plugin: string) => Promise<void>
-  readonly store?: PluginStore
+  readonly store?: PluginStore<TConfig>
   readonly services?: {
     readonly i18n?: {
       register(plugin: string, messages: PluginLocaleMessages): void
@@ -66,10 +66,10 @@ export interface PluginRuntimeOptions {
   }
 }
 
-interface PreparedPlugin {
-  readonly candidate: PluginCandidate
-  readonly config: PluginConfig
-  readonly module: LoadedPluginModule
+interface PreparedPlugin<TConfig extends PluginConfig> {
+  readonly candidate: PluginCandidate<TConfig>
+  readonly config: TConfig
+  readonly module: LoadedPluginModule<TConfig>
   readonly scope: PluginScope
 }
 
@@ -89,10 +89,10 @@ const loadingInfo = (): PluginLoadingInfo => ({
   steps: [{ description: '', name: 'waiting' }],
 })
 
-export class PluginRuntime {
+export class PluginRuntime<TConfig extends PluginConfig = PluginConfig> {
   readonly #activeNormal = new Map<string, PluginScope>()
-  readonly #options: PluginRuntimeOptions
-  readonly #prepared = new Map<string, PreparedPlugin>()
+  readonly #options: PluginRuntimeOptions<TConfig>
+  readonly #prepared = new Map<string, PreparedPlugin<TConfig>>()
   #app?: App
   #booted = false
   #normalOperation?: Promise<PluginRuntimeReport>
@@ -100,9 +100,9 @@ export class PluginRuntime {
   #preloadReport?: PluginRuntimeReport
 
   public readonly restartRequired = shallowReactive(new Set<string>())
-  public readonly store: PluginStore
+  public readonly store: PluginStore<TConfig>
 
-  public constructor(options: PluginRuntimeOptions) {
+  public constructor(options: PluginRuntimeOptions<TConfig>) {
     this.#options = options
     this.store = options.store ?? new PluginStore()
   }
@@ -167,7 +167,7 @@ export class PluginRuntime {
    */
   public async enablePlugins(plugins: readonly string[]) {
     this.#assertReadyForToggle()
-    const targets = new Map<string, PluginCandidate>()
+    const targets = new Map<string, PluginCandidate<TConfig>>()
     const visit = (plugin: string) => {
       if (targets.has(plugin)) return
       const candidate = this.store.candidates.get(plugin)
@@ -293,7 +293,7 @@ export class PluginRuntime {
     }
   }
 
-  async #prepareAndActivate(candidate: PluginCandidate) {
+  async #prepareAndActivate(candidate: PluginCandidate<TConfig>) {
     const plugin = candidate.manifest.id
     const app = this.#app
     if (!app) throw new Error('plugins must be preloaded before enabling a plugin')
@@ -302,7 +302,7 @@ export class PluginRuntime {
       const { config, module } = await this.#loadPlugin(candidate, scope)
       const cleanup = await config.hooks?.onPreboot?.({ app })
       if (cleanup) scope.defer(cleanup)
-      const prepared: PreparedPlugin = { candidate, config, module, scope }
+      const prepared: PreparedPlugin<TConfig> = { candidate, config, module, scope }
       this.#prepared.set(plugin, prepared)
       if (this.#booted) {
         const result = await this.#activateNormal(prepared)
@@ -499,7 +499,7 @@ export class PluginRuntime {
 
   /** Run the normal activation pipeline for a prepared plugin on a fresh normal scope. */
   async #activateNormal(
-    prepared: PreparedPlugin,
+    prepared: PreparedPlugin<TConfig>,
     info?: PluginLoadingInfo,
   ): Promise<{ error?: unknown; disposeError?: unknown }> {
     const plugin = prepared.candidate.manifest.id
@@ -509,16 +509,21 @@ export class PluginRuntime {
       await prepared.module.activate?.(scope)
       this.store.markLoading(plugin, prepared.config)
       scope.defer(() => this.store.markUnloaded(plugin))
-      await new ActivationPipeline(this.#options.capabilities()).activate(prepared.config, {
-        owner: plugin,
-        report: update => {
-          if (!info) return
-          const value = typeof update === 'string' ? { description: update } : update
-          info.steps[0] = { ...info.steps[0], ...value }
+      await new ActivationPipeline<TConfig>(this.#options.capabilities()).activate(
+        prepared.config,
+        {
+          owner: plugin,
+          report: update => {
+            if (!info) return
+            info.steps[0] = {
+              description: update.state === 'started' ? '' : 'completed',
+              name: update.capability,
+            }
+          },
+          scope,
+          signal: scope.signal,
         },
-        scope,
-        signal: scope.signal,
-      })
+      )
       this.#activeNormal.set(plugin, scope)
       this.store.markReady(plugin)
       if (info) info.progress.status = 'done'
@@ -530,16 +535,16 @@ export class PluginRuntime {
     }
   }
 
-  async #loadPlugin(candidate: PluginCandidate, scope: PluginScope) {
+  async #loadPlugin(candidate: PluginCandidate<TConfig>, scope: PluginScope) {
     const plugin = candidate.manifest.id
-    const loaded: LoadedPluginModule = await candidate.load(scope.signal)
+    const loaded: LoadedPluginModule<TConfig> = await candidate.load(scope.signal)
     if (loaded.dispose) scope.defer(loaded.dispose)
     const config = markRaw(loaded.factory(this.#options.environment()))
     if (config.name !== plugin) throw new Error(`plugin name mismatch: ${plugin} / ${config.name}`)
     return { config, module: loaded }
   }
 
-  async #runUninstallHook(candidate: PluginCandidate) {
+  async #runUninstallHook(candidate: PluginCandidate<TConfig>) {
     const plugin = candidate.manifest.id
     const scope = new PluginScope(plugin)
     try {
@@ -561,9 +566,12 @@ export class PluginRuntime {
     )
   }
 
-  #selectWithDependencies(candidates: readonly PluginCandidate[], selected: readonly string[]) {
+  #selectWithDependencies(
+    candidates: readonly PluginCandidate<TConfig>[],
+    selected: readonly string[],
+  ) {
     const byId = new Map(candidates.map(candidate => [candidate.manifest.id, candidate]))
-    const result = new Map<string, PluginCandidate>()
+    const result = new Map<string, PluginCandidate<TConfig>>()
     const visit = (plugin: string) => {
       const candidate = byId.get(plugin)
       if (!candidate || result.has(plugin)) return

@@ -14,24 +14,35 @@ export interface ActivationContext {
   readonly report: (update: ActivationStepUpdate) => void
 }
 
-export interface CapabilityModule {
+export interface CapabilityModule<TConfig extends PluginConfig = PluginConfig> {
   readonly id: string
-  activate(plugin: PluginConfig, context: ActivationContext): Promise<boolean>
+  activate(plugin: TConfig, context: ActivationContext): Promise<boolean>
 }
 
-export interface CapabilityDefinition<T extends PluginConfig = PluginConfig> {
+export interface CapabilityDefinition<
+  TConfig extends PluginConfig = PluginConfig,
+  TModel = unknown,
+> {
   readonly id: string
-  readonly select?: (plugin: T) => boolean
-  readonly activate: (plugin: T, context: ActivationContext) => Promise<boolean>
+  readonly select?: (plugin: TConfig) => TModel | undefined
+  readonly activate: (model: TModel, context: ActivationContext) => boolean | Promise<boolean>
 }
 
-export const defineCapability = <T extends PluginConfig>(definition: CapabilityDefinition<T>) =>
-  definition
+export const defineCapability = <TConfig extends PluginConfig, TModel>(
+  definition: CapabilityDefinition<TConfig, TModel>,
+): CapabilityModule<TConfig> => ({
+  id: definition.id,
+  async activate(plugin, context) {
+    const model = definition.select?.(plugin)
+    if (model === undefined) return false
+    return await definition.activate(model, context)
+  },
+})
 
-export class ActivationPipeline {
-  readonly #modules: readonly CapabilityModule[]
+export class ActivationPipeline<TConfig extends PluginConfig = PluginConfig> {
+  readonly #modules: readonly CapabilityModule<TConfig>[]
 
-  constructor(modules: readonly CapabilityModule[]) {
+  constructor(modules: readonly CapabilityModule<TConfig>[]) {
     if (modules.length === 0) throw new Error('At least one capability module is required')
     const ids = new Set<string>()
     for (const module of modules) {
@@ -41,7 +52,7 @@ export class ActivationPipeline {
     this.#modules = modules
   }
 
-  async activate(plugin: PluginConfig, context: ActivationContext) {
+  async activate(plugin: TConfig, context: ActivationContext) {
     const activated: string[] = []
     for (const module of this.#modules) {
       if (context.signal.aborted) throw new DOMException('Activation aborted', 'AbortError')

@@ -1,11 +1,9 @@
-import type { App } from 'vue'
-
 export type PluginLifecycleCleanup = () => Promise<void> | void
 
 export interface LifecycleHooks {
   /** Runs once before app.mount() for every plugin enabled at application startup. */
   onPreboot?(context: {
-    app: App
+    app: unknown
   }): PluginLifecycleCleanup | Promise<PluginLifecycleCleanup | void> | void
   onBooted?(): Promise<void> | void
   /** Runs before the plugin's normal part is reloaded or unloaded. */

@@ -1,4 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
+import type { PluginConfig } from '@delta-comic/plugin-api'
 import type { PluginCandidate, PluginCandidateProvider } from '@delta-comic/plugin-kernel'
 import type { LoadedPluginModule } from '@delta-comic/plugin-loader'
 import type { PluginManifest } from '@delta-comic/plugin-manifest'
@@ -21,31 +22,27 @@ const toRuntimeManifest = (manifest: PluginArchiveDB.Archive['meta']): PluginMan
   resources: [],
 })
 
-const toRuntimeModule = (
-  module: Awaited<ReturnType<PluginModuleReader['read']>>,
-): LoadedPluginModule => ({
+const toRuntimeModule = <TConfig extends PluginConfig>(
+  module: Awaited<ReturnType<PluginModuleReader<TConfig>['read']>>,
+): LoadedPluginModule<TConfig> => ({
   factory: environment =>
     module.factory({ platform: environment.platform === 'tauri' ? 'tauri' : 'web' }),
   activate: module.activate,
   dispose: module.dispose,
 })
 
-/**
- * The persisted `enable` flag is stored in a `TEXT` column. `kysely-plugin-serialize` normally
- * restores booleans, but the value that reaches this boundary is only typed as `boolean` — not
- * guaranteed at runtime. Normalize it so a legacy string/number (`'false'`, `'0'`, `1`, ...) can
- * never be mistaken for `true` by the runtime's truthiness check.
- */
 /** Normalize persisted archives into the same candidate protocol used by internal plugins. */
-export class InstalledPluginCandidateProvider implements PluginCandidateProvider {
+export class InstalledPluginCandidateProvider<
+  TConfig extends PluginConfig = PluginConfig,
+> implements PluginCandidateProvider<TConfig> {
   public readonly id = 'installed'
 
   public constructor(
     private readonly repository: PluginArchiveRepository,
-    private readonly readers: readonly PluginModuleReader[],
+    private readonly readers: readonly PluginModuleReader<TConfig>[],
   ) {}
 
-  public async list(signal: AbortSignal): Promise<PluginCandidate[]> {
+  public async list(signal: AbortSignal): Promise<PluginCandidate<TConfig>[]> {
     const archives = await this.repository.list()
     signal.throwIfAborted()
     return archives.map(archive => {

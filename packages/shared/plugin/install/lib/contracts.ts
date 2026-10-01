@@ -1,5 +1,6 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/model'
+import type { PluginConfig } from '@delta-comic/plugin-api'
 import type { LoadedPluginModule } from '@delta-comic/plugin-loader'
 
 export type PluginInstallInput = File | string
@@ -55,10 +56,10 @@ export interface PluginArchiveRepository {
   upsert(archive: PluginArchiveDB.Archive): Promise<void>
 }
 
-export interface PluginModuleReader {
+export interface PluginModuleReader<TConfig extends PluginConfig = PluginConfig> {
   readonly id: string
   matches?(archive: PluginArchiveDB.Archive): boolean
-  read(archive: PluginArchiveDB.Archive, signal: AbortSignal): Promise<LoadedPluginModule>
+  read(archive: PluginArchiveDB.Archive, signal: AbortSignal): Promise<LoadedPluginModule<TConfig>>
 }
 
 export interface PluginInstallProgress {

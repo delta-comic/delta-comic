@@ -1,6 +1,8 @@
-import { defineCapability, type CapabilityModule } from '../kernel'
+import { defineCapability, type CapabilityModule } from '@delta-comic/plugin-kernel'
 
-export const createLifecycleCapability = (): CapabilityModule =>
+import type { DCPluginConfig } from '../api'
+
+export const createLifecycleCapability = (): CapabilityModule<DCPluginConfig> =>
   defineCapability({
     id: 'lifecycle',
     select: config => {
@@ -10,5 +12,6 @@ export const createLifecycleCapability = (): CapabilityModule =>
     async activate(hooks, context) {
       if (hooks.onUnload) context.scope.defer(() => hooks.onUnload?.())
       await hooks.onBooted?.()
+      return true
     },
   })

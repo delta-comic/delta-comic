@@ -1,3 +1,4 @@
+import { PluginScope } from '@delta-comic/plugin-kernel'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -5,7 +6,6 @@ import {
   ContributionRegistry,
   defineContributionChannel,
 } from '../../../lib/kernel/contribution'
-import { PluginScope } from '../../../lib/kernel/scope'
 
 describe('ContributionRegistry', () => {
   it('keeps source identity and disposes only its own entry', () => {

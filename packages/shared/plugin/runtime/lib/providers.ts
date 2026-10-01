@@ -1,3 +1,4 @@
+import type { PluginConfig } from '@delta-comic/plugin-api'
 import type {
   InternalPluginDefinition,
   PluginCandidate,
@@ -39,16 +40,18 @@ export class LocalInternalPluginPreferences implements InternalPluginPreferences
   }
 }
 
-export class InternalPluginCandidateProvider implements PluginCandidateProvider {
+export class InternalPluginCandidateProvider<
+  TConfig extends PluginConfig = PluginConfig,
+> implements PluginCandidateProvider<TConfig> {
   public readonly id = 'internal'
 
   public constructor(
-    private readonly definitions: readonly InternalPluginDefinition[],
+    private readonly definitions: readonly InternalPluginDefinition<TConfig>[],
     private readonly preferences: InternalPluginPreferences = new LocalInternalPluginPreferences(),
   ) {}
 
   public async list(signal: AbortSignal) {
-    const candidates: PluginCandidate[] = []
+    const candidates: PluginCandidate<TConfig>[] = []
     for (const definition of this.definitions) {
       if (signal.aborted) throw signal.reason
       candidates.push({
@@ -73,16 +76,18 @@ export class InternalPluginCandidateProvider implements PluginCandidateProvider 
   }
 }
 
-export class CompositePluginCandidateProvider implements PluginCandidateProvider {
+export class CompositePluginCandidateProvider<
+  TConfig extends PluginConfig = PluginConfig,
+> implements PluginCandidateProvider<TConfig> {
   public readonly id = 'composite'
 
-  public constructor(private readonly providers: readonly PluginCandidateProvider[]) {}
+  public constructor(private readonly providers: readonly PluginCandidateProvider<TConfig>[]) {}
 
   public async list(signal: AbortSignal) {
     const candidates = (
       await Promise.all(this.providers.map(provider => provider.list(signal)))
     ).flat()
-    const owners = new Map<string, PluginCandidate>()
+    const owners = new Map<string, PluginCandidate<TConfig>>()
     for (const candidate of candidates) {
       const id = candidate.manifest.id
       const previous = owners.get(id)

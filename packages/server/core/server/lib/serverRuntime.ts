@@ -25,7 +25,7 @@ export interface ServerRuntimeOptions<DB extends object = Record<string, never>>
   db: Kysely<DB>
   identity?: ServerIdentity
   context?: Context
-  legacyPluginHost?: ServerPluginHost
+  pluginHost?: ServerPluginHost
 }
 
 export class ServerRuntime<DB extends object = Record<string, never>> {
@@ -52,11 +52,11 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
       installationId: options.installationId,
       db: options.db,
       diagnostics: this.#runtime.diagnostics,
-      ...(options.legacyPluginHost
+      ...(options.pluginHost
         ? {
-            legacyPluginHost: createServerPluginHostAdapter(
+            pluginHost: createServerPluginHostAdapter(
               this.#runtime.diagnostics,
-              options.legacyPluginHost,
+              options.pluginHost,
             ),
           }
         : {}),

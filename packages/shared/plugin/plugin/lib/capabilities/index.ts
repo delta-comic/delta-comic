@@ -1,4 +1,6 @@
-import type { CapabilityModule } from '../kernel'
+import type { CapabilityModule } from '@delta-comic/plugin-kernel'
+
+import type { DCPluginConfig } from '../api'
 
 import { createAuthCapability } from './auth'
 import { createConfigCapability } from './config'
@@ -26,7 +28,7 @@ export * from './user'
 /** Fixed host-owned activation topology. Third-party plugins only provide data to it. */
 export const createDefaultCapabilities = (
   services: PluginCapabilityServices,
-): readonly CapabilityModule[] => [
+): readonly CapabilityModule<DCPluginConfig>[] => [
   createConfigCapability(services),
   createI18nCapability(services),
   createModelCapability(services),

@@ -12,12 +12,15 @@ export interface PluginContextFactory {
   create(manifest: PluginManifest): Context
 }
 
-export interface PluginConfig {
+export interface PluginConfig<
+  TModel extends object = object,
+  THooks extends PluginHooks = PluginHooks,
+> {
   readonly name: string
-  readonly config?: Record<string, unknown>
+  readonly config?: unknown
   readonly i18n?: PluginLocaleMessages
-  readonly model?: Record<string, unknown>
-  readonly hooks?: PluginHooks
+  readonly model?: TModel
+  readonly hooks?: THooks
 }
 
 export interface PluginLocaleMessage {

@@ -1,5 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import type { PluginConfigFactory } from '@delta-comic/plugin-api'
+import type { PluginConfig, PluginConfigFactory } from '@delta-comic/plugin-api'
 import type { LoadedPluginModule, PluginScopeLike } from '@delta-comic/plugin-loader'
 
 import type { PluginFileStore, PluginModuleReader } from './contracts'
@@ -11,11 +11,14 @@ import {
   parseDevServerPort,
 } from './dev'
 
-const asFactory = (value: unknown, plugin: string): PluginConfigFactory => {
+const asFactory = <TConfig extends PluginConfig>(
+  value: unknown,
+  plugin: string,
+): PluginConfigFactory<TConfig> => {
   if (typeof value !== 'function') {
     throw new TypeError(`plugin entry has no default factory: ${plugin}`)
   }
-  return value as PluginConfigFactory
+  return value as PluginConfigFactory<TConfig>
 }
 
 const styleActivator = (plugin: string, styleText: string | undefined) =>
@@ -30,7 +33,9 @@ const styleActivator = (plugin: string, styleText: string | undefined) =>
         scope.defer(() => style.remove())
       }
 
-export class StoredPluginModuleReader implements PluginModuleReader {
+export class StoredPluginModuleReader<
+  TConfig extends PluginConfig = PluginConfig,
+> implements PluginModuleReader<TConfig> {
   public readonly id = 'stored'
 
   public constructor(private readonly files: PluginFileStore) {}
@@ -38,7 +43,7 @@ export class StoredPluginModuleReader implements PluginModuleReader {
   public async read(
     archive: PluginArchiveDB.Archive,
     signal: AbortSignal,
-  ): Promise<LoadedPluginModule> {
+  ): Promise<LoadedPluginModule<TConfig>> {
     const plugin = archive.pluginName
     const url = await this.files.createModuleUrl(plugin, 'index.js')
     if (signal.aborted) {
@@ -57,7 +62,7 @@ export class StoredPluginModuleReader implements PluginModuleReader {
       signal.throwIfAborted()
       return {
         activate: styleActivator(plugin, styleText),
-        factory: asFactory(module.default, plugin),
+        factory: asFactory<TConfig>(module.default, plugin),
         dispose: () => this.files.release(plugin),
       }
     } catch (error) {
@@ -67,7 +72,9 @@ export class StoredPluginModuleReader implements PluginModuleReader {
   }
 }
 
-export class DevServerPluginModuleReader implements PluginModuleReader {
+export class DevServerPluginModuleReader<
+  TConfig extends PluginConfig = PluginConfig,
+> implements PluginModuleReader<TConfig> {
   public readonly id = DEV_SERVER_LOADER_ID
   readonly #versions = new Map<string, number>()
 
@@ -78,7 +85,7 @@ export class DevServerPluginModuleReader implements PluginModuleReader {
   public async read(
     archive: PluginArchiveDB.Archive,
     signal: AbortSignal,
-  ): Promise<LoadedPluginModule> {
+  ): Promise<LoadedPluginModule<TConfig>> {
     const port = parseDevServerPort(archive.installInput)
     if (port === undefined) {
       throw new Error(`development plugin has an invalid install source: ${archive.installInput}`)
@@ -104,7 +111,7 @@ export class DevServerPluginModuleReader implements PluginModuleReader {
     signal.throwIfAborted()
     return {
       activate: styleActivator(archive.pluginName, styleText),
-      factory: asFactory(module.default, archive.pluginName),
+      factory: asFactory<TConfig>(module.default, archive.pluginName),
     }
   }
 }

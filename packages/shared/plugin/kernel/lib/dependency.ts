@@ -1,3 +1,5 @@
+import type { PluginConfig } from '@delta-comic/plugin-api'
+
 import type { PluginCandidate } from './candidate'
 
 export interface MissingPluginDependency {
@@ -5,8 +7,8 @@ export interface MissingPluginDependency {
   readonly dependencyId: string
 }
 
-export interface PluginDependencyPlan {
-  readonly levels: readonly (readonly PluginCandidate[])[]
+export interface PluginDependencyPlan<TConfig extends PluginConfig = PluginConfig> {
+  readonly levels: readonly (readonly PluginCandidate<TConfig>[])[]
   readonly missing: readonly MissingPluginDependency[]
   readonly cycles: readonly (readonly string[])[]
 }
@@ -39,9 +41,9 @@ export function findPluginDependencyCycles(candidates: readonly PluginCandidate[
   return cycles
 }
 
-export function planPluginDependencies(
-  candidates: readonly PluginCandidate[],
-): PluginDependencyPlan {
+export function planPluginDependencies<TConfig extends PluginConfig>(
+  candidates: readonly PluginCandidate<TConfig>[],
+): PluginDependencyPlan<TConfig> {
   const byId = new Map(candidates.map(candidate => [candidate.manifest.id, candidate]))
   const missing: MissingPluginDependency[] = []
   for (const candidate of candidates) {
@@ -51,7 +53,7 @@ export function planPluginDependencies(
     }
   }
   const cycles = findPluginDependencyCycles(candidates)
-  const levels: PluginCandidate[][] = []
+  const levels: PluginCandidate<TConfig>[][] = []
   const assigned = new Set<string>()
   while (assigned.size < candidates.length) {
     const level = candidates.filter(candidate => {

@@ -1,8 +1,12 @@
-import { defineCapability, type CapabilityModule } from '../kernel'
+import { defineCapability, type CapabilityModule } from '@delta-comic/plugin-kernel'
+
+import type { DCPluginConfig } from '../api'
 
 import type { PluginCapabilityServices } from './services'
 
-export const createConfigCapability = (services: PluginCapabilityServices): CapabilityModule =>
+export const createConfigCapability = (
+  services: PluginCapabilityServices,
+): CapabilityModule<DCPluginConfig> =>
   defineCapability({
     id: 'config',
     select: config => config.config,
@@ -12,9 +16,9 @@ export const createConfigCapability = (services: PluginCapabilityServices): Capa
           `plugin config owner mismatch: ${context.scope.owner} / ${pointer.pluginName}`,
         )
       }
-      context.report({ description: pointer.configName })
       const registered = services.config.register(pointer)
       context.scope.defer(() => services.config.unregister(pointer))
       await registered.ready
+      return true
     },
   })

@@ -43,7 +43,7 @@ export interface ServerHost<DB extends object = Record<string, never>> {
   readonly installationId: string
   readonly db: Kysely<DB>
   readonly diagnostics: DiagnosticRecorder
-  readonly legacyPluginHost?: ServerPluginHost
+  readonly pluginHost?: ServerPluginHost
   registerRoute(route: ServerRouteRegistration<DB>): () => void
   registerCron(schedule: string, handler: (context: ServerTaskContext<DB>) => unknown): () => void
   registerQueue(name: string, handler: (context: ServerTaskContext<DB>) => unknown): () => void
@@ -55,9 +55,9 @@ export const createServerPluginHostAdapter = (
   host: ServerPluginHost,
 ): ServerPluginHost => ({
   probeDatabase: () =>
-    withDiagnostic(diagnostics, 'server legacy plugin probe database', () => host.probeDatabase()),
+    withDiagnostic(diagnostics, 'server plugin probe database', () => host.probeDatabase()),
   readMetric: metric =>
-    withDiagnostic(diagnostics, 'server legacy plugin read metric', () => host.readMetric(metric), {
+    withDiagnostic(diagnostics, 'server plugin read metric', () => host.readMetric(metric), {
       metric,
     }),
 })

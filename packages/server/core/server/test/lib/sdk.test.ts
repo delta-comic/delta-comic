@@ -53,23 +53,23 @@ describe('server SDK', () => {
     await runtime.dispose()
   })
 
-  it('adapts legacy host metrics through the new diagnostic boundary', async () => {
+  it('records plugin host metrics through the diagnostic boundary', async () => {
     const runtime = new ServerRuntime({
       pluginId: 'demo',
       installationId: 'installation-1',
       db: {} as never,
-      legacyPluginHost: {
+      pluginHost: {
         probeDatabase: async () => true,
         readMetric: async metric => (metric === 'sync.changeCount' ? 3 : 0),
       },
     })
 
-    expect(await runtime.host.legacyPluginHost?.probeDatabase()).toBe(true)
-    expect(await runtime.host.legacyPluginHost?.readMetric('sync.changeCount')).toBe(3)
+    expect(await runtime.host.pluginHost?.probeDatabase()).toBe(true)
+    expect(await runtime.host.pluginHost?.readMetric('sync.changeCount')).toBe(3)
     expect(
       runtime.diagnostics
         .list()
-        .some(record => record.message === 'server legacy plugin read metric completed'),
+        .some(record => record.message === 'server plugin read metric completed'),
     ).toBe(true)
     await runtime.dispose()
   })

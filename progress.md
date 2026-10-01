@@ -174,6 +174,14 @@
 - 本次仅创建规划文档，未运行应用检查/测试。
 - 创建前确认仓库工作区干净，仓库根目录不存在 `task_plan.md`、`findings.md`、`progress.md` 或 `.planning` 规划文件。
 - 提交前 hook 自动验证 codegen、`vp check --fix`、codegen check 与 cspell 全部通过。
+
+## 2026-10-01：6G 过渡 Kernel 清理
+
+- 审阅阶段 6G 实现后，确认聚合包仍有一套与 `@delta-comic/plugin-kernel` 重复的本地 candidate/capability/dependency/scope，以及 `runtimeAdapter` 转换层。
+- 插件能力、聚合入口和运行时已直接使用新 Kernel；保留插件专属的多 channel `ContributionHub`，它承载宿主模型贡献类型，不再复制通用 Kernel 协议。
+- 删除旧 Kernel 实现、对应重复测试和 capability adapter；更新 capability state 进度事件映射，并移除旧的报告字段。
+- `vp run lib-build`、`vp check --fix`、插件 architecture/capability 专项测试（4 个文件、15 个测试）、`@delta-comic/plugin` typecheck 与 `@delta-comic/plugin-kernel` typecheck 通过。
+- 工作树中的 `AGENTS.md` 为用户提供的修改，继续保留且不纳入提交。
 ## 2026-09-27：6E Artifact 发布元数据边界
 
 - `@delta-comic/both/release` 增加 HTTPS 发布 artifact、版本、目录条目的 TypeBox 协议、解析器和非撤回版本查找函数。

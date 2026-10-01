@@ -38,7 +38,7 @@ export class D1ServerPluginHost implements ServerPluginHost {
 
 export type AppServerRuntimeOptions = Omit<
   ServerRuntimeOptions<ServerDatabase>,
-  'db' | 'legacyPluginHost'
+  'db' | 'pluginHost'
 >
 
 export const createAppServerRuntime = (
@@ -48,5 +48,5 @@ export const createAppServerRuntime = (
   new ServerRuntime({
     ...options,
     db: createKysely(database),
-    legacyPluginHost: new D1ServerPluginHost(database),
+    pluginHost: new D1ServerPluginHost(database),
   })

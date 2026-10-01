@@ -1,10 +1,13 @@
+import type { DCPluginConfig } from '../api'
 import type { PluginConfigModel } from '../api/model'
 import { defineCapability, type CapabilityModule, type ContributionChannel } from '../kernel'
 
 import { pluginModelChannels } from './channels'
 import type { PluginCapabilityServices } from './services'
 
-export const createModelCapability = (services: PluginCapabilityServices): CapabilityModule =>
+export const createModelCapability = (
+  services: PluginCapabilityServices,
+): CapabilityModule<DCPluginConfig> =>
   defineCapability({
     id: 'model',
     select: config => config.model,
@@ -21,5 +24,6 @@ export const createModelCapability = (services: PluginCapabilityServices): Capab
       register(pluginModelChannels.social, model.social)
       register(pluginModelChannels.special, model.special)
       register(pluginModelChannels.user, model.user)
+      return true
     },
   })

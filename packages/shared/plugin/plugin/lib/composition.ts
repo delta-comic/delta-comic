@@ -32,14 +32,14 @@ import {
   pluginI18n,
 } from './adapters'
 import { DatabasePluginArchiveRepository } from './adapters/pluginRepository'
+import type { DCPluginConfig } from './api'
 import { corePluginDefinition, internalPluginDefinitions } from './builtins'
 import { createDefaultCapabilities, type PluginAuthGateway } from './capabilities'
-import { adaptLegacyCapabilities } from './composition/runtimeAdapter'
 import { cfg } from './core/config'
 import { ContributionHub } from './kernel'
 
 export const pluginContributions = new ContributionHub()
-export const pluginStore = new PluginStore(value => pluginI18n.translateText(value))
+export const pluginStore = new PluginStore<DCPluginConfig>(value => pluginI18n.translateText(value))
 export const pluginConfigStore = new ConfigStore()
 export const useConfig = () => pluginConfigStore
 
@@ -60,18 +60,21 @@ export const configurePluginHost = (services: PluginHostServices) => {
 
 const pluginFiles = createDefaultPluginFileStore()
 const pluginRepository = new DatabasePluginArchiveRepository()
-const pluginReaders = [new StoredPluginModuleReader(pluginFiles), new DevServerPluginModuleReader()]
+const pluginReaders = [
+  new StoredPluginModuleReader<DCPluginConfig>(pluginFiles),
+  new DevServerPluginModuleReader<DCPluginConfig>(),
+]
 const internalPreferences = new LocalInternalPluginPreferences()
 const internalPluginIds = new Set(
   internalPluginDefinitions.map(definition => definition.manifest.id),
 )
-const internalProvider = new InternalPluginCandidateProvider(
+const internalProvider = new InternalPluginCandidateProvider<DCPluginConfig>(
   internalPluginDefinitions,
   internalPreferences,
 )
 const candidateProvider = new CompositePluginCandidateProvider([
   internalProvider,
-  new InstalledPluginCandidateProvider(pluginRepository, pluginReaders),
+  new InstalledPluginCandidateProvider<DCPluginConfig>(pluginRepository, pluginReaders),
 ])
 
 const devSource = new DevServerSourceResolver()
@@ -101,16 +104,14 @@ export const pluginInstaller = new PluginInstallService({
   ],
 })
 
-export const pluginRuntime = new PluginRuntime({
+export const pluginRuntime = new PluginRuntime<DCPluginConfig>({
   capabilities: () =>
-    adaptLegacyCapabilities(
-      createDefaultCapabilities({
-        auth: pluginHostServices.auth,
-        config: pluginConfigStore,
-        contributions: pluginContributions,
-        i18n: pluginI18n,
-      }),
-    ),
+    createDefaultCapabilities({
+      auth: pluginHostServices.auth,
+      config: pluginConfigStore,
+      contributions: pluginContributions,
+      i18n: pluginI18n,
+    }),
   environment: () => ({ platform: isTauri() ? 'tauri' : 'web' }),
   provider: candidateProvider,
   remove: plugin => pluginInstaller.uninstall(plugin),

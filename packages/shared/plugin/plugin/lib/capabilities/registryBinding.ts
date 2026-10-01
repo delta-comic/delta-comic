@@ -1,4 +1,4 @@
-import type { PluginScope } from '../kernel'
+import type { PluginScope } from '@delta-comic/plugin-kernel'
 
 interface MutableRegistry<TKey, TValue> {
   delete(key: TKey): boolean

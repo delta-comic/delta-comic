@@ -8,7 +8,6 @@ import {
   type PluginCandidate,
   usePluginStore,
 } from '@delta-comic/plugin'
-import { memoize } from 'es-toolkit'
 import type { DropdownOption } from 'naive-ui'
 import semver from 'semver'
 import { computed, shallowReactive } from 'vue'
@@ -20,8 +19,6 @@ import { usePluginInstall } from '@/features/pluginInstall/usePluginInstall'
 import { translateText } from '@/i18n'
 import { Icons } from '@/icons'
 import { isTauriRuntime, openPluginDirectory } from '@/platform'
-
-import pkg from '../../../../package.json'
 
 const pluginListLogger = logger.scoped('app:plugin-list')
 
@@ -43,9 +40,7 @@ const updatePlugin = async (plugin: ManagedPlugin) => {
   pluginListLogger.info('plugin update started', { plugin: plugin.pluginName })
   try {
     await runPluginInstall(
-      t('plugin.progress.updateTitle', {
-        plugin: translateText(plugin.meta.name.display ?? plugin.pluginName),
-      }),
+      t('plugin.progress.updateTitle', { plugin: translateText(plugin.meta.name) }),
       options => updatePluginByName(plugin.pluginName, options),
     )
     pluginListLogger.info('plugin update completed', { plugin: plugin.pluginName })
@@ -57,14 +52,10 @@ const updatePlugin = async (plugin: ManagedPlugin) => {
   }
 }
 
-const checkIsSupport = memoize((supportCore: string) => semver.satisfies(pkg.version, supportCore))
-
 const getCardClass = (plugin: ManagedPlugin) => {
   if (!plugin.enable)
     return 'bg-(--nui-icon-color-disabled)/20! border-(--nui-icon-color-pressed)/20!'
-  if (checkIsSupport(plugin.meta.version.supportCore))
-    return 'border-(--nui-primary-color)/20! bg-(--nui-primary-color-hover)/10!'
-  return 'border-(--nui-warning-color)/20! bg-(--nui-warning-color-hover)/10!'
+  return 'border-(--nui-primary-color)/20! bg-(--nui-primary-color-hover)/10!'
 }
 
 const pluginStore = usePluginStore()
@@ -108,7 +99,7 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
   switch (key) {
     case 'toggle': {
       const enabled = !plugin.enable
-      const name = translateText(plugin.meta.name.display ?? plugin.pluginName)
+      const name = translateText(plugin.meta.name)
       try {
         await setPluginEnabled(plugin.pluginName, enabled)
         window.$message.success(
@@ -165,8 +156,7 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
         <template #header>
           <div class="flex min-w-0 items-center gap-2.5">
             <PluginIcon
-              :icon="plugin.meta.icon"
-              :name="translateText(plugin.meta.name.display ?? plugin.pluginName)"
+              :name="translateText(plugin.meta.name)"
               :plugin-id="plugin.pluginName"
               size="small"
             />
@@ -174,7 +164,7 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
               <span class="mr-0.5 font-thin italic">{{
                 isBuiltIn(plugin) ? t('plugin.list.kind.builtInPrefix') : ''
               }}</span>
-              {{ translateText(plugin.meta.name.display ?? plugin.pluginName) }}
+              {{ translateText(plugin.meta.name) }}
             </span>
           </div>
         </template>
@@ -199,28 +189,16 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
           class="mr-3 font-bold text-(--nui-text-color-disabled) italic"
           v-if="plugin.meta.version"
         >
-          {{ semver.valid(semver.coerce(plugin.meta.version.plugin ?? 'v0')) }}
+          {{ semver.valid(semver.coerce(plugin.meta.version)) }}
         </span>
         <span class="text-(--nui-text-color-3)">
-          {{ translateText(plugin.meta.description) }}
+          {{ translateText(plugin.meta.description ?? '') }}
         </span>
-        <div class="w-full text-xs text-(--nui-text-color-disabled)">
-          {{ t('plugin.list.supportCore', { version: plugin.meta.version.supportCore }) }}
-        </div>
         <div
           v-if="pluginRuntime.restartRequired.has(plugin.pluginName)"
           class="mb-1 text-xs text-(--nui-warning-color)"
         >
           {{ t('plugin.list.restartRequired') }}
-        </div>
-        <div
-          class="mt-1 flex w-full items-center gap-1 text-sm! font-bold"
-          v-if="!checkIsSupport(plugin.meta.version.supportCore)"
-        >
-          <NIcon color="var(--nui-warning-color)" size="1.2rem">
-            <Icons.material.WarningRound />
-          </NIcon>
-          {{ t('plugin.list.incompatible') }}
         </div>
       </NCard>
     </TransitionGroup>

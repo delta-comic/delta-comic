@@ -1,10 +1,13 @@
 import type { InternalPluginDefinition } from '@delta-comic/plugin-kernel'
 
+import type { DCPluginConfig } from '../api'
+
 export * from './core.builtin'
 
-const builtinModules = import.meta.glob<{ default: InternalPluginDefinition }>('./*.builtin.ts', {
-  eager: true,
-})
+const builtinModules = import.meta.glob<{ default: InternalPluginDefinition<DCPluginConfig> }>(
+  './*.builtin.ts',
+  { eager: true },
+)
 
 /** Files are the registration boundary: adding a built-in does not change the composition root. */
 export const internalPluginDefinitions = Object.entries(builtinModules)

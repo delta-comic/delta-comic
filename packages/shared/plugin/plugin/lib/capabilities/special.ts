@@ -1,6 +1,8 @@
-import { defineCapability, type CapabilityModule } from '../kernel'
+import { defineCapability, type CapabilityModule } from '@delta-comic/plugin-kernel'
 
-export const createSpecialCapability = (): CapabilityModule =>
+import type { DCPluginConfig } from '../api'
+
+export const createSpecialCapability = (): CapabilityModule<DCPluginConfig> =>
   defineCapability({
     id: 'special',
     select: config => config.model?.special,
@@ -8,8 +10,8 @@ export const createSpecialCapability = (): CapabilityModule =>
       for (const step of steps) {
         context.signal.throwIfAborted()
         if (!step.name) throw new Error('special step name cannot be empty')
-        context.report({ name: step.name, description: '' })
-        await step.call(description => context.report({ name: step.name, description }))
+        await step.call(() => {})
       }
+      return true
     },
   })

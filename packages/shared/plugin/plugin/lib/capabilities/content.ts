@@ -1,10 +1,11 @@
 import { UniComment, UniContentPage, UniItem } from '@delta-comic/model'
+import { defineCapability, type CapabilityModule } from '@delta-comic/plugin-kernel'
 
-import { defineCapability, type CapabilityModule } from '../kernel'
+import type { DCPluginConfig } from '../api'
 
 import { bindRegistryValue } from './registryBinding'
 
-export const createContentCapability = (): CapabilityModule =>
+export const createContentCapability = (): CapabilityModule<DCPluginConfig> =>
   defineCapability({
     id: 'content-bindings',
     select: config => config.model?.content?.models,
@@ -27,5 +28,6 @@ export const createContentCapability = (): CapabilityModule =>
         bindRegistryValue(context.scope, UniComment.commentRow, key, model.CommentRow)
         bindRegistryValue(context.scope, UniItem.itemTranslator, key, model.ItemTranslator)
       }
+      return true
     },
   })

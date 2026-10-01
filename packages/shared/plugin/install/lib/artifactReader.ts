@@ -44,7 +44,7 @@ const createReplacement = async (
   )
 }
 
-/** Reads the shared Artifact protocol without changing the legacy factory loader. */
+/** Validates and loads a Cordis artifact into the host file store. */
 export class CordisArtifactModuleReader {
   public constructor(private readonly files: PluginFileStore) {}
 

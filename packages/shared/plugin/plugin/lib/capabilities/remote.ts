@@ -1,7 +1,9 @@
 import { UniResource } from '@delta-comic/model'
+import { defineCapability, type CapabilityModule } from '@delta-comic/plugin-kernel'
 
 import type { Remote } from '../api'
-import { defineCapability, defineContributionChannel, type CapabilityModule } from '../kernel'
+import type { DCPluginConfig } from '../api'
+import { defineContributionChannel } from '../kernel'
 
 import { selectFastestEndpoint } from './endpointProbe'
 import { bindRegistryValue } from './registryBinding'
@@ -31,7 +33,9 @@ export const pluginRemoteSelectionChannel = defineContributionChannel<RemoteSele
   'runtime:remote-selection',
 )
 
-export const createRemoteCapability = (services: PluginCapabilityServices): CapabilityModule =>
+export const createRemoteCapability = (
+  services: PluginCapabilityServices,
+): CapabilityModule<DCPluginConfig> =>
   defineCapability({
     id: 'remote',
     select: config =>
@@ -44,7 +48,6 @@ export const createRemoteCapability = (services: PluginCapabilityServices): Capa
           throw new Error(`duplicate remote group "${sourceGroup.name}"`)
         }
         groups.add(sourceGroup.name)
-        context.report({ name: 'remote', description: `probing ${sourceGroup.name}` })
         const group = await resolveGroup(sourceGroup, context.signal)
         const selected = await selectFastestEndpoint(
           group.remotes.map(remote => ({
@@ -104,5 +107,6 @@ export const createRemoteCapability = (services: PluginCapabilityServices): Capa
         )
         hooks?.onRemoteTestDone?.(group, selection.remote)
       }
+      return true
     },
   })

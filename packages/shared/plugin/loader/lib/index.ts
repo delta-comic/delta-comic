@@ -1,4 +1,4 @@
-import type { PluginConfigFactory } from '@delta-comic/plugin-api'
+import type { PluginConfig, PluginConfigFactory } from '@delta-comic/plugin-api'
 import type { PluginManifest } from '@delta-comic/plugin-manifest'
 
 export interface PluginScopeLike {
@@ -7,8 +7,8 @@ export interface PluginScopeLike {
   defer(disposer: () => void | Promise<void>): void | (() => void | Promise<void>)
 }
 
-export interface LoadedPluginModule {
-  readonly factory: PluginConfigFactory
+export interface LoadedPluginModule<TConfig extends PluginConfig = PluginConfig> {
+  readonly factory: PluginConfigFactory<TConfig>
   readonly activate?: (scope: PluginScopeLike) => void | Promise<void>
   readonly dispose?: () => void | Promise<void>
 }
@@ -18,8 +18,8 @@ export interface PluginModuleReaderInput {
   readonly source: string
 }
 
-export interface PluginModuleReader {
+export interface PluginModuleReader<TConfig extends PluginConfig = PluginConfig> {
   readonly id: string
   matches?(input: PluginModuleReaderInput): boolean | Promise<boolean>
-  read(input: PluginModuleReaderInput, signal?: AbortSignal): Promise<LoadedPluginModule>
+  read(input: PluginModuleReaderInput, signal?: AbortSignal): Promise<LoadedPluginModule<TConfig>>
 }

@@ -1,6 +1,5 @@
+import type { PluginScope } from '@delta-comic/plugin-kernel'
 import { shallowReactive } from 'vue'
-
-import type { PluginScope } from './scope'
 
 export interface Contribution<T> {
   readonly owner: string
