@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       deploy_admin:
-        description: '同时部署 server-admin Pages'
+        description: '同时部署 admin Pages'
         required: false
         default: true
         type: boolean
@@ -92,6 +92,6 @@ jobs:
       - name: Build workspace libraries
         run: vp run lib-build
       - name: Build admin
-        run: vp run --filter @delta-comic/server-admin build
+        run: vp run --filter @delta-comic/admin build
       - name: Deploy Pages
-        run: vp run --filter @delta-comic/server-admin deploy
+        run: vp run --filter @delta-comic/admin deploy

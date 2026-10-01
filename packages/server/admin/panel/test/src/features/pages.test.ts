@@ -38,6 +38,7 @@ import OpenApiPage from '@/features/openapi/OpenApiPage.vue'
 import OverviewPage from '@/features/overview/OverviewPage.vue'
 import PluginsPage from '@/features/plugins/PluginsPage.vue'
 import SettingsPage from '@/features/settings/SettingsPage.vue'
+import { AdminApiClient } from '@/shared/api/AdminApiClient'
 import type { AdminOverview } from '@/shared/api/types'
 import { useConnectionStore } from '@/stores/connection'
 import { useOverviewStore } from '@/stores/overview'
@@ -216,7 +217,7 @@ describe('overview and observability pages', () => {
 
   it('loads and composes overview data when credentials are present', async () => {
     const connection = useConnectionStore()
-    connection.apiBaseUrl = 'https://server.example'
+    connection.apiBaseUrl = 'https://example.com'
     connection.adminToken = 'token'
     connection.capabilities = {
       features: {},
@@ -250,8 +251,15 @@ describe('overview and observability pages', () => {
 
   it('loads observability only without existing data and renders degraded metrics', async () => {
     const connection = useConnectionStore()
-    connection.apiBaseUrl = 'https://server.example'
+    connection.apiBaseUrl = 'https://example.com'
     connection.adminToken = 'token'
+    const diagnostic = { fibers: [], plugins: [], records: [], runtime: 'test' }
+    vi.spyOn(connection, 'createClient').mockReturnValue(
+      new AdminApiClient({
+        baseUrl: 'https://example.com',
+        fetcher: async () => Response.json({ data: diagnostic, ok: true }),
+      }),
+    )
     const store = useOverviewStore()
     const load = vi.spyOn(store, 'load').mockResolvedValue(undefined)
 
@@ -294,7 +302,7 @@ describe('settings, modules, and OpenAPI pages', () => {
 
   it('shows connection validation and malformed endpoint failures', async () => {
     const connection = useConnectionStore()
-    connection.apiBaseUrl = 'https://server.example'
+    connection.apiBaseUrl = 'https://example.com'
     connection.adminToken = 'token'
     vi.spyOn(connection, 'saveCredentials').mockImplementationOnce(() => {})
     vi.spyOn(connection, 'connect').mockImplementationOnce(async () => {
@@ -355,10 +363,10 @@ describe('settings, modules, and OpenAPI pages', () => {
     const buttons = wrapper.findAllComponents({ name: 'Button' })
     expect(buttons.slice(-2).map(button => button.attributes('disabled'))).toEqual(['', ''])
 
-    connection.apiBaseUrl = 'https://server.example'
+    connection.apiBaseUrl = 'https://example.com'
     await nextTick()
-    expect(wrapper.html()).toContain('https://server.example/api/openapi')
-    expect(wrapper.html()).toContain('https://server.example/api/openapi/json')
+    expect(wrapper.html()).toContain('https://example.com/api/openapi')
+    expect(wrapper.html()).toContain('https://example.com/api/openapi/json')
   })
 })
 
@@ -391,7 +399,7 @@ describe('plugins page', () => {
   const setup = async (query = '') => {
     await router.push(`/plugins${query}`)
     const connection = useConnectionStore()
-    connection.apiBaseUrl = 'https://server.example'
+    connection.apiBaseUrl = 'https://example.com'
     connection.adminToken = 'token'
     const store = usePluginsStore()
     store.snapshot = snapshot
@@ -514,7 +522,7 @@ describe('admin shell', () => {
   it('connects on mount, tracks the deepest route, and coordinates mobile navigation', async () => {
     await router.push('/plugins')
     const connection = useConnectionStore()
-    connection.apiBaseUrl = 'https://server.example'
+    connection.apiBaseUrl = 'https://example.com'
     connection.adminToken = 'token'
     const connect = vi.spyOn(connection, 'connect').mockResolvedValue(true)
     const Sidebar = defineComponent({

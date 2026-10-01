@@ -14,8 +14,8 @@
 
 - 仓库：`/Users/wenxig/Documents/delta-comic`，分支 `develop`；本次开始时工作区干净。
 - 参考：`/Users/wenxig/Documents/deepseek-harness`，位于本仓库上一级目录。
-- 现有工作区包包括 `app`、`db`、`downloader`、`logger`、`model`、`plugin`、`runtime`、`server`、`server-admin`、`ui`、`utils`。
-- `app` 为 Vue/Tauri；`server` 为 Cloudflare Worker/Elysia + D1/Kysely；`server-admin` 为独立 Vue 管理应用，feature 自动发现。
+- 现有工作区包包括 `app`、`db`、`downloader`、`logger`、`model`、`plugin`、`runtime`、`server`、`admin`、`ui`、`utils`。
+- `app` 为 Vue/Tauri；`server` 为 Cloudflare Worker/Elysia + D1/Kysely；`admin` 为独立 Vue 管理应用，feature 自动发现。
 - 现有 plugin 架构已有 composition root、依赖规划、激活流程、PluginScope 清理以及 Vite 原生 HMR。
 - 仓库工作规则详见 `AGENTS.md`。核心命令使用全局 `vp`，不直接调用 pnpm、vite、vitest、oxlint、oxfmt。依赖调整后 `vp install`；Web 验证顺序 `vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`；Rust 验证另行执行 fmt、clippy、test。
 
@@ -41,7 +41,7 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 当前考虑的包依赖图：`client -> both`、`server -> both`；跨端扩展可以依赖 `both`，客户端插件依赖 client，服务端插件依赖 server。
 - 客户端和服务端插件彼此独立：各自 pluginId/version/lifecycle，不因共用核心协议而自动成对安装/部署。
 - 已确认包路径采用 `packages/*/*/*`，当前公开 SDK 位于 `packages/client/core/sdk` 与 `packages/server/core/server`；能力域继续按 client/server/shared family 组织。
-- 目录稳定化已完成：workspace 只使用 `packages/*/*/*`，当前 13 个包分别位于 `client/app/app`、`client/core/{runtime,sdk}`、`client/data/db`、`client/platform/downloader`、`client/ui/ui`、`server/admin/server-admin`、`server/core/server`、`shared/core/{both,logger,model,utils}`、`shared/plugin/plugin`。后续新包必须落入三级路径，并以实际能力命名第二、三级目录。
+- 目录稳定化已完成：workspace 只使用 `packages/*/*/*`，当前 13 个包分别位于 `client/app/app`、`client/core/{runtime,sdk}`、`client/data/db`、`client/platform/downloader`、`client/ui/ui`、`server/admin/admin`、`server/core/server`、`shared/core/{both,logger,model,utils}`、`shared/plugin/plugin`。后续新包必须落入三级路径，并以实际能力命名第二、三级目录。
 - 参考 DeepSeek Harness 的组织方式，后续 Cordis 拆分按独立包边界推进：协议、Manifest、Artifact、Loader、Install、Runtime、Vite adapter、release 与平台宿主分别拥有独立 package contract；聚合包只承担兼容导出和组合，不承载多个无关生命周期。
 
 ## 公共协议与客户端插件

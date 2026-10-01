@@ -16,7 +16,7 @@ import { createApp, defineComponent, h } from 'vue'
 import App from './App.vue'
 import { router } from './router'
 
-const adminLogger = logger.scoped('server-admin:lifecycle')
+const adminLogger = logger.scoped('admin:lifecycle')
 
 installGlobalLogger(logger)
 adminLogger.info('server admin bootstrap started')

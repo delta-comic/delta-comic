@@ -8,7 +8,7 @@ Cloudflare Dynamic Worker Loader 放进独立 isolate 执行。
 
 - `StaticPluginExecutor` 通过 `app/modules/plugins/definitions/index.ts` 的普通 ESM 索引收集定义；它兼容 Wrangler 的 Worker 打包链路，也让可执行插件清单保持可审计。
 - D1 保存注册目录、安装版本、期望/观测状态、配置、最近健康、任务与审计。
-- 管理员在 server-admin 中完成注册、安装、更新、启停、配置、健康检查和卸载。
+- 管理员在 admin 中完成注册、安装、更新、启停、配置、健康检查和卸载。
 - 静态插件只能获得 `ServerPluginHost` 暴露的低基数只读能力；不会得到完整 `Env`、secret 或 D1 binding。
 - `ServerPluginExecutor` 管理随部署发布、可审计的静态生命周期代码。
 - `DynamicWorkerPluginRunner` 管理管理员配置的运行期脚本：Dynamic Worker 继承父 Worker 的公网访问，
@@ -112,7 +112,7 @@ Worker 的 Cron Trigger 配置为 `0 * * * *`（UTC 每小时整点）。每次�
 ```bash
 vp run --filter @delta-comic/server migrate:local
 vp run --filter @delta-comic/server dev
-vp run --filter @delta-comic/server-admin dev
+vp run --filter @delta-comic/admin dev
 ```
 
 远端部署前显式执行 `migrate:remote`。`deploy` 不会自动修改生产数据库。

@@ -2,7 +2,7 @@ import { logger } from '@delta-comic/logger'
 
 import type { ApiResponse } from './types'
 
-const apiLogger = logger.scoped('server-admin:api')
+const apiLogger = logger.scoped('admin:api')
 
 export interface AdminApiClientOptions {
   baseUrl: string

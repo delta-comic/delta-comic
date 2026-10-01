@@ -9,7 +9,7 @@ import { pluginModels } from './plugins.schemas'
 import { createPluginScriptService } from './plugins.script'
 import { createPluginService } from './plugins.service'
 
-const actorId = 'server-admin'
+const actorId = 'admin'
 
 export const pluginRoutes = new Elysia({
   name: 'dc-server-plugin-routes',

@@ -141,27 +141,25 @@ describe('connection store', () => {
     store.status = 'connected'
     store.capabilities = capabilities
 
-    store.saveCredentials(' https://server.example/api/ ', ' token ')
+    store.saveCredentials(' https://example.com/api/ ', ' token ')
 
-    expect(store.apiBaseUrl).toBe('https://server.example')
+    expect(store.apiBaseUrl).toBe('https://example.com')
     expect(store.adminToken).toBe('token')
     expect(store.hasCredentials).toBe(true)
     expect(store.status).toBe('disconnected')
     expect(store.capabilities).toBeNull()
-    expect(window.localStorage.getItem('delta-comic.server-admin.endpoint')).toBe(
-      'https://server.example',
-    )
-    expect(window.sessionStorage.getItem('delta-comic.server-admin.token')).toBe('token')
+    expect(window.localStorage.getItem('delta-comic.admin.endpoint')).toBe('https://example.com')
+    expect(window.sessionStorage.getItem('delta-comic.admin.token')).toBe('token')
 
     store.clearToken()
     expect(store.adminToken).toBe('')
     expect(store.hasCredentials).toBe(false)
-    expect(window.sessionStorage.getItem('delta-comic.server-admin.token')).toBeNull()
+    expect(window.sessionStorage.getItem('delta-comic.admin.token')).toBeNull()
   })
 
   it('hydrates browser credentials and rejects client creation without an endpoint', () => {
-    window.localStorage.setItem('delta-comic.server-admin.endpoint', 'https://stored.example/api')
-    window.sessionStorage.setItem('delta-comic.server-admin.token', 'stored-token')
+    window.localStorage.setItem('delta-comic.admin.endpoint', 'https://stored.example/api')
+    window.sessionStorage.setItem('delta-comic.admin.token', 'stored-token')
     const hydrated = useConnectionStore()
     expect(hydrated.apiBaseUrl).toBe('https://stored.example')
     expect(hydrated.adminToken).toBe('stored-token')
@@ -170,7 +168,7 @@ describe('connection store', () => {
     window.localStorage.clear()
     const empty = useConnectionStore()
     expect(() => empty.createClient()).toThrow('请先配置 Server API 地址')
-    expect(() => empty.saveCredentials('ftp://server.example', 'token')).toThrow(/http/)
+    expect(() => empty.saveCredentials('ftp://example.com', 'token')).toThrow(/http/)
   })
 
   it('short-circuits missing credentials and connects with capabilities', async () => {
@@ -178,7 +176,7 @@ describe('connection store', () => {
     await expect(store.connect()).resolves.toBe(false)
     expect(store.error).toContain('请先在设置中')
 
-    store.saveCredentials('https://server.example', 'token')
+    store.saveCredentials('https://example.com', 'token')
     const get = vi.spyOn(AdminApiClient.prototype, 'get').mockResolvedValue(capabilities)
     await expect(store.connect()).resolves.toBe(true)
 
@@ -190,7 +188,7 @@ describe('connection store', () => {
 
   it('turns API failures into readable connection state', async () => {
     const store = useConnectionStore()
-    store.saveCredentials('https://server.example', 'token')
+    store.saveCredentials('https://example.com', 'token')
     vi.spyOn(AdminApiClient.prototype, 'get').mockRejectedValue(new Error('offline'))
 
     await expect(store.connect()).resolves.toBe(false)
@@ -215,7 +213,7 @@ describe('overview store', () => {
 
   it('loads overview data and always releases loading state', async () => {
     const connection = useConnectionStore()
-    connection.saveCredentials('https://server.example', 'token')
+    connection.saveCredentials('https://example.com', 'token')
     const get = vi.fn().mockResolvedValue(overview)
     vi.spyOn(connection, 'createClient').mockReturnValue({ get } as unknown as AdminApiClient)
     const store = useOverviewStore()
@@ -241,7 +239,7 @@ describe('plugins store', () => {
 
   const setupClient = () => {
     const connection = useConnectionStore()
-    connection.saveCredentials('https://server.example', 'token')
+    connection.saveCredentials('https://example.com', 'token')
     const client = { delete: vi.fn(), get: vi.fn(), patch: vi.fn(), post: vi.fn(), put: vi.fn() }
     vi.spyOn(connection, 'createClient').mockReturnValue(client as unknown as AdminApiClient)
     return { client, connection, store: usePluginsStore() }

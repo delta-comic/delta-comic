@@ -17,7 +17,7 @@ describe('AdminApiClient', () => {
     vi.stubGlobal('fetch', fetcher)
 
     try {
-      const client = new AdminApiClient({ baseUrl: 'https://server.example' })
+      const client = new AdminApiClient({ baseUrl: 'https://example.com' })
       await expect(client.get('/api/admin/capabilities')).resolves.toEqual({ connected: true })
       expect(fetcher).toHaveBeenCalledOnce()
     } finally {
@@ -31,7 +31,7 @@ describe('AdminApiClient', () => {
       return Response.json({ data: { ready: true }, ok: true })
     })
     const client = new AdminApiClient({
-      baseUrl: 'https://server.example',
+      baseUrl: 'https://example.com',
       fetcher,
       getToken: () => 'admin-token',
     })
@@ -44,7 +44,7 @@ describe('AdminApiClient', () => {
 
   it('normalizes a structured API failure', async () => {
     const client = new AdminApiClient({
-      baseUrl: 'https://server.example',
+      baseUrl: 'https://example.com',
       fetcher: async () =>
         Response.json(
           { error: { code: 'ADMIN_UNAUTHORIZED', message: 'unauthorized' }, ok: false },
@@ -66,7 +66,7 @@ describe('AdminApiClient', () => {
       expect(init?.body).toBe('{"enabled":true}')
       return Response.json({ data: { saved: true }, ok: true })
     })
-    const client = new AdminApiClient({ baseUrl: 'https://server.example', fetcher })
+    const client = new AdminApiClient({ baseUrl: 'https://example.com', fetcher })
 
     await expect(client.put('/plugin/script', { enabled: true })).resolves.toEqual({ saved: true })
   })
@@ -76,12 +76,12 @@ describe('AdminApiClient', () => {
     ['PATCH', 'patch'],
   ] as const)('sends JSON payloads with %s requests', async (method, call) => {
     const fetcher = vi.fn<typeof fetch>(async (input, init) => {
-      expect(input).toBe('https://server.example/api/item')
+      expect(input).toBe('https://example.com/api/item')
       expect(init?.method).toBe(method)
       expect(init?.body).toBe('{"value":1}')
       return Response.json({ data: method, ok: true })
     })
-    const client = new AdminApiClient({ baseUrl: 'https://server.example/', fetcher })
+    const client = new AdminApiClient({ baseUrl: 'https://example.com/', fetcher })
 
     await expect(client[call]('/api/item', { value: 1 })).resolves.toBe(method)
   })
@@ -93,14 +93,14 @@ describe('AdminApiClient', () => {
       expect(new Headers(init?.headers).has('content-type')).toBe(false)
       return Response.json({ data: true, ok: true })
     })
-    const client = new AdminApiClient({ baseUrl: 'https://server.example', fetcher })
+    const client = new AdminApiClient({ baseUrl: 'https://example.com', fetcher })
 
     await expect(client.delete('/api/item')).resolves.toBe(true)
   })
 
   it('rejects an invalid response envelope', async () => {
     const client = new AdminApiClient({
-      baseUrl: 'https://server.example',
+      baseUrl: 'https://example.com',
       fetcher: async () => Response.json({ status: 'ok' }),
     })
 
@@ -111,7 +111,7 @@ describe('AdminApiClient', () => {
 
   it('distinguishes invalid JSON from a valid but invalid envelope', async () => {
     const client = new AdminApiClient({
-      baseUrl: 'https://server.example',
+      baseUrl: 'https://example.com',
       fetcher: async () => new Response('not json', { status: 502 }),
     })
 
@@ -123,7 +123,7 @@ describe('AdminApiClient', () => {
 
   it('rejects an unsuccessful HTTP response even with a success envelope', async () => {
     const client = new AdminApiClient({
-      baseUrl: 'https://server.example',
+      baseUrl: 'https://example.com',
       fetcher: async () => Response.json({ data: null, ok: true }, { status: 503 }),
     })
 
@@ -135,7 +135,7 @@ describe('AdminApiClient', () => {
 
   it('wraps transport failures while preserving their message', async () => {
     const client = new AdminApiClient({
-      baseUrl: 'https://server.example',
+      baseUrl: 'https://example.com',
       fetcher: async () => {
         throw new Error('socket closed')
       },
@@ -155,7 +155,7 @@ describe('AdminApiClient', () => {
           init?.signal?.addEventListener('abort', () => reject(init.signal?.reason))
         }),
     )
-    const client = new AdminApiClient({ baseUrl: 'https://server.example', fetcher })
+    const client = new AdminApiClient({ baseUrl: 'https://example.com', fetcher })
     const request = client.get('/slow', caller.signal)
 
     caller.abort(new Error('cancelled by user'))
@@ -167,7 +167,7 @@ describe('AdminApiClient', () => {
   it('reports its own timeout separately from caller cancellation', async () => {
     vi.useFakeTimers()
     const client = new AdminApiClient({
-      baseUrl: 'https://server.example',
+      baseUrl: 'https://example.com',
       fetcher: (_input, init) =>
         new Promise((_resolve, reject) => {
           init?.signal?.addEventListener('abort', () => reject(new DOMException('aborted')))

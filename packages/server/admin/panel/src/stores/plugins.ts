@@ -15,7 +15,7 @@ import { readableApiError } from '@/shared/api/AdminApiClient'
 
 import { useConnectionStore } from './connection'
 
-const pluginsLogger = logger.scoped('server-admin:store:plugins')
+const pluginsLogger = logger.scoped('admin:store:plugins')
 
 export const usePluginsStore = defineStore('serverPlugins', () => {
   const connection = useConnectionStore()

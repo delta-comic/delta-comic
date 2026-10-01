@@ -108,10 +108,10 @@ describe('server plugin route handlers', () => {
 
     for (const [method, path, action] of cases) {
       await expect(findRoute(method, path).handler({ params, pluginService })).resolves.toEqual({
-        data: { action, actor: 'server-admin', pluginId: 'feature.sync' },
+        data: { action, actor: 'admin', pluginId: 'feature.sync' },
         ok: true,
       })
-      expect(pluginService[action]).toHaveBeenCalledExactlyOnceWith('feature.sync', 'server-admin')
+      expect(pluginService[action]).toHaveBeenCalledExactlyOnceWith('feature.sync', 'admin')
     }
 
     await expect(
@@ -123,7 +123,7 @@ describe('server plugin route handlers', () => {
     ).resolves.toEqual({
       data: {
         action: 'configure',
-        actor: 'server-admin',
+        actor: 'admin',
         config: { threshold: 9 },
         pluginId: 'feature.sync',
       },
@@ -132,7 +132,7 @@ describe('server plugin route handlers', () => {
     expect(pluginService.configure).toHaveBeenCalledExactlyOnceWith(
       'feature.sync',
       { threshold: 9 },
-      'server-admin',
+      'admin',
     )
   })
 })

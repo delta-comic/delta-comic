@@ -69,7 +69,7 @@
 - 6A：将新 Artifact/Manifest 接入现有安装文件与模块读取边界。complete（`b33ab532`）
 - 6B：公开构建并发布 `@delta-comic/server`，补齐 SDK 的产物测试。complete（`e9a83b1e`）
 - 6C：接入 Tauri command 的 specta 类型生成，并纳入 Rust/TypeScript 验证。complete（`127dd91b`）
-- 6D：complete。完成下载器、UI EnvironmentRegistry、诊断 harness、客户端网络 transport、UI registrar、app 路由/导航/command 接线、Worker fetch/scheduled 诊断适配器、旧 D1 插件宿主到新 ServerRuntime 的桥接、StaticPluginExecutor 的 Cordis mount/unmount 生命周期、诊断快照与回放执行器，以及 server-admin 诊断快照页面。
+- 6D：complete。完成下载器、UI EnvironmentRegistry、诊断 harness、客户端网络 transport、UI registrar、app 路由/导航/command 接线、Worker fetch/scheduled 诊断适配器、旧 D1 插件宿主到新 ServerRuntime 的桥接、StaticPluginExecutor 的 Cordis mount/unmount 生命周期、诊断快照与回放执行器，以及 admin 诊断快照页面。
 - 6E：complete。完成 artifact migration 声明与 ServerRuntime ID 核对/执行边界、Worker dispatcher、按 plugin/installation 记录并幂等执行 SQL migration 的 runner、市场目录协议、内存/HTTP/R2 存储、HTTP handler、发布器、发布者身份 header、目录 CAS、SHA-256 artifact 上传、D1 安装实例创建与回收、部署 workflow 和运维文档。
 - 6F：完成 workspace 目录稳定化。workspace 仅保留 `packages/*/*/*`，13 个现有包已落位到 client/server/shared 能力域，lockfile、symlink、构建入口、测试项目和 operational 路径已同步；市场操作由服务端发布接口与部署文档承载。
 - 每个子阶段均有实现、测试、规划状态和签名提交；发布者签名体系按已确认的 SHA-256 integrity 决策保留为当前范围外设计。
@@ -106,7 +106,7 @@
 
 ## Next Step
 
-阶段 8、9 已完成；保持工作树干净并提交最终验收记录。
+阶段 8、9 已完成；管理面板已更名并完成无网络悬挂请求的测试修复。下一步提交最终验收记录。
 
 ## 阶段 7 决策
 

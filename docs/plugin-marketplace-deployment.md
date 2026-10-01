@@ -113,8 +113,8 @@ plugin/installation 只创建一次并支持显式回收。
 部署前配置 WfP loader、D1 控制面凭证、每安装实例数据库适配器和访问权限。部署环境没有 WfP
 能力时使用 `UnavailablePluginWorkerProvisioner`，控制面继续提供明确的诊断错误。仓库中的
 `.github/workflows/server-deploy.yaml` 会依次执行 workspace 构建、格式与类型检查、测试、codegen
-检查、远程迁移、Worker 部署和可选的 server-admin Pages 部署。
+检查、远程迁移、Worker 部署和可选的 admin Pages 部署。
 
-server-admin 的运行指标页面包含 Worker 诊断快照入口；发布者账户由部署环境的授权回调提供，
+admin 的运行指标页面包含 Worker 诊断快照入口；发布者账户由部署环境的授权回调提供，
 凭证轮换通过 `SERVER_ADMIN_TOKEN` secret 完成。生产变更按目录 ETag 与 artifact 条件写入流程执行，
 回滚时保留上一份目录对象和已发布 artifact。

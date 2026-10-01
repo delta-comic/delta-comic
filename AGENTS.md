@@ -118,12 +118,12 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 - `packages/server/core/server/app/index.ts`：Elysia Cloudflare Worker 入口。
   `packages/server/core/server/lib/index.ts` 是客户端/共享公共 API，并非 Worker 入口。本地启动前必须先运行
   `vp run --filter @delta-comic/server migrate:local`，然后再运行 `... dev`。
-- `packages/server/admin/server-admin` 是独立的 Vue 管理应用。功能通过
+- `packages/server/admin/panel` 是独立的 Vue 管理应用。功能通过
   `src/features/*/feature.ts` 自动发现；应添加功能模块，而不是编辑集中式路由列表。
 - `packages/client/data/db`、`packages/client/platform/downloader`、`packages/client/ui/ui`、
   `packages/shared/core/{logger,model,utils}` 与 `packages/shared/plugin/plugin` 是可发布的工作区；其中一些还通过
   根 Cargo 工作区映射到 Rust Tauri 插件 crate。`packages/client/core/runtime`、`app`、`server` 和
-  `server-admin` 是私有包。
+  `admin` 是私有包。
 
 ## 架构约束
 

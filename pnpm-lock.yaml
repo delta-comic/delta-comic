@@ -800,7 +800,7 @@ importers:
         specifier: 'catalog:'
         version: 3.3.9(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)
 
-  packages/server/admin/server-admin:
+  packages/server/admin/panel:
     dependencies:
       '@delta-comic/logger':
         specifier: 'workspace:'

@@ -7,7 +7,7 @@ import type { AdminOverview } from '@/shared/api/types'
 
 import { useConnectionStore } from './connection'
 
-const overviewLogger = logger.scoped('server-admin:store:overview')
+const overviewLogger = logger.scoped('admin:store:overview')
 
 export const useOverviewStore = defineStore('serverOverview', () => {
   const connection = useConnectionStore()

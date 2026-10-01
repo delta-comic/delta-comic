@@ -158,7 +158,7 @@ const artifactUploadHandler = (env: AppEnv) => {
       const provided = request.headers.get('authorization')
       if (!expected || !provided?.startsWith('Bearer ')) return false
       return (await constantTimeTokenEqual(provided.slice('Bearer '.length), expected))
-        ? 'server-admin'
+        ? 'admin'
         : false
     },
   })

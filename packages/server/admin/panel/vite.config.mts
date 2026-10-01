@@ -42,7 +42,7 @@ export default defineConfig({
         output: ['dist/**'],
       },
       'deploy': {
-        command: 'wrangler pages deploy dist --project-name=delta-comic-server-admin',
+        command: 'wrangler pages deploy dist --project-name=delta-comic-admin',
         cache: false,
         dependsOn: ['build'],
       },

@@ -298,7 +298,7 @@
 - 完成发布者身份响应 header、R2 artifact `If-None-Match: *` 条件上传及重复版本 409；SHA-256 integrity 继续作为完整性契约。
 - 完成 `CloudflareDispatchWorkerProvisioner`、`CloudflareD1InstallationDatabase` 和 `PluginInstallationManager`。D1 删除使用创建返回的 database ID，安装实例按 plugin/installation 幂等创建并支持回收。
 - 新增 `.github/workflows/server-deploy.yaml`，按构建、检查、类型、测试、codegen、迁移、Worker 和 Pages 顺序执行部署。
-- 通过 `vp run lib-build`、`vp check`、server/server-admin typecheck，以及新增服务端专项测试（7 files / 18 tests）；实现已签名提交 `37d0e373`。
+- 通过 `vp run lib-build`、`vp check`、server/admin typecheck，以及新增服务端专项测试（7 files / 18 tests）；实现已签名提交 `37d0e373`。
 - 最终验收通过：`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`（164 files / 878 tests）、`vp run codegen:check` 和 `git diff --check`。
 - 阶段 6 全部子阶段已完成，最终工作树干净；阶段记录提交为 `e2bf7da5`，页面条件修复提交为 `52c2d97c`。
 
@@ -343,3 +343,11 @@
 - `vp run codegen:check`、`git diff --check` 通过；全量 `vp test run` 通过（164 files / 883 tests）。
 - 签名提交：`74a2c0cd`（功能实现）与 `8dccbcdb`（格式修正）。
 - 阶段 8、9 已完成，工作树保持干净。
+
+## 2026-10-01：管理面板命名与网络测试收尾
+
+- 管理面板包由 `@delta-comic/server-admin` 更名为 `@delta-comic/admin`，源码目录由 `packages/server/admin/server-admin` 调整为 `packages/server/admin/panel`。
+- 同步 Vite+ workspace、部署 workflow、Pages 项目名 `delta-comic-admin`、日志 scope、审计 actor、浏览器存储键、服务端文档与架构引用。
+- 管理面板测试地址统一使用可解析的 `https://example.com`；运行指标页面注入离线 API 响应，测试退出时无悬挂网络请求。
+- `vp check --fix`、`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp run codegen:check` 通过；管理面板定向测试 3 files / 42 tests 通过，页面测试无 AbortError 输出。
+- 全量测试最终通过 164 files / 883 tests；输出无 DNS 错误与 AbortError，重命名变更已完成验收。

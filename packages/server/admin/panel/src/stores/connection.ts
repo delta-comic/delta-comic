@@ -6,10 +6,10 @@ import { AdminApiClient, readableApiError } from '@/shared/api/AdminApiClient'
 import type { AdminCapabilities } from '@/shared/api/types'
 import { normalizeApiBaseUrl } from '@/utils/url'
 
-const endpointStorageKey = 'delta-comic.server-admin.endpoint'
-const tokenStorageKey = 'delta-comic.server-admin.token'
+const endpointStorageKey = 'delta-comic.admin.endpoint'
+const tokenStorageKey = 'delta-comic.admin.token'
 
-const connectionLogger = logger.scoped('server-admin:store:connection')
+const connectionLogger = logger.scoped('admin:store:connection')
 
 const browserStorage = (kind: 'local' | 'session'): Storage | undefined => {
   if (typeof window === 'undefined') return undefined

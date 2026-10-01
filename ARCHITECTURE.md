@@ -2365,7 +2365,7 @@ packages/client/app/app/              → 桌面 + Web 客户端混合
 apps/desktop/              → Tauri 桌面应用（macOS/Windows/Linux）
 apps/mobile/               → Tauri Android 应用
 packages/server/core/server/           → Worker 服务端
-packages/server/admin/server-admin/     → 独立 Vue 管理后台应用
+packages/server/admin/panel/     → 独立 Vue 管理后台应用
 ```
 
 ### 10.2 保留功能映射
