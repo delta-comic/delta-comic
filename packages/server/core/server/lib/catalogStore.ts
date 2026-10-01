@@ -1,10 +1,12 @@
 import {
   parsePluginCatalogIndex,
+  PluginCatalogConflictError,
   type PluginCatalogIndex,
   type PluginCatalogStore,
 } from '@delta-comic/both'
 
 export interface PluginCatalogObject {
+  httpEtag: string
   text(): Promise<string>
 }
 
@@ -13,8 +15,8 @@ export interface PluginCatalogBucket {
   put(
     key: string,
     value: string,
-    options?: { httpMetadata?: { contentType?: string } },
-  ): Promise<void>
+    options?: { httpMetadata?: { contentType?: string }; onlyIf?: Headers },
+  ): Promise<{ httpEtag: string } | null>
 }
 
 export const createR2PluginCatalogStore = (
@@ -26,9 +28,25 @@ export const createR2PluginCatalogStore = (
     if (!object) return undefined
     return parsePluginCatalogIndex(JSON.parse(await object.text()))
   },
-  async save(index: PluginCatalogIndex) {
-    await bucket.put(key, JSON.stringify(parsePluginCatalogIndex(index)), {
+  async loadSnapshot() {
+    const object = await bucket.get(key)
+    if (!object) return { index: undefined, version: null }
+    return {
+      index: parsePluginCatalogIndex(JSON.parse(await object.text())),
+      version: object.httpEtag,
+    }
+  },
+  async save(index: PluginCatalogIndex, expectedVersion) {
+    const result = await bucket.put(key, JSON.stringify(parsePluginCatalogIndex(index)), {
       httpMetadata: { contentType: 'application/json' },
+      ...(expectedVersion === undefined
+        ? {}
+        : {
+            onlyIf: new Headers(
+              expectedVersion === null ? { 'if-none-match': '*' } : { 'if-match': expectedVersion },
+            ),
+          }),
     })
+    if (result === null) throw new PluginCatalogConflictError()
   },
 })

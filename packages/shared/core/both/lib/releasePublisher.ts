@@ -19,11 +19,16 @@ export interface PluginReleaseMetadata {
 
 const catalogError = (message: string) => new Error(`Plugin release update failed: ${message}`)
 
-const loadCatalog = async (store: PluginCatalogStore): Promise<PluginCatalogIndex> => {
-  const current = await store.load()
-  return parsePluginCatalogIndex(
-    current ?? { protocolVersion: 1, generatedAt: new Date().toISOString(), entries: [] },
-  )
+const loadCatalog = async (store: PluginCatalogStore) => {
+  const snapshot = store.loadSnapshot
+    ? await store.loadSnapshot()
+    : { index: await store.load(), version: undefined }
+  return {
+    version: snapshot.version,
+    index: parsePluginCatalogIndex(
+      snapshot.index ?? { protocolVersion: 1, generatedAt: new Date().toISOString(), entries: [] },
+    ),
+  }
 }
 
 const updateEntry = (
@@ -45,7 +50,7 @@ export const createPluginReleasePublisher = (
   async publish(input, metadata) {
     const release = parsePluginRelease(input)
     if (!metadata.name.trim()) throw catalogError('plugin name is required')
-    const current = await loadCatalog(store)
+    const { index: current, version } = await loadCatalog(store)
     const nextEntries = updateEntry(current.entries, release.pluginId, entry => {
       if (entry?.releases.some(item => item.version === release.version)) {
         throw catalogError(`release already exists: ${release.pluginId}@${release.version}`)
@@ -66,12 +71,12 @@ export const createPluginReleasePublisher = (
       generatedAt: new Date().toISOString(),
       entries: nextEntries,
     })
-    await store.save(next)
+    await store.save(next, version)
     return next
   },
 
   async yank(pluginId, version) {
-    const current = await loadCatalog(store)
+    const { index: current, version: expectedVersion } = await loadCatalog(store)
     let changed = false
     const nextEntries = current.entries.map(entry => {
       if (entry.pluginId !== pluginId) return entry
@@ -88,7 +93,7 @@ export const createPluginReleasePublisher = (
       generatedAt: new Date().toISOString(),
       entries: nextEntries,
     })
-    await store.save(next)
+    await store.save(next, expectedVersion)
     return next
   },
 })

@@ -76,7 +76,17 @@
 
 ## Next Step
 
-  阶段 6G Install 与 Vite Adapter 已完成；后续继续处理 6D/6E 的完整旧宿主迁移、发布身份/CAS、WfP provisioning、应用/admin 重组和完整部署流水线。
+下一步处理 6D 旧 StaticPluginExecutor 的 ServerRuntime/Cordis 生命周期迁移，先完成现有静态插件定义的兼容适配和专项测试。
+
+## 阶段 6E 目录发布 CAS
+
+- **状态：** complete
+- 用户已认可本阶段设计并授权继续实施。
+- 最小改动范围：both 的目录存储和发布器、server 的目录 HTTP/R2 边界与 Worker 接线、对应测试、部署说明及三个规划文件。
+- 保持目录 JSON 协议和现有 load/save 调用；支持版本快照的存储提供条件保存，发布/撤回携带快照版本。
+- R2 使用官方 `put(..., { onlyIf: Headers })`，创建目录使用 `If-None-Match: *`，更新目录使用 `If-Match`；条件失败返回明确冲突。
+- 验收：并发首次发布、已有目录更新、发布/撤回交错、陈旧 HTTP 版本和 R2 条件失败；依次运行 lib-build、check、递归 typecheck、全量测试及 codegen 检查。
+- 已完成：目录快照、内存/HTTP/R2 条件保存、GET ETag、目录 PUT 条件响应、发布/撤回冲突映射和专项并发测试。
 
 ## 阶段 6G 实施计划
 
@@ -95,6 +105,7 @@
 | app `vue-tsc` 报告旧 `DCPluginConfig` model/hooks 字段缺失 | 1 | 聚合包已恢复可解析；记录为 6D 旧宿主类型迁移遗留，不扩大本次 6G Install/Vite 包拆分范围 |
 | 聚合包架构测试将多行 `export type` 续行误判为可执行代码 | 1 | 聚合入口改为通过 `lib/kernel` 统一导出新 Kernel，并移除旧 Kernel 的重复实现 |
 | 插件专项测试在依赖 dist 尚未重建时无法解析 `@delta-comic/plugin-kernel` | 1 | 先运行 `vp run lib-build`，再重新执行专项测试并通过 |
+| `vp run -r typecheck` 报告 `packages/shared/plugin/runtime/lib/store.ts:70` 及 `test/index.test.ts:37,42` 的 3 个类型错误 | 1 | 这些文件未被本阶段修改，记录为既有 Runtime 类型检查限制，不扩大目录 CAS 范围 |
 
 ## 6G 过渡设计清理
 

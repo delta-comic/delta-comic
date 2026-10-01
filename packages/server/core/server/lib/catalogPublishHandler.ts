@@ -1,6 +1,7 @@
 import {
   createPluginReleasePublisher,
   parsePluginRelease,
+  PluginCatalogConflictError,
   type PluginCatalogStore,
   type PluginReleaseMetadata,
 } from '@delta-comic/both'
@@ -77,7 +78,7 @@ export const createPluginCatalogPublishHandler = (
       } catch (error) {
         return json(
           { error: error instanceof Error ? error.message : 'invalid publish payload' },
-          400,
+          error instanceof PluginCatalogConflictError ? 409 : 400,
         )
       }
     },

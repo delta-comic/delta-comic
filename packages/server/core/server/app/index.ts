@@ -115,12 +115,7 @@ const publishPath = '/plugins/catalog/releases'
 const catalogHandler = (env: AppEnv) => {
   if (!env.PLUGIN_CATALOG) return undefined
   return createPluginCatalogHandler({
-    store: createR2PluginCatalogStore({
-      get: key => env.PLUGIN_CATALOG!.get(key),
-      async put(key, value, options) {
-        await env.PLUGIN_CATALOG!.put(key, value, options)
-      },
-    }),
+    store: createR2PluginCatalogStore(env.PLUGIN_CATALOG),
     pathname: catalogPath,
     authorizeWrite: async request => {
       const expected = env.SERVER_ADMIN_TOKEN
@@ -133,12 +128,7 @@ const catalogHandler = (env: AppEnv) => {
 
 const catalogPublishHandler = (env: AppEnv) => {
   if (!env.PLUGIN_CATALOG) return undefined
-  const store = createR2PluginCatalogStore({
-    get: key => env.PLUGIN_CATALOG!.get(key),
-    async put(key, value, options) {
-      await env.PLUGIN_CATALOG!.put(key, value, options)
-    },
-  })
+  const store = createR2PluginCatalogStore(env.PLUGIN_CATALOG)
   return createPluginCatalogPublishHandler({
     store,
     publishPath,

@@ -314,3 +314,10 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - `@delta-comic/plugin-vite` 承载构建和开发服务器适配器，依赖 Install 的 dev 协议常量与通用构建工具，不依赖 Runtime、数据库或应用服务。
 - 聚合 `@delta-comic/plugin` 通过新包导出 Install/Vite，删除旧 `lib/install`、`vite` 实现和对应测试，发布工作区与版本同步路径已纳入五个新增公共包。
 - Install 专项 24 测试、Vite 专项 26 测试、聚合插件 40 测试、发布工作区 3 测试和 semantic release command 4 测试通过。
+
+## 2026-10-01：6E 目录发布 CAS 边界
+
+- 目录发布器当前执行 load/save；并发发布或撤回会覆盖同一份目录。CAS 以可选版本快照与条件保存接入现有存储协议，目录 JSON 格式保持稳定。
+- 已核对 Cloudflare 官方 R2 Workers API 文档：https://developers.cloudflare.com/r2/api/workers/workers-api-reference/ 。`put` 接受 `onlyIf: R2Conditional | Headers`，条件失败返回 null；`httpEtag` 提供符合 HTTP 格式的带引号 ETag，写入具备强一致性。
+- R2 创建目录使用 `If-None-Match: *`，更新使用读取对象的 `httpEtag` 作为 `If-Match`。HTTP GET 暴露 ETag，条件 PUT 的陈旧版本返回 412，发布/撤回冲突返回 409；调用方刷新目录后重试。
+- Worker 已改为将原始 R2 binding 传入适配器，保留条件写入返回值并能把冲突映射到发布响应。

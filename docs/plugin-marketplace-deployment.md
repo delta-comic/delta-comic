@@ -78,13 +78,13 @@ curl -i \
   --data-binary @release-payload.json
 ```
 
-发布器会校验 HTTPS artifact URL、Manifest URL、平台、完整性值、版本和目录条目。artifact 文件上传、发布者账户、签名凭证、并发版本控制和完整管理后台仍需后续实现。
+发布器会校验 HTTPS artifact URL、Manifest URL、平台、完整性值、版本和目录条目。artifact 文件上传、发布者账户、签名凭证和完整管理后台仍需后续实现。
 
 ## 变更操作
 
-目录索引由 R2 object `catalog/index.json` 保存。发布和撤回请求会读取当前目录、应用一次领域变更并写回 JSON。生产环境变更前应保存当前 object，发布后检查目录中的 `generatedAt`、插件 ID 和版本。
+目录索引由 R2 object `catalog/index.json` 保存。发布和撤回请求会读取当前目录、携带对象的 HTTP ETag，并通过 R2 `If-Match` 条件写入完成一次领域变更；首次创建使用 `If-None-Match: *`。R2 条件失败会返回 409，调用方应重新读取目录后重试。生产环境变更前应保存当前 object，发布后检查目录中的 `generatedAt`、插件 ID 和版本。
 
-当前目录存储接口提供 `load/save`，发布流程尚未接入条件写入或版本号校验。多人并发发布时应安排单一发布窗口，待 CAS 或队列协调能力完成后再开放并行发布。
+目录 GET 响应包含 ETag，直接 PUT 可使用 `If-Match` 或 `If-None-Match: *`；陈旧条件返回 412。发布端点在目录冲突时返回 409，发布者可重新载入并重试。R2 写入具备强一致性，条件写入由对象存储原子执行。
 
 ## 未覆盖的部署事项
 

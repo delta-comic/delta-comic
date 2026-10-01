@@ -57,4 +57,31 @@ describe('plugin catalog handler', () => {
     ).toBe(405)
     expect((await handler.fetch(new Request('https://example.com/other'))).status).toBe(404)
   })
+
+  it('returns an ETag and rejects stale conditional writes', async () => {
+    const store = createMemoryPluginCatalogStore(catalog)
+    const handler = createPluginCatalogHandler({ store, authorizeWrite: () => true })
+    const read = await handler.fetch(new Request('https://example.com/plugins/catalog/index.json'))
+    const version = read.headers.get('etag')
+    expect(version).toMatch(/^"\d+"$/)
+
+    const update = await handler.fetch(
+      new Request('https://example.com/plugins/catalog/index.json', {
+        method: 'PUT',
+        headers: { 'if-match': version!, 'content-type': 'application/json' },
+        body: JSON.stringify({ ...catalog, generatedAt: 'updated' }),
+      }),
+    )
+    expect(update.status).toBe(200)
+    expect(update.headers.get('etag')).toBeNull()
+
+    const stale = await handler.fetch(
+      new Request('https://example.com/plugins/catalog/index.json', {
+        method: 'PUT',
+        headers: { 'if-match': version!, 'content-type': 'application/json' },
+        body: JSON.stringify(catalog),
+      }),
+    )
+    expect(stale.status).toBe(412)
+  })
 })
