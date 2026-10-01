@@ -1,3 +1,4 @@
+import semver from 'semver'
 import { Type, type Static } from 'typebox'
 import { Value } from 'typebox/value'
 
@@ -21,6 +22,8 @@ export const PluginManifestSchema = Type.Object({
   id: Type.String({ minLength: 1, maxLength: 64, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' }),
   name: Type.String({ minLength: 1 }),
   version: Type.String({ minLength: 1 }),
+  apiVersion: Type.Optional(Type.String({ minLength: 1 })),
+  cordisVersion: Type.Optional(Type.String({ minLength: 1 })),
   author: Type.Optional(Type.String()),
   description: Type.Optional(Type.String()),
   entry: Type.String({ minLength: 1 }),
@@ -35,6 +38,44 @@ export const PluginManifestSchema = Type.Object({
 export type PluginDependency = Static<typeof PluginDependencySchema>
 export type PluginResource = Static<typeof PluginResourceSchema>
 export type PluginManifest = Static<typeof PluginManifestSchema>
+
+export interface PluginManifestCompatibility {
+  readonly apiVersion?: string
+  readonly cordisVersion?: string
+  readonly protocolVersion?: number
+}
+
+export const assertPluginManifestCompatible = (
+  manifest: PluginManifest,
+  compatibility: PluginManifestCompatibility,
+) => {
+  if (
+    compatibility.protocolVersion !== undefined &&
+    manifest.protocolVersion !== compatibility.protocolVersion
+  ) {
+    throw new TypeError(
+      `plugin protocol ${manifest.protocolVersion} is incompatible with ${compatibility.protocolVersion}`,
+    )
+  }
+  if (
+    compatibility.apiVersion &&
+    manifest.apiVersion &&
+    !semver.satisfies(compatibility.apiVersion, manifest.apiVersion)
+  ) {
+    throw new TypeError(
+      `plugin API ${manifest.apiVersion} does not support ${compatibility.apiVersion}`,
+    )
+  }
+  if (
+    compatibility.cordisVersion &&
+    manifest.cordisVersion &&
+    !semver.satisfies(compatibility.cordisVersion, manifest.cordisVersion)
+  ) {
+    throw new TypeError(
+      `plugin Cordis ${manifest.cordisVersion} does not support ${compatibility.cordisVersion}`,
+    )
+  }
+}
 
 export const isPluginManifest = (value: unknown): value is PluginManifest =>
   Value.Check(PluginManifestSchema, value)

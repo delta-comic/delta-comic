@@ -20,6 +20,10 @@ export interface ArtifactValidationResult {
   entry: ArtifactFile
 }
 
+export interface ArtifactValidationOptions {
+  readonly platform?: string
+}
+
 export class ArtifactValidationError extends Error {
   public constructor(message: string) {
     super(`Invalid plugin artifact: ${message}`)
@@ -76,8 +80,13 @@ const digest = async (bytes: Uint8Array) => {
 const resourceByPath = (resources: readonly PluginResource[]) =>
   new Map(resources.map(resource => [normalizePath(resource.path), resource]))
 
-const validateResourceGraph = (manifest: PluginManifest) => {
-  const resources = resourceByPath(manifest.resources)
+const validateResourceGraph = (manifest: PluginManifest, platform?: string) => {
+  const resources = resourceByPath(
+    manifest.resources.filter(
+      resource =>
+        platform === undefined || !resource.platform || resource.platform.includes(platform),
+    ),
+  )
   if (!resources.has(normalizePath(manifest.entry))) {
     throw new ArtifactValidationError(`entry is not declared as a resource: ${manifest.entry}`)
   }
@@ -95,9 +104,10 @@ const validateResourceGraph = (manifest: PluginManifest) => {
 
 export const validateArtifact = async (
   artifact: PluginArtifact,
+  options: ArtifactValidationOptions = {},
 ): Promise<ArtifactValidationResult> => {
   const manifest = parsePluginManifest(artifact.manifest)
-  const resources = validateResourceGraph(manifest)
+  const resources = validateResourceGraph(manifest, options.platform)
   const files = new Map<string, ArtifactFile>()
   for (const file of artifact.files) {
     const path = normalizePath(file.path)

@@ -19,6 +19,14 @@ export interface PluginInstallServiceOptions {
   readonly resolvers: readonly PluginSourceResolver[]
 }
 
+export interface PluginInstallHooks {
+  /** Runs after the new files and metadata are staged, before the replacement is committed. */
+  readonly afterStage?: (
+    archive: PluginArchiveDB.Archive,
+    previous: PluginArchiveDB.Archive | undefined,
+  ) => void | Promise<void>
+}
+
 interface PluginInstallContext {
   readonly installing: Set<string>
   readonly installed: Set<string>
@@ -32,10 +40,11 @@ export class PluginInstallService {
     input: PluginInstallInput,
     signal = new AbortController().signal,
     report: PluginInstallReporter = () => {},
+    hooks: PluginInstallHooks = {},
   ) {
     const context: PluginInstallContext = { added: [], installed: new Set(), installing: new Set() }
     try {
-      return await this.#install(input, signal, report, context)
+      return await this.#install(input, signal, report, context, undefined, hooks, true)
     } catch (error) {
       const rollbackErrors: unknown[] = [error]
       for (const plugin of [...context.added].reverse()) {
@@ -56,6 +65,8 @@ export class PluginInstallService {
     report: PluginInstallReporter,
     context: PluginInstallContext,
     expectedPlugin?: string,
+    hooks: PluginInstallHooks = {},
+    root = false,
   ) {
     report({ phase: 'resolve', progress: 0 })
     const resolver = this.options.resolvers.find(candidate => candidate.matches(input))
@@ -92,7 +103,7 @@ export class PluginInstallService {
           continue
         }
         if (!dependency.download) continue
-        await this.#install(dependency.download, signal, report, context, dependency.id)
+        await this.#install(dependency.download, signal, report, context, dependency.id, hooks)
       }
 
       const previous = await this.options.repository.find(plugin)
@@ -113,6 +124,7 @@ export class PluginInstallService {
       try {
         report({ description: plugin, phase: 'persist', progress: 50 })
         await this.options.repository.upsert(archive)
+        if (root) await hooks.afterStage?.(archive, previous)
         await replacement.commit()
         report({ description: plugin, phase: 'persist', progress: 100 })
         context.installed.add(plugin)

@@ -124,7 +124,7 @@ export interface PluginInstallOptions {
   readonly signal?: AbortSignal
 }
 
-export const installPlugin = async (input: File | string, options: PluginInstallOptions = {}) => {
+const installPluginInternal = async (input: File | string, options: PluginInstallOptions = {}) => {
   const installed = new Set([
     ...internalPluginIds,
     ...(await pluginRepository.list()).map(archive => archive.pluginName),
@@ -150,12 +150,36 @@ export const installPlugin = async (input: File | string, options: PluginInstall
   return archive
 }
 
+export const installPlugin = async (input: File | string, options: PluginInstallOptions = {}) =>
+  await installPluginInternal(input, options)
+
 export const updatePlugin = async (
-  archive: { installInput: string },
+  archive: { installInput: string; pluginName?: string },
   options?: PluginInstallOptions,
 ) => {
   if (!archive.installInput) throw new Error('plugin has no reusable install source')
-  return await installPlugin(archive.installInput, options)
+  const plugin = archive.pluginName
+  try {
+    const current = await pluginInstaller.install(
+      archive.installInput,
+      options?.signal,
+      options?.report,
+      {
+        afterStage: async staged => {
+          await pluginRuntime.refreshCandidates()
+          await pluginRuntime.reloadPlugin(staged.pluginName)
+        },
+      },
+    )
+    await pluginRuntime.refreshCandidates()
+    return current
+  } catch (error) {
+    await pluginRuntime.refreshCandidates()
+    if (plugin && pluginRuntime.store.candidates.has(plugin)) {
+      await pluginRuntime.reloadPlugin(plugin).catch(() => undefined)
+    }
+    throw error
+  }
 }
 
 export const updatePluginByName = async (plugin: string, options?: PluginInstallOptions) => {

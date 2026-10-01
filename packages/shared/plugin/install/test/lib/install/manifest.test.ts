@@ -1,6 +1,12 @@
+import type { PluginManifest as ArtifactManifest } from '@delta-comic/plugin-manifest'
 import { describe, expect, it } from 'vitest'
 
-import { parsePluginManifest, PluginManifestError } from '../../../lib'
+import {
+  assertArtifactDependencies,
+  assertArtifactManifestCompatible,
+  parsePluginManifest,
+  PluginManifestError,
+} from '../../../lib'
 
 const manifest = (overrides: Record<string, unknown> = {}) => ({
   apiVersion: 1,
@@ -36,5 +42,47 @@ describe('plugin manifest v1', () => {
     expect(() =>
       parsePluginManifest(manifest({ name: { display: 'Unsafe', id: 'unsafe:name' } })),
     ).toThrow('portable')
+  })
+})
+
+describe('artifact manifest compatibility', () => {
+  const artifact = (overrides: Partial<ArtifactManifest> = {}): ArtifactManifest => ({
+    protocolVersion: 1,
+    id: 'reader',
+    name: 'Reader',
+    version: '1.0.0',
+    entry: 'index.js',
+    entryType: 'plugin',
+    resources: [],
+    ...overrides,
+  })
+
+  it('checks protocol and semver API compatibility', () => {
+    expect(() =>
+      assertArtifactManifestCompatible(artifact({ apiVersion: '^2.0.0' }), {
+        protocolVersion: 1,
+        apiVersion: '1.0.0',
+      }),
+    ).toThrow('does not support')
+    expect(() =>
+      assertArtifactManifestCompatible(artifact({ apiVersion: '^1.0.0' }), {
+        protocolVersion: 1,
+        apiVersion: '1.2.0',
+      }),
+    ).not.toThrow()
+  })
+
+  it('checks dependency presence, versions and cycles', () => {
+    const manifest = artifact({ dependencies: [{ id: 'base', version: '^1.0.0' }] })
+    expect(() => assertArtifactDependencies(manifest, [])).toThrow('missing')
+    expect(() => assertArtifactDependencies(manifest, [{ id: 'base', version: '2.0.0' }])).toThrow(
+      'version mismatch',
+    )
+    expect(() =>
+      assertArtifactDependencies(manifest, [{ id: 'base', version: '1.2.0' }]),
+    ).not.toThrow()
+    expect(() =>
+      assertArtifactDependencies(artifact({ dependencies: [{ id: 'reader' }] }), []),
+    ).toThrow('cycle')
   })
 })

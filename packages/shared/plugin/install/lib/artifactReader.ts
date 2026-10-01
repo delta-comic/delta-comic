@@ -6,6 +6,7 @@ import {
 import type { PluginManifest } from '@delta-comic/plugin-manifest'
 
 import type { PluginFileReplacement, PluginFileStore } from './contracts'
+import { createArtifactModuleGraph, type ModuleGraphUrl } from './moduleGraph'
 
 export interface CordisPluginArtifact extends PluginArtifact {
   readonly manifest: PluginManifest
@@ -56,17 +57,34 @@ export class CordisArtifactModuleReader {
     signal.throwIfAborted()
     const plugin = validated.manifest.id
     const replacement = await createReplacement(this.files, plugin, validated)
+    let graph: ModuleGraphUrl | undefined
 
     try {
       await replacement.commit()
       signal.throwIfAborted()
-      const url = await this.files.createModuleUrl(plugin, validated.manifest.entry)
+      graph =
+        validated.manifest.resources.length === 1 &&
+        validated.manifest.resources[0]?.imports.length === 0
+          ? undefined
+          : await createArtifactModuleGraph(
+              validated.manifest,
+              new Map(validated.files.map(file => [file.path, file.bytes])),
+            )
+      const url = graph?.url ?? (await this.files.createModuleUrl(plugin, validated.manifest.entry))
       const module = (await import(/* @vite-ignore */ url)) as { default?: unknown }
       signal.throwIfAborted()
       const entry = module.default ?? module
       assertEntryType(validated.manifest, entry)
-      return { entry, manifest: validated.manifest, dispose: () => this.files.release(plugin) }
+      return {
+        entry,
+        manifest: validated.manifest,
+        dispose: () => {
+          graph?.dispose()
+          this.files.release(plugin)
+        },
+      }
     } catch (error) {
+      graph?.dispose()
       this.files.release(plugin)
       await replacement.rollback()
       throw error

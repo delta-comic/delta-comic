@@ -301,3 +301,19 @@
 - 通过 `vp run lib-build`、`vp check`、server/server-admin typecheck，以及新增服务端专项测试（7 files / 18 tests）；实现已签名提交 `37d0e373`。
 - 最终验收通过：`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`（164 files / 878 tests）、`vp run codegen:check` 和 `git diff --check`。
 - 阶段 6 全部子阶段已完成，最终工作树干净；阶段记录提交为 `e2bf7da5`，页面条件修复提交为 `52c2d97c`。
+
+## 2026-10-01：阶段 7 启动
+
+- 阶段 6 已完成，现按 ARCHITECTURE.md 第 7 章推进 Manifest、Artifact、安装/升级与模块解析。
+- 已确认当前仓库的 `@delta-comic/plugin-manifest` 与 `@delta-comic/plugin-artifact` 是现行协议基线，`@delta-comic/plugin-install` 和数据库仍保留旧 Manifest 适配边界。
+- 阶段 7 先收敛协议和资源图校验，再补安装兼容性、升级事务和动态 chunk 模块解析；所有结果写入本规划文件并在最终阶段签名提交。
+
+## 2026-10-01：阶段 7 实现完成
+
+- `@delta-comic/plugin-artifact` 增加按目标平台筛选资源的校验选项；入口、资源 imports、重复路径、完整性和路径安全仍在动态加载前统一校验。
+- `@delta-comic/plugin-install` 增加 `ArtifactZipPackageCodec`、Artifact Manifest 兼容性与依赖校验、安装阶段 `afterStage` 事务钩子，以及 Blob 资源图模块 URL 解析。
+- 资源图为相对静态/动态 import 建立 URL 映射，生成的临时和最终 URL 在 dispose/失败路径统一回收；Node runner 不支持直接 import blob URL，专项测试验证了转换内容。
+- 聚合插件更新入口在新文件和数据库元数据阶段提交前执行 runtime reload，激活失败时由安装服务恢复旧版本并由宿主尝试重载旧候选。
+- 阶段专项测试已通过：artifact 3 tests、install 4 files/22 tests、manifest 2 tests；`vp check --fix` 通过。
+- 验收中 `vp run lib-build`、`vp check` 和递归 typecheck 通过；全量 `vp test run` 为 161 files / 875 passed / 3 existing timeout failures，单独运行失败文件后 db 6 tests 与 plugin 4 tests 全部通过，未发现阶段 7 回归。
+- `vp run codegen:check` 与 `git diff --check` 通过；规划状态切换为 complete，阶段实现已签名提交。

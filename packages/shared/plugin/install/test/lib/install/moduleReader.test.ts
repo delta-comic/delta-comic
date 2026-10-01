@@ -6,9 +6,57 @@ import { describe, expect, it, vi } from 'vitest'
 import type { PluginFileReplacement, PluginFileStore } from '../../../lib'
 import {
   CordisArtifactModuleReader,
+  createArtifactModuleGraph,
   DevServerPluginModuleReader,
   StoredPluginModuleReader,
 } from '../../../lib'
+
+describe('artifact module graph', () => {
+  it('rewrites relative dynamic imports for Blob URLs', async () => {
+    const chunk = new TextEncoder().encode('export const value = 42')
+    const entry = new TextEncoder().encode(
+      "export default async () => (await import('./chunks/value.js')).value",
+    )
+    const manifest = {
+      protocolVersion: 1 as const,
+      id: 'graph-reader',
+      name: 'Graph Reader',
+      version: '1.0.0',
+      entry: 'index.js',
+      entryType: 'plugin' as const,
+      resources: [
+        {
+          path: 'index.js',
+          mimeType: 'text/javascript',
+          integrity: await import('@delta-comic/plugin-artifact').then(({ sha256Integrity }) =>
+            sha256Integrity(entry),
+          ),
+          imports: ['./chunks/value.js'],
+        },
+        {
+          path: 'chunks/value.js',
+          mimeType: 'text/javascript',
+          integrity: await import('@delta-comic/plugin-artifact').then(({ sha256Integrity }) =>
+            sha256Integrity(chunk),
+          ),
+          imports: [],
+        },
+      ],
+    }
+
+    const graph = await createArtifactModuleGraph(
+      manifest,
+      new Map([
+        ['index.js', entry],
+        ['chunks/value.js', chunk],
+      ]),
+    )
+    const source = await fetch(graph.url).then(response => response.text())
+    expect(source).toContain('blob:')
+    expect(source).not.toContain("import('./chunks/value.js')")
+    graph.dispose()
+  })
+})
 
 const artifactManifest = async (entryType: 'plugin' | 'plugin-set' = 'plugin') => {
   const source = 'export default () => ({ name: "cordis-reader" })'

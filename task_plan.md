@@ -74,9 +74,39 @@
 - 6F：完成 workspace 目录稳定化。workspace 仅保留 `packages/*/*/*`，13 个现有包已落位到 client/server/shared 能力域，lockfile、symlink、构建入口、测试项目和 operational 路径已同步；市场操作由服务端发布接口与部署文档承载。
 - 每个子阶段均有实现、测试、规划状态和签名提交；发布者签名体系按已确认的 SHA-256 integrity 决策保留为当前范围外设计。
 
+## 阶段 7：Manifest、产物格式、安装/升级与模块解析
+
+- **状态：** complete
+- 目标：按第 12 章现行 API 基线完成架构第 7 章的可执行实现；覆盖新 Manifest/Artifact 校验、ZIP 资源图、安装依赖与兼容性检查、原子升级回滚、Blob/协议 URL 模块解析和动态 chunk。
+- 约束：保留已有插件宿主与旧数据库迁移边界，优先在 `@delta-comic/plugin-manifest`、`@delta-comic/plugin-artifact`、`@delta-comic/plugin-install` 和文件存储适配器内完成最小改动；不把架构中的历史伪代码当作 API。
+
+### 阶段 7 子阶段
+
+1. **Manifest/Artifact 边界（complete）**：补齐安全路径、资源图、平台过滤、ZIP manifest 与完整资源校验，建立新协议到安装边界的明确类型。
+2. **安装与依赖兼容性（complete）**：增加协议/API/Cordis semver 兼容检查、依赖版本/循环检查，保留旧数据库安装适配并确保校验失败不写入持久化状态。
+3. **升级事务（complete）**：安装服务增加 `afterStage` 钩子，旧文件与元数据在激活失败时恢复；聚合宿主更新入口在阶段提交前 reload runtime。
+4. **模块解析与动态 chunk（complete）**：为 Blob URL 提供资源图解析，重写相对静态/动态 import，并在 reader dispose 或失败时释放所有生成 URL。
+5. **验证与提交（complete）**：运行 `vp run lib-build`、`vp check`、递归 typecheck、阶段 7 专项与全量测试、codegen 检查、diff 检查，更新文档并签名提交。
+
 ## Next Step
 
-下一步：阶段 6 已完成，保持提交后的工作树作为后续迭代基线。
+阶段 7 已完成并签名提交，工作树保持干净；全量测试中既有冷启动超时已记录并完成包级复核。
+
+## 阶段 7 决策
+
+- 现行协议使用 `@delta-comic/plugin-manifest` 的 `protocolVersion/id/entry/resources`，旧 `@delta-comic/model` Manifest 只在现有数据库/宿主适配边界保留。
+- 新 Artifact 的校验在动态 import 之前完成；资源 integrity 使用 SHA-256 SRI，资源 imports 必须落在同一 artifact 的声明资源集合中。
+- 模块解析采用资源图和宿主注入的 module URL 工厂；不依赖 Blob URL 的相对路径行为，动态 chunk 也必须经过同一解析边界。
+
+## 阶段 7 Errors Encountered
+
+| Error | Attempt | Resolution |
+|---|---|---|
+| 当前安装包同时存在新 Artifact Manifest 与旧数据库 Manifest 类型 | 1 | 保留旧数据库适配边界，在安装协议增加显式新 Artifact 类型与转换函数，避免隐式断言和全仓无关迁移 |
+| 根级 `vp test run` 未收集 plugin-install 测试路径 | 1 | 按仓库现有测试项目边界切换到 `packages/shared/plugin/install` 目录执行包内测试 |
+| Node Vite+ runner 无法直接 import `blob:` URL | 1 | 测试改为读取生成 Blob 内容并断言相对动态 import 已重写；浏览器/Tauri 负责实际 Blob 模块执行 |
+| 递归 typecheck 在 plugin-vite 任务先于新 install dist 生成时无法解析包声明 | 1 | 单独完成 `@delta-comic/plugin-install` build 后重跑递归 typecheck |
+| 全量 `vp test run` 并行冷启动时 3 个既有 db/plugin 测试触发 5 秒超时 | 1 | 改用两个包的独立测试入口复核，6 个 db 测试和 4 个 plugin fileStore 测试均通过；记录为全量 runner 冷启动限制 |
 
 ## 阶段 6D StaticPluginExecutor 生命周期迁移
 

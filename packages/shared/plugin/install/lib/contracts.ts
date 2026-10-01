@@ -2,6 +2,7 @@ import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/model'
 import type { PluginConfig } from '@delta-comic/plugin-api'
 import type { LoadedPluginModule } from '@delta-comic/plugin-loader'
+import type { PluginManifest as ArtifactManifest } from '@delta-comic/plugin-manifest'
 
 export type PluginInstallInput = File | string
 
@@ -27,6 +28,13 @@ export interface DecodedPluginPackage {
   readonly codecId: string
   readonly files: ReadonlyMap<string, Uint8Array>
   readonly manifest: PluginManifest
+}
+
+/** A validated package using the current protocol manifest and resource graph. */
+export interface DecodedPluginArtifactPackage {
+  readonly codecId: string
+  readonly files: ReadonlyMap<string, Uint8Array>
+  readonly manifest: ArtifactManifest
 }
 
 export interface PluginPackageCodec {

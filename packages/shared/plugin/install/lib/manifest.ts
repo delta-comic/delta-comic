@@ -1,4 +1,9 @@
 import { DELTA_COMIC_PLUGIN_API_VERSION, type PluginManifest } from '@delta-comic/model'
+import {
+  assertPluginManifestCompatible,
+  type PluginManifest as ArtifactManifest,
+  type PluginManifestCompatibility,
+} from '@delta-comic/plugin-manifest'
 import semver from 'semver'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -112,3 +117,34 @@ export const parsePluginManifest = (value: unknown): PluginManifest => {
 
 export const isPluginManifestCompatible = (manifest: PluginManifest, coreVersion: string) =>
   semver.satisfies(coreVersion, manifest.version.supportCore)
+
+export interface InstalledPluginDependency {
+  readonly id: string
+  readonly version: string
+}
+
+export const assertArtifactManifestCompatible = (
+  manifest: ArtifactManifest,
+  compatibility: PluginManifestCompatibility,
+) => assertPluginManifestCompatible(manifest, compatibility)
+
+export const assertArtifactDependencies = (
+  manifest: ArtifactManifest,
+  installed: readonly InstalledPluginDependency[],
+  reserved: ReadonlySet<string> = new Set(),
+) => {
+  const versions = new Map(installed.map(dependency => [dependency.id, dependency.version]))
+  const seen = new Set<string>()
+  for (const dependency of manifest.dependencies ?? []) {
+    if (seen.has(dependency.id)) throw new Error(`duplicate plugin dependency: ${dependency.id}`)
+    seen.add(dependency.id)
+    if (dependency.id === manifest.id)
+      throw new Error(`plugin dependency cycle includes "${manifest.id}"`)
+    if (reserved.has(dependency.id)) continue
+    const version = versions.get(dependency.id)
+    if (!version) throw new Error(`missing plugin dependency: ${dependency.id}`)
+    if (dependency.version && !semver.satisfies(version, dependency.version)) {
+      throw new Error(`plugin dependency version mismatch: ${dependency.id}`)
+    }
+  }
+}

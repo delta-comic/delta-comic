@@ -121,6 +121,38 @@ describe('PluginInstallService', () => {
     expect(current.meta.version.plugin).toBe('1.0.0')
   })
 
+  it('restores the previous version when activation validation fails after staging', async () => {
+    const files = new MemoryPluginFileStore()
+    await (
+      await files.replace('example', new Map([['index.js', new TextEncoder().encode('old')]]))
+    ).commit()
+    let current = archive('1.0.0')
+    const repository: PluginArchiveRepository = {
+      find: async () => current,
+      list: async () => [current],
+      remove: vi.fn(),
+      upsert: async value => {
+        current = value
+      },
+    }
+    const service = new PluginInstallService({
+      codecs: [codec],
+      files,
+      repository,
+      resolvers: [resolver],
+    })
+
+    await expect(
+      service.install(new File([], 'plugin.zip'), undefined, undefined, {
+        afterStage: async () => {
+          throw new Error('activation failed')
+        },
+      }),
+    ).rejects.toThrow('activation failed')
+    expect(current.meta.version.plugin).toBe('1.0.0')
+    expect(new TextDecoder().decode(await files.read('example', 'index.js'))).toBe('old')
+  })
+
   it('rejects ids reserved by internal plugins before replacing files', async () => {
     const files = new MemoryPluginFileStore()
     const repository: PluginArchiveRepository = {
