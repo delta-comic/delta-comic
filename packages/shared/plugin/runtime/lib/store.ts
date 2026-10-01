@@ -65,9 +65,11 @@ export class PluginStore<TConfig extends PluginConfig = PluginConfig> {
 
   public modelEntries<K extends keyof PluginModel<TConfig>>(
     key: K,
-  ): [string, Exclude<PluginModel<TConfig>[K], undefined>][] {
+  ): [string, Exclude<PluginModel<TConfig>[K], undefined>][]
+  public modelEntries(key: PropertyKey): [string, unknown][] {
     return [...this.pluginEntries].flatMap(([plugin, config]) => {
-      const model = config.model?.[key]
+      if (!config.model) return []
+      const model: unknown = Reflect.get(config.model, key)
       return model === undefined ? [] : [[plugin, model]]
     })
   }

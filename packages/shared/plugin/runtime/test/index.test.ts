@@ -1,6 +1,6 @@
 import type { PluginConfig } from '@delta-comic/plugin-api'
 import type { PluginCandidate } from '@delta-comic/plugin-kernel'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 
 import {
   CompositePluginCandidateProvider,
@@ -28,8 +28,11 @@ const candidate = (id: string, origin: PluginCandidate['origin']): PluginCandida
 
 describe('PluginStore', () => {
   it('publishes models only after activation is ready', () => {
-    const store = new PluginStore()
-    const config = { model: { expose: { value: true } }, name: 'reader' } satisfies PluginConfig
+    const config: PluginConfig<{ expose?: { value: boolean } }> = {
+      model: { expose: { value: true } },
+      name: 'reader',
+    }
+    const store = new PluginStore<typeof config>()
 
     store.markLoading('reader', config)
     expect(store.loading.get('reader')).toBe(config)
@@ -37,12 +40,39 @@ describe('PluginStore', () => {
     expect(store.modelEntries('expose')).toEqual([])
 
     store.markReady('reader')
+    store.markLoading('empty', { name: 'empty' })
+    store.markReady('empty')
     expect(store.loading.has('reader')).toBe(false)
     expect(store.plugins.get('reader')).toBe(config)
     expect(store.modelEntries('expose')).toEqual([['reader', { value: true }]])
+    expectTypeOf(store.modelEntries('expose')).toEqualTypeOf<[string, { value: boolean }][]>()
 
     store.markUnloaded('reader')
     expect(store.plugins.has('reader')).toBe(false)
+  })
+
+  it('keeps defined falsy values and symbol keys in typed model entries', () => {
+    const channel = Symbol('channel')
+    type Model = {
+      count?: number
+      enabled?: boolean
+      nullable?: null
+      [channel]?: { value: string }
+    }
+    const config: PluginConfig<Model> = {
+      name: 'reader',
+      model: { count: 0, enabled: false, nullable: null, [channel]: { value: 'ready' } },
+    }
+    const store = new PluginStore<typeof config>()
+    store.markLoading('reader', config)
+    store.markReady('reader')
+
+    expect(store.modelEntries('count')).toEqual([['reader', 0]])
+    expect(store.modelEntries('enabled')).toEqual([['reader', false]])
+    expect(store.modelEntries('nullable')).toEqual([['reader', null]])
+    expect(store.modelEntries(channel)).toEqual([['reader', { value: 'ready' }]])
+    expectTypeOf(store.modelEntries('count')).toEqualTypeOf<[string, number][]>()
+    expectTypeOf(store.modelEntries(channel)).toEqualTypeOf<[string, { value: string }][]>()
   })
 
   it('translates candidate display names and rejects invalid transitions', () => {

@@ -17,6 +17,8 @@
 
 ## 当前状态
 
+- 2026-10-01 Runtime 修复：已定位模型约束和测试默认泛型的三处错误；store 重载与测试显式模型类型的方案通过独立 typecheck，正在验证宿主调用方。
+- Runtime 修复验证完成：`vp run lib-build`、`vp check --fix`、`vp run -r typecheck`、Runtime 专项测试（1 file / 5 tests）、`vp run codegen:check` 和 `git diff --check` 均通过。下一步回到 6D StaticPluginExecutor 生命周期迁移。
 - 2026-10-01 当前执行：6E 目录发布 CAS，设计已获用户批准。已核对 R2 条件写入官方接口，正在实现版本快照、冲突响应和专项测试。
 - 目录 CAS 实现的专项验证已通过：`vp run lib-build`，以及 both/server 的目录存储、发布器、HTTP handler、R2 adapter 测试（5 files / 16 tests）。
 - 全量 Web 测试通过：159 files / 865 tests；`vp check --fix`、both/server 类型检查和 `git diff --check` 通过。阶段 6E 目录发布 CAS 完成，下一步转入 6D StaticPluginExecutor 生命周期迁移。

@@ -321,3 +321,9 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 已核对 Cloudflare 官方 R2 Workers API 文档：https://developers.cloudflare.com/r2/api/workers/workers-api-reference/ 。`put` 接受 `onlyIf: R2Conditional | Headers`，条件失败返回 null；`httpEtag` 提供符合 HTTP 格式的带引号 ETag，写入具备强一致性。
 - R2 创建目录使用 `If-None-Match: *`，更新使用读取对象的 `httpEtag` 作为 `If-Match`。HTTP GET 暴露 ETag，条件 PUT 的陈旧版本返回 412，发布/撤回冲突返回 409；调用方刷新目录后重试。
 - Worker 已改为将原始 R2 binding 传入适配器，保留条件写入返回值并能把冲突映射到发布响应。
+
+## 2026-10-01：Runtime 模型类型错误根因
+
+- `PluginStore<TConfig>` 的泛型约束是 `PluginConfig<object>`。方法公开签名可以用 `keyof NonNullable<TConfig['model']>` 推导模型键，内部访问 `config.model` 时编译器使用约束 object，导致 TS2536。
+- `new PluginStore()` 默认模型为 object，`keyof object` 为 never；两处 expose 查询测试需指定包含 expose 的模型类型。对象被后续传入 markLoading 时，已创建的 store 的泛型不会随调用改变。
+- 公开 modelEntries 重载保留键到值的精确类型，实现接收 PropertyKey 并通过 Reflect.get 读取、标注 unknown、过滤 undefined。宿主模型接口继续保持现有约束。

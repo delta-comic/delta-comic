@@ -78,6 +78,14 @@
 
 下一步处理 6D 旧 StaticPluginExecutor 的 ServerRuntime/Cordis 生命周期迁移，先完成现有静态插件定义的兼容适配和专项测试。
 
+## Runtime 模型类型检查修复
+
+- **状态：** complete
+- 根因：泛型 store 内部把模型视为约束 `object`，动态键无法索引；默认 `PluginStore` 的模型键为 `never`，原测试需要声明具体模型类型。
+- 最小改动：store 的 typed overload 与属性读取、现有 Runtime 测试、规划记录。
+- 验证 optional model、可选属性返回值、symbol 键和合法 falsy 值；运行 lib-build、check、递归 typecheck、Runtime 专项和全仓测试。
+- 已完成：Runtime store 重载、模型类型测试、递归 typecheck（全量通过）、Runtime 测试（1 file / 5 tests）、codegen check 和 diff check。
+
 ## 阶段 6E 目录发布 CAS
 
 - **状态：** complete
@@ -105,7 +113,10 @@
 | app `vue-tsc` 报告旧 `DCPluginConfig` model/hooks 字段缺失 | 1 | 聚合包已恢复可解析；记录为 6D 旧宿主类型迁移遗留，不扩大本次 6G Install/Vite 包拆分范围 |
 | 聚合包架构测试将多行 `export type` 续行误判为可执行代码 | 1 | 聚合入口改为通过 `lib/kernel` 统一导出新 Kernel，并移除旧 Kernel 的重复实现 |
 | 插件专项测试在依赖 dist 尚未重建时无法解析 `@delta-comic/plugin-kernel` | 1 | 先运行 `vp run lib-build`，再重新执行专项测试并通过 |
-| `vp run -r typecheck` 报告 `packages/shared/plugin/runtime/lib/store.ts:70` 及 `test/index.test.ts:37,42` 的 3 个类型错误 | 1 | 这些文件未被本阶段修改，记录为既有 Runtime 类型检查限制，不扩大目录 CAS 范围 |
+| `vp run -r typecheck` 报告 `packages/shared/plugin/runtime/lib/store.ts:70` 及 `test/index.test.ts:37,42` 的 3 个类型错误 | 1 | 通过 store typed overload、Reflect.get 和测试模型泛型修复，递归 typecheck 已通过 |
+| 修改 API 的默认模型为 Record 导致 55 个宿主约束错误 | 1 | 恢复 API，使用 store 的 typed overload 与 Reflect.get，测试提供具体模型泛型 |
+| 泛型模型属性索引和 Exclude 返回值无法通过 TypeScript 检查 | 3 | 将公开签名与属性读取实现放在同一重载方法，值先标注 unknown 并过滤 undefined；Runtime 独立类型检查通过 |
+| 根级测试未收集 Runtime 独立包 | 1 | 在 Runtime 包目录使用 vp test run，专项测试通过 |
 
 ## 6G 过渡设计清理
 
