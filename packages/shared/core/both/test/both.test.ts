@@ -5,6 +5,7 @@ import {
   CordisRuntime,
   diagnostic,
   DiagnosticHarness,
+  DiagnosticReplayExecutor,
   DiagnosticRecorder,
   findPluginRelease,
   parsePluginCatalogIndex,
@@ -83,6 +84,24 @@ describe('@delta-comic/both cordis integration', () => {
     })
     expect(replayed).toEqual(['started'])
     expect(imported.replay[0]?.timestampOffset).toBe(0)
+  })
+
+  it('replays archived events through registered handlers and supports disposal', async () => {
+    const recorder = new DiagnosticRecorder({ source: 'replay-test', id: () => 'id' })
+    recorder.record('info', 'plugin.started', { pluginId: 'demo' })
+    recorder.record('warn', 'plugin.failed')
+    const harness = new DiagnosticHarness(recorder)
+    const executor = new DiagnosticReplayExecutor(harness)
+    const seen: string[] = []
+    const dispose = executor.register('plugin.started', event => {
+      seen.push(event.message)
+    })
+
+    await executor.replay(harness.capture())
+    dispose()
+    await executor.replay(harness.capture())
+
+    expect(seen).toEqual(['plugin.started'])
   })
 
   it('traces decorated methods without mixing logging into business logic', () => {

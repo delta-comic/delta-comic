@@ -4,7 +4,9 @@
  */
 export interface AppEnv extends Env {
   AUTH_PEPPER?: string
+  PLUGIN_ARTIFACTS?: R2Bucket
   PLUGIN_CATALOG?: R2Bucket
+  PLUGIN_PUBLIC_BASE_URL?: string
   SERVER_ADMIN_TOKEN?: string
   TOKEN_PEPPER?: string
 }

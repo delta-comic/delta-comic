@@ -106,4 +106,15 @@ describe('server Elysia app', () => {
     ).resolves.toMatchObject({ status: 200 })
     await expect(catalogRequest()).resolves.toMatchObject({ status: 200 })
   })
+
+  it('exposes an authorized worker diagnostic snapshot', async () => {
+    await expect(fetchWorker('/api/admin/diagnostics')).resolves.toMatchObject({ status: 401 })
+    const response = await fetchWorker(
+      '/api/admin/diagnostics',
+      { headers: { authorization: 'Bearer diagnostic-secret' } },
+      createEnv({ SERVER_ADMIN_TOKEN: 'diagnostic-secret' }),
+    )
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toMatchObject({ runtime: 'server-worker' })
+  })
 })

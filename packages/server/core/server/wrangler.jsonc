@@ -14,6 +14,7 @@
   // Enable this binding per deployment environment after creating the R2 bucket.
   // The catalog routes remain unavailable while the binding is absent.
   // "r2_buckets": [{ "binding": "PLUGIN_CATALOG", "bucket_name": "delta-comic-plugin-catalog" }],
+  // Configure PLUGIN_PUBLIC_BASE_URL and PLUGIN_ARTIFACTS together for artifact uploads.
   "triggers": { "crons": ["0 * * * *"] },
   "d1_databases": [
     {

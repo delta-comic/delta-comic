@@ -1,13 +1,17 @@
+import { DiagnosticRecorder } from '@delta-comic/both'
 import { logger } from '@delta-comic/logger'
 import { cors as elysiaCors } from '@elysiajs/cors'
 import { openapi } from '@elysiajs/openapi'
 import { Elysia, t } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
 
+import { createPluginArtifactUploadHandler } from '../lib/catalogArtifactHandler'
+import { createR2PluginArtifactStore } from '../lib/catalogArtifacts'
 import { createPluginCatalogHandler } from '../lib/catalogHandler'
 import { createPluginCatalogPublishHandler } from '../lib/catalogPublishHandler'
 import { createR2PluginCatalogStore } from '../lib/catalogStore'
 import { serverModules } from '../lib/config'
+import { createDiagnosticHandler } from '../lib/diagnosticHandler'
 import { createServerWorkerAdapter } from '../lib/serverAdapter'
 
 import { bindRuntime, type AppEnv } from './env'
@@ -111,6 +115,9 @@ const compiled = app.compile()
 
 const catalogPath = '/plugins/catalog/index.json'
 const publishPath = '/plugins/catalog/releases'
+const artifactPath = '/plugins/catalog/artifacts'
+const diagnosticPath = '/api/admin/diagnostics'
+const workerDiagnosticRecorder = new DiagnosticRecorder({ capacity: 1000, source: 'server-worker' })
 
 const catalogHandler = (env: AppEnv) => {
   if (!env.PLUGIN_CATALOG) return undefined
@@ -121,7 +128,7 @@ const catalogHandler = (env: AppEnv) => {
       const expected = env.SERVER_ADMIN_TOKEN
       const provided = request.headers.get('authorization')
       if (!expected || !provided?.startsWith('Bearer ')) return false
-      return constantTimeTokenEqual(provided.slice('Bearer '.length), expected)
+      return await constantTimeTokenEqual(provided.slice('Bearer '.length), expected)
     },
   })
 }
@@ -141,7 +148,24 @@ const catalogPublishHandler = (env: AppEnv) => {
   })
 }
 
+const artifactUploadHandler = (env: AppEnv) => {
+  if (!env.PLUGIN_ARTIFACTS || !env.PLUGIN_PUBLIC_BASE_URL) return undefined
+  return createPluginArtifactUploadHandler({
+    store: createR2PluginArtifactStore(env.PLUGIN_ARTIFACTS, env.PLUGIN_PUBLIC_BASE_URL),
+    uploadPath: artifactPath,
+    authorizeWrite: async request => {
+      const expected = env.SERVER_ADMIN_TOKEN
+      const provided = request.headers.get('authorization')
+      if (!expected || !provided?.startsWith('Bearer ')) return false
+      return (await constantTimeTokenEqual(provided.slice('Bearer '.length), expected))
+        ? 'server-admin'
+        : false
+    },
+  })
+}
+
 const workerAdapter = createServerWorkerAdapter<AppEnv>({
+  diagnostics: workerDiagnosticRecorder,
   fetch(request, env, ctx) {
     serverLogger.debug('request received', {
       method: request.method,
@@ -153,6 +177,22 @@ const workerAdapter = createServerWorkerAdapter<AppEnv>({
     const publisher = catalogPublishHandler(env)
     if (publisher && new URL(request.url).pathname.startsWith(publishPath)) {
       return publisher.fetch(request)
+    }
+    const artifacts = artifactUploadHandler(env)
+    if (artifacts && new URL(request.url).pathname === artifactPath) {
+      return artifacts.fetch(request)
+    }
+    if (new URL(request.url).pathname === diagnosticPath) {
+      return createDiagnosticHandler({
+        diagnostics: workerDiagnosticRecorder,
+        path: diagnosticPath,
+        authorize: async request => {
+          const expected = env.SERVER_ADMIN_TOKEN
+          const provided = request.headers.get('authorization')
+          if (!expected || !provided?.startsWith('Bearer ')) return false
+          return await constantTimeTokenEqual(provided.slice('Bearer '.length), expected)
+        },
+      }).fetch(request)
     }
     return compiled.fetch(request)
   },

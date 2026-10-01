@@ -208,6 +208,36 @@ export class DiagnosticHarness {
   }
 }
 
+export type DiagnosticReplayHandler = (
+  event: DiagnosticReplayEvent,
+  index: number,
+) => void | Promise<void>
+
+/** Dispatches archived diagnostic events to registered handlers in archive order. */
+export class DiagnosticReplayExecutor {
+  readonly #handlers = new Map<string, Set<DiagnosticReplayHandler>>()
+
+  public constructor(private readonly harness: DiagnosticHarness) {}
+
+  public register(message: string, handler: DiagnosticReplayHandler): () => void {
+    const handlers = this.#handlers.get(message) ?? new Set<DiagnosticReplayHandler>()
+    handlers.add(handler)
+    this.#handlers.set(message, handlers)
+    return () => {
+      handlers.delete(handler)
+      if (handlers.size === 0) this.#handlers.delete(message)
+    }
+  }
+
+  public async replay(archive: DiagnosticHarnessArchive): Promise<void> {
+    await this.harness.replay(archive, async (event, index) => {
+      const handlers = this.#handlers.get(event.message)
+      if (!handlers) return
+      for (const handler of handlers) await handler(event, index)
+    })
+  }
+}
+
 const isDiagnosticHarnessArchive = (value: unknown): value is DiagnosticHarnessArchive => {
   if (typeof value !== 'object' || value === null) return false
   const archive = value as Partial<DiagnosticHarnessArchive>
