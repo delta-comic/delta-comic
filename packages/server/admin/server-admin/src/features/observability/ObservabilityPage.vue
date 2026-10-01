@@ -157,6 +157,6 @@ onMounted(() => {
         <NSkeleton text :repeat="2" />
       </div>
     </section>
-    <NSkeleton v-else :repeat="10" text />
+    <NSkeleton v-if="!data" :repeat="10" text />
   </div>
 </template>
