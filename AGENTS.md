@@ -1,3 +1,84 @@
+# Pragmatic Engineering Rules
+
+Solve the requested task with the smallest simple change that is correct, maintainable, and consistent with the existing codebase.
+
+## Scope
+
+* Do exactly what the task requires.
+* Do not expand the scope unless it is necessary for correctness.
+* Do not redesign, rewrite, or refactor unrelated code.
+* Prefer modifying existing code over introducing new abstractions.
+* Preserve the existing architecture, conventions, and dependencies whenever practical.
+
+## YAGNI / KISS
+
+* Do not implement hypothetical future requirements.
+* Do not add abstractions "for future flexibility".
+* Do not add interfaces, factories, registries, plugins, managers, strategies, generic frameworks, configuration systems, or extension points unless the current task actually requires them.
+* Do not add a helper or abstraction merely because code could theoretically be reused later.
+* Prefer straightforward code when it is sufficient.
+* A small amount of duplication is preferable to unnecessary abstraction.
+
+## Change Budget
+
+Before making changes, identify the minimum set of files and code paths required.
+
+Prefer:
+
+1. Existing function over new helper.
+2. Existing module over new module.
+3. Existing dependency over new dependency.
+4. Local change over architectural change.
+5. Explicit code over additional indirection.
+
+Every additional abstraction or dependency must have a concrete current justification.
+
+## Refactoring
+
+Refactor only when:
+
+* the existing code directly prevents the requested change,
+* the refactor is necessary to preserve correctness, or
+* the task explicitly requests refactoring.
+
+Do not refactor merely for elegance, consistency, or personal preference.
+
+## Decision Rule
+
+When multiple solutions work, prefer the one with:
+
+* fewer changed lines,
+* fewer files,
+* fewer abstractions,
+* fewer dependencies,
+* fewer moving parts,
+* less configuration,
+* and easier rollback.
+
+Do not optimize for theoretical scalability unless scalability is part of the actual requirement.
+
+## Verification
+
+After making the minimal change:
+
+* run the most relevant tests, type checks, lint checks, or build commands;
+* verify the requested behavior;
+* inspect the final diff;
+* remove accidental or unrelated changes.
+
+Do not add tests, documentation, configuration, or infrastructure unless they are relevant to the requested behavior or required by the project.
+
+## Stop Condition
+
+Once the requested behavior works and the relevant checks pass, stop.
+
+Do not continue improving the system merely because additional improvements are possible.
+
+The goal is not to redesign the project.
+
+The goal is to make the requested change correctly, with minimal unnecessary complexity.
+
+
 # Delta Comic Agent 指南
 
 ## 工具链
