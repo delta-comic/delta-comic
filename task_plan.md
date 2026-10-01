@@ -92,6 +92,22 @@
 
 阶段 7 已完成并签名提交，工作树保持干净；全量测试中既有冷启动超时已记录并完成包级复核。
 
+## 阶段 8：完成架构第 8 章安全与故障隔离
+
+- **状态：** complete
+- 补齐客户端插件作用域的安全调用与失败状态、服务端身份/权限边界、Worker 资源限制声明、诊断隐私脱敏与容量控制。
+- 验收：相关包专项测试、构建、类型检查与全仓验证通过。
+
+## 阶段 9：完成架构第 9 章 AI diagnostics 与事件回放
+
+- **状态：** in_progress
+- 补齐结构化日志门面、稳定实体 ID、运行时丰富 snapshot、事件记录/回放、最小运行时 harness 与服务端诊断入口。
+- 验收：both/client/server 专项测试、构建、类型检查、全仓验证和 diff 检查无错误。
+
+## Next Step
+
+完成阶段 9 的最终全量构建、类型检查、测试和 diff 检查，然后提交验收结果。
+
 ## 阶段 7 决策
 
 - 现行协议使用 `@delta-comic/plugin-manifest` 的 `protocolVersion/id/entry/resources`，旧 `@delta-comic/model` Manifest 只在现有数据库/宿主适配边界保留。
@@ -156,6 +172,8 @@
 | 根级测试未收集 Runtime 独立包 | 1 | 在 Runtime 包目录使用 vp test run，专项测试通过 |
 | 使用 `vp run --filter @delta-comic/server test` 执行专项测试 | 1 | server 包没有 `test` task，改用根目录 `vp test run <path>` |
 | 并行 typecheck 触发 Vite+ cache restore 冲突提示 | 1 | 后续按依赖顺序串行运行 lib-build、typecheck 与测试 |
+| 根级 `vp test run` 未收集 plugin-kernel 测试路径 | 1 | 按 package 工作区目录执行该包测试 |
+| Worker provisioner 既有断言仍使用 subrequest 50 | 1 | 更新测试契约为第 8 章默认配额 CPU 50、内存 128、subrequest 10 |
 
 ## 6G 过渡设计清理
 

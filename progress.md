@@ -317,3 +317,22 @@
 - 阶段专项测试已通过：artifact 3 tests、install 4 files/22 tests、manifest 2 tests；`vp check --fix` 通过。
 - 验收中 `vp run lib-build`、`vp check` 和递归 typecheck 通过；全量 `vp test run` 为 161 files / 875 passed / 3 existing timeout failures，单独运行失败文件后 db 6 tests 与 plugin 4 tests 全部通过，未发现阶段 7 回归。
 - `vp run codegen:check` 与 `git diff --check` 通过；规划状态切换为 complete，阶段实现已签名提交。
+## 2026-10-01 阶段 8/9 启动
+
+- 读取并核对 `ARCHITECTURE.md` 第 8、9 章与现有 both/client/server 实现。
+- 确认当前已有诊断记录、快照基础、回放 handler、Worker limits 和共享 logger；待补齐作用域安全调用、隐私脱敏、资源限制 schema、丰富 snapshot、事件 recorder/replay、minimal harness。
+- 下一步：先修改公共诊断协议与 PluginScope，再接入客户端/服务端适配和专项测试。
+
+## 阶段 8/9 实现进展 1
+
+- 已扩展 `@delta-comic/both`：稳定实体字段、结构化诊断 logger、敏感字段默认脱敏、丰富 snapshot schema、`EventRecorder` 和 minimal runtime harness。
+- 已扩展 `PluginScope.safeCall()` 与失败/释放状态；客户端 SDK 暴露 logger、事件录制和 `mountSafely()`。
+- 服务端 runtime 绑定 plugin/installation 诊断身份，路由 handler 异常返回 500 并记录；Worker provisioner 增加 memory limit，默认配额调整为 CPU 50、内存 128、subrequest 10；增加身份 header 解析边界。
+- `vp run lib-build` 已通过；仍需执行类型检查、专项测试并修复发现的问题。
+
+## 阶段 8 完成与阶段 9 收敛
+
+- 作用域安全调用、身份解析、路由异常隔离、Worker CPU/内存/subrequest 配额和诊断脱敏已完成。
+- 结构化 logger、稳定 ID、rich snapshot、EventRecorder.call/replay、minimal runtime、client/server diagnostics facade 已完成。
+- `vp check --fix`、递归 typecheck、全量测试（164 files / 881 tests）及新增专项测试均通过。
+- 待办：最终重新运行 lib-build、全量 typecheck/test、codegen/diff 检查，完成阶段 9 提交。

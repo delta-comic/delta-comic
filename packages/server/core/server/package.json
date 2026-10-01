@@ -25,6 +25,10 @@
     "./runtime": {
       "types": "./dist/lib/serverRuntime.d.mts",
       "import": "./dist/lib/serverRuntime.mjs"
+    },
+    "./diagnostics": {
+      "types": "./dist/lib/diagnostics.d.mts",
+      "import": "./dist/lib/diagnostics.mjs"
     }
   },
   "publishConfig": {

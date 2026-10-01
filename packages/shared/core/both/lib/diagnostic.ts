@@ -5,6 +5,10 @@ export interface DiagnosticRecord {
   source: string
   message: string
   details?: Record<string, unknown>
+  pluginId?: string
+  installationId?: string
+  fiberId?: string
+  eventId?: string
 }
 
 export interface DiagnosticPluginSnapshot {
@@ -12,7 +16,42 @@ export interface DiagnosticPluginSnapshot {
   version: string
   state: 'pending' | 'loading' | 'active' | 'failed' | 'disposed'
   dependencies: readonly string[]
+  fiberId?: string
+  provides?: readonly string[]
+  config?: unknown
   error?: string
+}
+
+export interface DiagnosticServiceSnapshot {
+  id: string
+  pluginId?: string
+  state?: 'registered' | 'active' | 'failed' | 'disposed'
+}
+
+export interface DiagnosticEventSnapshot {
+  id: string
+  event: string
+  pluginId?: string
+  listenerCount?: number
+  callCount?: number
+}
+
+export interface DiagnosticFiberSnapshot {
+  id: string
+  pluginId?: string
+  state: DiagnosticPluginSnapshot['state']
+  disposed: boolean
+}
+
+export interface DiagnosticDependencyGraph {
+  readonly nodes: readonly string[]
+  readonly edges: readonly { from: string; to: string }[]
+}
+
+export interface DiagnosticConfigSource {
+  readonly id: string
+  readonly source: string
+  readonly keys: readonly string[]
 }
 
 export interface DiagnosticSnapshot {
@@ -20,6 +59,11 @@ export interface DiagnosticSnapshot {
   runtime: string
   plugins: readonly DiagnosticPluginSnapshot[]
   records: readonly DiagnosticRecord[]
+  services: readonly DiagnosticServiceSnapshot[]
+  events: readonly DiagnosticEventSnapshot[]
+  fibers: readonly DiagnosticFiberSnapshot[]
+  dependencyGraph: DiagnosticDependencyGraph
+  configSources: readonly DiagnosticConfigSource[]
   metrics?: SystemMetrics
 }
 
@@ -34,13 +78,39 @@ export interface DiagnosticRecorderOptions {
   capacity?: number
   now?: () => number
   id?: () => string
+  pluginId?: string
+  installationId?: string
+  redact?: (details: Record<string, unknown>) => Record<string, unknown>
 }
 
 export interface DiagnosticReplayEvent {
+  readonly id?: string
   readonly level: DiagnosticRecord['level']
   readonly message: string
   readonly details?: Record<string, unknown>
   readonly timestampOffset: number
+  readonly pluginId?: string
+  readonly eventId?: string
+}
+
+export interface RecordedEvent {
+  readonly id: string
+  readonly timestamp: number
+  readonly event: string
+  readonly payload?: unknown
+  readonly result?: unknown
+  readonly error?: string
+  readonly pluginId?: string
+  readonly duration: number
+}
+
+export interface DiagnosticLogger {
+  trace(message: string, details?: Record<string, unknown>): DiagnosticRecord
+  debug(message: string, details?: Record<string, unknown>): DiagnosticRecord
+  info(message: string, details?: Record<string, unknown>): DiagnosticRecord
+  warn(message: string, details?: Record<string, unknown>): DiagnosticRecord
+  error(message: string, details?: Record<string, unknown>): DiagnosticRecord
+  fatal(message: string, details?: Record<string, unknown>): DiagnosticRecord
 }
 
 export interface DiagnosticHarnessArchive {
@@ -55,6 +125,16 @@ const isPromiseLike = <T>(value: T | PromiseLike<T>): value is PromiseLike<T> =>
   typeof value === 'object' && value !== null && 'then' in value && typeof value.then === 'function'
 
 const describeError = (error: unknown) => (error instanceof Error ? error.message : String(error))
+
+const sensitiveKey = /(?:password|passwd|secret|token|authorization|cookie|payload|body|content)/i
+
+const redactDetails = (details: Record<string, unknown>): Record<string, unknown> => {
+  const result: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(details)) {
+    result[key] = sensitiveKey.test(key) ? '[redacted]' : value
+  }
+  return result
+}
 
 export function withDiagnostic<T>(
   diagnostics: DiagnosticRecorder,
@@ -121,6 +201,9 @@ export class DiagnosticRecorder {
   readonly #now: () => number
   readonly #id: () => string
   readonly #source: string
+  readonly #pluginId: string | undefined
+  readonly #installationId: string | undefined
+  readonly #redact: (details: Record<string, unknown>) => Record<string, unknown>
 
   public constructor(options: DiagnosticRecorderOptions) {
     this.#capacity = Math.max(1, options.capacity ?? 200)
@@ -129,6 +212,9 @@ export class DiagnosticRecorder {
       options.id ??
       (() => globalThis.crypto?.randomUUID() ?? `${this.#now()}-${this.#records.length}`)
     this.#source = options.source
+    this.#pluginId = options.pluginId
+    this.#installationId = options.installationId
+    this.#redact = options.redact ?? redactDetails
   }
 
   public record(
@@ -142,7 +228,9 @@ export class DiagnosticRecorder {
       level,
       source: this.#source,
       message,
-      ...(details === undefined ? {} : { details }),
+      ...(details === undefined ? {} : { details: this.#redact(details) }),
+      ...(this.#pluginId === undefined ? {} : { pluginId: this.#pluginId }),
+      ...(this.#installationId === undefined ? {} : { installationId: this.#installationId }),
     }
     this.#records.push(record)
     if (this.#records.length > this.#capacity)
@@ -157,13 +245,135 @@ export class DiagnosticRecorder {
   public snapshot(
     plugins: readonly DiagnosticPluginSnapshot[] = [],
     metrics?: SystemMetrics,
+    options: {
+      services?: readonly DiagnosticServiceSnapshot[]
+      events?: readonly DiagnosticEventSnapshot[]
+      fibers?: readonly DiagnosticFiberSnapshot[]
+      dependencyGraph?: DiagnosticDependencyGraph
+      configSources?: readonly DiagnosticConfigSource[]
+    } = {},
   ): DiagnosticSnapshot {
     return {
       capturedAt: this.#now(),
       runtime: this.#source,
       plugins: plugins.slice(),
       records: this.list(),
+      services: options.services?.slice() ?? [],
+      events: options.events?.slice() ?? [],
+      fibers: options.fibers?.slice() ?? [],
+      dependencyGraph: options.dependencyGraph ?? { nodes: [], edges: [] },
+      configSources: options.configSources?.slice() ?? [],
       ...(metrics === undefined ? {} : { metrics }),
+    }
+  }
+
+  public logger(context: Record<string, unknown> = {}): DiagnosticLogger {
+    const write = (
+      level: DiagnosticRecord['level'],
+      message: string,
+      details?: Record<string, unknown>,
+    ) => this.record(level, message, { ...context, ...details })
+    return {
+      trace: (message, details) => write('trace', message, details),
+      debug: (message, details) => write('debug', message, details),
+      info: (message, details) => write('info', message, details),
+      warn: (message, details) => write('warn', message, details),
+      error: (message, details) => write('error', message, details),
+      fatal: (message, details) => write('fatal', message, details),
+    }
+  }
+}
+
+export const createDiagnosticLogger = (
+  recorder: DiagnosticRecorder,
+  context?: Record<string, unknown>,
+): DiagnosticLogger => recorder.logger(context)
+
+export class EventRecorder {
+  readonly #events: RecordedEvent[] = []
+  readonly #now: () => number
+  readonly #id: () => string
+  #recording = false
+
+  public constructor(options: { now?: () => number; id?: () => string } = {}) {
+    this.#now = options.now ?? Date.now
+    this.#id =
+      options.id ??
+      (() => globalThis.crypto?.randomUUID() ?? `${this.#now()}-${this.#events.length}`)
+  }
+
+  public get recording(): boolean {
+    return this.#recording
+  }
+
+  public start(): void {
+    this.#recording = true
+  }
+
+  public stop(): readonly RecordedEvent[] {
+    this.#recording = false
+    return this.list()
+  }
+
+  public clear(): void {
+    this.#events.length = 0
+  }
+
+  public list(): readonly RecordedEvent[] {
+    return this.#events.slice()
+  }
+
+  public record(
+    event: string,
+    options: {
+      payload?: unknown
+      result?: unknown
+      error?: unknown
+      pluginId?: string
+      startedAt?: number
+      duration?: number
+      includePayload?: boolean
+    } = {},
+  ): RecordedEvent | undefined {
+    if (!this.#recording) return undefined
+    const timestamp = this.#now()
+    const record: RecordedEvent = {
+      id: this.#id(),
+      timestamp,
+      event,
+      ...(options.includePayload === true && options.payload !== undefined
+        ? { payload: options.payload }
+        : {}),
+      ...(options.result === undefined ? {} : { result: options.result }),
+      ...(options.error === undefined ? {} : { error: describeError(options.error) }),
+      ...(options.pluginId === undefined ? {} : { pluginId: options.pluginId }),
+      duration:
+        options.duration ?? (options.startedAt === undefined ? 0 : timestamp - options.startedAt),
+    }
+    this.#events.push(record)
+    return record
+  }
+
+  public async replay(
+    events: readonly RecordedEvent[] = this.list(),
+    dispatch: (event: RecordedEvent, index: number) => void | Promise<void>,
+  ): Promise<void> {
+    for (const [index, event] of events.entries()) await dispatch(event, index)
+  }
+
+  public async call<T>(
+    event: string,
+    operation: () => T | Promise<T>,
+    options: { payload?: unknown; pluginId?: string; includePayload?: boolean } = {},
+  ): Promise<T> {
+    const startedAt = this.#now()
+    try {
+      const result = await operation()
+      this.record(event, { ...options, result, startedAt })
+      return result
+    } catch (error) {
+      this.record(event, { ...options, error, startedAt })
+      throw error
     }
   }
 }
@@ -181,10 +391,13 @@ export class DiagnosticHarness {
       version: 1,
       snapshot,
       replay: snapshot.records.map(record => ({
+        id: record.id,
         level: record.level,
         message: record.message,
         ...(record.details === undefined ? {} : { details: record.details }),
         timestampOffset: record.timestamp - firstTimestamp,
+        ...(record.pluginId === undefined ? {} : { pluginId: record.pluginId }),
+        ...(record.eventId === undefined ? {} : { eventId: record.eventId }),
       })),
     }
   }
@@ -252,7 +465,8 @@ const isDiagnosticHarnessArchive = (value: unknown): value is DiagnosticHarnessA
         typeof event === 'object' &&
         event !== null &&
         typeof event.message === 'string' &&
-        typeof event.timestampOffset === 'number',
+        typeof event.timestampOffset === 'number' &&
+        (event.id === undefined || typeof event.id === 'string'),
     )
   )
 }

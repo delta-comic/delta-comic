@@ -7,6 +7,9 @@ import {
   DiagnosticHarness,
   DiagnosticReplayExecutor,
   DiagnosticRecorder,
+  EventRecorder,
+  createDiagnosticLogger,
+  createMinimalRuntime,
   findPluginRelease,
   parsePluginCatalogIndex,
   parsePluginRelease,
@@ -15,6 +18,12 @@ import {
   createPluginReleasePublisher,
   Service,
 } from '../lib/index.js'
+
+declare module 'cordis' {
+  interface Context {
+    answer: number
+  }
+}
 
 declare module 'cordis' {
   interface Context {
@@ -66,6 +75,55 @@ describe('@delta-comic/both cordis integration', () => {
     recorder.record('error', 'three')
     expect(recorder.list().map(record => record.message)).toEqual(['two', 'three'])
     expect(recorder.snapshot().runtime).toBe('test')
+  })
+
+  it('keeps stable context fields and redacts sensitive details by default', () => {
+    const recorder = new DiagnosticRecorder({
+      source: 'privacy',
+      pluginId: 'demo.plugin',
+      installationId: 'installation-1',
+      id: () => 'event-1',
+    })
+    const logger = createDiagnosticLogger(recorder, { fiberId: 'fiber-1' })
+    logger.info('request completed', { token: 'secret', durationMs: 4 })
+    expect(recorder.list()[0]).toMatchObject({
+      id: 'event-1',
+      pluginId: 'demo.plugin',
+      installationId: 'installation-1',
+      details: { token: '[redacted]', durationMs: 4 },
+    })
+  })
+
+  it('records private payloads only when explicitly enabled and replays in order', async () => {
+    let now = 100
+    const recorder = new EventRecorder({ now: () => now++, id: () => `event-${now}` })
+    recorder.start()
+    recorder.record('request', { payload: { secret: 'value' }, includePayload: false })
+    recorder.record('request', { payload: { itemId: '1' }, includePayload: true, duration: 2 })
+    const seen: string[] = []
+    await recorder.replay(recorder.stop(), event => {
+      seen.push(event.event)
+    })
+    expect(recorder.list()[0]).not.toHaveProperty('payload')
+    expect(recorder.list()[1]).toHaveProperty('payload.itemId', '1')
+    expect(seen).toEqual(['request', 'request'])
+  })
+
+  it('records operation results and failures with duration metadata', async () => {
+    let now = 10
+    const recorder = new EventRecorder({ now: () => now++, id: () => 'call-1' })
+    recorder.start()
+    await expect(recorder.call('load', async () => 'ok')).resolves.toBe('ok')
+    await expect(
+      recorder.call('fail', async () => {
+        throw new Error('bad')
+      }),
+    ).rejects.toThrow('bad')
+    expect(recorder.list()).toEqual([
+      expect.objectContaining({ event: 'load', result: 'ok', duration: 1 }),
+      expect.objectContaining({ event: 'fail', error: 'bad', duration: 1 }),
+    ])
+    recorder.stop()
   })
 
   it('captures, exports, imports, and replays diagnostic records', async () => {
@@ -202,5 +260,24 @@ describe('@delta-comic/both cordis integration', () => {
     expect(runtime.snapshot().plugins[0]?.state).toBe('active')
     await runtime.dispose()
     expect(runtime.list()).toEqual([])
+  })
+
+  it('creates a minimal runtime with mock services', async () => {
+    const runtime = await createMinimalRuntime({
+      mockServices: { answer: 42 },
+      plugins: [
+        {
+          id: 'minimal',
+          module: {
+            inject: ['answer'],
+            apply(ctx) {
+              expect(ctx.answer).toBe(42)
+            },
+          },
+        },
+      ],
+    })
+    expect(runtime.snapshot().fibers[0]).toMatchObject({ id: 'minimal', state: 'active' })
+    await runtime.dispose()
   })
 })

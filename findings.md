@@ -2,6 +2,14 @@
 
 # Delta Comic 全仓重构：研究与需求发现
 
+## 阶段 8/9 当前基线（2026-10-01）
+
+- `@delta-comic/both` 已有容量受限 `DiagnosticRecorder`、`withDiagnostic`、装饰器、Cordis runtime 快照以及日志回放 harness，但 snapshot 只有插件与记录两类数据。
+- `PluginScope` 当前只管理 disposer 和 AbortSignal，缺少安全调用、失败状态与诊断绑定。
+- 客户端和服务端 runtime 已把诊断记录接入 DB、store、网络、下载器、路由与任务，但插件失败隔离和丰富运行时实体快照仍需补齐。
+- 服务端 Worker provisioner 已传递 CPU/subrequest 限制，默认值为 50/50；第 8 章要求同时声明内存限制并将默认 subrequest 收敛到 10。
+- 共享 `@delta-comic/logger` 已提供跨 Web/Tauri 的结构化日志传输与序列化，适合作为诊断日志出口，避免再引入重复日志基础设施。
+
 ## 当前仓库与基线
 
 - 仓库：`/Users/wenxig/Documents/delta-comic`，分支 `develop`；本次开始时工作区干净。

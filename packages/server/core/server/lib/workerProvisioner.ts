@@ -3,7 +3,7 @@ export interface PluginWorkerCode {
   mainModule: string
   modules: Record<string, { js: string }>
   env?: Record<string, unknown>
-  limits?: { cpuMs?: number; subRequests?: number }
+  limits?: { cpuMs?: number; memoryMb?: number; subRequests?: number }
 }
 
 export interface PluginWorkerEntrypoint {
@@ -18,9 +18,15 @@ export interface PluginWorkerDispatcher {
   get(
     name: string,
     bindings?: Record<string, unknown>,
-    options?: { limits?: { cpuMs?: number; subRequests?: number } },
+    options?: { limits?: { cpuMs?: number; memoryMb?: number; subRequests?: number } },
   ): PluginWorkerEntrypoint
 }
+
+const defaultWorkerLimits = { cpuMs: 50, memoryMb: 128, subRequests: 10 } as const
+
+const resolveWorkerLimits = (
+  limits: { cpuMs?: number; memoryMb?: number; subRequests?: number } | undefined,
+) => ({ ...defaultWorkerLimits, ...limits })
 
 export interface PluginWorkerProvisionInput {
   installationId: string
@@ -48,6 +54,7 @@ export class CloudflarePluginWorkerProvisioner implements PluginWorkerProvisione
     if (!input.pluginId.trim()) throw new TypeError('pluginId is required')
     const worker = this.loader.load({
       ...input.code,
+      limits: resolveWorkerLimits(input.code.limits),
       env: { ...input.code.env, INSTALLATION_ID: input.installationId, PLUGIN_ID: input.pluginId },
     })
     return worker.getEntrypoint()
@@ -63,10 +70,11 @@ export class UnavailablePluginWorkerProvisioner implements PluginWorkerProvision
 export class CloudflareDispatchWorkerProvisioner implements PluginWorkerProvisioner {
   public constructor(
     private readonly dispatcher: PluginWorkerDispatcher,
-    private readonly limits: { cpuMs?: number; subRequests?: number } = {
-      cpuMs: 50,
-      subRequests: 50,
-    },
+    private readonly limits: {
+      cpuMs?: number
+      memoryMb?: number
+      subRequests?: number
+    } = defaultWorkerLimits,
   ) {}
 
   public async provision(input: PluginWorkerProvisionInput): Promise<PluginWorkerEntrypoint> {
@@ -75,7 +83,7 @@ export class CloudflareDispatchWorkerProvisioner implements PluginWorkerProvisio
     return this.dispatcher.get(
       input.installationId,
       { INSTALLATION_ID: input.installationId, PLUGIN_ID: input.pluginId },
-      { limits: input.code.limits ?? this.limits },
+      { limits: resolveWorkerLimits({ ...this.limits, ...input.code.limits }) },
     )
   }
 }

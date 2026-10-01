@@ -73,4 +73,47 @@ describe('server SDK', () => {
     ).toBe(true)
     await runtime.dispose()
   })
+
+  it('resolves trusted identity per request and records route failures', async () => {
+    const runtime = new ServerRuntime({
+      pluginId: 'secure',
+      installationId: 'installation-1',
+      db: {} as never,
+      identityResolver: request =>
+        request.headers.get('x-user') === 'user-1'
+          ? { userId: 'user-1', installationId: 'installation-1', permissions: ['read'] }
+          : undefined,
+    })
+    await runtime.mount('secure-routes', {
+      inject: ['server'],
+      apply(ctx: Context) {
+        ctx.server.registerRoute({
+          method: 'GET',
+          path: '/secure',
+          permission: 'read',
+          handler: () => new Response('ok'),
+        })
+        ctx.server.registerRoute({
+          method: 'GET',
+          path: '/broken',
+          public: true,
+          handler: () => {
+            throw new Error('broken')
+          },
+        })
+      },
+    })
+    await expect(
+      runtime.dispatch(new Request('https://example.test/secure')),
+    ).resolves.toHaveProperty('status', 401)
+    await expect(
+      runtime.dispatch(
+        new Request('https://example.test/secure', { headers: { 'x-user': 'user-1' } }),
+      ),
+    ).resolves.toHaveProperty('status', 200)
+    await expect(
+      runtime.dispatch(new Request('https://example.test/broken')),
+    ).resolves.toHaveProperty('status', 500)
+    await runtime.dispose()
+  })
 })

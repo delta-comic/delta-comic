@@ -1,11 +1,13 @@
 import {
   CordisRuntime,
+  DiagnosticRecorder,
   diagnostic,
   type Context,
   type DiagnosticSnapshot,
   type Plugin,
 } from '@delta-comic/both'
 
+import { createClientDiagnosticLogger, type ClientDiagnosticLogger } from './diagnostics.js'
 import { createClientDownloader, type ClientDownloader } from './downloader.js'
 import {
   instrumentClientDatabase,
@@ -50,6 +52,10 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
     this.#runtime = new CordisRuntime({
       source: `client:${options.pluginId}`,
       context: options.context,
+      diagnostics: new DiagnosticRecorder({
+        source: `client:${options.pluginId}`,
+        pluginId: options.pluginId,
+      }),
     })
     this.#ownsDownloader = options.downloader === undefined
     this.#host = {
@@ -83,6 +89,10 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
     return this.#runtime.diagnostics
   }
 
+  public get logger(): ClientDiagnosticLogger {
+    return createClientDiagnosticLogger(this.#host.pluginId, this.#runtime.diagnostics)
+  }
+
   @diagnostic('client plugin mount')
   public async mount(id: string, plugin: Plugin, config?: unknown) {
     if (!this.#hostMounted) {
@@ -94,6 +104,27 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
 
   public snapshot(): DiagnosticSnapshot {
     return this.#runtime.snapshot()
+  }
+
+  public startRecording(): void {
+    this.#runtime.startRecording()
+  }
+
+  public stopRecording() {
+    return this.#runtime.stopRecording()
+  }
+
+  public async mountSafely(id: string, plugin: Plugin, config?: unknown) {
+    try {
+      return await this.mount(id, plugin, config)
+    } catch (error) {
+      this.#runtime.diagnostics.record('error', 'client plugin failed', {
+        pluginId: this.#host.pluginId,
+        mountedId: id,
+        error: error instanceof Error ? error.message : String(error),
+      })
+      return undefined
+    }
   }
 
   @diagnostic('client plugin unmount')

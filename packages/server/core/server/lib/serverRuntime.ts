@@ -1,5 +1,6 @@
 import {
   CordisRuntime,
+  DiagnosticRecorder,
   diagnostic,
   type Context,
   type DiagnosticSnapshot,
@@ -7,6 +8,7 @@ import {
 } from '@delta-comic/both'
 import type { Kysely } from 'kysely'
 
+import { createServerDiagnosticLogger, type ServerDiagnosticLogger } from './diagnostics'
 import type { ServerPluginHost } from './plugin'
 import { createServerPluginHostAdapter } from './serverHost'
 import type {
@@ -24,6 +26,9 @@ export interface ServerRuntimeOptions<DB extends object = Record<string, never>>
   installationId: string
   db: Kysely<DB>
   identity?: ServerIdentity
+  identityResolver?: (
+    request: Request,
+  ) => ServerIdentity | undefined | Promise<ServerIdentity | undefined>
   context?: Context
   pluginHost?: ServerPluginHost
 }
@@ -39,14 +44,21 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
   readonly #migrations = new Map<string, ServerMigration<DB>>()
   readonly #host: ServerHost<DB>
   readonly #identity: ServerIdentity | undefined
+  readonly #identityResolver: ServerRuntimeOptions<DB>['identityResolver']
   #hostMounted = false
 
   public constructor(options: ServerRuntimeOptions<DB>) {
     this.#runtime = new CordisRuntime({
       source: `server:${options.pluginId}:${options.installationId}`,
       context: options.context,
+      diagnostics: new DiagnosticRecorder({
+        source: `server:${options.pluginId}:${options.installationId}`,
+        pluginId: options.pluginId,
+        installationId: options.installationId,
+      }),
     })
     this.#identity = options.identity
+    this.#identityResolver = options.identityResolver
     this.#host = {
       pluginId: options.pluginId,
       installationId: options.installationId,
@@ -91,6 +103,14 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
     return this.#runtime.diagnostics
   }
 
+  public get logger(): ServerDiagnosticLogger {
+    return createServerDiagnosticLogger(
+      this.#host.pluginId,
+      this.#host.installationId,
+      this.#runtime.diagnostics,
+    )
+  }
+
   public get routes(): readonly ServerRouteRegistration<DB>[] {
     return [...this.#routes]
   }
@@ -110,12 +130,22 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
       candidate => candidate.method === request.method && candidate.path === url.pathname,
     )
     if (!route) return new Response('Not found', { status: 404 })
-    if (!route.public && !this.#identity) return new Response('Unauthorized', { status: 401 })
-    if (route.permission && !this.#identity?.permissions.includes(route.permission)) {
+    const identity = this.#identityResolver ? await this.#identityResolver(request) : this.#identity
+    if (!route.public && !identity) return new Response('Unauthorized', { status: 401 })
+    if (route.permission && !identity?.permissions.includes(route.permission)) {
       return new Response('Forbidden', { status: 403 })
     }
-    const context: ServerRequestContext = { request, identity: this.#identity }
-    return await route.handler(context, this.#host.db)
+    const context: ServerRequestContext = { request, identity }
+    try {
+      return await route.handler(context, this.#host.db)
+    } catch (error) {
+      this.#runtime.diagnostics.record('error', 'server route failed', {
+        pluginId: this.#host.pluginId,
+        path: route.path,
+        error: error instanceof Error ? error.message : String(error),
+      })
+      return new Response('Internal Server Error', { status: 500 })
+    }
   }
 
   @diagnostic('server cron dispatch')

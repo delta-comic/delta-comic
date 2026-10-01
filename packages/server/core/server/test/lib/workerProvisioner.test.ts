@@ -63,7 +63,7 @@ describe('plugin worker provisioning', () => {
     expect(received).toMatchObject({
       bindings: { INSTALLATION_ID: 'installation-1', PLUGIN_ID: 'demo.plugin' },
       name: 'installation-1',
-      options: { limits: { cpuMs: 50, subRequests: 50 } },
+      options: { limits: { cpuMs: 50, memoryMb: 128, subRequests: 10 } },
     })
     expect(await worker.fetch(new Request('https://example.test'))).toHaveProperty('status', 200)
   })

@@ -9,6 +9,29 @@ export interface ServerIdentity {
   readonly permissions: readonly string[]
 }
 
+export const readServerIdentityHeaders = (
+  request: Request,
+  expectedInstallationId?: string,
+): ServerIdentity | undefined => {
+  const userId = request.headers.get('X-DC-User-Id')
+  const installationId = request.headers.get('X-DC-Installation-Id')
+  const permissionsHeader = request.headers.get('X-DC-Permissions')
+  if (!userId || !installationId || !permissionsHeader) return undefined
+  if (expectedInstallationId !== undefined && installationId !== expectedInstallationId)
+    return undefined
+  try {
+    const permissions: unknown = JSON.parse(permissionsHeader)
+    if (
+      !Array.isArray(permissions) ||
+      !permissions.every(permission => typeof permission === 'string')
+    )
+      return undefined
+    return { userId, installationId, permissions }
+  } catch {
+    return undefined
+  }
+}
+
 export interface ServerRequestContext {
   readonly request: Request
   readonly identity?: ServerIdentity

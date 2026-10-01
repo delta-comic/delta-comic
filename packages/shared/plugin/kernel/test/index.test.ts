@@ -42,4 +42,20 @@ describe('plugin kernel', () => {
     await scope.dispose()
     expect(order).toEqual(['second', 'first'])
   })
+
+  it('contains failed plugin calls and reports scope state', async () => {
+    const errors: string[] = []
+    const scope = new PluginScope('safe', {
+      diagnostics: { record: (_level, message) => errors.push(message) },
+    })
+    await expect(
+      scope.safeCall(() => {
+        throw new Error('boom')
+      }, 'load'),
+    ).resolves.toBeUndefined()
+    expect(scope.state).toBe('failed')
+    expect(errors).toEqual(['plugin scope call failed'])
+    await scope.dispose()
+    expect(scope.state).toBe('disposed')
+  })
 })

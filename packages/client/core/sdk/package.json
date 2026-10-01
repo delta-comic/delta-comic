@@ -29,6 +29,10 @@
     "./network": {
       "types": "./dist/network.d.mts",
       "import": "./dist/network.mjs"
+    },
+    "./diagnostics": {
+      "types": "./dist/diagnostics.d.mts",
+      "import": "./dist/diagnostics.mjs"
     }
   },
   "publishConfig": {
