@@ -299,3 +299,5 @@
 - 完成 `CloudflareDispatchWorkerProvisioner`、`CloudflareD1InstallationDatabase` 和 `PluginInstallationManager`。D1 删除使用创建返回的 database ID，安装实例按 plugin/installation 幂等创建并支持回收。
 - 新增 `.github/workflows/server-deploy.yaml`，按构建、检查、类型、测试、codegen、迁移、Worker 和 Pages 顺序执行部署。
 - 通过 `vp run lib-build`、`vp check`、server/server-admin typecheck，以及新增服务端专项测试（7 files / 18 tests）；实现已签名提交 `37d0e373`。
+- 最终验收通过：`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`（164 files / 878 tests）、`vp run codegen:check` 和 `git diff --check`。
+- 阶段 6 全部子阶段已完成，最终工作树干净；阶段记录提交为 `e2bf7da5`，页面条件修复提交为 `52c2d97c`。
