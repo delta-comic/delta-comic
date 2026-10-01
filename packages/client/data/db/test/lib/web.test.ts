@@ -16,6 +16,7 @@ describe('web database schema', () => {
       'plugin',
       'native_store',
       'config',
+      'plugin_diagnostic_log',
     ]) {
       expect(schema).toContain(`CREATE TABLE IF NOT EXISTS ${table}`)
     }

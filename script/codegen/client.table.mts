@@ -123,6 +123,42 @@ const configTable = defineTable(
   { kyselyCamelCase: true },
 )
 
+const pluginDiagnosticLogTable = defineTable(
+  'plugin_diagnostic_log',
+  {
+    id: Type.String(),
+    plugin_id: Type.String(),
+    timestamp: Type.Integer(),
+    level: Type.Union([
+      Type.Literal('trace'),
+      Type.Literal('debug'),
+      Type.Literal('info'),
+      Type.Literal('warn'),
+      Type.Literal('error'),
+      Type.Literal('fatal'),
+    ]),
+    source: Type.String(),
+    message: Type.String(),
+    details: Type.Optional(Type.String()),
+    fiber_id: Type.Optional(Type.String()),
+    event_id: Type.Optional(Type.String()),
+  },
+  {
+    primaryKey: ['id'],
+    indexes: [
+      {
+        name: 'plugin_diagnostic_log_plugin_timestamp',
+        columns: ['plugin_id', { column: 'timestamp', order: 'DESC' }],
+      },
+      {
+        name: 'plugin_diagnostic_log_timestamp',
+        columns: [{ column: 'timestamp', order: 'DESC' }],
+      },
+    ],
+  },
+  { kyselyCamelCase: true },
+)
+
 export const clientTables: readonly TableSchema[] = [
   itemStoreTable,
   favouriteCardTable,
@@ -133,4 +169,5 @@ export const clientTables: readonly TableSchema[] = [
   pluginTable,
   nativeStoreTable,
   configTable,
+  pluginDiagnosticLogTable,
 ]

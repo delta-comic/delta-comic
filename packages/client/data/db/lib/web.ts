@@ -76,6 +76,19 @@ export const WEB_SCHEMA_STATEMENTS = [
     data TEXT NOT NULL
   )`,
   'CREATE INDEX IF NOT EXISTS config_belong_to ON config (belong_to)',
+  `CREATE TABLE IF NOT EXISTS plugin_diagnostic_log (
+    id TEXT PRIMARY KEY NOT NULL,
+    plugin_id TEXT NOT NULL,
+    timestamp INTEGER NOT NULL,
+    level TEXT NOT NULL CHECK (level IN ('trace', 'debug', 'info', 'warn', 'error', 'fatal')),
+    source TEXT NOT NULL,
+    message TEXT NOT NULL,
+    details TEXT,
+    fiber_id TEXT,
+    event_id TEXT
+  )`,
+  'CREATE INDEX IF NOT EXISTS plugin_diagnostic_log_plugin_timestamp ON plugin_diagnostic_log (plugin_id, timestamp DESC)',
+  'CREATE INDEX IF NOT EXISTS plugin_diagnostic_log_timestamp ON plugin_diagnostic_log (timestamp DESC)',
 ] as const
 
 export const createWebDialect = (): Dialect =>

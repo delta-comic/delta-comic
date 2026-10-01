@@ -112,6 +112,8 @@ CREATE INDEX IF NOT EXISTS favourite_item_belong_to_add_time
 ON favourite_item (add_time DESC, belong_to);
 "#;
 
+const PLUGIN_DIAGNOSTIC_LOG: &str = include_str!("../lib/generated/plugin_diagnostic_log.sql");
+
 pub fn all() -> Vec<Migration> {
   vec![
     Migration {
@@ -138,5 +140,30 @@ pub fn all() -> Vec<Migration> {
       sql: FIX_FAVOURITE_ITEM_FOREIGN_KEY,
       kind: MigrationKind::Up,
     },
+    Migration {
+      version: 5,
+      description: "plugin_diagnostic_log",
+      sql: PLUGIN_DIAGNOSTIC_LOG,
+      kind: MigrationKind::Up,
+    },
   ]
+}
+
+#[cfg(test)]
+mod tests {
+  use super::all;
+
+  #[test]
+  fn includes_the_diagnostic_log_migration_after_the_initial_schema() {
+    let migrations = all();
+    assert_eq!(
+      migrations.last().map(|migration| migration.version),
+      Some(5)
+    );
+    assert!(
+      migrations
+        .last()
+        .is_some_and(|migration| migration.sql.contains("plugin_diagnostic_log"))
+    );
+  }
 }

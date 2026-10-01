@@ -81,6 +81,7 @@ export interface DiagnosticRecorderOptions {
   pluginId?: string
   installationId?: string
   redact?: (details: Record<string, unknown>) => Record<string, unknown>
+  onRecord?: (record: DiagnosticRecord) => void | Promise<void>
 }
 
 export interface DiagnosticReplayEvent {
@@ -204,6 +205,7 @@ export class DiagnosticRecorder {
   readonly #pluginId: string | undefined
   readonly #installationId: string | undefined
   readonly #redact: (details: Record<string, unknown>) => Record<string, unknown>
+  readonly #onRecord: ((record: DiagnosticRecord) => void | Promise<void>) | undefined
 
   public constructor(options: DiagnosticRecorderOptions) {
     this.#capacity = Math.max(1, options.capacity ?? 200)
@@ -215,6 +217,7 @@ export class DiagnosticRecorder {
     this.#pluginId = options.pluginId
     this.#installationId = options.installationId
     this.#redact = options.redact ?? redactDetails
+    this.#onRecord = options.onRecord
   }
 
   public record(
@@ -235,6 +238,14 @@ export class DiagnosticRecorder {
     this.#records.push(record)
     if (this.#records.length > this.#capacity)
       this.#records.splice(0, this.#records.length - this.#capacity)
+    if (this.#onRecord) {
+      try {
+        const result = this.#onRecord(record)
+        if (isPromiseLike(result)) void result.catch(() => undefined)
+      } catch {
+        // A persistence sink must not break the diagnostic caller.
+      }
+    }
     return record
   }
 

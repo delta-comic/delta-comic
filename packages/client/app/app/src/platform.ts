@@ -1,7 +1,26 @@
 import { getTauriPluginRoot } from '@delta-comic/plugin'
 import { isTauri } from '@tauri-apps/api/core'
 
+import { commands } from './bindings'
+import { createAppHostProfile, detectWebHostPlatform, type AppHostProfile } from './host/profile'
+
 export const isTauriRuntime = isTauri
+
+let hostProfilePromise: Promise<AppHostProfile> | undefined
+
+export const resolveAppHostProfile = (): Promise<AppHostProfile> => {
+  hostProfilePromise ??= (async () => {
+    if (!isTauriRuntime()) {
+      return createAppHostProfile({ platform: detectWebHostPlatform(), runtime: 'web' })
+    }
+    const platform = await commands.getRuntimePlatform()
+    return createAppHostProfile({
+      platform: platform === 'android' ? 'android' : 'desktop',
+      runtime: 'tauri',
+    })
+  })()
+  return hostProfilePromise
+}
 
 export interface SafeAreaInsets {
   adjustedInsetBottom?: number
@@ -19,7 +38,7 @@ export const initializePlatform = async (): Promise<SafeAreaInsets | false> => {
     import('tauri-plugin-better-cors-fetch'),
     import('tauri-plugin-m3'),
   ])
-  CORSFetch.init({
+  await CORSFetch.init({
     request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } },
   })
   window.$api.M3 = M3

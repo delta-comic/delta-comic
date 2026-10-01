@@ -111,6 +111,43 @@ export const configRowSchema = {
   additionalProperties: false,
 } as const
 
+/** Runtime SQLite row schema for plugin_diagnostic_log. */
+export const pluginDiagnosticLogRowSchema = {
+  type: 'object',
+  properties: {
+    id: { type: 'string' },
+    plugin_id: { type: 'string' },
+    timestamp: { type: 'integer' },
+    level: {
+      anyOf: [
+        { type: 'string', const: 'trace' },
+        { type: 'string', const: 'debug' },
+        { type: 'string', const: 'info' },
+        { type: 'string', const: 'warn' },
+        { type: 'string', const: 'error' },
+        { type: 'string', const: 'fatal' },
+      ],
+    },
+    source: { type: 'string' },
+    message: { type: 'string' },
+    details: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    fiber_id: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    event_id: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+  },
+  required: [
+    'id',
+    'plugin_id',
+    'timestamp',
+    'level',
+    'source',
+    'message',
+    'details',
+    'fiber_id',
+    'event_id',
+  ],
+  additionalProperties: false,
+} as const
+
 /** Runtime TS-level row schema for item_store (camelCase keys). */
 export const itemStoreCamelRowSchema = {
   type: 'object',
@@ -225,6 +262,43 @@ export const configCamelRowSchema = {
   additionalProperties: false,
 } as const
 
+/** Runtime TS-level row schema for plugin_diagnostic_log (camelCase keys). */
+export const pluginDiagnosticLogCamelRowSchema = {
+  type: 'object',
+  properties: {
+    id: { type: 'string' },
+    pluginId: { type: 'string' },
+    timestamp: { type: 'integer' },
+    level: {
+      anyOf: [
+        { type: 'string', const: 'trace' },
+        { type: 'string', const: 'debug' },
+        { type: 'string', const: 'info' },
+        { type: 'string', const: 'warn' },
+        { type: 'string', const: 'error' },
+        { type: 'string', const: 'fatal' },
+      ],
+    },
+    source: { type: 'string' },
+    message: { type: 'string' },
+    details: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    fiberId: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    eventId: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+  },
+  required: [
+    'id',
+    'pluginId',
+    'timestamp',
+    'level',
+    'source',
+    'message',
+    'details',
+    'fiberId',
+    'eventId',
+  ],
+  additionalProperties: false,
+} as const
+
 export const clientRowSchemas = {
   item_store: itemStoreRowSchema,
   favourite_card: favouriteCardRowSchema,
@@ -235,6 +309,7 @@ export const clientRowSchemas = {
   plugin: pluginRowSchema,
   native_store: nativeStoreRowSchema,
   config: configRowSchema,
+  plugin_diagnostic_log: pluginDiagnosticLogRowSchema,
 } satisfies Record<string, TSchema>
 export const clientCamelRowSchemas = {
   itemStore: itemStoreCamelRowSchema,
@@ -246,4 +321,5 @@ export const clientCamelRowSchemas = {
   plugin: pluginCamelRowSchema,
   nativeStore: nativeStoreCamelRowSchema,
   config: configCamelRowSchema,
+  pluginDiagnosticLog: pluginDiagnosticLogCamelRowSchema,
 } satisfies Record<string, TSchema>

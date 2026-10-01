@@ -30,7 +30,7 @@ import AppSetup from './AppSetup.vue'
 import { appClientRuntime, disposeAppClientRuntime } from './clientHost'
 import { i18n } from './i18n'
 import { appLogger } from './logger'
-import { initializePlatform } from './platform'
+import { initializePlatform, resolveAppHostProfile } from './platform'
 import { router } from './router'
 
 configureUiI18n((key: UiMessageKey, params?: UiMessageParams) =>
@@ -39,6 +39,9 @@ configureUiI18n((key: UiMessageKey, params?: UiMessageParams) =>
 
 document.addEventListener('contextmenu', e => e.preventDefault())
 document.documentElement.lang = 'zh-CN'
+
+const appHostProfile = await resolveAppHostProfile()
+appLogger.scoped('platform').info('app host profile resolved', appHostProfile)
 
 await initializePlatform().then(v => {
   appLogger.scoped('platform').info('platform initialized', { nativeInsets: v || undefined })

@@ -11,6 +11,7 @@ import type * as ConfigDB from './config'
 import type { PluginTable } from './generated/plugin.table'
 import type * as ItemStoreDB from './itemStore'
 import type * as NativeStoreDB from './nativeStore'
+import type * as PluginDiagnosticLogDB from './pluginDiagnosticLog'
 export type { PluginTable } from './generated/plugin.table'
 export * as HistoryDB from './history'
 export * as ItemStoreDB from './itemStore'
@@ -19,6 +20,7 @@ export * as SubscribeDB from './subscribe'
 import type * as SubscribeDB from './subscribe'
 export * as RecentDB from './recentView'
 export * as ConfigDB from './config'
+export * as PluginDiagnosticLogDB from './pluginDiagnosticLog'
 import { WriteValidationPlugin } from './writeValidation'
 export { WriteValidationPlugin } from './writeValidation'
 export * from './validation'
@@ -33,6 +35,7 @@ export interface DB {
   plugin: PluginTable
   nativeStore: NativeStoreDB.Table
   config: ConfigDB.Table
+  pluginDiagnosticLog: PluginDiagnosticLogDB.Table
 }
 
 const databaseLogger = logger.scoped('db:lifecycle')

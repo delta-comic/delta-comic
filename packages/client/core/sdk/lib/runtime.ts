@@ -30,6 +30,7 @@ export interface ClientRuntimeOptions<DB extends object = Record<string, never>>
   uiRegistrars?: ClientUiRegistrars
   downloader?: ClientDownloader
   network?: ClientNetwork
+  diagnosticSink?: (record: ReturnType<DiagnosticRecorder['record']>) => void | Promise<void>
 }
 
 const defaultStore = (): ClientStore => {
@@ -55,6 +56,7 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
       diagnostics: new DiagnosticRecorder({
         source: `client:${options.pluginId}`,
         pluginId: options.pluginId,
+        onRecord: options.diagnosticSink,
       }),
     })
     this.#ownsDownloader = options.downloader === undefined

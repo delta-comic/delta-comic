@@ -3,11 +3,12 @@ import {
   type ClientRouteRegistration,
   type ClientUiRegistrars,
 } from '@delta-comic/client'
-import { db, type DB } from '@delta-comic/db'
+import { db, type DB, PluginDiagnosticLogDB } from '@delta-comic/db'
 import { shallowReactive } from 'vue'
 import type { Component } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 
+import { appLogger } from './logger'
 import { router } from './router'
 
 export interface AppNavigationRegistration {
@@ -78,12 +79,37 @@ export const clientUiRegistrars: ClientUiRegistrars = {
   route: registerRoute,
 }
 
+let diagnosticWrites = Promise.resolve()
+
 export const appClientRuntime = new ClientRuntime<DB>({
   database: { db, query: (_name, operation) => operation(db) },
   pluginId: 'app',
   uiRegistrars: clientUiRegistrars,
+  diagnosticSink: record => {
+    diagnosticWrites = diagnosticWrites
+      .then(() =>
+        PluginDiagnosticLogDB.append(db, {
+          id: record.id,
+          pluginId: record.pluginId ?? 'app',
+          timestamp: record.timestamp,
+          level: record.level,
+          source: record.source,
+          message: record.message,
+          details: record.details,
+          fiberId: record.fiberId,
+          eventId: record.eventId,
+        }),
+      )
+      .catch(error => {
+        appLogger.scoped('diagnostics').error('failed to persist diagnostic record', error)
+      })
+    return diagnosticWrites
+  },
 })
 
-export const disposeAppClientRuntime = () => appClientRuntime.dispose()
+export const disposeAppClientRuntime = async () => {
+  await appClientRuntime.dispose()
+  await diagnosticWrites
+}
 
 export type AppClientComponent = Component
