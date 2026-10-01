@@ -1,4 +1,4 @@
-<!-- cspell:ignore deepseek Cordis subrequest -->
+<!-- cspell:ignore deepseek Cordis subrequest getaddrinfo ENOTFOUND -->
 
 # Delta Comic 全仓架构重构规划
 
@@ -100,13 +100,13 @@
 
 ## 阶段 9：完成架构第 9 章 AI diagnostics 与事件回放
 
-- **状态：** in_progress
+- **状态：** complete
 - 补齐结构化日志门面、稳定实体 ID、运行时丰富 snapshot、事件记录/回放、最小运行时 harness 与服务端诊断入口。
 - 验收：both/client/server 专项测试、构建、类型检查、全仓验证和 diff 检查无错误。
 
 ## Next Step
 
-完成阶段 9 的最终全量构建、类型检查、测试和 diff 检查，然后提交验收结果。
+阶段 8、9 已完成；保持工作树干净并提交最终验收记录。
 
 ## 阶段 7 决策
 
@@ -174,6 +174,8 @@
 | 并行 typecheck 触发 Vite+ cache restore 冲突提示 | 1 | 后续按依赖顺序串行运行 lib-build、typecheck 与测试 |
 | 根级 `vp test run` 未收集 plugin-kernel 测试路径 | 1 | 按 package 工作区目录执行该包测试 |
 | Worker provisioner 既有断言仍使用 subrequest 50 | 1 | 更新测试契约为第 8 章默认配额 CPU 50、内存 128、subrequest 10 |
+| 全量测试输出 `getaddrinfo ENOTFOUND server.example` | 1 | 该输出来自既有网络失败场景；164 个测试文件、883 个用例均通过 |
+| 提交钩子 cspell 报告 `getaddrinfo` 与 `ENOTFOUND` 未收录 | 1 | 在规划文件局部 cspell 标记中登记错误码后重试提交 |
 
 ## 6G 过渡设计清理
 

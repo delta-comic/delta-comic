@@ -336,3 +336,10 @@
 - 结构化 logger、稳定 ID、rich snapshot、EventRecorder.call/replay、minimal runtime、client/server diagnostics facade 已完成。
 - `vp check --fix`、递归 typecheck、全量测试（164 files / 881 tests）及新增专项测试均通过。
 - 待办：最终重新运行 lib-build、全量 typecheck/test、codegen/diff 检查，完成阶段 9 提交。
+
+## 阶段 9 完成
+
+- 提交后 `vp run lib-build` 通过；`vp check` 通过（854 files），递归 typecheck 通过。
+- `vp run codegen:check`、`git diff --check` 通过；全量 `vp test run` 通过（164 files / 883 tests）。
+- 签名提交：`74a2c0cd`（功能实现）与 `8dccbcdb`（格式修正）。
+- 阶段 8、9 已完成，工作树保持干净。
