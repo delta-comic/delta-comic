@@ -69,14 +69,21 @@
 - 6A：将新 Artifact/Manifest 接入现有安装文件与模块读取边界。complete（`b33ab532`）
 - 6B：公开构建并发布 `@delta-comic/server`，补齐 SDK 的产物测试。complete（`e9a83b1e`）
 - 6C：接入 Tauri command 的 specta 类型生成，并纳入 Rust/TypeScript 验证。complete（`127dd91b`）
-- 6D：完成客户端/服务端宿主迁移、诊断 harness、UI/网络/下载器能力迁移。已完成下载器、UI EnvironmentRegistry、诊断 harness、客户端网络 transport、UI registrar 接口、app 路由/导航/command 接线、Worker fetch/scheduled 诊断适配器，以及旧 D1 插件宿主到新 ServerRuntime 的桥接工厂；旧 StaticPluginExecutor 全量迁移仍未完成。
+- 6D：完成客户端/服务端宿主迁移、诊断 harness、UI/网络/下载器能力迁移。已完成下载器、UI EnvironmentRegistry、诊断 harness、客户端网络 transport、UI registrar 接口、app 路由/导航/command 接线、Worker fetch/scheduled 诊断适配器、旧 D1 插件宿主到新 ServerRuntime 的桥接工厂，以及 StaticPluginExecutor 的 Cordis mount/unmount 生命周期适配；诊断面板、事件回放执行器和客户端旧 runtime 全量迁移仍未完成。
 - 6E：完成 Worker dispatcher、D1 migration、发布/市场、应用/admin 重组与部署文档。已增加 artifact migration 声明与 ServerRuntime ID 核对/执行边界、Worker fetch/scheduled dispatcher 边界、按 plugin/installation 记录并幂等执行 SQL migration 的 runner，以及市场目录协议、内存/HTTP/R2 存储、HTTP handler、发布器、受授权发布/撤回端点和部署运维边界；发布者身份、并发 CAS、签名凭证、artifact 上传、完整发布工作流、应用/admin 重组与完整部署流水线仍未完成。
 - 6F：完成 workspace 目录稳定化。complete：workspace 仅保留 `packages/*/*/*`，13 个现有包已落位到 client/server/shared 能力域，lockfile、symlink、构建入口、测试项目和 operational 路径已同步；市场管理界面保持暂停。
 - 每个子阶段必须有实现、测试、规划状态和签名提交；未实现事项保持未勾选。
 
 ## Next Step
 
-下一步处理 6D 旧 StaticPluginExecutor 的 ServerRuntime/Cordis 生命周期迁移，先完成现有静态插件定义的兼容适配和专项测试。
+下一步完成 6D 诊断面板与事件回放执行器，接着处理 6E 发布者身份、完整 CAS 发布工作流和 Workers for Platforms provisioning。
+
+## 阶段 6D StaticPluginExecutor 生命周期迁移
+
+- **状态：** complete
+- `StaticPluginExecutor` 支持注入 `StaticPluginRuntimeFactory`；生产 `createPluginService` 为每个静态插件创建 runtime，Cordis fiber mount 执行旧 `start` hook，fiber dispose 执行旧 `stop` hook。
+- 保留旧 executor 的安装、更新、卸载、健康检查和无 runtime factory 的测试兼容路径。
+- 专项执行器、服务、runtime 测试通过；`vp check --fix` 与 `git diff --check` 通过。
 
 ## Runtime 模型类型检查修复
 

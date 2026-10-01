@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { StaticPluginExecutor } from '../../../../app/modules/plugins/plugins.executor'
 import { defineServerPlugin } from '../../../../lib/plugin'
+import { ServerRuntime } from '../../../../lib/serverRuntime'
 
 const manifest = {
   apiVersion: 1 as const,
@@ -91,6 +92,35 @@ describe('StaticPluginExecutor', () => {
     expect(install).toHaveBeenCalledOnce()
     expect(health).toMatchObject({ message: 'static plugin runtime is ready', status: 'healthy' })
     expect(health.observedAt).toBeTypeOf('number')
+  })
+
+  it('runs static start and stop through the Cordis ServerRuntime lifecycle', async () => {
+    const calls: string[] = []
+    const plugin = defineServerPlugin({
+      manifest,
+      runtime: {
+        async start() {
+          calls.push('start')
+        },
+        async stop() {
+          calls.push('stop')
+        },
+      },
+    })
+    const runtime = new ServerRuntime({
+      db: {} as never,
+      installationId: 'static-installation',
+      pluginId: manifest.id,
+    })
+    const executor = new StaticPluginExecutor([plugin], undefined, () => runtime)
+
+    await executor.start(manifest.id, {})
+    expect(runtime.snapshot().plugins[0]).toMatchObject({ id: manifest.id, state: 'active' })
+
+    await executor.stop(manifest.id, {})
+    expect(calls).toEqual(['start', 'stop'])
+    expect(runtime.snapshot().plugins).toHaveLength(0)
+    await runtime.dispose()
   })
 
   it('sorts definitions and rejects duplicates or unknown runtime ids', async () => {

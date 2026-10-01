@@ -16,7 +16,7 @@ import type {
 } from '../../../lib/plugin'
 
 import { StaticPluginExecutor, type ServerPluginExecutor } from './plugins.executor'
-import { D1ServerPluginHost } from './plugins.host'
+import { createAppServerRuntime, D1ServerPluginHost } from './plugins.host'
 import { normalizeServerPluginConfig, validateServerPluginManifest } from './plugins.manifest'
 import { findServerPluginDependents, planServerPluginLoadOrder } from './plugins.plan'
 import { ServerPluginRepository } from './plugins.repository'
@@ -590,5 +590,7 @@ export class ServerPluginService {
 export const createPluginService = (db: D1Database): ServerPluginService =>
   new ServerPluginService(
     new ServerPluginRepository(db),
-    new StaticPluginExecutor(undefined, new D1ServerPluginHost(db)),
+    new StaticPluginExecutor(undefined, new D1ServerPluginHost(db), pluginId =>
+      createAppServerRuntime(db, { installationId: `static:${pluginId}`, pluginId }),
+    ),
   )

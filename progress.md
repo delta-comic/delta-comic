@@ -27,6 +27,14 @@
 - 设计 spec：已由根目录 ARCHITECTURE.md 与 findings.md 承载并获用户批准。
 - 下一个动作：继续实现 6D/6E 的完整旧宿主迁移、市场发布身份/CAS、WfP provisioning、应用/admin 重组和完整部署流水线。
 
+### 2026-10-01 — 阶段 6D StaticPluginExecutor 生命周期迁移
+
+- `StaticPluginExecutor` 新增可注入 `StaticPluginRuntimeFactory`；生产插件服务通过 `createAppServerRuntime` 为静态插件创建 `ServerRuntime`。
+- 静态定义的 `start` 在 Cordis fiber mount 中执行，`stop` 注册为 fiber effect disposer；executor stop 通过 `ServerRuntime.unmount` 触发清理。
+- 保留无 runtime factory 的旧调用路径，安装、更新、卸载、健康检查协议保持不变。
+- 验证通过：server executor/service/runtime 专项测试（3 files / 21 tests）、server typecheck、`vp check --fix`、`git diff --check`。
+- 阶段 6D 剩余诊断面板、事件回放执行器和客户端旧 runtime 全量迁移继续排队；随后处理阶段 6E 发布身份、CAS 工作流与 WfP provisioning。
+
 ### 2026-09-27 — 阶段 6G Install 与 Vite Adapter
 
 - 新增 `@delta-comic/plugin-install`，迁移 Install contracts、service、source resolver、ZIP codec、stored/dev module reader、candidate provider、artifact reader 和 marketplace ports。

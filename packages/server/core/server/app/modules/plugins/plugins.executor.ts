@@ -1,3 +1,4 @@
+import type { Plugin } from '@delta-comic/both'
 import { logger } from '@delta-comic/logger'
 
 import { AppError } from '@/shared/errors'
@@ -30,6 +31,13 @@ export abstract class ServerPluginExecutor {
   abstract health(pluginId: string, config: ServerPluginConfig): Promise<ServerPluginHealth>
 }
 
+export interface StaticPluginRuntime {
+  mount(id: string, plugin: Plugin, config?: unknown): Promise<unknown>
+  unmount(id: string): Promise<void>
+}
+
+export type StaticPluginRuntimeFactory = (pluginId: string, version: string) => StaticPluginRuntime
+
 export class StaticPluginExecutor extends ServerPluginExecutor {
   private readonly definitions: ReadonlyMap<string, ServerPluginDefinition>
 
@@ -43,6 +51,7 @@ export class StaticPluginExecutor extends ServerPluginExecutor {
         return 0
       },
     },
+    private readonly createRuntime?: StaticPluginRuntimeFactory,
   ) {
     super()
     const entries = [...definitions].map(definition => {
@@ -93,12 +102,32 @@ export class StaticPluginExecutor extends ServerPluginExecutor {
   async start(pluginId: string, config: ServerPluginConfig): Promise<void> {
     const { context, definition } = this.resolve(pluginId, config)
     executorLogger.debug('starting plugin runtime', { pluginId })
-    await definition.runtime.start?.(context)
+    if (!this.createRuntime) {
+      await definition.runtime.start?.(context)
+      return
+    }
+    const runtime = this.createRuntime(pluginId, definition.manifest.version)
+    const plugin: Plugin = {
+      async apply(scope) {
+        await definition.runtime.start?.(context)
+        scope.effect(() => async () => {
+          await definition.runtime.stop?.(context)
+        })
+      },
+    }
+    await runtime.mount(pluginId, plugin, context.config)
+    this.runtimes.set(pluginId, runtime)
   }
 
   async stop(pluginId: string, config: ServerPluginConfig): Promise<void> {
     const { context, definition } = this.resolve(pluginId, config)
     executorLogger.debug('stopping plugin runtime', { pluginId })
+    const runtime = this.runtimes.get(pluginId)
+    if (runtime) {
+      await runtime.unmount(pluginId)
+      this.runtimes.delete(pluginId)
+      return
+    }
     await definition.runtime.stop?.(context)
   }
 
@@ -142,4 +171,6 @@ export class StaticPluginExecutor extends ServerPluginExecutor {
       definition,
     }
   }
+
+  private readonly runtimes = new Map<string, StaticPluginRuntime>()
 }
