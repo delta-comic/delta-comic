@@ -1,0 +1,97 @@
+name: 服务端部署
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_admin:
+        description: '同时部署 server-admin Pages'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: delta-comic-server-production
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: 验证工作区
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: .node-version
+          cache: true
+      - name: Install dependencies
+        run: vp install --frozen-lockfile
+      - name: Build workspace libraries
+        run: vp run lib-build
+      - name: Check formatting and lint
+        run: vp check
+      - name: Check TypeScript
+        run: vp run -r typecheck
+      - name: Run tests
+        run: vp test run
+      - name: Check generated files
+        run: vp run codegen:check
+      - name: Check diff
+        run: git diff --check
+
+  server:
+    name: 迁移并部署 Worker
+    runs-on: ubuntu-latest
+    needs: validate
+    env:
+      HUSKY: 0
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: .node-version
+          cache: true
+      - name: Install dependencies
+        run: vp install --frozen-lockfile
+      - name: Build workspace libraries
+        run: vp run lib-build
+      - name: Apply remote migrations
+        run: vp run --filter @delta-comic/server migrate:remote
+      - name: Deploy Worker
+        run: vp run --filter @delta-comic/server deploy
+
+  admin:
+    name: 构建并部署管理后台
+    if: inputs.deploy_admin
+    needs: server
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: .node-version
+          cache: true
+      - name: Install dependencies
+        run: vp install --frozen-lockfile
+      - name: Build workspace libraries
+        run: vp run lib-build
+      - name: Build admin
+        run: vp run --filter @delta-comic/server-admin build
+      - name: Deploy Pages
+        run: vp run --filter @delta-comic/server-admin deploy

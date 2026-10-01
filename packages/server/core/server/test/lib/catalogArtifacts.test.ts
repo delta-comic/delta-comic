@@ -4,11 +4,16 @@ import { createPluginArtifactUploadHandler, createR2PluginArtifactStore } from '
 
 describe('plugin artifact uploads', () => {
   it('stores artifacts with an integrity digest and stable public URL', async () => {
-    const writes: Array<{ key: string; body: ArrayBuffer; mimeType?: string }> = []
+    const writes: Array<{ key: string; body: ArrayBuffer; mimeType?: string; onlyIf?: string }> = []
     const store = createR2PluginArtifactStore(
       {
         async put(key, body, options) {
-          writes.push({ key, body, mimeType: options?.httpMetadata?.contentType })
+          writes.push({
+            key,
+            body,
+            mimeType: options?.httpMetadata?.contentType,
+            onlyIf: options?.onlyIf?.get('if-none-match') ?? undefined,
+          })
         },
       },
       'https://plugins.example/files',
@@ -32,6 +37,7 @@ describe('plugin artifact uploads', () => {
     expect(writes[0]).toMatchObject({
       key: 'artifacts/demo.plugin/1.0.0/desktop.zip',
       mimeType: 'application/zip',
+      onlyIf: '*',
     })
   })
 
@@ -65,5 +71,26 @@ describe('plugin artifact uploads', () => {
     )
     expect(response.status).toBe(200)
     expect(await response.json()).toMatchObject({ artifact: { platform: 'desktop' } })
+  })
+
+  it('reports a conflict when an artifact version already exists', async () => {
+    const store = createR2PluginArtifactStore(
+      { put: async () => null },
+      'https://plugins.example/files',
+    )
+    const handler = createPluginArtifactUploadHandler({ store, authorizeWrite: () => true })
+    const response = await handler.fetch(
+      new Request('https://example.test/plugins/catalog/artifacts', {
+        body: 'demo',
+        headers: {
+          'content-type': 'application/zip',
+          'x-plugin-id': 'demo.plugin',
+          'x-plugin-platform': 'desktop',
+          'x-plugin-version': '1.0.0',
+        },
+        method: 'POST',
+      }),
+    )
+    expect(response.status).toBe(409)
   })
 })

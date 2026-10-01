@@ -1,4 +1,4 @@
-import type { PluginArtifactStore } from './catalogArtifacts'
+import { PluginArtifactConflictError, type PluginArtifactStore } from './catalogArtifacts'
 
 export interface PluginArtifactUploadHandlerOptions {
   store: PluginArtifactStore
@@ -51,7 +51,7 @@ export const createPluginArtifactUploadHandler = (
       } catch (error) {
         return json(
           { error: error instanceof Error ? error.message : 'invalid artifact upload' },
-          400,
+          error instanceof PluginArtifactConflictError ? 409 : 400,
         )
       }
     },

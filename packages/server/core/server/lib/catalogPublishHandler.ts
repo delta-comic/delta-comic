@@ -10,17 +10,20 @@ export interface PluginCatalogPublishHandlerOptions {
   store: PluginCatalogStore
   publishPath?: string
   yankPath?: string
-  authorizeWrite?: (request: Request) => boolean | Promise<boolean>
+  authorizeWrite?: (request: Request) => boolean | string | Promise<boolean | string>
 }
 
 export interface PluginCatalogPublishHandler {
   fetch(request: Request): Promise<Response>
 }
 
-const json = (body: unknown, status = 200) =>
+const json = (body: unknown, status = 200, publisherId?: string) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { 'content-type': 'application/json; charset=utf-8' },
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      ...(publisherId ? { 'x-publisher-id': publisherId } : {}),
+    },
   })
 
 const readMetadata = (value: unknown): PluginReleaseMetadata => {
@@ -56,7 +59,8 @@ export const createPluginCatalogPublishHandler = (
       if (request.method !== 'POST') {
         return new Response(null, { status: 405, headers: { allow: 'POST' } })
       }
-      if (!(await authorizeWrite(request))) return new Response(null, { status: 401 })
+      const identity = await authorizeWrite(request)
+      if (!identity) return new Response(null, { status: 401 })
 
       try {
         const payload = await request.json()
@@ -66,7 +70,7 @@ export const createPluginCatalogPublishHandler = (
           const body = payload as { release?: unknown }
           const release = parsePluginRelease(body.release)
           const next = await publisher.publish(release, readMetadata(payload))
-          return json(next)
+          return json(next, 200, typeof identity === 'string' ? identity : undefined)
         }
 
         if (!payload || typeof payload !== 'object') throw new TypeError('invalid yank payload')
@@ -74,7 +78,11 @@ export const createPluginCatalogPublishHandler = (
         if (typeof body.pluginId !== 'string' || typeof body.version !== 'string') {
           throw new TypeError('yank pluginId and version are required')
         }
-        return json(await publisher.yank(body.pluginId, body.version))
+        return json(
+          await publisher.yank(body.pluginId, body.version),
+          200,
+          typeof identity === 'string' ? identity : undefined,
+        )
       } catch (error) {
         return json(
           { error: error instanceof Error ? error.message : 'invalid publish payload' },

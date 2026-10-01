@@ -49,7 +49,8 @@ vp run --filter @delta-comic/server build
 vp -C packages/server/core/server exec wrangler deploy --config dist/delta_comic_server/wrangler.json
 ```
 
-当前免费账号部署采用单 Worker 模式。`worker_loaders` 未加入生产配置，插件路由、目录发布、SQL migration 和静态 Cordis runtime 可以正常使用；依赖 Workers for Platforms 的动态旧插件脚本在该部署模式下会记录清晰错误，应用的其他定时任务仍继续运行。
+当前测试环境采用单 Worker 模式。目录发布、SQL migration、静态 Cordis runtime 和现有 API 由同一
+Worker 提供；动态脚本由运行时能力检查决定是否进入 WfP loader。
 
 当前测试部署使用免费 D1 `delta-comic-server-db`，远程迁移已执行完成。部署后的健康检查：
 
@@ -59,7 +60,19 @@ GET https://delta-comic-server.wenxig.workers.dev/plugins/catalog/index.json -> 
 POST https://delta-comic-server.wenxig.workers.dev/plugins/catalog/releases -> 404
 ```
 
-目录相关路径返回 404 的原因是测试部署未配置 `PLUGIN_CATALOG` R2 binding。免费账号使用当前单 Worker 静态能力继续运行，动态脚本保持明确的不可用错误。
+测试部署没有配置 `PLUGIN_CATALOG` R2 binding，因此目录路径返回 404；启用 binding 后会自动打开
+目录、发布和撤回端点。
+
+## 产物上传与诊断
+
+配置 `PLUGIN_ARTIFACTS` R2 binding 和 `PLUGIN_PUBLIC_BASE_URL` 后，管理员可以向
+`POST /plugins/catalog/artifacts` 上传预构建 ZIP。请求需要 `SERVER_ADMIN_TOKEN`，并携带
+`x-plugin-id`、`x-plugin-version`、`x-plugin-platform` 和 `content-type` 请求头。Worker 会计算
+SHA-256 integrity，写入 `artifacts/{pluginId}/{version}/{platform}.zip`，返回可放入目录 release
+的 artifact 元数据和 `x-publisher-id`。
+
+管理员可以通过 `GET /api/admin/diagnostics` 读取 Worker 诊断快照；向同一路径 POST 已导出的
+diagnostic archive 可执行注册的回放处理器。接口复用容量上限和 Bearer 管理员鉴权。
 
 部署后检查公开目录：
 
@@ -78,7 +91,9 @@ curl -i \
   --data-binary @release-payload.json
 ```
 
-发布器会校验 HTTPS artifact URL、Manifest URL、平台、完整性值、版本和目录条目。artifact 文件上传、发布者账户、签名凭证和完整管理后台仍需后续实现。
+发布器会校验 HTTPS artifact URL、Manifest URL、平台、完整性值、版本和目录条目。artifact 上传使用
+R2 `If-None-Match: *`，已存在的版本返回 409。授权回调返回的发布者 ID 会写入
+`x-publisher-id` 响应头；产物完整性使用 Manifest 声明的 SHA-256。
 
 ## 变更操作
 
@@ -86,12 +101,20 @@ curl -i \
 
 目录 GET 响应包含 ETag，直接 PUT 可使用 `If-Match` 或 `If-None-Match: *`；陈旧条件返回 412。发布端点在目录冲突时返回 409，发布者可重新载入并重试。R2 写入具备强一致性，条件写入由对象存储原子执行。
 
-## 未覆盖的部署事项
+## Workers for Platforms 与安装隔离
 
-以下清单保持未完成状态：
+`@delta-comic/server` 提供 `CloudflarePluginWorkerProvisioner` 和
+`PluginWorkerRuntimeRegistry`。启用 Workers for Platforms loader 时，宿主为每个
+`installationId` 注入独立的 `PLUGIN_ID`/`INSTALLATION_ID`，再将请求路由到对应 Worker；免费账号
+继续使用 `UnavailablePluginWorkerProvisioner`，会返回可诊断的 unavailable 错误。D1 创建/销毁通过
+`PluginInstallationDatabase` 端口接入 Cloudflare 控制面，`PluginInstallationManager` 保证同一
+plugin/installation 只创建一次并支持显式回收。
 
-- Workers for Platforms runtime provisioning 与每安装实例隔离部署
-- D1 per-installation binding 自动创建与配额管理
-- 发布者账户、凭证轮换和审计日志
-- app 与 server-admin 的市场管理界面
-- 生产环境回滚、灾备和完整 CI/CD 发布流水线
+部署前配置 WfP loader、D1 控制面凭证、每安装实例数据库适配器和访问权限。部署环境没有 WfP
+能力时使用 `UnavailablePluginWorkerProvisioner`，控制面继续提供明确的诊断错误。仓库中的
+`.github/workflows/server-deploy.yaml` 会依次执行 workspace 构建、格式与类型检查、测试、codegen
+检查、远程迁移、Worker 部署和可选的 server-admin Pages 部署。
+
+server-admin 的运行指标页面包含 Worker 诊断快照入口；发布者账户由部署环境的授权回调提供，
+凭证轮换通过 `SERVER_ADMIN_TOKEN` secret 完成。生产变更按目录 ETag 与 artifact 条件写入流程执行，
+回滚时保留上一份目录对象和已发布 artifact。

@@ -30,7 +30,8 @@ describe('plugin catalog publish handler', () => {
   it('publishes and yanks a release behind authorization', async () => {
     const handler = createPluginCatalogPublishHandler({
       store: createMemoryPluginCatalogStore(),
-      authorizeWrite: request => request.headers.get('authorization') === 'Bearer publisher',
+      authorizeWrite: request =>
+        request.headers.get('authorization') === 'Bearer publisher' ? 'publisher-1' : false,
     })
 
     await expect(
@@ -41,11 +42,11 @@ describe('plugin catalog publish handler', () => {
         }),
       ),
     ).resolves.toMatchObject({ status: 401 })
-    await expect(
-      handler.fetch(
-        request('/plugins/catalog/releases', { release, metadata: { name: 'Publish demo' } }),
-      ),
-    ).resolves.toMatchObject({ status: 200 })
+    const published = await handler.fetch(
+      request('/plugins/catalog/releases', { release, metadata: { name: 'Publish demo' } }),
+    )
+    expect(published.status).toBe(200)
+    expect(published.headers.get('x-publisher-id')).toBe('publisher-1')
     await expect(
       handler.fetch(
         request('/plugins/catalog/releases/yank', {

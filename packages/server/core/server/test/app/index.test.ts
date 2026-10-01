@@ -115,6 +115,9 @@ describe('server Elysia app', () => {
       createEnv({ SERVER_ADMIN_TOKEN: 'diagnostic-secret' }),
     )
     expect(response.status).toBe(200)
-    await expect(response.json()).resolves.toMatchObject({ runtime: 'server-worker' })
+    await expect(response.json()).resolves.toMatchObject({
+      data: { runtime: 'server-worker' },
+      ok: true,
+    })
   })
 })

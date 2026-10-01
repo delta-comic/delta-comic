@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { DiagnosticSnapshot } from '@delta-comic/server'
 import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
+import { onMounted, shallowRef } from 'vue'
 
+import { readableApiError } from '@/shared/api/AdminApiClient'
 import AppIcon from '@/shared/components/AppIcon.vue'
 import PageHeader from '@/shared/components/PageHeader.vue'
 import StatusMark from '@/shared/components/StatusMark.vue'
@@ -12,11 +14,28 @@ const connection = useConnectionStore()
 const store = useOverviewStore()
 const { data, error, loading } = storeToRefs(store)
 const { load } = store
+const diagnostic = shallowRef<DiagnosticSnapshot | null>(null)
+const diagnosticError = shallowRef('')
+
+const loadDiagnostics = async () => {
+  if (!connection.hasCredentials) return
+  diagnosticError.value = ''
+  try {
+    diagnostic.value = await connection
+      .createClient()
+      .get<DiagnosticSnapshot>('/api/admin/diagnostics')
+  } catch (cause) {
+    diagnosticError.value = readableApiError(cause)
+  }
+}
 
 const formatNumber = (value: number): string => new Intl.NumberFormat('zh-CN').format(value)
 
 onMounted(() => {
-  if (connection.hasCredentials && !data.value) void load()
+  if (connection.hasCredentials) {
+    if (!data.value) void load()
+    void loadDiagnostics()
+  }
 })
 </script>
 
@@ -100,6 +119,42 @@ onMounted(() => {
         >
           {{ data.health.issues.join(' · ') }}
         </NAlert>
+      </div>
+    </section>
+    <section class="admin-panel mt-5">
+      <header class="border-border flex items-center justify-between border-b px-5 py-[18px]">
+        <div>
+          <h2 class="m-0 text-[15px]">Worker 诊断快照</h2>
+          <p class="text-muted-foreground mt-1 mb-0 text-[11px]">
+            生命周期、请求和调度事件按容量保留，可用于故障回放。
+          </p>
+        </div>
+        <NButton
+          size="small"
+          secondary
+          :loading="!diagnostic && !diagnosticError"
+          @click="loadDiagnostics"
+        >
+          刷新
+        </NButton>
+      </header>
+      <div v-if="diagnosticError" class="admin-error m-5">{{ diagnosticError }}</div>
+      <div v-else-if="diagnostic" class="grid gap-4 p-5 md:grid-cols-3">
+        <div>
+          <div class="text-muted-foreground text-[11px]">运行时</div>
+          <code class="text-xs">{{ diagnostic.runtime }}</code>
+        </div>
+        <div>
+          <div class="text-muted-foreground text-[11px]">插件</div>
+          <strong>{{ diagnostic.plugins.length }}</strong>
+        </div>
+        <div>
+          <div class="text-muted-foreground text-[11px]">记录</div>
+          <strong>{{ diagnostic.records.length }}</strong>
+        </div>
+      </div>
+      <div v-else class="p-5">
+        <NSkeleton text :repeat="2" />
       </div>
     </section>
     <NSkeleton v-else :repeat="10" text />

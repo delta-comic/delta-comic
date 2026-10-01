@@ -6,8 +6,15 @@ export interface PluginArtifactBucket {
   put(
     key: string,
     value: ArrayBuffer,
-    options?: { httpMetadata?: { contentType?: string } },
+    options?: { httpMetadata?: { contentType?: string }; onlyIf?: Headers },
   ): Promise<unknown>
+}
+
+export class PluginArtifactConflictError extends Error {
+  public constructor() {
+    super('plugin artifact already exists; choose a new version')
+    this.name = 'PluginArtifactConflictError'
+  }
 }
 
 export interface PluginArtifactUpload {
@@ -55,7 +62,11 @@ export const createR2PluginArtifactStore = (
 
       const integrity = await sha256(input.body)
       const key = `${prefix}/${input.pluginId}/${input.version}/${input.platform}.zip`
-      await bucket.put(key, input.body, { httpMetadata: { contentType: input.mimeType } })
+      const result = await bucket.put(key, input.body, {
+        httpMetadata: { contentType: input.mimeType },
+        onlyIf: new Headers({ 'if-none-match': '*' }),
+      })
+      if (result === null) throw new PluginArtifactConflictError()
       const url = new URL(key, `${baseUrl.toString().replace(/\/$/, '')}/`).toString()
       return {
         integrity,

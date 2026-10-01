@@ -23,8 +23,8 @@ describe('diagnostic handler', () => {
     )
     expect(response.status).toBe(200)
     expect(await response.json()).toMatchObject({
-      runtime: 'test',
-      records: [{ message: 'plugin.started' }],
+      data: { runtime: 'test', records: [{ message: 'plugin.started' }] },
+      ok: true,
     })
   })
 })
