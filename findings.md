@@ -327,3 +327,12 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - `PluginStore<TConfig>` 的泛型约束是 `PluginConfig<object>`。方法公开签名可以用 `keyof NonNullable<TConfig['model']>` 推导模型键，内部访问 `config.model` 时编译器使用约束 object，导致 TS2536。
 - `new PluginStore()` 默认模型为 object，`keyof object` 为 never；两处 expose 查询测试需指定包含 expose 的模型类型。对象被后续传入 markLoading 时，已创建的 store 的泛型不会随调用改变。
 - 公开 modelEntries 重载保留键到值的精确类型，实现接收 PropertyKey 并通过 Reflect.get 读取、标注 unknown、过滤 undefined。宿主模型接口继续保持现有约束。
+
+## 2026-10-01：阶段 6E Cloudflare 边界验证
+
+- Workers for Platforms 的 `DispatchNamespace.get(name, bindings, options)` 接受每次 dispatch 的绑定和资源限制；`CloudflareDispatchWorkerProvisioner` 将 `PLUGIN_ID`、`INSTALLATION_ID` 和 manifest limits 传入对应 installation worker。
+- D1 REST API 创建端点为 `POST /accounts/{account_id}/d1/database`，删除端点为
+  `DELETE /accounts/{account_id}/d1/database/{database_id}`。安装记录保存创建响应的 `uuid`，回收时按该 ID 删除。
+- R2 Workers API 的条件写入通过 `onlyIf: Headers` 表达，`If-None-Match: *` 用于 artifact 首次上传，条件失败返回 `null`；重复 artifact 由 HTTP handler 转换为 409。
+- 管理端 `AdminApiClient` 使用 `{ ok, data }` envelope，诊断快照接口已统一该响应格式，避免页面读取时绕过管理 API 契约。
+- 生产发布工作流由 `.github/workflows/server-deploy.yaml` 固化验证、远程迁移、Worker 部署和可选 Pages 部署；WfP、R2 bucket 与 secret 仍由部署环境配置。

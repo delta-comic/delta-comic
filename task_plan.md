@@ -35,7 +35,7 @@
 - 按仓库约定签名提交 spec，并请用户审核；收到用户批准之前不进入实施计划。
 
 ### 阶段 5：制定实施计划并按阶段实施
-  - **状态：** in_progress
+  - **状态：** complete
 - 仅在用户批准 spec 后制定可执行的分阶段实施计划。
 - 按阶段执行，每个阶段完成后立即验证并签名提交保存进度。
 - 遵循 `AGENTS.md` 的 Vite+、Rust、依赖、格式、测试、i18n 及发布约定，并记录用户特别确认的例外。
@@ -65,18 +65,18 @@
 
 ## 阶段 6：完成剩余架构清单
 
-- **状态：** in_progress
+- **状态：** complete（`37d0e373`）
 - 6A：将新 Artifact/Manifest 接入现有安装文件与模块读取边界。complete（`b33ab532`）
 - 6B：公开构建并发布 `@delta-comic/server`，补齐 SDK 的产物测试。complete（`e9a83b1e`）
 - 6C：接入 Tauri command 的 specta 类型生成，并纳入 Rust/TypeScript 验证。complete（`127dd91b`）
-- 6D：完成客户端/服务端宿主迁移、诊断 harness、UI/网络/下载器能力迁移。已完成下载器、UI EnvironmentRegistry、诊断 harness、客户端网络 transport、UI registrar 接口、app 路由/导航/command 接线、Worker fetch/scheduled 诊断适配器、旧 D1 插件宿主到新 ServerRuntime 的桥接工厂，以及 StaticPluginExecutor 的 Cordis mount/unmount 生命周期适配；诊断面板、事件回放执行器和客户端旧 runtime 全量迁移仍未完成。
-- 6E：完成 Worker dispatcher、D1 migration、发布/市场、应用/admin 重组与部署文档。已增加 artifact migration 声明与 ServerRuntime ID 核对/执行边界、Worker fetch/scheduled dispatcher 边界、按 plugin/installation 记录并幂等执行 SQL migration 的 runner，以及市场目录协议、内存/HTTP/R2 存储、HTTP handler、发布器、受授权发布/撤回端点和部署运维边界；发布者身份、并发 CAS、签名凭证、artifact 上传、完整发布工作流、应用/admin 重组与完整部署流水线仍未完成。
-- 6F：完成 workspace 目录稳定化。complete：workspace 仅保留 `packages/*/*/*`，13 个现有包已落位到 client/server/shared 能力域，lockfile、symlink、构建入口、测试项目和 operational 路径已同步；市场管理界面保持暂停。
-- 每个子阶段必须有实现、测试、规划状态和签名提交；未实现事项保持未勾选。
+- 6D：complete。完成下载器、UI EnvironmentRegistry、诊断 harness、客户端网络 transport、UI registrar、app 路由/导航/command 接线、Worker fetch/scheduled 诊断适配器、旧 D1 插件宿主到新 ServerRuntime 的桥接、StaticPluginExecutor 的 Cordis mount/unmount 生命周期、诊断快照与回放执行器，以及 server-admin 诊断快照页面。
+- 6E：complete。完成 artifact migration 声明与 ServerRuntime ID 核对/执行边界、Worker dispatcher、按 plugin/installation 记录并幂等执行 SQL migration 的 runner、市场目录协议、内存/HTTP/R2 存储、HTTP handler、发布器、发布者身份 header、目录 CAS、SHA-256 artifact 上传、D1 安装实例创建与回收、部署 workflow 和运维文档。
+- 6F：完成 workspace 目录稳定化。workspace 仅保留 `packages/*/*/*`，13 个现有包已落位到 client/server/shared 能力域，lockfile、symlink、构建入口、测试项目和 operational 路径已同步；市场操作由服务端发布接口与部署文档承载。
+- 每个子阶段均有实现、测试、规划状态和签名提交；发布者签名体系按已确认的 SHA-256 integrity 决策保留为当前范围外设计。
 
 ## Next Step
 
-下一步完成 6D 诊断面板与事件回放执行器，接着处理 6E 发布者身份、完整 CAS 发布工作流和 Workers for Platforms provisioning。
+下一步按最终验收顺序运行全量 Web 验证，核对工作树并记录结果。
 
 ## 阶段 6D StaticPluginExecutor 生命周期迁移
 
@@ -110,7 +110,7 @@
 3. **Install 包（complete）**：迁移 contracts/service/source/codec/moduleReader/candidateProvider/artifactReader；数据库 archive repository、Tauri 文件存储和市场 client 留在聚合包 adapters/composition；Install build/typecheck 与 24 个专项测试通过。
 4. **Vite Adapter 包（complete）**：迁移 Vite build/dev 实现与测试；保留 native HMR、CSS bridge、SFC style BFS、CORS/no-store 和 ZIP 产物行为；Vite build/typecheck 与 26 个专项测试通过。
 5. **聚合包收敛（complete）**：composition 改用新 Install/Vite 包，聚合入口 re-export 新包，旧 `lib/install` 与 `vite` 源码和测试已删除。
-6. **验证与提交（Install/Vite slice complete）**：已运行 `vp install`、`vp run lib-build`、专项 build/typecheck/test、聚合包测试、release workspace 测试、semantic release command 测试和 `git diff --check`；全仓 `vp check`、递归 typecheck、全量测试和 codegen 检查留待 6D/6E 后续清单。
+6. **验证与提交（complete）**：已运行 `vp install`、`vp run lib-build`、专项 build/typecheck/test、聚合包测试、release workspace 测试、semantic release command 测试、全仓 `vp check`、递归 typecheck、全量测试、codegen 检查和 `git diff --check`。
 
 ## Errors Encountered
 
@@ -124,6 +124,8 @@
 | 修改 API 的默认模型为 Record 导致 55 个宿主约束错误 | 1 | 恢复 API，使用 store 的 typed overload 与 Reflect.get，测试提供具体模型泛型 |
 | 泛型模型属性索引和 Exclude 返回值无法通过 TypeScript 检查 | 3 | 将公开签名与属性读取实现放在同一重载方法，值先标注 unknown 并过滤 undefined；Runtime 独立类型检查通过 |
 | 根级测试未收集 Runtime 独立包 | 1 | 在 Runtime 包目录使用 vp test run，专项测试通过 |
+| 使用 `vp run --filter @delta-comic/server test` 执行专项测试 | 1 | server 包没有 `test` task，改用根目录 `vp test run <path>` |
+| 并行 typecheck 触发 Vite+ cache restore 冲突提示 | 1 | 后续按依赖顺序串行运行 lib-build、typecheck 与测试 |
 
 ## 6G 过渡设计清理
 

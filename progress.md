@@ -291,3 +291,11 @@
 - 删除旧聚合 Runtime 实现及 engine/providers/store 测试；聚合包没有独立 test task，使用指定 capability/install/architecture 测试验证，3 files / 15 tests 通过。
 - Runtime standalone typecheck 的 12 个 tsgo 陈旧诊断已记录为工具链限制；当前 Runtime 源码和依赖解析路径已核对。
 - 当前进度停止在 Runtime；6G-3 Install、6G-4 Vite Adapter 与完整聚合收敛保持 pending。
+
+## 2026-10-01：阶段 6D/6E 收尾
+
+- 完成诊断快照管理端页面、统一管理 API envelope 和诊断回放响应；服务端测试覆盖授权快照与 Worker 路由。
+- 完成发布者身份响应 header、R2 artifact `If-None-Match: *` 条件上传及重复版本 409；SHA-256 integrity 继续作为完整性契约。
+- 完成 `CloudflareDispatchWorkerProvisioner`、`CloudflareD1InstallationDatabase` 和 `PluginInstallationManager`。D1 删除使用创建返回的 database ID，安装实例按 plugin/installation 幂等创建并支持回收。
+- 新增 `.github/workflows/server-deploy.yaml`，按构建、检查、类型、测试、codegen、迁移、Worker 和 Pages 顺序执行部署。
+- 通过 `vp run lib-build`、`vp check`、server/server-admin typecheck，以及新增服务端专项测试（7 files / 18 tests）；实现已签名提交 `37d0e373`。
