@@ -1,6 +1,6 @@
 import { UniItem, UniResource } from '@delta-comic/model'
 import { Context, type Plugin } from 'cordis'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { ContentService, RemoteService, ShareService, UiService } from '../../lib/services'
 

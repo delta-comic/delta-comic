@@ -275,4 +275,27 @@
 | legacy 构建解析动态导入中的 await 失败 | 1 | URL 赋值改为显式分支，保持动态导入参数为局部变量 |
 
 ## Next Step
-第 12 章与启动调试完成；`ARCHITECTURE.md` 共 12 章，没有第 13 章。
+依赖升级兼容修复与声明输出路径验证完成。
+
+## 2026-10-02 依赖升级兼容修复
+
+- 依赖安装与升级差异核对：complete
+- 测试入口、任务配置和集中依赖管理同步：complete
+- Web 与 Rust API 兼容修复：complete
+- 全仓验证与 diff 检查：complete
+- 签名提交：随本次提交保存
+
+### 错误记录
+
+- Vite+ 1.0 构建拒绝旧任务 output 配置，需迁移至 cache.output。
+- rfd 0.17 移除 tokio feature，已更新根依赖配置。
+- 声明生成的 dts.oxc 配置需要对象，已同步 UI 构建入口。
+- Vue 类型工具 3.3.12 存在模板导入闭包回归，固定 vue-tsc 与直接依赖的 language-core 为 3.3.11。
+- Vue Router 使用子包 root 与声明绝对路径；组件声明同样使用子包绝对路径，已恢复声明跟踪。
+
+### 验证结果
+
+- 冻结安装、lib-build、格式 lint、无缓存递归 typecheck、代码生成与 diff 检查通过。
+- Web 全量覆盖率测试：155 files / 833 tests；行 84.25%、函数 79.30%、分支 73.85%、语句 81.60%。
+- Rust fmt、全仓严格 Clippy、Android 目标严格 Clippy、132 项测试通过；既有文档示例跳过 1 项。
+- 应用生产构建通过，根目录声明在依赖构建、类型检查和全量测试后均未出现。

@@ -7,8 +7,10 @@ use std::{
 };
 
 use jni::{
-  JNIEnv,
-  objects::{GlobalRef, JObject, JString},
+  Env, EnvUnowned,
+  errors::ThrowRuntimeExAndDefault,
+  objects::{JObject, JString},
+  refs::Global,
   sys::{jint, jstring},
 };
 use serde::de::DeserializeOwned;
@@ -42,7 +44,7 @@ static ENGINE: OnceLock<RegisteredEngine> = OnceLock::new();
 static ENGINE_INIT: OnceLock<tokio::sync::Mutex<()>> = OnceLock::new();
 static EVENT_SINK: OnceLock<RwLock<Option<MobileEventSink>>> = OnceLock::new();
 static SECRET_RESOLVER: OnceLock<RwLock<Option<Arc<dyn SecretResolver>>>> = OnceLock::new();
-static CREDENTIAL_CONTEXT: OnceLock<GlobalRef> = OnceLock::new();
+static CREDENTIAL_CONTEXT: OnceLock<Global<JObject<'static>>> = OnceLock::new();
 static CREDENTIAL_CONTEXT_INIT: OnceLock<Mutex<()>> = OnceLock::new();
 
 struct MobileSecretResolver;
@@ -61,7 +63,7 @@ impl SecretResolver for MobileSecretResolver {
   }
 }
 
-fn initialize_credential_context(env: &mut JNIEnv<'_>, context: &JObject<'_>) -> crate::Result<()> {
+fn initialize_credential_context(env: &mut Env<'_>, context: &JObject<'_>) -> crate::Result<()> {
   let _guard = CREDENTIAL_CONTEXT_INIT
     .get_or_init(|| Mutex::new(()))
     .lock()
@@ -76,7 +78,7 @@ fn initialize_credential_context(env: &mut JNIEnv<'_>, context: &JObject<'_>) ->
   let java_vm = env.get_java_vm().map_err(|_| {
     crate::Error::CredentialStore("Android credential context could not access the JVM".into())
   })?;
-  let java_vm_pointer = java_vm.get_java_vm_pointer() as *mut c_void;
+  let java_vm_pointer = java_vm.get_raw() as *mut c_void;
   let context_pointer = context.as_obj().as_raw() as *mut c_void;
 
   // The global reference is retained for the process lifetime below, and the initialization gate
@@ -250,385 +252,463 @@ impl<R: Runtime> MobileDownloader<R> {
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_initializeCredentialContext(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   context: JObject<'_>,
 ) -> jint {
-  match initialize_credential_context(&mut env, &context) {
-    Ok(()) => 0,
-    Err(error) => {
-      tracing::error!("Android credential context initialization failed: {error}");
-      1
-    }
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        match initialize_credential_context(env, &context) {
+          Ok(()) => 0,
+          Err(error) => {
+            tracing::error!("Android credential context initialization failed: {error}");
+            1
+          }
+        }
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_runTask(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
 ) -> jint {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return 1;
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return 2;
-  };
-  match tauri::async_runtime::block_on(engine.run_task_now(&task_id)) {
-    Ok(()) => {
-      match tauri::async_runtime::block_on(engine.repository.pending_saf_export(&task_id)) {
-        Ok(Some(_)) => 3,
-        Ok(None) => 0,
-        Err(error) => {
-          tracing::error!("Android SAF export lookup failed: {error}");
-          1
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+          return Ok(1);
+        };
+        let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+          return Ok(2);
+        };
+        match tauri::async_runtime::block_on(engine.run_task_now(&task_id)) {
+          Ok(()) => {
+            match tauri::async_runtime::block_on(engine.repository.pending_saf_export(&task_id)) {
+              Ok(Some(_)) => 3,
+              Ok(None) => 0,
+              Err(error) => {
+                tracing::error!("Android SAF export lookup failed: {error}");
+                1
+              }
+            }
+          }
+          Err(error) => {
+            tracing::error!("Android background download failed: {error}");
+            let task = tauri::async_runtime::block_on(engine.repository.get_task(&task_id))
+              .ok()
+              .flatten();
+            if task.is_some_and(|task| {
+              matches!(
+                task.status,
+                crate::TaskStatus::Paused
+                  | crate::TaskStatus::Cancelled
+                  | crate::TaskStatus::Failed
+                  | crate::TaskStatus::WaitingForSource
+              )
+            }) {
+              2
+            } else {
+              1
+            }
+          }
         }
-      }
-    }
-    Err(error) => {
-      tracing::error!("Android background download failed: {error}");
-      let task = tauri::async_runtime::block_on(engine.repository.get_task(&task_id))
-        .ok()
-        .flatten();
-      if task.is_some_and(|task| {
-        matches!(
-          task.status,
-          crate::TaskStatus::Paused
-            | crate::TaskStatus::Cancelled
-            | crate::TaskStatus::Failed
-            | crate::TaskStatus::WaitingForSource
-        )
-      }) {
-        2
-      } else {
-        1
-      }
-    }
-  }
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_getTaskSnapshot(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
 ) -> jstring {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return std::ptr::null_mut();
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return std::ptr::null_mut();
-  };
-  let task = match tauri::async_runtime::block_on(engine.repository.get_task(&task_id)) {
-    Ok(Some(task)) => task,
-    Ok(None) => return std::ptr::null_mut(),
-    Err(error) => {
-      tracing::error!("Android task snapshot lookup failed: {error}");
-      return std::ptr::null_mut();
-    }
-  };
-  let json = serde_json::json!({
-    "title": task.title,
-    "totalBytes": task.total_bytes,
-    "downloadedBytes": task.downloaded_bytes,
-  })
-  .to_string();
   env
-    .new_string(json)
-    .map(JString::into_raw)
-    .unwrap_or(std::ptr::null_mut())
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+          return Ok(std::ptr::null_mut());
+        };
+        let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+          return Ok(std::ptr::null_mut());
+        };
+        let task = match tauri::async_runtime::block_on(engine.repository.get_task(&task_id)) {
+          Ok(Some(task)) => task,
+          Ok(None) => return Ok(std::ptr::null_mut()),
+          Err(error) => {
+            tracing::error!("Android task snapshot lookup failed: {error}");
+            return Ok(std::ptr::null_mut());
+          }
+        };
+        let json = serde_json::json!({
+          "title": task.title,
+          "totalBytes": task.total_bytes,
+          "downloadedBytes": task.downloaded_bytes,
+        })
+        .to_string();
+        env
+          .new_string(json)
+          .map(JString::into_raw)
+          .unwrap_or(std::ptr::null_mut())
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_getSafDirectInstruction(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
 ) -> jstring {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return std::ptr::null_mut();
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return std::ptr::null_mut();
-  };
-  let instruction =
-    match tauri::async_runtime::block_on(engine.repository.direct_saf_instruction(&task_id)) {
-      Ok(Some(instruction)) => instruction,
-      Ok(None) => return std::ptr::null_mut(),
-      Err(error) => {
-        tracing::error!("Android direct SAF instruction lookup failed: {error}");
-        return std::ptr::null_mut();
-      }
-    };
-  let json = serde_json::json!({
-    "treeUri": instruction.tree_uri,
-    "relativePath": instruction.relative_path,
-    "expectedLength": instruction.expected_length,
-    "temporaryName": instruction.temporary_name,
-    "temporaryDocumentUri": instruction.temporary_document_uri,
-    "readyToCommit": instruction.ready_to_commit,
-  })
-  .to_string();
   env
-    .new_string(json)
-    .map(JString::into_raw)
-    .unwrap_or(std::ptr::null_mut())
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+          return Ok(std::ptr::null_mut());
+        };
+        let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+          return Ok(std::ptr::null_mut());
+        };
+        let instruction = match tauri::async_runtime::block_on(
+          engine.repository.direct_saf_instruction(&task_id),
+        ) {
+          Ok(Some(instruction)) => instruction,
+          Ok(None) => return Ok(std::ptr::null_mut()),
+          Err(error) => {
+            tracing::error!("Android direct SAF instruction lookup failed: {error}");
+            return Ok(std::ptr::null_mut());
+          }
+        };
+        let json = serde_json::json!({
+          "treeUri": instruction.tree_uri,
+          "relativePath": instruction.relative_path,
+          "expectedLength": instruction.expected_length,
+          "temporaryName": instruction.temporary_name,
+          "temporaryDocumentUri": instruction.temporary_document_uri,
+          "readyToCommit": instruction.ready_to_commit,
+        })
+        .to_string();
+        env
+          .new_string(json)
+          .map(JString::into_raw)
+          .unwrap_or(std::ptr::null_mut())
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_rememberDirectSaf(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
   document_uri: JString<'_>,
 ) -> jint {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return 1;
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return 2;
-  };
-  let Ok(document_uri): Result<String, _> = env.get_string(&document_uri).map(Into::into) else {
-    return 2;
-  };
-  match tauri::async_runtime::block_on(
-    engine
-      .repository
-      .begin_direct_saf_transfer(&task_id, &document_uri),
-  ) {
-    Ok(()) => 0,
-    Err(error) => {
-      tracing::error!("Android direct SAF state could not be persisted: {error}");
-      1
-    }
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+          return Ok(1);
+        };
+        let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+          return Ok(2);
+        };
+        let Ok(document_uri): Result<String, _> = document_uri.try_to_string(env) else {
+          return Ok(2);
+        };
+        match tauri::async_runtime::block_on(
+          engine
+            .repository
+            .begin_direct_saf_transfer(&task_id, &document_uri),
+        ) {
+          Ok(()) => 0,
+          Err(error) => {
+            tracing::error!("Android direct SAF state could not be persisted: {error}");
+            1
+          }
+        }
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_runTaskDirectSaf(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
   file_descriptor: jint,
   document_uri: JString<'_>,
 ) -> jint {
-  if file_descriptor < 0 {
-    return 2;
-  }
-  // ParcelFileDescriptor.detachFd transfers ownership to this native call.
-  // Construct the File before parsing any Java strings so every early return
-  // closes the descriptor exactly once.
-  let file = unsafe { File::from_raw_fd(file_descriptor) };
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return 1;
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return 2;
-  };
-  let Ok(document_uri): Result<String, _> = env.get_string(&document_uri).map(Into::into) else {
-    return 2;
-  };
-  let target = DirectSafTarget {
-    file: Arc::new(file),
-    document_uri,
-  };
-  match tauri::async_runtime::block_on(engine.run_task_now_with_direct_saf(&task_id, target)) {
-    Ok(()) => 4,
-    Err(error) => {
-      tracing::error!("Android direct SAF download failed: {error}");
-      let task = tauri::async_runtime::block_on(engine.repository.get_task(&task_id))
-        .ok()
-        .flatten();
-      if task.is_some_and(|task| {
-        matches!(
-          task.status,
-          crate::TaskStatus::Paused
-            | crate::TaskStatus::Cancelled
-            | crate::TaskStatus::Failed
-            | crate::TaskStatus::WaitingForSource
-        )
-      }) {
-        2
-      } else {
-        1
-      }
-    }
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        if file_descriptor < 0 {
+          return Ok(2);
+        }
+        // ParcelFileDescriptor.detachFd transfers ownership to this native call.
+        // Construct the File before parsing any Java strings so every early return
+        // closes the descriptor exactly once.
+        let file = unsafe { File::from_raw_fd(file_descriptor) };
+        let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+          return Ok(1);
+        };
+        let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+          return Ok(2);
+        };
+        let Ok(document_uri): Result<String, _> = document_uri.try_to_string(env) else {
+          return Ok(2);
+        };
+        let target = DirectSafTarget {
+          file: Arc::new(file),
+          document_uri,
+        };
+        match tauri::async_runtime::block_on(engine.run_task_now_with_direct_saf(&task_id, target))
+        {
+          Ok(()) => 4,
+          Err(error) => {
+            tracing::error!("Android direct SAF download failed: {error}");
+            let task = tauri::async_runtime::block_on(engine.repository.get_task(&task_id))
+              .ok()
+              .flatten();
+            if task.is_some_and(|task| {
+              matches!(
+                task.status,
+                crate::TaskStatus::Paused
+                  | crate::TaskStatus::Cancelled
+                  | crate::TaskStatus::Failed
+                  | crate::TaskStatus::WaitingForSource
+              )
+            }) {
+              2
+            } else {
+              1
+            }
+          }
+        }
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_abandonDirectSaf(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
 ) -> jint {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return 1;
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return 2;
-  };
-  match tauri::async_runtime::block_on(engine.abandon_direct_saf_transfer(&task_id)) {
-    Ok(()) => 0,
-    Err(error) => {
-      tracing::error!("Android direct SAF fallback failed: {error}");
-      1
-    }
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+          return Ok(1);
+        };
+        let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+          return Ok(2);
+        };
+        match tauri::async_runtime::block_on(engine.abandon_direct_saf_transfer(&task_id)) {
+          Ok(()) => 0,
+          Err(error) => {
+            tracing::error!("Android direct SAF fallback failed: {error}");
+            1
+          }
+        }
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_resumeSafCommit(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
 ) -> jint {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return 1;
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return 2;
-  };
-  match tauri::async_runtime::block_on(engine.resume_saf_commit(&task_id)) {
-    Ok(()) => 0,
-    Err(error) => {
-      tracing::error!("Android SAF commit resume failed: {error}");
-      1
-    }
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+          return Ok(1);
+        };
+        let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+          return Ok(2);
+        };
+        match tauri::async_runtime::block_on(engine.resume_saf_commit(&task_id)) {
+          Ok(()) => 0,
+          Err(error) => {
+            tracing::error!("Android SAF commit resume failed: {error}");
+            1
+          }
+        }
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_getSafExportInstruction(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
 ) -> jstring {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return std::ptr::null_mut();
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return std::ptr::null_mut();
-  };
-  let instruction =
-    match tauri::async_runtime::block_on(engine.repository.pending_saf_export(&task_id)) {
-      Ok(Some(instruction)) => instruction,
-      Ok(None) => return std::ptr::null_mut(),
-      Err(error) => {
-        tracing::error!("Android SAF export instruction lookup failed: {error}");
-        return std::ptr::null_mut();
-      }
-    };
-  let json = serde_json::json!({
-    "treeUri": instruction.tree_uri,
-    "relativePath": instruction.relative_path,
-    "stagingPath": instruction.staging_path,
-    "isDirectory": instruction.is_directory,
-  })
-  .to_string();
   env
-    .new_string(json)
-    .map(JString::into_raw)
-    .unwrap_or(std::ptr::null_mut())
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+          return Ok(std::ptr::null_mut());
+        };
+        let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+          return Ok(std::ptr::null_mut());
+        };
+        let instruction =
+          match tauri::async_runtime::block_on(engine.repository.pending_saf_export(&task_id)) {
+            Ok(Some(instruction)) => instruction,
+            Ok(None) => return Ok(std::ptr::null_mut()),
+            Err(error) => {
+              tracing::error!("Android SAF export instruction lookup failed: {error}");
+              return Ok(std::ptr::null_mut());
+            }
+          };
+        let json = serde_json::json!({
+          "treeUri": instruction.tree_uri,
+          "relativePath": instruction.relative_path,
+          "stagingPath": instruction.staging_path,
+          "isDirectory": instruction.is_directory,
+        })
+        .to_string();
+        env
+          .new_string(json)
+          .map(JString::into_raw)
+          .unwrap_or(std::ptr::null_mut())
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_completeSafExport(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
   document_uri: JString<'_>,
 ) -> jint {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return 1;
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return 2;
-  };
-  let Ok(document_uri): Result<String, _> = env.get_string(&document_uri).map(Into::into) else {
-    return 2;
-  };
-  match tauri::async_runtime::block_on(engine.complete_saf_export(&task_id, &document_uri)) {
-    Ok(()) => 0,
-    Err(error) => {
-      tracing::error!("Android SAF export completion failed: {error}");
-      2
-    }
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+          return Ok(1);
+        };
+        let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+          return Ok(2);
+        };
+        let Ok(document_uri): Result<String, _> = document_uri.try_to_string(env) else {
+          return Ok(2);
+        };
+        match tauri::async_runtime::block_on(engine.complete_saf_export(&task_id, &document_uri)) {
+          Ok(()) => 0,
+          Err(error) => {
+            tracing::error!("Android SAF export completion failed: {error}");
+            2
+          }
+        }
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_failSafExport(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
   message: JString<'_>,
 ) {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return;
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return;
-  };
-  let Ok(message): Result<String, _> = env.get_string(&message).map(Into::into) else {
-    return;
-  };
-  if let Err(error) = tauri::async_runtime::block_on(engine.fail_saf_export(&task_id, &message)) {
-    tracing::error!("Android SAF export failure could not be persisted: {error}");
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+        return Ok(());
+      };
+      let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+        return Ok(());
+      };
+      let Ok(message): Result<String, _> = message.try_to_string(env) else {
+        return Ok(());
+      };
+      if let Err(error) = tauri::async_runtime::block_on(engine.fail_saf_export(&task_id, &message))
+      {
+        tracing::error!("Android SAF export failure could not be persisted: {error}");
+      }
+      Ok(())
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_pauseTask(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
 ) {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return;
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return;
-  };
-  if let Err(error) = tauri::async_runtime::block_on(engine.pause(&task_id)) {
-    tracing::error!("Android downloader pause action failed: {error}");
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+        return Ok(());
+      };
+      let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+        return Ok(());
+      };
+      if let Err(error) = tauri::async_runtime::block_on(engine.pause(&task_id)) {
+        tracing::error!("Android downloader pause action failed: {error}");
+      }
+      Ok(())
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_cancelTask(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
 ) {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return;
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return;
-  };
-  if let Err(error) = tauri::async_runtime::block_on(engine.cancel(&task_id)) {
-    tracing::error!("Android downloader cancel action failed: {error}");
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+        return Ok(());
+      };
+      let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+        return Ok(());
+      };
+      if let Err(error) = tauri::async_runtime::block_on(engine.cancel(&task_id)) {
+        tracing::error!("Android downloader cancel action failed: {error}");
+      }
+      Ok(())
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_checkpointTask(
-  _env: JNIEnv<'_>,
+  _env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   _task_id: JString<'_>,
 ) {
@@ -642,54 +722,65 @@ pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_checkpointTas
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_systemStopTask(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   task_id: JString<'_>,
 ) {
-  let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
-    return;
-  };
-  let Ok(task_id): Result<String, _> = env.get_string(&task_id).map(Into::into) else {
-    return;
-  };
-  if let Err(error) = tauri::async_runtime::block_on(engine.system_stop_task(&task_id)) {
-    tracing::error!("Android downloader system stop failed: {error}");
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      let Some(engine) = ENGINE.get().map(|registered| &registered.engine) else {
+        return Ok(());
+      };
+      let Ok(task_id): Result<String, _> = task_id.try_to_string(env) else {
+        return Ok(());
+      };
+      if let Err(error) = tauri::async_runtime::block_on(engine.system_stop_task(&task_id)) {
+        tracing::error!("Android downloader system stop failed: {error}");
+      }
+      Ok(())
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }
 
 #[allow(non_snake_case)]
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_bootstrap(
-  mut env: JNIEnv<'_>,
+  mut env: EnvUnowned<'_>,
   _receiver: JObject<'_>,
   database_path: JString<'_>,
   download_dir: JString<'_>,
 ) -> jint {
-  let Ok(database_path): Result<String, _> = env.get_string(&database_path).map(Into::into) else {
-    return 2;
-  };
-  let Ok(download_dir): Result<String, _> = env.get_string(&download_dir).map(Into::into) else {
-    return 2;
-  };
-  let config = match AndroidEngineConfig::new(
-    PathBuf::from(database_path).as_path(),
-    PathBuf::from(download_dir).as_path(),
-  ) {
-    Ok(config) => config,
-    Err(error) => {
-      tracing::error!("Android downloader bootstrap rejected its configuration: {error}");
-      return 2;
-    }
-  };
-  if let Err(error) = register_system_secret_resolver_if_missing() {
-    tracing::error!("Android credential store initialization failed: {error}");
-    return 1;
-  }
-  match tauri::async_runtime::block_on(open_or_reuse_engine(config, None)) {
-    Ok(_) => 0,
-    Err(error) => {
-      tracing::error!("Android downloader bootstrap failed: {error}");
-      1
-    }
-  }
+  env
+    .with_env(|env| -> jni::errors::Result<_> {
+      Ok({
+        let Ok(database_path): Result<String, _> = database_path.try_to_string(env) else {
+          return Ok(2);
+        };
+        let Ok(download_dir): Result<String, _> = download_dir.try_to_string(env) else {
+          return Ok(2);
+        };
+        let config = match AndroidEngineConfig::new(
+          PathBuf::from(database_path).as_path(),
+          PathBuf::from(download_dir).as_path(),
+        ) {
+          Ok(config) => config,
+          Err(error) => {
+            tracing::error!("Android downloader bootstrap rejected its configuration: {error}");
+            return Ok(2);
+          }
+        };
+        if let Err(error) = register_system_secret_resolver_if_missing() {
+          tracing::error!("Android credential store initialization failed: {error}");
+          return Ok(1);
+        }
+        match tauri::async_runtime::block_on(open_or_reuse_engine(config, None)) {
+          Ok(_) => 0,
+          Err(error) => {
+            tracing::error!("Android downloader bootstrap failed: {error}");
+            1
+          }
+        }
+      })
+    })
+    .resolve::<ThrowRuntimeExAndDefault>()
 }

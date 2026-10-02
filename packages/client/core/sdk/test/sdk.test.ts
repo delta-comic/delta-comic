@@ -1,5 +1,5 @@
 import { DiagnosticRecorder } from '@delta-comic/both'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { createClientDownloader, createClientNetwork } from '../lib/index.js'
 

@@ -405,6 +405,22 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 生产 legacy 构建中，pack 将 artifact URL 的 await 表达式内联到 import，Vite preload 转换产生含 await 的普通回调。改为显式分支赋值，构建产物保留局部 URL 变量。
 # 2026-10-02 原生 Cordis 与 JSON 流程
 
+## 2026-10-02 依赖升级兼容修复
+
+- 升级提交 062243e 与忽略配置提交 9bd5f76 已核对；起始工作树干净，vp install 成功。
+- Vite+ 1.0 任务输出配置改为 cache.output；测试仍有 vitest 导入。
+- npm 发布工具与解析工具、Rust downloader/logger/performance-baseline 仍有局部依赖版本。
+- Vite+ 内置 Vitest 5.0.1，覆盖率插件已对齐；UI 声明生成需要对象形式 oxc 和 node tsconfig。
+- 插件 Vite config hook 返回配置增量，由 Vite 合并；旧 merge 返回值在新版类型约束下不匹配。
+- JNI 0.22.4 使用 EnvUnowned/Env、Global<JObject>、try_to_string 和 JavaVM.get_raw。
+- 全量测试首次 831/833 通过，两项超时；单 worker 专项 7 项全部通过。
+- Vue 类型工具 3.3.12 的模板导入闭包回归已由 https://github.com/vuejs/language-tools/issues/6237 确认；vue-tsc 与直接依赖的 language-core 固定为 3.3.11。
+- Vue Router 插件默认 root 为 process.cwd()，从仓库根加载配置会生成根目录声明；已明确子包 root 与声明绝对路径，恢复子包声明跟踪。
+- 清理重复的直接 vite 别名依赖后，vp install --frozen-lockfile 通过；客户端环境类型使用 vite-plus/client。
+- Rust fmt、全仓严格 Clippy、Android 目标严格 Clippy 和 132 项 Rust 测试通过，既有文档示例跳过 1 项。
+- 最终串行 lib-build、格式 lint、无缓存递归 typecheck 与代码生成检查通过。全量覆盖率测试 155 files / 833 tests 全部通过，日志无错误或警告，行 84.25%、函数 79.30%、分支 73.85%、语句 81.60%。
+- 依赖构建、类型检查和全量测试后，根目录声明均不存在；子包声明位置正确，diff 检查通过。
+
 - 本轮采用用户已批准的四阶段方案，服务端采用单 Worker、共享 D1、认证 `auth.userId` 租户及 JSON 流程。
 - 当前工作树干净；manifest 为 protocolVersion 1，包含 entry/entryType/dependencies/capabilities。
 - 客户端聚合 composition 连接 candidate provider、capabilities 与 PluginRuntime；SDK 另有 ClientRuntime。需要统一为原生 Context 与包 Fiber。

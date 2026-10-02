@@ -1,6 +1,6 @@
 import type { Static, TProperties, TSchema } from 'typebox'
 import { IsOptional, IsUnion, Type } from 'typebox'
-import { describe, expect, expectTypeOf, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vite-plus/test'
 
 const optionalInt = Type.Optional(Type.Integer())
 const requiredInt = Type.Integer()

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { pluginI18n, PluginI18nRegistry } from '../../../lib/adapters/i18n'
 

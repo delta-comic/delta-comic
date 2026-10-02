@@ -8,7 +8,7 @@
       "./components.d.ts",
       "vue-component-type-helpers",
       "./typed-router.d.ts",
-      "vite/client",
+      "vite-plus/client",
       "@delta-comic/utils"
     ],
     "rootDir": "."

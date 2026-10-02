@@ -10,13 +10,21 @@ allowBuilds:
   workerd: true
 
 catalog:
+  '@vitejs/devtools': ^0.7.6
+  '@semantic-release/changelog': ^6.0.3
+  '@semantic-release/release-notes-generator': ^14.1.1
+  semantic-release: ^25.0.7
+  acorn: ^8.18.0
+  es-module-lexer: ^2.3.1
+  magic-string: ^1.1.0
   cordis: ^4.0.0-rc.10
   tslog: ^5.2.0
   pino: ^10.3.1
   '@types/pino': ^7.0.5
   '@elysia/eden': '^1.4.10'
   '@swc/core': ^1.16.0
-  vue-tsc: ^3.3.12
+  # https://github.com/vuejs/language-tools/issues/6237
+  vue-tsc: 3.3.11
   rolldown-plugin-dts: ^0.28.6
   '@commitlint/cli': ^21.2.3
   '@commitlint/config-conventional': ^21.2.3
@@ -44,9 +52,9 @@ catalog:
   '@vitejs/plugin-legacy': ^8.2.3
   '@vitejs/plugin-vue': ^6.0.9
   '@vitejs/plugin-vue-jsx': ^5.1.6
-  '@vue/language-core': ^3.3.12
+  '@vue/language-core': 3.3.11
   '@vueuse/core': ^15.0.0
-  '@vitest/coverage-v8': ^5.0.3
+  '@vitest/coverage-v8': 5.0.1
   browserslist: ^4.29.3
   blake3-wasm: 3.0.0
   color: ^5.0.3
@@ -107,12 +115,14 @@ catalog:
 minimumReleaseAgeExclude:
   - '@cloudflare/vite-plugin@1.62.5'
   - '@pinia/colada@1.4.7'
+  - '@vue/language-core@3.3.11'
   - '@vue/language-core@3.3.12'
   - miniflare@5.20261001.0-alpha
   - vue-component-type-helpers@3.3.12
+  - vue-tsc@3.3.11
   - vue-tsc@3.3.12
   - wrangler@4.147.0
-  
+
 overrides:
   typescript: npm:typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2
   vite: 'catalog:'

@@ -421,6 +421,22 @@
 - 最终无缓存 lib-build、vp check、plugin-install 专项测试和 app build:web 全部通过；git diff 检查通过，启动调试完成。
 # 2026-10-02 原生 Cordis 与 JSON 流程重构
 
+## 2026-10-02 依赖升级兼容修复
+
+- 已核对升级提交与 AGENTS.md；vp install 成功。
+- 开始同步 Vite+ 1.0 任务配置、vite-plus/test 导入及根依赖版本管理。
+- 已同步测试导入与 cache.output，将局部依赖版本集中到根配置；覆盖率插件对齐 Vitest 5.0.1。
+- vp install 与 vp check --fix 通过；构建发现 dts.oxc 参数变化，已改为对象。Rust 正在编译升级依赖。
+- lib-build 和 macOS cargo check 通过；已修正插件 Vite hook 与 JNI 0.22 桥接。
+- 已同步 tsdown 和 tauri-v2 技能说明；首轮全量测试两个超时用例在单 worker 专项通过。
+- 技能同步已签名提交 216ea529、77771065，覆盖构建、Tauri、Cloudflare、Wrangler、Elysia 和 Cordis 的仓库约定，校验通过。
+- 确认 Vue 类型工具上游回归并固定到 3.3.11，应用专项类型检查通过；应用生产构建通过。
+- 固定路由与组件声明在各子包生成，移除对应全局忽略规则；冻结安装通过，继续串行 Web 验证。
+- Rust fmt、全仓与 Android 目标 Clippy、132 项 Rust 测试通过。
+- 最终串行 lib-build、格式 lint、无缓存递归 typecheck、代码生成和 diff 检查通过。
+- 全量覆盖率验证 155 files / 833 tests 全部通过，行 84.25%、函数 79.30%、分支 73.85%、语句 81.60%，日志无错误或警告。
+- 根目录声明在构建、类型检查与全量测试后均不存在；子包声明已恢复跟踪，本轮修复签名提交保存。
+
 - 阶段 3 已签名提交 `d23ed6dc`，阶段 4 共享包装器与 SDK 清理已签名提交 `22eb690c`。
 - 服务端修正每次调用的 D1/HTTP 预算；流程写入失败也释放 Context。真实 D1 专项 6 tests 通过。
 - 客户端修正内置保留 ID 与无效安装元数据，应用内管理按 ID 展示并支持停用。宿主专项 6 tests 通过。

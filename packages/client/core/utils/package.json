@@ -37,10 +37,10 @@
     "@delta-comic/logger": "workspace:",
     "@tauri-apps/api": "catalog:",
     "@vue/language-core": "catalog:",
-    "acorn": "^8.18.0",
-    "es-module-lexer": "^2.3.1",
+    "acorn": "catalog:",
+    "es-module-lexer": "catalog:",
     "es-toolkit": "catalog:",
-    "magic-string": "^1.1.0",
+    "magic-string": "catalog:",
     "mitt": "catalog:"
   },
   "devDependencies": {

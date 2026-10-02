@@ -44,7 +44,6 @@
   },
   "devDependencies": {
     "typescript": "catalog:",
-    "vite": "catalog:",
     "vite-plus": "catalog:"
   },
   "peerDependencies": {

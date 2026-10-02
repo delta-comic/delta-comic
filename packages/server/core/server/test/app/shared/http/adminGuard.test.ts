@@ -1,5 +1,5 @@
 import Elysia from 'elysia'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 
 import { bindRuntime, type AppEnv } from '@/env'
 import { errorResponse } from '@/shared/response'

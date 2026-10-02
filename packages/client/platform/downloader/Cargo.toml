@@ -24,24 +24,24 @@ bittorrent = ["dep:librqbit"]
 tauri-plugin = { workspace = true, features = ["build"] }
 
 [dependencies]
-async-trait = "0.1.89"
-base64 = "0.23.1"
-bytes = "1.11.1"
-futures-util = "0.3.32"
-hex = "0.4.3"
-httpdate = "1.0.3"
-keyring-core = "1.0.0"
-librqbit = { version = "9.0.1", default-features = false, features = ["rust-tls"], optional = true }
-md-5 = "0.11.0"
-rand = "0.10.3"
-reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls", "stream"] }
+async-trait = { workspace = true }
+base64 = { workspace = true }
+bytes = { workspace = true }
+futures-util = { workspace = true }
+hex = { workspace = true }
+httpdate = { workspace = true }
+keyring-core = { workspace = true }
+librqbit = { workspace = true, optional = true }
+md-5 = { workspace = true }
+rand = { workspace = true }
+reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-sha2 = "0.11.0"
-sqlx = { version = "0.9.0", default-features = false, features = ["runtime-tokio", "sqlite"] }
+sha2 = { workspace = true }
+sqlx = { workspace = true }
 tauri = { workspace = true }
-tempfile = "3.27.0"
-thiserror = "2.0.21"
+tempfile = { workspace = true }
+thiserror = { workspace = true }
 tokio = { workspace = true, features = [
   "fs",
   "io-util",
@@ -50,29 +50,29 @@ tokio = { workspace = true, features = [
   "sync",
   "time",
 ] }
-tokio-util = { version = "0.7.19", features = ["rt"] }
+tokio-util = { workspace = true }
 tracing = { workspace = true }
-url = "2.5.8"
-uuid = { version = "1.26.1", features = ["serde", "v4"] }
-zeroize = "1.9.0"
+url = { workspace = true }
+uuid = { workspace = true }
+zeroize = { workspace = true }
 
 [target.'cfg(target_os = "android")'.dependencies]
-android-native-keyring-store = "1.0.0"
-jni = "0.22.4"
-ndk-context = "0.1.1"
+android-native-keyring-store = { workspace = true }
+jni = { workspace = true }
+ndk-context = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
-apple-native-keyring-store = { version = "1.0.2", features = ["keychain"] }
+apple-native-keyring-store = { workspace = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows-native-keyring-store = { version = "1.1.0", default-features = false }
-windows-sys = { version = "0.61.2", features = ["Win32_Storage_FileSystem"] }
+windows-native-keyring-store = { workspace = true }
+windows-sys = { workspace = true }
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
-rfd = { version = "0.17.2", default-features = false, features = ["tokio", "xdg-portal"] }
+rfd = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
-libc = "0.2.189"
+libc = { workspace = true }
 
 [dev-dependencies]
-axum = "0.8.9"
+axum = { workspace = true }

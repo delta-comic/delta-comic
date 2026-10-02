@@ -4,9 +4,8 @@ import { isAbsolute, relative, resolve } from 'node:path'
 
 import type { PluginManifest } from '@delta-comic/model'
 import { exposeHostLibraries, extendsDepends } from '@delta-comic/utils/vite'
-import { merge } from 'es-toolkit'
 import JSZip from 'jszip'
-import type { Plugin, PluginOption } from 'vite'
+import type { Plugin, PluginOption } from 'vite-plus'
 
 import { createDevPlugin } from './dev'
 
@@ -48,8 +47,8 @@ export const deltaComic = (meta: PluginManifest): PluginOption[] => {
     load(id) {
       if (id === '\0delta-comic-server') return 'export {}'
     },
-    config(config) {
-      return merge(config, {
+    config() {
+      return {
         build: {
           assetsInlineLimit: Number.POSITIVE_INFINITY,
           cssCodeSplit: false,
@@ -61,7 +60,7 @@ export const deltaComic = (meta: PluginManifest): PluginOption[] => {
             formats: ['es'],
           },
         },
-      })
+      }
     },
     async generateBundle(_options, bundle) {
       const archiveName = 'plugin.zip'

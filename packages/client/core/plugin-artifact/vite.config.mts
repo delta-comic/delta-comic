@@ -7,12 +7,12 @@ export default defineConfig({
       build: {
         command: 'vp pack',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
-        output: ['dist/**'],
+        cache: { output: ['dist/**'] },
       },
       typecheck: {
         command: 'tsc -p tsconfig.json --noEmit',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
-        output: [],
+        cache: { output: [] },
       },
     },
   },

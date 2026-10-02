@@ -1,7 +1,7 @@
 import { db } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/plugin-manifest'
 import type { Context, Plugin } from 'cordis'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 declare module 'cordis' {
   interface Context {

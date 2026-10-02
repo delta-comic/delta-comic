@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import type { AuthContext } from '../../../../app/modules/auth/auth.types'
 import type { SyncRepository } from '../../../../app/modules/sync/sync.repository'

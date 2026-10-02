@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { LocalStorageCloudSessionStorage, MemoryCloudSessionStorage } from '../../lib/storage'
 import type { CloudSession } from '../../lib/types'

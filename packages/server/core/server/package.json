@@ -55,7 +55,6 @@
     "@types/semver": "catalog:",
     "miniflare": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
     "vite-plus": "catalog:",
     "wrangler": "catalog:"
   },

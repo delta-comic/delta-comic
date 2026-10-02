@@ -1,5 +1,5 @@
 import { Type } from 'typebox'
-import { describe, expect, expectTypeOf, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vite-plus/test'
 
 import {
   camelCase,

@@ -1,6 +1,6 @@
 import { transform } from '@swc/core'
 import { defineConfig } from 'vite-plus'
-import type { Plugin } from 'vitest/config'
+import type { Plugin } from 'vite-plus'
 
 const lowerDecorators = async (code: string, id: string) => {
   if (!/\.[cm]?tsx?$/.test(id) || id.includes('node_modules')) return
@@ -31,12 +31,12 @@ export default defineConfig({
       build: {
         command: 'vp pack',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
-        output: ['dist/**'],
+        cache: { output: ['dist/**'] },
       },
       typecheck: {
         command: ['tsc -p tsconfig.json --noEmit'],
         dependsOn: [{ task: 'build', from: 'dependencies' }],
-        output: [],
+        cache: { output: [] },
       },
     },
   },

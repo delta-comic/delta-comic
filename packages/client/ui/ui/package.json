@@ -70,7 +70,6 @@
     "rolldown-plugin-dts": "catalog:",
     "tailwindcss": "catalog:",
     "unplugin-vue-components": "catalog:",
-    "vite": "catalog:",
     "vite-plus": "catalog:",
     "vue-component-type-helpers": "catalog:",
     "vue-tsc": "catalog:"

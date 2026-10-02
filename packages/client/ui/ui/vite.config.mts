@@ -36,7 +36,10 @@ export default defineConfig(({ command }) => ({
     ])
 
     return [
-      VueRouter({ dts: 'typed-router.d.ts' }),
+      VueRouter({
+        root: import.meta.dirname,
+        dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
+      }),
       vue(),
       vueJsx(),
       tailwindcss(),
@@ -84,7 +87,7 @@ export default defineConfig(({ command }) => ({
   pack: {
     entry: './vite/index.ts',
     outDir: 'dist-vite',
-    dts: { oxc: true },
+    dts: { oxc: {}, tsconfig: './tsconfig.node.json' },
     sourcemap: true,
     deps: { neverBundle: ['unplugin-vue-components'] },
   },
@@ -93,13 +96,13 @@ export default defineConfig(({ command }) => ({
       build: {
         command: ['vp build', 'vp pack'],
         dependsOn: [{ task: 'build', from: ['dependencies', 'peerDependencies'] }],
-        output: ['dist/**', 'dist-vite/**'],
+        cache: { output: ['dist/**', 'dist-vite/**'] },
       },
       dev: { command: 'vp dev', cache: false },
       typecheck: {
         command: ['vue-tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
         dependsOn: [{ task: 'build', from: ['dependencies', 'peerDependencies'] }],
-        output: [],
+        cache: { output: [] },
       },
     },
   },

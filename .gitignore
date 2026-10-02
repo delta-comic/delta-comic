@@ -43,6 +43,3 @@ packages/client/app/app/public/runtime/
 *.tsbuildinfo
 packages/*/android/.tauri
 packages/*/android/.gradle
-
-typed-router.d.ts
-components.d.ts

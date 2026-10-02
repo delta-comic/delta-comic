@@ -24,13 +24,16 @@ impl Repository {
   async fn mutate_task(
     &self,
     id: &str,
-    assignments: &str,
+    assignments: &'static str,
     text_bindings: &[&str],
   ) -> super::Result<DownloadTask> {
     let mut transaction = self.writer.begin().await?;
     let revision = next_revision(&mut transaction).await?;
-    let sql = format!("UPDATE tasks SET {assignments}, updated_at = ?, revision = ? WHERE id = ?");
-    let mut query = sqlx::query(&sql);
+    let mut sql = sqlx::QueryBuilder::new("UPDATE tasks SET ");
+    sql
+      .push(assignments)
+      .push(", updated_at = ?, revision = ? WHERE id = ?");
+    let mut query = sql.build();
     for binding in text_bindings {
       query = query.bind(*binding);
     }

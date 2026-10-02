@@ -52,9 +52,9 @@ export default defineConfig({
       'build': {
         command: 'vp pack && vp build',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
-        output: ['dist/**'],
+        cache: { output: ['dist/**'] },
       },
-      'cf-typegen': { command: 'wrangler types', output: ['worker-configuration.d.ts'] },
+      'cf-typegen': { command: 'wrangler types', cache: { output: ['worker-configuration.d.ts'] } },
       'deploy': { command: 'wrangler deploy', cache: false, dependsOn: ['build'] },
       'dev': { command: 'wrangler dev --config wrangler.jsonc', cache: false },
       'migrate:local': {
@@ -69,7 +69,7 @@ export default defineConfig({
       'typecheck': {
         command: ['tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
         dependsOn: [{ task: 'build', from: 'dependencies' }],
-        output: [],
+        cache: { output: [] },
       },
     },
   },

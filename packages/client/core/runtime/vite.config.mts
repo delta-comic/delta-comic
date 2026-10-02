@@ -14,13 +14,17 @@ export default defineConfig(({ mode }) => {
       tasks: {
         'build': {
           command: 'vp build',
-          output: [{ pattern: 'packages/client/app/app/public/runtime/**', base: 'workspace' }],
+          cache: {
+            output: [{ pattern: 'packages/client/app/app/public/runtime/**', base: 'workspace' }],
+          },
         },
         'build:dev': {
           command: 'vp build --mode development',
-          output: [{ pattern: 'packages/client/app/app/public/runtime/**', base: 'workspace' }],
+          cache: {
+            output: [{ pattern: 'packages/client/app/app/public/runtime/**', base: 'workspace' }],
+          },
         },
-        'typecheck': { command: 'tsc -p tsconfig.json --noEmit', output: [] },
+        'typecheck': { command: 'tsc -p tsconfig.json --noEmit', cache: { output: [] } },
       },
     },
     plugins: [

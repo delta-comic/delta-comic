@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 
 import { AuthRepository } from '../../../../app/modules/auth/auth.repository'
 import type {

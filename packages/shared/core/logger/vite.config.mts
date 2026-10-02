@@ -9,11 +9,11 @@ export default defineConfig({
   root,
   run: {
     tasks: {
-      build: { command: 'vp pack', output: ['dist/**'] },
-      test: { command: 'vp test run test/lib', output: [] },
+      build: { command: 'vp pack', cache: { output: ['dist/**'] } },
+      test: { command: 'vp test run test/lib', cache: { output: [] } },
       typecheck: {
         command: ['tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
-        output: [],
+        cache: { output: [] },
       },
     },
   },

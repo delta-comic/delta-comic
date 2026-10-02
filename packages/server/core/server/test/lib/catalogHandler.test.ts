@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 
 import { createPluginCatalogHandler } from '../../lib/catalogHandler'
 import { createMemoryPluginCatalogStore } from '../../lib/catalogProtocol/index.js'

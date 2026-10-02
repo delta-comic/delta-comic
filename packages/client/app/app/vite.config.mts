@@ -35,6 +35,7 @@ const decoratorPlugin = {
 export default defineConfig(
   () =>
     ({
+      devtools: { apply: 'serve' },
       plugins: [
         decoratorPlugin as any,
         lazyPlugins(async () => {
@@ -70,14 +71,17 @@ export default defineConfig(
             // @ts-ignore
             wasm(),
             legacy({ targets: ['ie >= 11'], renderModernChunks: false }),
-            VueRouter({ dts: 'typed-router.d.ts' }),
+            VueRouter({
+              root: import.meta.dirname,
+              dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
+            }),
             vueDevTools(),
             vue({
               template: { compilerOptions: { isCustomElement: tag => tag.startsWith('media-') } },
             }),
             vueJsx(),
             Components({
-              dts: true,
+              dts: resolve(import.meta.dirname, 'components.d.ts'),
               resolvers: [MotionResolver(), NaiveUiResolver(), DeltaComicUiResolver()],
               dtsTsx: false,
             }),
@@ -132,7 +136,7 @@ export default defineConfig(
             dependsOn: skipLibBuild
               ? []
               : [{ task: 'build', from: ['dependencies', 'devDependencies'] }],
-            output: [],
+            cache: { output: [] },
           },
           'build:app': { command: 'TRUE_BUILD_MAIN_APP=true tauri android build', cache: false },
           'build:debug': { command: 'tauri android build --debug', cache: false },
@@ -142,7 +146,7 @@ export default defineConfig(
             dependsOn: skipLibBuild
               ? []
               : [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build'],
-            output: ['dist/**'],
+            cache: { output: ['dist/**', 'components.d.ts', 'typed-router.d.ts'] },
           },
           'dev': { command: 'tauri dev', cache: false },
           'dev:web': {
@@ -157,7 +161,7 @@ export default defineConfig(
               'tsc -p tsconfig.node.json --noEmit',
             ],
             dependsOn: [{ task: 'build', from: 'dependencies' }],
-            output: [],
+            cache: { output: [] },
           },
         },
       },

@@ -1,7 +1,7 @@
 import { createRequire } from 'node:module'
 import { pathToFileURL } from 'node:url'
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 
 import { createReleaseNameTemplate } from '../release-notes.mts'
 import { rootDir } from '../set-version.mts'

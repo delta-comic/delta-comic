@@ -1,5 +1,5 @@
 import { Logger } from '@delta-comic/logger'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { D1AdminMetricsRepository } from '../../../../app/modules/admin/admin.repository'
 import { D1Recorder } from '../../d1'

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 
 import type { PluginRelease } from '../../../lib/catalogProtocol/release.js'
 import { createPluginReleasePublisher } from '../../../lib/catalogProtocol/releasePublisher.js'

@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 
 import { Type } from 'typebox'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vite-plus/test'
 
 import { autoIncrement, defineTable, jsonColumn, type TableSchema } from '../../codegen/schema.mts'
 import { serverTables } from '../../codegen/server.table.mts'

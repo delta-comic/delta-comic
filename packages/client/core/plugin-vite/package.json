@@ -24,11 +24,10 @@
     "@delta-comic/utils": "workspace:",
     "es-toolkit": "catalog:",
     "jszip": "catalog:",
-    "vite": "catalog:"
+    "vite-plus": "catalog:"
   },
   "devDependencies": {
     "@delta-comic/db": "workspace:",
-    "@vitejs/plugin-vue": "catalog:",
-    "vite-plus": "catalog:"
+    "@vitejs/plugin-vue": "catalog:"
   }
 }

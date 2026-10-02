@@ -1,5 +1,5 @@
 import { Logger } from '@delta-comic/logger'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { bindRuntime, getRuntime, readNumberVar, type AppRuntime } from '../../../app/env'
 import {

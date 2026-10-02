@@ -19,14 +19,37 @@ rust-version = "1.95.0"
 version = "3.0.0-next.19"
 
 [workspace.dependencies]
+android-native-keyring-store = "1.0.0"
+apple-native-keyring-store = { version = "1.0.2", features = ["keychain"] }
+async-trait = "0.1.89"
+axum = "0.8.9"
+base64 = "0.23.1"
+bytes = "1.11.1"
+chrono = { version = "0.4.45", features = ["serde"] }
+flate2 = "1.1.10"
+futures-util = "0.3.32"
+hex = "0.4.3"
+httpdate = "1.0.3"
+jni = "0.22.4"
+keyring-core = "1.0.0"
+libc = "0.2.189"
+librqbit = { version = "9.0.1", default-features = false, features = ["rust-tls"] }
 log = "0.4.34"
+mach2 = "0.4.2"
+md-5 = "0.11.0"
 mime_guess = "2.0.5"
+ndk-context = "0.1.1"
 objc2-foundation = { version = "0.3.2", features = ["NSString", "NSUserDefaults"] }
 percent-encoding = "2.3.2"
+rand = "0.10.3"
+reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls", "stream"] }
+rfd = { version = "0.17.2", default-features = false, features = ["xdg-portal"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
+sha2 = "0.11.0"
 specta = "=2.0.0-rc.25"
 specta-typescript = "0.0.12"
+sqlx = { version = "0.9.0", default-features = false, features = ["runtime-tokio", "sqlite"] }
 tauri = "2.12.1"
 tauri-build = "2.7.1"
 tauri-plugin = "2.7.1"
@@ -49,9 +72,17 @@ tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", br
 tauri-plugin-utils = { path = "packages/client/core/utils" }
 tauri-runtime-wry = "2.12.1"
 tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript", "javascript"] }
+tempfile = "3.27.0"
+thiserror = "2.0.21"
 tokio = "1.53.1"
+tokio-util = { version = "0.7.19", features = ["rt"] }
 tracing = "0.1.44"
 tracing-subscriber = "0.3.23"
+url = "2.5.8"
+uuid = { version = "1.26.1", features = ["serde", "v4"] }
+windows-native-keyring-store = { version = "1.1.0", default-features = false }
+windows-sys = { version = "0.61.2", features = ["Win32_Storage_FileSystem"] }
+zeroize = "1.9.0"
 zip = { version = "8.6.0", default-features = false, features = ["deflate-flate2"] }
 
 [profile.dev]

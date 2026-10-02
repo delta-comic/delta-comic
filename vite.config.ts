@@ -28,10 +28,10 @@ export default defineConfig({
         command: 'node ./script/release-branches.mts develop --dry-run',
         cache: false,
       },
-      'check': { command: 'vp check', output: [] },
+      'check': { command: 'vp check', cache: { output: [] } },
       'dev': { command: 'vp run app#dev', cache: false },
       'dev:web': { command: 'vp run app#dev:web', cache: false },
-      'lib-build': { command: 'node -e ""', dependsOn: ['app#build'], output: [] },
+      'lib-build': { command: 'node -e ""', dependsOn: ['app#build'], cache: { output: [] } },
       'release': { command: 'node ./script/release.mts', cache: false },
       'release:dry-run': { command: 'node ./script/release.mts --dry-run', cache: false },
       'release:preview': { command: 'node ./script/release-branches.mts preview', cache: false },
@@ -49,9 +49,13 @@ export default defineConfig({
       'test:coverage': {
         command: 'vp test run --coverage',
         dependsOn: ['lib-build'],
-        output: ['coverage/**'],
+        cache: { output: ['coverage/**'] },
       },
-      'typecheck': { command: 'vp run -r typecheck', dependsOn: ['lib-build'], output: [] },
+      'typecheck': {
+        command: 'vp run -r typecheck',
+        dependsOn: ['lib-build'],
+        cache: { output: [] },
+      },
       'vp:install': { command: 'vp install', cache: false },
       'codegen': {
         command:

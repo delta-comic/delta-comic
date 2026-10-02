@@ -4,6 +4,7 @@ import type { UserConfig } from 'vite-plus'
 import { defineConfig, lazyPlugins } from 'vite-plus'
 
 export default defineConfig({
+  devtools: { apply: 'serve' },
   plugins: lazyPlugins((async () => {
     const [
       { default: tailwindcss },
@@ -24,7 +25,11 @@ export default defineConfig({
       vueDevTools(),
       vue(),
       vueJsx(),
-      Components({ dts: true, dtsTsx: false, resolvers: [NaiveUiResolver()] }),
+      Components({
+        dts: fileURLToPath(new URL('./components.d.ts', import.meta.url)),
+        dtsTsx: false,
+        resolvers: [NaiveUiResolver()],
+      }),
       tailwindcss(),
     ]
   }) as any),
@@ -39,7 +44,7 @@ export default defineConfig({
       'build': {
         command: 'vp build',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
-        output: ['dist/**'],
+        cache: { output: ['dist/**', 'components.d.ts'] },
       },
       'deploy': {
         command: 'wrangler pages deploy dist --project-name=delta-comic-admin',
@@ -56,7 +61,7 @@ export default defineConfig({
       'typecheck': {
         command: ['vue-tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
         dependsOn: [{ task: 'build', from: 'dependencies' }],
-        output: [],
+        cache: { output: [] },
       },
     },
   },

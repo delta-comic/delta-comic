@@ -1,6 +1,6 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/model'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { MemoryPluginFileStore } from '../../../../plugin/lib/adapters'
 import type {

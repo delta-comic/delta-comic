@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url'
 
 import { transform } from '@swc/core'
 import { defineConfig } from 'vite-plus'
-import type { Plugin } from 'vitest/config'
+import type { Plugin } from 'vite-plus'
 
 const root = fileURLToPath(new URL('.', import.meta.url))
 
@@ -57,12 +57,12 @@ export default defineConfig({
       build: {
         command: 'vp pack',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
-        output: ['dist/**'],
+        cache: { output: ['dist/**'] },
       },
       typecheck: {
         command: ['tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
         dependsOn: [{ task: 'build', from: 'dependencies' }],
-        output: [],
+        cache: { output: [] },
       },
     },
   },
