@@ -18,4 +18,3 @@ export {
 } from 'cordis'
 
 export * from './diagnostic.js'
-export * from './runtime.js'

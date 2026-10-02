@@ -111,7 +111,7 @@ export const prepareAppPluginHost = () =>
     uiRegistrars: clientUiRegistrars,
   })
 
-export const disposeAppClientRuntime = async () => {
+export const disposeAppPluginHost = async () => {
   await disposePluginHost()
   await diagnosticWrites
 }

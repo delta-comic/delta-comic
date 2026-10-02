@@ -394,7 +394,9 @@ describe('JSON plugins page', () => {
       },
     ]
     vi.spyOn(store, 'load').mockResolvedValue(undefined)
-    vi.spyOn(store, 'select').mockImplementation(async id => { store.selectedId = id })
+    vi.spyOn(store, 'select').mockImplementation(async id => {
+      store.selectedId = id
+    })
     const run = vi.spyOn(store, 'run').mockResolvedValue(undefined)
     const wrapper = mountPage(PluginsPage)
     await wrapper

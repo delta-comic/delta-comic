@@ -2,14 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import {
   Context,
-  CordisRuntime,
   diagnostic,
   DiagnosticHarness,
   DiagnosticReplayExecutor,
   DiagnosticRecorder,
   EventRecorder,
   createDiagnosticLogger,
-  createMinimalRuntime,
   Service,
 } from '../lib/index.js'
 
@@ -164,33 +162,5 @@ describe('@delta-comic/both cordis integration', () => {
       'demo/ping completed',
       'demo/fail failed',
     ])
-  })
-
-  it('mounts and snapshots a Cordis runtime', async () => {
-    const runtime = new CordisRuntime({ source: 'test-runtime' })
-    await runtime.mount('dummy', DummyService)
-    expect(runtime.list()).toEqual(['dummy'])
-    expect(runtime.snapshot().plugins[0]?.state).toBe('active')
-    await runtime.dispose()
-    expect(runtime.list()).toEqual([])
-  })
-
-  it('creates a minimal runtime with mock services', async () => {
-    const runtime = await createMinimalRuntime({
-      mockServices: { answer: 42 },
-      plugins: [
-        {
-          id: 'minimal',
-          module: {
-            inject: ['answer'],
-            apply(ctx) {
-              expect(ctx.answer).toBe(42)
-            },
-          },
-        },
-      ],
-    })
-    expect(runtime.snapshot().fibers[0]).toMatchObject({ id: 'minimal', state: 'active' })
-    await runtime.dispose()
   })
 })

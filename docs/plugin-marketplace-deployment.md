@@ -46,11 +46,12 @@ vp exec wrangler secret put SERVER_ADMIN_TOKEN
 
 ```sh
 vp run --filter @delta-comic/server build
+vp run --filter @delta-comic/server migrate:remote
 vp -C packages/server/core/server exec wrangler deploy --config dist/delta_comic_server/wrangler.json
 ```
 
-当前测试环境采用单 Worker 模式。目录发布、SQL migration、静态 Cordis runtime 和现有 API 由同一
-Worker 提供；动态脚本由运行时能力检查决定是否进入 WfP loader。
+当前服务端采用单 Worker 和共享 D1。目录发布、认证、同步与 JSON 流程由同一 Worker 提供。
+每次流程执行创建原生 Cordis Context，注入认证租户身份和宿主操作，完成后释放。
 
 当前测试部署使用免费 D1 `delta-comic-server-db`，远程迁移已执行完成。部署后的健康检查：
 
@@ -101,17 +102,24 @@ R2 `If-None-Match: *`，已存在的版本返回 409。授权回调返回的发�
 
 目录 GET 响应包含 ETag，直接 PUT 可使用 `If-Match` 或 `If-None-Match: *`；陈旧条件返回 412。发布端点在目录冲突时返回 409，发布者可重新载入并重试。R2 写入具备强一致性，条件写入由对象存储原子执行。
 
-## Workers for Platforms 与安装隔离
+## 租户 JSON 流程
 
-`@delta-comic/server` 提供 `CloudflarePluginWorkerProvisioner` 和
-`PluginWorkerRuntimeRegistry`。启用 Workers for Platforms loader 时，宿主为每个
-`installationId` 注入独立的 `PLUGIN_ID`/`INSTALLATION_ID`，再将请求路由到对应 Worker；免费账号
-继续使用 `UnavailablePluginWorkerProvisioner`，会返回可诊断的 unavailable 错误。D1 创建/销毁通过
-`PluginInstallationDatabase` 端口接入 Cloudflare 控制面，`PluginInstallationManager` 保证同一
-plugin/installation 只创建一次并支持显式回收。
+`@delta-comic/server` 提供 JSON 流程 schema、类型与 Cordis Context 扩展，云客户端入口为
+`@delta-comic/server/api`。流程安装与执行通过 `/api/plugins` 接口接受用户 access token；
+`auth.userId` 确定租户。管理端插件页面分别保存用户 token 与运营管理 token。
 
-部署前配置 WfP loader、D1 控制面凭证、每安装实例数据库适配器和访问权限。部署环境没有 WfP
-能力时使用 `UnavailablePluginWorkerProvisioner`，控制面继续提供明确的诊断错误。仓库中的
+manifest 使用协议 v2，`server.entry` 指向资源清单中的 JSON 文件。在线安装提交 manifest、
+流程源码、配置、启用与可选间隔任务设置，宿主校验 schema、表达式和 SHA-256 后保存。
+下一次调用读取已保存流程。流程操作为 `if`、`http`、`store.get`、`store.set`、`store.delete`
+和 `return`，参数表达式使用显式 `{ expr: JsonLogic }`。
+
+安装、定时、执行记录和键值分别保存在共享 D1 的 `server_plugin_packages`、
+`server_plugin_schedules`、`server_plugin_runs`、`server_plugin_store`。
+租户与插件复合键限定数据访问；定时任务由 D1 原子领取并推进下次执行时间。
+远程部署前应用全部迁移，包括 `0005_plugin_flows.sql` 与 `0006_remove_legacy_plugin_tables.sql`。
+
+每次执行限制为 64 步、分支深度 16、HTTP 16 次，每次 HTTP timeout 为 10 秒。
+免费计划的 CPU、D1 与 subrequest 约束及实际资源测量见 `docs/plugin-flow-acceptance.md`。
 `.github/workflows/server-deploy.yaml` 会依次执行 workspace 构建、格式与类型检查、测试、codegen
 检查、远程迁移、Worker 部署和可选的 admin Pages 部署。
 

@@ -27,7 +27,7 @@ import '@/index.css'
 import { DataLoaderPlugin } from 'vue-router/experimental'
 
 import AppSetup from './AppSetup.vue'
-import { prepareAppPluginHost, disposeAppClientRuntime } from './clientHost'
+import { prepareAppPluginHost, disposeAppPluginHost } from './clientHost'
 import { i18n } from './i18n'
 import { appLogger } from './logger'
 import { initializePlatform, resolveAppHostProfile } from './platform'
@@ -123,4 +123,4 @@ document.head.appendChild(meta)
 app.mount('#app')
 appLogger.info('frontend application mounted')
 
-window.addEventListener('beforeunload', () => void disposeAppClientRuntime())
+window.addEventListener('beforeunload', () => void disposeAppPluginHost())
