@@ -427,6 +427,10 @@
 - 新增 workerd CPU profiler、真实本地 D1/HTTP 测量，3 个场景各预热 5 次、测量 30 次；资源数据和测量边界记入 `docs/plugin-flow-acceptance.md`。
 - Rust fmt/clippy/workspace test 已通过，共 132 单元测试，1 个既有文档示例跳过。客户端元数据修复后的实际启动复核与最终串行 Web 检查正在进行。
 - 预算与现场修正已签名提交 `8e017cdc`。首次全量测试发现 11 项相关测试夹具未同步；更新配置列、新 manifest、原生内容集合、Tauri 下载事件和发布任务顺序，专项 9 files / 50 tests 全部通过。
+- 测试夹具同步已签名提交 `99ebbe6d`。最终串行构建、check、typecheck、全量测试（155 files / 833 tests）、codegen 与 diff 检查通过。
+- Web 实际验证 ZIP 安装、热替换失败清理、保存启用状态和界面手动恢复；390px 页面展示正常。Tauri 单可见主窗口自动进入首页，安全模式管理页正确展示无效元数据和错误来源。
+- Web 实际卸载发现 IndexedDB 键游标删除抛出 InvalidStateError；修正为对象仓库按主键删除，继续复核更新与卸载。
+- IndexedDB 修正后的真实 ZIP 安装、1.0.0 到 2.0.0 更新和卸载通过，core 持续 ACTIVE，临时包资源释放。宿主与文件存储专项 2 files / 10 tests 通过。浏览器最终无运行错误，剪贴板权限与框架实验性提示属于现场警告。
 
 - 已读取当前规划、插件技能和历史验证经验，确认用户实施授权及干净工作树。
 - 已建立本轮四阶段执行计划；开始协议、Context 服务和安装构建链核对。

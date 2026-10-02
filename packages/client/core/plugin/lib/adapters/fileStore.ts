@@ -166,7 +166,7 @@ class IndexedDbPluginFileBackend implements PluginFileBackend {
         const cursor = store.openKeyCursor()
         cursor.onsuccess = () => {
           if (cursor.result) {
-            if (String(cursor.result.key).startsWith(prefix)) cursor.result.delete()
+            if (String(cursor.result.key).startsWith(prefix)) store.delete(cursor.result.primaryKey)
             cursor.result.continue()
             return
           }
