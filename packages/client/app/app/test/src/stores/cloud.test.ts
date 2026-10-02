@@ -18,7 +18,7 @@ vi.mock('@delta-comic/plugin', () => ({
 
 vi.mock('@/cloud', () => ({ createAppCloudRuntime }))
 
-import { CloudClientError, CloudDisabledError } from '@delta-comic/server'
+import { CloudClientError, CloudDisabledError } from '@delta-comic/server/api'
 
 import { useCloudStore } from '../../../src/stores/cloud'
 

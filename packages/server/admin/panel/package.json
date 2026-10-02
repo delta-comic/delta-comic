@@ -5,9 +5,11 @@
   "type": "module",
   "dependencies": {
     "@delta-comic/logger": "workspace:",
+    "@delta-comic/plugin-manifest": "workspace:",
     "@delta-comic/server": "workspace:",
     "@delta-comic/ui": "workspace:",
     "@vueuse/core": "catalog:",
+    "dayjs": "catalog:",
     "naive-ui": "catalog:",
     "pinia": "catalog:",
     "vue": "catalog:",

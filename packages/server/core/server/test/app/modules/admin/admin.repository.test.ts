@@ -10,10 +10,10 @@ const tableNames = [
   'auth_sessions',
   'sync_entities',
   'sync_changes',
-  'server_plugin_registry',
-  'server_plugin_installations',
-  'server_plugin_jobs',
-  'server_plugin_audit',
+  'server_plugin_packages',
+  'server_plugin_schedules',
+  'server_plugin_runs',
+  'server_plugin_store',
 ]
 
 describe('D1AdminMetricsRepository', () => {
@@ -52,7 +52,7 @@ describe('D1AdminMetricsRepository', () => {
       status: 'ok',
       value: 4,
     })
-    expect(metrics.find(metric => metric.key === 'pluginAudit')).toMatchObject({ value: 0 })
+    expect(metrics.find(metric => metric.key === 'pluginStore')).toMatchObject({ value: 0 })
     expect(
       recorder.statements.find(statement => statement.values.includes(123_456))?.values,
     ).toEqual([123_456])
@@ -71,58 +71,43 @@ describe('D1AdminMetricsRepository', () => {
     expect(recorder.statements).toHaveLength(2)
   })
 
-  it('converts recent audit rows, parses valid detail, and clamps the requested limit', async () => {
+  it('converts recent flow rows, parses valid detail, and clamps the requested limit', async () => {
     const recorder = new D1Recorder()
     recorder.allResults.push(
-      [{ name: 'server_plugin_audit' }],
+      [{ name: 'server_plugin_runs' }],
       [
         {
-          action: 'enable',
-          actor_id: 'admin',
-          created_at: 20,
-          detail_json: '{"changed":true}',
-          id: 'audit-1',
-          job_id: 'job-1',
-          outcome: 'succeeded',
-          plugin_id: 'core.base',
-        },
-        {
-          action: 'health',
-          actor_id: 'system',
-          created_at: 10,
-          detail_json: '{broken',
-          id: 'audit-2',
-          job_id: 'job-2',
-          outcome: 'failed',
-          plugin_id: 'feature.sync',
+          id: 'run-1',
+          tenant_id: 'alice',
+          plugin_id: 'counter',
+          flow_id: 'main',
+          trigger: 'manual',
+          status: 'succeeded',
+          input_json: null,
+          result_json: null,
+          step_id: null,
+          error_message: null,
+          metrics_json: '{}',
+          started_at: 20,
+          completed_at: 21,
         },
       ],
     )
     const repository = new D1AdminMetricsRepository(recorder.db)
 
-    const activity = await repository.readRecentPluginAudit(1_000)
+    const activity = await repository.readRecentPluginRuns(1_000)
 
     expect(activity).toEqual({
       available: true,
       items: [
         {
-          action: 'enable',
-          actorId: 'admin',
+          id: 'run-1',
+          pluginId: 'counter',
+          action: 'main',
+          actorId: 'alice',
           createdAt: 20,
-          detail: { changed: true },
-          id: 'audit-1',
-          jobId: 'job-1',
+          detail: { trigger: 'manual', stepId: null, error: null },
           outcome: 'succeeded',
-          pluginId: 'core.base',
-        },
-        {
-          action: 'health',
-          actorId: 'system',
-          createdAt: 10,
-          id: 'audit-2',
-          jobId: 'job-2',
-          outcome: 'failed',
-          pluginId: 'feature.sync',
         },
       ],
     })
@@ -139,7 +124,7 @@ describe('D1AdminMetricsRepository', () => {
     const repository = new D1AdminMetricsRepository(db)
 
     const metrics = await repository.readMetrics(1)
-    const activity = await repository.readRecentPluginAudit(5)
+    const activity = await repository.readRecentPluginRuns(5)
 
     expect(metrics.every(metric => metric.issue === 'query_failed')).toBe(true)
     expect(activity).toEqual({ available: false, issue: 'query_failed', items: [] })
@@ -151,7 +136,7 @@ describe('D1AdminMetricsRepository', () => {
     recorder.allResults.push([])
     const repository = new D1AdminMetricsRepository(recorder.db)
 
-    await expect(repository.readRecentPluginAudit(5)).resolves.toEqual({
+    await expect(repository.readRecentPluginRuns(5)).resolves.toEqual({
       available: false,
       issue: 'table_missing',
       items: [],

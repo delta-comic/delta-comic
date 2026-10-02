@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { createPluginArtifactUploadHandler, createR2PluginArtifactStore } from '../../lib/index'
+import { createPluginArtifactUploadHandler } from '../../lib/catalogArtifactHandler'
+import { createR2PluginArtifactStore } from '../../lib/catalogArtifacts'
 
 describe('plugin artifact uploads', () => {
   it('stores artifacts with an integrity digest and stable public URL', async () => {

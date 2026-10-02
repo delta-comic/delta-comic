@@ -1,8 +1,3 @@
-import type {
-  ServerPluginAuditEvent,
-  ServerPluginJob,
-  ServerPluginSnapshotEntry,
-} from '@delta-comic/server'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { defineComponent, h } from 'vue'
@@ -12,22 +7,11 @@ import AdminTopbar from '@/app/AdminTopbar.vue'
 import OverviewMetricBand from '@/features/overview/components/OverviewMetricBand.vue'
 import RecentActivityTable from '@/features/overview/components/RecentActivityTable.vue'
 import RuntimeSummary from '@/features/overview/components/RuntimeSummary.vue'
-import InstallPlanDialog from '@/features/plugins/components/InstallPlanDialog.vue'
-import PluginActivityPanel from '@/features/plugins/components/PluginActivityPanel.vue'
-import PluginTable from '@/features/plugins/components/PluginTable.vue'
 import type { AdminCapabilities, AdminOverview } from '@/shared/api/types'
 
 import AppIcon from '../../../../src/shared/components/AppIcon.vue'
 import PageHeader from '../../../../src/shared/components/PageHeader.vue'
 import StatusMark from '../../../../src/shared/components/StatusMark.vue'
-
-const ButtonStub = defineComponent({
-  name: 'Button',
-  inheritAttrs: false,
-  setup(_, { attrs, slots }) {
-    return () => h('button', attrs, [slots.icon?.(), slots.default?.()])
-  },
-})
 
 const PassThrough = (name: string, tag = 'div') =>
   defineComponent({
@@ -37,38 +21,6 @@ const PassThrough = (name: string, tag = 'div') =>
       return () => h(tag, attrs, [slots.default?.(), slots.footer?.()])
     },
   })
-
-const naiveStubs = {
-  Alert: PassThrough('Alert'),
-  Button: ButtonStub,
-  Modal: PassThrough('Modal'),
-  Space: PassThrough('Space'),
-  Tag: PassThrough('Tag', 'span'),
-}
-
-const plugin = (
-  id: string,
-  overrides: Partial<ServerPluginSnapshotEntry> = {},
-): ServerPluginSnapshotEntry => ({
-  allowedActions: ['install'],
-  config: {},
-  desiredState: 'uninstalled',
-  manifest: {
-    apiVersion: 1,
-    author: 'Delta',
-    capabilities: ['reader'],
-    configSchema: { properties: {} },
-    dependencies: [],
-    description: `${id} description`,
-    id,
-    name: `Plugin ${id}`,
-    version: '1.0.0',
-  },
-  observedState: 'available',
-  registered: false,
-  updateAvailable: false,
-  ...overrides,
-})
 
 const overview = (status: AdminOverview['health']['status'] = 'ready'): AdminOverview => ({
   deployment: { available: true, id: 'deployment-1', tag: 'v1', timestamp: '2026-01-01T00:00:00Z' },
@@ -266,130 +218,5 @@ describe('overview presentation', () => {
     expect(wrapper.text()).toContain('版本元数据')
     expect(wrapper.text()).toContain('未绑定')
     expect(wrapper.text()).not.toContain('配置限制')
-  })
-})
-
-describe('plugin presentation', () => {
-  it('renders jobs and audit outcomes, including pending and failed jobs', async () => {
-    const jobs: ServerPluginJob[] = (['succeeded', 'failed', 'queued'] as const).map(
-      (status, index) => ({
-        action: 'install',
-        createdAt: Date.UTC(2026, 0, index + 1),
-        errorMessage: status === 'failed' ? 'boom' : undefined,
-        id: `job-${index}`,
-        pluginId: 'plugin-a',
-        status,
-        updatedAt: 2,
-      }),
-    )
-    const audit: ServerPluginAuditEvent[] = (['succeeded', 'failed'] as const).map(
-      (outcome, index) => ({
-        action: 'install',
-        actorId: 'admin',
-        createdAt: Date.UTC(2026, 1, index + 1),
-        id: `audit-${index}`,
-        jobId: `job-${index}`,
-        outcome,
-        pluginId: 'plugin-a',
-      }),
-    )
-    const wrapper = mount(PluginActivityPanel, { props: { audit, jobs } })
-    expect(wrapper.findAll('tbody tr')).toHaveLength(5)
-    expect(wrapper.text()).toContain('boom')
-    expect(wrapper.findAllComponents(StatusMark).map(mark => mark.props('tone'))).toEqual([
-      'success',
-      'danger',
-      'warning',
-      'success',
-      'danger',
-    ])
-
-    await wrapper.setProps({ audit: [], jobs: [] })
-    expect(wrapper.text()).toContain('暂无插件任务')
-    expect(wrapper.text()).toContain('暂无审计记录')
-  })
-
-  it('filters primary actions, maps health tones, and emits row interactions', async () => {
-    const states = [
-      'available',
-      'disabled',
-      'enabled',
-      'failed',
-      'installed',
-      'registered',
-    ] as const
-    const entries = states.map((observedState, index) =>
-      plugin(`plugin-${index}`, {
-        allowedActions: index === 0 ? ['register', 'install'] : index === 1 ? ['disable'] : [],
-        desiredState: index === 2 ? 'enabled' : index === 1 ? 'disabled' : 'uninstalled',
-        installedVersion: index ? '1.0.0' : undefined,
-        lastHealth:
-          index < 3
-            ? {
-                message: 'health',
-                observedAt: 1,
-                status: (['healthy', 'degraded', 'unavailable'] as const)[index],
-              }
-            : undefined,
-        observedState,
-      }),
-    )
-    const wrapper = mount(PluginTable, {
-      global: { stubs: naiveStubs },
-      props: { entries, pending: { 'plugin-0': 'register' }, selectedId: 'plugin-1' },
-    })
-
-    expect(wrapper.findAll('tbody tr')).toHaveLength(6)
-    expect(wrapper.findAll('tbody tr')[1].classes()).toContain('plugin-table__row--selected')
-    expect(wrapper.findAllComponents(StatusMark).map(mark => mark.props('tone'))).toEqual(
-      expect.arrayContaining(['success', 'danger', 'warning', 'muted']),
-    )
-
-    await wrapper.findAll('tbody tr')[2].trigger('click')
-    const actionButtons = wrapper.findAll('button').filter(button => button.text() === '注册')
-    await actionButtons[0].trigger('click')
-    const detailButtons = wrapper.findAll('button').filter(button => button.text() === '详情')
-    await detailButtons[0].trigger('click')
-    expect(wrapper.emitted('action')?.[0]).toEqual([entries[0], 'register'])
-    expect(wrapper.emitted('select')).toEqual([['plugin-2'], ['plugin-0']])
-
-    await wrapper.setProps({ entries: [] })
-    expect(wrapper.text()).toContain('没有符合当前条件的插件')
-  })
-
-  it('describes dependencies and confirms the selected install plan', async () => {
-    const dependency = plugin('dependency', { installedVersion: '2.0.0' })
-    const target = plugin('target', {
-      manifest: {
-        ...plugin('target').manifest,
-        dependencies: [{ id: 'dependency', versionRange: '^2' }, { id: 'missing' }],
-      },
-    })
-    const wrapper = mount(InstallPlanDialog, {
-      global: { stubs: naiveStubs },
-      props: { allPlugins: [dependency, target], pending: false, plugin: target, show: true },
-    })
-
-    expect(wrapper.text()).toContain('已安装 2.0.0')
-    expect(wrapper.text()).toContain('将自动安装')
-    expect(wrapper.text()).toContain('任意版本')
-
-    const confirm = wrapper.findAll('button').find(button => button.text() === '确认安装')!
-    await confirm.trigger('click')
-    expect(wrapper.emitted('confirm')).toEqual([['target']])
-    expect(wrapper.emitted('update:show')).toBeUndefined()
-  })
-
-  it('disables the plan confirmation while an action is pending', async () => {
-    const target = plugin('target')
-    const wrapper = mount(InstallPlanDialog, {
-      global: { stubs: naiveStubs },
-      props: { allPlugins: [], pending: true, plugin: target, show: true },
-    })
-
-    const confirm = wrapper.findAll('button').find(button => button.text() === '确认安装')!
-    expect(confirm.attributes('disabled')).toBeDefined()
-    await confirm.trigger('click')
-    expect(wrapper.emitted('confirm')).toBeUndefined()
   })
 })

@@ -64,10 +64,10 @@ export const serverModules = [
   {
     key: 'plugins',
     name: '服务端插件',
-    description: '服务端插件注册、安装状态、依赖计划、任务与审计记录。',
-    apiPrefix: '/api/admin/plugins',
+    description: '认证租户的 JSON 流程、配置、定时执行与执行记录。',
+    apiPrefix: '/api/plugins',
     cloudflareBindings: ['DB'],
-    workerEnvVars: ['SERVER_ADMIN_TOKEN'],
+    workerEnvVars: ['AUTH_PEPPER', 'TOKEN_PEPPER'],
     adminRoute: '/plugins',
   },
   {

@@ -1,5 +1,5 @@
 import { Logger } from '@delta-comic/logger'
-import type { CloudSession } from '@delta-comic/server'
+import type { CloudSession } from '@delta-comic/server/api'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const { nativeStore } = vi.hoisted(() => ({ nativeStore: new Map<string, string>() }))

@@ -1,8 +1,3 @@
-import type {
-  ServerPluginScriptRun,
-  ServerPluginSnapshot,
-  ServerPluginSnapshotEntry,
-} from '@delta-comic/server'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -38,6 +33,7 @@ import OpenApiPage from '@/features/openapi/OpenApiPage.vue'
 import OverviewPage from '@/features/overview/OverviewPage.vue'
 import PluginsPage from '@/features/plugins/PluginsPage.vue'
 import SettingsPage from '@/features/settings/SettingsPage.vue'
+import { flowText } from '@/i18n/flows'
 import { AdminApiClient } from '@/shared/api/AdminApiClient'
 import type { AdminOverview } from '@/shared/api/types'
 import { useConnectionStore } from '@/stores/connection'
@@ -89,6 +85,10 @@ const naiveStubs = {
   Select: PassThrough('Select'),
   Skeleton: PassThrough('Skeleton'),
   Space: PassThrough('Space'),
+  Modal: PassThrough('Modal'),
+  Checkbox: PassThrough('Checkbox'),
+  Switch: PassThrough('Switch'),
+  InputNumber: PassThrough('InputNumber'),
 }
 
 const overview: AdminOverview = {
@@ -124,41 +124,8 @@ const overview: AdminOverview = {
   recentActivity: { available: true, items: [] },
 }
 
-const plugin = (id: string, installed: boolean): ServerPluginSnapshotEntry => ({
-  allowedActions: installed ? ['enable', 'configure', 'uninstall'] : ['install'],
-  config: {},
-  desiredState: installed ? 'disabled' : 'uninstalled',
-  installedVersion: installed ? '1.0.0' : undefined,
-  manifest: {
-    apiVersion: 1,
-    author: 'Delta',
-    capabilities: [],
-    configSchema: { properties: {} },
-    dependencies: [],
-    description: `${id} plugin`,
-    id,
-    name: id,
-    version: '1.0.0',
-  },
-  observedState: installed ? 'disabled' : 'available',
-  registered: installed,
-  updateAvailable: id === 'available-update',
-})
-
-const snapshot: ServerPluginSnapshot = {
-  observedAt: 1,
-  plan: { cycles: [], levels: [], missing: [] },
-  plugins: [
-    plugin('installed', true),
-    plugin('available', false),
-    plugin('available-update', false),
-  ],
-  recentAudit: [],
-  recentJobs: [],
-}
-
-let router: Router
 let pinia: ReturnType<typeof createPinia>
+let router: Router
 
 const memoryStorage = (): Storage => {
   const data = new Map<string, string>()
@@ -370,154 +337,6 @@ describe('settings, modules, and OpenAPI pages', () => {
   })
 })
 
-describe('plugins page', () => {
-  const TableStub = defineComponent({
-    name: 'PluginTable',
-    props: ['entries', 'pending', 'selectedId'],
-    emits: ['action', 'select'],
-    template:
-      '<div class="table-stub">{{ entries.map((entry) => entry.manifest.id).join(",") }}</div>',
-  })
-  const ActivityStub = defineComponent({
-    name: 'PluginActivityPanel',
-    props: ['audit', 'jobs'],
-    template: '<div class="activity-stub">activity</div>',
-  })
-  const PlanStub = defineComponent({
-    name: 'InstallPlanDialog',
-    props: ['allPlugins', 'plugin', 'show'],
-    emits: ['confirm', 'update:show'],
-    template: '<div class="plan-stub" />',
-  })
-  const DrawerStub = defineComponent({
-    name: 'PluginDetailDrawer',
-    props: ['pending', 'plugin', 'script', 'scriptPending', 'scriptRuns', 'show'],
-    emits: ['action', 'configure', 'runScript', 'saveScript', 'update:show'],
-    template: '<div class="drawer-stub" />',
-  })
-
-  const setup = async (query = '') => {
-    await router.push(`/plugins${query}`)
-    const connection = useConnectionStore()
-    connection.apiBaseUrl = 'https://example.com'
-    connection.adminToken = 'token'
-    const store = usePluginsStore()
-    store.snapshot = snapshot
-    const load = vi.spyOn(store, 'load').mockResolvedValue(undefined)
-    const loadScript = vi.spyOn(store, 'loadScript').mockResolvedValue(undefined)
-    const runAction = vi
-      .spyOn(store, 'runAction')
-      .mockResolvedValue({
-        action: 'enable',
-        createdAt: 1,
-        id: 'job-1',
-        pluginId: 'installed',
-        status: 'succeeded',
-        updatedAt: 2,
-      })
-    const saveScript = vi.spyOn(store, 'saveScript').mockResolvedValue(true)
-    const runScript = vi
-      .spyOn(store, 'runScript')
-      .mockResolvedValue({
-        completedAt: 2,
-        id: 'run-1',
-        pluginId: 'installed',
-        startedAt: 1,
-        status: 'succeeded',
-        trigger: 'manual',
-      })
-    const wrapper = mount(PluginsPage, {
-      global: {
-        plugins: [pinia, router],
-        stubs: {
-          ...naiveStubs,
-          InstallPlanDialog: PlanStub,
-          PluginActivityPanel: ActivityStub,
-          PluginDetailDrawer: DrawerStub,
-          PluginTable: TableStub,
-        },
-      },
-    })
-    return { load, loadScript, runAction, runScript, saveScript, store, wrapper }
-  }
-
-  it('filters installed and available plugins and opens plugin details', async () => {
-    const { load, loadScript, store, wrapper } = await setup()
-    expect(load).toHaveBeenCalledOnce()
-    expect(wrapper.get('.table-stub').text()).toBe('installed')
-
-    await wrapper.findAll('.plugins-page__tabs button')[0].trigger('click')
-    expect(wrapper.get('.table-stub').text()).toContain('available,available-update')
-    const table = wrapper.getComponent(TableStub)
-    table.vm.$emit('select', 'available')
-    await nextTick()
-    expect(store.selectedId).toBe('available')
-    expect(loadScript).toHaveBeenCalledWith('available')
-    expect(wrapper.getComponent(DrawerStub).props('show')).toBe(true)
-  })
-
-  it('opens plans, confirms uninstall, and reports successful actions', async () => {
-    const { runAction, wrapper } = await setup()
-    const table = wrapper.getComponent(TableStub)
-    table.vm.$emit('action', snapshot.plugins[1], 'install')
-    await nextTick()
-    expect(wrapper.getComponent(PlanStub).props('show')).toBe(true)
-    expect(wrapper.getComponent(PlanStub).props('plugin')).toEqual(snapshot.plugins[1])
-
-    const plan = wrapper.getComponent(PlanStub)
-    plan.vm.$emit('confirm', 'available')
-    await flushPromises()
-    expect(runAction).toHaveBeenCalledWith('available', 'install', undefined)
-    expect(wrapper.getComponent(PlanStub).props('show')).toBe(false)
-
-    table.vm.$emit('action', snapshot.plugins[0], 'uninstall')
-    expect(naive.dialog.warning).toHaveBeenCalledOnce()
-    await naive.instance.onPositiveClick?.()
-    expect(runAction).toHaveBeenCalledWith('installed', 'uninstall', undefined)
-    expect(naive.instance.loading).toBe(true)
-    expect(naive.instance.negativeButtonProps).toEqual({ disabled: true })
-    expect(naive.instance.closable).toBe(false)
-    expect(naive.instance.maskClosable).toBe(false)
-    expect(naive.instance.closeOnEsc).toBe(false)
-    await naive.instance.onPositiveClick?.()
-    expect(runAction).toHaveBeenCalledTimes(2)
-    expect(naive.message.success).toHaveBeenCalledWith('uninstall 操作已完成')
-  })
-
-  it('coordinates script saving and successful or failed execution feedback', async () => {
-    const { runScript, saveScript, wrapper } = await setup()
-    const drawer = wrapper.getComponent(DrawerStub)
-    const scriptInput = { enabled: true, intervalHours: 2, source: 'return input' }
-    drawer.vm.$emit('saveScript', 'installed', scriptInput)
-    await flushPromises()
-    expect(saveScript).toHaveBeenCalledWith('installed', scriptInput)
-    expect(naive.message.success).toHaveBeenCalledWith('插件代码已保存')
-
-    drawer.vm.$emit('runScript', 'installed', { id: 1 })
-    await flushPromises()
-    expect(naive.message.success).toHaveBeenCalledWith('插件代码运行完成')
-
-    runScript.mockResolvedValueOnce({
-      completedAt: 2,
-      errorMessage: 'sandbox failed',
-      id: 'run-2',
-      pluginId: 'installed',
-      startedAt: 1,
-      status: 'failed',
-      trigger: 'manual',
-    } satisfies ServerPluginScriptRun)
-    drawer.vm.$emit('runScript', 'installed', null)
-    await flushPromises()
-    expect(naive.message.error).toHaveBeenCalledWith('sandbox failed')
-  })
-
-  it('selects the activity view from the route query', async () => {
-    const { wrapper } = await setup('?tab=activity')
-    expect(wrapper.findComponent(ActivityStub).exists()).toBe(true)
-    expect(wrapper.findComponent(TableStub).exists()).toBe(false)
-  })
-})
-
 describe('admin shell', () => {
   it('connects on mount, tracks the deepest route, and coordinates mobile navigation', async () => {
     await router.push('/plugins')
@@ -551,5 +370,49 @@ describe('admin shell', () => {
     await flushPromises()
     expect(router.currentRoute.value.path).toBe('/settings')
     expect(wrapper.getComponent(Sidebar).props('open')).toBe(false)
+  })
+})
+
+describe('JSON plugins page', () => {
+  it('shows execution history and sends the selected flow input', async () => {
+    const connection = useConnectionStore()
+    connection.userToken = 'user'
+    const store = usePluginsStore()
+    store.plugins = [
+      {
+        manifest: {
+          protocolVersion: 2,
+          id: 'demo',
+          name: 'Demo',
+          version: '1.0.0',
+          server: { entry: 'flows.json' },
+          resources: [],
+        },
+        config: {},
+        enabled: true,
+        document: { version: 1, flows: [{ id: 'main', steps: [] }] },
+      },
+    ]
+    vi.spyOn(store, 'load').mockResolvedValue(undefined)
+    vi.spyOn(store, 'select').mockImplementation(async id => { store.selectedId = id })
+    const run = vi.spyOn(store, 'run').mockResolvedValue(undefined)
+    const wrapper = mountPage(PluginsPage)
+    await wrapper
+      .findAll('button')
+      .find(button => button.text() === 'Demo')!
+      .trigger('click')
+    await flushPromises()
+    expect(wrapper.text()).toContain(flowText.history)
+    await wrapper
+      .findAll('input')
+      .find(input => input.attributes('aria-label') === flowText.input)
+      ?.setValue('{"value":2}')
+    await wrapper
+      .findAll('button')
+      .find(button => button.text() === flowText.run)!
+      .trigger('click')
+    await flushPromises()
+    expect(run).toHaveBeenCalledWith('demo', 'main', { value: 2 })
+    wrapper.unmount()
   })
 })

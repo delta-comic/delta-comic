@@ -153,7 +153,7 @@ export class AdminMetricsService {
     const [readiness, metrics, recentActivity] = await Promise.all([
       this.readiness(observedAt),
       this.repository.readMetrics(observedAt),
-      this.repository.readRecentPluginAudit(20),
+      this.repository.readRecentPluginRuns(20),
     ])
     const incompleteMetrics =
       metrics.some(metric => metric.status === 'degraded') || !recentActivity.available

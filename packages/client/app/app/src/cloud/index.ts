@@ -1,4 +1,4 @@
-import { createCloudClient, createSyncSnapshotRequest } from '@delta-comic/server'
+import { createCloudClient, createSyncSnapshotRequest } from '@delta-comic/server/api'
 
 import { DbCloudSessionStorage, DbCloudSyncStorage, getCloudTerminal } from './storage'
 import { DbCloudSyncAdapter } from './syncAdapter'

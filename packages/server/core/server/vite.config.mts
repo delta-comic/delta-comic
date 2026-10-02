@@ -28,7 +28,7 @@ export default defineConfig({
       plugins: [decoratorPlugin as any],
     },
     {
-      entry: ['./lib/index.ts', './lib/serverManifest.ts', './lib/serverRuntime.ts'],
+      entry: ['./lib/index.ts', './lib/api.ts', './lib/flow.ts'],
       outDir: './dist/lib',
       dts: { tsconfig: './tsconfig.lib.json' },
       plugins: [decoratorPlugin as any],

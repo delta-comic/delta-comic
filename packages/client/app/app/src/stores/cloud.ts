@@ -9,7 +9,7 @@ import {
   type CloudSession,
   type SyncPullRequest,
   type SyncPushOperation,
-} from '@delta-comic/server'
+} from '@delta-comic/server/api'
 import { defineStore } from 'pinia'
 import { computed, shallowRef } from 'vue'
 

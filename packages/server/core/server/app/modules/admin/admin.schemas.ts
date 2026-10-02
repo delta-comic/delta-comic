@@ -30,10 +30,10 @@ export const adminMetricKeySchema = t.UnionEnum([
   'activeAuthSessions',
   'syncEntities',
   'syncChanges',
-  'pluginRegistry',
-  'pluginInstallations',
-  'pluginJobs',
-  'pluginAudit',
+  'pluginPackages',
+  'pluginSchedules',
+  'pluginRuns',
+  'pluginStore',
 ])
 
 export const adminMetricIssueSchema = t.UnionEnum(['table_missing', 'query_failed'])

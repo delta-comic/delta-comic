@@ -101,6 +101,9 @@ catalog:
   '@vue/test-utils': ^2.4.11
   happy-dom: ^20.11.2
   eslint-plugin-tailwindcss: 4.2.0
+  json-logic-js: ^2.0.5
+  '@types/json-logic-js': ^2.0.8
+  miniflare: 5.20260930.0-alpha
 overrides:
   typescript: npm:typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2
   vite: 'catalog:'

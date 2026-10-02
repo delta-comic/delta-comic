@@ -2,6 +2,7 @@
 import { useMessage } from 'naive-ui'
 import { shallowRef } from 'vue'
 
+import { flowText } from '@/i18n/flows'
 import PageHeader from '@/shared/components/PageHeader.vue'
 import StatusMark from '@/shared/components/StatusMark.vue'
 import { useConnectionStore } from '@/stores/connection'
@@ -10,6 +11,7 @@ const connection = useConnectionStore()
 const message = useMessage()
 const endpointDraft = shallowRef(connection.apiBaseUrl)
 const tokenDraft = shallowRef(connection.adminToken)
+const userTokenDraft = shallowRef(connection.userToken)
 const saving = shallowRef(false)
 const formError = shallowRef('')
 
@@ -18,6 +20,7 @@ const save = async () => {
   formError.value = ''
   try {
     connection.saveCredentials(endpointDraft.value, tokenDraft.value)
+    connection.saveUserToken(userTokenDraft.value)
     const connected = await connection.connect()
     if (connected) message.success('连接验证成功')
     else formError.value = connection.error
@@ -51,6 +54,14 @@ const save = async () => {
               show-password-on="click"
               placeholder="SERVER_ADMIN_TOKEN"
               autocomplete="current-password"
+            />
+          </NFormItem>
+          <NFormItem :label="flowText.token">
+            <NInput
+              v-model:value="userTokenDraft"
+              type="password"
+              show-password-on="click"
+              autocomplete="off"
             />
           </NFormItem>
           <NAlert class="mb-4" type="info" :show-icon="false">

@@ -1,234 +1,275 @@
 <script setup lang="ts">
-import type {
-  ServerPluginAction,
-  ServerPluginConfig,
-  ServerPluginScript,
-  ServerPluginSnapshotEntry,
-} from '@delta-comic/server'
+import { parsePluginManifest } from '@delta-comic/plugin-manifest'
+import { parseFlowDocument, type FlowInstallation } from '@delta-comic/server'
+import dayjs from 'dayjs'
 import { useDialog, useMessage } from 'naive-ui'
-import { storeToRefs } from 'pinia'
-import { computed, onMounted, shallowRef } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onMounted, shallowRef, watch } from 'vue'
 
+import { flowText as text } from '@/i18n/flows'
 import AppIcon from '@/shared/components/AppIcon.vue'
 import PageHeader from '@/shared/components/PageHeader.vue'
 import { useConnectionStore } from '@/stores/connection'
 import { usePluginsStore } from '@/stores/plugins'
 
-import InstallPlanDialog from './components/InstallPlanDialog.vue'
-import PluginActivityPanel from './components/PluginActivityPanel.vue'
-import PluginDetailDrawer from './components/PluginDetailDrawer.vue'
-import PluginTable from './components/PluginTable.vue'
-
-const route = useRoute()
-const dialog = useDialog()
-const message = useMessage()
-const connection = useConnectionStore()
 const store = usePluginsStore()
-const {
-  error,
-  loading,
-  pending,
-  plugins,
-  script,
-  scriptPending,
-  scriptRuns,
-  selected,
-  selectedId,
-  snapshot,
-} = storeToRefs(store)
-const { load, loadScript, runAction, runScript, saveScript, select } = store
-
-const tab = shallowRef<'activity' | 'available' | 'installed'>(
-  route.query.tab === 'activity' ? 'activity' : 'installed',
+const connection = useConnectionStore()
+const message = useMessage()
+const dialog = useDialog()
+const editing = shallowRef(false)
+const manifestText = shallowRef('')
+const source = shallowRef('')
+const configText = shallowRef('{}')
+const enabled = shallowRef(true)
+const scheduled = shallowRef(false)
+const intervalHours = shallowRef<number | null>(1)
+const flowId = shallowRef('')
+const inputText = shallowRef('{}')
+const editingFlow = shallowRef('')
+const flowOptions = computed(
+  () => store.selected?.document.flows.map(flow => ({ label: flow.id, value: flow.id })) ?? [],
 )
-const search = shallowRef('')
-const stateFilter = shallowRef('all')
-const drawerOpen = shallowRef(false)
-const planOpen = shallowRef(false)
-const planPlugin = shallowRef<ServerPluginSnapshotEntry>()
-
-const listed = computed(() => {
-  const source =
-    tab.value === 'available'
-      ? plugins.value.filter(plugin => !plugin.installedVersion)
-      : plugins.value.filter(plugin => Boolean(plugin.installedVersion))
-  const keyword = search.value.trim().toLowerCase()
-  return source.filter(plugin => {
-    const matchesSearch =
-      !keyword || `${plugin.manifest.name} ${plugin.manifest.id}`.toLowerCase().includes(keyword)
-    const matchesState = stateFilter.value === 'all' || plugin.observedState === stateFilter.value
-    return matchesSearch && matchesState
-  })
-})
-
-const openPlugin = (pluginId: string) => {
-  select(pluginId)
-  drawerOpen.value = true
-  void loadScript(pluginId)
+watch(
+  () => store.selectedId,
+  () => {
+    flowId.value = store.selected?.document.flows[0]?.id ?? ''
+  },
+)
+const edit = (installation?: FlowInstallation) => {
+  manifestText.value = JSON.stringify(
+    installation?.manifest ?? {
+      protocolVersion: 2,
+      id: 'my-plugin',
+      name: 'My Plugin',
+      version: '1.0.0',
+      server: { entry: 'flows.json' },
+      resources: [],
+    },
+    null,
+    2,
+  )
+  source.value = JSON.stringify(
+    installation?.document ?? {
+      version: 1,
+      flows: [
+        { id: 'main', steps: [{ id: 'result', op: 'return', value: { expr: { var: 'input' } } }] },
+      ],
+    },
+    null,
+    2,
+  )
+  configText.value = JSON.stringify(installation?.config ?? {}, null, 2)
+  enabled.value = installation?.enabled ?? true
+  scheduled.value = installation?.schedule?.enabled ?? false
+  editingFlow.value =
+    installation?.schedule?.flowId ?? installation?.document.flows[0]?.id ?? 'main'
+  intervalHours.value = installation?.schedule?.intervalHours ?? 1
+  editing.value = true
 }
-
-const savePluginScript = async (
-  pluginId: string,
-  input: Pick<ServerPluginScript, 'enabled' | 'intervalHours' | 'source'>,
-) => {
-  if (await saveScript(pluginId, input)) message.success('插件代码已保存')
-}
-
-const executePluginScript = async (pluginId: string, input: unknown) => {
-  const result = await runScript(pluginId, input)
-  if (!result) return
-  if (result.status === 'succeeded') message.success('插件代码运行完成')
-  else message.error(result.errorMessage ?? '插件代码运行失败')
-}
-
-const execute = async (
-  pluginId: string,
-  action: ServerPluginAction,
-  config?: ServerPluginConfig,
-) => {
-  const job = await runAction(pluginId, action, config)
-  if (job?.status === 'succeeded') message.success(`${action} 操作已完成`)
-}
-
-const requestAction = (plugin: ServerPluginSnapshotEntry, action: ServerPluginAction) => {
-  if (action === 'install' || action === 'update') {
-    planPlugin.value = plugin
-    planOpen.value = true
-    return
-  }
-  if (action === 'uninstall') {
-    let confirmed = false
-    const instance = dialog.warning({
-      title: '确认卸载插件',
-      content: `将停用并移除 ${plugin.manifest.name} 的安装与注册记录。存在已安装依赖方时服务端会拒绝操作。`,
-      positiveText: '确认卸载',
-      negativeText: '取消',
-      onPositiveClick: () => {
-        if (confirmed) return false
-        confirmed = true
-        instance.loading = true
-        instance.negativeButtonProps = { disabled: true }
-        instance.closable = false
-        instance.maskClosable = false
-        instance.closeOnEsc = false
-        return execute(plugin.manifest.id, 'uninstall')
+const save = async () => {
+  try {
+    const manifest = parsePluginManifest(JSON.parse(manifestText.value))
+    const document = parseFlowDocument(JSON.parse(source.value))
+    const config: unknown = JSON.parse(configText.value)
+    if (typeof config !== 'object' || config === null || Array.isArray(config))
+      throw new Error(text.configObject)
+    const entry = manifest.server?.entry
+    if (!entry) throw new Error(text.manifest)
+    const digest = new Uint8Array(
+      await crypto.subtle.digest('SHA-256', new TextEncoder().encode(source.value)),
+    )
+    const manifestWithResource = {
+      ...manifest,
+      resources: [
+        ...manifest.resources.filter(item => item.path !== entry),
+        {
+          path: entry,
+          mimeType: 'application/json',
+          integrity: `sha256-${btoa(String.fromCharCode(...digest))}`,
+          imports: [],
+        },
+      ],
+    }
+    const result = await store.save(manifest.id, {
+      manifest: manifestWithResource,
+      source: source.value,
+      config: Object.fromEntries(Object.entries(config)),
+      enabled: enabled.value,
+      schedule: {
+        enabled: scheduled.value,
+        flowId: editingFlow.value || document.flows[0]!.id,
+        intervalHours: intervalHours.value ?? 1,
       },
     })
-    return
+    if (result) {
+      editing.value = false
+      message.success(text.success)
+    }
+  } catch (error) {
+    message.error(error instanceof Error ? error.message : String(error))
   }
-  void execute(plugin.manifest.id, action)
 }
-
-const onPlanConfirm = async (pluginId: string) => {
-  await execute(pluginId, planPlugin.value?.updateAvailable ? 'update' : 'install')
-  planOpen.value = false
+const run = async () => {
+  try {
+    const result = await store.run(store.selectedId, flowId.value, JSON.parse(inputText.value))
+    if (result?.status === 'failed') message.error(result.error ?? text.failed)
+  } catch (error) {
+    message.error(error instanceof Error ? error.message : String(error))
+  }
 }
-
+const remove = (installation: FlowInstallation) =>
+  dialog.warning({
+    title: text.confirmRemove,
+    content: installation.manifest.name,
+    positiveText: text.remove,
+    negativeText: text.cancel,
+    onPositiveClick: () => store.remove(installation.manifest.id),
+  })
 onMounted(() => {
-  if (connection.hasCredentials) void load()
+  if (connection.userToken) void store.load()
 })
 </script>
 
 <template>
-  <div class="admin-page plugins-page max-w-[1600px]">
-    <PageHeader title="插件中心" description="统一管理注册、安装、配置与运行状态">
+  <div class="admin-page max-w-[1600px]">
+    <PageHeader :title="text.title">
       <template #actions>
-        <NButton :loading="loading" secondary @click="load">
-          <template #icon><AppIcon name="refresh" :size="17" /></template>刷新
+        <NButton :loading="store.pending" :disabled="!connection.userToken" @click="store.load">
+          <template #icon><AppIcon name="refresh" :size="17" /></template>{{ text.refresh }}
         </NButton>
+        <NButton type="primary" :disabled="!connection.userToken" @click="edit()">{{
+          text.install
+        }}</NButton>
       </template>
     </PageHeader>
-
-    <div class="plugins-page__tabs border-border mb-5 flex gap-[26px] border-b" role="tablist">
-      <button
-        class="text-foreground-secondary cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-[11px] text-[13px]"
-        type="button"
-        :class="[tab === 'available' && 'active border-brand text-brand font-[620]']"
-        @click="tab = 'available'"
-      >
-        可注册
-      </button>
-      <button
-        class="text-foreground-secondary cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-[11px] text-[13px]"
-        type="button"
-        :class="[tab === 'installed' && 'active border-brand text-brand font-[620]']"
-        @click="tab = 'installed'"
-      >
-        已安装
-      </button>
-      <button
-        class="text-foreground-secondary cursor-pointer border-0 border-b-2 border-transparent bg-transparent px-0.5 py-[11px] text-[13px]"
-        type="button"
-        :class="[tab === 'activity' && 'active border-brand text-brand font-[620]']"
-        @click="tab = 'activity'"
-      >
-        任务与审计
-      </button>
-    </div>
-
-    <div v-if="error" class="admin-error plugins-page__error mb-4">{{ error }}</div>
-    <NResult
-      v-if="!connection.hasCredentials"
-      status="info"
-      title="尚未连接 Server API"
-      description="插件控制面需要管理员令牌。"
+    <NAlert v-if="!connection.userToken" type="info" class="mb-4"
+      ><RouterLink to="/settings">{{ text.token }}</RouterLink></NAlert
     >
-      <template #footer
-        ><NButton type="primary" @click="$router.push('/settings')">打开设置</NButton></template
-      >
-    </NResult>
-
-    <PluginActivityPanel
-      v-else-if="tab === 'activity'"
-      :audit="snapshot?.recentAudit ?? []"
-      :jobs="snapshot?.recentJobs ?? []"
-    />
-    <section v-else class="admin-panel plugins-page__panel">
-      <div
-        class="plugins-page__filters border-border grid grid-cols-[minmax(240px,360px)_160px] gap-3 border-b p-4 max-sm:grid-cols-1"
-      >
-        <NInput v-model:value="search" clearable placeholder="搜索插件">
-          <template #prefix><AppIcon name="search" :size="16" /></template>
-        </NInput>
-        <NSelect
-          v-model:value="stateFilter"
-          :options="[
-            { label: '全部状态', value: 'all' },
-            { label: '运行中', value: 'enabled' },
-            { label: '已停用', value: 'disabled' },
-            { label: '异常', value: 'failed' },
-            { label: '已注册', value: 'registered' },
-          ]"
+    <NAlert v-if="store.error" type="error" class="mb-4">{{ store.error }}</NAlert>
+    <div class="grid grid-cols-[260px_minmax(0,1fr)] gap-6 max-md:grid-cols-1">
+      <aside class="border-border border-r pr-4 max-md:border-r-0 max-md:pr-0">
+        <NEmpty v-if="!store.plugins.length" :description="text.empty" />
+        <div
+          v-for="plugin in store.plugins"
+          :key="plugin.manifest.id"
+          class="border-border border-b py-3"
+        >
+          <button class="text-left font-semibold" @click="store.select(plugin.manifest.id)">
+            {{ plugin.manifest.name }}
+          </button>
+          <div class="text-foreground-secondary text-xs break-all">
+            {{ plugin.manifest.id }} · {{ plugin.manifest.version }}
+          </div>
+          <div class="mt-2 flex items-center gap-2">
+            <NSwitch
+              :value="plugin.enabled"
+              :disabled="store.pending"
+              :aria-label="text.enabled"
+              @update:value="value => store.configure(plugin, value)"
+            />
+            <span class="text-xs">{{ plugin.enabled ? text.enabled : text.disabled }}</span>
+            <NButton size="tiny" @click="edit(plugin)">{{ text.edit }}</NButton>
+            <NButton size="tiny" @click="remove(plugin)">{{ text.remove }}</NButton>
+          </div>
+        </div>
+      </aside>
+      <section v-if="store.selected" class="min-w-0">
+        <h2 class="mb-3 text-lg font-semibold">{{ store.selected.manifest.name }}</h2>
+        <div class="mb-3 flex gap-3">
+          <NSelect v-model:value="flowId" :options="flowOptions" :placeholder="text.flow" />
+          <NButton
+            type="primary"
+            :loading="store.pending"
+            :disabled="!flowId || !store.selected.enabled"
+            @click="run"
+            >{{ text.run }}</NButton
+          >
+        </div>
+        <NInput
+          v-model:value="inputText"
+          type="textarea"
+          :aria-label="text.input"
+          :autosize="{ minRows: 3, maxRows: 12 }"
         />
-      </div>
-      <PluginTable
-        :entries="listed"
-        :pending="pending"
-        :selected-id="selectedId"
-        @action="requestAction"
-        @select="openPlugin"
-      />
-    </section>
-
-    <InstallPlanDialog
-      v-model:show="planOpen"
-      :all-plugins="plugins"
-      :pending="planPlugin ? Boolean(pending[planPlugin.manifest.id]) : false"
-      :plugin="planPlugin"
-      @confirm="onPlanConfirm"
-    />
-    <PluginDetailDrawer
-      v-model:show="drawerOpen"
-      :pending="selected ? pending[selected.manifest.id] : undefined"
-      :plugin="selected"
-      :script="script"
-      :script-pending="scriptPending"
-      :script-runs="scriptRuns"
-      @action="requestAction"
-      @configure="(pluginId, config) => execute(pluginId, 'configure', config)"
-      @run-script="executePluginScript"
-      @save-script="savePluginScript"
-    />
+        <h3 class="my-4 font-semibold">{{ text.history }}</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr>
+                <th>{{ text.time }}</th>
+                <th>{{ text.status }}</th>
+                <th>{{ text.step }}</th>
+                <th>{{ text.metrics }}</th>
+                <th>{{ text.result }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="record in store.runs"
+                :key="record.id"
+                class="border-border border-b align-top"
+              >
+                <td class="py-2 whitespace-nowrap">
+                  {{ dayjs(record.startedAt).format('YYYY-MM-DD HH:mm:ss') }}
+                </td>
+                <td class="p-2">{{ record.status }}</td>
+                <td class="p-2">{{ record.stepId }}</td>
+                <td class="p-2 whitespace-nowrap">
+                  {{ record.metrics.steps }} / {{ record.metrics.http }} /
+                  {{ record.metrics.durationMs.toFixed(1) }}
+                </td>
+                <td class="max-w-[400px] p-2 break-all">
+                  {{ record.error ?? JSON.stringify(record.result) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <NEmpty v-else :description="text.select" />
+    </div>
+    <NModal
+      v-model:show="editing"
+      preset="card"
+      :title="text.edit"
+      class="w-[900px]! max-w-[95vw]!"
+      :mask-closable="false"
+    >
+      <NForm label-placement="top">
+        <NFormItem :label="text.manifest"
+          ><NInput
+            v-model:value="manifestText"
+            type="textarea"
+            :autosize="{ minRows: 4, maxRows: 8 }"
+        /></NFormItem>
+        <NFormItem :label="text.source"
+          ><NInput v-model:value="source" type="textarea" :autosize="{ minRows: 8, maxRows: 18 }"
+        /></NFormItem>
+        <NFormItem :label="text.configure"
+          ><NInput
+            v-model:value="configText"
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 8 }"
+        /></NFormItem>
+        <NSpace align="center">
+          <NCheckbox v-model:checked="enabled">{{ text.enabled }}</NCheckbox>
+          <NCheckbox v-model:checked="scheduled">{{ text.schedule }}</NCheckbox>
+          <NInput v-model:value="editingFlow" :placeholder="text.flow" />
+          <NInputNumber
+            v-model:value="intervalHours"
+            :min="1"
+            :max="168"
+            :aria-label="text.interval"
+          />
+        </NSpace>
+      </NForm>
+      <template #footer
+        ><NSpace justify="end"
+          ><NButton @click="editing = false">{{ text.cancel }}</NButton
+          ><NButton type="primary" :loading="store.pending" @click="save">{{
+            text.save
+          }}</NButton></NSpace
+        ></template
+      >
+    </NModal>
   </div>
 </template>

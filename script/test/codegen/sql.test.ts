@@ -6,6 +6,7 @@ import { Type } from 'typebox'
 import { describe, expect, it } from 'vitest'
 
 import { autoIncrement, defineTable, jsonColumn, type TableSchema } from '../../codegen/schema.mts'
+import { serverTables } from '../../codegen/server.table.mts'
 import { generateIndexSql, generateTableSql } from '../../codegen/sql.mts'
 import { rootDir } from '../../set-version.mts'
 
@@ -81,208 +82,6 @@ const authSessionsTable = defineTable(
         columns: ['user_id', 'terminal_uuid'],
         refTable: 'auth_terminals',
         refColumns: ['user_id', 'terminal_uuid'],
-        onDelete: 'cascade',
-      },
-    ],
-  },
-)
-
-const pluginRegistryTable = defineTable(
-  'server_plugin_registry',
-  {
-    plugin_id: Type.String(),
-    manifest_json: Type.String(),
-    source: Type.String(),
-    trusted: Type.Boolean({ default: true }),
-    registered_at: Type.Integer(),
-    updated_at: Type.Integer(),
-  },
-  {
-    primaryKey: ['plugin_id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_registry_updated',
-        columns: [{ column: 'updated_at', order: 'DESC' }],
-      },
-    ],
-  },
-)
-
-const pluginInstallationsTable = defineTable(
-  'server_plugin_installations',
-  {
-    plugin_id: Type.String(),
-    installed_version: Type.String(),
-    desired_state: Type.Union([Type.Literal('disabled'), Type.Literal('enabled')]),
-    observed_state: Type.Union([
-      Type.Literal('disabled'),
-      Type.Literal('enabled'),
-      Type.Literal('failed'),
-      Type.Literal('installed'),
-    ]),
-    config_json: Type.String({ default: '{}' }),
-    installed_at: Type.Integer(),
-    updated_at: Type.Integer(),
-    last_error: Type.Optional(Type.String()),
-    last_health_json: Type.Optional(Type.String()),
-    last_health_at: Type.Optional(Type.Integer()),
-  },
-  {
-    primaryKey: ['plugin_id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_installations_state',
-        columns: ['desired_state', 'observed_state', { column: 'updated_at', order: 'DESC' }],
-      },
-    ],
-    foreignKeys: [
-      {
-        columns: ['plugin_id'],
-        refTable: 'server_plugin_registry',
-        refColumns: ['plugin_id'],
-        onDelete: 'cascade',
-      },
-    ],
-  },
-)
-
-const pluginJobsTable = defineTable(
-  'server_plugin_jobs',
-  {
-    id: Type.String(),
-    plugin_id: Type.String(),
-    action: Type.Union([
-      Type.Literal('configure'),
-      Type.Literal('disable'),
-      Type.Literal('enable'),
-      Type.Literal('health'),
-      Type.Literal('install'),
-      Type.Literal('register'),
-      Type.Literal('uninstall'),
-      Type.Literal('update'),
-    ]),
-    status: Type.Union([
-      Type.Literal('failed'),
-      Type.Literal('queued'),
-      Type.Literal('running'),
-      Type.Literal('succeeded'),
-    ]),
-    result_json: Type.Optional(Type.String()),
-    error_message: Type.Optional(Type.String()),
-    created_at: Type.Integer(),
-    started_at: Type.Optional(Type.Integer()),
-    completed_at: Type.Optional(Type.Integer()),
-    updated_at: Type.Integer(),
-  },
-  {
-    primaryKey: ['id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_jobs_plugin_created',
-        columns: ['plugin_id', { column: 'created_at', order: 'DESC' }],
-      },
-      {
-        name: 'idx_server_plugin_jobs_status_updated',
-        columns: ['status', { column: 'updated_at', order: 'DESC' }],
-      },
-    ],
-  },
-)
-
-const pluginAuditTable = defineTable(
-  'server_plugin_audit',
-  {
-    id: Type.String(),
-    plugin_id: Type.String(),
-    job_id: Type.String(),
-    action: Type.String(),
-    outcome: Type.Union([Type.Literal('failed'), Type.Literal('succeeded')]),
-    actor_id: Type.String(),
-    detail_json: Type.Optional(Type.String()),
-    created_at: Type.Integer(),
-  },
-  {
-    primaryKey: ['id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_audit_created',
-        columns: [
-          { column: 'created_at', order: 'DESC' },
-          { column: 'id', order: 'DESC' },
-        ],
-      },
-      {
-        name: 'idx_server_plugin_audit_plugin_created',
-        columns: ['plugin_id', { column: 'created_at', order: 'DESC' }],
-      },
-    ],
-    foreignKeys: [
-      {
-        columns: ['job_id'],
-        refTable: 'server_plugin_jobs',
-        refColumns: ['id'],
-        onDelete: 'cascade',
-      },
-    ],
-  },
-)
-
-const pluginScriptsTable = defineTable(
-  'server_plugin_scripts',
-  {
-    plugin_id: Type.String(),
-    source: Type.String(),
-    enabled: Type.Boolean({ default: false }),
-    interval_hours: Type.Integer({ minimum: 1, maximum: 168, default: 1 }),
-    next_run_at: Type.Integer(),
-    created_at: Type.Integer(),
-    updated_at: Type.Integer(),
-  },
-  {
-    primaryKey: ['plugin_id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_scripts_due',
-        columns: ['enabled', { column: 'next_run_at', order: 'ASC' }],
-      },
-    ],
-    foreignKeys: [
-      {
-        columns: ['plugin_id'],
-        refTable: 'server_plugin_installations',
-        refColumns: ['plugin_id'],
-        onDelete: 'cascade',
-      },
-    ],
-  },
-)
-
-const pluginScriptRunsTable = defineTable(
-  'server_plugin_script_runs',
-  {
-    id: Type.String(),
-    plugin_id: Type.String(),
-    trigger: Type.Union([Type.Literal('manual'), Type.Literal('scheduled')]),
-    status: Type.Union([Type.Literal('failed'), Type.Literal('succeeded')]),
-    input_json: Type.Optional(Type.String()),
-    result_json: Type.Optional(Type.String()),
-    error_message: Type.Optional(Type.String()),
-    started_at: Type.Integer(),
-    completed_at: Type.Integer(),
-  },
-  {
-    primaryKey: ['id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_script_runs_plugin_started',
-        columns: ['plugin_id', { column: 'started_at', order: 'DESC' }],
-      },
-    ],
-    foreignKeys: [
-      {
-        columns: ['plugin_id'],
-        refTable: 'server_plugin_scripts',
-        refColumns: ['plugin_id'],
         onDelete: 'cascade',
       },
     ],
@@ -393,12 +192,7 @@ const tables = [
   syncChangesTable,
   syncOpsTable,
   syncTerminalCursorsTable,
-  pluginRegistryTable,
-  pluginInstallationsTable,
-  pluginJobsTable,
-  pluginAuditTable,
-  pluginScriptsTable,
-  pluginScriptRunsTable,
+  ...serverTables.filter(table => table.name.startsWith('server_plugin_')),
 ]
 
 const generatedSql = (table: TableSchema): string =>
@@ -410,6 +204,8 @@ const runMigration = (db: DatabaseSync): void => {
     '0002_sync.sql',
     '0003_server_plugins.sql',
     '0004_server_plugin_scripts.sql',
+    '0005_plugin_flows.sql',
+    '0006_remove_legacy_plugin_tables.sql',
   ]) {
     db.exec(readFileSync(join(rootDir, 'packages/server/core/server/migrations', name), 'utf8'))
   }
@@ -487,24 +283,24 @@ describe('sql codegen', () => {
   })
 
   it('renders defaults from TypeBox default values', () => {
-    const registry = generateTableSql(pluginRegistryTable)
-    const installations = generateTableSql(pluginInstallationsTable)
-    expect(registry).toContain('"trusted" integer default 1')
-    expect(installations).toContain('"config_json" text default \'{}\'')
+    const packages = generateTableSql(
+      serverTables.find(table => table.name === 'server_plugin_packages')!,
+    )
+    expect(packages).toContain('"enabled" integer default 1')
+    expect(packages).toContain('"config_json" text default \'{}\'')
   })
 
   it('renders boolean columns with an in (0, 1) check', () => {
-    const scripts = generateTableSql(pluginScriptsTable)
+    const scripts = generateTableSql(
+      serverTables.find(table => table.name === 'server_plugin_schedules')!,
+    )
     expect(scripts).toContain('"enabled" integer default 0 not null check (enabled in (0, 1))')
   })
 
   it('renders enum columns with an in (...) check', () => {
-    const installations = generateTableSql(pluginInstallationsTable)
-    const jobs = generateTableSql(pluginJobsTable)
-    expect(installations).toContain("check (desired_state in ('disabled', 'enabled'))")
-    expect(jobs).toContain(
-      "check (action in ('configure', 'disable', 'enable', 'health', 'install', 'register', 'uninstall', 'update'))",
-    )
+    const runs = generateTableSql(serverTables.find(table => table.name === 'server_plugin_runs')!)
+    expect(runs).toContain("check (trigger in ('manual', 'scheduled'))")
+    expect(runs).toContain("check (status in ('running', 'succeeded', 'failed'))")
   })
 
   it('escapes quotes in enum checks', () => {
@@ -517,9 +313,11 @@ describe('sql codegen', () => {
   })
 
   it('renders integer range checks as between', () => {
-    const scripts = generateTableSql(pluginScriptsTable)
+    const scripts = generateTableSql(
+      serverTables.find(table => table.name === 'server_plugin_schedules')!,
+    )
     expect(scripts).toContain(
-      '"interval_hours" integer default 1 not null check (interval_hours between 1 and 168)',
+      '"interval_hours" integer not null check (interval_hours between 1 and 168)',
     )
   })
 

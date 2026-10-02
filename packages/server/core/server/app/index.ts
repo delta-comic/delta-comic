@@ -17,13 +17,11 @@ import { createServerWorkerAdapter } from '../lib/serverAdapter'
 import { bindRuntime, type AppEnv } from './env'
 import { adminModule } from './modules/admin/admin.module'
 import { authModule } from './modules/auth/auth.module'
+import { runScheduledFlows } from './modules/plugins/plugins.flow.service'
 import { pluginsModule } from './modules/plugins/plugins.module'
-import { runScheduledPluginScripts } from './modules/plugins/plugins.script'
 import { syncModule } from './modules/sync/sync.module'
 import { constantTimeTokenEqual } from './shared/http/adminGuard'
 import { apiSuccessSchema, errorResponse, ok } from './shared/response'
-
-export { PluginDatabase } from './modules/plugins/plugins.database'
 
 const serverLogger = logger.scoped('server:lifecycle')
 
@@ -49,7 +47,7 @@ export const app = new Elysia({ adapter: CloudflareAdapter, prefix: '/api' })
     elysiaCors({
       allowedHeaders: ['content-type', 'authorization'],
       maxAge: 86_400,
-      methods: ['DELETE', 'GET', 'PATCH', 'POST', 'OPTIONS'],
+      methods: ['DELETE', 'GET', 'PATCH', 'POST', 'PUT', 'OPTIONS'],
       origin: true,
       preflight: true,
     }),
@@ -198,7 +196,7 @@ const workerAdapter = createServerWorkerAdapter<AppEnv>({
   },
   scheduled(controller, env, ctx) {
     serverLogger.info('scheduled plugin run started', { cron: controller.cron })
-    ctx.waitUntil(runScheduledPluginScripts(env, ctx, controller.scheduledTime, controller.cron))
+    ctx.waitUntil(runScheduledFlows(env.DB, controller.scheduledTime))
   },
 })
 

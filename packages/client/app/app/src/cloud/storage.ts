@@ -1,5 +1,5 @@
 import { logger } from '@delta-comic/logger'
-import type { CloudSession, CloudSessionStorage, CloudTerminalInput } from '@delta-comic/server'
+import type { CloudSession, CloudSessionStorage, CloudTerminalInput } from '@delta-comic/server/api'
 
 const cloudStorageLogger = logger.scoped('app:cloud:storage')
 const namespace = 'cloud'

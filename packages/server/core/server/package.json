@@ -18,13 +18,13 @@
       "types": "./dist/app/index.d.mts",
       "import": "./dist/app/index.mjs"
     },
-    "./manifest": {
-      "types": "./dist/lib/serverManifest.d.mts",
-      "import": "./dist/lib/serverManifest.mjs"
+    "./api": {
+      "types": "./dist/lib/api.d.mts",
+      "import": "./dist/lib/api.mjs"
     },
-    "./runtime": {
-      "types": "./dist/lib/serverRuntime.d.mts",
-      "import": "./dist/lib/serverRuntime.mjs"
+    "./flow": {
+      "types": "./dist/lib/flow.d.mts",
+      "import": "./dist/lib/flow.mjs"
     },
     "./diagnostics": {
       "types": "./dist/lib/diagnostics.d.mts",
@@ -40,6 +40,7 @@
     "@delta-comic/plugin-manifest": "workspace:",
     "@elysia/eden": "catalog:",
     "cordis": "catalog:",
+    "json-logic-js": "catalog:",
     "ky": "catalog:",
     "kysely": "catalog:",
     "kysely-d1": "catalog:",
@@ -53,8 +54,10 @@
     "@elysiajs/openapi": "catalog:",
     "@sinclair/typebox": "catalog:",
     "@swc/core": "catalog:",
+    "@types/json-logic-js": "catalog:",
     "@types/node": "catalog:",
     "@types/semver": "catalog:",
+    "miniflare": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",

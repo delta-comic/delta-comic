@@ -1,7 +1,7 @@
 import type { DB, InsertObject, Kysely } from '@delta-comic/db'
 import { assertWriteRow, filterValidRowsFor } from '@delta-comic/db'
 import { logger } from '@delta-comic/logger'
-import { syncCollectionNames, type SyncChange, type SyncCollection } from '@delta-comic/server'
+import { syncCollectionNames, type SyncChange, type SyncCollection } from '@delta-comic/server/api'
 
 const syncAdapterLogger = logger.scoped('app:cloud:sync-adapter')
 

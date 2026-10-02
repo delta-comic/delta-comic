@@ -2,6 +2,14 @@
 
 # Delta Comic 全仓重构：研究与需求发现
 
+## 2026-10-02 JSON 流程实施核对
+
+- Cordis Fiber 的原生 await 方法会等待稳定并抛出加载错误。FAILED Fiber 在释放后仍可保留失败状态，清理验证使用 effect 释放和服务可用性。
+- Miniflare 5 使用 workers/config/manifest/env 配置；真实 D1 测试已验证 UPDATE RETURNING 原子领取和复合租户键。
+- 流式取消时必须先确定失败记录，再取消上游读取；单次完成函数负责释放 Context 和写入执行记录。
+- HTTP 使用十秒 AbortSignal deadline，并限制为每步一次请求；代表性资源测量与完整 Rust/Tauri 验收进入最终阶段。
+
+
 ## 阶段 8/9 当前基线（2026-10-01）
 
 - `@delta-comic/both` 已有容量受限 `DiagnosticRecorder`、`withDiagnostic`、装饰器、Cordis runtime 快照以及日志回放 harness，但 snapshot 只有插件与记录两类数据。

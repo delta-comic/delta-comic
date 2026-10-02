@@ -18,9 +18,9 @@ const healthyMetric: AdminMetric = {
 
 const missingPluginMetric: AdminMetric = {
   issue: 'table_missing',
-  key: 'pluginRegistry',
+  key: 'pluginPackages',
   label: '插件注册项',
-  source: { table: 'server_plugin_registry' },
+  source: { table: 'server_plugin_packages' },
   status: 'degraded',
   unit: 'count',
   value: 0,
@@ -39,7 +39,7 @@ class FakeAdminMetricsRepository implements AdminMetricsRepository {
     return this.metrics
   }
 
-  async readRecentPluginAudit(): Promise<AdminRecentActivity> {
+  async readRecentPluginRuns(): Promise<AdminRecentActivity> {
     return this.recentActivity
   }
 }
@@ -49,7 +49,6 @@ const createEnv = (overrides: Partial<AppEnv> = {}): AppEnv => ({
   AUTH_PEPPER: 'auth-pepper',
   CF_VERSION_METADATA: { id: 'version-id', tag: 'test', timestamp: '2026-07-10T00:00:00Z' },
   DB: {} as D1Database,
-  PLUGIN_LOADER: {} as WorkerLoader,
   REFRESH_TOKEN_TTL_SECONDS: '2592000',
   SERVER_ADMIN_TOKEN: 'admin-secret',
   SYNC_MAX_PULL_CHANGES: '500',

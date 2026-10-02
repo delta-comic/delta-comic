@@ -1,4 +1,4 @@
-import { syncCollectionNames, type SyncChange } from '@delta-comic/server'
+import { syncCollectionNames, type SyncChange } from '@delta-comic/server/api'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 interface DbAction {

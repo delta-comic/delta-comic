@@ -11,7 +11,6 @@ const createEnv = (overrides: Partial<AppEnv> = {}): AppEnv => ({
   AUTH_PEPPER: 'auth-pepper',
   CF_VERSION_METADATA: { id: 'test-version', tag: 'test', timestamp: '2026-07-10T00:00:00.000Z' },
   DB: {} as D1Database,
-  PLUGIN_LOADER: {} as WorkerLoader,
   REFRESH_TOKEN_TTL_SECONDS: '2592000',
   SYNC_MAX_PULL_CHANGES: '500',
   SYNC_MAX_PUSH_OPS: '100',

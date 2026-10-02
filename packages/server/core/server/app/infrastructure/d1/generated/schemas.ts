@@ -250,183 +250,64 @@ export const syncTerminalCursorsRowSchema = {
   additionalProperties: false,
 } as const
 
-/** Runtime SQLite row schema for server_plugin_registry. */
-export const serverPluginRegistryRowSchema = {
+/** Runtime SQLite row schema for server_plugin_packages. */
+export const serverPluginPackagesRowSchema = {
   type: 'object',
   properties: {
+    tenant_id: { type: 'string' },
     plugin_id: { type: 'string' },
     manifest_json: { type: 'string' },
-    source: { type: 'string' },
-    trusted: { type: 'integer' },
-    registered_at: { type: 'integer' },
-    updated_at: { type: 'integer' },
-  },
-  required: ['plugin_id', 'manifest_json', 'source', 'trusted', 'registered_at', 'updated_at'],
-  additionalProperties: false,
-} as const
-
-/** Runtime SQLite row schema for server_plugin_installations. */
-export const serverPluginInstallationsRowSchema = {
-  type: 'object',
-  properties: {
-    plugin_id: { type: 'string' },
-    installed_version: { type: 'string' },
-    desired_state: {
-      anyOf: [
-        { type: 'string', const: 'disabled' },
-        { type: 'string', const: 'enabled' },
-      ],
-    },
-    observed_state: {
-      anyOf: [
-        { type: 'string', const: 'disabled' },
-        { type: 'string', const: 'enabled' },
-        { type: 'string', const: 'failed' },
-        { type: 'string', const: 'installed' },
-      ],
-    },
+    document_json: { type: 'string' },
     config_json: { type: 'string' },
-    installed_at: { type: 'integer' },
+    enabled: { type: 'integer' },
+    created_at: { type: 'integer' },
     updated_at: { type: 'integer' },
-    last_error: { anyOf: [{ type: 'string' }, { type: 'null' }] },
-    last_health_json: { anyOf: [{ type: 'string' }, { type: 'null' }] },
-    last_health_at: { anyOf: [{ type: 'integer' }, { type: 'null' }] },
   },
   required: [
+    'tenant_id',
     'plugin_id',
-    'installed_version',
-    'desired_state',
-    'observed_state',
+    'manifest_json',
+    'document_json',
     'config_json',
-    'installed_at',
-    'updated_at',
-    'last_error',
-    'last_health_json',
-    'last_health_at',
-  ],
-  additionalProperties: false,
-} as const
-
-/** Runtime SQLite row schema for server_plugin_jobs. */
-export const serverPluginJobsRowSchema = {
-  type: 'object',
-  properties: {
-    id: { type: 'string' },
-    plugin_id: { type: 'string' },
-    action: {
-      anyOf: [
-        { type: 'string', const: 'configure' },
-        { type: 'string', const: 'disable' },
-        { type: 'string', const: 'enable' },
-        { type: 'string', const: 'health' },
-        { type: 'string', const: 'install' },
-        { type: 'string', const: 'register' },
-        { type: 'string', const: 'uninstall' },
-        { type: 'string', const: 'update' },
-      ],
-    },
-    status: {
-      anyOf: [
-        { type: 'string', const: 'failed' },
-        { type: 'string', const: 'queued' },
-        { type: 'string', const: 'running' },
-        { type: 'string', const: 'succeeded' },
-      ],
-    },
-    result_json: { anyOf: [{ type: 'string' }, { type: 'null' }] },
-    error_message: { anyOf: [{ type: 'string' }, { type: 'null' }] },
-    created_at: { type: 'integer' },
-    started_at: { anyOf: [{ type: 'integer' }, { type: 'null' }] },
-    completed_at: { anyOf: [{ type: 'integer' }, { type: 'null' }] },
-    updated_at: { type: 'integer' },
-  },
-  required: [
-    'id',
-    'plugin_id',
-    'action',
-    'status',
-    'result_json',
-    'error_message',
+    'enabled',
     'created_at',
-    'started_at',
-    'completed_at',
     'updated_at',
   ],
   additionalProperties: false,
 } as const
 
-/** Runtime SQLite row schema for server_plugin_audit. */
-export const serverPluginAuditRowSchema = {
+/** Runtime SQLite row schema for server_plugin_schedules. */
+export const serverPluginSchedulesRowSchema = {
   type: 'object',
   properties: {
-    id: { type: 'string' },
+    tenant_id: { type: 'string' },
     plugin_id: { type: 'string' },
-    job_id: { type: 'string' },
-    action: {
-      anyOf: [
-        { type: 'string', const: 'configure' },
-        { type: 'string', const: 'disable' },
-        { type: 'string', const: 'enable' },
-        { type: 'string', const: 'health' },
-        { type: 'string', const: 'install' },
-        { type: 'string', const: 'register' },
-        { type: 'string', const: 'uninstall' },
-        { type: 'string', const: 'update' },
-      ],
-    },
-    outcome: {
-      anyOf: [
-        { type: 'string', const: 'failed' },
-        { type: 'string', const: 'succeeded' },
-      ],
-    },
-    actor_id: { type: 'string' },
-    detail_json: { anyOf: [{ type: 'string' }, { type: 'null' }] },
-    created_at: { type: 'integer' },
-  },
-  required: [
-    'id',
-    'plugin_id',
-    'job_id',
-    'action',
-    'outcome',
-    'actor_id',
-    'detail_json',
-    'created_at',
-  ],
-  additionalProperties: false,
-} as const
-
-/** Runtime SQLite row schema for server_plugin_scripts. */
-export const serverPluginScriptsRowSchema = {
-  type: 'object',
-  properties: {
-    plugin_id: { type: 'string' },
-    source: { type: 'string' },
+    flow_id: { type: 'string' },
     enabled: { type: 'integer' },
     interval_hours: { type: 'integer', minimum: 1, maximum: 168 },
     next_run_at: { type: 'integer' },
-    created_at: { type: 'integer' },
     updated_at: { type: 'integer' },
   },
   required: [
+    'tenant_id',
     'plugin_id',
-    'source',
+    'flow_id',
     'enabled',
     'interval_hours',
     'next_run_at',
-    'created_at',
     'updated_at',
   ],
   additionalProperties: false,
 } as const
 
-/** Runtime SQLite row schema for server_plugin_script_runs. */
-export const serverPluginScriptRunsRowSchema = {
+/** Runtime SQLite row schema for server_plugin_runs. */
+export const serverPluginRunsRowSchema = {
   type: 'object',
   properties: {
     id: { type: 'string' },
+    tenant_id: { type: 'string' },
     plugin_id: { type: 'string' },
+    flow_id: { type: 'string' },
     trigger: {
       anyOf: [
         { type: 'string', const: 'manual' },
@@ -435,27 +316,47 @@ export const serverPluginScriptRunsRowSchema = {
     },
     status: {
       anyOf: [
-        { type: 'string', const: 'failed' },
+        { type: 'string', const: 'running' },
         { type: 'string', const: 'succeeded' },
+        { type: 'string', const: 'failed' },
       ],
     },
     input_json: { anyOf: [{ type: 'string' }, { type: 'null' }] },
     result_json: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    step_id: { anyOf: [{ type: 'string' }, { type: 'null' }] },
     error_message: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    metrics_json: { type: 'string' },
     started_at: { type: 'integer' },
-    completed_at: { type: 'integer' },
+    completed_at: { anyOf: [{ type: 'integer' }, { type: 'null' }] },
   },
   required: [
     'id',
+    'tenant_id',
     'plugin_id',
+    'flow_id',
     'trigger',
     'status',
     'input_json',
     'result_json',
+    'step_id',
     'error_message',
+    'metrics_json',
     'started_at',
     'completed_at',
   ],
+  additionalProperties: false,
+} as const
+
+/** Runtime SQLite row schema for server_plugin_store. */
+export const serverPluginStoreRowSchema = {
+  type: 'object',
+  properties: {
+    tenant_id: { type: 'string' },
+    plugin_id: { type: 'string' },
+    key: { type: 'string' },
+    value_json: { type: 'string' },
+  },
+  required: ['tenant_id', 'plugin_id', 'key', 'value_json'],
   additionalProperties: false,
 } as const
 
@@ -467,10 +368,8 @@ export const serverRowSchemas = {
   sync_changes: syncChangesRowSchema,
   sync_ops: syncOpsRowSchema,
   sync_terminal_cursors: syncTerminalCursorsRowSchema,
-  server_plugin_registry: serverPluginRegistryRowSchema,
-  server_plugin_installations: serverPluginInstallationsRowSchema,
-  server_plugin_jobs: serverPluginJobsRowSchema,
-  server_plugin_audit: serverPluginAuditRowSchema,
-  server_plugin_scripts: serverPluginScriptsRowSchema,
-  server_plugin_script_runs: serverPluginScriptRunsRowSchema,
+  server_plugin_packages: serverPluginPackagesRowSchema,
+  server_plugin_schedules: serverPluginSchedulesRowSchema,
+  server_plugin_runs: serverPluginRunsRowSchema,
+  server_plugin_store: serverPluginStoreRowSchema,
 } satisfies Record<string, TSchema>

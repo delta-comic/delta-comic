@@ -1,7 +1,8 @@
 import { logger } from '@delta-comic/logger'
 import { sql } from 'kysely'
 
-import { serverPluginAuditRowSchema } from '@/infrastructure/d1/generated/schemas'
+import { serverPluginRunsRowSchema } from '@/infrastructure/d1/generated/schemas'
+import type { ServerPluginRun } from '@/infrastructure/d1/generated/server_plugin_runs.table'
 import { createKysely } from '@/infrastructure/d1/kysely'
 import type { ServerDatabase } from '@/infrastructure/d1/kysely'
 import { assertDatabaseRead } from '@/infrastructure/d1/validation'
@@ -19,17 +20,6 @@ interface CountRow {
 
 interface TableNameRow {
   name: string
-}
-
-interface PluginAuditRow {
-  action: string
-  actor_id: string | null
-  created_at: number
-  detail_json: string | null
-  id: string
-  job_id: string | null
-  outcome: string
-  plugin_id: string
 }
 
 interface MetricDefinition {
@@ -50,10 +40,10 @@ const metricDefinitions: readonly MetricDefinition[] = [
   },
   { key: 'syncEntities', label: '同步实体', table: 'sync_entities' },
   { key: 'syncChanges', label: '同步变更', table: 'sync_changes' },
-  { key: 'pluginRegistry', label: '插件注册项', table: 'server_plugin_registry' },
-  { key: 'pluginInstallations', label: '插件安装项', table: 'server_plugin_installations' },
-  { key: 'pluginJobs', label: '插件任务', table: 'server_plugin_jobs' },
-  { key: 'pluginAudit', label: '插件审计记录', table: 'server_plugin_audit' },
+  { key: 'pluginPackages', label: '插件安装项', table: 'server_plugin_packages' },
+  { key: 'pluginSchedules', label: '定时流程', table: 'server_plugin_schedules' },
+  { key: 'pluginRuns', label: '流程执行记录', table: 'server_plugin_runs' },
+  { key: 'pluginStore', label: '插件存储项', table: 'server_plugin_store' },
 ]
 
 const unavailableMetric = (definition: MetricDefinition, issue: AdminMetricIssue): AdminMetric => ({
@@ -84,19 +74,10 @@ const logQueryFailure = (operation: string, error: unknown) => {
   metricsLogger.error('admin metrics query failed', { error: errorMessage(error), operation })
 }
 
-const parseAuditDetail = (value: string | null): unknown => {
-  if (!value) return undefined
-  try {
-    return JSON.parse(value) as unknown
-  } catch {
-    return undefined
-  }
-}
-
 export interface AdminMetricsRepository {
   probeDatabase(): Promise<void>
   readMetrics(observedAt: number): Promise<AdminMetric[]>
-  readRecentPluginAudit(limit: number): Promise<AdminRecentActivity>
+  readRecentPluginRuns(limit: number): Promise<AdminRecentActivity>
 }
 
 export class D1AdminMetricsRepository implements AdminMetricsRepository {
@@ -135,35 +116,35 @@ export class D1AdminMetricsRepository implements AdminMetricsRepository {
     )
   }
 
-  async readRecentPluginAudit(limit: number): Promise<AdminRecentActivity> {
+  async readRecentPluginRuns(limit: number): Promise<AdminRecentActivity> {
     let tables: Set<string>
     try {
-      tables = await this.readExistingTables(['server_plugin_audit'])
+      tables = await this.readExistingTables(['server_plugin_runs'])
     } catch (error) {
-      logQueryFailure('inspect_plugin_audit_table', error)
+      logQueryFailure('inspect_plugin_runs_table', error)
       return { available: false, issue: 'query_failed', items: [] }
     }
-    if (!tables.has('server_plugin_audit')) {
+    if (!tables.has('server_plugin_runs')) {
       return { available: false, issue: 'table_missing', items: [] }
     }
 
     try {
       const safeLimit = Math.min(100, Math.max(1, Math.trunc(limit)))
       const result = await this.kysely
-        .selectFrom('server_plugin_audit')
+        .selectFrom('server_plugin_runs')
         .selectAll()
-        .orderBy('created_at', 'desc')
+        .orderBy('started_at', 'desc')
         .orderBy('id', 'desc')
         .limit(safeLimit)
         .execute()
       return {
         available: true,
         items: result
-          .map(row => assertDatabaseRead(serverPluginAuditRowSchema, 'server_plugin_audit', row))
-          .map(this.toPluginAudit),
+          .map(row => assertDatabaseRead(serverPluginRunsRowSchema, 'server_plugin_runs', row))
+          .map(this.toPluginActivity),
       }
     } catch (error) {
-      logQueryFailure('recent_plugin_audit', error)
+      logQueryFailure('recent_plugin_runs', error)
       return { available: false, issue: 'query_failed', items: [] }
     }
   }
@@ -186,19 +167,17 @@ export class D1AdminMetricsRepository implements AdminMetricsRepository {
           qb.where('revoked_at', 'is', null).where('refresh_expires_at', '>', observedAt),
         )
         .executeTakeFirst()
-    return await count(definition.table as keyof ServerDatabase)
+    return await count(definition.table)
   }
 
-  private readonly toPluginAudit = (row: PluginAuditRow): AdminPluginAudit => {
-    const detail = parseAuditDetail(row.detail_json)
+  private readonly toPluginActivity = (row: ServerPluginRun): AdminPluginAudit => {
     return {
-      action: row.action,
-      ...(row.actor_id ? { actorId: row.actor_id } : {}),
-      createdAt: row.created_at,
-      ...(detail === undefined ? {} : { detail }),
+      action: row.flow_id,
+      actorId: row.tenant_id,
+      createdAt: row.started_at,
+      detail: { trigger: row.trigger, stepId: row.step_id, error: row.error_message },
       id: row.id,
-      ...(row.job_id ? { jobId: row.job_id } : {}),
-      outcome: row.outcome,
+      outcome: row.status,
       pluginId: row.plugin_id,
     }
   }

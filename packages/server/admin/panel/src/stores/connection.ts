@@ -29,6 +29,9 @@ const readEndpoint = (): string => {
 export const useConnectionStore = defineStore('serverConnection', () => {
   const apiBaseUrl = shallowRef(readEndpoint())
   const adminToken = shallowRef(browserStorage('session')?.getItem(tokenStorageKey) ?? '')
+  const userToken = shallowRef(
+    browserStorage('session')?.getItem('delta-comic.admin.user-token') ?? '',
+  )
   const status = shallowRef<'connected' | 'connecting' | 'disconnected' | 'error'>('disconnected')
   const error = shallowRef('')
   const capabilities = shallowRef<AdminCapabilities | null>(null)
@@ -41,6 +44,19 @@ export const useConnectionStore = defineStore('serverConnection', () => {
   const createClient = (): AdminApiClient => {
     if (!apiBaseUrl.value) throw new Error('请先配置 Server API 地址')
     return new AdminApiClient({ baseUrl: apiBaseUrl.value, getToken: () => adminToken.value })
+  }
+
+  const createUserClient = (): AdminApiClient =>
+    new AdminApiClient({
+      baseUrl: apiBaseUrl.value,
+      getToken: () => userToken.value,
+      timeout: 180_000,
+    })
+  const saveUserToken = (token: string) => {
+    userToken.value = token.trim()
+    if (userToken.value)
+      browserStorage('session')?.setItem('delta-comic.admin.user-token', userToken.value)
+    else browserStorage('session')?.removeItem('delta-comic.admin.user-token')
   }
 
   const saveCredentials = (endpoint: string, token: string) => {
@@ -93,6 +109,9 @@ export const useConnectionStore = defineStore('serverConnection', () => {
   }
 
   return {
+    userToken,
+    saveUserToken,
+    createUserClient,
     adminToken,
     apiBaseUrl,
     capabilities,
