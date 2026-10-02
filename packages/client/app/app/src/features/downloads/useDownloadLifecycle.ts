@@ -38,6 +38,7 @@ export function useDownloadLifecycle() {
   }
 
   onMounted(() => {
+    if (!isTauri()) return
     disposed = false
     downloadLifecycleLogger.debug('download lifecycle mounted')
     void store.connect().catch(error => {

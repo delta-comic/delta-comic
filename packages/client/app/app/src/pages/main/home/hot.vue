@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { usePluginStore } from '@delta-comic/plugin'
+import { pluginContext, usePluginStore } from '@delta-comic/plugin'
 import { isEmpty } from 'es-toolkit/compat'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -11,35 +11,29 @@ const $router = useRouter()
 const { t } = useI18n()
 const pluginStore = usePluginStore()
 const leaderboards = computed(() =>
-  pluginStore
-    .modelEntries('content')
-    .flatMap(([plugin, content]) =>
-      (content.promotes?.hotPageContent?.levelboard ?? []).map(value => ({ plugin, value })),
-    ),
+  [...pluginStore.content].flatMap(([plugin, content]) =>
+    (content.promotes?.hotPageContent?.levelboard ?? []).map(value => ({ plugin, value })),
+  ),
 )
 const hotList = computed(() =>
-  pluginStore
-    .modelEntries('content')
-    .flatMap(([plugin, content]) =>
-      (content.promotes?.hotPageContent?.categories ?? []).map((category, blockIndex) => ({
-        block: {
-          ...category,
-          onClick: () => pluginStore.plugins.get(plugin)?.hooks?.onHotCategoryClick?.(category),
-        },
-        blockIndex,
-        plugin,
-      })),
-    ),
+  [...pluginStore.content].flatMap(([plugin, content]) =>
+    (content.promotes?.hotPageContent?.categories ?? []).map((category, blockIndex) => ({
+      block: {
+        ...category,
+        onClick: () => pluginContext.emit('content/hot-category', plugin, category),
+      },
+      blockIndex,
+      plugin,
+    })),
+  ),
 )
 const topButtons = computed(() => {
-  const buttons = pluginStore
-    .modelEntries('content')
-    .flatMap(([plugin, content]) =>
-      (content.promotes?.hotPageContent?.topButton ?? []).map(button => ({
-        ...button,
-        onClick: () => pluginStore.plugins.get(plugin)?.hooks?.onHotTopButtonClick?.(button),
-      })),
-    )
+  const buttons = [...pluginStore.content].flatMap(([plugin, content]) =>
+    (content.promotes?.hotPageContent?.topButton ?? []).map(button => ({
+      ...button,
+      onClick: () => pluginContext.emit('content/hot-button', plugin, button),
+    })),
+  )
   if (!isEmpty(leaderboards.value)) {
     buttons.unshift({
       bgColor: '#ff9212',

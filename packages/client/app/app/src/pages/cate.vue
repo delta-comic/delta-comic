@@ -9,11 +9,9 @@ const $router = useRouter()
 const pluginStore = usePluginStore()
 const { t } = useI18n()
 const categoryEntries = computed(() =>
-  pluginStore
-    .modelEntries('content')
-    .flatMap(([plugin, content]) =>
-      content.promotes?.categories ? [[plugin, content.promotes.categories] as const] : [],
-    ),
+  [...pluginStore.content].flatMap(([plugin, content]) =>
+    content.promotes?.categories ? [[plugin, content.promotes.categories] as const] : [],
+  ),
 )
 </script>
 

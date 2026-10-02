@@ -18,20 +18,18 @@ const config = useConfig().load(Core.cfg)
 const { t } = useI18n()
 
 const allSearchSource = computed(() =>
-  pluginStore
-    .modelEntries('content')
-    .flatMap(([plugin, content]) =>
-      content.search
-        ? [
-            [
-              plugin,
-              content.search.methods.map(
-                method => [method.id, method] as [string, Content.SearchMethod],
-              ),
-            ] as const,
-          ]
-        : [],
-    ),
+  [...pluginStore.content].flatMap(([plugin, content]) =>
+    content.search
+      ? [
+          [
+            plugin,
+            content.search.methods.map(
+              method => [method.id, method] as [string, Content.SearchMethod],
+            ),
+          ] as const,
+        ]
+      : [],
+  ),
 )
 
 const method = computed(() => {

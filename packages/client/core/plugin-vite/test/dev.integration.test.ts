@@ -12,12 +12,14 @@ import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test'
 import { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH, createDevPlugin } from '../lib/dev'
 
 const meta: PluginManifest = {
-  apiVersion: 1,
-  name: { display: 'Dev Plugin', id: 'dev-plugin' },
-  version: { plugin: '1.0.0', supportCore: '1.0.0' },
+  protocolVersion: 2,
+  client: { entry: 'index.js' },
+  resources: [],
+  name: 'Dev Plugin',
+  id: 'dev-plugin',
+  version: '1.0.0',
   author: 'delta',
   description: 'dev plugin',
-  require: [],
 }
 
 let root: string
@@ -79,7 +81,7 @@ describe('deltaComic dev protocol', () => {
     expect(status).toBe(200)
     expect(headers.get('access-control-allow-origin')).toBe('*')
     expect(headers.get('cache-control')).toContain('no-cache')
-    expect(JSON.parse(text).entry).toBeUndefined()
+    expect(JSON.parse(text).client.entry).toBe('index.js')
   })
 
   it('serves the transformed dev entry module', async () => {

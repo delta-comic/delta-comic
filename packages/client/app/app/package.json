@@ -21,6 +21,7 @@
     "@tauri-apps/plugin-shell": "catalog:",
     "@vueuse/core": "catalog:",
     "color": "catalog:",
+    "cordis": "catalog:",
     "dayjs": "catalog:",
     "es-toolkit": "catalog:",
     "motion-v": "catalog:",

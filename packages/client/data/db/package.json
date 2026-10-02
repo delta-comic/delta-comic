@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@delta-comic/logger": "workspace:",
+    "@delta-comic/plugin-manifest": "workspace:",
     "@subframe7536/sqlite-wasm": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-sql": "catalog:",

@@ -89,17 +89,19 @@ const registerProvider = (provider: UniContentDownloadProvider = { resolve }) =>
   return provider
 }
 
-const archiveMeta = (
-  integrity?: PluginArchiveDB.Meta['integrity'],
-): Pick<PluginArchiveDB.Archive, 'meta'> => ({
+const archiveMeta = (integrity?: string): Pick<PluginArchiveDB.Archive, 'meta'> => ({
   meta: {
-    apiVersion: 1,
+    protocolVersion: 2,
+    client: { entry: 'index.js' },
+    resources: integrity
+      ? [{ path: 'index.js', mimeType: 'text/javascript', integrity, imports: [] }]
+      : [],
     author: 'Delta',
     description: 'Reader',
-    integrity,
-    name: { display: 'Reader', id: 'reader' },
-    require: [],
-    version: { plugin: '3.2.1', supportCore: '^2.3.0' },
+    name: 'Reader',
+    id: 'reader',
+
+    version: '3.2.1',
   },
 })
 
@@ -118,9 +120,7 @@ describe('contentPlanToEnqueueInput', () => {
   })
 
   it('preserves HTTP mirrors and persists the exact content reconstruction context', async () => {
-    database.executeTakeFirst.mockResolvedValue(
-      archiveMeta({ algorithm: 'sha256', digest: 'archive-digest' }),
-    )
+    database.executeTakeFirst.mockResolvedValue(archiveMeta('sha256-archive-digest'))
 
     await expect(contentPlanToEnqueueInput(httpPlan, page)).resolves.toMatchObject({
       assets: [
@@ -145,7 +145,7 @@ describe('contentPlanToEnqueueInput', () => {
         contentType: ['reader', 'comic'],
         episodeId: 'episode-2',
         plugin: 'reader',
-        pluginIntegrity: 'sha256:archive-digest',
+        pluginIntegrity: 'sha256-archive-digest',
         pluginVersion: '3.2.1',
         providerFingerprint: expect.stringMatching(/^sha256:[\da-f]{64}$/),
       },

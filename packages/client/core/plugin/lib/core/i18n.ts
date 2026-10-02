@@ -1,4 +1,4 @@
-import type { PluginLocaleMessages } from '../api/i18n'
+import type { PluginLocaleMessages } from '@delta-comic/client'
 
 export const coreI18n: PluginLocaleMessages = {
   'zh-CN': {

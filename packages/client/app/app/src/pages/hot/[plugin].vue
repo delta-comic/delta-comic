@@ -16,13 +16,11 @@ const plugin = computed(() => $route.params.plugin.toString())
 const leaderboards = computed(
   () =>
     new Map(
-      pluginStore
-        .modelEntries('content')
-        .flatMap(([owner, content]) =>
-          content.promotes?.hotPageContent?.levelboard
-            ? ([[owner, content.promotes.hotPageContent.levelboard]] as const)
-            : [],
-        ),
+      [...pluginStore.content].flatMap(([owner, content]) =>
+        content.promotes?.hotPageContent?.levelboard
+          ? ([[owner, content.promotes.hotPageContent.levelboard]] as const)
+          : [],
+      ),
     ),
 )
 const select = computed(

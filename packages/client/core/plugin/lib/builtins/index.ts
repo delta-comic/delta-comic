@@ -1,19 +1,18 @@
-import type { InternalPluginDefinition } from '@delta-comic/plugin-kernel'
+import type { PluginManifest } from '@delta-comic/plugin-manifest'
+import type { Plugin } from 'cordis'
 
-import type { DCPluginConfig } from '../api'
+export { manifest as coreManifest } from './core.builtin'
 
-export * from './core.builtin'
-
-const builtinModules = import.meta.glob<{ default: InternalPluginDefinition<DCPluginConfig> }>(
+const modules = import.meta.glob<{ default: readonly Plugin.Function[]; manifest: PluginManifest }>(
   './*.builtin.ts',
   { eager: true },
 )
 
-/** Files are the registration boundary: adding a built-in does not change the composition root. */
-export const internalPluginDefinitions = Object.entries(builtinModules)
+export const builtinPlugins = Object.entries(modules)
   .sort(([left], [right]) => left.localeCompare(right))
   .map(([path, module]) => {
-    if (!module.default)
-      throw new Error(`built-in plugin module has no default definition: ${path}`)
-    return module.default
+    if (!Array.isArray(module.default) || module.default.some(fn => typeof fn !== 'function')) {
+      throw new Error(`built-in entry must export a function array: ${path}`)
+    }
+    return { manifest: module.manifest, functions: module.default }
   })

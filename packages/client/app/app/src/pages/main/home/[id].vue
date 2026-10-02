@@ -8,9 +8,7 @@ const plugin = computed(() => $route.query.plugin?.toString() ?? '')
 const id = computed(() => $route.params.id)
 const pluginStore = usePluginStore()
 const tabbar = computed(() =>
-  pluginStore.plugins
-    .get(plugin.value)
-    ?.model?.content?.promotes?.tabbar?.find(value => value.id === id.value),
+  pluginStore.content.get(plugin.value)?.promotes?.tabbar?.find(value => value.id === id.value),
 )
 </script>
 

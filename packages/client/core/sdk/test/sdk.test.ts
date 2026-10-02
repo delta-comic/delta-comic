@@ -1,123 +1,9 @@
 import { DiagnosticRecorder } from '@delta-comic/both'
-import { environmentRegistry } from '@delta-comic/ui/environment'
 import { describe, expect, it, vi } from 'vitest'
-import { defineComponent } from 'vue'
 
-import {
-  ClientRuntime,
-  createClientDownloader,
-  createClientNetwork,
-  type ClientDatabase,
-  type Context,
-} from '../lib/index.js'
-
-const database = {
-  db: {} as ClientDatabase<Record<string, never>>['db'],
-  query: vi.fn(),
-} as ClientDatabase<Record<string, never>>
+import { createClientDownloader, createClientNetwork } from '../lib/index.js'
 
 describe('client SDK', () => {
-  it('provides typed host services through Cordis injection', async () => {
-    const runtime = new ClientRuntime({ pluginId: 'demo', database })
-    await runtime.mount('consumer', {
-      inject: ['client'],
-      apply(ctx: Context) {
-        ctx.client.store.set('ready', true)
-        ctx.client.ui.registerRoute({ path: '/plugins/demo/home', title: 'Demo' })
-      },
-    })
-    expect(runtime.host.store.get<boolean>('ready')).toBe(true)
-    expect(runtime.snapshot().plugins[0]?.state).toBe('active')
-    await runtime.dispose()
-  })
-
-  it('delegates UI registrations to injectable host registrars', async () => {
-    const removed: string[] = []
-    const runtime = new ClientRuntime({
-      pluginId: 'registrars',
-      database,
-      uiRegistrars: {
-        route: route => () => removed.push(`route:${route.path}`),
-        navItem: item => () => removed.push(`nav:${item.path}`),
-        command: id => () => removed.push(`command:${id}`),
-      },
-    })
-    await runtime.mount('consumer', {
-      inject: ['client'],
-      apply(ctx: Context) {
-        ctx.client.ui.registerRoute({ path: '/plugins/registrars', title: 'Registrars' })
-        ctx.client.ui.registerNavItem({ path: '/plugins/registrars', title: 'Registrars' })
-        ctx.client.ui.registerCommand('registrars.refresh', () => undefined)
-      },
-    })
-    await runtime.dispose()
-    expect(removed).toEqual([
-      'route:/plugins/registrars',
-      'nav:/plugins/registrars',
-      'command:registrars.refresh',
-    ])
-  })
-
-  it('records database and store operations through host boundaries', async () => {
-    const runtime = new ClientRuntime({ pluginId: 'diagnostics', database })
-    await runtime.mount('consumer', {
-      inject: ['client'],
-      async apply(ctx: Context) {
-        ctx.client.store.set('ready', true)
-        ctx.client.store.get<boolean>('ready')
-        await ctx.client.db.query('load-items', async () => [])
-      },
-    })
-    expect(
-      runtime
-        .snapshot()
-        .records.map(record => record.message)
-        .filter(
-          message => message.startsWith('client store') || message.startsWith('client database'),
-        ),
-    ).toEqual([
-      'client store write completed',
-      'client store read completed',
-      'client database query completed',
-    ])
-    await runtime.dispose()
-  })
-
-  it('releases plugin-owned UI registrations when that plugin unmounts', async () => {
-    const removed: string[] = []
-    const runtime = new ClientRuntime({
-      pluginId: 'scoped-ui',
-      database,
-      uiRegistrars: { route: route => () => removed.push(route.path) },
-    })
-    await runtime.mount('consumer', {
-      inject: ['client'],
-      apply(ctx: Context) {
-        ctx.client.ui.registerRoute({ path: '/plugins/scoped-ui', title: 'Scoped UI' })
-      },
-    })
-    expect(removed).toEqual([])
-    const registered = runtime.host.ui.registerRoute({ path: '/plugins/host', title: 'Host UI' })
-    await runtime.unmount('consumer')
-    expect(removed).toEqual(['/plugins/scoped-ui'])
-    registered()
-    await runtime.dispose()
-    expect(runtime.snapshot().plugins).toHaveLength(0)
-  })
-
-  it('records store key and delete operations', async () => {
-    const runtime = new ClientRuntime({ pluginId: 'store-operations', database })
-    runtime.host.store.set('value', 1)
-    expect(runtime.host.store.keys()).toEqual(['value'])
-    expect(runtime.host.store.delete('value')).toBe(true)
-    expect(runtime.diagnostics.list().map(record => record.message)).toEqual([
-      'client store write completed',
-      'client store keys completed',
-      'client store delete completed',
-    ])
-    await runtime.dispose()
-  })
-
   it('exposes the downloader with diagnostic command instrumentation', async () => {
     const invoke = vi.fn()
     const diagnostics = new DiagnosticRecorder({ source: 'test', capacity: 20 })
@@ -138,33 +24,6 @@ describe('client SDK', () => {
       'client downloader get settings completed',
     ])
     downloader.dispose()
-  })
-
-  it('removes plugin environment registrations during runtime disposal', async () => {
-    const runtime = new ClientRuntime({ pluginId: 'environment', database })
-    const component = defineComponent({ template: '<div />' })
-    let removeEnvironment: (() => void) | undefined
-
-    await runtime.mount('consumer', {
-      inject: ['client'],
-      apply(ctx: Context) {
-        removeEnvironment = ctx.client.ui.registerEnvironment('test-environment', component)
-      },
-    })
-
-    expect(environmentRegistry.forKey('test-environment')).toHaveLength(1)
-    removeEnvironment?.()
-    expect(environmentRegistry.forKey('test-environment')).toHaveLength(0)
-
-    await runtime.mount('second-consumer', {
-      inject: ['client'],
-      apply(ctx: Context) {
-        ctx.client.ui.registerEnvironment('test-environment', component)
-      },
-    })
-    expect(environmentRegistry.forKey('test-environment')).toHaveLength(1)
-    await runtime.dispose()
-    expect(environmentRegistry.forKey('test-environment')).toHaveLength(0)
   })
 
   it('provides an injectable network transport with diagnostics', async () => {

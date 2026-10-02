@@ -90,10 +90,11 @@ export function isContentSourceRefreshCandidateCurrent(
 export function pluginArchiveToContentRefreshIdentity(
   archive: Pick<PluginArchiveDB.Archive, 'meta'>,
 ): ContentRefreshPluginIdentity {
-  const integrity = archive.meta.integrity
   return {
-    pluginVersion: archive.meta.version.plugin,
-    pluginIntegrity: integrity ? `${integrity.algorithm}:${integrity.digest}` : undefined,
+    pluginVersion: archive.meta.version,
+    pluginIntegrity: archive.meta.resources.find(
+      resource => resource.path === archive.meta.client?.entry,
+    )?.integrity,
   }
 }
 

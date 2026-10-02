@@ -18,9 +18,12 @@ import { environmentRegistry } from '@delta-comic/ui/environment'
 import { Service, type Context } from 'cordis'
 import { shallowReactive } from 'vue'
 
+import { selectFastestEndpoint } from './adapters/endpointProbe'
 import { pluginI18n } from './adapters/i18n'
-import { selectFastestEndpoint } from './capabilities/endpointProbe'
-import type { PluginAuthGateway } from './capabilities/services'
+
+export interface PluginAuthGateway {
+  authenticate(plugin: string, auth: User.Auth, signal: AbortSignal): Promise<void>
+}
 
 export type PluginOwner = (ctx: Context) => string
 
@@ -110,7 +113,7 @@ export class UserService extends CollectionService<User.UserModel> implements Cl
   public constructor(
     ctx: Context,
     owner: PluginOwner,
-    private readonly auth?: PluginAuthGateway,
+    private readonly auth: () => PluginAuthGateway | undefined = () => undefined,
   ) {
     super(ctx, 'user', owner)
   }
@@ -131,7 +134,7 @@ export class UserService extends CollectionService<User.UserModel> implements Cl
     const owner = this.owner(this.ctx)
     const user = this.entries.get(owner)
     if (!user) throw new Error(`user model is unavailable: ${owner}`)
-    await this.auth?.authenticate(owner, user.auth, signal)
+    await this.auth()?.authenticate(owner, user.auth, signal)
   }
 }
 

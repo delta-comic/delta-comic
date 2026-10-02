@@ -24,17 +24,36 @@ const entry = (version = '2.0.0'): PluginMarketplaceEntry => ({
     source: { repository: 'delta-comic/example', type: 'github' },
   },
   manifest: {
-    apiVersion: 1,
+    protocolVersion: 2,
+    client: { entry: 'index.js' },
+    resources: [],
     author: 'delta-comic',
     description: 'Searchable description',
-    name: { display: 'Example Plugin', id: 'example' },
-    require: [],
-    version: { plugin: version, supportCore: '^2.3.0' },
+    name: 'Example Plugin',
+    id: 'example',
+
+    version: version,
   },
 })
 
 const installed = (version = '1.0.0') =>
-  ({ meta: { version: { plugin: version } }, pluginName: 'example' }) as PluginArchiveDB.Archive
+  ({
+    meta: {
+      protocolVersion: 2,
+      id: 'example',
+      name: 'Example',
+      version,
+      client: { entry: 'index.js' },
+      resources: [],
+    },
+    enable: true,
+    config: {},
+    installInput: '',
+    installerName: 'local',
+    loaderName: 'zip',
+    displayName: 'Example',
+    pluginName: 'example',
+  }) as PluginArchiveDB.Archive
 
 describe('plugin marketplace view model', () => {
   it('merges installed state by manifest plugin id and detects updates', () => {

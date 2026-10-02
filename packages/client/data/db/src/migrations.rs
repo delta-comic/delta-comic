@@ -146,6 +146,12 @@ pub fn all() -> Vec<Migration> {
       sql: PLUGIN_DIAGNOSTIC_LOG,
       kind: MigrationKind::Up,
     },
+    Migration {
+      version: 6,
+      description: "plugin_config",
+      sql: "ALTER TABLE plugin ADD COLUMN config JSON;",
+      kind: MigrationKind::Up,
+    },
   ]
 }
 
@@ -157,12 +163,16 @@ mod tests {
   fn includes_the_diagnostic_log_migration_after_the_initial_schema() {
     let migrations = all();
     assert_eq!(
-      migrations.last().map(|migration| migration.version),
+      migrations
+        .iter()
+        .find(|migration| migration.version == 5)
+        .map(|migration| migration.version),
       Some(5)
     );
     assert!(
       migrations
-        .last()
+        .iter()
+        .find(|migration| migration.version == 5)
         .is_some_and(|migration| migration.sql.contains("plugin_diagnostic_log"))
     );
   }

@@ -1,8 +1,6 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import type { PluginManifest } from '@delta-comic/model'
-import type { PluginConfig } from '@delta-comic/plugin-api'
-import type { LoadedPluginModule } from '@delta-comic/plugin-loader'
-import type { PluginManifest as ArtifactManifest } from '@delta-comic/plugin-manifest'
+import type { PluginManifest } from '@delta-comic/plugin-manifest'
+import type { Context, Plugin } from 'cordis'
 
 export type PluginInstallInput = File | string
 
@@ -28,13 +26,6 @@ export interface DecodedPluginPackage {
   readonly codecId: string
   readonly files: ReadonlyMap<string, Uint8Array>
   readonly manifest: PluginManifest
-}
-
-/** A validated package using the current protocol manifest and resource graph. */
-export interface DecodedPluginArtifactPackage {
-  readonly codecId: string
-  readonly files: ReadonlyMap<string, Uint8Array>
-  readonly manifest: ArtifactManifest
 }
 
 export interface PluginPackageCodec {
@@ -64,10 +55,16 @@ export interface PluginArchiveRepository {
   upsert(archive: PluginArchiveDB.Archive): Promise<void>
 }
 
-export interface PluginModuleReader<TConfig extends PluginConfig = PluginConfig> {
+export interface LoadedPluginModule {
+  readonly functions: readonly Plugin.Function[]
+  readonly activate?: (ctx: Context) => void
+  readonly dispose?: () => void | Promise<void>
+}
+
+export interface PluginModuleReader {
   readonly id: string
   matches?(archive: PluginArchiveDB.Archive): boolean
-  read(archive: PluginArchiveDB.Archive, signal: AbortSignal): Promise<LoadedPluginModule<TConfig>>
+  read(archive: PluginArchiveDB.Archive, signal: AbortSignal): Promise<LoadedPluginModule>
 }
 
 export interface PluginInstallProgress {

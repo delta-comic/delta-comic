@@ -50,8 +50,7 @@ const syncFromCloud = () =>
     const controller = new AbortController()
     try {
       await Promise.all(
-        Array.from(pluginStore.plugins.entries()).map(async ([plugin, config], index) => {
-          const user = config.model?.user
+        Array.from(pluginStore.user.entries()).map(async ([plugin, user], index) => {
           if (!user?.favourites) return
 
           const { download, upload } = user.favourites

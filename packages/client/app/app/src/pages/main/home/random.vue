@@ -16,10 +16,10 @@ const temp = useTemp().$applyRaw('randomConfig', () => ({ scroll: 0 }))
 const plugin = usePluginStore()
 
 const randomProvider = computed(() =>
-  plugin.plugins
+  plugin.content
     .values()
     .toArray()
-    .map(v => v.model?.content?.promotes?.fetchRandomItems)
+    .map(v => v.promotes?.fetchRandomItems)
     .filter(v => !!v),
 )
 const getRandomItems = async (signal: AbortSignal) => {

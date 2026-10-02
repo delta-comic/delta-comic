@@ -1,207 +1,156 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import type { PluginManifest } from '@delta-comic/model'
-import { PluginScope } from '@delta-comic/plugin-kernel'
-import { describe, expect, it, vi } from 'vitest'
+import { sha256Integrity } from '@delta-comic/plugin-artifact'
+import type { PluginManifest } from '@delta-comic/plugin-manifest'
+import { Context } from 'cordis'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
-import type { PluginFileReplacement, PluginFileStore } from '../../../lib'
 import {
-  CordisArtifactModuleReader,
   createArtifactModuleGraph,
-  DevServerPluginModuleReader,
+  parseClientPluginEntry,
   StoredPluginModuleReader,
+  type PluginFileStore,
 } from '../../../lib'
 
-describe('artifact module graph', () => {
-  it('rewrites relative dynamic imports for Blob URLs', async () => {
-    const chunk = new TextEncoder().encode('export const value = 42')
-    const entry = new TextEncoder().encode(
-      "export default async () => (await import('./chunks/value.js')).value",
-    )
-    const manifest = {
-      protocolVersion: 1 as const,
-      id: 'graph-reader',
-      name: 'Graph Reader',
-      version: '1.0.0',
-      entry: 'index.js',
-      entryType: 'plugin' as const,
-      resources: [
-        {
-          path: 'index.js',
-          mimeType: 'text/javascript',
-          integrity: await import('@delta-comic/plugin-artifact').then(({ sha256Integrity }) =>
-            sha256Integrity(entry),
-          ),
-          imports: ['./chunks/value.js'],
-        },
-        {
-          path: 'chunks/value.js',
-          mimeType: 'text/javascript',
-          integrity: await import('@delta-comic/plugin-artifact').then(({ sha256Integrity }) =>
-            sha256Integrity(chunk),
-          ),
-          imports: [],
-        },
-      ],
-    }
+const NativeBlob = Blob
+class ModuleBlob extends NativeBlob {
+  readonly source: string
+  constructor(parts: BlobPart[], options?: BlobPropertyBag) {
+    super(parts, options)
+    this.source = parts.filter(part => typeof part === 'string').join('')
+  }
+}
 
-    const graph = await createArtifactModuleGraph(
-      manifest,
-      new Map([
-        ['index.js', entry],
-        ['chunks/value.js', chunk],
-      ]),
-    )
-    const source = await fetch(graph.url).then(response => response.text())
-    expect(source).toContain('blob:')
-    expect(source).not.toContain("import('./chunks/value.js')")
-    graph.dispose()
+beforeEach(() => {
+  vi.stubGlobal('Blob', ModuleBlob)
+  vi.spyOn(URL, 'createObjectURL').mockImplementation(blob => {
+    if (!(blob instanceof ModuleBlob)) throw new Error('expected a module blob')
+    return `data:text/javascript,${encodeURIComponent(blob.source)}#${crypto.randomUUID()}`
   })
+  vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
+})
+afterEach(() => {
+  vi.restoreAllMocks()
+  vi.unstubAllGlobals()
 })
 
-const artifactManifest = async (entryType: 'plugin' | 'plugin-set' = 'plugin') => {
-  const source = 'export default () => ({ name: "cordis-reader" })'
-  const integrity = await import('@delta-comic/plugin-artifact').then(({ sha256Integrity }) =>
-    sha256Integrity(new TextEncoder().encode(source)),
-  )
-  return {
-    manifest: {
-      protocolVersion: 1 as const,
-      id: 'cordis-reader',
-      name: 'Cordis Reader',
-      version: '1.0.0',
-      entry: 'index.js',
-      entryType,
-      resources: [{ path: 'index.js', mimeType: 'text/javascript', integrity, imports: [] }],
+const artifact = async (source: string, css = '') => {
+  const files = new Map([['index.js', new TextEncoder().encode(source)]])
+  if (css) files.set('index.css', new TextEncoder().encode(css))
+  const manifest: PluginManifest = {
+    protocolVersion: 2,
+    id: 'reader',
+    name: 'Reader',
+    version: '1.0.0',
+    client: { entry: 'index.js' },
+    resources: await Promise.all(
+      [...files].map(async ([path, bytes]) => ({
+        path,
+        mimeType: path.endsWith('.css') ? 'text/css' : 'text/javascript',
+        integrity: await sha256Integrity(bytes),
+        imports: [],
+      })),
+    ),
+  }
+  const archive: PluginArchiveDB.Archive = {
+    displayName: 'Reader',
+    enable: true,
+    config: {},
+    installerName: 'local',
+    installInput: '',
+    loaderName: 'zip',
+    meta: manifest,
+    pluginName: 'reader',
+  }
+  const store: PluginFileStore = {
+    read: async (_plugin, path) => {
+      const bytes = files.get(path)
+      if (!bytes) throw new Error(path)
+      return bytes
     },
-    source,
-  }
-}
-
-const manifest: PluginManifest = {
-  apiVersion: 1 as const,
-  author: 'test',
-  description: 'test',
-  name: { display: 'Reader', id: 'reader' },
-  require: [],
-  version: { plugin: '1.0.0', supportCore: '*' },
-}
-
-const archive = (pluginName: string, meta = manifest): PluginArchiveDB.Archive => ({
-  displayName: meta.name.display,
-  enable: true,
-  installerName: 'local',
-  installInput: '',
-  loaderName: 'zip',
-  meta,
-  pluginName,
-})
-
-const fileStore = (moduleSource: string) => {
-  const release = vi.fn()
-  const files: PluginFileStore = {
+    release: vi.fn(),
     createAssetUrl: vi.fn(),
-    createModuleUrl: async () =>
-      `data:text/javascript,${encodeURIComponent(`${moduleSource}\n//# ${crypto.randomUUID()}`)}`,
-    read: vi.fn(),
-    release,
+    createModuleUrl: vi.fn(),
+    replace: vi.fn(),
     remove: vi.fn(),
-    replace: vi.fn<() => Promise<PluginFileReplacement>>(),
   }
-  return { files, release }
+  return { archive, store }
 }
 
-describe('StoredPluginModuleReader', () => {
-  it('releases module URLs when entry validation fails', async () => {
-    const { files, release } = fileStore('export const value = 1')
-
-    await expect(
-      new StoredPluginModuleReader(files).read(archive('reader'), new AbortController().signal),
-    ).rejects.toThrow('no default factory')
-    expect(release).toHaveBeenCalledWith('reader')
-  })
-
-  it('owns module URLs until the loaded module is disposed', async () => {
-    const { files, release } = fileStore('export default () => ({ name: "reader" })')
-    const loaded = await new StoredPluginModuleReader(files).read(
-      archive('reader'),
+describe('native module reader', () => {
+  it('loads a function array and owns URLs until disposal', async () => {
+    const { archive, store } = await artifact('export default [function reader() {}]')
+    const module = await new StoredPluginModuleReader(store).read(
+      archive,
       new AbortController().signal,
     )
-
-    expect(release).not.toHaveBeenCalled()
-    await loaded.dispose?.()
-    expect(release).toHaveBeenCalledWith('reader')
+    expect(module.functions).toHaveLength(1)
+    expect(module.functions[0].name).toBe('reader')
+    await module.dispose?.()
+    expect(store.release).toHaveBeenCalledWith('reader')
+    expect(URL.revokeObjectURL).toHaveBeenCalledOnce()
   })
 
-  it('defers plugin CSS injection to normal module activation', async () => {
-    const { files } = fileStore('export default () => ({ name: "reader" })')
-    vi.mocked(files.read).mockResolvedValue(new TextEncoder().encode('.reader { color: red }'))
-    const style = { dataset: {}, remove: vi.fn(), textContent: '' }
+  it('validates function-array entries', () => {
+    expect(parseClientPluginEntry([() => {}], 'reader')).toHaveLength(1)
+    expect(() => parseClientPluginEntry([1], 'reader')).toThrow('function array')
+  })
+
+  it('binds CSS to the package fiber', async () => {
+    const { archive, store } = await artifact('export default []', '.reader { color: red }')
+    const style = { dataset: {}, textContent: '', remove: vi.fn() }
     const append = vi.fn()
-    vi.stubGlobal('document', { createElement: vi.fn(() => style), head: { append } })
-    const loaded = await new StoredPluginModuleReader(files).read(
-      archive('reader'),
+    vi.stubGlobal('document', { createElement: () => style, head: { append } })
+    const module = await new StoredPluginModuleReader(store).read(
+      archive,
       new AbortController().signal,
     )
-
-    expect(append).not.toHaveBeenCalled()
-    const scope = new PluginScope('reader')
-    await loaded.activate?.(scope)
-    expect(append).toHaveBeenCalledExactlyOnceWith(style)
-    expect(style.textContent).toBe('.reader { color: red }')
-
-    await scope.dispose()
-    expect(style.remove).toHaveBeenCalledOnce()
-    vi.unstubAllGlobals()
-  })
-
-  it('routes development archives to the network reader', () => {
-    const reader = new DevServerPluginModuleReader()
-    expect(reader.matches?.({ ...archive('reader'), loaderName: 'dev-server' })).toBe(true)
-    expect(reader.matches?.(archive('reader'))).toBe(false)
-  })
-
-  it('loads and releases a shared Cordis artifact', async () => {
-    const { manifest, source } = await artifactManifest()
-    const release = vi.fn()
-    const replacement = { commit: vi.fn(), rollback: vi.fn() }
-    const files: PluginFileStore = {
-      createAssetUrl: vi.fn(),
-      createModuleUrl: async () =>
-        `data:text/javascript,${encodeURIComponent(`${source}\n//# ${crypto.randomUUID()}`)}`,
-      read: vi.fn(),
-      release,
-      remove: vi.fn(),
-      replace: vi.fn(async () => replacement),
-    }
-    const loaded = await new CordisArtifactModuleReader(files).read({
-      manifest,
-      files: [{ path: 'index.js', bytes: new TextEncoder().encode(source) }],
+    const root = new Context()
+    const fiber = await root.plugin(ctx => {
+      module.activate?.(ctx)
     })
-
-    expect(loaded.manifest.id).toBe('cordis-reader')
-    expect(typeof loaded.entry).toBe('function')
-    expect(replacement.commit).toHaveBeenCalledOnce()
-    loaded.dispose?.()
-    expect(release).toHaveBeenCalledWith('cordis-reader')
+    expect(append).toHaveBeenCalledWith(style)
+    expect(style.textContent).toBe('.reader { color: red }')
+    await fiber.dispose()
+    expect(style.remove).toHaveBeenCalledOnce()
+    await module.dispose?.()
+    await root.fiber.dispose()
   })
 
-  it('rejects a plugin set with a single plugin entry', async () => {
-    const { manifest, source } = await artifactManifest('plugin-set')
-    const files: PluginFileStore = {
-      createAssetUrl: vi.fn(),
-      createModuleUrl: async () =>
-        `data:text/javascript,${encodeURIComponent(`${source}\n//# ${crypto.randomUUID()}`)}`,
-      read: vi.fn(),
-      release: vi.fn(),
-      remove: vi.fn(),
-      replace: vi.fn(async () => ({ commit: vi.fn(), rollback: vi.fn() })),
+  it('rewrites nested static and dynamic import graphs', async () => {
+    const files = new Map([
+      [
+        'index.js',
+        new TextEncoder().encode(
+          "export default async () => (await import('./chunks/middle.js')).value",
+        ),
+      ],
+      ['chunks/middle.js', new TextEncoder().encode("export { value } from './value.js'")],
+      ['chunks/value.js', new TextEncoder().encode('export const value = 42')],
+    ])
+    const manifest: PluginManifest = {
+      protocolVersion: 2,
+      id: 'graph',
+      name: 'Graph',
+      version: '1.0.0',
+      client: { entry: 'index.js' },
+      resources: await Promise.all(
+        [...files].map(async ([path, bytes]) => ({
+          path,
+          mimeType: 'text/javascript',
+          integrity: await sha256Integrity(bytes),
+          imports:
+            path === 'index.js'
+              ? ['chunks/middle.js']
+              : path === 'chunks/middle.js'
+                ? ['chunks/value.js']
+                : [],
+        })),
+      ),
     }
-
-    await expect(
-      new CordisArtifactModuleReader(files).read({
-        manifest,
-        files: [{ path: 'index.js', bytes: new TextEncoder().encode(source) }],
-      }),
-    ).rejects.toThrow('plugin set')
+    const graph = await createArtifactModuleGraph(manifest, files)
+    const module = await import(/* @vite-ignore */ graph.url)
+    expect(await module.default()).toBe(42)
+    graph.dispose()
+    expect(URL.revokeObjectURL).toHaveBeenCalledTimes(3)
   })
 })

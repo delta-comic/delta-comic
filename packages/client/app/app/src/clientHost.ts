@@ -1,9 +1,6 @@
-import {
-  ClientRuntime,
-  type ClientRouteRegistration,
-  type ClientUiRegistrars,
-} from '@delta-comic/client'
-import { db, type DB, PluginDiagnosticLogDB } from '@delta-comic/db'
+import { type ClientRouteRegistration, type ClientUiRegistrars } from '@delta-comic/client'
+import { db, PluginDiagnosticLogDB } from '@delta-comic/db'
+import { configurePluginHost, disposePluginHost, preparePluginHost } from '@delta-comic/plugin'
 import { shallowReactive } from 'vue'
 import type { Component } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
@@ -81,22 +78,23 @@ export const clientUiRegistrars: ClientUiRegistrars = {
 
 let diagnosticWrites = Promise.resolve()
 
-export const appClientRuntime = new ClientRuntime<DB>({
-  database: { db, query: (_name, operation) => operation(db) },
-  pluginId: 'app',
-  uiRegistrars: clientUiRegistrars,
+configurePluginHost({
   diagnosticSink: record => {
     diagnosticWrites = diagnosticWrites
       .then(() =>
         PluginDiagnosticLogDB.append(db, {
           id: record.id,
-          pluginId: record.pluginId ?? 'app',
+          pluginId:
+            record.pluginId ??
+            (typeof record.details?.pluginId === 'string' ? record.details.pluginId : 'app'),
           timestamp: record.timestamp,
           level: record.level,
           source: record.source,
           message: record.message,
           details: record.details,
-          fiberId: record.fiberId,
+          fiberId:
+            record.fiberId ??
+            (typeof record.details?.fiberId === 'string' ? record.details.fiberId : undefined),
           eventId: record.eventId,
         }),
       )
@@ -107,8 +105,14 @@ export const appClientRuntime = new ClientRuntime<DB>({
   },
 })
 
+export const prepareAppPluginHost = () =>
+  preparePluginHost({
+    database: { db, query: (_name, operation) => operation(db) },
+    uiRegistrars: clientUiRegistrars,
+  })
+
 export const disposeAppClientRuntime = async () => {
-  await appClientRuntime.dispose()
+  await disposePluginHost()
   await diagnosticWrites
 }
 

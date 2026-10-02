@@ -2,12 +2,7 @@ import semver from 'semver'
 import { Type, type Static } from 'typebox'
 import { Value } from 'typebox/value'
 
-export const PLUGIN_PROTOCOL_VERSION = 1 as const
-
-export const PluginDependencySchema = Type.Object({
-  id: Type.String({ minLength: 1 }),
-  version: Type.Optional(Type.String({ minLength: 1 })),
-})
+export const PLUGIN_PROTOCOL_VERSION = 2 as const
 
 export const PluginResourceSchema = Type.Object({
   path: Type.String({ minLength: 1 }),
@@ -17,27 +12,31 @@ export const PluginResourceSchema = Type.Object({
   platform: Type.Optional(Type.Array(Type.String({ minLength: 1 }))),
 })
 
-export const PluginManifestSchema = Type.Object({
-  protocolVersion: Type.Literal(PLUGIN_PROTOCOL_VERSION),
-  id: Type.String({ minLength: 1, maxLength: 64, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' }),
-  name: Type.String({ minLength: 1 }),
-  version: Type.String({ minLength: 1 }),
-  apiVersion: Type.Optional(Type.String({ minLength: 1 })),
-  cordisVersion: Type.Optional(Type.String({ minLength: 1 })),
-  author: Type.Optional(Type.String()),
-  description: Type.Optional(Type.String()),
-  entry: Type.String({ minLength: 1 }),
-  entryType: Type.Union([Type.Literal('plugin'), Type.Literal('plugin-set')]),
-  capabilities: Type.Optional(Type.Array(Type.String({ minLength: 1 }))),
-  permissions: Type.Optional(Type.Array(Type.String({ minLength: 1 }))),
-  dependencies: Type.Optional(Type.Array(PluginDependencySchema)),
-  resources: Type.Array(PluginResourceSchema),
-  integrationId: Type.Optional(Type.String({ minLength: 1 })),
-})
+export const PluginManifestSchema = Type.Object(
+  {
+    protocolVersion: Type.Literal(PLUGIN_PROTOCOL_VERSION),
+    id: Type.String({ minLength: 1, maxLength: 64, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' }),
+    name: Type.String({ minLength: 1 }),
+    version: Type.String({ minLength: 1 }),
+    apiVersion: Type.Optional(Type.String({ minLength: 1 })),
+    cordisVersion: Type.Optional(Type.String({ minLength: 1 })),
+    author: Type.Optional(Type.String()),
+    description: Type.Optional(Type.String()),
+    icon: Type.Optional(Type.String({ minLength: 1 })),
+    client: Type.Optional(
+      Type.Object({ entry: Type.String({ minLength: 1 }) }, { additionalProperties: false }),
+    ),
+    server: Type.Optional(
+      Type.Object({ entry: Type.String({ minLength: 1 }) }, { additionalProperties: false }),
+    ),
+    resources: Type.Array(PluginResourceSchema),
+  },
+  { additionalProperties: false },
+)
 
-export type PluginDependency = Static<typeof PluginDependencySchema>
 export type PluginResource = Static<typeof PluginResourceSchema>
 export type PluginManifest = Static<typeof PluginManifestSchema>
+export type PluginUserConfig = Record<string, unknown>
 
 export interface PluginManifestCompatibility {
   readonly apiVersion?: string
@@ -78,7 +77,7 @@ export const assertPluginManifestCompatible = (
 }
 
 export const isPluginManifest = (value: unknown): value is PluginManifest =>
-  Value.Check(PluginManifestSchema, value)
+  Value.Check(PluginManifestSchema, value) && Boolean(value.client || value.server)
 
 export const parsePluginManifest = (value: unknown): PluginManifest => {
   if (!isPluginManifest(value)) {

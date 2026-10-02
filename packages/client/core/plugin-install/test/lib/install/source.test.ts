@@ -34,12 +34,15 @@ const delegatedSource = (matches: (input: unknown) => boolean): PluginSourceReso
 })
 
 const manifest = (version: string) => ({
-  apiVersion: 1,
+  protocolVersion: 2,
+  client: { entry: 'index.js' },
+  resources: [],
   author: 'test',
   description: 'test',
-  name: { display: 'Reader', id: 'reader' },
-  require: [],
-  version: { plugin: version, supportCore: '*' },
+  name: 'Reader',
+  id: 'reader',
+
+  version: version,
 })
 
 const release = (version: string, prerelease: boolean) => ({

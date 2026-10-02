@@ -103,12 +103,7 @@ export default defineConfig(
         minify: !process.env.TAURI_ENV_DEBUG ? 'oxc' : false,
         // produce sourcemaps for debug builds
         sourcemap: !!process.env.TAURI_ENV_DEBUG,
-        rolldownOptions: {
-          input: {
-            main: resolve(import.meta.dirname, 'main.html'),
-            splash: resolve(import.meta.dirname, 'index.html'),
-          },
-        },
+        rolldownOptions: { input: { main: resolve(import.meta.dirname, 'index.html') } },
       },
       worker: { format: 'es' },
       base: '/',

@@ -1,116 +1,59 @@
-# Plugin architecture
+# Client plugin architecture
 
-The client plugin package uses a directed dependency graph. Code is grouped by responsibility,
-and only the composition root may assemble concrete adapters and application services.
+Each application session owns one native Cordis `Context` in `composition.ts`. The application
+prepares configuration, business collections, UI registrations, network, downloader, database,
+and diagnostic services before mounting the shell. Enabled installations load after the shell
+mounts. The Web entry and visible Tauri main window both use `index.html`.
 
-```text
-api <- kernel <- runtime
-        ^         install <- adapters
-        |
-   capabilities
+## Package Entry
 
-builtins -> api
-composition -> capabilities / adapters / runtime / install / builtins
-index -> public API and read-only facades
+Manifest protocol 2 has optional `client.entry` and `server.entry` fields. A client module exports
+a default `readonly Plugin.Function<Config>[]`. Functions use Cordis `name`, `inject`, `provide`,
+and Standard Schema `Config` metadata. Plugin authors import types and Context extensions from
+`@delta-comic/client`. The build bridge shares Cordis and UI library instances with the host.
 
-install/PluginCatalog <- adapters/awesomeRegistry
-                         ^
-                         composition -> app/features/pluginMarketplace
-```
+Each installation has one parent Fiber. Its functions are child plugins, mounted as a group
+before awaiting stability. Cordis coordinates service providers and consumers, including pending
+dependencies, disposal, replacement, and restoration. The host maps installation IDs to parents
+and derives package state from parent and child Fibers.
 
-## Import rules
+## Services And Ownership
 
-- `api` contains the plugin author contract and pure helpers.
-- `kernel` contains source-agnostic primitives such as candidates, scopes, contributions, and
-  capability modules.
-- `runtime` depends only on API and kernel protocols. Installed-source normalization lives in
-  `install`, so the runtime never knows how a candidate was persisted or decoded.
-- `install` owns package acquisition protocols and provider-neutral catalog ports. It depends on
-  ports instead of concrete persistence, registry, UI, or platform implementations.
-- `adapters` implement kernel/install ports and never import application services. External wire
-  schemas are translated to host contracts at this boundary.
-- `builtins` use the same public author contract as external plugins.
-- `composition.ts` is the only place allowed to assemble capabilities, adapters, providers, and
-  runtime services.
-- `index.ts` is export-only. Package code must never import `@/index` or self-import
-  `@delta-comic/plugin`.
+`services.ts` implements configuration, content, user, remote-resource, sharing, i18n, and UI
+services. Each service owns its business collection. Registrations use the calling Context's
+`effect()` and are released when that caller is disposed. The parent Fiber determines package
+ownership for child functions. Platform implementations and application registrars stay in their
+respective host modules.
 
-Globs are reserved for homogeneous discovery. Each `*.builtin.ts` file default-exports an
-`InternalPluginDefinition`, so adding an internal plugin requires a file rather than a composition
-change. Lifecycle and capability order is always an explicit list in the composition root.
+`composition.ts` assembles concrete services, adapters, builtin definitions, and installation
+readers. `index.ts` exports the public entry. Package internals import local modules. Builtins are
+discovered from `builtins/*.builtin.ts`; each file supplies its manifest and function array.
 
-## Extension rule
+## Installation And Management
 
-A new business capability is implemented as a vertical module with its contract, registry view,
-and activation behavior. It is then added once to the explicit capability list in
-`createDefaultCapabilities`. The activation pipeline itself must not gain plugin IDs, origins, or
-feature-specific branches. Host-only operations such as authentication are injected through a
-gateway; plugin contracts never import application UI.
+`@delta-comic/plugin-install` owns source resolution, manifest validation, ZIP integrity,
+persistence transactions, module graph rewriting, and development-server module reading.
+Database/file/catalog adapters live in this package. Vite tooling emits manifest resources and
+integrity, JSON flow files, icons, and client chunks. Development loading uses Vite's HMR and CSS
+bridge. Resource disposal follows the installation parent Context.
 
-The product marketplace is an application feature, not a plugin-runtime layer. Its loading and
-view models live under `packages/client/app/app/src/features/pluginMarketplace`. The concrete
-`awesome-plugins` network, schema, and cache implementation lives under
-`adapters/awesomeRegistry`; install source resolution sees only `PluginInstallCatalog`.
+Installation records persist enable state and user configuration. Configuration validation uses
+each function's native Config, including disabled installations. Management operations are
+serialized and update the current module and Fiber mapping.
 
-Internal and installed plugins are normalized to `PluginCandidate` before dependency planning.
-Everything after `candidate.load()` is source-agnostic and shares the same activation, rollback,
-reload, and unload behavior.
+## Failure And Recovery
 
-## Runtime flow
+A module-load failure or managed FAILED Fiber enters session safe mode. One cleanup per failure
+generation unloads all managed packages; host services and builtin Fibers remain available.
+Persistent enable values support retry on the next launch. Within safe mode, the plugin page can
+enable individual installations and displays persisted enable state, current Fiber state, and
+error source. Cleanup errors enter diagnostics. Business-operation errors are reported by their
+calling application flow.
 
-```text
-*.builtin.ts --------> InternalPluginCandidateProvider --+
-                                                          |
-archive -> module reader (stored files or dev-server network) -> InstalledPluginCandidateProvider +-> collision check
-                                                              -> dependency plan
-                                                              -> module + factory preload
-                                                              -> onPreboot scope
-                                                              -> serial normal capability pipeline
-                                                              -> normal scope
-```
+## Verification
 
-Every plugin enabled at application startup is prepared before Vue mounts. Preparation loads its
-module, evaluates its factory once, and runs only `onPreboot`; declarative capabilities remain
-inactive. A later user selection reuses the prepared config and activates the plugin's normal part.
-Normal reloads dispose only the normal scope, so they do not rerun the factory or preload hook.
-Plugins installed or updated after this startup snapshot are loaded immediately instead of
-requiring an application restart: `PluginRuntime.enablePlugin`/`enablePlugins` prepare the
-candidate (and activate it once normal parts are booted), `disablePlugin` deactivates and unloads
-it in LIFO order, and `reloadPlugin` unloads a plugin together with its prepared dependents and
-loads the current files again. The persisted flag changes are orchestrated by `setPluginEnabled`,
-while `installPlugin` reloads the result of an install or update right away.
-
-Installed archives select their module reader at candidate load time. ZIP archives use the stored
-file reader; `dev:<port>` archives use the development-server reader, which fetches the fixed
-entry and optional CSS paths without relying on the file store. This distinction is kept in the
-install composition and does not enter the runtime dependency planner or activation pipeline.
-
-The composition root also owns host integrations for development reloads and relative icons. The
-Vite development entry loads the native `/@vite/client` bridge so source edits propagate through
-Vite's own HMR graph, and a small CSS bridge re-fetches the independent `/index.css` on
-`vite:afterUpdate` to update the host-owned plugin style in place; no window event or plugin-level
-reload is involved. Development icon paths resolve against the same localhost port. Runtime and
-plugin author contracts remain unaware of these transport details.
-
-Endpoint probes within one remote group may run in parallel with independent abort
-signals. Plugin dependency levels and capability modules are deliberately activated serially so
-registration and rollback order stays deterministic. Every mutable host registration must attach
-its inverse operation to `PluginScope`; unload and failed activation run those inverses in LIFO
-order.
-
-## Change matrix
-
-| Change | Add or edit | Must remain unchanged |
-| --- | --- | --- |
-| Built-in plugin | Add one default-exporting `builtins/*.builtin.ts` definition | composition, runtime, installed loader |
-| Installed package format | Add a `PluginPackageCodec` and wire it in composition | candidate protocol, runtime, capabilities |
-| Download source | Add a `PluginSourceResolver` and wire it in composition | codecs, candidate protocol, runtime |
-| Development source | Add the `dev:<port>` resolver and network module reader in composition | runtime pipeline, ZIP codec, dependency planner |
-| Catalog provider | Add an adapter implementing `PluginCatalog` and wire it in composition | install resolver, runtime, application view model |
-| Business model | Add an API model plus one capability module; optionally add a typed contribution channel | candidate providers, dependency planner, runtime engine |
-| Host-only UI/platform operation | Add a narrow gateway interface and inject its host adapter | public plugin model, runtime kernel |
-
-Application code reads declarative models through `PluginStore.modelEntries()` or a typed
-`ContributionHub` channel. It must not recreate origin-specific registries. There is no fallback
-`Global`, booter registry, loader registry, or compatibility export layer; adding one would create a
-second ownership model and violate this architecture.
+Native lifecycle tests cover reverse service order, provider disable/restore, function arrays,
+failed-group cleanup, individual recovery, configuration validation, and hot replacement.
+Installation and builder tests cover integrity, module graphs, CSS disposal, update rollback,
+paired packages, and server-only packages. Runtime acceptance includes direct Web/Tauri startup
+and the application plugin-management view.

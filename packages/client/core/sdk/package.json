@@ -18,10 +18,6 @@
       "types": "./dist/manifest.d.mts",
       "import": "./dist/manifest.mjs"
     },
-    "./runtime": {
-      "types": "./dist/runtime.d.mts",
-      "import": "./dist/runtime.mjs"
-    },
     "./ui": {
       "types": "./dist/ui.d.mts",
       "import": "./dist/ui.mjs"

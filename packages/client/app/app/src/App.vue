@@ -37,8 +37,7 @@ const handleShareTokenCheck = async () => {
     const chipText = await readClipboardText()
     if (scanned.has(chipText)) return
     scanned.add(chipText)
-    const handlers = pluginStore
-      .modelEntries('social')
+    const handlers = [...pluginStore.share]
       .flatMap(([, social]) => social.share?.tokenListen ?? [])
       .filter(handler => handler.isMatched(chipText))
     appShellLogger.debug('share token handlers matched', { handlerCount: handlers.length })

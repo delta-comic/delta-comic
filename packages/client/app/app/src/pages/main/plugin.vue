@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { logger } from '@delta-comic/logger'
-import { pluginRuntime } from '@delta-comic/plugin'
+import { loadEnabledPlugins, pluginSafeMode } from '@delta-comic/plugin'
 import { type MenuOption, NIcon } from 'naive-ui'
 import type { Component } from 'vue'
 import { computed, h, shallowRef } from 'vue'
@@ -36,8 +36,7 @@ const reloadPlugins = async () => {
   reloading.value = true
   pluginPageLogger.info('plugin reload started')
   try {
-    const { operation } = pluginRuntime.reloadNormal()
-    await operation
+    await loadEnabledPlugins()
     pluginPageLogger.info('plugin reload completed')
     window.$message.success(t('plugin.reload.success'))
   } catch (error) {
@@ -67,6 +66,7 @@ const reloadPlugins = async () => {
       secondary
       type="primary"
       :loading="reloading"
+      :disabled="pluginSafeMode"
       @click="reloadPlugins"
     >
       {{ t('plugin.reload.action') }}

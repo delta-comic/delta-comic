@@ -8,7 +8,6 @@ import type {
   PluginInstallReporter,
   PluginPackageCodec,
   PluginSourceResolver,
-  ResolvedPluginSource,
 } from './contracts'
 
 export interface PluginInstallServiceOptions {
@@ -20,17 +19,10 @@ export interface PluginInstallServiceOptions {
 }
 
 export interface PluginInstallHooks {
-  /** Runs after the new files and metadata are staged, before the replacement is committed. */
   readonly afterStage?: (
     archive: PluginArchiveDB.Archive,
     previous: PluginArchiveDB.Archive | undefined,
   ) => void | Promise<void>
-}
-
-interface PluginInstallContext {
-  readonly installing: Set<string>
-  readonly installed: Set<string>
-  readonly added: string[]
 }
 
 export class PluginInstallService {
@@ -42,135 +34,73 @@ export class PluginInstallService {
     report: PluginInstallReporter = () => {},
     hooks: PluginInstallHooks = {},
   ) {
-    const context: PluginInstallContext = { added: [], installed: new Set(), installing: new Set() }
-    try {
-      return await this.#install(input, signal, report, context, undefined, hooks, true)
-    } catch (error) {
-      const rollbackErrors: unknown[] = [error]
-      for (const plugin of [...context.added].reverse()) {
-        try {
-          await this.uninstall(plugin)
-        } catch (rollbackError) {
-          rollbackErrors.push(rollbackError)
-        }
-      }
-      if (rollbackErrors.length === 1) throw error
-      throw new AggregateError(rollbackErrors, 'failed to install plugin dependencies')
-    }
-  }
-
-  async #install(
-    input: PluginInstallInput,
-    signal: AbortSignal,
-    report: PluginInstallReporter,
-    context: PluginInstallContext,
-    expectedPlugin?: string,
-    hooks: PluginInstallHooks = {},
-    root = false,
-  ) {
     report({ phase: 'resolve', progress: 0 })
-    const resolver = this.options.resolvers.find(candidate => candidate.matches(input))
+    const resolver = this.options.resolvers.find(source => source.matches(input))
     if (!resolver) throw new Error('no plugin source resolver accepts this input')
     const source = await resolver.resolve(input, signal, report)
+    signal.throwIfAborted()
     report({
-      description: source.file?.name ?? source.installInput,
       phase: 'resolve',
       progress: 100,
+      description: source.file?.name ?? source.installInput,
     })
-
-    const decoded = source.package ?? (await this.#decode(source, signal, report))
-    const plugin = decoded.manifest.name.id
-    if (this.options.reservedIds?.has(plugin)) {
-      throw new Error(`plugin id "${plugin}" is reserved by an internal plugin`)
+    let decoded: DecodedPluginPackage
+    if (source.package) decoded = source.package
+    else {
+      const file = source.file
+      if (!file) throw new Error('resolved plugin source contains neither a file nor a package')
+      const codec = this.options.codecs.find(codec => codec.matches(file))
+      if (!codec) throw new Error('no plugin package codec accepts this file')
+      report({ phase: 'decode', progress: 0, description: codec.id })
+      decoded = await codec.decode(file, signal)
     }
-    if (expectedPlugin && plugin !== expectedPlugin) {
-      throw new Error(`plugin dependency "${expectedPlugin}" downloaded as "${plugin}"`)
+    const plugin = decoded.manifest.id
+    if (!decoded.manifest.client) throw new Error(`plugin has no client entry: ${plugin}`)
+    if (this.options.reservedIds?.has(plugin)) throw new Error(`plugin id is reserved: ${plugin}`)
+    signal.throwIfAborted()
+    report({ phase: 'decode', progress: 100, description: plugin })
+    const previous = await this.options.repository.find(plugin)
+    const replacement = await this.options.files.replace(
+      plugin,
+      source.storage === 'remote' ? new Map() : decoded.files,
+    )
+    const archive: PluginArchiveDB.Archive = {
+      displayName: decoded.manifest.name,
+      enable: previous?.enable ?? true,
+      config: previous?.config ?? {},
+      installerName: source.resolverId,
+      installInput: source.installInput,
+      loaderName: decoded.codecId,
+      meta: decoded.manifest,
+      pluginName: plugin,
     }
-    if (context.installing.has(plugin)) {
-      throw new Error(`plugin dependency cycle includes "${plugin}"`)
-    }
-    report({ description: plugin, phase: 'decode', progress: 100 })
-
-    context.installing.add(plugin)
     try {
-      for (const dependency of decoded.manifest.require) {
-        if (
-          this.options.reservedIds?.has(dependency.id) ||
-          context.installed.has(dependency.id) ||
-          (await this.options.repository.find(dependency.id))
-        ) {
-          context.installed.add(dependency.id)
-          continue
-        }
-        if (!dependency.download) continue
-        await this.#install(dependency.download, signal, report, context, dependency.id, hooks)
-      }
-
-      const previous = await this.options.repository.find(plugin)
-      const replacement = await this.options.files.replace(
-        plugin,
-        source.storage === 'remote' ? new Map() : decoded.files,
-      )
-      const archive: PluginArchiveDB.Archive = {
-        displayName: decoded.manifest.name.display,
-        enable: previous?.enable ?? true,
-        installerName: source.resolverId,
-        installInput: source.installInput,
-        loaderName: source.package?.codecId ?? decoded.codecId,
-        meta: decoded.manifest,
-        pluginName: plugin,
-      }
-
+      signal.throwIfAborted()
+      report({ phase: 'persist', progress: 50, description: plugin })
+      await this.options.repository.upsert(archive)
+      await hooks.afterStage?.(archive, previous)
+      await replacement.commit()
+      report({ phase: 'persist', progress: 100, description: plugin })
+      return archive
+    } catch (error) {
+      const errors: unknown[] = [error]
       try {
-        report({ description: plugin, phase: 'persist', progress: 50 })
-        await this.options.repository.upsert(archive)
-        if (root) await hooks.afterStage?.(archive, previous)
-        await replacement.commit()
-        report({ description: plugin, phase: 'persist', progress: 100 })
-        context.installed.add(plugin)
-        if (!previous) context.added.push(plugin)
-        return archive
+        await replacement.rollback()
       } catch (error) {
-        const rollbackErrors: unknown[] = []
-        try {
-          await replacement.rollback()
-        } catch (rollbackError) {
-          rollbackErrors.push(rollbackError)
-        }
-        try {
-          if (previous) await this.options.repository.upsert(previous)
-          else await this.options.repository.remove(plugin)
-        } catch (rollbackError) {
-          rollbackErrors.push(rollbackError)
-        }
-        if (rollbackErrors.length > 0) {
-          throw new AggregateError(
-            [error, ...rollbackErrors],
-            `failed to install plugin "${plugin}"`,
-          )
-        }
-        throw error
+        errors.push(error)
       }
-    } finally {
-      context.installing.delete(plugin)
+      try {
+        if (previous) await this.options.repository.upsert(previous)
+        else await this.options.repository.remove(plugin)
+      } catch (error) {
+        errors.push(error)
+      }
+      if (errors.length > 1)
+        throw new AggregateError(errors, `plugin install rollback failed: ${plugin}`)
+      throw error
     }
   }
 
-  async #decode(
-    source: ResolvedPluginSource,
-    signal: AbortSignal,
-    report: PluginInstallReporter,
-  ): Promise<DecodedPluginPackage> {
-    const file = source.file
-    if (!file) throw new Error('resolved plugin source contains neither a file nor a package')
-    const codec = this.options.codecs.find(candidate => candidate.matches(file))
-    if (!codec) throw new Error('no plugin package codec accepts this file')
-    report({ description: codec.id, phase: 'decode', progress: 0 })
-    const decoded = await codec.decode(file, signal)
-    return decoded
-  }
-
-  /** Remove archive metadata and files as one compensating transaction. */
   public async uninstall(plugin: string) {
     const previous = await this.options.repository.find(plugin)
     const replacement = await this.options.files.replace(plugin, new Map())
@@ -178,23 +108,19 @@ export class PluginInstallService {
       await this.options.repository.remove(plugin)
       await replacement.commit()
     } catch (error) {
-      const rollbackErrors: unknown[] = []
+      const errors: unknown[] = [error]
       try {
         await replacement.rollback()
-      } catch (rollbackError) {
-        rollbackErrors.push(rollbackError)
+      } catch (error) {
+        errors.push(error)
       }
       try {
         if (previous) await this.options.repository.upsert(previous)
-      } catch (rollbackError) {
-        rollbackErrors.push(rollbackError)
+      } catch (error) {
+        errors.push(error)
       }
-      if (rollbackErrors.length > 0) {
-        throw new AggregateError(
-          [error, ...rollbackErrors],
-          `failed to uninstall plugin "${plugin}"`,
-        )
-      }
+      if (errors.length > 1)
+        throw new AggregateError(errors, `plugin uninstall rollback failed: ${plugin}`)
       throw error
     }
   }

@@ -20,7 +20,11 @@ const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*' } as const
 const VUE_STYLE_QUERY = /(?:^|[?&])vue&type=style(?:&|$)/
 const CSS_RUNTIME_BYPASS_QUERY = /(?:^|[?&])(?:direct|inline|raw|url)(?:&|$)/
 
-export const createWireManifest = (meta: PluginManifest) => ({ ...meta })
+export const createWireManifest = (meta: PluginManifest) => ({
+  ...meta,
+  client: { entry: DEV_ENTRY_PATH.slice(1) },
+  resources: [],
+})
 
 export const createDevEntryCode = (meta: PluginManifest, entryUrl: string) =>
   [
@@ -34,13 +38,15 @@ export const createDevEntryCode = (meta: PluginManifest, entryUrl: string) =>
     `    if (!__deltaComicResponse.ok) return`,
     `    const __deltaComicCss = await __deltaComicResponse.text()`,
     `    for (const __deltaComicStyle of __deltaComicDocument.head.querySelectorAll('style')) {`,
-    `      if (__deltaComicStyle.dataset.plugin === ${JSON.stringify(meta.name.id)}) __deltaComicStyle.textContent = __deltaComicCss`,
+    `      if (__deltaComicStyle.dataset.plugin === ${JSON.stringify(meta.id)}) __deltaComicStyle.textContent = __deltaComicCss`,
     `    }`,
     `  } catch {}`,
     `}`,
     `const __deltaComicHot = import.meta.hot`,
     `if (__deltaComicHot) {`,
-    `  __deltaComicHot.accept(${JSON.stringify(entryUrl)}, () => {})`,
+    `  __deltaComicHot.accept(${JSON.stringify(entryUrl)}, module => {`,
+    `    if (module) globalThis.dispatchEvent(new CustomEvent('delta-comic:plugin-update', { detail: { id: ${JSON.stringify(meta.id)}, functions: module.default } }))`,
+    `  })`,
     `  const __deltaComicAfterUpdate = () => { void __deltaComicUpdateStyle() }`,
     `  __deltaComicHot.on('vite:afterUpdate', __deltaComicAfterUpdate)`,
     `  __deltaComicHot.dispose(() => __deltaComicHot.off('vite:afterUpdate', __deltaComicAfterUpdate))`,

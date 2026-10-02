@@ -2,7 +2,7 @@ import { sha256Integrity } from '@delta-comic/plugin-artifact'
 import JSZip from 'jszip'
 import { describe, expect, it } from 'vite-plus/test'
 
-import { ArtifactZipPackageCodec } from '../../../lib'
+import { ZipPackageCodec } from '../../../lib'
 
 const archive = async (entry = 'export default () => ({})') => {
   const bytes = new TextEncoder().encode(entry)
@@ -10,12 +10,12 @@ const archive = async (entry = 'export default () => ({})') => {
   zip.file(
     'manifest.json',
     JSON.stringify({
-      protocolVersion: 1,
+      protocolVersion: 2,
       id: 'artifact-reader',
       name: 'Artifact Reader',
       version: '1.0.0',
-      entry: 'index.js',
-      entryType: 'plugin',
+      client: { entry: 'index.js' },
+
       resources: [
         {
           path: 'index.js',
@@ -30,9 +30,9 @@ const archive = async (entry = 'export default () => ({})') => {
   return new File([await zip.generateAsync({ type: 'uint8array' })], 'plugin.zip')
 }
 
-describe('ArtifactZipPackageCodec', () => {
+describe('ZipPackageCodec', () => {
   it('decodes and validates the current artifact protocol', async () => {
-    const decoded = await new ArtifactZipPackageCodec().decode(
+    const decoded = await new ZipPackageCodec().decode(
       await archive(),
       new AbortController().signal,
     )
@@ -51,7 +51,7 @@ describe('ArtifactZipPackageCodec', () => {
     const invalid = new File([await zip.generateAsync({ type: 'uint8array' })], 'plugin.zip')
 
     await expect(
-      new ArtifactZipPackageCodec().decode(invalid, new AbortController().signal),
+      new ZipPackageCodec().decode(invalid, new AbortController().signal),
     ).rejects.toThrow('integrity mismatch')
   })
 })

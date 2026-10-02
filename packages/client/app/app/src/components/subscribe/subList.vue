@@ -13,7 +13,7 @@ const pluginStore = usePluginStore()
 const subscribe = computed(() => {
   const [plugin] = SubscribeDB.key.toJSON($props.source.key)
   if ($props.source.type == 'author') {
-    const sub = pluginStore.plugins.get(plugin)?.model?.social?.subscribe
+    const sub = pluginStore.share.get(plugin)?.subscribe
     if (!sub) throw new Error(`Can not find subscribe model for plugin: ${plugin}`)
     return sub
   }

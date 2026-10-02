@@ -1,8 +1,8 @@
-export * from './api'
-export * from './capabilities'
+export * from './api/config'
+export type * from './api/host'
+export type { Content, User, Remote, Social, PluginLocaleMessages } from '@delta-comic/client'
 export * from './composition'
-export * from './kernel'
-export * from '@delta-comic/plugin-runtime'
+export type { PluginAuthGateway } from './services'
 export * from '@delta-comic/plugin-install'
-
+export type { PluginManifest } from '@delta-comic/plugin-manifest'
 export * as Core from './core'

@@ -1,13 +1,14 @@
-import { defineDeltaComicPlugin } from '../api'
+import type { Context, Plugin } from 'cordis'
 
 export { cfg } from './config'
 
-import { pluginName } from './env'
 import { coreI18n } from './i18n'
 import { tokenInit, nativeInit, tokenShare } from './share'
 
-export default defineDeltaComicPlugin(() => ({
-  name: pluginName,
-  i18n: coreI18n,
-  model: { social: { share: { initiative: [tokenInit, nativeInit], tokenListen: [tokenShare] } } },
-}))
+function core(ctx: Context) {
+  ctx.i18n.register(coreI18n)
+  ctx.share.register({ share: { initiative: [tokenInit, nativeInit], tokenListen: [tokenShare] } })
+}
+
+core.inject = ['i18n', 'share']
+export default [core] satisfies readonly Plugin.Function[]

@@ -106,7 +106,7 @@ describe('useDownloadLifecycle', () => {
     wrapper = mount(Host)
     await flushPromises()
 
-    expect(mocks.store.connect).toHaveBeenCalledOnce()
+    expect(mocks.store.connect).not.toHaveBeenCalled()
     expect(mocks.listen).not.toHaveBeenCalled()
   })
 

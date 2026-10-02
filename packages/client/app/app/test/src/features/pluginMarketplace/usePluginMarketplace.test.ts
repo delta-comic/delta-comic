@@ -38,12 +38,15 @@ const listing = (id: string, manifestUrl = `https://example.test/${id}.json`) =>
 })
 
 const manifest = (id: string) => ({
-  apiVersion: 1 as const,
+  protocolVersion: 2,
+  client: { entry: 'index.js' },
+  resources: [],
   author: 'Delta Comic',
   description: `${id} description`,
-  name: { display: `${id} display`, id },
-  require: [],
-  version: { plugin: '2.0.0', supportCore: '^2.3.0' },
+  name: `${id} display`,
+  id,
+
+  version: '2.0.0',
 })
 
 const createClient = () => ({ loadIndex: vi.fn(), loadManifest: vi.fn(), loadPage: vi.fn() })
@@ -56,7 +59,20 @@ describe('usePluginMarketplace', () => {
 
   it('refreshes index, installed state and manifests while isolating one broken manifest', async () => {
     installedRows.push({
-      meta: { version: { plugin: '1.0.0' } },
+      meta: {
+        protocolVersion: 2,
+        id: 'example',
+        name: 'Example',
+        version: '1.0.0',
+        client: { entry: 'index.js' },
+        resources: [],
+      },
+      enable: true,
+      config: {},
+      installInput: '',
+      installerName: 'local',
+      loaderName: 'zip',
+      displayName: 'Reader',
       pluginName: 'alpha',
     } as PluginArchiveDB.Archive)
     const client = createClient()

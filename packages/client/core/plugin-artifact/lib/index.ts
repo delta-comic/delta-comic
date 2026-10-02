@@ -17,7 +17,8 @@ export interface PluginArtifact {
 export interface ArtifactValidationResult {
   manifest: PluginManifest
   files: readonly ArtifactFile[]
-  entry: ArtifactFile
+  client?: ArtifactFile
+  server?: ArtifactFile
 }
 
 export interface ArtifactValidationOptions {
@@ -87,8 +88,10 @@ const validateResourceGraph = (manifest: PluginManifest, platform?: string) => {
         platform === undefined || !resource.platform || resource.platform.includes(platform),
     ),
   )
-  if (!resources.has(normalizePath(manifest.entry))) {
-    throw new ArtifactValidationError(`entry is not declared as a resource: ${manifest.entry}`)
+  for (const entry of [manifest.client?.entry, manifest.server?.entry]) {
+    if (entry && !resources.has(normalizePath(entry))) {
+      throw new ArtifactValidationError(`entry is not declared as a resource: ${entry}`)
+    }
   }
   for (const resource of resources.values()) {
     for (const imported of resource.imports) {
@@ -121,9 +124,9 @@ export const validateArtifact = async (
       throw new ArtifactValidationError(`integrity mismatch: ${path}`)
     }
   }
-  const entry = files.get(normalizePath(manifest.entry))
-  if (!entry) throw new ArtifactValidationError(`entry is missing: ${manifest.entry}`)
-  return { manifest, files: [...files.values()], entry }
+  const client = manifest.client ? files.get(normalizePath(manifest.client.entry)) : undefined
+  const server = manifest.server ? files.get(normalizePath(manifest.server.entry)) : undefined
+  return { manifest, files: [...files.values()], client, server }
 }
 
 export const sha256Integrity = digest

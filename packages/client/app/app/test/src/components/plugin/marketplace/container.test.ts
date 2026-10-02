@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
   message: { error: vi.fn(), success: vi.fn() },
   openExternal: vi.fn(),
   runPluginInstall: vi.fn(),
-  updatePlugin: vi.fn(),
+  updatePluginByName: vi.fn(),
 }))
 
 const marketplaceMocks = vi.hoisted(() => ({
@@ -44,7 +44,7 @@ vi.mock('@delta-comic/plugin', () => ({
   installPlugin: mocks.installPlugin,
   isPluginManifestCompatible: () => true,
   pluginCatalogInstallInput: (pluginId: string) => `catalog:${pluginId}`,
-  updatePlugin: mocks.updatePlugin,
+  updatePluginByName: mocks.updatePluginByName,
 }))
 vi.mock('@/features/pluginInstall/usePluginInstall', () => ({
   usePluginInstall: () => ({ runPluginInstall: mocks.runPluginInstall }),
@@ -152,13 +152,16 @@ const marketplaceItem = (overrides: Partial<PluginMarketplaceItem> = {}): Plugin
       source: { repository: 'delta-comic/reader', type: 'github' },
     },
     manifest: {
-      apiVersion: 1,
+      protocolVersion: 2,
+      client: { entry: 'index.js' },
+      resources: [],
       author: 'Delta Comic',
       description: 'Reads comics',
       icon: 'https://cdn.example.test/reader.png',
-      name: { display: 'Reader', id: 'reader' },
-      require: [],
-      version: { plugin: '2.0.0', supportCore: '^2.3.0' },
+      name: 'Reader',
+      id: 'reader',
+
+      version: '2.0.0',
     },
   }
   return { ...entry, compatibility: 'compatible', updateAvailable: false, ...overrides }

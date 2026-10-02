@@ -24,7 +24,6 @@ export default defineConfig({
     entry: [
       './lib/index.ts',
       './lib/manifest.ts',
-      './lib/runtime.ts',
       './lib/ui.ts',
       './lib/network.ts',
       './lib/diagnostics.ts',

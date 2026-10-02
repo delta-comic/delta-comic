@@ -1,6 +1,6 @@
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
-import { defineComponent, h, nextTick, Suspense } from 'vue'
+import { defineComponent, h, Suspense } from 'vue'
 import type { SetupContext } from 'vue'
 
 // cspell:ignore vnode
@@ -12,8 +12,7 @@ const {
   downloads,
   intervalCallbacks,
   message,
-  pluginRuntime,
-  revealMainEntry,
+  loadEnabledPlugins,
   router,
   shareToken,
 } = vi.hoisted(() => ({
@@ -22,9 +21,8 @@ const {
   dialog: { info: vi.fn() },
   downloads: { connect: vi.fn(), disconnect: vi.fn(), refresh: vi.fn() },
   intervalCallbacks: [] as Array<() => Promise<void>>,
-  message: { success: vi.fn() },
-  pluginRuntime: { clearRecovery: vi.fn(), readRecovery: vi.fn() },
-  revealMainEntry: vi.fn(),
+  message: { success: vi.fn(), error: vi.fn() },
+  loadEnabledPlugins: vi.fn(),
   router: { push: vi.fn() },
   shareToken: new Map<
     string,
@@ -69,10 +67,11 @@ await vi.hoisted(async () => {
 vi.mock('@delta-comic/plugin', () => ({
   configurePluginHost: vi.fn(),
   pluginI18n: { install: vi.fn() },
-  pluginRuntime,
+  loadEnabledPlugins,
   usePluginStore: () => ({
-    modelEntries: (key: string) =>
-      key === 'social' ? [['comic', { share: { tokenListen: [...shareToken.values()] } }]] : [],
+    get share() {
+      return new Map([['comic', { share: { tokenListen: [...shareToken.values()] } }]])
+    },
   }),
 }))
 vi.mock('@delta-comic/ui', () => ({ DcImage: { name: 'DcImage', render: () => null } }))
@@ -143,51 +142,6 @@ vi.mock('../../src/platform', () => ({
   readClipboardText: clipboard.read,
   writeClipboardText: clipboard.write,
 }))
-vi.mock('../../src/startup/entry', () => ({ revealMainEntry }))
-
-vi.mock('../../src/components/plugin/index.vue', () => ({
-  default: window.$$lib$$.Vue.defineComponent({
-    name: 'Plugin',
-    props: { isBooted: Boolean, show: Boolean, startupReady: Boolean },
-    emits: ['update:isBooted', 'update:show'],
-    setup:
-      (_props: Record<string, never>, { emit }: SetupContext) =>
-      () =>
-        window.$$lib$$.Vue.h('section', { class: 'plugin-stub' }, [
-          window.$$lib$$.Vue.h(
-            'button',
-            { class: 'open', onClick: () => emit('update:show', true) },
-            'open',
-          ),
-          window.$$lib$$.Vue.h(
-            'button',
-            { class: 'boot', onClick: () => emit('update:isBooted', true) },
-            'boot',
-          ),
-        ]),
-  }),
-}))
-vi.mock('../../src/components/plugin/PluginPreloadRecoveryAlert.vue', () => ({
-  default: window.$$lib$$.Vue.defineComponent({
-    name: 'PluginPreloadRecoveryAlert',
-    emits: ['dismiss', 'manage'],
-    setup:
-      (_props: Record<string, never>, { emit }: SetupContext) =>
-      () =>
-        window.$$lib$$.Vue.h('aside', { class: 'recovery-stub' }, [
-          window.$$lib$$.Vue.h(
-            'button',
-            { class: 'dismiss', onClick: () => emit('dismiss') },
-            'dismiss',
-          ),
-          window.$$lib$$.Vue.h(
-            'button',
-            { class: 'manage', onClick: () => emit('manage') },
-            'manage',
-          ),
-        ]),
-  }),
-}))
 vi.mock('../../src/components/updateChecker.vue', () => ({
   default: window.$$lib$$.Vue.defineComponent({
     name: 'UpdateChecker',
@@ -196,7 +150,9 @@ vi.mock('../../src/components/updateChecker.vue', () => ({
 }))
 vi.mock('../../src/App.vue', async importOriginal => {
   const original = await importOriginal<typeof import('../../src/App.vue')>()
-  return original
+  return {
+    default: { ...original.default, render: () => window.$$lib$$.Vue.h('main', 'main-app') },
+  }
 })
 
 import App from '../../src/App.vue'
@@ -299,60 +255,17 @@ describe('App share-token orchestration', () => {
   })
 })
 
-describe('AppSetup startup shell', () => {
-  beforeEach(() => {
-    pluginRuntime.clearRecovery.mockClear()
-    pluginRuntime.readRecovery
-      .mockReset()
-      .mockReturnValue({ plugins: ['reader'], reason: 'previous startup failed' })
-    revealMainEntry.mockReset().mockResolvedValue(undefined)
-  })
-
-  it('reveals the startup shell and delegates plugin preload recovery actions', async () => {
+describe('AppSetup application entry', () => {
+  it('mounts the application and automatically loads enabled plugins', async () => {
+    loadEnabledPlugins.mockResolvedValue(undefined)
     const wrapper = mount(AppSetup, {
       global: {
-        stubs: {
-          App: defineComponent({ name: 'App', render: () => h('main', 'main-app') }),
-          DcImage: true,
-          NIcon: true,
-        },
-      },
-    })
-
-    expect(wrapper.find('.recovery-stub').exists()).toBe(true)
-    const artwork = wrapper.get('img[src="/setup.avif"]')
-    expect(artwork.attributes('aria-hidden')).toBe('true')
-    await flushPromises()
-    await nextTick()
-    const recoveryListeners = wrapper.getComponent({ name: 'PluginPreloadRecoveryAlert' }).vm.$
-      .vnode.props as Record<string, (...args: unknown[]) => void>
-    expect(recoveryListeners.onManage).toBeTypeOf('function')
-    recoveryListeners.onManage()
-    recoveryListeners.onDismiss()
-    expect(pluginRuntime.clearRecovery).toHaveBeenCalledOnce()
-
-    const pluginListeners = wrapper.getComponent({ name: 'Plugin' }).vm.$.vnode.props as Record<
-      string,
-      (...args: unknown[]) => void
-    >
-    expect(pluginListeners['onUpdate:isBooted']).toBeTypeOf('function')
-    pluginListeners['onUpdate:isBooted'](true)
-    wrapper.unmount()
-  })
-
-  it('reveals the main entry after the mounted shell is ready', async () => {
-    const wrapper = mount(AppSetup, {
-      global: {
-        stubs: {
-          App: defineComponent({ name: 'App', render: () => h('main', 'main-app') }),
-          NIcon: true,
-        },
+        stubs: { App: defineComponent({ name: 'App', render: () => h('main', 'main-app') }) },
       },
     })
     await flushPromises()
-    await nextTick()
-
-    expect(revealMainEntry).toHaveBeenCalledOnce()
+    expect(wrapper.text()).toContain('main-app')
+    expect(loadEnabledPlugins).toHaveBeenCalledOnce()
     wrapper.unmount()
   })
 })

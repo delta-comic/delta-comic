@@ -3,12 +3,12 @@ import { describe, expect, it } from 'vitest'
 import { isPluginManifest, parsePluginManifest, PluginManifestSchema } from '../lib/index.js'
 
 const manifest = {
-  protocolVersion: 1,
+  protocolVersion: 2,
   id: 'demo',
   name: 'Demo',
   version: '1.0.0',
-  entry: 'index.js',
-  entryType: 'plugin',
+  client: { entry: 'index.js' },
+
   resources: [],
 }
 
@@ -21,7 +21,7 @@ describe('@delta-comic/plugin-manifest', () => {
 
   it('rejects malformed manifests', () => {
     expect(isPluginManifest({ ...manifest, id: 'bad id' })).toBe(false)
-    expect(() => parsePluginManifest({ ...manifest, protocolVersion: 2 })).toThrow(
+    expect(() => parsePluginManifest({ ...manifest, protocolVersion: 3 })).toThrow(
       'invalid plugin manifest',
     )
   })

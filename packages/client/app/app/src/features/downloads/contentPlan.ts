@@ -1,4 +1,4 @@
-import { db, type PluginArchiveDB } from '@delta-comic/db'
+import { db } from '@delta-comic/db'
 import type { ContentRefreshContext, EnqueuePlanInput } from '@delta-comic/downloader'
 import {
   type UniContentDownloadProvider,
@@ -164,9 +164,6 @@ export interface PluginDownloadIdentity {
   pluginIntegrity?: string
 }
 
-const formatPluginIntegrity = (integrity: PluginArchiveDB.Meta['integrity']) =>
-  integrity ? `${integrity.algorithm}:${integrity.digest}` : undefined
-
 /** Reads the installed archive rather than trusting runtime classes to describe plugin identity. */
 export async function getPluginDownloadIdentity(plugin: string): Promise<PluginDownloadIdentity> {
   const archive = await db
@@ -175,8 +172,10 @@ export async function getPluginDownloadIdentity(plugin: string): Promise<PluginD
     .where('pluginName', '=', plugin)
     .executeTakeFirst()
   return {
-    pluginVersion: archive?.meta.version.plugin,
-    pluginIntegrity: formatPluginIntegrity(archive?.meta.integrity),
+    pluginVersion: archive?.meta.version,
+    pluginIntegrity: archive?.meta.resources.find(
+      resource => resource.path === archive.meta.client?.entry,
+    )?.integrity,
   }
 }
 

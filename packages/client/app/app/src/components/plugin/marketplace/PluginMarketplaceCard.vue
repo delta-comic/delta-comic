@@ -15,14 +15,9 @@ const emit = defineEmits<{ details: []; install: [] }>()
 const { t } = useI18n()
 
 const displayName = computed(
-  () =>
-    props.item.manifest?.name.display ??
-    props.item.listing.repository?.name ??
-    props.item.listing.id,
+  () => props.item.manifest?.name ?? props.item.listing.repository?.name ?? props.item.listing.id,
 )
-const version = computed(
-  () => props.item.manifest?.version.plugin ?? props.item.listing.release?.version,
-)
+const version = computed(() => props.item.manifest?.version ?? props.item.listing.release?.version)
 const actionDisabled = computed(
   () =>
     props.item.compatibility === 'incompatible' ||

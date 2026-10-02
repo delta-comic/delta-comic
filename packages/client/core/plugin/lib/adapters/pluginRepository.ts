@@ -21,7 +21,11 @@ export class DatabasePluginArchiveRepository implements PluginArchiveRepository 
   }
 
   public async upsert(archive: PluginArchiveDB.Archive) {
-    const row = assertWriteRow('plugin', { ...archive, meta: JSON.stringify(archive.meta) })
+    const row = assertWriteRow('plugin', {
+      ...archive,
+      meta: JSON.stringify(archive.meta),
+      config: JSON.stringify(archive.config ?? {}),
+    })
     await db.replaceInto('plugin').values(row).execute()
   }
 }

@@ -1,5 +1,4 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import type { PluginPreloadRecovery } from '@delta-comic/plugin'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
@@ -125,7 +124,6 @@ import type {
 
 import PluginMarketplaceCard from '../../../../../src/components/plugin/marketplace/PluginMarketplaceCard.vue'
 import PluginMarketplaceFilters from '../../../../../src/components/plugin/marketplace/PluginMarketplaceFilters.vue'
-import PluginPreloadRecoveryAlert from '../../../../../src/components/plugin/PluginPreloadRecoveryAlert.vue'
 
 const marketplaceItem = (overrides: Partial<PluginMarketplaceItem> = {}): PluginMarketplaceItem => {
   const entry: PluginMarketplaceEntry = {
@@ -141,13 +139,16 @@ const marketplaceItem = (overrides: Partial<PluginMarketplaceItem> = {}): Plugin
       source: { repository: 'delta-comic/reader', type: 'github' },
     },
     manifest: {
-      apiVersion: 1,
+      protocolVersion: 2,
+      client: { entry: 'index.js' },
+      resources: [],
       author: 'Delta Comic',
       description: 'Reads comics',
       icon: 'https://cdn.example.test/reader.png',
-      name: { display: 'Reader', id: 'reader' },
-      require: [],
-      version: { plugin: '2.0.0', supportCore: '^2.3.0' },
+      name: 'Reader',
+      id: 'reader',
+
+      version: '2.0.0',
     },
   }
   return { ...entry, compatibility: 'compatible', updateAvailable: false, ...overrides }
@@ -226,7 +227,20 @@ describe('PluginMarketplaceCard', () => {
 
   it('disables current or incompatible installs and exposes update progress', () => {
     const installed = {
-      meta: { version: { plugin: '2.0.0' } },
+      meta: {
+        protocolVersion: 2,
+        id: 'reader',
+        name: 'Reader',
+        version: '2.0.0',
+        client: { entry: 'index.js' },
+        resources: [],
+      },
+      enable: true,
+      config: {},
+      installInput: '',
+      installerName: 'local',
+      loaderName: 'zip',
+      displayName: 'Reader',
       pluginName: 'reader',
     } as PluginArchiveDB.Archive
     const currentWrapper = mount(PluginMarketplaceCard, {
@@ -268,23 +282,5 @@ describe('PluginMarketplaceCard', () => {
 
     expect(button.attributes('disabled')).toBeDefined()
     expect(button.attributes('data-loading')).toBe('true')
-  })
-})
-
-describe('PluginPreloadRecoveryAlert', () => {
-  it('shows the recovery reason and affected plugins and emits both recovery actions', async () => {
-    const recovery = {
-      plugins: ['reader', 'sync'],
-      reason: 'previous plugin preload crashed',
-    } as PluginPreloadRecovery
-    const wrapper = mount(PluginPreloadRecoveryAlert, { props: { recovery } })
-
-    expect(wrapper.text()).toContain('previous plugin preload crashed')
-    expect(wrapper.text()).toContain('plugin.recovery.affected:{"plugins":"reader, sync"}')
-    await wrapper.get('button:not(.close)').trigger('click')
-    await wrapper.get('.close').trigger('click')
-
-    expect(wrapper.emitted('manage')).toEqual([[]])
-    expect(wrapper.emitted('dismiss')).toEqual([[]])
   })
 })

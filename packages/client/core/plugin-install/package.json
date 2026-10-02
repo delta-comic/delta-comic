@@ -21,12 +21,11 @@
   "dependencies": {
     "@delta-comic/logger": "workspace:",
     "@delta-comic/model": "workspace:",
-    "@delta-comic/plugin-api": "workspace:",
     "@delta-comic/plugin-artifact": "workspace:",
-    "@delta-comic/plugin-kernel": "workspace:",
-    "@delta-comic/plugin-loader": "workspace:",
     "@delta-comic/plugin-manifest": "workspace:",
     "@octokit/rest": "catalog:",
+    "cordis": "catalog:",
+    "es-module-lexer": "^2.3.1",
     "jszip": "catalog:",
     "ky": "catalog:",
     "semver": "catalog:"

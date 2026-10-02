@@ -39,7 +39,13 @@ export const useUpsert = defineMutation(() => {
       withTransition(async trx => {
         await trx
           .replaceInto('plugin')
-          .values(archives.map(a => ({ ...a, meta: JSON.stringify(a.meta) })))
+          .values(
+            archives.map(a => ({
+              ...a,
+              meta: JSON.stringify(a.meta),
+              config: JSON.stringify(a.config ?? {}),
+            })),
+          )
           .execute()
       }, trx),
     onSettled: () => {

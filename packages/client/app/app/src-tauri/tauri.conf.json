@@ -12,29 +12,14 @@
   "app": {
     "windows": [
       {
-        "label": "splash",
-        "url": "index.html",
-        "title": "Delta Comic",
-        "width": 640,
-        "height": 420,
-        "center": true,
-        "resizable": false,
-        "maximizable": false,
-        "minimizable": false,
-        "decorations": false,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "fullscreen": false
-      },
-      {
         "label": "main",
-        "url": "main.html",
+        "url": "index.html",
         "title": "Delta Comic",
         "width": 800,
         "height": 600,
         "resizable": true,
-        "visible": false,
-        "focus": false,
+        "visible": true,
+        "focus": true,
         "fullscreen": false
       }
     ],

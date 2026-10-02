@@ -1,1 +1,0 @@
-export type { SpecialModel, Step } from '@delta-comic/client'

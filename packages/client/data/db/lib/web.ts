@@ -57,6 +57,7 @@ export const WEB_SCHEMA_STATEMENTS = [
     loader_name TEXT NOT NULL,
     plugin_name TEXT PRIMARY KEY NOT NULL,
     meta JSON NOT NULL,
+    config JSON,
     enable TEXT NOT NULL,
     install_input TEXT NOT NULL,
     display_name TEXT
@@ -98,6 +99,14 @@ export const createWebDialect = (): Dialect =>
       await connection.executeQuery(CompiledQuery.raw('PRAGMA foreign_keys = ON'))
       for (const statement of WEB_SCHEMA_STATEMENTS) {
         await connection.executeQuery(CompiledQuery.raw(statement))
+      }
+      const columns = await connection.executeQuery<{ name: string }>(
+        CompiledQuery.raw('PRAGMA table_info(plugin)'),
+      )
+      if (!columns.rows.some(column => column.name === 'config')) {
+        await connection.executeQuery(
+          CompiledQuery.raw('ALTER TABLE plugin ADD COLUMN config JSON'),
+        )
       }
     },
     preferOPFS: true,

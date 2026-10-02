@@ -76,26 +76,38 @@ describe('content source refresh preparation', () => {
     expect(
       pluginArchiveToContentRefreshIdentity({
         meta: {
-          apiVersion: 1,
+          protocolVersion: 2,
+          client: { entry: 'index.js' },
+          resources: [
+            {
+              path: 'index.js',
+              mimeType: 'text/javascript',
+              integrity: 'sha256-abc123',
+              imports: [],
+            },
+          ],
           author: 'author',
           description: 'description',
-          name: { display: 'Reader', id: 'reader' },
-          require: [],
-          version: { plugin: '2.3.4', supportCore: '*' },
-          integrity: { algorithm: 'blake3', digest: 'abc123' },
+          name: 'Reader',
+          id: 'reader',
+
+          version: '2.3.4',
         },
       }),
-    ).toEqual({ pluginVersion: '2.3.4', pluginIntegrity: 'blake3:abc123' })
+    ).toEqual({ pluginVersion: '2.3.4', pluginIntegrity: 'sha256-abc123' })
 
     expect(
       pluginArchiveToContentRefreshIdentity({
         meta: {
-          apiVersion: 1,
+          protocolVersion: 2,
+          client: { entry: 'index.js' },
+          resources: [],
           author: 'author',
           description: 'description',
-          name: { display: 'Reader', id: 'reader' },
-          require: [],
-          version: { plugin: '2.3.4', supportCore: '*' },
+          name: 'Reader',
+          id: 'reader',
+
+          version: '2.3.4',
         },
       }),
     ).toEqual({ pluginVersion: '2.3.4', pluginIntegrity: undefined })

@@ -1,4 +1,4 @@
-import { pluginRuntime, preparePluginHost, useConfig } from '@delta-comic/plugin'
+import { useConfig } from '@delta-comic/plugin'
 import {
   configureUiI18n,
   DcConfigProvider,
@@ -27,7 +27,7 @@ import '@/index.css'
 import { DataLoaderPlugin } from 'vue-router/experimental'
 
 import AppSetup from './AppSetup.vue'
-import { appClientRuntime, disposeAppClientRuntime } from './clientHost'
+import { prepareAppPluginHost, disposeAppClientRuntime } from './clientHost'
 import { i18n } from './i18n'
 import { appLogger } from './logger'
 import { initializePlatform, resolveAppHostProfile } from './platform'
@@ -54,8 +54,7 @@ await initializePlatform().then(v => {
 
 const pinia = createPinia()
 setActivePinia(pinia)
-await preparePluginHost()
-await appClientRuntime.mount('app-host', () => {})
+await prepareAppPluginHost()
 
 const app = createApp(
   defineComponent(() => {
@@ -116,14 +115,6 @@ app.use(PiniaColada)
 app.use(i18n)
 
 app.use(router)
-
-const preload = await pluginRuntime.preload(app)
-appLogger
-  .scoped('plugin')
-  .info('plugins preloaded', {
-    activated: preload.activated,
-    failureCount: preload.failures.length,
-  })
 
 const meta = document.createElement('meta')
 meta.name = 'naive-ui-style'

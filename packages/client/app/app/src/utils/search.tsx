@@ -9,7 +9,7 @@ export type ThinkList = ({ text: string; value: string } | Component)[]
 
 export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise<ThinkList> => {
   const store = usePluginStore()
-  const matched = store.modelEntries('content').flatMap(([plugin, content]) => {
+  const matched = [...store.content].flatMap(([plugin, content]) => {
     const search = content.search
     if (!search) return []
     return (search.barcode ?? []).flatMap(barcode =>

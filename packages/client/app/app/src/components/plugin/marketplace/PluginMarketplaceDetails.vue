@@ -18,9 +18,7 @@ const { t } = useI18n()
 
 const title = computed(
   () =>
-    props.item?.manifest?.name.display ??
-    props.item?.listing.repository?.name ??
-    props.item?.listing.id,
+    props.item?.manifest?.name ?? props.item?.listing.repository?.name ?? props.item?.listing.id,
 )
 const installInput = computed(() =>
   props.item ? pluginMarketplaceInstallInput(props.item.listing) : '',
@@ -80,7 +78,7 @@ const canInstall = computed(
         </div>
         <div v-if="item.manifest">
           <dt>{{ t('plugin.market.details.supportCore') }}</dt>
-          <dd>{{ item.manifest.version.supportCore }}</dd>
+          <dd>{{ item.manifest.apiVersion ?? '*' }}</dd>
         </div>
         <div>
           <dt>{{ t('plugin.market.details.manifest') }}</dt>

@@ -1,15 +1,14 @@
 export * from './config'
-export * from './env'
 export type * from './host'
-export type * from './hook'
-export * from './i18n'
-export type * from './model'
-export * as Content from './model/content'
-export * as Expose from './model/expose'
-export * as Remote from './model/remote'
-export * as Social from './model/social'
-export * as Special from './model/special'
-export * as User from './model/user'
-export * from './plugin'
+export type {
+  Content,
+  Expose,
+  Remote,
+  Social,
+  Special,
+  User,
+  PluginLocaleMessage,
+  PluginLocaleMessages,
+} from '@delta-comic/client'
 
-export { DELTA_COMIC_PLUGIN_API_VERSION, type PluginManifest } from '@delta-comic/model'
+export type { PluginManifest } from '@delta-comic/plugin-manifest'

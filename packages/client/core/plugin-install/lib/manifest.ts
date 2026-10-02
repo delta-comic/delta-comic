@@ -1,49 +1,9 @@
-import { DELTA_COMIC_PLUGIN_API_VERSION, type PluginManifest } from '@delta-comic/model'
 import {
   assertPluginManifestCompatible,
-  type PluginManifest as ArtifactManifest,
+  parsePluginManifest as parseManifest,
+  type PluginManifest,
   type PluginManifestCompatibility,
 } from '@delta-comic/plugin-manifest'
-import semver from 'semver'
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value)
-
-const record = (value: unknown, path: string) => {
-  if (!isRecord(value)) throw new PluginManifestError(`${path} must be an object`)
-  return value
-}
-
-const text = (value: unknown, path: string) => {
-  if (typeof value !== 'string' || value.length === 0) {
-    throw new PluginManifestError(`${path} must be a non-empty string`)
-  }
-  return value
-}
-
-const pluginId = (value: unknown, path: string) => {
-  const id = text(value, path)
-  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(id)) {
-    throw new PluginManifestError(`${path} must be a portable 1-64 character plugin identifier`)
-  }
-  return id
-}
-
-export const safePluginPath = (value: unknown, path: string) => {
-  const normalized = text(value, path).replaceAll('\\', '/')
-  if (
-    normalized.startsWith('/') ||
-    /^[a-z]:($|\/)/i.test(normalized) ||
-    normalized.includes('\0') ||
-    normalized.split('/').some(segment => segment === '..')
-  ) {
-    throw new PluginManifestError(`${path} must be a safe relative path`)
-  }
-  return normalized
-    .split('/')
-    .filter(segment => segment && segment !== '.')
-    .join('/')
-}
 
 export class PluginManifestError extends Error {
   public constructor(message: string) {
@@ -52,99 +12,56 @@ export class PluginManifestError extends Error {
   }
 }
 
-const pluginIcon = (value: unknown) => {
-  const icon = text(value, 'manifest.icon').trim()
-  if (!/^[a-z][a-z\d+.-]*:/i.test(icon)) return safePluginPath(icon, 'manifest.icon')
-  let url: URL
-  try {
-    url = new URL(icon)
-  } catch {
-    throw new PluginManifestError('manifest.icon must be an HTTP(S) URL or a safe relative path')
+export const safePluginPath = (value: unknown, path: string) => {
+  if (typeof value !== 'string' || !value.length) {
+    throw new PluginManifestError(`${path} must be a non-empty string`)
   }
-  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
-    throw new PluginManifestError(
-      'manifest.icon must be a credential-free HTTP(S) URL or a safe relative path',
-    )
-  }
-  return icon
-}
-
-export const parsePluginManifest = (value: unknown): PluginManifest => {
-  const manifest = record(value, 'manifest')
-  if (manifest.apiVersion !== DELTA_COMIC_PLUGIN_API_VERSION) {
-    throw new PluginManifestError(`manifest.apiVersion must be ${DELTA_COMIC_PLUGIN_API_VERSION}`)
-  }
-  const name = record(manifest.name, 'manifest.name')
-  const version = record(manifest.version, 'manifest.version')
-  const id = pluginId(name.id, 'manifest.name.id')
-  if (!Array.isArray(manifest.require)) {
-    throw new PluginManifestError('manifest.require must be an array')
-  }
-
-  const result: PluginManifest = {
-    apiVersion: DELTA_COMIC_PLUGIN_API_VERSION,
-    author: text(manifest.author, 'manifest.author'),
-    description: text(manifest.description, 'manifest.description'),
-    name: { display: text(name.display, 'manifest.name.display'), id },
-    require: manifest.require.map((value, index) => {
-      const dependency = record(value, `manifest.require[${index}]`)
-      return {
-        id: pluginId(dependency.id, `manifest.require[${index}].id`),
-        ...(dependency.download === undefined
-          ? {}
-          : { download: text(dependency.download, `manifest.require[${index}].download`) }),
-      }
-    }),
-    version: {
-      plugin: text(version.plugin, 'manifest.version.plugin'),
-      supportCore: text(version.supportCore, 'manifest.version.supportCore'),
-    },
-  }
-
-  if (manifest.icon !== undefined) result.icon = pluginIcon(manifest.icon)
-  if (manifest.integrity !== undefined) {
-    const integrity = record(manifest.integrity, 'manifest.integrity')
-    if (integrity.algorithm !== 'blake3' && integrity.algorithm !== 'sha256') {
-      throw new PluginManifestError('manifest.integrity.algorithm is unsupported')
-    }
-    result.integrity = {
-      algorithm: integrity.algorithm,
-      digest: text(integrity.digest, 'manifest.integrity.digest'),
-    }
-  }
+  const normalized = value.replaceAll('\\', '/')
+  if (
+    normalized.startsWith('/') ||
+    /^[a-z]:($|\/)/i.test(normalized) ||
+    normalized.includes('\0') ||
+    normalized.split('/').some(segment => segment === '..')
+  )
+    throw new PluginManifestError(`${path} must be a safe relative path`)
+  const result = normalized
+    .split('/')
+    .filter(segment => segment && segment !== '.')
+    .join('/')
+  if (!result) throw new PluginManifestError(`${path} must be a safe relative path`)
   return result
 }
 
-export const isPluginManifestCompatible = (manifest: PluginManifest, coreVersion: string) =>
-  semver.satisfies(coreVersion, manifest.version.supportCore)
+export const parsePluginManifest = (value: unknown): PluginManifest => {
+  const manifest = parseManifest(value)
+  for (const entry of [manifest.client?.entry, manifest.server?.entry]) {
+    if (entry) safePluginPath(entry, 'manifest entry')
+  }
+  for (const resource of manifest.resources) {
+    safePluginPath(resource.path, 'resource path')
+    for (const imported of resource.imports) safePluginPath(imported, 'resource import')
+  }
+  if (manifest.icon) {
+    if (/^[a-z][a-z\d+.-]*:/i.test(manifest.icon)) {
+      const url = new URL(manifest.icon)
+      if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) {
+        throw new PluginManifestError('icon must be a credential-free HTTP(S) URL')
+      }
+    } else safePluginPath(manifest.icon, 'icon path')
+  }
+  return manifest
+}
 
-export interface InstalledPluginDependency {
-  readonly id: string
-  readonly version: string
+export const isPluginManifestCompatible = (manifest: PluginManifest, coreVersion: string) => {
+  try {
+    assertPluginManifestCompatible(manifest, { apiVersion: coreVersion })
+    return true
+  } catch {
+    return false
+  }
 }
 
 export const assertArtifactManifestCompatible = (
-  manifest: ArtifactManifest,
+  manifest: PluginManifest,
   compatibility: PluginManifestCompatibility,
 ) => assertPluginManifestCompatible(manifest, compatibility)
-
-export const assertArtifactDependencies = (
-  manifest: ArtifactManifest,
-  installed: readonly InstalledPluginDependency[],
-  reserved: ReadonlySet<string> = new Set(),
-) => {
-  const versions = new Map(installed.map(dependency => [dependency.id, dependency.version]))
-  const seen = new Set<string>()
-  for (const dependency of manifest.dependencies ?? []) {
-    if (seen.has(dependency.id)) throw new Error(`duplicate plugin dependency: ${dependency.id}`)
-    seen.add(dependency.id)
-    if (dependency.id === manifest.id)
-      throw new Error(`plugin dependency cycle includes "${manifest.id}"`)
-    if (reserved.has(dependency.id)) continue
-    const version = versions.get(dependency.id)
-    if (!version) throw new Error(`missing plugin dependency: ${dependency.id}`)
-    if (dependency.version && !semver.satisfies(version, dependency.version)) {
-      throw new Error(`plugin dependency version mismatch: ${dependency.id}`)
-    }
-  }
-}

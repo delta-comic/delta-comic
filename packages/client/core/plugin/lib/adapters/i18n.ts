@@ -1,8 +1,7 @@
+import type { PluginLocaleMessage, PluginLocaleMessages } from '@delta-comic/client'
 import { defaultsDeep } from 'es-toolkit/compat'
 
-import type { PluginLocaleMessage, PluginLocaleMessages } from '../api/i18n'
-
-export type { PluginLocaleMessage, PluginLocaleMessages } from '../api/i18n'
+export type { PluginLocaleMessage, PluginLocaleMessages } from '@delta-comic/client'
 
 export interface PluginI18nAdapter {
   setLocaleMessage(locale: string, message: PluginLocaleMessage): void

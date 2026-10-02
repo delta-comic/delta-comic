@@ -50,12 +50,11 @@ describe('semantic-release command runner', () => {
         '@delta-comic/db',
         '@delta-comic/downloader',
         '@delta-comic/plugin-manifest',
-        '@delta-comic/plugin-api',
+
         '@delta-comic/plugin-artifact',
-        '@delta-comic/plugin-loader',
-        '@delta-comic/plugin-kernel',
+
         '@delta-comic/plugin-install',
-        '@delta-comic/plugin-runtime',
+
         '@delta-comic/utils',
         '@delta-comic/plugin-vite',
         '@delta-comic/ui',

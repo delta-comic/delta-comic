@@ -140,9 +140,9 @@ export class AwesomeRegistryClient implements PluginCatalog {
     const manifestUrl = listing.release?.manifestUrl
     if (!manifestUrl) return undefined
     const manifest = parsePluginManifest(await this.requestJson(manifestUrl, signal))
-    if (manifest.name.id !== listing.id) {
+    if (manifest.id !== listing.id) {
       throw new AwesomeRegistryValidationError(
-        `listing ${listing.id} points to manifest for ${manifest.name.id}`,
+        `listing ${listing.id} points to manifest for ${manifest.id}`,
       )
     }
     return manifest

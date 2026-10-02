@@ -44,9 +44,9 @@ const thinkList = computedAsync<ThinkList>(async onCancel => {
   const { method, plugin } = source.value
   const st = searchText.value
   if (isEmpty(st)) return history.value.map(v => ({ text: v, value: v }))
-  const localSource = pluginStore.plugins
+  const localSource = pluginStore.content
     .get(plugin)
-    ?.model?.content?.search?.methods.find(value => value.id === method)
+    ?.search?.methods.find(value => value.id === method)
   try {
     const barcodeList = await getBarcodeList(st, thinkListAbort.signal)
     if (!localSource) return [...barcodeList, ...history.value.map(v => ({ text: v, value: v }))]

@@ -30,12 +30,11 @@ describe('ReleaseWorkspace', () => {
       '@delta-comic/db',
       '@delta-comic/downloader',
       '@delta-comic/plugin-manifest',
-      '@delta-comic/plugin-api',
+
       '@delta-comic/plugin-artifact',
-      '@delta-comic/plugin-loader',
-      '@delta-comic/plugin-kernel',
+
       '@delta-comic/plugin-install',
-      '@delta-comic/plugin-runtime',
+
       '@delta-comic/utils',
       '@delta-comic/plugin-vite',
       '@delta-comic/ui',
@@ -46,7 +45,7 @@ describe('ReleaseWorkspace', () => {
     expect(packages.map(pkg => pkg.path).toSorted()).toEqual(
       jsonVersionPaths
         .filter(path =>
-          /^packages\/(?:client\/(?:core\/(?:sdk|plugin|plugin-api|plugin-artifact|plugin-kernel|plugin-loader|plugin-install|plugin-runtime|plugin-vite|model|utils)|data\/db|platform\/downloader|ui\/ui)|server\/core\/server|shared\/(?:core\/(?:both|logger)|plugin\/manifest))\//.test(
+          /^packages\/(?:client\/(?:core\/(?:sdk|plugin|plugin-artifact|plugin-install|plugin-vite|model|utils)|data\/db|platform\/downloader|ui\/ui)|server\/core\/server|shared\/(?:core\/(?:both|logger)|plugin\/manifest))\//.test(
             path,
           ),
         )

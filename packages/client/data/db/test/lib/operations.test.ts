@@ -273,13 +273,16 @@ describe('plugin archive mutations', () => {
     installerName: '',
     loaderName: 'zip',
     meta: {
-      apiVersion: 1 as const,
+      protocolVersion: 2,
+      client: { entry: 'index.js' },
+      resources: [],
       author: 'test',
       description: 'test',
       icon: 'assets/icon.png',
-      name: { display: 'Fixture', id: 'fixture' },
-      require: [],
-      version: { plugin: '1.0.0', supportCore: '*' },
+      name: 'Fixture',
+      id: 'fixture',
+
+      version: '1.0.0',
     },
     pluginName: 'fixture',
   }

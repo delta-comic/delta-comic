@@ -22,15 +22,13 @@ const app = useAppStore()
 const pluginStore = usePluginStore()
 
 const tabItem = computed(() =>
-  pluginStore
-    .modelEntries('content')
-    .flatMap(([plugin, content]) =>
-      (content.promotes?.tabbar ?? []).map(val => ({
-        title: val.title,
-        name: val.id,
-        queries: { plugin },
-      })),
-    ),
+  [...pluginStore.content].flatMap(([plugin, content]) =>
+    (content.promotes?.tabbar ?? []).map(val => ({
+      title: val.title,
+      name: val.id,
+      queries: { plugin },
+    })),
+  ),
 )
 const tabs = computed(() => [
   {

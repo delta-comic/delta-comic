@@ -9,9 +9,9 @@ const plugin = computed(() => $route.params.plugin.toString())
 const key = computed(() => $route.params.key.toString())
 const pluginStore = usePluginStore()
 const item = computed(() =>
-  pluginStore.plugins
+  pluginStore.user
     .get(plugin.value)
-    ?.model?.user?.userActionPages?.flatMap(page => page.items)
+    ?.userActionPages?.flatMap(page => page.items)
     .find(action => action.key == key.value),
 )
 </script>

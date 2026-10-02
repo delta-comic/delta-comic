@@ -15,13 +15,15 @@ import {
 } from '../lib/dev'
 
 const meta: PluginManifest = {
-  apiVersion: 1,
-  name: { display: 'Dev Plugin', id: 'dev-plugin' },
-  version: { plugin: '1.0.0', supportCore: '1.0.0' },
+  protocolVersion: 2,
+  client: { entry: 'index.js' },
+  resources: [],
+  name: 'Dev Plugin',
+  id: 'dev-plugin',
+  version: '1.0.0',
   author: 'delta',
   description: 'dev plugin',
   icon: 'assets/icon.svg',
-  require: [],
 }
 
 type TestMiddleware = (req: IncomingMessage, res: ServerResponse, next: () => void) => void
@@ -66,11 +68,11 @@ const cssModule = (url: string): ModuleNode =>
   ({ url, type: 'css', importedModules: new Set() }) as unknown as ModuleNode
 
 describe('createWireManifest', () => {
-  it('does not expose removed entry metadata', () => {
+  it('exposes the development client endpoint', () => {
     const wire = createWireManifest(meta)
 
-    expect(wire.name.id).toBe('dev-plugin')
-    expect(wire).not.toHaveProperty('entry')
+    expect(wire.id).toBe('dev-plugin')
+    expect(wire.client.entry).toBe('index.js')
   })
 })
 
@@ -94,7 +96,8 @@ describe('createDevEntryCode', () => {
 
     expect(code).toContain('const __deltaComicCssPath = "/index.css"')
     expect(code).toContain('new URL(__deltaComicCssPath, import.meta.url)')
-    expect(code).toContain('__deltaComicHot.accept("/src/main.ts", () => {})')
+    expect(code).toContain('__deltaComicHot.accept("/src/main.ts", module => {')
+    expect(code).toContain('functions: module.default')
     expect(code).toContain("__deltaComicHot.on('vite:afterUpdate'")
     expect(code).toContain("__deltaComicHot.off('vite:afterUpdate'")
   })

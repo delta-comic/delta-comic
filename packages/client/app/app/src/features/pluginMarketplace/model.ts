@@ -23,7 +23,7 @@ export interface PluginMarketplaceItem extends PluginMarketplaceEntry {
 }
 
 const releaseVersion = (entry: PluginMarketplaceEntry) =>
-  entry.manifest?.version.plugin ?? entry.listing.release?.version
+  entry.manifest?.version ?? entry.listing.release?.version
 
 export const mergePluginMarketplaceItems = (
   entries: PluginMarketplaceEntry[],
@@ -38,10 +38,10 @@ export const mergePluginMarketplaceItems = (
       installed &&
       availableVersion &&
       semver.valid(semver.coerce(availableVersion)) &&
-      semver.valid(semver.coerce(installed.meta.version.plugin)) &&
+      semver.valid(semver.coerce(installed.meta.version)) &&
       semver.gt(
         semver.coerce(availableVersion) as semver.SemVer,
-        semver.coerce(installed.meta.version.plugin) as semver.SemVer,
+        semver.coerce(installed.meta.version) as semver.SemVer,
       ),
     )
     return {
@@ -80,7 +80,7 @@ export const filterPluginMarketplaceItems = (
     if (!normalizedQuery) return true
     return [
       item.listing.id,
-      item.manifest?.name.display,
+      item.manifest?.name,
       item.manifest?.description,
       ...item.listing.authors,
     ].some(value => value?.toLocaleLowerCase().includes(normalizedQuery))

@@ -1,41 +1,43 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
-import type { PluginConfig, PluginConfigFactory } from '@delta-comic/plugin-api'
-import type { LoadedPluginModule, PluginScopeLike } from '@delta-comic/plugin-loader'
+import { validateArtifact } from '@delta-comic/plugin-artifact'
+import type { Context, Plugin } from 'cordis'
 
-import type { PluginFileStore, PluginModuleReader } from './contracts'
-import {
-  DEV_CSS_PATH,
-  DEV_ENTRY_PATH,
-  DEV_SERVER_LOADER_ID,
-  devServerUrl,
-  parseDevServerPort,
-} from './dev'
+import type { LoadedPluginModule, PluginFileStore, PluginModuleReader } from './contracts'
+import { DEV_CSS_PATH, DEV_SERVER_LOADER_ID, devServerUrl, parseDevServerPort } from './dev'
+import { safePluginPath } from './manifest'
+import { createArtifactModuleGraph } from './moduleGraph'
 
-const asFactory = <TConfig extends PluginConfig>(
+export const parseClientPluginEntry = (
   value: unknown,
   plugin: string,
-): PluginConfigFactory<TConfig> => {
-  if (typeof value !== 'function') {
-    throw new TypeError(`plugin entry has no default factory: ${plugin}`)
-  }
-  return value as PluginConfigFactory<TConfig>
+): readonly Plugin.Function[] => {
+  const isFunctionArray = (value: unknown): value is readonly Plugin.Function[] =>
+    Array.isArray(value) && value.every(item => typeof item === 'function')
+  if (!isFunctionArray(value))
+    throw new TypeError(`client entry must export a function array: ${plugin}`)
+  return value
 }
 
-const styleActivator = (plugin: string, styleText: string | undefined) =>
-  styleText === undefined
-    ? undefined
-    : (scope: PluginScopeLike) => {
-        if (typeof document === 'undefined') return
-        const style = document.createElement('style')
-        style.dataset.plugin = plugin
-        style.textContent = styleText
-        document.head.append(style)
-        scope.defer(() => style.remove())
-      }
+const moduleEntry = (module: unknown, plugin: string) =>
+  parseClientPluginEntry(
+    typeof module === 'object' && module !== null && 'default' in module
+      ? module.default
+      : undefined,
+    plugin,
+  )
 
-export class StoredPluginModuleReader<
-  TConfig extends PluginConfig = PluginConfig,
-> implements PluginModuleReader<TConfig> {
+const styleActivator = (plugin: string, text: string) => (ctx: Context) => {
+  if (typeof document === 'undefined' || !text) return
+  ctx.effect(() => {
+    const style = document.createElement('style')
+    style.dataset.plugin = plugin
+    style.textContent = text
+    document.head.append(style)
+    return () => style.remove()
+  }, 'plugin CSS')
+}
+
+export class StoredPluginModuleReader implements PluginModuleReader {
   public readonly id = 'stored'
 
   public constructor(private readonly files: PluginFileStore) {}
@@ -43,38 +45,43 @@ export class StoredPluginModuleReader<
   public async read(
     archive: PluginArchiveDB.Archive,
     signal: AbortSignal,
-  ): Promise<LoadedPluginModule<TConfig>> {
-    const plugin = archive.pluginName
-    const url = await this.files.createModuleUrl(plugin, 'index.js')
-    if (signal.aborted) {
-      this.files.release(plugin)
-      throw signal.reason
+  ): Promise<LoadedPluginModule> {
+    const manifest = archive.meta
+    if (!manifest.client) throw new Error(`plugin has no client entry: ${archive.pluginName}`)
+    const resources = new Map<string, Uint8Array>()
+    for (const resource of manifest.resources) {
+      resources.set(resource.path, await this.files.read(archive.pluginName, resource.path))
+      signal.throwIfAborted()
     }
+    await validateArtifact({
+      manifest,
+      files: [...resources].map(([path, bytes]) => ({ path, bytes })),
+    })
+    const graph = await createArtifactModuleGraph(manifest, resources)
     try {
-      const module = (await import(/* @vite-ignore */ url)) as { default?: unknown }
+      const module: unknown = await import(/* @vite-ignore */ graph.url)
       signal.throwIfAborted()
-      let styleText: string | undefined
-      try {
-        styleText = new TextDecoder().decode(await this.files.read(plugin, 'index.css'))
-      } catch {
-        styleText = undefined
-      }
-      signal.throwIfAborted()
+      const styleText = manifest.resources
+        .filter(resource => resource.mimeType === 'text/css')
+        .map(resource => new TextDecoder().decode(resources.get(resource.path)))
+        .join('\n')
       return {
-        activate: styleActivator(plugin, styleText),
-        factory: asFactory<TConfig>(module.default, plugin),
-        dispose: () => this.files.release(plugin),
+        functions: moduleEntry(module, archive.pluginName),
+        activate: styleActivator(archive.pluginName, styleText),
+        dispose: () => {
+          graph.dispose()
+          this.files.release(archive.pluginName)
+        },
       }
     } catch (error) {
-      this.files.release(plugin)
+      graph.dispose()
+      this.files.release(archive.pluginName)
       throw error
     }
   }
 }
 
-export class DevServerPluginModuleReader<
-  TConfig extends PluginConfig = PluginConfig,
-> implements PluginModuleReader<TConfig> {
+export class DevServerPluginModuleReader implements PluginModuleReader {
   public readonly id = DEV_SERVER_LOADER_ID
   readonly #versions = new Map<string, number>()
 
@@ -85,34 +92,28 @@ export class DevServerPluginModuleReader<
   public async read(
     archive: PluginArchiveDB.Archive,
     signal: AbortSignal,
-  ): Promise<LoadedPluginModule<TConfig>> {
+  ): Promise<LoadedPluginModule> {
     const port = parseDevServerPort(archive.installInput)
-    if (port === undefined) {
-      throw new Error(`development plugin has an invalid install source: ${archive.installInput}`)
-    }
-    const previousVersion = this.#versions.get(archive.pluginName)
-    const version = (previousVersion ?? 0) + 1
+    if (port === undefined)
+      throw new Error(`invalid development install source: ${archive.installInput}`)
+    const entry = archive.meta.client?.entry
+    if (!entry) throw new Error(`plugin has no client entry: ${archive.pluginName}`)
+    const previous = this.#versions.get(archive.pluginName)
+    const version = (previous ?? 0) + 1
     this.#versions.set(archive.pluginName, version)
+    const url = devServerUrl(port, safePluginPath(entry, 'client entry'))
+    const module: unknown = await import(
+      /* @vite-ignore */ `${url}${previous === undefined ? '' : `?v=${version}`}`
+    )
     signal.throwIfAborted()
-
-    // Keep the first entry URL stable so its source modules share one native Vite HMR graph.
-    // Explicit plugin updates still get a fresh bootstrap URL after the first load.
-    const entryUrl = devServerUrl(port, DEV_ENTRY_PATH)
-    const module = (await (previousVersion === undefined
-      ? import(/* @vite-ignore */ entryUrl)
-      : import(/* @vite-ignore */ `${entryUrl}?v=${version}`))) as { default?: unknown }
-    signal.throwIfAborted()
-
-    let styleText: string | undefined
     const response = await fetch(devServerUrl(port, DEV_CSS_PATH), { cache: 'no-store', signal })
-    if (response.status !== 404) {
-      if (!response.ok) throw new Error(`development plugin CSS request failed: ${response.status}`)
-      styleText = await response.text()
-    }
+    if (!response.ok && response.status !== 404)
+      throw new Error(`development CSS request failed: ${response.status}`)
+    const text = response.status === 404 ? '' : await response.text()
     signal.throwIfAborted()
     return {
-      activate: styleActivator(archive.pluginName, styleText),
-      factory: asFactory<TConfig>(module.default, archive.pluginName),
+      functions: moduleEntry(module, archive.pluginName),
+      activate: styleActivator(archive.pluginName, text),
     }
   }
 }

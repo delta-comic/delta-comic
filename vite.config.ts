@@ -112,12 +112,8 @@ export default defineConfig({
     projects: [
       { test: { name: 'root', environment: 'node', include: ['script/test/**/*.test.ts'] } },
       'packages/shared/core/both',
-      'packages/client/core/plugin-api',
       'packages/client/core/plugin-artifact',
-      'packages/client/core/plugin-kernel',
-      'packages/client/core/plugin-loader',
       'packages/client/core/plugin-install',
-      'packages/client/core/plugin-runtime',
       'packages/client/core/plugin-vite',
       'packages/shared/plugin/manifest',
       'packages/client/core/sdk',

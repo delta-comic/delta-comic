@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { installPlugin, updatePlugin } from '@delta-comic/plugin'
+import { installPlugin, updatePluginByName } from '@delta-comic/plugin'
 import { useDialog, useMessage } from 'naive-ui'
 import { computed, onMounted, shallowReactive, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -41,12 +41,12 @@ const runInstall = async (item: PluginMarketplaceItem) => {
     const title = t(
       item.installed ? 'plugin.progress.updateTitle' : 'plugin.progress.installTitle',
       item.installed
-        ? { plugin: item.manifest?.name.display ?? item.listing.id }
-        : { file: item.manifest?.name.display ?? item.listing.id },
+        ? { plugin: item.manifest?.name ?? item.listing.id }
+        : { file: item.manifest?.name ?? item.listing.id },
     )
     await runPluginInstall(title, options =>
       item.installed
-        ? updatePlugin(item.installed, options)
+        ? updatePluginByName(item.installed.pluginName, options)
         : installPlugin(pluginMarketplaceInstallInput(item.listing), options),
     )
     await marketplace.refreshInstalled()

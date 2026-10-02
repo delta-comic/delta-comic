@@ -257,6 +257,8 @@ const zhCN = {
       useLocalFile: '使用本地文件',
     },
     list: {
+      safeMode: '本次会话已进入安全模式，可在插件管理中逐个启用插件。',
+      configObject: '配置必须是 JSON 对象',
       actions: {
         disable: '禁用',
         enable: '启用',

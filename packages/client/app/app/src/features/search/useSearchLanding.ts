@@ -34,8 +34,8 @@ export function useSearchLanding(options: UseSearchLandingOptions) {
   const isLoadingHotSearch = shallowRef(false)
 
   const fallbackTarget = computed<ResolvedSearchTarget | undefined>(() => {
-    for (const [plugin, config] of pluginStore.plugins) {
-      const method = config.model?.content?.search?.methods[0]
+    for (const [plugin, content] of pluginStore.content) {
+      const method = content.search?.methods[0]
       if (!method) continue
       return { method: method.id, plugin, sort: method.sorts.default }
     }
@@ -44,11 +44,9 @@ export function useSearchLanding(options: UseSearchLandingOptions) {
 
   const hotSearchSections = computedAsync<ResolvedHotSearchSection[]>(
     async onCancel => {
-      const providers = pluginStore
-        .modelEntries('content')
-        .flatMap(([plugin, content]) =>
-          content.search?.getHotSearch ? [{ plugin, provider: content.search.getHotSearch }] : [],
-        )
+      const providers = [...pluginStore.content].flatMap(([plugin, content]) =>
+        content.search?.getHotSearch ? [{ plugin, provider: content.search.getHotSearch }] : [],
+      )
       const controller = new AbortController()
       onCancel(() => controller.abort())
 
@@ -80,9 +78,9 @@ export function useSearchLanding(options: UseSearchLandingOptions) {
     target?: Content.SearchAim['search'],
   ): ResolvedSearchTarget | undefined {
     if (!plugin || !target) return fallbackTarget.value
-    const method = pluginStore.plugins
+    const method = pluginStore.content
       .get(plugin)
-      ?.model?.content?.search?.methods.find(value => value.id === target.method)
+      ?.search?.methods.find(value => value.id === target.method)
     if (!method) return fallbackTarget.value
     return { method: target.method, plugin, sort: target.sort ?? method.sorts.default }
   }

@@ -1,1 +1,0 @@
-export type { ExposeModel, PluginExposeRegistry } from '@delta-comic/client'

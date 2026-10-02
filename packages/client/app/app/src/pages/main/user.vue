@@ -53,7 +53,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: UniUser; plugin: strin
 
 <template>
   <DefineUser v-slot="{ user, plugin }">
-    <DcVar :value="pluginStore.plugins.get(plugin)?.model?.user?.card" v-slot="{ value }">
+    <DcVar :value="pluginStore.user.get(plugin)?.card" v-slot="{ value }">
       <div class="relative w-full">
         <component
           :is="value"
@@ -221,10 +221,10 @@ const [DefineUser, User] = createReusableTemplate<{ user: UniUser; plugin: strin
         <span class="mt-1 text-(--dc-text)">{{ t('user.sections.watchLater') }}</span>
       </button>
     </div>
-    <template v-for="[pluginName, plugin] of pluginStore.plugins.entries()" :key="pluginName">
+    <template v-for="[pluginName, plugin] of pluginStore.user.entries()" :key="pluginName">
       <ActionCard
         :pluginName
-        v-for="(card, cardIndex) of plugin.model?.user?.userActionPages ?? []"
+        v-for="(card, cardIndex) of plugin.userActionPages ?? []"
         :key="`${pluginName}:${cardIndex}`"
         :card
       />
