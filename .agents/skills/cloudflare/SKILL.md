@@ -1,15 +1,20 @@
 ---
 name: cloudflare
 description: Comprehensive Cloudflare platform skill covering Workers, Pages, storage (KV, D1, R2), AI (Workers AI, Vectorize, Agents SDK), feature flags (Flagship), networking (Tunnel, Spectrum), security (WAF, DDoS), and infrastructure-as-code (Terraform, Pulumi). Use for any Cloudflare development task. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.
-references:
-  - workers
-  - pages
-  - d1
-  - durable-objects
-  - workers-ai
+metadata:
+  references:
+    - workers
+    - pages
+    - d1
+    - durable-objects
+    - workers-ai
 ---
 
 # Cloudflare Platform Skill
+
+## Delta Comic repository
+
+Apply [AGENTS.md](../../../AGENTS.md) when using these examples here. Define dependency versions in root `pnpm-workspace.yaml`, reference `catalog:` in package manifests, and run `vp install`. Use `vp run` for workspace scripts and `vp exec wrangler` for CLI calls. Test APIs come from `vite-plus/test`; build dependencies with `vp run lib-build` before `vp test run`. Inspect the existing server tests and root Vite+ projects when configuring Worker tests.
 
 Consolidated skill for building on the Cloudflare platform. Use decision trees below to find the right product, then load detailed references.
 

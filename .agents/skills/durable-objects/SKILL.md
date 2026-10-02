@@ -5,6 +5,10 @@ description: Create and review Cloudflare Durable Objects. Use when building sta
 
 # Durable Objects
 
+## Delta Comic repository
+
+Apply [AGENTS.md](../../../AGENTS.md) to dependencies and tests: versions in root `pnpm-workspace.yaml`, manifest references via `catalog:`, installation via `vp install`, and test APIs from `vite-plus/test`. Run `vp run lib-build` before `vp test run`. Inspect existing server tests and root Vite+ projects when choosing Worker test configuration; check the installed runner version against any testing integration.
+
 Build stateful, coordinated applications on Cloudflare's edge using Durable Objects.
 
 ## Retrieval Sources

@@ -5,6 +5,10 @@ description: Cloudflare Workers CLI for deploying, developing, and managing Work
 
 # Wrangler CLI
 
+## Delta Comic repository
+
+Apply [AGENTS.md](../../../AGENTS.md): dependency versions belong in root `pnpm-workspace.yaml` and package manifests use `catalog:`. Install with `vp install`, invoke this CLI through `vp exec wrangler` or existing `vp run --filter @delta-comic/server` scripts, and import test APIs from `vite-plus/test`. Run `vp run lib-build` before tests. Check the installed Wrangler schema and current server configuration; generate Worker bindings with the server `cf-typegen` script. Run the matching D1 migration script before local startup or deployment.
+
 Your knowledge of Wrangler CLI flags, config fields, and subcommands may be outdated. **Prefer retrieval over pre-training** for any Wrangler task.
 
 ## Retrieval Sources
