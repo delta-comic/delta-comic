@@ -49,8 +49,10 @@ D1 查询数包含流程安装读取和执行记录写入；认证另有 3 条�
 
 ## 最终检查
 
-已通过一次完整串行构建、格式/lint、递归类型检查、全量测试（155 files / 833 tests）、codegen 一致性和 diff 检查。IndexedDB 文件删除修正后正在进行最终复核。
+IndexedDB 文件删除修正后的最终串行验收于 19:14 完成，全部通过：`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`（155 files / 833 tests）、`vp run codegen:check`、`git diff --check`。
 
 Rust `cargo fmt --all --check`、全工作区 clippy（含 all-targets、locked、-D warnings）及工作区测试通过，共 132 单元测试；1 个既有文档示例跳过。
 
 实际启动复核中修复了安装元数据展示和 IndexedDB 文件删除；最终浏览器无运行错误。现场警告包含框架实验性提示和浏览器剪贴板权限提示；原生下载器 DHT bootstrap 在当前网络下重试。
+
+本轮实现按阶段签名提交，现场修正与验证同步保存。临时 Web 验收包已卸载，原生调试进程已结束。Web 截图与日志保存在 `/tmp/delta-comic-playwright-final-20261002`。
