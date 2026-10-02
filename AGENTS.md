@@ -83,6 +83,7 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 
 ## 工具链
 
+- 依赖版本统一定义于根`pnpm-workspace.yaml`和`Cargo.toml`，除此之外的位置只能引用(如:`catalog:`/`{ workspace = true }`)。
 - 使用 Vite+（`vp`），不要直接运行 `pnpm`、`vite`、`vitest`、`oxlint` 或 `oxfmt`
   命令。仓库固定使用 Node `25.9.0`、pnpm `12.0.0-rc.3` 和
   `nightly-2026-08-12` Rust 工具链（MSRV `1.95.0`，2024 edition）。
@@ -90,6 +91,7 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 - Vite+ 并非 Vite：工作区脚本通过 `vp run` 运行，例如
   `vp run --filter app dev:web`。本地 Vite+ 文档位于 `node_modules/vite-plus/docs`。
 - 本地会话中使用全局 `vp`；仅在没有全局 CLI 时使用 `pnpm exec vp`。
+- js测试使用`vite-plus/test`而不是`vitest`，`vite-plus/test`是`vitest`的re-export。
 
 ## 验证
 
@@ -128,9 +130,6 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 
 ## 架构约束
 
-- 修改插件时遵循 `packages/client/core/plugin/ARCHITECTURE.md`。只有 `composition.ts` 可以组装具体的
-  capability/adapter；`index.ts` 仅用于导出；包内代码不得自引用 `@delta-comic/plugin` 或
-  `@/index`。
 - 内置客户端插件采用文件驱动方式，由 `builtins/*.builtin.ts` 默认导出。服务端内置插件有所不同：
   Wrangler 不会转换 `import.meta.glob`，因此需要在
   `packages/server/core/server/app/modules/plugins/definitions/index.ts` 中添加显式 ESM 导入。

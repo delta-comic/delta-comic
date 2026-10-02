@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "@types/semver": "catalog:",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite-plus": "catalog:"
   }
 }

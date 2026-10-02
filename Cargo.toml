@@ -19,7 +19,7 @@ rust-version = "1.95.0"
 version = "3.0.0-next.19"
 
 [workspace.dependencies]
-log = "0.4.33"
+log = "0.4.34"
 mime_guess = "2.0.5"
 objc2-foundation = { version = "0.3.2", features = ["NSString", "NSUserDefaults"] }
 percent-encoding = "2.3.2"
@@ -27,27 +27,27 @@ serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 specta = "=2.0.0-rc.25"
 specta-typescript = "0.0.12"
-tauri = "2.11.5"
-tauri-build = "2.6.3"
-tauri-plugin = "2.6.3"
+tauri = "2.12.1"
+tauri-build = "2.7.1"
+tauri-plugin = "2.7.1"
 tauri-plugin-aptabase = { git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls", branch = "main" }
 tauri-plugin-better-cors-fetch = { version = "1.8.0", features = ["multipart", "blocking"] }
-tauri-plugin-clipboard-manager = "2.3.2"
+tauri-plugin-clipboard-manager = "2.4.1"
 tauri-plugin-db = { path = "packages/client/data/db" }
 tauri-plugin-downloader = { path = "packages/client/platform/downloader" }
 tauri-plugin-logger = { path = "packages/client/platform/logger" }
-tauri-plugin-fs = "2.5.1"
-tauri-plugin-m3 = "0.3.1"
-tauri-plugin-persisted-scope = "2.3.7"
+tauri-plugin-fs = "2.6.0"
+tauri-plugin-m3 = "0.3.2"
+tauri-plugin-persisted-scope = "2.4.0"
 tauri-plugin-plugin = { path = "packages/client/core/plugin" }
-tauri-plugin-shell = "2"
+tauri-plugin-shell = "2.4.0"
 tauri-plugin-webview-upgrade = { git = "https://github.com/readest/tauri-plugin-webview-upgrade" }
 
 tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2", features = [
   "sqlite",
 ] }
 tauri-plugin-utils = { path = "packages/client/core/utils" }
-tauri-runtime-wry = "2.11.4"
+tauri-runtime-wry = "2.12.1"
 tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript", "javascript"] }
 tokio = "1.53.1"
 tracing = "0.1.44"

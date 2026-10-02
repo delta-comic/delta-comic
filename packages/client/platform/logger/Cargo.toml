@@ -23,12 +23,12 @@ ios = { level = "full", notes = "" }
 tauri-plugin = { workspace = true, features = ["build"] }
 
 [dependencies]
-chrono = { version = "0.4.44", features = ["serde"] }
-flate2 = "1.1.9"
+chrono = { version = "0.4.45", features = ["serde"] }
+flate2 = "1.1.10"
 log = { workspace = true }
 serde = { workspace = true }
 tauri = { workspace = true }
-thiserror = "2.0.18"
+thiserror = "2.0.21"
 tokio = { workspace = true, features = ["fs", "io-std", "io-util", "sync", "time"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }

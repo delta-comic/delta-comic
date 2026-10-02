@@ -26,7 +26,6 @@
   },
   "devDependencies": {
     "@swc/core": "catalog:",
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite-plus": "catalog:"
   }
 }

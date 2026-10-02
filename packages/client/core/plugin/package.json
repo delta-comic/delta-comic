@@ -57,7 +57,6 @@
     "@types/semver": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "typescript": "catalog:",
-    "vitest": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
   "peerDependencies": {

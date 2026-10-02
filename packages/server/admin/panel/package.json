@@ -26,7 +26,6 @@
     "vite": "catalog:",
     "vite-plugin-vue-devtools": "catalog:",
     "vite-plus": "catalog:",
-    "vitest": "catalog:",
     "vue-component-type-helpers": "catalog:",
     "vue-tsc": "catalog:",
     "wrangler": "catalog:"

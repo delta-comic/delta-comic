@@ -21,7 +21,6 @@
     "@delta-comic/plugin-manifest": "workspace:"
   },
   "devDependencies": {
-    "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vite-plus": "catalog:"
   }
 }
