@@ -37,6 +37,7 @@ describe('assertWrite', () => {
     expect(
       assertWrite(tableSchema('plugin'), 'plugin', {
         displayName: null,
+        config: '{}',
         enable: 1,
         installInput: '',
         installerName: 'x',

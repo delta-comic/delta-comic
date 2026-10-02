@@ -62,8 +62,9 @@ const pluginColumns = [
   'enable',
   'installInput',
   'displayName',
+  'config',
 ]
-const validPluginRow = ['installer', 'loader', 'p', '{"name":"p"}', true, '', null]
+const validPluginRow = ['installer', 'loader', 'p', '{"name":"p"}', true, '', null, '{}']
 
 describe('validateWriteNode', () => {
   it('accepts valid insert rows', () => {

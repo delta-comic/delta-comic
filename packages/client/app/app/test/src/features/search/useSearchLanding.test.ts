@@ -19,11 +19,9 @@ vi.mock('@delta-comic/db', () => ({ useNativeStore: () => mocks.history }))
 vi.mock('@delta-comic/plugin', () => ({
   usePluginStore: () => ({
     displayName: (plugin: string) => `${plugin} trending`,
-    modelEntries: (key: string) =>
-      key === 'content'
-        ? [...mocks.plugins].map(([plugin, config]) => [plugin, config.model.content])
-        : [],
-    plugins: mocks.plugins,
+    get content() {
+      return new Map([...mocks.plugins].map(([plugin, config]) => [plugin, config.model.content]))
+    },
   }),
 }))
 vi.mock('@delta-comic/utils', () => ({ SharedFunction: { call: mocks.routeCall } }))

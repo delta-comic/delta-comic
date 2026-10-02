@@ -306,7 +306,7 @@ describe('plugin archive mutations', () => {
 
     expect(trx.calls.replaces[0]).toEqual({
       table: 'plugin',
-      values: [{ ...pluginArchive, meta: JSON.stringify(pluginArchive.meta) }],
+      values: [{ ...pluginArchive, meta: JSON.stringify(pluginArchive.meta), config: '{}' }],
     })
     expect(trx.calls.deletes[0].table).toBe('plugin')
   })

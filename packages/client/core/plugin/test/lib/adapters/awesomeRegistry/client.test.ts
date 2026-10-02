@@ -31,12 +31,14 @@ const pagePayload = {
 }
 
 const manifestPayload = {
-  apiVersion: 1,
+  protocolVersion: 2,
+  id: 'reader',
   author: 'delta-comic',
   description: 'Reader',
-  name: { display: 'Reader', id: 'reader' },
-  require: [],
-  version: { plugin: '2.0.0', supportCore: '^3.0.0' },
+  name: 'Reader',
+  version: '2.0.0',
+  client: { entry: 'index.js' },
+  resources: [],
 }
 
 const memoryStorage = (): AwesomeRegistryStorage => {
@@ -96,10 +98,7 @@ describe('AwesomeRegistryClient', () => {
       signal,
     )
 
-    requestJson.mockResolvedValueOnce({
-      ...manifestPayload,
-      name: { display: 'Other', id: 'other' },
-    })
+    requestJson.mockResolvedValueOnce({ ...manifestPayload, id: 'other', name: 'Other' })
     await expect(client.loadManifest(listing)).rejects.toThrow(
       'listing reader points to manifest for other',
     )

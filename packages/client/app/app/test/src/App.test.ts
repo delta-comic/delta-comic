@@ -82,6 +82,11 @@ vi.mock('@delta-comic/utils', () => ({
   },
 }))
 vi.mock('@/stores/downloads', () => ({ useDownloadsStore: () => downloads }))
+vi.mock('@tauri-apps/api/core', () => ({ isTauri: () => true }))
+vi.mock('@tauri-apps/api/event', () => ({
+  TauriEvent: { WINDOW_RESUMED: 'tauri://resumed' },
+  listen: vi.fn(async () => vi.fn()),
+}))
 vi.mock('@vueuse/core', () => ({
   useIntervalFn: (callback: () => Promise<void>) => intervalCallbacks.push(callback),
 }))
