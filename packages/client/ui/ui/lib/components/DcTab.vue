@@ -210,7 +210,7 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
         </Swiper>
         <div
           v-show="indicatorReady"
-          class="dc-tabs__indicator pointer-events-none absolute bottom-[var(--dc-tabs-indicator-offset,10px)] left-0 h-[3px] rounded-[3px] bg-[var(--dc-tabs-indicator-color,var(--dc-color-primary))] transition-[transform,width] duration-[250ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
+          class="dc-tabs__indicator pointer-events-none absolute bottom-0 left-0 h-[3px] rounded-[3px] bg-[var(--dc-tabs-indicator-color,var(--dc-color-primary))] transition-[transform,width] duration-[250ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
           :style="{ transform: `translate3d(${indicatorX}px, 0, 0)`, width: `${indicatorWidth}px` }"
         />
       </div>
