@@ -1,15 +1,11 @@
 import dayjs from 'dayjs'
 
-import { TauriLoggerClient } from './client'
 import { serializeLogArguments } from './serializer'
 import {
   LOG_LEVELS,
-  type ExportLogsOptions,
   type LogEntry,
-  type LogFileContent,
-  type LogFileInfo,
   type LogLevel,
-  type LoggerClient,
+  type LoggerTransport,
   type LoggerOptions,
 } from './types'
 
@@ -54,7 +50,7 @@ export const formatLogEntry = (entry: LogEntry): string => {
 }
 
 interface LoggerRuntime {
-  client: LoggerClient
+  transport: LoggerTransport
   minLevel: LogLevel
   consoleWriters: Record<ConsoleMethod, ConsoleWriter>
   cleanup: Set<() => void>
@@ -73,7 +69,11 @@ export class Logger {
   ) {
     this.scope = normalizeScope(scope)
     this.runtime = {
-      client: new TauriLoggerClient(options),
+      transport: options.transport ?? {
+        write: () => undefined,
+        flush: async () => undefined,
+        dispose: async () => undefined,
+      },
       minLevel: resolveMinLevel(options.minLevel),
       consoleWriters: this.captureConsole(),
       cleanup: new Set(),
@@ -91,8 +91,12 @@ export class Logger {
     return logger
   }
 
-  public get client(): LoggerClient {
-    return this.runtime.client
+  public get transport(): LoggerTransport {
+    return this.runtime.transport
+  }
+
+  public setTransport(transport: LoggerTransport): void {
+    this.runtime.transport = transport
   }
 
   public get minLevel(): LogLevel {
@@ -206,13 +210,13 @@ export class Logger {
   }
 
   public flush(): Promise<void> {
-    return this.runtime.client.flush()
+    return this.runtime.transport.flush()
   }
 
   public async dispose(): Promise<void> {
     this.runtime.consoleRestore?.()
     for (const cleanup of this.runtime.cleanup) cleanup()
-    await this.runtime.client.dispose()
+    await this.runtime.transport.dispose()
   }
 
   private emit(level: LogLevel, values: readonly unknown[], mirrorConsole = true): void {
@@ -227,7 +231,7 @@ export class Logger {
       const writer = this.runtime.consoleWriters[LEVEL_CONSOLE[level]]
       writer(formatLogEntry(entry))
     }
-    this.runtime.client.write([entry])
+    this.runtime.transport.write([entry])
   }
 
   private captureConsole(): Record<ConsoleMethod, ConsoleWriter> {
@@ -250,16 +254,6 @@ export const createLogger = (scope = 'app', options: LoggerOptions = {}) =>
 
 /** Shared queue used by application modules and third-party plugins. */
 export const logger = createLogger('delta-comic', { captureErrors: false, flushOnLifecycle: false })
-
-/** Typed native reader/export client sharing the global logger transport. */
-export const loggerClient = logger.client
-
-export const listLogFiles = (): Promise<LogFileInfo[]> => loggerClient.listLogFiles()
-
-export const readLogFile = (path: string): Promise<LogFileContent> => loggerClient.readLogFile(path)
-
-export const exportLogs = (options?: ExportLogsOptions): Promise<string> =>
-  loggerClient.exportLogs(options)
 
 const globalInstallations = new WeakMap<Logger, () => void>()
 

@@ -2,7 +2,7 @@ import {
   parsePluginCatalogIndex,
   PluginCatalogConflictError,
   type PluginCatalogStore,
-} from '@delta-comic/both'
+} from './catalogProtocol/index.js'
 
 export interface PluginCatalogHandlerOptions {
   store: PluginCatalogStore

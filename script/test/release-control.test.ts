@@ -23,7 +23,7 @@ const publishablePackages: PublishableWorkspacePackage[] = [
   {
     dependencies: [],
     name: '@delta-comic/model',
-    path: 'packages/shared/core/model/package.json',
+    path: 'packages/client/core/model/package.json',
     version: '3.0.0',
   },
   {

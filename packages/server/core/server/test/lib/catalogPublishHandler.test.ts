@@ -1,6 +1,9 @@
-import { createMemoryPluginCatalogStore, type PluginRelease } from '@delta-comic/both'
 import { describe, expect, it } from 'vitest'
 
+import {
+  createMemoryPluginCatalogStore,
+  type PluginRelease,
+} from '../../lib/catalogProtocol/index.js'
 import { createPluginCatalogPublishHandler } from '../../lib/catalogPublishHandler'
 
 const release: PluginRelease = {

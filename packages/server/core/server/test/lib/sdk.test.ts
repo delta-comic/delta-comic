@@ -116,4 +116,35 @@ describe('server SDK', () => {
     ).resolves.toHaveProperty('status', 500)
     await runtime.dispose()
   })
+
+  it('releases plugin-owned routes and tasks on unmount', async () => {
+    const runtime = new ServerRuntime({
+      pluginId: 'scoped-server',
+      installationId: 'installation-1',
+      db: {} as never,
+    })
+    await runtime.mount('scoped', {
+      inject: ['server'],
+      apply(ctx: Context) {
+        ctx.server.registerRoute({
+          method: 'GET',
+          path: '/scoped',
+          public: true,
+          handler: () => new Response('ok'),
+        })
+        ctx.server.registerCron('* * * * *', () => undefined)
+        ctx.server.registerQueue('scoped', () => undefined)
+        ctx.server.registerMigration({ id: 'scoped-migration', up: async () => undefined })
+      },
+    })
+    expect(runtime.routes).toHaveLength(1)
+    await runtime.unmount('scoped')
+    expect(runtime.routes).toHaveLength(0)
+    expect(runtime.crons).toHaveLength(0)
+    expect(runtime.migrations).toHaveLength(0)
+    await expect(
+      runtime.dispatch(new Request('https://example.test/scoped')),
+    ).resolves.toHaveProperty('status', 404)
+    await runtime.dispose()
+  })
 })

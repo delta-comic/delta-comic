@@ -1,6 +1,6 @@
-import { PluginCatalogConflictError } from '@delta-comic/both'
 import { describe, expect, it } from 'vitest'
 
+import { PluginCatalogConflictError } from '../../lib/catalogProtocol/index.js'
 import { createR2PluginCatalogStore } from '../../lib/catalogStore'
 
 describe('R2 plugin catalog store', () => {

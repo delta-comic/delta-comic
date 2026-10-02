@@ -4,7 +4,7 @@ import {
   createHttpPluginCatalogStore,
   createMemoryPluginCatalogStore,
   PluginCatalogConflictError,
-} from '../../lib/releaseStore'
+} from '../../../lib/catalogProtocol/releaseStore.js'
 
 const index = { protocolVersion: 1 as const, generatedAt: 'now', entries: [] }
 

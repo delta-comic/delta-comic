@@ -15,10 +15,10 @@
     { "path": "./packages/client/app/app/tsconfig.node.json" },
 
     { "path": "./packages/client/data/db/tsconfig.node.json" },
-    { "path": "./packages/shared/core/model/tsconfig.node.json" },
-    { "path": "./packages/shared/plugin/plugin/tsconfig.node.json" },
+    { "path": "./packages/client/core/model/tsconfig.node.json" },
+    { "path": "./packages/client/core/plugin/tsconfig.node.json" },
     { "path": "./packages/server/core/server/tsconfig.node.json" },
     { "path": "./packages/client/ui/ui/tsconfig.node.json" },
-    { "path": "./packages/shared/core/utils/tsconfig.node.json" }
+    { "path": "./packages/client/core/utils/tsconfig.node.json" }
   ]
 }

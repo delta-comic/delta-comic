@@ -1,4 +1,4 @@
-import type { PluginReleaseArtifact } from '@delta-comic/both'
+import type { PluginReleaseArtifact } from './catalogProtocol/release.js'
 
 const pathSegment = /^[A-Za-z0-9._-]+$/
 

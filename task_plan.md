@@ -141,7 +141,7 @@
 | Error | Attempt | Resolution |
 |---|---|---|
 | 当前安装包同时存在新 Artifact Manifest 与旧数据库 Manifest 类型 | 1 | 保留旧数据库适配边界，在安装协议增加显式新 Artifact 类型与转换函数，避免隐式断言和全仓无关迁移 |
-| 根级 `vp test run` 未收集 plugin-install 测试路径 | 1 | 按仓库现有测试项目边界切换到 `packages/shared/plugin/install` 目录执行包内测试 |
+| 根级 `vp test run` 未收集 plugin-install 测试路径 | 1 | 按仓库现有测试项目边界切换到 `packages/client/core/plugin-install` 目录执行包内测试 |
 | Node Vite+ runner 无法直接 import `blob:` URL | 1 | 测试改为读取生成 Blob 内容并断言相对动态 import 已重写；浏览器/Tauri 负责实际 Blob 模块执行 |
 | 递归 typecheck 在 plugin-vite 任务先于新 install dist 生成时无法解析包声明 | 1 | 单独完成 `@delta-comic/plugin-install` build 后重跑递归 typecheck |
 | 全量 `vp test run` 并行冷启动时 3 个既有 db/plugin 测试触发 5 秒超时 | 1 | 改用两个包的独立测试入口复核，6 个 db 测试和 4 个 plugin fileStore 测试均通过；记录为全量 runner 冷启动限制 |
@@ -188,7 +188,7 @@
 | app `vue-tsc` 报告旧 `DCPluginConfig` model/hooks 字段缺失 | 1 | 聚合包已恢复可解析；记录为 6D 旧宿主类型迁移遗留，不扩大本次 6G Install/Vite 包拆分范围 |
 | 聚合包架构测试将多行 `export type` 续行误判为可执行代码 | 1 | 聚合入口改为通过 `lib/kernel` 统一导出新 Kernel，并移除旧 Kernel 的重复实现 |
 | 插件专项测试在依赖 dist 尚未重建时无法解析 `@delta-comic/plugin-kernel` | 1 | 先运行 `vp run lib-build`，再重新执行专项测试并通过 |
-| `vp run -r typecheck` 报告 `packages/shared/plugin/runtime/lib/store.ts:70` 及 `test/index.test.ts:37,42` 的 3 个类型错误 | 1 | 通过 store typed overload、Reflect.get 和测试模型泛型修复，递归 typecheck 已通过 |
+| `vp run -r typecheck` 报告 `packages/client/core/plugin-runtime/lib/store.ts:70` 及 `test/index.test.ts:37,42` 的 3 个类型错误 | 1 | 通过 store typed overload、Reflect.get 和测试模型泛型修复，递归 typecheck 已通过 |
 | 修改 API 的默认模型为 Record 导致 55 个宿主约束错误 | 1 | 恢复 API，使用 store 的 typed overload 与 Reflect.get，测试提供具体模型泛型 |
 | 泛型模型属性索引和 Exclude 返回值无法通过 TypeScript 检查 | 3 | 将公开签名与属性读取实现放在同一重载方法，值先标注 unknown 并过滤 undefined；Runtime 独立类型检查通过 |
 | 根级测试未收集 Runtime 独立包 | 1 | 在 Runtime 包目录使用 vp test run，专项测试通过 |
@@ -205,3 +205,35 @@
 - 聚合包能力已直接使用 `@delta-comic/plugin-kernel` 的 `CapabilityModule`、`ActivationPipeline` 和 `PluginScope`。
 - 删除聚合包重复的 candidate/capability/dependency/scope 实现、运行时 capability adapter 及其重复测试；插件特有的多 channel `ContributionHub` 保留为宿主能力服务。
 - 更新运行时进度报告以消费新 Kernel 的 capability state 事件，移除旧报告结构。
+
+## 第 12 章验收计划（2026-10-02）
+
+## Goal
+逐项验收公共协议、诊断装饰器、客户端和服务端 SDK、Manifest 与隔离边界，补齐真实实现缺口。文档无第 13 章。用户已授权实现选择与全部必要操作。
+
+### Phase 12A: 契约与实现审计
+**Status:** complete
+- 核对第 12 章全部公开 API、包导出与已有行为测试。
+- 确定最小实现范围与验收项。
+
+### Phase 12B: 完成契约与回归验证
+**Status:** complete
+- 修复审计确认的实现缺口，覆盖生命周期与失败路径。
+- 同步第 12 章实际 API 和验收说明。
+- 按用户确认的硬边界清理 shared：单端 model/utils/plugin 包和 Tauri logger crate 迁移到 client；release catalog 存储、发布与 schema 迁移到 server。shared 仅保留双端均消费的 Cordis/诊断/runtime、日志核心和 Manifest schema。
+
+### Phase 12C: 全仓验收与保存
+**Status:** complete
+- lib-build、check、递归 typecheck、全量测试、codegen 与 diff 检查。
+- 核对必要的原生验收，签名提交并确认工作树状态。
+
+## Next Step
+第 12 章验收完成；`ARCHITECTURE.md` 共 12 章，没有第 13 章。
+
+## 第 12 章错误记录
+| Error | Attempt | Resolution |
+|---|---|---|
+| 当前聊天目录无 ARCHITECTURE.md | 1 | 定位到 delta-comic 仓库根目录 |
+| 早期查询使用 client 路径 | 1 | 文档确认实际客户端 SDK 路径为 packages/client/core/sdk |
+
+| SDK 文件与 Vite 配置扩展名查询不匹配 | 1 | 使用 rg --files 确认 runtime.ts/host.ts 与 vite.config.mts |

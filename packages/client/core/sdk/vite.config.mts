@@ -27,6 +27,7 @@ export default defineConfig({
       './lib/runtime.ts',
       './lib/ui.ts',
       './lib/network.ts',
+      './lib/diagnostics.ts',
     ],
     sourcemap: true,
     dts: { tsconfig: './tsconfig.json' },

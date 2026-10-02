@@ -1,7 +1,7 @@
+import type { LogEntry } from '@delta-comic/logger'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 
-import { TauriLoggerClient } from '../../lib/client'
-import type { Invoke, LogEntry } from '../../lib/types'
+import { TauriLoggerClient, type Invoke } from '../../../src/logger/TauriLoggerClient'
 
 const entry = (content: string): LogEntry => ({
   content,

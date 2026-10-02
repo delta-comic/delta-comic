@@ -1,4 +1,4 @@
-import { TauriLoggerClient } from '@delta-comic/logger'
+import { TauriLoggerClient } from '../../logger/TauriLoggerClient'
 
 import type { LogFileInfo, LogReadResult } from './model'
 

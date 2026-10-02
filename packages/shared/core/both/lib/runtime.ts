@@ -55,6 +55,7 @@ export class CordisRuntime {
       this.events.record('plugin.mounted', { pluginId: id })
       return fiber
     } catch (error) {
+      this.#metadata.delete(id)
       this.diagnostics.record('error', 'plugin mount failed', {
         pluginId: id,
         error: error instanceof Error ? error.message : String(error),

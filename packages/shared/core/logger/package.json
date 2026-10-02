@@ -31,7 +31,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@tauri-apps/api": "catalog:",
     "dayjs": "catalog:"
   },
   "devDependencies": {

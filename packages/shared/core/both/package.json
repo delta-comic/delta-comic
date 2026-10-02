@@ -19,18 +19,6 @@
     "./runtime": {
       "types": "./dist/runtime.d.mts",
       "import": "./dist/runtime.mjs"
-    },
-    "./release": {
-      "types": "./dist/release.d.mts",
-      "import": "./dist/release.mjs"
-    },
-    "./release-store": {
-      "types": "./dist/releaseStore.d.mts",
-      "import": "./dist/releaseStore.mjs"
-    },
-    "./release-publisher": {
-      "types": "./dist/releasePublisher.d.mts",
-      "import": "./dist/releasePublisher.mjs"
     }
   },
   "publishConfig": {

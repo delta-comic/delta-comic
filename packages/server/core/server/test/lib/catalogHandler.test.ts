@@ -1,7 +1,7 @@
-import { createMemoryPluginCatalogStore } from '@delta-comic/both'
 import { describe, expect, it } from 'vitest'
 
 import { createPluginCatalogHandler } from '../../lib/catalogHandler'
+import { createMemoryPluginCatalogStore } from '../../lib/catalogProtocol/index.js'
 
 const catalog = { protocolVersion: 1 as const, generatedAt: 'now', entries: [] }
 

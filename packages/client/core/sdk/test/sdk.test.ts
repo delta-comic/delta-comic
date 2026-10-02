@@ -83,6 +83,41 @@ describe('client SDK', () => {
     await runtime.dispose()
   })
 
+  it('releases plugin-owned UI registrations when that plugin unmounts', async () => {
+    const removed: string[] = []
+    const runtime = new ClientRuntime({
+      pluginId: 'scoped-ui',
+      database,
+      uiRegistrars: { route: route => () => removed.push(route.path) },
+    })
+    await runtime.mount('consumer', {
+      inject: ['client'],
+      apply(ctx: Context) {
+        ctx.client.ui.registerRoute({ path: '/plugins/scoped-ui', title: 'Scoped UI' })
+      },
+    })
+    expect(removed).toEqual([])
+    const registered = runtime.host.ui.registerRoute({ path: '/plugins/host', title: 'Host UI' })
+    await runtime.unmount('consumer')
+    expect(removed).toEqual(['/plugins/scoped-ui'])
+    registered()
+    await runtime.dispose()
+    expect(runtime.snapshot().plugins).toHaveLength(0)
+  })
+
+  it('records store key and delete operations', async () => {
+    const runtime = new ClientRuntime({ pluginId: 'store-operations', database })
+    runtime.host.store.set('value', 1)
+    expect(runtime.host.store.keys()).toEqual(['value'])
+    expect(runtime.host.store.delete('value')).toBe(true)
+    expect(runtime.diagnostics.list().map(record => record.message)).toEqual([
+      'client store write completed',
+      'client store keys completed',
+      'client store delete completed',
+    ])
+    await runtime.dispose()
+  })
+
   it('exposes the downloader with diagnostic command instrumentation', async () => {
     const invoke = vi.fn()
     const diagnostics = new DiagnosticRecorder({ source: 'test', capacity: 20 })

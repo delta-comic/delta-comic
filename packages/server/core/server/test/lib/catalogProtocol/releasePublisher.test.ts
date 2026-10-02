@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import type { PluginRelease } from '../../lib/release'
-import { createPluginReleasePublisher } from '../../lib/releasePublisher'
-import { createMemoryPluginCatalogStore, PluginCatalogConflictError } from '../../lib/releaseStore'
+import type { PluginRelease } from '../../../lib/catalogProtocol/release.js'
+import { createPluginReleasePublisher } from '../../../lib/catalogProtocol/releasePublisher.js'
+import {
+  createMemoryPluginCatalogStore,
+  PluginCatalogConflictError,
+} from '../../../lib/catalogProtocol/releaseStore.js'
 
 const release = (version: string): PluginRelease => ({
   pluginId: 'demo',

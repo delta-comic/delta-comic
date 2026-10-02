@@ -80,11 +80,11 @@ jobs:
             packages/client/data/db/dist
             packages/client/platform/downloader/dist
             packages/shared/core/logger/dist
-            packages/shared/core/model/dist
-            packages/shared/plugin/plugin/dist
+            packages/client/core/model/dist
+            packages/client/core/plugin/dist
             packages/client/ui/ui/dist
             packages/client/ui/ui/dist-vite
-            packages/shared/core/utils/dist
+            packages/client/core/utils/dist
           if-no-files-found: error
           retention-days: 1
 

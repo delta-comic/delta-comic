@@ -19,7 +19,7 @@ const mocks = vi.hoisted(() => ({
   })),
 }))
 
-vi.mock('@delta-comic/logger', () => ({
+vi.mock('../../../../src/logger/TauriLoggerClient', () => ({
   TauriLoggerClient: class TauriLoggerClient {
     exportLogs = mocks.exportLogs
     listLogFiles = mocks.listLogFiles

@@ -10,12 +10,6 @@ import {
   EventRecorder,
   createDiagnosticLogger,
   createMinimalRuntime,
-  findPluginRelease,
-  parsePluginCatalogIndex,
-  parsePluginRelease,
-  createHttpPluginCatalogStore,
-  createMemoryPluginCatalogStore,
-  createPluginReleasePublisher,
   Service,
 } from '../lib/index.js'
 
@@ -170,87 +164,6 @@ describe('@delta-comic/both cordis integration', () => {
       'demo/ping completed',
       'demo/fail failed',
     ])
-  })
-
-  it('validates release metadata and resolves a non-yanked catalog release', () => {
-    const release = parsePluginRelease({
-      pluginId: 'demo',
-      version: '1.0.0',
-      manifestUrl: 'https://plugins.example/demo/1.0.0/manifest.json',
-      artifacts: [
-        {
-          platform: 'desktop',
-          url: 'https://plugins.example/demo/1.0.0/desktop.zip',
-          mimeType: 'application/zip',
-          size: 42,
-          integrity: 'sha256-YWJj',
-        },
-      ],
-      publishedAt: '2026-09-27T00:00:00Z',
-    })
-    const index = parsePluginCatalogIndex({
-      protocolVersion: 1,
-      generatedAt: '2026-09-27T00:00:00Z',
-      entries: [
-        { pluginId: 'demo', name: 'Demo', releases: [{ ...release, yanked: true }, release] },
-      ],
-    })
-    expect(findPluginRelease(index, 'demo')?.version).toBe('1.0.0')
-    expect(() =>
-      parsePluginRelease({ ...release, manifestUrl: 'http://insecure.test/manifest' }),
-    ).toThrow('invalid plugin release')
-  })
-
-  it('reads and writes catalog indexes through injected stores', async () => {
-    const memory = createMemoryPluginCatalogStore()
-    await memory.save({ protocolVersion: 1, generatedAt: 'now', entries: [] })
-    await expect(memory.load()).resolves.toMatchObject({ entries: [] })
-
-    const requests: RequestInit[] = []
-    const http = createHttpPluginCatalogStore(
-      'https://plugins.example/catalog.json',
-      async (_url, init) => {
-        requests.push(init ?? {})
-        return {
-          ok: true,
-          status: 200,
-          async json() {
-            return { protocolVersion: 1, generatedAt: 'now', entries: [] }
-          },
-        }
-      },
-    )
-    await expect(http.load()).resolves.toMatchObject({ entries: [] })
-    await http.save({ protocolVersion: 1, generatedAt: 'now', entries: [] })
-    expect(requests[0]?.headers).toMatchObject({ accept: 'application/json' })
-    expect(requests[1]?.method).toBe('PUT')
-  })
-
-  it('publishes and yanks releases with one catalog save per update', async () => {
-    const store = createMemoryPluginCatalogStore()
-    const publisher = createPluginReleasePublisher(store)
-    const release = parsePluginRelease({
-      pluginId: 'publisher-demo',
-      version: '1.0.0',
-      manifestUrl: 'https://plugins.example/publisher-demo/1.0.0/manifest.json',
-      artifacts: [
-        {
-          platform: 'desktop',
-          url: 'https://plugins.example/publisher-demo/1.0.0/desktop.zip',
-          mimeType: 'application/zip',
-          size: 1,
-          integrity: 'sha256-YQ==',
-        },
-      ],
-      publishedAt: '2026-09-27T00:00:00Z',
-    })
-
-    await publisher.publish(release, { name: 'Publisher demo' })
-    await expect(publisher.publish(release, { name: 'Publisher demo' })).rejects.toThrow(
-      'release already exists',
-    )
-    await publisher.yank('publisher-demo', '1.0.0')
-    expect(findPluginRelease((await store.load())!, 'publisher-demo')).toBeUndefined()
   })
 
   it('mounts and snapshots a Cordis runtime', async () => {

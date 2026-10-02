@@ -31,14 +31,16 @@ Delta Comic 插件系统重构方案，采用 Cordis 作为统一的客户端/�
 ### 12.1 公共包 `@delta-comic/both`
 
 `packages/shared/core/both` 是平台无关的协议包，统一 re-export 上游 `cordis` 的核心类型，
-并提供以下模块：
+并提供 Cordis re-export、跨端诊断协议与 runtime harness：
 
 | 模块 | 当前职责 |
 |---|---|
-| `manifest` | `PluginManifestSchema`、依赖、入口类型、资源路径、MIME、SHA-256 integrity、imports 和 platform |
-| `artifact` | 安全相对路径、资源图、重复/缺失文件、入口和 integrity 校验 |
 | `diagnostic` | 有容量上限的 `DiagnosticRecorder`、`DiagnosticSnapshot`、`withDiagnostic` 和 `@diagnostic` |
-| `runtime` | `CordisRuntime` 的 mount、unmount、list、snapshot、dispose harness |
+| `runtime` | client/server 共用的 `CordisRuntime` mount、unmount、list、snapshot、dispose harness |
+
+插件 Manifest schema 位于 `@delta-comic/plugin-manifest`，由客户端 SDK 与服务端 SDK
+共同消费。Artifact 校验位于客户端 `@delta-comic/plugin-artifact`，release catalog
+schema、存储与发布实现位于服务端 `packages/server/core/server/lib/catalogProtocol`。
 
 Manifest 的入口默认是 ESM module：
 
@@ -336,6 +338,12 @@ packages/
 │   │   ├── sdk/              → @delta-comic/client (公开)
 │   │   ├── runtime/          → 客户端 Cordis runtime 封装
 │   │   └── diagnostics/      → 诊断/快照/事件记录
+│   │   ├── plugin/           → 客户端插件宿主与组合
+│   │   ├── plugin-runtime/   → Vue 插件生命周期与响应式状态
+│   │   ├── plugin-install/   → 客户端插件安装与模块读取
+│   │   ├── plugin-vite/      → 插件开发与打包适配器
+│   │   ├── model/            → 客户端业务模型
+│   │   └── utils/            → 客户端与 Vite 工具
 │   ├── ui/
 │   │   ├── components/       → 基础 UI 组件
 │   │   ├── layout/           → 内容布局系统（迁移自 layout 仓库）
@@ -346,6 +354,7 @@ packages/
 │   │   └── sync/             → 云同步客户端
 │   └── platform/
 │       ├── tauri/            → Tauri 桥接与 IPC
+│       ├── logger/           → Tauri 原生日志 crate
 │       ├── network/          → 网络插件（内化 better-cors-fetch）
 │       └── downloader/       → 下载管理器
 ├── server/                    # 服务端 capability families
@@ -359,14 +368,28 @@ packages/
 │   │   └── plugins/          → 插件安装/管理
 │   └── admin/                → 管理后台独立应用
 └── shared/                    # 跨端共享
-    ├── both/                 → @delta-comic/both (公开)
-    ├── model/                → 数据模型（specta 类型源）
-    └── utils/                → 通用工具
+    ├── core/both/            → @delta-comic/both (公开)
+    ├── core/logger/          → 跨端结构化日志核心
+    └── plugin/manifest/      → client/server 插件 Manifest 协议
 
 apps/
 ├── desktop/                  → Tauri 桌面应用（原 packages/client/app/app）
 └── mobile/                   → Tauri Android 应用
 ```
+
+`packages/shared` 中的每个包、代码和类型都必须有 client 与 server 两端的直接消费者，
+并且两端必须依赖同一份实现或协议：
+
+| Shared package | Client consumer | Server consumer |
+|---|---|---|
+| `@delta-comic/both` | `packages/client/core/sdk` | `packages/server/core/server` |
+| `@delta-comic/logger` | client packages | server runtime and admin panel |
+| `@delta-comic/plugin-manifest` | client plugin packages | `packages/server/core/server` |
+
+Artifact 校验、插件 kernel/loader、release catalog 存储/发布实现均为单端能力，归入
+对应的 client 或 server family；其中插件运行时、安装适配、Vite 开发适配和 Tauri
+聚合宿主属于 `packages/client/core`，catalog 发布实现属于
+`packages/server/core/server`。
 
 ### 3.2 公开发布包
 

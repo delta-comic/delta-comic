@@ -4,7 +4,7 @@ import {
   PluginCatalogConflictError,
   type PluginCatalogStore,
   type PluginReleaseMetadata,
-} from '@delta-comic/both'
+} from './catalogProtocol/index.js'
 
 export interface PluginCatalogPublishHandlerOptions {
   store: PluginCatalogStore

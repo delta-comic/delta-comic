@@ -364,3 +364,28 @@
 - workspace catalog 更新至已核对的 Vue `3.6.0-rc.10`、Kysely `0.30.0-beta.2`、tslog `5.2.0`、pino `10.3.1`，`vp install` 成功并更新锁文件。
 - 发布协同基于 `script/release-workspace.mts`、`script/set-version.mts` 与 `release:dry-run` 工作流，架构文档已与真实入口同步。
 - 第 10、11 章实现与验收完成，待签名提交保存进度。
+
+## 2026-10-02：第 12 章启动
+- 读取技能、仓库规划与 AGENTS.md，完成 session catchup（无待恢复输出）。
+- 确认第 12 章范围与缺少第 13 章，添加三阶段实施验收计划。
+- 开始核对 SDK、诊断装饰器、资源校验及生命周期契约。
+
+## 第 12 章审计完成
+- both runtime、diagnostic、artifact 与 manifest 契约已核对。
+- 确认实现缺口：mount 失败元数据清理、客户端 UI/服务端扩展注册的插件生命周期、store 读删键诊断、client diagnostics 子路径构建入口。
+- 进入实现阶段，采用现有 Cordis mount/unmount 边界和最小作用域注册追踪。
+
+## 第 12 章实现修复
+- CordisRuntime mount 失败时清理插件元数据。
+- Client UI registrations 按插件作用域追踪，client unmount 释放对应 route/nav/command/environment；store read/delete/keys 纳入诊断。
+- Server route/cron/queue/migration registrations 按插件追踪，server unmount/dispose 释放注册项。
+- client SDK pack 增加 diagnostics 子路径产物。
+- 新增 client/server 作用域与 store 回归测试；both/client/server 专项测试通过。
+- 按 shared 硬边界迁移客户端专属的 plugin API/artifact/kernel/loader/runtime/install/Vite/host、model、utils 到 `packages/client`；Tauri logger adapter 与 Rust crate 归入 client，shared logger 保留跨端核心。
+
+## 2026-10-02：shared 双端消费边界与第 12 章验收完成
+
+- 将 release catalog schema、HTTP/memory store、publisher 和相应测试迁入 `packages/server/core/server`；服务端 catalog upload 与测试改为依赖 server 本地协议。
+- 修正 `ARCHITECTURE.md` 中 shared 对 Artifact 的旧归属描述，并为每个 shared 包列出 client/server 消费者；确认 `shared/core/both` 不再包含 release catalog 能力。
+- 第 12 章生命周期清理、store 操作诊断和 diagnostics 子路径产物已有回归测试；规划记录更新为 complete。架构文档无第 13 章。
+- 验证通过：`vp run lib-build`、`vp check --fix`、`vp run -r typecheck`、`vp test run`（180 files / 954 tests）、`vp run codegen:check`、`git diff --check`。Rust fmt、clippy 与 workspace test 此前完成通过。

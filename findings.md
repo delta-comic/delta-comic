@@ -354,3 +354,25 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 第 10 章当前采用单一 Tauri 应用共享 desktop/Android 入口；原生下载器已有 Android SAF/UIDT/WorkManager 和 desktop 编译分支，Cloudflare auth_users/auth_sessions 已有 Kysely typed repository 与 0001_auth migration。
 - 客户端新增诊断表沿用 TypeBox schema codegen；Rust 迁移通过 include_str 消费生成 SQL。持久化按插件保留 100 条，应用按顺序写入并报告失败。
 - 2026-10-01 从 npm/crates 元数据核对依赖：Vue 当前 RC 为 3.6.0-rc.10，Cordis rc.10，Kysely beta.2，tslog 5.2.0，pino 10.3.1；Tauri 3 仍为 alpha，因此保持 Tauri 2.11.x 与 specta 2.0.0-rc.25。
+
+## 第 12 章审计（2026-10-02）
+- 实际项目为 `/Users/wenxig/Documents/delta-comic`，初始工作树干净。
+- 根架构文档共 12 章，无第 13 章；第 12 章描述阶段 40A 已实现基线。
+- 既有阶段 10、11 验收已完成；本轮按现行实现核对第 12 章契约。
+- 包路径为 shared/core/both、client/core/sdk、server/core/server。
+- 仓库要求先 lib-build，再 check/typecheck/test；任务完成后签名提交。
+- 发现 SDK 生命周期缺口：客户端 UI 注册只在整个 runtime.dispose 清理，unmount 未绑定插件 fiber；服务端路由/cron/queue/migration 同样留在全局集合。
+- store.get/delete/keys 的真实调用位于诊断边界外，失败无法记录。
+- CordisRuntime 的并发 mount 检查在 await 前后存在间隙；待核对上游 Fiber 失败与 context disposal 语义。
+
+### 包边界复核
+
+- Shared 已收敛为 client/server 均有消费者的 `@delta-comic/both`、`@delta-comic/logger` 日志核心和 `@delta-comic/plugin-manifest` 协议；Tauri logger transport/crate 与其它客户端模型、工具、插件 API/runtime/install/Vite/host 已迁移到 client。
+- `@delta-comic/plugin-manifest` 由 client SDK 和 server SDK 同时依赖；`@delta-comic/both` 的 Cordis/诊断/runtime 契约由两端 SDK 同时依赖；`@delta-comic/logger` 被 client app、server Worker 和 server admin 使用。
+
+## 2026-10-02：shared 的双端必要性边界
+
+- `packages/shared` 中的包、代码和类型必须同时由 client 与 server 直接消费，并代表两端必须一致的实现或协议；单端调用便利不能作为共享理由。
+- release catalog schema、store 与 publisher 目前由服务端目录存储/发布实现消费，客户端市场使用自己的 catalog contract，因此这些文件及测试归入 `packages/server/core/server/lib/catalogProtocol`。
+- 客户端 Artifact 校验与 plugin kernel/loader 是安装和宿主实现，归入 `packages/client/core`。共享 Manifest schema 由两端 SDK 消费；Cordis、诊断/runtime 与日志核心由两端运行时消费。
+- 重新验收通过：180 个测试文件、954 个测试；lib-build、格式/lint、递归类型检查、codegen schema 检查与 diff 检查通过。Rust fmt/clippy/workspace tests 通过。

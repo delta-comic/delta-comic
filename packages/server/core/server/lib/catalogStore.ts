@@ -3,7 +3,7 @@ import {
   PluginCatalogConflictError,
   type PluginCatalogIndex,
   type PluginCatalogStore,
-} from '@delta-comic/both'
+} from './catalogProtocol/index.js'
 
 export interface PluginCatalogObject {
   httpEtag: string

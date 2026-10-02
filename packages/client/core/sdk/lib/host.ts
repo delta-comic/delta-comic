@@ -39,13 +39,10 @@ export const instrumentClientStore = (
   pluginId: string,
 ): ClientStore => ({
   get: <T>(key: string) => {
-    const value = store.get<T>(key)
-    withDiagnostic(diagnostics, 'client store read', () => value, {
+    return withDiagnostic(diagnostics, 'client store read', () => store.get<T>(key), {
       pluginId,
       key,
-      hit: value !== undefined,
     })
-    return value
   },
   set: <T>(key: string, value: T) => {
     withDiagnostic(diagnostics, 'client store write', () => store.set(key, value), {
@@ -53,12 +50,9 @@ export const instrumentClientStore = (
       key,
     })
   },
-  delete: key => {
-    const deleted = store.delete(key)
-    withDiagnostic(diagnostics, 'client store delete', () => deleted, { pluginId, key, deleted })
-    return deleted
-  },
-  keys: () => store.keys(),
+  delete: key =>
+    withDiagnostic(diagnostics, 'client store delete', () => store.delete(key), { pluginId, key }),
+  keys: () => withDiagnostic(diagnostics, 'client store keys', () => store.keys(), { pluginId }),
 })
 
 export interface ClientStore {
@@ -86,6 +80,9 @@ export interface ClientUi {
     condition?: (args: Record<string, unknown>) => boolean | Promise<boolean>,
   ): () => void
   dispose?(): void
+  __beginPluginScope?(pluginId: string): void
+  __endPluginScope?(): void
+  __disposePlugin?(pluginId: string): void
 }
 
 export interface ClientUiRegistrars {

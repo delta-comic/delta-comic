@@ -5,9 +5,9 @@ members = [
   "packages/client/data/db",
   "packages/client/platform/downloader",
   "packages/client/platform/downloader/tools/performance-baseline",
-  "packages/shared/core/logger",
-  "packages/shared/plugin/plugin",
-  "packages/shared/core/utils",
+  "packages/client/platform/logger",
+  "packages/client/core/plugin",
+  "packages/client/core/utils",
 ]
 
 [workspace.package]
@@ -35,18 +35,18 @@ tauri-plugin-better-cors-fetch = { version = "1.8.0", features = ["multipart", "
 tauri-plugin-clipboard-manager = "2.3.2"
 tauri-plugin-db = { path = "packages/client/data/db" }
 tauri-plugin-downloader = { path = "packages/client/platform/downloader" }
-tauri-plugin-logger = { path = "packages/shared/core/logger" }
+tauri-plugin-logger = { path = "packages/client/platform/logger" }
 tauri-plugin-fs = "2.5.1"
 tauri-plugin-m3 = "0.3.1"
 tauri-plugin-persisted-scope = "2.3.7"
-tauri-plugin-plugin = { path = "packages/shared/plugin/plugin" }
+tauri-plugin-plugin = { path = "packages/client/core/plugin" }
 tauri-plugin-shell = "2"
 tauri-plugin-webview-upgrade = { git = "https://github.com/readest/tauri-plugin-webview-upgrade" }
 
 tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2", features = [
   "sqlite",
 ] }
-tauri-plugin-utils = { path = "packages/shared/core/utils" }
+tauri-plugin-utils = { path = "packages/client/core/utils" }
 tauri-runtime-wry = "2.11.4"
 tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript", "javascript"] }
 tokio = "1.53.1"

@@ -101,7 +101,12 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
       await this.context.plugin(ctx => ctx.provide('client', this.#host))
       this.#hostMounted = true
     }
-    return this.#runtime.mount(id, plugin, config)
+    this.#host.ui.__beginPluginScope?.(id)
+    try {
+      return await this.#runtime.mount(id, plugin, config)
+    } finally {
+      this.#host.ui.__endPluginScope?.()
+    }
   }
 
   public snapshot(): DiagnosticSnapshot {
@@ -131,7 +136,7 @@ export class ClientRuntime<DB extends object = Record<string, never>> {
 
   @diagnostic('client plugin unmount')
   public unmount(id: string): Promise<void> {
-    return this.#runtime.unmount(id)
+    return this.#runtime.unmount(id).then(() => this.#host.ui.__disposePlugin?.(id))
   }
 
   @diagnostic('client runtime dispose')

@@ -120,14 +120,15 @@ The goal is to make the requested change correctly, with minimal unnecessary com
   `vp run --filter @delta-comic/server migrate:local`，然后再运行 `... dev`。
 - `packages/server/admin/panel` 是独立的 Vue 管理应用。功能通过
   `src/features/*/feature.ts` 自动发现；应添加功能模块，而不是编辑集中式路由列表。
-- `packages/client/data/db`、`packages/client/platform/downloader`、`packages/client/ui/ui`、
-  `packages/shared/core/{logger,model,utils}` 与 `packages/shared/plugin/plugin` 是可发布的工作区；其中一些还通过
+- `packages/client/data/db`、`packages/client/platform/{downloader,logger}`、`packages/client/ui/ui`、
+  `packages/shared/core/logger` 与 `packages/client/core/{model,utils,plugin}` 是可发布的工作区；其中一些还通过
   根 Cargo 工作区映射到 Rust Tauri 插件 crate。`packages/client/core/runtime`、`app`、`server` 和
   `admin` 是私有包。
+- `packages/shared` 只容纳客户端和服务端都必须消费的代码与类型。某项能力若只被单端使用，或依赖 Vue UI、浏览器存储、Tauri、Worker binding、平台文件/网络等单端环境，应归入对应的 `packages/client` 或 `packages/server`。
 
 ## 架构约束
 
-- 修改插件时遵循 `packages/shared/plugin/plugin/ARCHITECTURE.md`。只有 `composition.ts` 可以组装具体的
+- 修改插件时遵循 `packages/client/core/plugin/ARCHITECTURE.md`。只有 `composition.ts` 可以组装具体的
   capability/adapter；`index.ts` 仅用于导出；包内代码不得自引用 `@delta-comic/plugin` 或
   `@/index`。
 - 内置客户端插件采用文件驱动方式，由 `builtins/*.builtin.ts` 默认导出。服务端内置插件有所不同：

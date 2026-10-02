@@ -24,29 +24,29 @@ describe('ReleaseWorkspace', () => {
     const packages = await new ReleaseWorkspace(rootDir).publishablePackages()
 
     expect(packages.map(pkg => pkg.name)).toEqual([
-      '@delta-comic/both',
-      '@delta-comic/downloader',
-      '@delta-comic/plugin-manifest',
       '@delta-comic/logger',
       '@delta-comic/model',
-      '@delta-comic/utils',
-      '@delta-comic/ui',
-      '@delta-comic/client',
+      '@delta-comic/both',
       '@delta-comic/db',
-      '@delta-comic/server',
+      '@delta-comic/downloader',
+      '@delta-comic/plugin-manifest',
       '@delta-comic/plugin-api',
       '@delta-comic/plugin-artifact',
       '@delta-comic/plugin-loader',
       '@delta-comic/plugin-kernel',
       '@delta-comic/plugin-install',
       '@delta-comic/plugin-runtime',
+      '@delta-comic/utils',
       '@delta-comic/plugin-vite',
+      '@delta-comic/ui',
       '@delta-comic/plugin',
+      '@delta-comic/client',
+      '@delta-comic/server',
     ])
     expect(packages.map(pkg => pkg.path).toSorted()).toEqual(
       jsonVersionPaths
         .filter(path =>
-          /^packages\/(?:client\/(?:core\/sdk|data\/db|platform\/downloader|ui\/ui)|server\/core\/server|shared\/(?:core\/(?:both|logger|model|utils)|plugin\/(?:plugin|manifest|artifact|api|loader|kernel|install|runtime|vite)))\//.test(
+          /^packages\/(?:client\/(?:core\/(?:sdk|plugin|plugin-api|plugin-artifact|plugin-kernel|plugin-loader|plugin-install|plugin-runtime|plugin-vite|model|utils)|data\/db|platform\/downloader|ui\/ui)|server\/core\/server|shared\/(?:core\/(?:both|logger)|plugin\/manifest))\//.test(
             path,
           ),
         )

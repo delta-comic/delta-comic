@@ -1,12 +1,33 @@
-import type {
-  ExportLogsOptions,
-  Invoke,
-  LogEntry,
-  LogFileContent,
-  LogFileInfo,
-  LoggerClient,
-  LoggerOptions,
-} from './types'
+import type { LogEntry, LoggerTransport } from '@delta-comic/logger'
+
+interface LogFileInfo {
+  name: string
+  path: string
+  size: number
+  modifiedAt: string
+  archived: boolean
+}
+
+interface LogFileContent {
+  path: string
+  content: string
+  size: number
+  truncated: boolean
+}
+
+interface ExportLogsOptions {
+  paths?: string[]
+}
+
+export type Invoke = (command: string, args?: Record<string, unknown>) => Promise<unknown>
+
+interface TauriLoggerOptions {
+  batchSize?: number
+  flushIntervalMs?: number
+  maxQueueSize?: number
+  invoke?: Invoke
+  native?: boolean
+}
 
 const COMMAND_PREFIX = 'plugin:logger|'
 
@@ -21,7 +42,7 @@ const loadTauriInvoke = async (): Promise<Invoke> => {
 }
 
 /** Batched, non-blocking client for the native logger plugin. */
-export class TauriLoggerClient implements LoggerClient {
+export class TauriLoggerClient implements LoggerTransport {
   public readonly native: boolean
   private readonly batchSize: number
   private readonly flushIntervalMs: number
@@ -33,7 +54,7 @@ export class TauriLoggerClient implements LoggerClient {
   private inFlight?: Promise<void>
   private disposed = false
 
-  constructor(options: LoggerOptions = {}) {
+  constructor(options: TauriLoggerOptions = {}) {
     this.native = options.native ?? (Boolean(options.invoke) || isTauriRuntime())
     this.configuredInvoke = options.invoke
     this.batchSize = Math.max(1, options.batchSize ?? 64)

@@ -45,6 +45,8 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
   readonly #host: ServerHost<DB>
   readonly #identity: ServerIdentity | undefined
   readonly #identityResolver: ServerRuntimeOptions<DB>['identityResolver']
+  readonly #registrations = new Map<string, Set<() => void>>()
+  #activePlugin: string | undefined
   #hostMounted = false
 
   public constructor(options: ServerRuntimeOptions<DB>) {
@@ -76,17 +78,23 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
       registerCron: (schedule, handler) => {
         const key = `${schedule}:${this.#crons.size}`
         this.#crons.set(key, { schedule, handler })
-        return () => void this.#crons.delete(key)
+        const disposer = () => void this.#crons.delete(key)
+        this.trackRegistration(disposer)
+        return disposer
       },
       registerQueue: (name, handler) => {
         this.#queues.set(name, handler)
-        return () => void this.#queues.delete(name)
+        const disposer = () => void this.#queues.delete(name)
+        this.trackRegistration(disposer)
+        return disposer
       },
       registerMigration: migration => {
         if (this.#migrations.has(migration.id))
           throw new Error(`migration is already registered: ${migration.id}`)
         this.#migrations.set(migration.id, migration)
-        return () => void this.#migrations.delete(migration.id)
+        const disposer = () => void this.#migrations.delete(migration.id)
+        this.trackRegistration(disposer)
+        return disposer
       },
     }
   }
@@ -206,7 +214,12 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
       await this.context.plugin(ctx => ctx.provide('server', this.#host))
       this.#hostMounted = true
     }
-    return this.#runtime.mount(id, plugin, config)
+    this.#activePlugin = id
+    try {
+      return await this.#runtime.mount(id, plugin, config)
+    } finally {
+      this.#activePlugin = undefined
+    }
   }
 
   public snapshot(): DiagnosticSnapshot {
@@ -215,17 +228,33 @@ export class ServerRuntime<DB extends object = Record<string, never>> {
 
   @diagnostic('server plugin unmount')
   public unmount(id: string): Promise<void> {
-    return this.#runtime.unmount(id)
+    return this.#runtime.unmount(id).then(() => {
+      for (const dispose of this.#registrations.get(id) ?? []) dispose()
+      this.#registrations.delete(id)
+    })
   }
 
   @diagnostic('server runtime dispose')
   public dispose(): Promise<void> {
-    return this.#runtime.dispose()
+    return this.#runtime.dispose().then(() => {
+      for (const registrations of this.#registrations.values())
+        for (const dispose of registrations) dispose()
+      this.#registrations.clear()
+    })
   }
 
   private register<T>(registry: Set<T>, value: T): () => void {
     registry.add(value)
-    return () => void registry.delete(value)
+    const disposer = () => void registry.delete(value)
+    this.trackRegistration(disposer)
+    return disposer
+  }
+
+  private trackRegistration(disposer: () => void): void {
+    if (!this.#activePlugin) return
+    const registrations = this.#registrations.get(this.#activePlugin) ?? new Set<() => void>()
+    registrations.add(disposer)
+    this.#registrations.set(this.#activePlugin, registrations)
   }
 }
 
