@@ -3,9 +3,15 @@ use chrono::{Local, TimeZone};
 use super::{LogLevel, LogRecord};
 
 #[test]
-fn enforces_info_as_the_minimum_level() {
-  assert!(!LogLevel::Trace.meets_minimum_level());
-  assert!(!LogLevel::Debug.meets_minimum_level());
+fn accepts_verbose_frontend_logs_in_debug_builds() {
+  assert_eq!(
+    LogLevel::Trace.meets_minimum_level(),
+    cfg!(debug_assertions)
+  );
+  assert_eq!(
+    LogLevel::Debug.meets_minimum_level(),
+    cfg!(debug_assertions)
+  );
   assert!(LogLevel::Info.meets_minimum_level());
   assert!(LogLevel::Warn.meets_minimum_level());
   assert!(LogLevel::Error.meets_minimum_level());

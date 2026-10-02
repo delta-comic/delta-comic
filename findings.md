@@ -1,4 +1,4 @@
-<!-- cspell:ignore deepseek Cordis subrequest specta -->
+<!-- cspell:ignore deepseek Cordis subrequest specta libtorrent -->
 
 # Delta Comic 全仓重构：研究与需求发现
 
@@ -376,3 +376,15 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - release catalog schema、store 与 publisher 目前由服务端目录存储/发布实现消费，客户端市场使用自己的 catalog contract，因此这些文件及测试归入 `packages/server/core/server/lib/catalogProtocol`。
 - 客户端 Artifact 校验与 plugin kernel/loader 是安装和宿主实现，归入 `packages/client/core`。共享 Manifest schema 由两端 SDK 消费；Cordis、诊断/runtime 与日志核心由两端运行时消费。
 - 重新验收通过：180 个测试文件、954 个测试；lib-build、格式/lint、递归类型检查、codegen schema 检查与 diff 检查通过。Rust fmt/clippy/workspace tests 通过。
+
+## Splash 启动复现（2026-10-02）
+
+- Tauri 原生实际运行后只显示 splash；Vite 捕获 `__vite__injectQuery` 重复声明的 SyntaxError。
+- 浏览器检查确认错误模块为 Vite Node 实现；`@delta-comic/plugin` 顶层 re-export `plugin-vite`，且 `/vite` 指向同一运行时产物。
+- 原主入口使用静态 import，依赖图解析失败时 logger 尚未初始化，原生日志无法显示该错误。日志还分别在 JS 与 Rust 层强制 info 过滤。
+- 排除构建入口后出现 `React is not defined`：应用装饰器 SWC transform 处理 TSX，产生 React 调用；应用 TSX 由 Vue JSX 插件负责。
+- 14:06:04 与 14:09:14 原生启动均记录 `plugins preloaded`（failureCount 0）、`frontend application mounted` 与 `main entry revealed`。主窗口需要进一步可见内容验收。
+- 开发服务器运行时递归任务重建 dist 会触发模块热重载；本轮 typecheck 曾在 logger dist 清理期间失败。暂停服务器、无缓存重建后递归 typecheck 全部通过。
+- 原生日志中的 DHT bootstrap 警告指向外部节点 `dht.libtorrent.org:25401`；Vue I18n 与 Router 同时输出既有实验 API 提示。
+- 干净重启后的原生窗口显示启动插图；实际点击插件按钮打开管理页，再选择启动，进入已安装插件的登录弹窗。用户确认该验收已足够。
+- 生产 legacy 构建中，pack 将 artifact URL 的 await 表达式内联到 import，Vite preload 转换产生含 await 的普通回调。改为显式分支赋值，构建产物保留局部 URL 变量。

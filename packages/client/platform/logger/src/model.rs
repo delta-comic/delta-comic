@@ -25,7 +25,7 @@ impl LogLevel {
   }
 
   pub(crate) const fn meets_minimum_level(self) -> bool {
-    matches!(self, Self::Info | Self::Warn | Self::Error)
+    cfg!(debug_assertions) || matches!(self, Self::Info | Self::Warn | Self::Error)
   }
 
   const fn ansi_color(self) -> &'static str {

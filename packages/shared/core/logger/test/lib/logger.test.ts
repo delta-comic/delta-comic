@@ -31,7 +31,7 @@ const setup = (minLevel: 'trace' | 'info' = 'info') => {
 }
 
 describe('Logger', () => {
-  it('enforces info as the minimum level', () => {
+  it('defaults to info and honors an explicit verbose level', () => {
     const logger = createLogger('app', { captureErrors: false, flushOnLifecycle: false })
     const explicitlyVerboseLogger = createLogger('app', {
       captureErrors: false,
@@ -41,7 +41,9 @@ describe('Logger', () => {
     loggers.push(logger, explicitlyVerboseLogger)
 
     expect(logger.minLevel).toBe('info')
-    expect(explicitlyVerboseLogger.minLevel).toBe('info')
+    expect(explicitlyVerboseLogger.minLevel).toBe('trace')
+    explicitlyVerboseLogger.minLevel = 'debug'
+    expect(explicitlyVerboseLogger.minLevel).toBe('debug')
   })
 
   it('creates scoped loggers sharing the platform transport', async () => {

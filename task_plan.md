@@ -237,3 +237,24 @@
 | 早期查询使用 client 路径 | 1 | 文档确认实际客户端 SDK 路径为 packages/client/core/sdk |
 
 | SDK 文件与 Vite 配置扩展名查询不匹配 | 1 | 使用 rg --files 确认 runtime.ts/host.ts 与 vite.config.mts |
+
+## Splash 启动调试（2026-10-02）
+
+- **状态：** complete
+- 已主动启动 Tauri 并复现主入口模块解析错误；plugin 运行时 barrel 将 plugin-vite 的 Node/Vite 实现带入 WebView。
+- 修正运行时与构建入口，启用开发日志等级与主入口加载失败记录，重启原生应用验收。
+- 修正 SWC 装饰器 transform 的文件范围，Vue TSX 交由 Vue JSX 插件处理。
+- 原生启动记录插件预加载成功、前端挂载和 main entry revealed；窗口显示启动插图，实际打开插件管理页并点击启动，进入插件登录弹窗。用户确认验收足够并要求收尾提交。
+- 最终 lib-build、check、递归 typecheck、954 项全仓测试、30 项 plugin-install 测试、codegen、Rust logger 测试/clippy/fmt 与生产 Web 构建通过。
+
+### 启动调试错误记录
+| Error | Attempt | Resolution |
+|---|---|---|
+| `__vite__injectQuery` 重复声明 | 1 | plugin 运行时与 Vite 子路径使用独立入口 |
+| `React is not defined` | 1 | SWC 装饰器 transform 限定为 TypeScript 文件 |
+| 递归 typecheck 时 logger dist 临时缺失 | 1 | 停止开发服务器，完成无缓存 lib-build 后串行运行无缓存 typecheck，通过 |
+| 读取旧原生 window ID 返回 window_not_found | 1 | 原生重编译已重启进程，重新查询窗口 ID |
+| legacy 构建解析动态导入中的 await 失败 | 1 | URL 赋值改为显式分支，保持动态导入参数为局部变量 |
+
+## Next Step
+第 12 章与启动调试完成；`ARCHITECTURE.md` 共 12 章，没有第 13 章。

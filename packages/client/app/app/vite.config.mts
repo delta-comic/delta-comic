@@ -14,7 +14,7 @@ const skipLibBuild = process.env.DELTA_SKIP_LIB_BUILD === 'true'
 const decoratorPlugin = {
   name: 'delta-comic:lower-decorators',
   async transform(code: string, id: string) {
-    if (!/\.[cm]?tsx?$/.test(id) || id.includes('node_modules')) return
+    if (!/\.[cm]?ts$/.test(id) || id.includes('node_modules')) return
     const result = await transform(code, {
       filename: id,
       sourceMaps: true,

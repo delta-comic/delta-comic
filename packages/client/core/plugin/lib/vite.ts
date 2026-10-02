@@ -1,0 +1,1 @@
+export * from '@delta-comic/plugin-vite'

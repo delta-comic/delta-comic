@@ -389,3 +389,15 @@
 - 修正 `ARCHITECTURE.md` 中 shared 对 Artifact 的旧归属描述，并为每个 shared 包列出 client/server 消费者；确认 `shared/core/both` 不再包含 release catalog 能力。
 - 第 12 章生命周期清理、store 操作诊断和 diagnostics 子路径产物已有回归测试；规划记录更新为 complete。架构文档无第 13 章。
 - 验证通过：`vp run lib-build`、`vp check --fix`、`vp run -r typecheck`、`vp test run`（180 files / 954 tests）、`vp run codegen:check`、`git diff --check`。Rust fmt、clippy 与 workspace test 此前完成通过。
+
+## 2026-10-02：原生 Splash 启动调试
+
+- 主动运行 `vp run --filter app dev`，复现运行时引入 Vite Node 模块导致的语法错误；为 plugin 增加独立 Vite 构建与导出入口。
+- 修正应用 SWC 装饰器 transform 对 Vue TSX 的处理范围，消除 React 调用错误。
+- 开发环境启用 JS trace 日志与原生应用 DEBUG 日志，添加主入口模块加载失败捕获和 splash 初始化日志。
+- 原生两次启动均完成插件预加载、前端挂载及主窗口显示调用；继续验收可见页面。
+- 当前通过：18 项专项 Web 测试、13 项 Rust logger 测试、logger clippy、Rust fmt、无缓存 lib-build、全仓无缓存递归 typecheck、vp check。
+- 全仓测试通过 180 files / 954 tests，codegen 检查通过。原生窗口经截图与实际操作确认显示启动插图、插件管理页和启动后的登录弹窗；用户确认验收足够并要求收尾提交。
+- 修正生产 legacy 构建中 artifact URL 表达式被内联的问题，plugin-install 专项测试通过 6 files / 30 tests。
+- 已停止原生调试进程；生成 bindings 经格式工具恢复至原有内容。
+- 最终无缓存 lib-build、vp check、plugin-install 专项测试和 app build:web 全部通过；git diff 检查通过，启动调试完成。

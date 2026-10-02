@@ -70,7 +70,9 @@ export class CordisArtifactModuleReader {
               validated.manifest,
               new Map(validated.files.map(file => [file.path, file.bytes])),
             )
-      const url = graph?.url ?? (await this.files.createModuleUrl(plugin, validated.manifest.entry))
+      let url: string
+      if (graph) url = graph.url
+      else url = await this.files.createModuleUrl(plugin, validated.manifest.entry)
       const module = (await import(/* @vite-ignore */ url)) as { default?: unknown }
       signal.throwIfAborted()
       const entry = module.default ?? module

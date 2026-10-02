@@ -6,7 +6,7 @@ const root = fileURLToPath(new URL('.', import.meta.url))
 
 export default defineConfig({
   pack: {
-    entry: './lib/index.ts',
+    entry: ['./lib/index.ts', './lib/vite.ts'],
     alias: { '@': './lib' },
     dts: { tsconfig: './tsconfig.app.json' },
     sourcemap: true,

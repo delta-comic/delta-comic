@@ -31,10 +31,7 @@ const LEVEL_CONSOLE: Record<LogLevel, ConsoleMethod> = {
 
 const levelValue = (level: LogLevel) => LOG_LEVELS.indexOf(level)
 
-const resolveMinLevel = (requested?: LogLevel): LogLevel => {
-  const level = requested ?? 'info'
-  return levelValue(level) < levelValue('info') ? 'info' : level
-}
+const resolveMinLevel = (requested?: LogLevel): LogLevel => requested ?? 'info'
 
 const normalizeScope = (scope: string) => scope.trim() || 'app'
 

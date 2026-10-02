@@ -2,7 +2,10 @@ use std::{fmt, sync::Once};
 
 use tracing::{Event, Subscriber, field::Visit};
 use tracing_subscriber::{
-  Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt,
+  Layer,
+  filter::{LevelFilter, Targets},
+  layer::SubscriberExt,
+  util::SubscriberInitExt,
 };
 
 use crate::{
@@ -17,8 +20,14 @@ pub(crate) struct TracingBridge {
 
 impl TracingBridge {
   pub(crate) fn install(handle: LoggerHandle) -> Result<()> {
+    let mut filter = Targets::new().with_default(LevelFilter::INFO);
+    if cfg!(debug_assertions) {
+      for target in ["app", "plugin", "database", "downloader"] {
+        filter = filter.with_target(target, LevelFilter::DEBUG);
+      }
+    }
     tracing_subscriber::registry()
-      .with(LevelFilter::INFO)
+      .with(filter)
       .with(Self { handle })
       .try_init()
       .map_err(|error| Error::Initialization(error.to_string()))
