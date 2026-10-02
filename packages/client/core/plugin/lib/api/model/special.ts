@@ -1,6 +1,1 @@
-export type SpecialModel = Step[]
-
-export interface Step {
-  name: string
-  call: (setDescription: (description: string) => void) => Promise<void>
-}
+export type { SpecialModel, Step } from '@delta-comic/client'

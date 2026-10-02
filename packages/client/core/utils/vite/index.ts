@@ -7,6 +7,7 @@ const RESOLVED_HOST_LIBRARIES_MODULE_ID = `\0${HOST_LIBRARIES_MODULE_ID}`
 
 /** Libraries physically bundled into the prebuilt UMD runtime. */
 export const umdLibraryNames = {
+  'cordis': 'Cordis',
   'vue': 'Vue',
   'naive-ui': 'Naive',
   'vue-router': 'VR',
@@ -17,6 +18,7 @@ export const umdLibraryNames = {
 
 /** Host-owned ESM modules exposed to plugins after the UMD runtime has loaded. */
 export const hostExposedLibraryNames = {
+  '@delta-comic/client': 'DcClient',
   '@delta-comic/ui': 'DcUi',
   '@delta-comic/model': 'DcModel',
   '@delta-comic/plugin': 'DcPlugin',
@@ -181,7 +183,14 @@ const createHostLibrariesModule = () => {
 }
 
 const assertNoBundledRuntime = (context: SharedRuntimePluginContext) => {
-  const runtimePackages = ['vue', 'naive-ui', 'vue-router', 'pinia', '@pinia/colada'] as const
+  const runtimePackages = [
+    'vue',
+    'naive-ui',
+    'vue-router',
+    'pinia',
+    '@pinia/colada',
+    'cordis',
+  ] as const
   const bundledRuntime = [...context.getModuleIds()].find(id => {
     const normalizedId = id.replaceAll('\\', '/')
     return runtimePackages.some(packageName =>

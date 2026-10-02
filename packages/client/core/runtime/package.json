@@ -6,6 +6,7 @@
   "type": "module",
   "dependencies": {
     "@pinia/colada": "catalog:",
+    "cordis": "catalog:",
     "naive-ui": "catalog:",
     "pinia": "catalog:",
     "vue": "catalog:",

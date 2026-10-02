@@ -388,3 +388,12 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 原生日志中的 DHT bootstrap 警告指向外部节点 `dht.libtorrent.org:25401`；Vue I18n 与 Router 同时输出既有实验 API 提示。
 - 干净重启后的原生窗口显示启动插图；实际点击插件按钮打开管理页，再选择启动，进入已安装插件的登录弹窗。用户确认该验收已足够。
 - 生产 legacy 构建中，pack 将 artifact URL 的 await 表达式内联到 import，Vite preload 转换产生含 await 的普通回调。改为显式分支赋值，构建产物保留局部 URL 变量。
+# 2026-10-02 原生 Cordis 与 JSON 流程
+
+- 本轮采用用户已批准的四阶段方案，服务端采用单 Worker、共享 D1、认证 `auth.userId` 租户及 JSON 流程。
+- 当前工作树干净；manifest 为 protocolVersion 1，包含 entry/entryType/dependencies/capabilities。
+- 客户端聚合 composition 连接 candidate provider、capabilities 与 PluginRuntime；SDK 另有 ClientRuntime。需要统一为原生 Context 与包 Fiber。
+- 资源完整性、模块图、ZIP 文件读取继续在安装模块承担；代码生成源为 script/codegen/client.table.mts 与 server.table.mts。
+- Cordis Service 跟踪调用方 ctx；注册服务方法中的 this.ctx.effect 归属调用插件 Fiber。effect 生成器通过 yield 收集子注册，显式取消注册也会释放模型绑定。
+- Cordis 函数 name 为可配置只读属性，使用具名函数声明提供 name 元数据。
+- 本轮已使用 cloudflare 技能，服务端切换时需核对最新免费计划约束；表达式引擎参考 https://github.com/jwadhams/json-logic-js 的上游文档。

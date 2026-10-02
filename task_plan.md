@@ -2,6 +2,24 @@
 
 # Delta Comic 全仓架构重构规划
 
+## 2026-10-02 原生 Cordis 与 JSON 流程实施
+
+用户已批准本轮四阶段方案并要求按计划实现。本节为当前执行计划。
+
+1. **协议与服务（in_progress）**：manifest v2，客户端函数数组，原生 Context 类型扩展与宿主服务，内置插件、安装模块和构建桥接迁移。
+2. **客户端启动与管理（pending）**：每会话 Context、包父 Fiber、自动启动、单次安全模式清理、应用内安装启停配置更新卸载、Web/Tauri 主窗口和三语文案。
+3. **单 Worker JSON 流程（pending）**：json-logic-js 校验与执行、认证租户 D1 存储、安装/执行/记录接口、间隔任务原子领取、管理端 JSON 编辑。
+4. **收敛与验收（pending）**：移除旧执行模块与失责包，更新文档，串行 Web/codegen/Rust 验证，记录实际资源测量。
+
+每阶段完成后立即签名提交。新增代码优先落入现有安装、客户端宿主与服务端 plugins 模块。
+
+- 阶段 1A 服务与桥接：complete。客户端 SDK 持有业务类型与 Context 扩展；原生集合/UI/i18n 注册绑定调用方 effect；Cordis 与客户端 SDK 接入宿主共享桥接。
+- 阶段 1B 协议、安装和内置插件：in_progress。
+
+### 当前下一步
+
+核对原生 Cordis API、两端 SDK 和安装数据结构，落地协议与服务迁移。
+
 ## 目标
 
 完成 Delta Comic 全仓架构重构的需求发现、方案设计与分阶段实施。参考仓库上一级目录的 `/Users/wenxig/Documents/deepseek-harness` 中 Cordis 与 capability-family monorepo 组织方式。保留既有产品能力，允许数据库迁移，不承诺旧插件/API 兼容；依赖升级至最新版本（包含预发布版本）。最终公共 npm SDK 包包括 `@delta-comic/both`、`@delta-comic/client`、`@delta-comic/server`。

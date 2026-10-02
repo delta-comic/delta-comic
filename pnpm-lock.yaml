@@ -585,6 +585,9 @@ importers:
       '@delta-comic/both':
         specifier: 'workspace:'
         version: link:../../../shared/core/both
+      '@delta-comic/client':
+        specifier: 'workspace:'
+        version: link:../sdk
       '@delta-comic/db':
         specifier: workspace:*
         version: link:../../data/db
@@ -639,6 +642,9 @@ importers:
       blake3-wasm:
         specifier: 'catalog:'
         version: 3.0.0
+      cordis:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.10
       es-toolkit:
         specifier: 'catalog:'
         version: 1.50.0
@@ -860,6 +866,9 @@ importers:
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.4.2(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
+      cordis:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.10
       naive-ui:
         specifier: 'catalog:'
         version: 2.44.1(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.8.tsgo.7.0.2))
@@ -885,9 +894,15 @@ importers:
       '@delta-comic/both':
         specifier: 'workspace:'
         version: link:../../../shared/core/both
+      '@delta-comic/db':
+        specifier: 'workspace:'
+        version: link:../../data/db
       '@delta-comic/downloader':
         specifier: 'workspace:'
         version: link:../../platform/downloader
+      '@delta-comic/model':
+        specifier: 'workspace:'
+        version: link:../model
       '@delta-comic/plugin-manifest':
         specifier: 'workspace:'
         version: link:../../../shared/plugin/manifest

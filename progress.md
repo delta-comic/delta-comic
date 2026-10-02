@@ -401,3 +401,13 @@
 - 修正生产 legacy 构建中 artifact URL 表达式被内联的问题，plugin-install 专项测试通过 6 files / 30 tests。
 - 已停止原生调试进程；生成 bindings 经格式工具恢复至原有内容。
 - 最终无缓存 lib-build、vp check、plugin-install 专项测试和 app build:web 全部通过；git diff 检查通过，启动调试完成。
+# 2026-10-02 原生 Cordis 与 JSON 流程重构
+
+- 已读取当前规划、插件技能和历史验证经验，确认用户实施授权及干净工作树。
+- 已建立本轮四阶段执行计划；开始协议、Context 服务和安装构建链核对。
+- 已迁移内容、用户、远程资源及分享类型到客户端 SDK，新增原生 Context 服务与调用方 effect 清理；Cordis 已加入 UMD 桥接，客户端 SDK 加入宿主 ESM 桥接。
+- 原生服务与桥接专项验证 2 files / 20 tests 通过；继续补提供者停用恢复验证。
+- 初版测试使用 Object.assign 写函数 name 时触发只读属性错误，已改为具名函数；格式检查提示四文件需格式化，已运行 vp check --fix。
+- 第一阶段当前仍在进行，下一步迁移 manifest v2、安装记录及函数数组模块读取，然后接入 composition 与内置插件。
+- 阶段 1A 验证：lib-build、vp check --fix、SDK 与聚合包 typecheck 通过；原生服务及构建桥接 2 files / 21 tests 通过，包含逆序服务加载、提供者停用与恢复。将本子阶段签名提交，继续阶段 1B。
+- 阶段 1A 初次提交被 cspell 拦截，发现记录中的上游仓库标识已改为可识别的完整 URL。
