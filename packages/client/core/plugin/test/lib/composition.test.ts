@@ -12,10 +12,11 @@ declare module 'cordis' {
 const state = vi.hoisted(() => ({
   archives: new Map<
     string,
-    { pluginName: string; meta: PluginManifest; enable: boolean; config: Record<string, unknown> }
+    { pluginName: string; meta: unknown; enable: boolean; config: Record<string, unknown> }
   >(),
   modules: new Map<string, readonly Plugin.Function[]>(),
   released: vi.fn(),
+  builtins: new Array<{ manifest: PluginManifest; functions: readonly Plugin.Function[] }>(),
 }))
 
 vi.mock('@delta-comic/db', () => ({ db: {} }))
@@ -51,7 +52,7 @@ vi.mock('../../lib/adapters/pluginRepository', () => ({
   },
 }))
 vi.mock('../../lib/builtins', () => ({
-  builtinPlugins: [],
+  builtinPlugins: state.builtins,
   coreManifest: { id: 'core', name: 'Core', version: '1.0.0' },
 }))
 vi.mock('@delta-comic/plugin-install', async importOriginal => ({
@@ -71,6 +72,7 @@ beforeEach(async () => {
   state.archives.clear()
   state.modules.clear()
   state.released.mockClear()
+  state.builtins.length = 0
   host = await import('../../lib/composition')
 })
 afterEach(async () => {
@@ -97,6 +99,46 @@ const prepare = () =>
   host.preparePluginHost({ database: { db, query: (_name, operation) => operation(db) } })
 
 describe('native package lifecycle', () => {
+  it('retains built-in identity when an installation uses its reserved ID', async () => {
+    await host.disposePluginHost()
+    vi.resetModules()
+    const manifest: PluginManifest = {
+      protocolVersion: 2,
+      id: 'core',
+      name: 'Core',
+      version: '1.0.0',
+      client: { entry: 'core' },
+      resources: [],
+    }
+    state.builtins.push({ manifest, functions: [function core() {}] })
+    host = await import('../../lib/composition')
+    install('core', [function installedCore() {}])
+    await prepare()
+    await host.loadEnabledPlugins()
+    expect(host.pluginInstallations.get('core')).toMatchObject({
+      manifest,
+      origin: 'builtin',
+      enabled: true,
+    })
+    await expect(host.uninstallPlugin('core')).rejects.toThrow('host plugin cannot be uninstalled')
+  })
+
+  it('keeps invalid installations manageable by ID during safe mode', async () => {
+    state.archives.set('invalid', {
+      pluginName: 'invalid',
+      meta: { id: 'invalid' },
+      enable: true,
+      config: {},
+    })
+    await prepare()
+    await expect(host.loadEnabledPlugins()).rejects.toThrow('invalid plugin manifest: invalid')
+    expect(host.pluginSafeMode.value).toBe(true)
+    expect(host.pluginInstallations.get('invalid')).toMatchObject({ manifest: null, enabled: true })
+    expect(host.pluginStore.displayName('invalid')).toBe('invalid')
+    await host.setPluginEnabled('invalid', false)
+    expect(state.archives.get('invalid')?.enable).toBe(false)
+  })
+
   it('validates native Config while disabled and reactivates a repaired failed group', async () => {
     const configured = Object.assign(function configured() {}, {
       Config: {

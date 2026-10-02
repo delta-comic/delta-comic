@@ -28,7 +28,7 @@ import {
   type PluginInstallReporter,
   type PluginModuleReader,
 } from '@delta-comic/plugin-install'
-import type { PluginManifest } from '@delta-comic/plugin-manifest'
+import { isPluginManifest, type PluginManifest } from '@delta-comic/plugin-manifest'
 import {
   Context,
   DisposableList,
@@ -69,7 +69,7 @@ export const pluginFiberStates = {
 } satisfies Record<string, FiberState>
 
 export interface PluginInstallation {
-  readonly manifest: PluginManifest
+  readonly manifest: PluginManifest | null
   readonly enabled: boolean
   readonly config: Record<string, unknown>
   readonly origin: 'builtin' | 'installed'
@@ -242,8 +242,9 @@ const refreshInstallations = async () => {
     })
   }
   for (const archive of archives) {
+    if (internalIds.has(archive.pluginName)) continue
     pluginInstallations.set(archive.pluginName, {
-      manifest: archive.meta,
+      manifest: isPluginManifest(archive.meta) ? archive.meta : null,
       enabled: archive.enable,
       config: archive.config ?? {},
       origin: 'installed',
@@ -254,6 +255,7 @@ const refreshInstallations = async () => {
 const mount = async (id: string, override?: readonly Plugin.Function[]) => {
   const installation = pluginInstallations.get(id)
   if (!installation) throw new Error(`installed plugin not found: ${id}`)
+  if (!installation.manifest) throw new TypeError(`invalid plugin manifest: ${id}`)
   let module: LoadedPluginModule
   const builtin = builtinPlugins.find(plugin => plugin.manifest.id === id)
   if (builtin) module = { functions: builtin.functions }
@@ -505,7 +507,7 @@ export const pluginStore = {
   },
   isLoaded: (id: string) => ready.value.has(id),
   displayName: (id: string) =>
-    pluginI18n.translateText(pluginInstallations.get(id)?.manifest.name ?? id),
+    pluginI18n.translateText(pluginInstallations.get(id)?.manifest?.name ?? id),
 }
 
 export const usePluginStore = () => pluginStore

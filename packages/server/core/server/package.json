@@ -25,10 +25,6 @@
     "./flow": {
       "types": "./dist/lib/flow.d.mts",
       "import": "./dist/lib/flow.mjs"
-    },
-    "./diagnostics": {
-      "types": "./dist/lib/diagnostics.d.mts",
-      "import": "./dist/lib/diagnostics.mjs"
     }
   },
   "publishConfig": {

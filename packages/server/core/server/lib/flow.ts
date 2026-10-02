@@ -2,7 +2,7 @@ import type { DiagnosticRecorder } from '@delta-comic/both'
 import type { Context } from 'cordis'
 import jsonLogic, { type RulesLogic } from 'json-logic-js'
 import { Type, type Static } from 'typebox'
-import { Value } from 'typebox/value'
+import { Compile } from 'typebox/compile'
 
 export const FLOW_LIMITS = { steps: 64, depth: 16, http: 16, httpTimeoutMs: 10_000 } as const
 const identifier = Type.String({ pattern: '^[A-Za-z0-9_-]{1,64}$' })
@@ -73,6 +73,7 @@ export const FlowDocumentSchema = Type.Object(
 )
 export type FlowDocument = Static<typeof FlowDocumentSchema>
 export type FlowStep = FlowDocument['flows'][number]['steps'][number]
+const flowValidator = Compile(FlowDocumentSchema)
 
 const operators = new Set([
   'var',
@@ -146,7 +147,7 @@ const validateValue = (value: unknown, depth = 0): void => {
 }
 
 export const parseFlowDocument = (value: unknown): FlowDocument => {
-  if (!Value.Check(FlowDocumentSchema, value)) throw new TypeError('invalid flow document schema')
+  if (!flowValidator.Check(value)) throw new TypeError('invalid flow document schema')
   if (JSON.stringify(value).length > 262_144)
     throw new TypeError('flow document size limit exceeded')
   const flows = new Set<string>()

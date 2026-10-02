@@ -207,6 +207,7 @@ export class FlowRepository {
 export const claimDueFlows = async (
   db: D1Database,
   now: number,
+  limit = 20,
 ): Promise<ServerPluginSchedule[]> => {
   const result = await db
     .prepare(`UPDATE server_plugin_schedules
@@ -215,9 +216,9 @@ export const claimDueFlows = async (
       SELECT s.tenant_id, s.plugin_id FROM server_plugin_schedules s
       JOIN server_plugin_packages p ON p.tenant_id = s.tenant_id AND p.plugin_id = s.plugin_id
       WHERE s.enabled = 1 AND p.enabled = 1 AND s.next_run_at <= ?
-      ORDER BY s.next_run_at LIMIT 20
+      ORDER BY s.next_run_at LIMIT ?
     ) RETURNING *`)
-    .bind(now, now, now)
+    .bind(now, now, now, limit)
     .all<ServerPluginSchedule>()
   return result.results
 }

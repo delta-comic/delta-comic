@@ -6,7 +6,10 @@ import { Miniflare } from 'miniflare'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vite-plus/test'
 
 import { claimDueFlows } from '../../../../app/modules/plugins/plugins.flow.repository'
-import { FlowService } from '../../../../app/modules/plugins/plugins.flow.service'
+import {
+  FlowService,
+  runScheduledFlows,
+} from '../../../../app/modules/plugins/plugins.flow.service'
 import type { FlowDocument } from '../../../../lib/flow'
 
 const mf = new Miniflare({
@@ -204,5 +207,59 @@ describe('tenant flow lifecycle with D1', () => {
     } finally {
       plugin.mockRestore()
     }
+  })
+
+  it('reserves run writes when a flow exhausts its free-plan D1 query budget', async () => {
+    const service = new FlowService(db, 'query-budget')
+    await install(service, 'many-reads', {
+      version: 1,
+      flows: [
+        {
+          id: 'main',
+          steps: Array.from({ length: 64 }, (_, index) => ({
+            id: `read${index}`,
+            op: 'store.get',
+            key: 'value',
+          })),
+        },
+      ],
+    })
+    const prepare = vi.fn((sql: string) => db.prepare(sql))
+    const measured = new Proxy(db, {
+      get: (target, key) => (key === 'prepare' ? prepare : Reflect.get(target, key)),
+    })
+    expect(
+      await new FlowService(measured, 'query-budget').run('many-reads', 'main', null),
+    ).toMatchObject({ status: 'failed', stepId: 'read43', error: 'flow D1 query limit exceeded' })
+    expect(prepare).toHaveBeenCalledTimes(47)
+    expect(await service.repository.listRuns('many-reads')).toEqual([
+      expect.objectContaining({ status: 'failed', stepId: 'read43' }),
+    ])
+  })
+
+  it('keeps unclaimed schedules due when the invocation reaches fifty D1 queries', async () => {
+    const service = new FlowService(db, 'scheduled-budget')
+    for (let index = 0; index < 11; index++)
+      await install(
+        service,
+        `timer${index}`,
+        { version: 1, flows: [{ id: 'main', steps: [{ id: 'done', op: 'return', value: 1 }] }] },
+        true,
+      )
+    const prepare = vi.fn((sql: string) => db.prepare(sql))
+    const measured = new Proxy(db, {
+      get: (target, key) => (key === 'prepare' ? prepare : Reflect.get(target, key)),
+    })
+    await runScheduledFlows(measured, 100)
+    expect(prepare).toHaveBeenCalledTimes(50)
+    const due = await claimDueFlows(db, 100)
+    expect(due.filter(row => row.tenant_id === 'scheduled-budget')).toHaveLength(1)
+    const runs = await db
+      .prepare(
+        'SELECT COUNT(*) AS count FROM server_plugin_runs WHERE tenant_id = ? AND status = ?',
+      )
+      .bind('scheduled-budget', 'succeeded')
+      .first<{ count: number }>()
+    expect(runs?.count).toBe(10)
   })
 })

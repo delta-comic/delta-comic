@@ -17,6 +17,11 @@ export interface FlowInstallInput {
   schedule?: FlowInstallation['schedule']
 }
 
+interface FlowBudget {
+  queries: number
+  http: number
+}
+
 export class FlowService {
   readonly repository: FlowRepository
   constructor(
@@ -91,7 +96,11 @@ export class FlowService {
     input: unknown,
     trigger: FlowRun['trigger'] = 'manual',
     signal = new AbortController().signal,
+    budget: FlowBudget = { queries: 47, http: 16 },
   ): Promise<FlowRun | Response> {
+    // Reserve the installation reads and both run writes; HTTP auth uses three D1 queries.
+    if (budget.queries < 4) throw new Error('flow D1 query limit exceeded')
+    budget.queries -= 4
     const installation = await this.require(pluginId)
     if (!installation.enabled) throw new AppError('PLUGIN_DISABLED', 'plugin is disabled', 409)
     const flow = installation.document.flows.find(flow => flow.id === flowId)
@@ -135,14 +144,34 @@ export class FlowService {
         run.metrics.durationMs = performance.now() - started
         await this.repository.saveRun(run)
       })())
-    await this.repository.saveRun(run)
     try {
+      await this.repository.saveRun(run)
       context.provide('identity', { tenantId: this.tenantId, pluginId })
       context.provide('input', input ?? null)
       context.provide('flowConfig', installation.config)
-      context.provide('store', this.repository.store(pluginId))
+      const store = this.repository.store(pluginId)
+      const consumeQuery = () => {
+        if (budget.queries <= 0) throw new Error('flow D1 query limit exceeded')
+        budget.queries--
+      }
+      context.provide('store', {
+        get: key => {
+          consumeQuery()
+          return store.get(key)
+        },
+        set: (key, value) => {
+          consumeQuery()
+          return store.set(key, value)
+        },
+        delete: key => {
+          consumeQuery()
+          return store.delete(key)
+        },
+      })
       const http = createFlowHttp(executionSignal, this.fetcher)
       context.provide('http', async input => {
+        if (budget.http <= 0) throw new Error('flow HTTP limit exceeded')
+        budget.http--
         const result = await http(input)
         if (result instanceof Response && result.body) {
           const body = result.body
@@ -216,13 +245,19 @@ export class FlowService {
 }
 
 export const runScheduledFlows = async (db: D1Database, now: number): Promise<void> => {
-  for (const schedule of await claimDueFlows(db, now)) {
+  const budget: FlowBudget = { queries: 50, http: 50 }
+  while (budget.queries >= 5 && budget.http >= 16) {
+    budget.queries--
+    const [schedule] = await claimDueFlows(db, now, 1)
+    if (!schedule) return
     try {
       const result = await new FlowService(db, schedule.tenant_id).run(
         schedule.plugin_id,
         schedule.flow_id,
         null,
         'scheduled',
+        new AbortController().signal,
+        budget,
       )
       if (result instanceof Response) await result.body?.cancel()
     } catch (error) {

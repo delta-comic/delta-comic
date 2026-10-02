@@ -31,7 +31,10 @@ const openMarketplace = () => router.force.replace({ name: '/main/plugin/shop' }
 type ManagedPlugin = {
   enable: boolean
   config: PluginInstallation['config']
-  meta: PluginInstallation['manifest']
+  meta: Pick<
+    NonNullable<PluginInstallation['manifest']>,
+    'name' | 'version' | 'icon' | 'description'
+  >
   origin: PluginInstallation['origin']
   pluginName: string
 }
@@ -64,7 +67,7 @@ const plugins = computed<ManagedPlugin[]>(() =>
   [...pluginStore.installations].map(([pluginName, candidate]) => ({
     enable: candidate.enabled,
     config: candidate.config,
-    meta: candidate.manifest,
+    meta: candidate.manifest ?? { name: pluginName, version: '' },
     origin: candidate.origin,
     pluginName,
   })),

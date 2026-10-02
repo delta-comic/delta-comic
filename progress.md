@@ -421,6 +421,12 @@
 - 最终无缓存 lib-build、vp check、plugin-install 专项测试和 app build:web 全部通过；git diff 检查通过，启动调试完成。
 # 2026-10-02 原生 Cordis 与 JSON 流程重构
 
+- 阶段 3 已签名提交 `d23ed6dc`，阶段 4 共享包装器与 SDK 清理已签名提交 `22eb690c`。
+- 服务端修正每次调用的 D1/HTTP 预算；流程写入失败也释放 Context。真实 D1 专项 6 tests 通过。
+- 客户端修正内置保留 ID 与无效安装元数据，应用内管理按 ID 展示并支持停用。宿主专项 6 tests 通过。
+- 新增 workerd CPU profiler、真实本地 D1/HTTP 测量，3 个场景各预热 5 次、测量 30 次；资源数据和测量边界记入 `docs/plugin-flow-acceptance.md`。
+- Rust fmt/clippy/workspace test 已通过，共 132 单元测试，1 个既有文档示例跳过。客户端元数据修复后的实际启动复核与最终串行 Web 检查正在进行。
+
 - 已读取当前规划、插件技能和历史验证经验，确认用户实施授权及干净工作树。
 - 已建立本轮四阶段执行计划；开始协议、Context 服务和安装构建链核对。
 - 已迁移内容、用户、远程资源及分享类型到客户端 SDK，新增原生 Context 服务与调用方 effect 清理；Cordis 已加入 UMD 桥接，客户端 SDK 加入宿主 ESM 桥接。
