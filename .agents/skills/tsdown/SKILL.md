@@ -7,6 +7,14 @@ description: Bundle TypeScript and JavaScript libraries with blazing-fast speed 
 
 Blazing-fast bundler for TypeScript/JavaScript libraries powered by Rolldown and Oxc.
 
+## Delta Comic Workspace
+
+Read the repository `AGENTS.md` and the installed `node_modules/vite-plus/docs` before changing build configuration. This workspace runs library builds with `vp pack` and scripts with `vp run`. Define npm dependency versions in root `pnpm-workspace.yaml` and reference them with `catalog:` in package manifests.
+
+Use `vite-plus` for config and plugin types, and `vite-plus/test` for test APIs. Vite+ 1.0 task outputs use `cache: { output: [...] }`. Its bundled declaration generator accepts `dts.oxc` as an options object; use `dts: { oxc: {}, tsconfig: './tsconfig.node.json' }` for the UI Vite entry with isolated declarations. Select the tsconfig that includes the entry; check project references when declaration generation fails.
+
+Run `vp run lib-build` before Web checks or tests. Follow with `vp check`, `vp run -r typecheck`, and `vp test run`. Align the coverage provider with the exact Vitest version bundled by the installed Vite+ package.
+
 ## Runtime Requirement
 
 `tsdown` requires **Node.js 22.18.0 or higher to run** (build-time only). However, the bundled output can target much lower Node.js versions via the [`target`](references/option-target.md) option, so libraries built with tsdown are **not locked to Node.js 22+ at runtime**.

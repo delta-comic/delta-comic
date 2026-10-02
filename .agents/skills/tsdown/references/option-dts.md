@@ -206,7 +206,7 @@ Control Oxc usage for declaration generation:
 ```ts
 export default defineConfig({
   dts: {
-    oxc: true,  // Use oxc-transform (fast, requires isolatedDeclarations)
+    oxc: {},  // Oxc options; select a tsconfig with isolatedDeclarations
   },
 })
 ```
@@ -230,7 +230,7 @@ export default defineConfig({
 | `sourcemap` | `boolean` | Generate declaration source maps |
 | `compilerOptions` | `object` | Override TypeScript compiler options |
 | `vue` | `boolean` | Enable Vue type generation (requires vue-tsc) |
-| `oxc` | `boolean` | Use oxc-transform for fast generation |
+| `oxc` | `object` | Oxc isolated declaration options in Vite+ 1.0 |
 | `tsconfig` | `string` | Path to tsconfig file |
 | `resolver` | `'oxc' \| 'tsc'` | Module resolver: `'oxc'` (default, fast) or `'tsc'` (more compatible) |
 | `cjsDefault` | `boolean` | CJS default export handling |
