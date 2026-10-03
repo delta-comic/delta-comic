@@ -84,6 +84,7 @@ catalog:
   tailwind-merge: ^3.7.0
   tailwindcss: ^4.3.3
   tailwindcss-safe-area-capacitor: ^0.5.1
+  twlinter: ^0.8.0
   tauri-plugin-better-cors-fetch: ^1.8.0
   tauri-plugin-m3: ^0.3.2
   tauri-plugin-sentry-api: ^0.5.0
@@ -107,9 +108,7 @@ catalog:
   '@subframe7536/sqlite-wasm': ^1.4.0
   '@typescript-eslint/parser': ^8.71.0
   eslint: ^10.12.0
-  eslint-plugin-better-tailwindcss: ^4.7.0
   eslint-plugin-vue: ^10.11.1
-  oxlint-tailwindcss: ^1.14.0
   vue-eslint-parser: ^10.4.1
   '@vue/test-utils': ^2.5.1
   happy-dom: ^20.14.5
