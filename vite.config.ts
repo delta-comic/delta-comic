@@ -1,5 +1,3 @@
-import { resolve } from 'node:path'
-
 import { defineConfig } from 'vite-plus'
 import type { OxfmtConfig } from 'vite-plus/fmt'
 import type { OxlintConfig } from 'vite-plus/lint'
@@ -8,7 +6,6 @@ import fmt from './.oxfmtrc.json' with { type: 'json' }
 import lint from './.oxlintrc.json' with { type: 'json' }
 
 const lintConfig = lint as OxlintConfig
-const uiTailwindConfigPath = resolve(import.meta.dirname, 'packages/client/ui/ui/src/index.css')
 
 export default defineConfig({
   staged: {
@@ -16,10 +13,7 @@ export default defineConfig({
     '*.{ts,tsx,mts,js,jsx,mjs,vue,html,md,json,yaml,toml}': 'vp exec cspell --no-must-find-files',
   },
   fmt: fmt as OxfmtConfig,
-  lint: {
-    ...lintConfig,
-    settings: { ...lintConfig.settings, tailwindcss: { cssConfigPath: uiTailwindConfigPath } },
-  },
+  lint: lintConfig,
   run: {
     cache: { tasks: true, scripts: false },
     tasks: {
@@ -31,6 +25,7 @@ export default defineConfig({
       'check': { command: 'vp check', cache: { output: [] } },
       'dev': { command: 'vp run mobile#dev', cache: false },
       'dev:web': { command: 'vp run mobile#dev:web', cache: false },
+      'lint:vue': { command: "vp exec eslint 'packages/**/*.vue' --max-warnings 0", cache: false },
       'lib-build': {
         command: 'node -e ""',
         dependsOn: ['mobile#build', 'desktop#build'],

@@ -1,7 +1,36 @@
 {
-  "plugins": ["unicorn", "typescript", "oxc", "vue"],
+  "plugins": ["unicorn", "typescript", "vue"],
   "categories": { "correctness": "error" },
-  "rules": { "no-thenable": "allow" },
+  "rules": {
+    "no-thenable": "allow",
+    "tailwindcss/no-conflicting-classes": "error",
+    "tailwindcss/no-contradicting-variants": "error",
+    "tailwindcss/no-dark-without-light": "error",
+    "tailwindcss/no-duplicate-classes": "error",
+    "tailwindcss/no-dynamic-classes": "error",
+    "tailwindcss/no-unknown-classes": "error",
+    "tailwindcss/enforce-canonical": "error",
+    "tailwindcss/enforce-negative-arbitrary-values": "error",
+    "tailwindcss/no-deprecated-classes": "error",
+    "tailwindcss/no-unnecessary-arbitrary-value": "error",
+    "tailwindcss/prefer-scale-token": "error",
+    "tailwindcss/prefer-theme-tokens": "error",
+    "tailwindcss/consistent-variant-order": "error",
+    "tailwindcss/enforce-consistent-important-position": "error",
+    "tailwindcss/enforce-consistent-line-wrapping": "error",
+    "tailwindcss/enforce-consistent-variable-syntax": "error",
+    "tailwindcss/enforce-logical": "error",
+    "tailwindcss/enforce-physical": "error",
+    "tailwindcss/enforce-shorthand": "error",
+    "tailwindcss/enforce-sort-order": "error",
+    "tailwindcss/no-unnecessary-whitespace": "error",
+    "tailwindcss/max-class-count": "error",
+    "tailwindcss/no-arbitrary-value": "error",
+    "tailwindcss/no-borrowed-component-styles": "error",
+    "tailwindcss/no-default-palette": "error",
+    "tailwindcss/no-hardcoded-colors": "error",
+    "tailwindcss/no-restricted-classes": "error"
+  },
   "settings": {
     "jsx-a11y": { "components": {}, "attributes": {} },
     "next": { "rootDir": [] },
@@ -15,7 +44,25 @@
       "exemptDestructuredRootsFromChecks": false,
       "tagNamePreference": {}
     },
-    "vitest": { "typecheck": true }
+    "vitest": { "typecheck": true },
+    "tailwindcss": {
+      "entryPoint": [
+        {
+          "files": "packages/client/app/mobile/**",
+          "use": "packages/client/app/mobile/src/index.css"
+        },
+        {
+          "files": "packages/client/app/desktop/**",
+          "use": "packages/client/app/desktop/src/index.css"
+        },
+        { "files": "packages/client/ui/ui/**", "use": "packages/client/ui/ui/src/index.css" },
+        {
+          "files": "packages/server/admin/panel/**",
+          "use": "packages/server/admin/panel/src/index.css"
+        },
+        { "files": "**", "use": "packages/client/ui/ui/src/index.css" }
+      ]
+    }
   },
   "env": { "builtin": true },
   "globals": {},
@@ -28,25 +75,7 @@
     "**/_lib/**",
     "packages/client/app/*/public/runtime/**"
   ],
-  "overrides": [
-    {
-      "files": [
-        "packages/client/app/mobile/**/*",
-        "packages/client/app/desktop/**/*",
-        "packages/client/ui/ui/**/*"
-      ],
-      "jsPlugins": ["eslint-plugin-tailwindcss"],
-      "rules": {
-        "tailwindcss/classnames-order": "warn",
-        "tailwindcss/enforces-negative-arbitrary-values": "warn",
-        "tailwindcss/enforces-shorthand": "warn",
-        "tailwindcss/important-modifier-suffix": "warn",
-        "tailwindcss/no-arbitrary-value": "off",
-        "tailwindcss/no-custom-classname": "warn",
-        "tailwindcss/no-contradicting-classname": "error",
-        "tailwindcss/no-unnecessary-arbitrary-value": "warn"
-      }
-    }
-  ],
-  "options": { "typeAware": false, "typeCheck": false }
+  "overrides": [],
+  "options": { "typeAware": false, "typeCheck": false },
+  "jsPlugins": ["oxlint-tailwindcss"]
 }

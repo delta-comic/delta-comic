@@ -105,9 +105,14 @@ catalog:
   wrangler: 4.147.0
   kysely-wasqlite-worker: ^2.0.1
   '@subframe7536/sqlite-wasm': ^1.4.0
+  '@typescript-eslint/parser': ^8.71.0
+  eslint: ^10.12.0
+  eslint-plugin-better-tailwindcss: ^4.7.0
+  eslint-plugin-vue: ^10.11.1
+  oxlint-tailwindcss: ^1.14.0
+  vue-eslint-parser: ^10.4.1
   '@vue/test-utils': ^2.5.1
   happy-dom: ^20.14.5
-  eslint-plugin-tailwindcss: 4.4.1-beta.1
   json-logic-js: ^2.0.5
   '@types/json-logic-js': ^2.0.8
   miniflare: 5.20261001.0-alpha
@@ -122,6 +127,7 @@ minimumReleaseAgeExclude:
   - vue-tsc@3.3.11
   - vue-tsc@3.3.12
   - wrangler@4.147.0
+  - eslint@10.12.0
 
 overrides:
   typescript: npm:typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2
