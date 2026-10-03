@@ -39,7 +39,7 @@ export const initializePlatform = async (): Promise<SafeAreaInsets | false> => {
     return false
   }
   const [{ CORSFetch }, { M3 }] = await Promise.all([
-    import('tauri-plugin-better-cors-fetch'),
+    import('@delta-comic/http'),
     import('tauri-plugin-m3'),
   ])
   await CORSFetch.init({

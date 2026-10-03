@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-all-domain-cookies"
+description = "Enables the get_all_domain_cookies command without any pre-configured scope."
+commands.allow = ["get_all_domain_cookies"]
+
+[[permission]]
+identifier = "deny-get-all-domain-cookies"
+description = "Denies the get_all_domain_cookies command without any pre-configured scope."
+commands.deny = ["get_all_domain_cookies"]

@@ -34,7 +34,7 @@ pub fn builder() -> tauri::Builder<tauri::Wry> {
   );
   let builder = builder
     .plugin(tauri_plugin_shell::init())
-    .plugin(tauri_plugin_better_cors_fetch::init())
+    .plugin(tauri_plugin_http::init())
     .plugin(tauri_plugin_clipboard_manager::init())
     .plugin(tauri_plugin_persisted_scope::init())
     .plugin(tauri_plugin_plugin::init())

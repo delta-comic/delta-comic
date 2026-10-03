@@ -30,7 +30,7 @@
     "downloader:delete-secrets",
     "downloader:manage-destinations",
     "downloader:store-secrets",
-    "better-cors-fetch:default",
+    "http:default",
     "shell:default"
   ]
 }

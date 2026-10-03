@@ -1,5 +1,13 @@
 <!-- cspell:ignore Cordis deepseek subrequest specta -->
 
+### 2026-10-03 - HTTP 插件 Specta 过渡适配
+
+- HTTP 插件 Rust 类型和 Tauri 命令改用 `specta::Type`、`#[specta::specta]` 与 `tauri_specta::Builder`。
+- 桌面/移动端 debug 入口导出 HTTP bindings；导出先写临时文件并比较内容，避免 Vite 热重载循环。
+- 绑定将 `u64`/`usize` 映射为 TypeScript `number`，前端沿用直接返回值模式；流式 body 的原始二进制 IPC 保留。
+- 已移除旧 `ts-rs` 绑定目录，前端请求体适配 Specta 生成的 `number[]`。
+- 验证通过：HTTP typecheck、HTTP 9 项测试、Rust fmt、HTTP/desktop/mobile cargo check。
+
 # Delta Comic 架构重构规划进度
 
 ## 会话记录
@@ -476,3 +484,10 @@
 - 两端已分别完成 Web 构建；Vapor 编译能力在生产配置启用，测试环境使用常规 Vue 编译以兼容 happy-dom，Vapor 组件覆盖下载信息与日志文本片段。
 - `vp run -r typecheck`、`vp check`、`vp test run`、`cargo fmt --all --check`、严格 Clippy、workspace Rust tests、`vp run codegen:check` 均通过。
 - Android downloader Gradle 校验已运行；当前生成的 `tauri-android` 工程在 AGP 8.11.0 下没有可消费 variant，`lintReportDebug` 因该工程配置失败，需在重新生成 Android 工程后复核。
+
+## 2026-10-03：内化 HTTP 插件
+
+- 从 `tauri-plugin-better-cors-fetch` 1.8.0 clone 到 `packages/client/platform/http`，移除嵌套 `.git` 与独立项目工程化文件。
+- Rust crate 内化为 `tauri-plugin-http`，TypeScript 包内化为 `@delta-comic/http`，Tauri IPC 命名空间与 capability 更新为 `http`。
+- desktop/mobile/core、workspace Cargo、pnpm、Vite+ 构建、TypeScript project references、版本同步脚本已完成迁移。
+- 包构建、包类型检查、包测试（3 files / 9 tests）、双端相关测试（32 files / 139 tests）、Rust fmt、包级 clippy/check 已通过。

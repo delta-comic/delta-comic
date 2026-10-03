@@ -35,7 +35,7 @@ export const initializePlatform = async (): Promise<SafeAreaInsets | false> => {
     window.$api.M3 = { getInsets: async () => false, setBarColor: async () => true }
     return false
   }
-  const { CORSFetch } = await import('tauri-plugin-better-cors-fetch')
+  const { CORSFetch } = await import('@delta-comic/http')
   await CORSFetch.init({
     request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } },
   })

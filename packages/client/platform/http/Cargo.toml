@@ -1,0 +1,74 @@
+[package]
+name = "tauri-plugin-http"
+description = "Internal HTTP and CORS fetch plugin for Delta Comic"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+links = "tauri-plugin-http"
+
+[package.metadata.platforms]
+windows = { level = "full", notes = "" }
+linux = { level = "full", notes = "" }
+macos = { level = "full", notes = "" }
+android = { level = "full", notes = "" }
+ios = { level = "full", notes = "" }
+
+[features]
+default = [
+  "reqwest/default",
+  "charset",
+  "stream",
+  "http2",
+  "json",
+  "system-proxy",
+  "socks",
+  "tracing",
+]
+tracing = ["dep:tracing"]
+http2 = ["reqwest/http2"]
+rustls = ["reqwest/rustls"]
+rustls-no-provider = ["reqwest/rustls-no-provider"]
+native-tls = ["reqwest/native-tls"]
+native-tls-no-alpn = ["reqwest/native-tls-no-alpn"]
+native-tls-vendored = ["reqwest/native-tls-vendored"]
+native-tls-vendored-no-alpn = ["reqwest/native-tls-vendored-no-alpn"]
+blocking = ["reqwest/blocking"]
+charset = ["reqwest/charset"]
+gzip = ["reqwest/gzip"]
+brotli = ["reqwest/brotli"]
+zstd = ["reqwest/zstd"]
+deflate = ["reqwest/deflate"]
+query = ["reqwest/query"]
+form = ["reqwest/form"]
+json = ["reqwest/json"]
+multipart = ["reqwest/multipart"]
+hickory-dns = ["reqwest/hickory-dns"]
+stream = ["reqwest/stream"]
+socks = ["reqwest/socks"]
+system-proxy = ["reqwest/system-proxy"]
+http3 = ["reqwest/http3"]
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+
+[dependencies]
+bytes.workspace = true
+cookie_store.workspace = true
+dashmap.workspace = true
+data-url.workspace = true
+futures-util.workspace = true
+http.workspace = true
+reqwest = { workspace = true, features = ["cookies"] }
+serde.workspace = true
+serde_json.workspace = true
+specta.workspace = true
+specta-typescript.workspace = true
+tauri.workspace = true
+tauri-specta.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["sync", "macros"] }
+tracing = { workspace = true, optional = true }
+url.workspace = true

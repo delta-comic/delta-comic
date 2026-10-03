@@ -34,6 +34,7 @@
     { "path": "./packages/client/core/runtime/tsconfig.json" },
     { "path": "./packages/client/core/sdk/tsconfig.json" },
     { "path": "./packages/client/data/db/tsconfig.json" },
+    { "path": "./packages/client/platform/http/tsconfig.json" },
     { "path": "./tsconfig.node.json" }
   ]
 }

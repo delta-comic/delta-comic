@@ -12,6 +12,7 @@ export const jsonVersionPaths = [
   'packages/client/app/desktop/src-tauri/tauri.conf.json',
   'packages/client/data/db/package.json',
   'packages/client/platform/downloader/package.json',
+  'packages/client/platform/http/package.json',
   'packages/shared/core/logger/package.json',
   'packages/client/core/model/package.json',
   'packages/shared/plugin/manifest/package.json',

@@ -441,3 +441,10 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 全量 Web 测试为 170 个文件、898 个测试全部通过。happy-dom 不能直接为 UMD Vue runtime 安装 `vaporInteropPlugin`，因此测试构建通过 `VITEST` 条件回退常规 Vue 编译；生产构建继续启用 Vapor。
 - Rust `fmt`、严格 `clippy` 与 workspace tests 全部通过。
 - Android Gradle 任务未完成，错误为 `project :tauri-android` 在 AGP 8.11.0 下没有匹配 variant；这是当前生成工程/工具链状态，需要重新生成工程后复核。
+
+- **HTTP 插件内化**：外部 `tauri-plugin-better-cors-fetch` 1.8.0 已纳入 `packages/client/platform/http`。内部 crate 使用 `tauri-plugin-http`，前端入口使用 `@delta-comic/http`，插件标识与权限使用 `http`；保留运行源码、权限定义、许可证和必要测试，移除上游独立仓库配置、发布/CI 文件、锁文件与文档资源。
+## HTTP 插件 Specta 过渡适配（2026-10-03）
+
+- Tauri Specta 默认禁止 `u64`/`usize` 导出为 TypeScript，HTTP 配置字段映射为 `number` 后保持 Rust 运行时类型不变。
+- 绑定生成文件必须在 Vite 首次预打包前存在；debug 导出通过临时文件比较内容，避免重复写入造成热重载循环。
+- `Vec<u8>` 生成成 `number[]`，请求体在前端转换为数组；`fetch_read_body` 继续使用原始 IPC 以保留二进制流语义。

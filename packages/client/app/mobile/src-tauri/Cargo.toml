@@ -26,7 +26,7 @@ tauri-plugin-webview-upgrade.workspace = true
 [dependencies.tauri-plugin-aptabase]
 workspace = true
 
-[dependencies.tauri-plugin-better-cors-fetch]
+[dependencies.tauri-plugin-http]
 workspace = true
 
 [dependencies.tauri-plugin-clipboard-manager]

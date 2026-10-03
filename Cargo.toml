@@ -6,6 +6,7 @@ members = [
   "packages/client/app/core",
   "packages/client/data/db",
   "packages/client/platform/downloader",
+  "packages/client/platform/http",
   "packages/client/platform/downloader/tools/performance-baseline",
   "packages/client/platform/logger",
   "packages/client/core/plugin",
@@ -29,9 +30,13 @@ axum = "0.8.9"
 base64 = "0.23.1"
 bytes = "1.11.1"
 chrono = { version = "0.4.45", features = ["serde"] }
+cookie_store = { version = "0.22.1", features = ["serde"] }
+data-url = "0.3"
+dashmap = "6.2.1"
 flate2 = "1.1.10"
 futures-util = "0.3.32"
 hex = "0.4.3"
+http = "1.4.1"
 httpdate = "1.0.3"
 jni = "0.22.4"
 keyring-core = "1.0.0"
@@ -57,7 +62,7 @@ tauri = "2.12.1"
 tauri-build = "2.7.1"
 tauri-plugin = "2.7.1"
 tauri-plugin-aptabase = { git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls", branch = "main" }
-tauri-plugin-better-cors-fetch = { version = "1.8.0", features = ["multipart", "blocking"] }
+tauri-plugin-http = { path = "packages/client/platform/http", features = ["multipart", "blocking"] }
 tauri-plugin-clipboard-manager = "2.4.1"
 tauri-plugin-db = { path = "packages/client/data/db" }
 tauri-plugin-downloader = { path = "packages/client/platform/downloader" }

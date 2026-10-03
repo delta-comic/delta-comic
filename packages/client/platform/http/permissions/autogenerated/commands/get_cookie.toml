@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-cookie"
+description = "Enables the get_cookie command without any pre-configured scope."
+commands.allow = ["get_cookie"]
+
+[[permission]]
+identifier = "deny-get-cookie"
+description = "Denies the get_cookie command without any pre-configured scope."
+commands.deny = ["get_cookie"]
