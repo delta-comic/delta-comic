@@ -25,11 +25,16 @@
     "*.md",
     "**/worker-configuration.d.ts",
     "packages/client/ui/ui/lib/components/DcPullRefresh.vue",
-    "**/_lib/**"
+    "**/_lib/**",
+    "packages/client/app/*/public/runtime/**"
   ],
   "overrides": [
     {
-      "files": ["packages/client/app/app/**/*", "packages/client/ui/ui/**/*"],
+      "files": [
+        "packages/client/app/mobile/**/*",
+        "packages/client/app/desktop/**/*",
+        "packages/client/ui/ui/**/*"
+      ],
       "jsPlugins": ["eslint-plugin-tailwindcss"],
       "rules": {
         "tailwindcss/classnames-order": "warn",

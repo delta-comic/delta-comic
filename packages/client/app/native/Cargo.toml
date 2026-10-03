@@ -1,0 +1,66 @@
+[package]
+name = "delta-comic-native"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies.serde]
+workspace = true
+
+[dependencies.serde_json]
+workspace = true
+
+[dependencies.specta]
+workspace = true
+
+[dependencies.specta-typescript]
+workspace = true
+
+[dependencies.tauri]
+workspace = true
+features = ["protocol-asset"]
+
+[dependencies.tauri-specta]
+workspace = true
+
+[dependencies.tauri-plugin-aptabase]
+workspace = true
+
+[dependencies.tauri-plugin-better-cors-fetch]
+workspace = true
+
+[dependencies.tauri-plugin-clipboard-manager]
+workspace = true
+
+[dependencies.tauri-plugin-db]
+workspace = true
+
+[dependencies.tauri-plugin-downloader]
+workspace = true
+
+[dependencies.tauri-plugin-logger]
+workspace = true
+
+[dependencies.tauri-plugin-fs]
+workspace = true
+
+
+[dependencies.tauri-plugin-persisted-scope]
+workspace = true
+
+[dependencies.tauri-plugin-plugin]
+workspace = true
+
+[dependencies.tauri-plugin-shell]
+workspace = true
+
+
+[dependencies.tauri-plugin-sql]
+workspace = true
+
+[dependencies.tauri-plugin-utils]
+workspace = true
+
+[dependencies.tracing]
+workspace = true

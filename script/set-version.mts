@@ -4,9 +4,12 @@ import { pathToFileURL } from 'node:url'
 
 export const jsonVersionPaths = [
   'package.json',
-  'packages/client/app/app/package.json',
+  'packages/client/app/mobile/package.json',
+  'packages/client/app/desktop/package.json',
+  'packages/client/app/core/package.json',
   'packages/client/core/sdk/package.json',
-  'packages/client/app/app/src-tauri/tauri.conf.json',
+  'packages/client/app/mobile/src-tauri/tauri.conf.json',
+  'packages/client/app/desktop/src-tauri/tauri.conf.json',
   'packages/client/data/db/package.json',
   'packages/client/platform/downloader/package.json',
   'packages/shared/core/logger/package.json',
@@ -23,12 +26,15 @@ export const jsonVersionPaths = [
 ] as const
 
 export const cargoTomlVersionPaths = [
-  ['packages/client/app/app/src-tauri/Cargo.toml', 'package'],
+  ['packages/client/app/mobile/src-tauri/Cargo.toml', 'package'],
+  ['packages/client/app/desktop/src-tauri/Cargo.toml', 'package'],
   ['Cargo.toml', 'workspace.package'],
 ] as const
 
 export const cargoLockPackageNames = [
-  'delta-comic',
+  'delta-comic-mobile',
+  'delta-comic-desktop',
+  'delta-comic-native',
   'tauri-plugin-db',
   'tauri-plugin-downloader',
   'tauri-plugin-logger',

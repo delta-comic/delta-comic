@@ -1,0 +1,39 @@
+<script setup lang="ts">
+import { Icons } from '@delta-comic/core/icons'
+import type { FavouriteDB } from '@delta-comic/db'
+import { useI18n } from 'vue-i18n'
+
+import FavouriteCard from '../favouriteCard.vue'
+
+defineProps<{ cards: FavouriteDB.Card[]; isCardMode: boolean }>()
+const emit = defineEmits<{
+  create: []
+  open: [card: FavouriteDB.Card]
+  play: [card: FavouriteDB.Card]
+}>()
+const { t } = useI18n()
+</script>
+
+<template>
+  <div v-if="cards.length === 0" class="flex size-full flex-col items-center justify-center gap-4">
+    <NEmpty :description="t('common.status.noResults')" />
+    <NButton round secondary type="primary" size="small" @click="emit('create')">
+      {{ t('favourite.actions.newFolder') }}
+      <template #icon>
+        <NIcon>
+          <Icons.material.PlusFilled />
+        </NIcon>
+      </template>
+    </NButton>
+  </div>
+  <div v-else class="grid h-full content-start gap-2 overflow-y-auto p-2">
+    <FavouriteCard
+      v-for="card in cards"
+      :key="card.createAt"
+      :card="card"
+      :is-card-mode="isCardMode"
+      @open="emit('open', card)"
+      @play="emit('play', card)"
+    />
+  </div>
+</template>

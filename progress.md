@@ -462,3 +462,17 @@
 - 客户端安装/管理专项 21 files / 115 tests 通过；新增 Config、失败修复、配套 JSON 与纯服务端打包用例通过。client/install/Vite/app 类型检查和全仓格式 lint 通过。
 - Web 实际加载首页及应用内插件页面；修复宿主下载器实例重名，Web 按平台条件启动下载生命周期。Tauri 实际启动与最终串行验收留在阶段 4。
 - 更新客户端原生 Context/Fiber 架构说明，签名保存阶段 1B 与阶段 2 实现，开始服务端 JSON 流程。
+
+## 2026-10-03：双端拆分启动
+
+- 已确认现有工作树干净，旧应用同时包含移动/桌面布局与 Rust 平台行为。
+- 最小修改范围为客户端应用、共享 UI 的端布局 token、runtime 输出、构建/版本/CI 路径及对应测试。
+
+- 共享 core 范围扩展到布局差异较小的组件：插件配置/市场、搜索、收藏卡片、下载操作和 Vapor 片段，共 31 个 SFC；图标资源同步共用。
+
+## 2026-10-03 双端拆分与局部 Vapor 验证
+
+- 移动端应用已迁移至 `packages/client/app/mobile`，桌面端位于 `packages/client/app/desktop`，共享业务与布局影响较小的组件位于 `packages/client/app/core`，共享 Rust 原生边界位于 `packages/client/app/native`。
+- 两端已分别完成 Web 构建；Vapor 编译能力在生产配置启用，测试环境使用常规 Vue 编译以兼容 happy-dom，Vapor 组件覆盖下载信息与日志文本片段。
+- `vp run -r typecheck`、`vp check`、`vp test run`、`cargo fmt --all --check`、严格 Clippy、workspace Rust tests、`vp run codegen:check` 均通过。
+- Android downloader Gradle 校验已运行；当前生成的 `tauri-android` 工程在 AGP 8.11.0 下没有可消费 variant，`lintReportDebug` 因该工程配置失败，需在重新生成 Android 工程后复核。

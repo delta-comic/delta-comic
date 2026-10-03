@@ -33,8 +33,12 @@ describe('release channel configuration', () => {
     expect(workflow).toContain('name: workspace-libraries')
     expect(workflow.match(/name: Download workspace libraries/g)).toHaveLength(2)
     expect(workflow).toContain('uses: pnpm/action-setup@v4')
-    expect(workflow).toContain('pnpm tauri android init --ci --skip-targets-install')
-    expect(workflow).toContain('pnpm tauri android build --ci --target aarch64 armv7')
+    expect(workflow).toContain(
+      'vp run --filter mobile tauri android init --ci --skip-targets-install',
+    )
+    expect(workflow).toContain(
+      'vp run --filter mobile tauri android build --ci --target aarch64 armv7',
+    )
     expect(workflow).not.toContain('uses: tauri-apps/tauri-action@dev')
   })
 

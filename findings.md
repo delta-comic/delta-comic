@@ -428,3 +428,16 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - Cordis Service 跟踪调用方 ctx；注册服务方法中的 this.ctx.effect 归属调用插件 Fiber。effect 生成器通过 yield 收集子注册，显式取消注册也会释放模型绑定。
 - Cordis 函数 name 为可配置只读属性，使用具名函数声明提供 name 元数据。
 - 本轮已使用 cloudflare 技能，服务端切换时需核对最新免费计划约束；表达式引擎参考 https://github.com/jwadhams/json-logic-js 的上游文档。
+
+## 2026-10-03：双端拆分调查
+
+- 宿主 UMD runtime 将 Vue/Pinia/Naive UI 暴露到 window.$$lib$$，Vapor 必须复用该 Vue runtime。
+- features/stores 已具备抽取基础；下载生命周期、原生日志与插件认证包含端能力，需要适配器。
+- 发布与版本同步脚本硬编码旧应用路径，两个原生工程需保持现有 identifier 与数据路径连续。
+
+## 2026-10-03 双端拆分验收记录
+
+- 生产 Web 构建在 Vapor 开关开启后移动端与桌面端均成功完成。Vite 输出仍提示既有 legacy top-level await 与大 chunk 警告，未阻断构建。
+- 全量 Web 测试为 170 个文件、898 个测试全部通过。happy-dom 不能直接为 UMD Vue runtime 安装 `vaporInteropPlugin`，因此测试构建通过 `VITEST` 条件回退常规 Vue 编译；生产构建继续启用 Vapor。
+- Rust `fmt`、严格 `clippy` 与 workspace tests 全部通过。
+- Android Gradle 任务未完成，错误为 `project :tauri-android` 在 AGP 8.11.0 下没有匹配 variant；这是当前生成工程/工具链状态，需要重新生成工程后复核。

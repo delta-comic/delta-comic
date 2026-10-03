@@ -436,7 +436,7 @@ importers:
         specifier: 'catalog:'
         version: 1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.1)(happy-dom@20.14.5)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1)
 
-  packages/client/app/app:
+  packages/client/app/core:
     dependencies:
       '@delta-comic/both':
         specifier: 'workspace:'
@@ -444,6 +444,91 @@ importers:
       '@delta-comic/client':
         specifier: 'workspace:'
         version: link:../../core/sdk
+      '@delta-comic/db':
+        specifier: 'workspace:'
+        version: link:../../data/db
+      '@delta-comic/downloader':
+        specifier: 'workspace:'
+        version: link:../../platform/downloader
+      '@delta-comic/logger':
+        specifier: 'workspace:'
+        version: link:../../../shared/core/logger
+      '@delta-comic/model':
+        specifier: 'workspace:'
+        version: link:../../core/model
+      '@delta-comic/plugin':
+        specifier: 'workspace:'
+        version: link:../../core/plugin
+      '@delta-comic/server':
+        specifier: 'workspace:'
+        version: link:../../../server/core/server
+      '@delta-comic/ui':
+        specifier: 'workspace:'
+        version: link:../../ui/ui
+      '@delta-comic/utils':
+        specifier: 'workspace:'
+        version: link:../../core/utils
+      '@pinia/colada':
+        specifier: 'catalog:'
+        version: 1.4.7(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      '@vueuse/core':
+        specifier: 'catalog:'
+        version: 15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      cordis:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.10
+      dayjs:
+        specifier: 'catalog:'
+        version: 1.11.21
+      es-toolkit:
+        specifier: 'catalog:'
+        version: 1.52.0
+      motion-v:
+        specifier: 'catalog:'
+        version: 2.5.1(@vueuse/core@15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      naive-ui:
+        specifier: 'catalog:'
+        version: 2.45.3(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      pinia:
+        specifier: 'catalog:'
+        version: 4.0.3(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      semver:
+        specifier: 'catalog:'
+        version: 7.8.5
+      vue:
+        specifier: 'catalog:'
+        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)
+      vue-i18n:
+        specifier: 'catalog:'
+        version: 12.0.0-alpha.4(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      vue-router:
+        specifier: 'catalog:'
+        version: 5.3.1(@pinia/colada@1.4.7(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(@vue/compiler-sfc@3.5.40)(esbuild@0.28.1)(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)))(rolldown@1.2.1)(rollup@4.62.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+    devDependencies:
+      '@types/semver':
+        specifier: 'catalog:'
+        version: 7.8.0
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.1)(happy-dom@20.14.5)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1)
+      vue-tsc:
+        specifier: 'catalog:'
+        version: 3.3.11(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)
+
+  packages/client/app/desktop:
+    dependencies:
+      '@delta-comic/both':
+        specifier: 'workspace:'
+        version: link:../../../shared/core/both
+      '@delta-comic/client':
+        specifier: 'workspace:'
+        version: link:../../core/sdk
+      '@delta-comic/core':
+        specifier: 'workspace:'
+        version: link:../core
       '@delta-comic/db':
         specifier: 'workspace:'
         version: link:../../data/db
@@ -543,10 +628,10 @@ importers:
         version: 7.8.0
       '@vitejs/devtools':
         specifier: 'catalog:'
-        version: 0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5)
+        version: 0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5)
       '@vitejs/plugin-legacy':
         specifier: 'catalog:'
-        version: 8.2.3(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(supports-color@10.2.2)(terser@5.49.0)
+        version: 8.2.3(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(supports-color@10.2.2)(terser@5.49.0)
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.9(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
@@ -573,10 +658,164 @@ importers:
         version: 32.1.0(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.62.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
       vite-plugin-vue-devtools:
         specifier: 'catalog:'
-        version: 9.0.0-beta.1(@devframes/agentic@1.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(cac@7.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5)
+        version: 9.0.0-beta.1(cc9636894e0d303b65adcf2d07c10fba)
       vite-plugin-wasm:
         specifier: 'catalog:'
-        version: 3.6.0(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))
+        version: 3.6.0(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.1)(happy-dom@20.14.5)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1)
+      vue-component-type-helpers:
+        specifier: 'catalog:'
+        version: 3.3.12
+      vue-tsc:
+        specifier: 'catalog:'
+        version: 3.3.11(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)
+
+  packages/client/app/mobile:
+    dependencies:
+      '@delta-comic/both':
+        specifier: 'workspace:'
+        version: link:../../../shared/core/both
+      '@delta-comic/client':
+        specifier: 'workspace:'
+        version: link:../../core/sdk
+      '@delta-comic/core':
+        specifier: 'workspace:'
+        version: link:../core
+      '@delta-comic/db':
+        specifier: 'workspace:'
+        version: link:../../data/db
+      '@delta-comic/downloader':
+        specifier: 'workspace:'
+        version: link:../../platform/downloader
+      '@delta-comic/logger':
+        specifier: 'workspace:'
+        version: link:../../../shared/core/logger
+      '@delta-comic/model':
+        specifier: 'workspace:'
+        version: link:../../core/model
+      '@delta-comic/plugin':
+        specifier: 'workspace:'
+        version: link:../../core/plugin
+      '@delta-comic/server':
+        specifier: 'workspace:'
+        version: link:../../../server/core/server
+      '@delta-comic/ui':
+        specifier: 'workspace:'
+        version: link:../../ui/ui
+      '@delta-comic/utils':
+        specifier: 'workspace:'
+        version: link:../../core/utils
+      '@octokit/rest':
+        specifier: 'catalog:'
+        version: 22.0.1
+      '@pinia/colada':
+        specifier: 'catalog:'
+        version: 1.4.7(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      '@tauri-apps/api':
+        specifier: 'catalog:'
+        version: 2.12.1
+      '@tauri-apps/plugin-clipboard-manager':
+        specifier: 'catalog:'
+        version: 2.4.1
+      '@tauri-apps/plugin-shell':
+        specifier: 'catalog:'
+        version: 2.4.0
+      '@vueuse/core':
+        specifier: 'catalog:'
+        version: 15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      color:
+        specifier: 'catalog:'
+        version: 5.0.3
+      cordis:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.10
+      dayjs:
+        specifier: 'catalog:'
+        version: 1.11.21
+      es-toolkit:
+        specifier: 'catalog:'
+        version: 1.52.0
+      motion-v:
+        specifier: 'catalog:'
+        version: 2.5.1(@vueuse/core@15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      naive-ui:
+        specifier: 'catalog:'
+        version: 2.45.3(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      pinia:
+        specifier: 'catalog:'
+        version: 4.0.3(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      semver:
+        specifier: 'catalog:'
+        version: 7.8.5
+      tauri-plugin-better-cors-fetch:
+        specifier: 'catalog:'
+        version: 1.8.0
+      tauri-plugin-m3:
+        specifier: 'catalog:'
+        version: 0.3.2
+      vue:
+        specifier: 'catalog:'
+        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)
+      vue-i18n:
+        specifier: 'catalog:'
+        version: 12.0.0-alpha.4(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      vue-router:
+        specifier: 'catalog:'
+        version: 5.3.1(@pinia/colada@1.4.7(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(@vue/compiler-sfc@3.5.40)(esbuild@0.28.1)(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)))(rolldown@1.2.1)(rollup@4.62.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+    devDependencies:
+      '@delta-comic/runtime':
+        specifier: 'workspace:'
+        version: link:../../core/runtime
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.16.0
+      '@tailwindcss/vite':
+        specifier: 'catalog:'
+        version: 4.3.3(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))
+      '@tauri-apps/cli':
+        specifier: 'catalog:'
+        version: 2.12.1
+      '@types/semver':
+        specifier: 'catalog:'
+        version: 7.8.0
+      '@vitejs/devtools':
+        specifier: 'catalog:'
+        version: 0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5)
+      '@vitejs/plugin-legacy':
+        specifier: 'catalog:'
+        version: 8.2.3(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(supports-color@10.2.2)(terser@5.49.0)
+      '@vitejs/plugin-vue':
+        specifier: 'catalog:'
+        version: 6.0.9(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      '@vitejs/plugin-vue-jsx':
+        specifier: 'catalog:'
+        version: 5.1.6(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(supports-color@10.2.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      browserslist:
+        specifier: 'catalog:'
+        version: 4.29.3
+      lightningcss:
+        specifier: 'catalog:'
+        version: 1.33.0
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
+      tailwindcss-safe-area-capacitor:
+        specifier: 'catalog:'
+        version: 0.5.1(tailwindcss@4.3.3)
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2
+      unplugin-vue-components:
+        specifier: 'catalog:'
+        version: 32.1.0(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.62.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
+      vite-plugin-vue-devtools:
+        specifier: 'catalog:'
+        version: 9.0.0-beta.1(65a06d9b0e067b7569ee42171367160f)
+      vite-plugin-wasm:
+        specifier: 'catalog:'
+        version: 3.6.0(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))
       vite-plus:
         specifier: 'catalog:'
         version: 1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.1)(happy-dom@20.14.5)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1)
@@ -9981,6 +10220,22 @@ snapshots:
   '@typescript-native-bridge/win32-x64@6.0.3-bridge.18.tsgo.7.0.2':
     optional: true
 
+  '@vitejs/devtools-kit@0.7.6(@devframes/agentic@1.1.0)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(crossws@0.4.12(srvx@1.0.5))':
+    dependencies:
+      '@devframes/hub': 1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0)
+      '@devframes/json-render': 1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0)
+      devframe: 1.1.0(@devframes/agentic@1.1.0)(cac@7.0.0)(srvx@1.0.5)
+      local-pkg: 1.2.1
+      nostics: 1.3.0
+      package-manager-detector: 1.8.0
+      vite: '@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1)'
+    transitivePeerDependencies:
+      - '@devframes/agentic'
+      - cac
+      - crossws
+      - ocache
+      - srvx
+
   '@vitejs/devtools-kit@0.7.6(@devframes/agentic@1.1.0)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(cac@7.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5)':
     dependencies:
       '@devframes/hub': 1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0)
@@ -10066,8 +10321,9 @@ snapshots:
       - crossws
       - ocache
       - srvx
+    optional: true
 
-  '@vitejs/plugin-legacy@8.2.3(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(supports-color@10.2.2)(terser@5.49.0)':
+  '@vitejs/plugin-legacy@8.2.3(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(supports-color@10.2.2)(terser@5.49.0)':
     dependencies:
       '@babel/core': 7.29.7(supports-color@10.2.2)
       '@babel/plugin-transform-dynamic-import': 7.29.7(@babel/core@7.29.7(supports-color@10.2.2))
@@ -10475,7 +10731,7 @@ snapshots:
       - ocache
       - srvx
 
-  '@vue/devtools-kit@9.0.0-beta.1(@devframes/agentic@1.1.0)(cac@7.0.0)(srvx@1.0.5)':
+  '@vue/devtools-kit@9.0.0-beta.1(@devframes/agentic@1.1.0)':
     dependencies:
       devframe: 1.1.0(@devframes/agentic@1.1.0)(cac@7.0.0)(srvx@1.0.5)
     transitivePeerDependencies:
@@ -13352,11 +13608,11 @@ snapshots:
       - ocache
       - srvx
 
-  vite-plugin-vue-devtools@9.0.0-beta.1(@devframes/agentic@1.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(cac@7.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5):
+  vite-plugin-vue-devtools@9.0.0-beta.1(cc9636894e0d303b65adcf2d07c10fba):
     dependencies:
-      '@vitejs/devtools': 0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5)
-      '@vitejs/devtools-kit': 0.7.6(@devframes/agentic@1.1.0)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(cac@7.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5)
-      '@vue/devtools-kit': 9.0.0-beta.1(@devframes/agentic@1.1.0)(cac@7.0.0)(srvx@1.0.5)
+      '@vitejs/devtools': 0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5)
+      '@vitejs/devtools-kit': 0.7.6(@devframes/agentic@1.1.0)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1))(crossws@0.4.12(srvx@1.0.5))
+      '@vue/devtools-kit': 9.0.0-beta.1(@devframes/agentic@1.1.0)
       vite: '@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1)'
     transitivePeerDependencies:
       - '@devframes/agentic'
@@ -13365,7 +13621,7 @@ snapshots:
       - ocache
       - srvx
 
-  vite-plugin-wasm@3.6.0(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1)):
+  vite-plugin-wasm@3.6.0(@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(@voidzero-dev/vite-plus-core@1.0.0)(crossws@0.4.12(srvx@1.0.5))(srvx@1.0.5))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1)):
     dependencies:
       vite: '@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.1.0)(@vitejs/devtools@0.7.6)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1)'
 

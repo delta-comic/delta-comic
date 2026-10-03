@@ -39,7 +39,7 @@ release
 
 target
 dist-vite
-packages/client/app/app/public/runtime/
+packages/client/app/*/public/runtime/
 *.tsbuildinfo
 packages/*/android/.tauri
 packages/*/android/.gradle

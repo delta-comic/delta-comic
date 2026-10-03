@@ -1,0 +1,68 @@
+[package]
+name = "delta-comic-mobile"
+description = "Delta Comic"
+version = "3.0.0-next.19"
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "delta_comic"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[dependencies]
+serde_json.workspace = true
+delta-comic-native.workspace = true
+tauri = { workspace = true, features = ["protocol-asset"] }
+specta-typescript.workspace = true
+tracing.workspace = true
+tauri-plugin-m3.workspace = true
+
+[target.'cfg(target_os = "android")'.dependencies]
+tauri-plugin-webview-upgrade.workspace = true
+
+[dependencies.tauri-plugin-aptabase]
+workspace = true
+
+[dependencies.tauri-plugin-better-cors-fetch]
+workspace = true
+
+[dependencies.tauri-plugin-clipboard-manager]
+workspace = true
+
+[dependencies.tauri-plugin-db]
+workspace = true
+
+[dependencies.tauri-plugin-downloader]
+workspace = true
+
+[dependencies.tauri-plugin-logger]
+workspace = true
+
+[dependencies.tauri-plugin-fs]
+workspace = true
+
+[dependencies.tauri-plugin-persisted-scope]
+workspace = true
+
+[dependencies.tauri-plugin-plugin]
+workspace = true
+
+[dependencies.tauri-plugin-shell]
+workspace = true
+
+[dependencies.tauri-plugin-sql]
+workspace = true
+
+[dependencies.tauri-plugin-utils]
+workspace = true
+
+[build-dependencies]
+tauri-build.workspace = true
+
+[features]
+default = []
+custom-protocol = ["tauri/protocol-asset", "tauri/custom-protocol"]
+protocol-asset = ["tauri/protocol-asset", "tauri/custom-protocol"]

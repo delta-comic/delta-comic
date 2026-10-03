@@ -23,7 +23,9 @@
   },
   "files": [],
   "references": [
-    { "path": "./packages/client/app/app/tsconfig.json" },
+    { "path": "./packages/client/app/mobile/tsconfig.json" },
+    { "path": "./packages/client/app/desktop/tsconfig.json" },
+    { "path": "./packages/client/app/core/tsconfig.json" },
     { "path": "./packages/client/core/utils/tsconfig.json" },
     { "path": "./packages/client/ui/ui/tsconfig.json" },
     { "path": "./packages/client/core/model/tsconfig.json" },

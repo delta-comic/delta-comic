@@ -1,0 +1,8 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["vite-plus/client", "@delta-comic/utils", "./components.d.ts"]
+  },
+  "include": ["lib", "test"]
+}

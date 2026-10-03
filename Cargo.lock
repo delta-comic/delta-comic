@@ -1100,13 +1100,36 @@ dependencies = [
 ]
 
 [[package]]
-name = "delta-comic"
+name = "delta-comic-desktop"
 version = "3.0.0-next.19"
 dependencies = [
+ "delta-comic-native",
  "objc2-foundation",
- "serde",
  "serde_json",
- "specta",
+ "specta-typescript",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-aptabase",
+ "tauri-plugin-better-cors-fetch",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-db",
+ "tauri-plugin-downloader",
+ "tauri-plugin-fs",
+ "tauri-plugin-logger",
+ "tauri-plugin-persisted-scope",
+ "tauri-plugin-plugin",
+ "tauri-plugin-shell",
+ "tauri-plugin-sql",
+ "tauri-plugin-utils",
+ "tracing",
+]
+
+[[package]]
+name = "delta-comic-mobile"
+version = "3.0.0-next.19"
+dependencies = [
+ "delta-comic-native",
+ "serde_json",
  "specta-typescript",
  "tauri",
  "tauri-build",
@@ -1124,6 +1147,30 @@ dependencies = [
  "tauri-plugin-sql",
  "tauri-plugin-utils",
  "tauri-plugin-webview-upgrade",
+ "tracing",
+]
+
+[[package]]
+name = "delta-comic-native"
+version = "3.0.0-next.19"
+dependencies = [
+ "serde",
+ "serde_json",
+ "specta",
+ "specta-typescript",
+ "tauri",
+ "tauri-plugin-aptabase",
+ "tauri-plugin-better-cors-fetch",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-db",
+ "tauri-plugin-downloader",
+ "tauri-plugin-fs",
+ "tauri-plugin-logger",
+ "tauri-plugin-persisted-scope",
+ "tauri-plugin-plugin",
+ "tauri-plugin-shell",
+ "tauri-plugin-sql",
+ "tauri-plugin-utils",
  "tauri-specta",
  "tracing",
 ]
