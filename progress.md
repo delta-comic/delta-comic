@@ -472,7 +472,7 @@
 
 ## 2026-10-03 双端拆分与局部 Vapor 验证
 
-- 移动端应用已迁移至 `packages/client/app/mobile`，桌面端位于 `packages/client/app/desktop`，共享业务与布局影响较小的组件位于 `packages/client/app/core`，共享 Rust 原生边界位于 `packages/client/app/core/native`。
+- 移动端应用已迁移至 `packages/client/app/mobile`，桌面端位于 `packages/client/app/desktop`，共享业务与布局影响较小的组件位于 `packages/client/app/core`，共享 Rust 原生边界位于 `packages/client/app/core`。
 - 两端已分别完成 Web 构建；Vapor 编译能力在生产配置启用，测试环境使用常规 Vue 编译以兼容 happy-dom，Vapor 组件覆盖下载信息与日志文本片段。
 - `vp run -r typecheck`、`vp check`、`vp test run`、`cargo fmt --all --check`、严格 Clippy、workspace Rust tests、`vp run codegen:check` 均通过。
 - Android downloader Gradle 校验已运行；当前生成的 `tauri-android` 工程在 AGP 8.11.0 下没有可消费 variant，`lintReportDebug` 因该工程配置失败，需在重新生成 Android 工程后复核。

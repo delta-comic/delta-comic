@@ -3,7 +3,7 @@ resolver = "3"
 members = [
   "packages/client/app/mobile/src-tauri",
   "packages/client/app/desktop/src-tauri",
-  "packages/client/app/core/native",
+  "packages/client/app/core",
   "packages/client/data/db",
   "packages/client/platform/downloader",
   "packages/client/platform/downloader/tools/performance-baseline",
@@ -21,7 +21,7 @@ rust-version = "1.95.0"
 version = "3.0.0-next.19"
 
 [workspace.dependencies]
-delta-comic-native = { path = "packages/client/app/core/native" }
+delta-comic-native = { path = "packages/client/app/core" }
 android-native-keyring-store = "1.0.0"
 apple-native-keyring-store = { version = "1.0.2", features = ["keychain"] }
 async-trait = "0.1.89"

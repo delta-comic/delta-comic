@@ -19,7 +19,7 @@
 | `packages/client/app/mobile` | 移动端 Vue/Tauri 应用、路由、三语 i18n、应用内管理 |
 | `packages/client/app/desktop` | 桌面端 Vue/Tauri 应用、路由、侧栏与窗口行为 |
 | `packages/client/app/core` | 双端共享业务状态、功能 composables 与布局影响较小的组件 |
-| `packages/client/app/core/native` | 双端共享 Rust Tauri 命令、插件初始化与生命周期协议 |
+| `packages/client/app/core` | 双端共享 Rust Tauri 命令、插件初始化与生命周期协议 |
 | `packages/client/core/sdk` | `@delta-comic/client` 类型、Context 扩展、平台客户端工具 |
 | `packages/client/core/plugin` | 宿主服务、内置插件、安装组合与 Fiber 管理 |
 | `packages/client/core/plugin-install` | 来源、安装记录、ZIP、模块读取、开发服务器 |
