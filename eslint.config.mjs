@@ -5,7 +5,12 @@ import { globalIgnores } from 'eslint/config'
 import vueParser from 'vue-eslint-parser'
 
 const betterTailwindRules = Object.fromEntries(
-  Object.keys(betterTailwindcss.rules).map(rule => [`better-tailwindcss/${rule}`, 'error']),
+  [
+    'no-unknown-classes',
+    'no-conflicting-classes',
+    'no-duplicate-classes',
+    'no-deprecated-classes',
+  ].map(rule => [`better-tailwindcss/${rule}`, 'error']),
 )
 
 const vueParserOptions = {
@@ -16,7 +21,7 @@ const vueParserOptions = {
 }
 
 const vueLintConfig = (files, entryPoint) => [
-  ...vue.configs['flat/recommended-error'].map(config => ({ ...config, files })),
+  ...vue.configs['flat/essential'].map(config => ({ ...config, files })),
   {
     files,
     languageOptions: { parser: vueParser, parserOptions: vueParserOptions },

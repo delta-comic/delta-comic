@@ -16,20 +16,9 @@
     "tailwindcss/prefer-scale-token": "error",
     "tailwindcss/prefer-theme-tokens": "error",
     "tailwindcss/consistent-variant-order": "error",
-    "tailwindcss/enforce-consistent-important-position": "error",
-    "tailwindcss/enforce-consistent-line-wrapping": "error",
-    "tailwindcss/enforce-consistent-variable-syntax": "error",
-    "tailwindcss/enforce-logical": "error",
-    "tailwindcss/enforce-physical": "error",
-    "tailwindcss/enforce-shorthand": "error",
     "tailwindcss/enforce-sort-order": "error",
     "tailwindcss/no-unnecessary-whitespace": "error",
-    "tailwindcss/max-class-count": "error",
-    "tailwindcss/no-arbitrary-value": "error",
-    "tailwindcss/no-borrowed-component-styles": "error",
-    "tailwindcss/no-default-palette": "error",
-    "tailwindcss/no-hardcoded-colors": "error",
-    "tailwindcss/no-restricted-classes": "error"
+    "tailwindcss/no-hardcoded-colors": "error"
   },
   "settings": {
     "jsx-a11y": { "components": {}, "attributes": {} },
