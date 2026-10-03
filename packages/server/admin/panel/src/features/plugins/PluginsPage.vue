@@ -217,7 +217,7 @@ onMounted(() => {
                   {{ record.metrics.steps }} / {{ record.metrics.http }} /
                   {{ record.metrics.durationMs.toFixed(1) }}
                 </td>
-                <td class="max-w-[400px] p-2 break-all">
+                <td class="max-w-100 p-2 break-all">
                   {{ record.error ?? JSON.stringify(record.result) }}
                 </td>
               </tr>
@@ -231,7 +231,7 @@ onMounted(() => {
       v-model:show="editing"
       preset="card"
       :title="text.edit"
-      class="w-[900px]! max-w-[95vw]!"
+      class="w-225! max-w-[95vw]!"
       :mask-closable="false"
     >
       <NForm label-placement="top">

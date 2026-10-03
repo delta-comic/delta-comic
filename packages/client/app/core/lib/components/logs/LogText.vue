@@ -4,6 +4,6 @@ defineProps<{ content: string }>()
 
 <template>
   <pre
-    class="m-0 min-w-max cursor-text font-mono text-xs leading-5 break-words whitespace-pre-wrap text-dc-text select-text"
+    class="m-0 min-w-max cursor-text font-mono text-xs leading-5 wrap-break-word whitespace-pre-wrap text-dc-text select-text"
     >{{ content }}</pre>
 </template>

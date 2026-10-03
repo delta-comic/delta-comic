@@ -25,7 +25,7 @@ async function handleNavigate(item: ShowcaseNavItem) {
 
 <template>
   <div
-    class="flex h-dvh min-w-80 flex-col bg-[var(--nui-body-color)] [--p-color:var(--nui-primary-color)]"
+    class="flex h-dvh min-w-80 flex-col bg-(--nui-body-color) [--p-color:var(--nui-primary-color)]"
   >
     <ShowcaseHeader
       v-model:keyword="searchKeyword"
@@ -36,7 +36,7 @@ async function handleNavigate(item: ShowcaseNavItem) {
 
     <div class="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1">
       <aside
-        class="hidden w-64 shrink-0 border-r border-[var(--nui-divider-color)] bg-[var(--nui-card-color)] lg:block"
+        class="hidden w-64 shrink-0 border-r border-(--nui-divider-color) bg-(--nui-card-color) lg:block"
       >
         <ShowcaseSidebar
           v-model:keyword="searchKeyword"

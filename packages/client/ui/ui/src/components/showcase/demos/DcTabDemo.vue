@@ -24,10 +24,10 @@ const items = [
       description="router=false 时使用 v-model:active 管理选中项，shrink 让标签宽度跟随内容。"
     >
       <div
-        class="overflow-hidden rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+        class="overflow-hidden rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color)"
       >
         <DcTab v-model:active="compactActive" :items="items" :router="false" shrink />
-        <div class="p-6 text-sm text-[var(--nui-text-color-2)]">当前标签：{{ compactActive }}</div>
+        <div class="p-6 text-sm text-(--nui-text-color-2)">当前标签：{{ compactActive }}</div>
       </div>
     </DemoSection>
 
@@ -37,7 +37,7 @@ const items = [
       description="shrink=false 时标签等宽；swipeable 开启滑动切换，左右和底部插槽可承载附加操作。"
     >
       <div
-        class="overflow-hidden rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+        class="overflow-hidden rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color)"
       >
         <DcTab
           v-model:active="equalActive"
@@ -51,7 +51,7 @@ const items = [
           <template #right><NButton class="mr-3" size="tiny" quaternary>管理</NButton></template>
           <template #bottom>
             <div
-              class="border-t border-[var(--nui-divider-color)] px-4 py-3 text-xs text-[var(--nui-text-color-3)]"
+              class="border-t border-(--nui-divider-color) px-4 py-3 text-xs text-(--nui-text-color-3)"
             >
               bottom slot · {{ equalActive }}
             </div>

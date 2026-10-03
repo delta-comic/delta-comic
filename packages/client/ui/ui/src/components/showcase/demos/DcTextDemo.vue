@@ -22,15 +22,15 @@ const unsafeText = [
       description="纯文本会保留换行和空白，并可通过 class 调整排版与强调方式。"
     >
       <div class="grid gap-4 lg:grid-cols-2">
-        <article class="rounded-xl border border-[var(--nui-divider-color)] p-4">
-          <div class="mb-3 text-xs font-semibold text-[var(--nui-text-color-3)]">多行文本</div>
+        <article class="rounded-xl border border-(--nui-divider-color) p-4">
+          <div class="mb-3 text-xs font-semibold text-(--nui-text-color-3)">多行文本</div>
           <DcText :text="multilineText" class="text-sm leading-7" />
         </article>
-        <article class="rounded-xl bg-[var(--nui-action-color)] p-4">
-          <div class="mb-3 text-xs font-semibold text-[var(--nui-text-color-3)]">自定义排版</div>
+        <article class="rounded-xl bg-(--nui-action-color) p-4">
+          <div class="mb-3 text-xs font-semibold text-(--nui-text-color-3)">自定义排版</div>
           <DcText
             text="Delta Comic UI\n安全文本 · 自动换行 · 样式透传"
-            class="font-mono text-base leading-8 text-[var(--nui-primary-color)]!"
+            class="font-mono text-base leading-8 text-(--nui-primary-color)!"
           />
         </article>
       </div>
@@ -42,11 +42,11 @@ const unsafeText = [
       description="URL 会转换为安全链接，输入中的 HTML 标签仅作为文本显示。"
     >
       <div class="space-y-4">
-        <article class="rounded-xl border border-[var(--nui-divider-color)] p-4">
-          <div class="mb-2 text-xs font-semibold text-[var(--nui-text-color-3)]">链接识别</div>
+        <article class="rounded-xl border border-(--nui-divider-color) p-4">
+          <div class="mb-2 text-xs font-semibold text-(--nui-text-color-3)">链接识别</div>
           <DcText
             text="https://example.com/delta-comic"
-            class="pointer-events-none text-sm text-[var(--nui-primary-color)]! underline"
+            class="pointer-events-none text-sm text-(--nui-primary-color)! underline"
           />
         </article>
         <article class="rounded-xl border border-amber-500/30 bg-amber-500/8 p-4">

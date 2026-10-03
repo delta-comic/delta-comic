@@ -49,17 +49,17 @@ const dottedRangeValue = ref<[string, string]>(['2026.07.01', '2026.07.17'])
       description="time=true 使用日期范围，time=false 使用包含时分的日期时间范围。"
     >
       <div class="space-y-4">
-        <label class="grid gap-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">日期范围</span>
+        <label class="grid gap-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">日期范围</span>
           <DcFormDateRange v-model="rangeValue" :config="rangeConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">
+          <code class="block text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(rangeValue) }}
           </code>
         </label>
-        <label class="grid gap-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">日期时间范围</span>
+        <label class="grid gap-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">日期时间范围</span>
           <DcFormDateRange v-model="dateTimeRangeValue" :config="dateTimeRangeConfig" />
-          <code class="block text-xs break-all text-[var(--nui-text-color-3)]">
+          <code class="block text-xs break-all text-(--nui-text-color-3)">
             model: {{ JSON.stringify(dateTimeRangeValue) }}
           </code>
         </label>
@@ -73,17 +73,17 @@ const dottedRangeValue = ref<[string, string]>(['2026.07.01', '2026.07.17'])
       description="format 同时应用于范围两端，适合按存储或展示约定输出。"
     >
       <div class="space-y-4">
-        <label class="grid gap-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">MM/dd/yyyy</span>
+        <label class="grid gap-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">MM/dd/yyyy</span>
           <DcFormDateRange v-model="slashRangeValue" :config="slashRangeConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">
+          <code class="block text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(slashRangeValue) }}
           </code>
         </label>
-        <label class="grid gap-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">yyyy.MM.dd</span>
+        <label class="grid gap-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">yyyy.MM.dd</span>
           <DcFormDateRange v-model="dottedRangeValue" :config="dottedRangeConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">
+          <code class="block text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(dottedRangeValue) }}
           </code>
         </label>

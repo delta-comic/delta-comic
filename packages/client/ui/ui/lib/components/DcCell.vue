@@ -87,14 +87,13 @@ const renderArrowIcon = computed(() => {
           borderless: !border,
           [size || '']: !!size,
         }),
-        `relative box-border flex w-full overflow-hidden px-[var(--dc-cell-horizontal-padding,var(--dc-space-4))] py-[var(--dc-cell-vertical-padding,10px)] text-[length:var(--dc-cell-font-size,var(--dc-font-size-md))] leading-[var(--dc-cell-line-height,var(--dc-line-height-md))] text-[color:var(--dc-cell-text-color,var(--dc-color-text))] [background:var(--dc-cell-background,var(--dc-color-surface))] after:pointer-events-none after:absolute after:right-[var(--dc-space-4)] after:bottom-0 after:left-[var(--dc-space-4)] after:box-border after:scale-y-50 after:border-b after:border-[var(--dc-cell-border-color,var(--dc-color-border))] after:content-[''] last:after:hidden`,
+        `relative box-border flex w-full overflow-hidden px-(--dc-cell-horizontal-padding,var(--dc-space-4)) py-(--dc-cell-vertical-padding,10px) text-(length:--dc-cell-font-size,var(--dc-font-size-md)) leading-(--dc-cell-line-height,var(--dc-line-height-md)) text-(--dc-cell-text-color,var(--dc-color-text)) [background:var(--dc-cell-background,var(--dc-color-surface))] after:pointer-events-none after:absolute after:right-(--dc-space-4) after:bottom-0 after:left-(--dc-space-4) after:box-border after:scale-y-50 after:border-b after:border-(--dc-cell-border-color,var(--dc-color-border)) after:content-[''] last:after:hidden`,
         center && 'items-center',
-        isClickable &&
-          'cursor-pointer active:bg-[var(--dc-cell-active-color,var(--dc-color-active))]',
+        isClickable && 'cursor-pointer active:bg-(--dc-cell-active-color,var(--dc-color-active))',
         !border && 'after:hidden',
         required &&
-          `overflow-visible before:absolute before:left-[var(--dc-space-2)] before:text-[length:var(--dc-cell-font-size,var(--dc-font-size-md))] before:text-[color:var(--dc-cell-required-color,var(--dc-color-danger))] before:content-['*']`,
-        size === 'large' && 'py-[var(--dc-cell-large-vertical-padding,var(--dc-space-3))]',
+          `overflow-visible before:absolute before:left-(--dc-space-2) before:text-(length:--dc-cell-font-size,var(--dc-font-size-md)) before:text-(--dc-cell-required-color,var(--dc-color-danger)) before:content-['*']`,
+        size === 'large' && 'py-(--dc-cell-large-vertical-padding,var(--dc-space-3))',
         $props.class,
       )
     "
@@ -106,7 +105,7 @@ const renderArrowIcon = computed(() => {
     <!-- left icon -->
     <div
       v-if="slots.icon || icon"
-      class="dc-cell__left-icon mr-[var(--dc-space-1)] h-[var(--dc-cell-line-height,var(--dc-line-height-md))] text-[length:var(--dc-cell-icon-size,16px)] leading-[var(--dc-cell-line-height,var(--dc-line-height-md))]"
+      class="dc-cell__left-icon mr-(--dc-space-1) h-(--dc-cell-line-height,var(--dc-line-height-md)) text-(length:--dc-cell-icon-size,16px) leading-(--dc-cell-line-height,var(--dc-line-height-md))"
     >
       <slot v-if="slots.icon" name="icon" />
       <span
@@ -124,7 +123,7 @@ const renderArrowIcon = computed(() => {
         cn(
           'dc-cell__title flex-1',
           size === 'large' &&
-            'text-[length:var(--dc-cell-large-title-font-size,var(--dc-font-size-lg))]',
+            'text-(length:--dc-cell-large-title-font-size,var(--dc-font-size-lg))',
           titleClass,
         )
       "
@@ -136,9 +135,9 @@ const renderArrowIcon = computed(() => {
         v-if="slots.label || label != null"
         :class="
           cn(
-            'dc-cell__label mt-[var(--dc-cell-label-margin-top,var(--dc-space-1))] text-[length:var(--dc-cell-label-font-size,var(--dc-font-size-sm))] leading-[var(--dc-cell-label-line-height,var(--dc-line-height-sm))] text-[color:var(--dc-cell-label-color,var(--dc-color-text-secondary))]',
+            'dc-cell__label mt-(--dc-cell-label-margin-top,var(--dc-space-1)) text-(length:--dc-cell-label-font-size,var(--dc-font-size-sm)) leading-(--dc-cell-label-line-height,var(--dc-line-height-sm)) text-(--dc-cell-label-color,var(--dc-color-text-secondary))',
             size === 'large' &&
-              'text-[length:var(--dc-cell-large-label-font-size,var(--dc-font-size-md))]',
+              'text-(length:--dc-cell-large-label-font-size,var(--dc-font-size-md))',
             labelClass,
           )
         "
@@ -153,8 +152,8 @@ const renderArrowIcon = computed(() => {
       v-if="slots.value || slots.default || value != null"
       :class="
         cn(
-          'dc-cell__value relative flex-1 overflow-hidden text-right align-middle text-[length:var(--dc-cell-value-font-size,inherit)] break-words text-[color:var(--dc-cell-value-color,var(--dc-color-text-secondary))]',
-          size === 'large' && 'text-[length:var(--dc-cell-large-value-font-size,inherit)]',
+          'dc-cell__value relative flex-1 overflow-hidden text-right align-middle text-(length:--dc-cell-value-font-size,inherit) wrap-break-word text-(--dc-cell-value-color,var(--dc-color-text-secondary))',
+          size === 'large' && 'text-(length:--dc-cell-large-value-font-size,inherit)',
           valueClass,
         )
       "
@@ -167,10 +166,10 @@ const renderArrowIcon = computed(() => {
     <!-- right icon -->
     <div
       v-if="slots['right-icon'] || isLink"
-      class="dc-cell__right-icon ml-[var(--dc-space-1)] h-[var(--dc-cell-line-height,var(--dc-line-height-md))] text-[length:var(--dc-cell-icon-size,16px)] leading-[var(--dc-cell-line-height,var(--dc-line-height-md))] text-[color:var(--dc-cell-right-icon-color,var(--dc-color-icon))]"
+      class="dc-cell__right-icon ml-(--dc-space-1) h-(--dc-cell-line-height,var(--dc-line-height-md)) text-(length:--dc-cell-icon-size,16px) leading-(--dc-cell-line-height,var(--dc-line-height-md)) text-(--dc-cell-right-icon-color,var(--dc-color-icon))"
     >
       <slot v-if="slots['right-icon']" name="right-icon" />
-      <span v-else class="dc-cell__arrow text-[18px] font-[200]">{{ renderArrowIcon }}</span>
+      <span v-else class="dc-cell__arrow text-[18px] font-extralight">{{ renderArrowIcon }}</span>
     </div>
 
     <!-- extra slot -->

@@ -45,7 +45,7 @@ const reader = { theme: 'dark', page: 12 }
       description="config、env 和 isDarkMode 可控制解析行为、渲染环境与 iframe 主题。"
     >
       <template #actions>
-        <div class="flex items-center gap-2 text-xs text-[var(--nui-text-color-3)]">
+        <div class="flex items-center gap-2 text-xs text-(--nui-text-color-3)">
           深色主题 <NSwitch v-model:value="dark" size="small" />
         </div>
       </template>

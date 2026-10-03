@@ -15,7 +15,7 @@ const selected = computed(() =>
 </script>
 
 <template>
-  <div class="admin-page modules-page max-w-[1380px]">
+  <div class="admin-page modules-page max-w-345">
     <PageHeader
       title="服务模块"
       description="以 Worker 运行时能力为准，不依赖 Pages 编译期静态列表"
@@ -27,7 +27,7 @@ const selected = computed(() =>
     </div>
     <section
       v-else
-      class="modules-page__layout admin-panel grid min-h-[520px] grid-cols-[minmax(280px,0.42fr)_minmax(0,0.58fr)] max-[760px]:grid-cols-1"
+      class="modules-page__layout admin-panel grid min-h-130 grid-cols-[minmax(280px,0.42fr)_minmax(0,0.58fr)] max-[760px]:grid-cols-1"
     >
       <div
         class="modules-page__list border-border border-r max-[760px]:border-r-0 max-[760px]:border-b"
@@ -36,10 +36,10 @@ const selected = computed(() =>
           v-for="module in modules"
           :key="module.key"
           :to="`/modules/${module.key}`"
-          class="modules-page__row border-border hover:bg-brand-soft flex items-center justify-between gap-5 border-b px-[18px] py-4"
+          class="modules-page__row border-border hover:bg-brand-soft flex items-center justify-between gap-5 border-b px-4.5 py-4"
           :class="[selected?.key === module.key && 'modules-page__row--selected bg-brand-soft']"
         >
-          <div class="grid gap-[5px]">
+          <div class="grid gap-1.25">
             <strong class="text-[13px]">{{ module.name }}</strong
             ><small class="text-muted-foreground font-mono text-[10px]">{{
               module.apiPrefix

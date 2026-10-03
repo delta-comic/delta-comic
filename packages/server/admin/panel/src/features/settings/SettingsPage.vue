@@ -33,11 +33,11 @@ const save = async () => {
 </script>
 
 <template>
-  <div class="admin-page settings-page max-w-[1180px]">
+  <div class="admin-page settings-page max-w-295">
     <PageHeader title="设置" description="管理 Server API 连接与当前浏览器会话" />
 
     <section
-      class="settings-page__layout grid grid-cols-[minmax(0,1.25fr)_minmax(300px,0.75fr)] gap-[22px] max-[840px]:grid-cols-1"
+      class="settings-page__layout grid grid-cols-[minmax(0,1.25fr)_minmax(300px,0.75fr)] gap-5.5 max-[840px]:grid-cols-1"
     >
       <NCard title="服务器连接" :bordered="true">
         <NForm label-placement="top" @submit.prevent="save">
@@ -81,7 +81,7 @@ const save = async () => {
       </NCard>
 
       <NCard title="运行时能力" :bordered="true">
-        <div class="settings-page__status mb-[18px]">
+        <div class="settings-page__status mb-4.5">
           <StatusMark
             :label="connection.isConnected ? '已认证' : '未认证'"
             :tone="

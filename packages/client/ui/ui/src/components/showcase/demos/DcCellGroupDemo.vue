@@ -34,11 +34,11 @@ import DemoSection from '../DemoSection.vue'
       title="嵌入与插槽"
       description="inset 会增加水平留白和圆角，标题插槽可承载状态与操作提示。"
     >
-      <div class="rounded-xl bg-[var(--nui-action-color)] py-2">
+      <div class="rounded-xl bg-(--nui-action-color) py-2">
         <DcCellGroup inset border data-demo="inset-group">
           <template #title>
             <div class="flex items-center justify-between gap-3">
-              <span class="font-medium text-[var(--nui-text-color-1)]">同步服务</span>
+              <span class="font-medium text-(--nui-text-color-1)">同步服务</span>
               <NTag size="small" type="success" :bordered="false">运行中</NTag>
             </div>
           </template>

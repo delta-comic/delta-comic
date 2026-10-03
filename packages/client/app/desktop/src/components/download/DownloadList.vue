@@ -56,7 +56,7 @@ const empty = computed(() => props.tasks.length === 0)
       <div v-bind="wrapperProps">
         <div v-for="item in list" :key="item.data.id">
           <div
-            class="grid h-[72px] grid-cols-[minmax(12rem,2fr)_7rem_minmax(10rem,1fr)_8rem_12rem] items-center gap-3 border-b border-(--dc-border) px-4"
+            class="grid h-18 grid-cols-[minmax(12rem,2fr)_7rem_minmax(10rem,1fr)_8rem_12rem] items-center gap-3 border-b border-(--dc-border) px-4"
           >
             <DownloadTaskInfo :title="taskDisplayName(item.data)" :path="item.data.relativePath" />
             <NTag :bordered="false" size="small">

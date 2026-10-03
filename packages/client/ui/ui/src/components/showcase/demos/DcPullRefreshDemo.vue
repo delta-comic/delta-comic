@@ -39,14 +39,14 @@ const previewRefresh = async () => {
         v-model:pulling="pulling"
         :disabled="false"
         :refresher="refresh"
-        class="h-52 rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+        class="h-52 rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color)"
         content-class="min-h-72 p-5"
       >
         <div class="flex items-center justify-between">
-          <span class="text-sm text-[var(--nui-text-color-2)]">在触屏设备向下拉动</span>
+          <span class="text-sm text-(--nui-text-color-2)">在触屏设备向下拉动</span>
           <NTag type="success" :bordered="false">刷新 {{ refreshCount }} 次</NTag>
         </div>
-        <p class="mt-5 text-xs leading-6 text-[var(--nui-text-color-3)]">
+        <p class="mt-5 text-xs leading-6 text-(--nui-text-color-3)">
           pulling: {{ pulling }} · refreshing: {{ refreshing }}
         </p>
       </DcPullRefresh>
@@ -75,11 +75,11 @@ const previewRefresh = async () => {
           disabled
           :refresher="refresh"
           :pull-distance="90"
-          class="h-44 rounded-lg border border-dashed border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+          class="h-44 rounded-lg border border-dashed border-(--nui-divider-color) bg-(--nui-card-color)"
           content-class="min-h-56 p-4"
         >
-          <strong class="text-sm text-[var(--nui-text-color-2)]">已禁用</strong>
-          <p class="mt-2 text-xs text-[var(--nui-text-color-3)]">保留纵向滚动，不响应下拉刷新。</p>
+          <strong class="text-sm text-(--nui-text-color-2)">已禁用</strong>
+          <p class="mt-2 text-xs text-(--nui-text-color-3)">保留纵向滚动，不响应下拉刷新。</p>
         </DcPullRefresh>
       </div>
     </DemoSection>

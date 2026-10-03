@@ -161,7 +161,7 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
 <template>
   <div :class="cn('dc-tabs w-full', $props.class)" :style="style">
     <div
-      class="dc-tabs__nav flex h-[var(--dc-tabs-height,44px)] items-center bg-(--dc-color-surface) pb-[var(--dc-tabs-indicator-offset,10px)]"
+      class="dc-tabs__nav flex h-(--dc-tabs-height,44px) items-center bg-(--dc-color-surface) pb-(--dc-tabs-indicator-offset,10px)"
     >
       <slot name="left" />
       <div ref="swiperContainerRef" class="dc-tabs__swiper relative h-full min-w-0 flex-1">
@@ -210,7 +210,7 @@ defineSlots<{ left(): any; right(): any; bottom(): any }>()
         </Swiper>
         <div
           v-show="indicatorReady"
-          class="dc-tabs__indicator pointer-events-none absolute bottom-0 left-0 h-[3px] rounded-[3px] bg-[var(--dc-tabs-indicator-color,var(--dc-color-primary))] transition-[transform,width] duration-[250ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
+          class="dc-tabs__indicator pointer-events-none absolute bottom-0 left-0 h-0.75 rounded-[3px] bg-(--dc-tabs-indicator-color,var(--dc-color-primary)) transition-[transform,width] duration-250 ease-in-out"
           :style="{ transform: `translate3d(${indicatorX}px, 0, 0)`, width: `${indicatorWidth}px` }"
         />
       </div>

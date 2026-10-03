@@ -49,18 +49,18 @@ const alternateSingleValue = ref([{ key: 'command', value: 'install' }])
       description="标准模式允许增加、删除和排序多行，每行包含 key 与 value。"
     >
       <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem]">
-        <div class="space-y-6 rounded-lg bg-[var(--nui-card-color)] p-5">
+        <div class="space-y-6 rounded-lg bg-(--nui-card-color) p-5">
           <label class="grid gap-2">
-            <span class="text-sm font-medium text-[var(--nui-text-color-1)]">预设请求头</span>
+            <span class="text-sm font-medium text-(--nui-text-color-1)">预设请求头</span>
             <DcFormPairs v-model="multipleValue" :config="multipleConfig" />
           </label>
           <label class="grid gap-2">
-            <span class="text-sm font-medium text-[var(--nui-text-color-1)]">空白扩展行</span>
+            <span class="text-sm font-medium text-(--nui-text-color-1)">空白扩展行</span>
             <DcFormPairs v-model="emptyMultipleValue" :config="emptyMultipleConfig" />
           </label>
         </div>
         <pre
-          class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-[var(--nui-text-color-2)] dark:bg-white/5"
+          class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-(--nui-text-color-2) dark:bg-white/5"
           >{{
             JSON.stringify({ headers: multipleValue, extras: emptyMultipleValue }, null, 2)
           }}</pre>
@@ -74,17 +74,17 @@ const alternateSingleValue = ref([{ key: 'command', value: 'install' }])
       description="noMultiple=true 将数据约束为一组键值，适合单一命令或映射配置。"
     >
       <div class="grid gap-4 lg:grid-cols-2">
-        <label class="grid gap-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">来源映射</span>
+        <label class="grid gap-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">来源映射</span>
           <DcFormPairs v-model="singleValue" :config="singleConfig" />
-          <code class="block text-xs break-all text-[var(--nui-text-color-3)]">
+          <code class="block text-xs break-all text-(--nui-text-color-3)">
             model: {{ JSON.stringify(singleValue) }}
           </code>
         </label>
-        <label class="grid gap-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">命令映射</span>
+        <label class="grid gap-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">命令映射</span>
           <DcFormPairs v-model="alternateSingleValue" :config="alternateSingleConfig" />
-          <code class="block text-xs break-all text-[var(--nui-text-color-3)]">
+          <code class="block text-xs break-all text-(--nui-text-color-3)">
             model: {{ JSON.stringify(alternateSingleValue) }}
           </code>
         </label>

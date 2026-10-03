@@ -21,15 +21,15 @@ const states = [
         <article
           v-for="state in states"
           :key="state.label"
-          class="rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)] p-4"
+          class="rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color) p-4"
         >
-          <p class="mb-3 text-xs font-semibold text-[var(--nui-text-color-3)]">{{ state.label }}</p>
+          <p class="mb-3 text-xs font-semibold text-(--nui-text-color-3)">{{ state.label }}</p>
           <DcState
             :state="state.value as any"
             content-class="min-h-20 flex items-center justify-center"
           >
             <template #default="{ data }">
-              <strong class="text-lg text-[var(--nui-text-color-1)]">{{
+              <strong class="text-lg text-(--nui-text-color-1)">{{
                 data ? `${data.count} 本漫画` : '暂无数据'
               }}</strong>
             </template>
@@ -49,7 +49,7 @@ const states = [
         content-class="flex items-center justify-between gap-4"
       >
         <template #default="{ data }">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">{{ data?.title }}</span>
+          <span class="text-sm font-medium text-(--nui-text-color-1)">{{ data?.title }}</span>
           <span class="text-sm text-emerald-600 dark:text-emerald-400">{{ data?.progress }}%</span>
         </template>
       </DcState>

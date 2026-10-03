@@ -40,25 +40,23 @@ const registeredAuthor = { $$plugin: 'showcase', icon: 'pen' }
     >
       <div class="grid gap-4 sm:grid-cols-2">
         <article
-          class="flex items-center gap-4 rounded-xl border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)] p-4"
+          class="flex items-center gap-4 rounded-xl border border-(--nui-divider-color) bg-(--nui-card-color) p-4"
         >
           <DcAuthorIcon :author="resourceAuthor" :size-spacing="14" />
           <div class="min-w-0 flex-1">
-            <div class="font-semibold text-[var(--nui-text-color-1)]">图片资源作者</div>
-            <div class="mt-1 text-xs text-[var(--nui-text-color-3)]">
-              RawImage → Image → DcImage
-            </div>
+            <div class="font-semibold text-(--nui-text-color-1)">图片资源作者</div>
+            <div class="mt-1 text-xs text-(--nui-text-color-3)">RawImage → Image → DcImage</div>
           </div>
           <NTag size="small" :bordered="false">资源</NTag>
         </article>
 
         <article
-          class="flex items-center gap-4 rounded-xl border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)] p-4"
+          class="flex items-center gap-4 rounded-xl border border-(--nui-divider-color) bg-(--nui-card-color) p-4"
         >
           <DcAuthorIcon :author="registeredAuthor" :size-spacing="14" />
           <div class="min-w-0 flex-1">
-            <div class="font-semibold text-[var(--nui-text-color-1)]">插件注册作者</div>
-            <div class="mt-1 text-xs text-[var(--nui-text-color-3)]">showcase:pen</div>
+            <div class="font-semibold text-(--nui-text-color-1)">插件注册作者</div>
+            <div class="mt-1 text-xs text-(--nui-text-color-3)">showcase:pen</div>
           </div>
           <NTag size="small" type="success" :bordered="false">组件</NTag>
         </article>
@@ -70,13 +68,13 @@ const registeredAuthor = { $$plugin: 'showcase', icon: 'pen' }
       title="尺寸与留白"
       description="sizeSpacing 使用 Tailwind spacing 标尺，适配列表、卡片和个人资料等密度。"
     >
-      <div class="flex flex-wrap items-end gap-6 rounded-xl bg-[var(--nui-action-color)] p-5">
+      <div class="flex flex-wrap items-end gap-6 rounded-xl bg-(--nui-action-color) p-5">
         <div v-for="size in [8, 10, 12, 16]" :key="size" class="text-center">
           <DcAuthorIcon
             :author="size % 4 === 0 ? resourceAuthor : registeredAuthor"
             :size-spacing="size"
           />
-          <div class="mt-2 font-mono text-xs text-[var(--nui-text-color-3)]">{{ size }}</div>
+          <div class="mt-2 font-mono text-xs text-(--nui-text-color-3)">{{ size }}</div>
         </div>
       </div>
       <template #note>字符串图标需要先以“插件 ID + 图标名”注册，图片资源则直接解析。</template>

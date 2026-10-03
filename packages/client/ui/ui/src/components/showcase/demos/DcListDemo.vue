@@ -34,10 +34,10 @@ const source = { type: 'array' as const, value: items }
             { label: '宽松 84px', height: 84 },
           ]"
           :key="option.height"
-          class="overflow-hidden rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+          class="overflow-hidden rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color)"
         >
           <p
-            class="border-b border-[var(--nui-divider-color)] px-4 py-2 text-xs font-semibold text-[var(--nui-text-color-3)]"
+            class="border-b border-(--nui-divider-color) px-4 py-2 text-xs font-semibold text-(--nui-text-color-3)"
           >
             {{ option.label }}
           </p>
@@ -45,7 +45,7 @@ const source = { type: 'array' as const, value: items }
             <DcList :source="source" :min-height="option.height" class="size-full">
               <template #default="{ item, index, minHeight, length }">
                 <article
-                  class="flex w-full items-center gap-3 border-b border-[var(--nui-divider-color)] px-4 py-2"
+                  class="flex w-full items-center gap-3 border-b border-(--nui-divider-color) px-4 py-2"
                   :style="{ minHeight: `${minHeight}px` }"
                 >
                   <span
@@ -53,14 +53,12 @@ const source = { type: 'array' as const, value: items }
                     >{{ index + 1 }}</span
                   >
                   <span class="min-w-0 flex-1">
-                    <strong class="block text-sm text-[var(--nui-text-color-1)]">{{
+                    <strong class="block text-sm text-(--nui-text-color-1)">{{
                       item.title
                     }}</strong>
-                    <small
-                      v-if="option.height > 60"
-                      class="mt-1 block text-[var(--nui-text-color-3)]"
-                      >{{ item.description }}</small
-                    >
+                    <small v-if="option.height > 60" class="mt-1 block text-(--nui-text-color-3)">{{
+                      item.description
+                    }}</small>
                   </span>
                   <NTag size="tiny" :bordered="false">{{ index + 1 }}/{{ length }}</NTag>
                 </article>
@@ -83,10 +81,10 @@ const source = { type: 'array' as const, value: items }
             { label: '禁用下拉刷新', disabled: true },
           ]"
           :key="option.label"
-          class="overflow-hidden rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+          class="overflow-hidden rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color)"
         >
           <p
-            class="border-b border-[var(--nui-divider-color)] px-4 py-2 text-xs font-semibold text-[var(--nui-text-color-3)]"
+            class="border-b border-(--nui-divider-color) px-4 py-2 text-xs font-semibold text-(--nui-text-color-3)"
           >
             {{ option.label }}
           </p>
@@ -99,7 +97,7 @@ const source = { type: 'array' as const, value: items }
             >
               <template #default="{ item, index }">
                 <div
-                  class="flex min-h-14 items-center border-b border-[var(--nui-divider-color)] px-4 text-sm text-[var(--nui-text-color-2)]"
+                  class="flex min-h-14 items-center border-b border-(--nui-divider-color) px-4 text-sm text-(--nui-text-color-2)"
                 >
                   {{ index + 1 }} · {{ item.title }}
                 </div>

@@ -98,7 +98,7 @@ function save() {
             <dt class="text-(--dc-text-secondary)">
               {{ t('download.destinations.defaultDestination') }}
             </dt>
-            <dd class="min-w-0 text-right font-medium break-words text-(--dc-text)">
+            <dd class="min-w-0 text-right font-medium wrap-break-word text-(--dc-text)">
               {{ defaultDestination?.label ?? t('download.destinations.none') }}
             </dd>
           </dl>
@@ -110,7 +110,7 @@ function save() {
           >
             <li v-for="destination in destinations" :key="destination.id" class="py-3">
               <div class="flex min-w-0 flex-wrap items-center gap-2">
-                <span class="min-w-0 font-medium break-words text-(--dc-text)">
+                <span class="min-w-0 font-medium wrap-break-word text-(--dc-text)">
                   {{ destination.label }}
                 </span>
                 <NTag v-if="destination.isDefault" :bordered="false" size="small" type="success">

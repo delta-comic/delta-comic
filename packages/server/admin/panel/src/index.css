@@ -121,7 +121,7 @@
   }
 
   .admin-empty {
-    @apply text-muted-foreground grid min-h-[230px] place-items-center text-center;
+    @apply text-muted-foreground grid min-h-57.5 place-items-center text-center;
   }
 
   .admin-data-table {
@@ -130,7 +130,7 @@
 
   .admin-data-table th,
   .admin-data-table td {
-    @apply border-border border-b px-[18px] py-[13px] text-left;
+    @apply border-border border-b px-4.5 py-3.25 text-left;
   }
 
   .admin-data-table th {

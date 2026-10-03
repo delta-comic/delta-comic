@@ -32,7 +32,7 @@ const longPressCount = shallowRef(0)
     >
       <div class="grid gap-4 sm:grid-cols-3">
         <article
-          class="flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-[var(--nui-divider-color)] p-4"
+          class="flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-(--nui-divider-color) p-4"
         >
           <DcToggleIcon
             v-model="favorite"
@@ -50,7 +50,7 @@ const longPressCount = shallowRef(0)
         </article>
 
         <article
-          class="flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-[var(--nui-divider-color)] p-4"
+          class="flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-(--nui-divider-color) p-4"
         >
           <DcToggleIcon
             v-model="bookmarked"
@@ -65,7 +65,7 @@ const longPressCount = shallowRef(0)
         </article>
 
         <article
-          class="flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-[var(--nui-divider-color)] p-4"
+          class="flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-(--nui-divider-color) p-4"
         >
           <DcToggleIcon
             :model-value="true"
@@ -90,12 +90,12 @@ const longPressCount = shallowRef(0)
       title="尺寸与布局"
       description="图标可以纵向或横向排布，并通过 padding 扩展可点击区域。"
     >
-      <div class="flex flex-wrap items-center gap-6 rounded-xl bg-[var(--nui-action-color)] p-5">
+      <div class="flex flex-wrap items-center gap-6 rounded-xl bg-(--nui-action-color) p-5">
         <DcToggleIcon
           :icon="HeartIcon"
           size="20"
           padding
-          class="cursor-pointer rounded-lg bg-[var(--nui-card-color)] py-3"
+          class="cursor-pointer rounded-lg bg-(--nui-card-color) py-3"
         >
           20px
         </DcToggleIcon>
@@ -104,7 +104,7 @@ const longPressCount = shallowRef(0)
           size="30"
           row-mode
           padding
-          class="cursor-pointer gap-2 rounded-lg bg-[var(--nui-card-color)] py-3"
+          class="cursor-pointer gap-2 rounded-lg bg-(--nui-card-color) py-3"
         >
           横向布局
         </DcToggleIcon>
@@ -112,7 +112,7 @@ const longPressCount = shallowRef(0)
           :icon="HeartIcon"
           size="38"
           padding
-          class="cursor-pointer rounded-lg bg-[var(--nui-card-color)] py-3"
+          class="cursor-pointer rounded-lg bg-(--nui-card-color) py-3"
           @long-click="longPressCount++"
         >
           长按我

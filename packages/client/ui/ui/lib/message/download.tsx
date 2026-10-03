@@ -101,7 +101,7 @@ export const createDownloadMessage = async <T,>(
         }}
         onDragEnd={(_, { offset }) => offset.y < -30 && (minsize.value = true)}
         animate={minsize.value ? 'minsize' : 'maxsize'}
-        class='overflow-hidden bg-(--n-color) shadow-[var(--n-box-shadow)]'
+        class='overflow-hidden bg-(--n-color) shadow-(--n-box-shadow)'
       >
         <Transition
           enterActiveClass='transition-opacity duration-[var(--dc-duration-fast,200ms)] ease-[ease]'

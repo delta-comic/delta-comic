@@ -43,30 +43,24 @@ const BookIcon = () =>
       description="同一个组件统一处理 Vue 图标组件与图片资源两条渲染路径。"
     >
       <div class="grid gap-4 sm:grid-cols-3">
-        <article
-          class="flex items-center gap-4 rounded-xl border border-[var(--nui-divider-color)] p-4"
-        >
+        <article class="flex items-center gap-4 rounded-xl border border-(--nui-divider-color) p-4">
           <DcImagedIcon :icon="SparkIcon" :size-spacing="12" />
           <div>
-            <div class="font-medium text-[var(--nui-text-color-1)]">组件图标</div>
+            <div class="font-medium text-(--nui-text-color-1)">组件图标</div>
             <NTag class="mt-2" size="small" type="success" :bordered="false">Component</NTag>
           </div>
         </article>
-        <article
-          class="flex items-center gap-4 rounded-xl border border-[var(--nui-divider-color)] p-4"
-        >
+        <article class="flex items-center gap-4 rounded-xl border border-(--nui-divider-color) p-4">
           <DcImagedIcon :icon="BookIcon" :size-spacing="12" bg-color="#dbeafe" />
           <div>
-            <div class="font-medium text-[var(--nui-text-color-1)]">自定义背景</div>
+            <div class="font-medium text-(--nui-text-color-1)">自定义背景</div>
             <NTag class="mt-2" size="small" type="info" :bordered="false">bgColor</NTag>
           </div>
         </article>
-        <article
-          class="flex items-center gap-4 rounded-xl border border-[var(--nui-divider-color)] p-4"
-        >
+        <article class="flex items-center gap-4 rounded-xl border border-(--nui-divider-color) p-4">
           <DcImagedIcon :icon="imageIcon" :size-spacing="12" />
           <div>
-            <div class="font-medium text-[var(--nui-text-color-1)]">图片资源</div>
+            <div class="font-medium text-(--nui-text-color-1)">图片资源</div>
             <NTag class="mt-2" size="small" :bordered="false">Image</NTag>
           </div>
         </article>
@@ -78,7 +72,7 @@ const BookIcon = () =>
       title="背景与留白"
       description="不同 spacing 尺寸可用于工具栏、列表头像和强调入口。"
     >
-      <div class="flex flex-wrap items-end gap-6 rounded-xl bg-[var(--nui-action-color)] p-5">
+      <div class="flex flex-wrap items-end gap-6 rounded-xl bg-(--nui-action-color) p-5">
         <div v-for="size in [8, 10, 14, 18]" :key="size" class="text-center">
           <DcImagedIcon
             :icon="size === 14 ? imageIcon : SparkIcon"
@@ -86,7 +80,7 @@ const BookIcon = () =>
             :bg-color="size === 18 ? '#dcfce7' : '#f3f4f6'"
             class="ring-2 ring-white/70"
           />
-          <div class="mt-2 font-mono text-xs text-[var(--nui-text-color-3)]">{{ size }}</div>
+          <div class="mt-2 font-mono text-xs text-(--nui-text-color-3)">{{ size }}</div>
         </div>
       </div>
     </DemoSection>

@@ -9,7 +9,7 @@ const emit = defineEmits<{ openNavigation: [] }>()
 
 <template>
   <header
-    class="z-30 flex h-16 shrink-0 items-center border-b border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]/95 px-4 backdrop-blur sm:px-6"
+    class="z-30 flex h-16 shrink-0 items-center border-b border-(--nui-divider-color) bg-(--nui-card-color)/95 px-4 backdrop-blur sm:px-6"
   >
     <div class="mx-auto flex w-full max-w-[1600px] items-center gap-3">
       <span class="lg:hidden">
@@ -30,14 +30,14 @@ const emit = defineEmits<{ openNavigation: [] }>()
 
       <a href="/" class="flex min-w-0 items-center gap-3 no-underline">
         <span
-          class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[var(--nui-primary-color)] text-lg font-black text-white shadow-sm"
+          class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-(--nui-primary-color) text-lg font-black text-white shadow-sm"
           aria-hidden="true"
         >
           Δ
         </span>
         <span class="min-w-0">
-          <strong class="block truncate text-base text-[var(--nui-text-color-1)]">Delta UI</strong>
-          <span class="hidden truncate text-xs text-[var(--nui-text-color-3)] sm:block">
+          <strong class="block truncate text-base text-(--nui-text-color-1)">Delta UI</strong>
+          <span class="hidden truncate text-xs text-(--nui-text-color-3) sm:block">
             {{ packageName }}
           </span>
         </span>
@@ -46,11 +46,11 @@ const emit = defineEmits<{ openNavigation: [] }>()
       <nav class="ml-8 hidden items-center gap-6 md:flex" aria-label="顶部导航">
         <a
           href="/"
-          class="text-sm font-medium text-[var(--nui-text-color-2)] no-underline transition-colors hover:text-[var(--nui-primary-color)]"
+          class="text-sm font-medium text-(--nui-text-color-2) no-underline transition-colors hover:text-(--nui-primary-color)"
         >
           首页
         </a>
-        <span class="text-sm font-medium text-[var(--nui-primary-color)]">组件</span>
+        <span class="text-sm font-medium text-(--nui-primary-color)">组件</span>
       </nav>
 
       <NInput
@@ -67,7 +67,7 @@ const emit = defineEmits<{ openNavigation: [] }>()
           href="https://github.com/delta-comic/delta-comic"
           target="_blank"
           rel="noreferrer"
-          class="rounded-md px-2 py-1 text-sm font-medium text-[var(--nui-text-color-2)] no-underline transition-colors hover:text-[var(--nui-primary-color)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nui-primary-color)]"
+          class="rounded-md px-2 py-1 text-sm font-medium text-(--nui-text-color-2) no-underline transition-colors hover:text-(--nui-primary-color) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--nui-primary-color)"
         >
           GitHub
         </a>

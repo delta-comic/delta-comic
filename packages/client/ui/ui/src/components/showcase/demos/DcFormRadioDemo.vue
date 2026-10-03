@@ -65,16 +65,16 @@ const emptySelectValue = shallowRef('')
       title="单选按钮组"
       description="comp=radio 使所有 selects 直接可见，适合选项较少的场景。"
     >
-      <div class="space-y-5 rounded-lg bg-[var(--nui-card-color)] p-5">
+      <div class="space-y-5 rounded-lg bg-(--nui-card-color) p-5">
         <label class="grid gap-2">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">阅读模式</span>
+          <span class="text-sm font-medium text-(--nui-text-color-1)">阅读模式</span>
           <DcFormRadio v-model="buttonValue" :config="buttonConfig" />
-          <code class="text-xs text-[var(--nui-text-color-3)]">model: {{ buttonValue }}</code>
+          <code class="text-xs text-(--nui-text-color-3)">model: {{ buttonValue }}</code>
         </label>
         <label class="grid gap-2">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">翻页方向</span>
+          <span class="text-sm font-medium text-(--nui-text-color-1)">翻页方向</span>
           <DcFormRadio v-model="directionValue" :config="compactButtonConfig" />
-          <code class="text-xs text-[var(--nui-text-color-3)]">model: {{ directionValue }}</code>
+          <code class="text-xs text-(--nui-text-color-3)">model: {{ directionValue }}</code>
         </label>
       </div>
       <template #note>每个选项使用 label 显示文案，并把对应 value 写入模型。</template>
@@ -86,15 +86,15 @@ const emptySelectValue = shallowRef('')
       description="comp=select 将相同 selects 投影为可搜索下拉框，placeholder 用于空状态。"
     >
       <div class="grid gap-4 sm:grid-cols-2">
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">有默认值</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">有默认值</span>
           <DcFormRadio v-model="selectValue" :config="selectConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">model: {{ selectValue }}</code>
+          <code class="block text-xs text-(--nui-text-color-3)">model: {{ selectValue }}</code>
         </label>
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">空状态</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">空状态</span>
           <DcFormRadio v-model="emptySelectValue" :config="emptySelectConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">
+          <code class="block text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(emptySelectValue) }}
           </code>
         </label>

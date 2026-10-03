@@ -17,7 +17,7 @@ const scopeQueryModel = computed({ get: () => reader.scopeQuery.value, set: read
 
 <template>
   <section
-    class="flex h-[min(72dvh,48rem)] min-h-[28rem] w-full flex-col overflow-hidden rounded-xl border border-(--dc-border) bg-(--dc-surface)"
+    class="flex h-[min(72dvh,48rem)] min-h-112 w-full flex-col overflow-hidden rounded-xl border border-(--dc-border) bg-(--dc-surface)"
   >
     <header
       class="flex shrink-0 items-start justify-between gap-3 border-b border-(--dc-border) px-3 py-3"

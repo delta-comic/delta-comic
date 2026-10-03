@@ -27,7 +27,7 @@ const visibleGroups = computed(() => {
 </script>
 
 <template>
-  <div class="flex h-full min-h-0 flex-col bg-[var(--nui-card-color)] px-3 py-5">
+  <div class="flex h-full min-h-0 flex-col bg-(--nui-card-color) px-3 py-5">
     <div class="px-2 lg:hidden">
       <NInput v-model:value="keyword" clearable placeholder="搜索组件" aria-label="搜索组件" />
     </div>
@@ -36,7 +36,7 @@ const visibleGroups = computed(() => {
       <nav aria-label="组件导航" class="min-h-0 flex-1 space-y-6 overflow-y-auto px-1">
         <section v-for="entryGroup in visibleGroups" :key="entryGroup.group">
           <h2
-            class="mb-2 px-3 text-xs font-semibold tracking-[0.12em] text-[var(--nui-text-color-3)] uppercase"
+            class="mb-2 px-3 text-xs font-semibold tracking-[0.12em] text-(--nui-text-color-3) uppercase"
           >
             {{ entryGroup.group }} ({{ entryGroup.items.length }})
           </h2>
@@ -45,17 +45,17 @@ const visibleGroups = computed(() => {
               v-for="item in entryGroup.items"
               :key="item.name"
               type="button"
-              class="group relative flex w-full items-center rounded-lg px-3 py-2.5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nui-primary-color)]"
+              class="group relative flex w-full items-center rounded-lg px-3 py-2.5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--nui-primary-color)"
               :class="
                 item.path === activePath
-                  ? 'bg-[color-mix(in_srgb,var(--nui-primary-color)_12%,transparent)] text-[var(--nui-primary-color)]'
-                  : 'text-[var(--nui-text-color-2)] hover:bg-[var(--nui-action-color)] hover:text-[var(--nui-text-color-1)]'
+                  ? 'bg-[color-mix(in_srgb,var(--nui-primary-color)_12%,transparent)] text-(--nui-primary-color)'
+                  : 'text-(--nui-text-color-2) hover:bg-(--nui-action-color) hover:text-(--nui-text-color-1)'
               "
               :aria-current="item.path === activePath ? 'page' : undefined"
               @click="emit('select', item)"
             >
               <span
-                class="absolute inset-y-2 left-0 w-0.5 rounded-full bg-[var(--nui-primary-color)] transition-opacity"
+                class="absolute inset-y-2 left-0 w-0.5 rounded-full bg-(--nui-primary-color) transition-opacity"
                 :class="item.path === activePath ? 'opacity-100' : 'opacity-0'"
               />
               <span class="min-w-0">
@@ -76,7 +76,7 @@ const visibleGroups = computed(() => {
     </div>
 
     <p
-      class="mt-4 border-t border-[var(--nui-divider-color)] px-3 pt-4 text-xs text-[var(--nui-text-color-3)]"
+      class="mt-4 border-t border-(--nui-divider-color) px-3 pt-4 text-xs text-(--nui-text-color-3)"
     >
       Vue 3 · TypeScript · Tailwind CSS
     </p>

@@ -131,7 +131,7 @@ onUnmounted(() => loadController?.abort())
           <NCheckboxGroup v-if="episodes.length" v-model:value="selectedEpisodeIds">
             <div class="grid grid-cols-1 gap-2">
               <NCheckbox v-for="episode in episodes" :key="episode.id" :value="episode.id">
-                <span class="break-words">{{ episode.name }}</span>
+                <span class="wrap-break-word">{{ episode.name }}</span>
               </NCheckbox>
             </div>
           </NCheckboxGroup>

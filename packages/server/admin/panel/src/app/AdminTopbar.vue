@@ -29,7 +29,7 @@ const statusTone = computed<StatusTone>(() => {
 
 <template>
   <header
-    class="admin-topbar h-header border-border bg-topbar sticky top-0 z-10 flex items-center justify-end gap-6 border-b px-7 backdrop-blur-[12px] max-[860px]:justify-between max-[860px]:px-4"
+    class="admin-topbar h-header border-border bg-topbar sticky top-0 z-10 flex items-center justify-end gap-6 border-b px-7 backdrop-blur-md max-[860px]:justify-between max-[860px]:px-4"
   >
     <button
       class="admin-topbar__menu text-foreground hidden border-0 bg-transparent max-[860px]:block"
@@ -44,14 +44,14 @@ const statusTone = computed<StatusTone>(() => {
     >
       <span class="max-[860px]:hidden">当前 API 端点</span>
       <code
-        class="border-border bg-surface-muted text-foreground-secondary max-w-[min(40vw,520px)] overflow-hidden rounded-sm border px-2.5 py-[7px] font-mono text-xs text-ellipsis whitespace-nowrap max-[860px]:max-w-[42vw]"
+        class="border-border bg-surface-muted text-foreground-secondary max-w-[min(40vw,520px)] overflow-hidden rounded-sm border px-2.5 py-1.75 font-mono text-xs text-ellipsis whitespace-nowrap max-[860px]:max-w-[42vw]"
         >{{ apiBaseUrl || '尚未配置' }}</code
       >
     </div>
     <div class="admin-topbar__actions flex items-center gap-5">
       <StatusMark :label="statusLabel" :tone="statusTone" />
       <button
-        class="admin-topbar__settings text-foreground-secondary hover:text-brand flex cursor-pointer items-center gap-[7px] border-0 bg-transparent p-1.5 text-xs"
+        class="admin-topbar__settings text-foreground-secondary hover:text-brand flex cursor-pointer items-center gap-1.75 border-0 bg-transparent p-1.5 text-xs"
         type="button"
         @click="emit('openSettings')"
       >

@@ -26,11 +26,11 @@ const retryableStatuses = new Set<SourceRefreshWarning['status']>([
     >
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="min-w-0 flex-1">
-          <p class="font-medium break-words">{{ warning.taskTitle }}</p>
-          <p v-if="warning.collectionTitle" class="mt-0.5 text-xs break-words opacity-70">
+          <p class="font-medium wrap-break-word">{{ warning.taskTitle }}</p>
+          <p v-if="warning.collectionTitle" class="mt-0.5 text-xs wrap-break-word opacity-70">
             {{ warning.collectionTitle }}
           </p>
-          <p class="mt-1 text-xs break-words">
+          <p class="mt-1 text-xs wrap-break-word">
             {{ t(`download.sourceRefresh.statuses.${warning.status}`) }}
           </p>
           <ul v-if="warning.changes?.length" class="mt-1 list-disc pl-4 text-xs">

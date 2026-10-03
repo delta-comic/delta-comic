@@ -46,7 +46,7 @@ const eventStatus = shallowRef('等待交互')
               :img-prop="{ class: 'h-full object-cover' }"
             />
           </div>
-          <div class="mt-2 text-sm font-medium text-[var(--nui-text-color-1)]">cover</div>
+          <div class="mt-2 text-sm font-medium text-(--nui-text-color-1)">cover</div>
         </article>
         <article>
           <div class="h-44 overflow-hidden rounded-xl bg-slate-200 dark:bg-slate-800">
@@ -58,7 +58,7 @@ const eventStatus = shallowRef('等待交互')
               :img-prop="{ class: 'h-full object-contain' }"
             />
           </div>
-          <div class="mt-2 text-sm font-medium text-[var(--nui-text-color-1)]">contain</div>
+          <div class="mt-2 text-sm font-medium text-(--nui-text-color-1)">contain</div>
         </article>
         <article class="flex flex-col items-center sm:col-span-2 xl:col-span-1">
           <DcImage
@@ -69,7 +69,7 @@ const eventStatus = shallowRef('等待交互')
             class="size-36 bg-slate-200 dark:bg-slate-800"
             :img-prop="{ class: 'size-full object-cover' }"
           />
-          <div class="mt-2 text-sm font-medium text-[var(--nui-text-color-1)]">round</div>
+          <div class="mt-2 text-sm font-medium text-(--nui-text-color-1)">round</div>
         </article>
       </div>
     </DemoSection>
@@ -81,7 +81,7 @@ const eventStatus = shallowRef('等待交互')
     >
       <div class="grid gap-5 sm:grid-cols-2">
         <article
-          class="overflow-hidden rounded-xl border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+          class="overflow-hidden rounded-xl border border-(--nui-divider-color) bg-(--nui-card-color)"
         >
           <DcImage
             :src="brokenUrl"
@@ -93,15 +93,13 @@ const eventStatus = shallowRef('等待交互')
             :img-prop="{ class: 'h-full object-cover' }"
           />
           <div class="p-3">
-            <div class="font-medium text-[var(--nui-text-color-1)]">fallback</div>
-            <div class="mt-1 text-xs text-[var(--nui-text-color-3)]">
-              主资源失败后切换本地回退图
-            </div>
+            <div class="font-medium text-(--nui-text-color-1)">fallback</div>
+            <div class="mt-1 text-xs text-(--nui-text-color-3)">主资源失败后切换本地回退图</div>
           </div>
         </article>
 
         <article
-          class="overflow-hidden rounded-xl border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+          class="overflow-hidden rounded-xl border border-(--nui-divider-color) bg-(--nui-card-color)"
         >
           <DcImage
             :src="brokenUrl"
@@ -119,8 +117,8 @@ const eventStatus = shallowRef('等待交互')
             </template>
           </DcImage>
           <div class="p-3">
-            <div class="font-medium text-[var(--nui-text-color-1)]">自定义状态插槽</div>
-            <div class="mt-1 text-xs text-[var(--nui-text-color-3)]">retryMax = 0</div>
+            <div class="font-medium text-(--nui-text-color-1)">自定义状态插槽</div>
+            <div class="mt-1 text-xs text-(--nui-text-color-3)">retryMax = 0</div>
           </div>
         </article>
       </div>
@@ -151,7 +149,7 @@ const eventStatus = shallowRef('等待交互')
             <NTag type="info" :bordered="false">fetchpriority=high</NTag>
             <NTag :bordered="false">decoding=async</NTag>
           </div>
-          <p class="text-sm text-[var(--nui-text-color-2)]">点击图片观察 click 与预览行为。</p>
+          <p class="text-sm text-(--nui-text-color-2)">点击图片观察 click 与预览行为。</p>
           <NTag size="small" type="warning" :bordered="false">{{ eventStatus }}</NTag>
         </div>
       </div>

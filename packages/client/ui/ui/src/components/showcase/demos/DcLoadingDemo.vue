@@ -12,7 +12,7 @@ import DemoSection from '../DemoSection.vue'
       description="size、color 和 strokeWidth 可以组合出不同层级的加载提示。"
     >
       <div
-        class="flex min-h-36 flex-wrap items-center justify-around gap-8 rounded-lg bg-[var(--nui-card-color)] p-6"
+        class="flex min-h-36 flex-wrap items-center justify-around gap-8 rounded-lg bg-(--nui-card-color) p-6"
       >
         <DcLoading :size="20" color="#18a058" :stroke-width="3" />
         <DcLoading :size="32" color="#2080f0" :stroke-width="5" />
@@ -26,7 +26,7 @@ import DemoSection from '../DemoSection.vue'
       description="默认插槽提供说明文字，vertical 控制排布，spinning 可暂停动画。"
     >
       <div
-        class="grid min-h-36 grid-cols-1 place-items-center gap-8 rounded-lg bg-[var(--nui-card-color)] p-6 sm:grid-cols-3"
+        class="grid min-h-36 grid-cols-1 place-items-center gap-8 rounded-lg bg-(--nui-card-color) p-6 sm:grid-cols-3"
       >
         <DcLoading :size="24" :text-size="13" color="var(--nui-primary-color)">加载章节</DcLoading>
         <DcLoading vertical :size="32" text-size="12px" color="#f0a020">同步书架</DcLoading>

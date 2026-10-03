@@ -32,7 +32,7 @@ const loadManual = async () => {
       <DcAwait :promise="loadAutomatic" auto-load>
         <template #default="{ result, load }">
           <div
-            class="flex min-h-32 flex-col items-center justify-center gap-4 rounded-lg bg-[var(--nui-card-color)] p-6"
+            class="flex min-h-32 flex-col items-center justify-center gap-4 rounded-lg bg-(--nui-card-color) p-6"
           >
             <NTag :type="result ? 'success' : 'warning'">{{ result ?? '等待异步结果…' }}</NTag>
             <NButton size="small" secondary type="primary" @click="load">重新执行</NButton>
@@ -49,9 +49,9 @@ const loadManual = async () => {
       <DcAwait :promise="loadManual">
         <template #default="{ result, load }">
           <div
-            class="flex min-h-32 flex-col items-center justify-center gap-4 rounded-lg bg-[var(--nui-card-color)] p-6"
+            class="flex min-h-32 flex-col items-center justify-center gap-4 rounded-lg bg-(--nui-card-color) p-6"
           >
-            <p class="text-sm text-[var(--nui-text-color-2)]">
+            <p class="text-sm text-(--nui-text-color-2)">
               {{ result ? `${result.title}（id: ${result.id}）` : '尚未请求数据' }}
             </p>
             <NButton type="primary" @click="load">{{ result ? '再次加载' : '开始加载' }}</NButton>

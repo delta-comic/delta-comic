@@ -65,7 +65,7 @@ onScopeDispose(() => disposers.forEach(dispose => dispose()))
       title="同一扩展点注册多个组件"
       description="DcEnvironment 会按注册顺序渲染所有条件成立的组件，并把 args 透传给它们。"
     >
-      <div class="grid gap-3 rounded-lg bg-[var(--nui-card-color)] p-5">
+      <div class="grid gap-3 rounded-lg bg-(--nui-card-color) p-5">
         <DcEnvironment
           name="showcase-banner"
           :args="{ label: '基础注册：始终显示', tone: 'primary' } as any"
@@ -84,12 +84,12 @@ onScopeDispose(() => disposers.forEach(dispose => dispose()))
       description="condition 可以返回 Promise；改变依赖后重新挂载环境即可观察是否匹配。"
     >
       <template #actions>
-        <div class="flex items-center gap-2 text-xs text-[var(--nui-text-color-3)]">
+        <div class="flex items-center gap-2 text-xs text-(--nui-text-color-3)">
           启用条件 <NSwitch v-model:value="showOptional" size="small" />
         </div>
       </template>
       <div
-        class="flex min-h-32 flex-col items-center justify-center gap-4 rounded-lg bg-[var(--nui-card-color)] p-5"
+        class="flex min-h-32 flex-col items-center justify-center gap-4 rounded-lg bg-(--nui-card-color) p-5"
       >
         <DcEnvironment
           :key="String(showOptional)"
@@ -97,7 +97,7 @@ onScopeDispose(() => disposers.forEach(dispose => dispose()))
           :args="{ label: showOptional ? '已通过' : '未通过', tone: 'warning' } as any"
         />
         <NButton size="small" secondary @click="showOptional = !showOptional">切换条件</NButton>
-        <p v-if="!showOptional" class="text-xs text-[var(--nui-text-color-3)]">
+        <p v-if="!showOptional" class="text-xs text-(--nui-text-color-3)">
           当前条件返回 false，因此扩展点为空。
         </p>
       </div>

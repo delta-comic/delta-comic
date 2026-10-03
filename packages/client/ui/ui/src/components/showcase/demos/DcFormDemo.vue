@@ -82,15 +82,13 @@ const overrideValue = ref<FormResult<typeof overrideConfigs>>({ alias: '书架',
       description="一份配置同时生成文本、数字、单选、多选和开关控件。"
     >
       <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_18rem]">
-        <div
-          class="rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)] p-5"
-        >
+        <div class="rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color) p-5">
           <DcForm v-model="generatedValue" :configs="generatedConfigs" />
         </div>
         <div class="min-w-0">
-          <p class="mb-2 text-xs font-semibold text-[var(--nui-text-color-2)]">CURRENT MODEL</p>
+          <p class="mb-2 text-xs font-semibold text-(--nui-text-color-2)">CURRENT MODEL</p>
           <pre
-            class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-[var(--nui-text-color-2)] dark:bg-white/5"
+            class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-(--nui-text-color-2) dark:bg-white/5"
             >{{ JSON.stringify(generatedValue, null, 2) }}</pre>
         </div>
       </div>
@@ -113,7 +111,7 @@ const overrideValue = ref<FormResult<typeof overrideConfigs>>({ alias: '书架',
           </template>
           <template #row="{ modelValue, path, setModelValue }">
             <label class="mb-5 grid gap-2">
-              <span class="text-sm font-medium text-[var(--nui-text-color-1)]">
+              <span class="text-sm font-medium text-(--nui-text-color-1)">
                 自定义行 · {{ path }}
               </span>
               <NInput
@@ -128,7 +126,7 @@ const overrideValue = ref<FormResult<typeof overrideConfigs>>({ alias: '书架',
           </template>
         </DcForm>
         <pre
-          class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-[var(--nui-text-color-2)] dark:bg-white/5"
+          class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-(--nui-text-color-2) dark:bg-white/5"
           >{{ JSON.stringify(overrideValue, null, 2) }}</pre>
       </div>
       <template #note> overrideRow 为 true 时可覆盖全部行；数组模式仅覆盖指定 key。 </template>

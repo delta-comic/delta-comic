@@ -55,7 +55,7 @@ const canInstall = computed(
         </p>
       </div>
       <dl
-        class="m-0 grid grid-cols-2 gap-3 *:min-w-0 *:rounded-[10px] *:bg-[color-mix(in_srgb,var(--dc-surface)_88%,var(--nui-primary-color))] *:p-2.5 max-[520px]:grid-cols-1 [&_dd]:mt-1 [&_dd]:mb-0 [&_dd]:[overflow-wrap:anywhere] [&_dt]:text-xs [&_dt]:text-(--nui-text-color-3)"
+        class="m-0 grid grid-cols-2 gap-3 *:min-w-0 *:rounded-[10px] *:bg-[color-mix(in_srgb,var(--dc-surface)_88%,var(--nui-primary-color))] *:p-2.5 max-[520px]:grid-cols-1 [&_dd]:mt-1 [&_dd]:mb-0 [&_dd]:wrap-anywhere [&_dt]:text-xs [&_dt]:text-(--nui-text-color-3)"
       >
         <div>
           <dt>{{ t('plugin.market.details.installId') }}</dt>

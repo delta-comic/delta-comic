@@ -51,7 +51,7 @@ const query = useQuery({ key: () => ['waterfall-test'], query: async () => items
           >
             {{ option.label }}
           </p>
-          <div class="h-[420px]">
+          <div class="h-105">
             <DcWaterfall
               :source="{ type: 'array' as const, value: items }"
               :col="option.col"
@@ -87,7 +87,7 @@ const query = useQuery({ key: () => ['waterfall-test'], query: async () => items
       description="gap、padding 和 minHeight 决定初始布局；unReloadable 控制下拉刷新能力。"
     >
       <div
-        class="h-[440px] overflow-hidden rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+        class="h-110 overflow-hidden rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color)"
       >
         <DcWaterfall
           :source="{ type: 'query', value: query }"
@@ -99,11 +99,11 @@ const query = useQuery({ key: () => ['waterfall-test'], query: async () => items
         >
           <template #default="{ item, height, minHeight }">
             <article
-              class="rounded-xl border border-dashed border-[var(--nui-divider-color)] bg-[var(--nui-action-color)] p-4"
+              class="rounded-xl border border-dashed border-(--nui-divider-color) bg-(--nui-action-color) p-4"
               :style="{ minHeight: `${item.height}px` }"
             >
-              <strong class="text-sm text-[var(--nui-text-color-1)]">{{ item.title }}</strong>
-              <p class="mt-3 text-xs leading-5 text-[var(--nui-text-color-3)]">
+              <strong class="text-sm text-(--nui-text-color-1)">{{ item.title }}</strong>
+              <p class="mt-3 text-xs leading-5 text-(--nui-text-color-3)">
                 初始 {{ minHeight }}px · 已测量 {{ Math.round(height ?? 0) || '等待' }}
               </p>
             </article>

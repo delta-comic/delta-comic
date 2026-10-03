@@ -42,23 +42,19 @@ const disabledValue = shallowRef(false)
       description="open 和 close 分别定义开启与关闭时的插槽文案。"
     >
       <div class="grid gap-4 sm:grid-cols-2">
-        <label
-          class="flex items-center justify-between gap-4 rounded-lg bg-[var(--nui-card-color)] p-5"
-        >
+        <label class="flex items-center justify-between gap-4 rounded-lg bg-(--nui-card-color) p-5">
           <span>
-            <strong class="block text-sm text-[var(--nui-text-color-1)]">下载状态</strong>
-            <code class="mt-1 block text-xs text-[var(--nui-text-color-3)]">
+            <strong class="block text-sm text-(--nui-text-color-1)">下载状态</strong>
+            <code class="mt-1 block text-xs text-(--nui-text-color-3)">
               model: {{ labeledValue }}
             </code>
           </span>
           <DcFormSwitch v-model="labeledValue" :config="labeledConfig" />
         </label>
-        <label
-          class="flex items-center justify-between gap-4 rounded-lg bg-[var(--nui-card-color)] p-5"
-        >
+        <label class="flex items-center justify-between gap-4 rounded-lg bg-(--nui-card-color) p-5">
           <span>
-            <strong class="block text-sm text-[var(--nui-text-color-1)]">网络状态</strong>
-            <code class="mt-1 block text-xs text-[var(--nui-text-color-3)]">
+            <strong class="block text-sm text-(--nui-text-color-1)">网络状态</strong>
+            <code class="mt-1 block text-xs text-(--nui-text-color-3)">
               model: {{ statusValue }}
             </code>
           </span>
@@ -74,23 +70,19 @@ const disabledValue = shallowRef(false)
       description="不提供 open/close 时呈现紧凑开关，defaultValue 可表达开启或关闭预设。"
     >
       <div class="grid gap-4 sm:grid-cols-2">
-        <label
-          class="flex items-center justify-between gap-4 rounded-lg bg-[var(--nui-card-color)] p-5"
-        >
+        <label class="flex items-center justify-between gap-4 rounded-lg bg-(--nui-card-color) p-5">
           <span>
-            <strong class="block text-sm text-[var(--nui-text-color-1)]">默认开启</strong>
-            <code class="mt-1 block text-xs text-[var(--nui-text-color-3)]">
+            <strong class="block text-sm text-(--nui-text-color-1)">默认开启</strong>
+            <code class="mt-1 block text-xs text-(--nui-text-color-3)">
               model: {{ enabledValue }}
             </code>
           </span>
           <DcFormSwitch v-model="enabledValue" :config="enabledConfig" />
         </label>
-        <label
-          class="flex items-center justify-between gap-4 rounded-lg bg-[var(--nui-card-color)] p-5"
-        >
+        <label class="flex items-center justify-between gap-4 rounded-lg bg-(--nui-card-color) p-5">
           <span>
-            <strong class="block text-sm text-[var(--nui-text-color-1)]">默认关闭</strong>
-            <code class="mt-1 block text-xs text-[var(--nui-text-color-3)]">
+            <strong class="block text-sm text-(--nui-text-color-1)">默认关闭</strong>
+            <code class="mt-1 block text-xs text-(--nui-text-color-3)">
               model: {{ disabledValue }}
             </code>
           </span>

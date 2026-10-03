@@ -4,11 +4,11 @@ defineProps<{ title: string; description?: string }>()
 
 <template>
   <header
-    class="page-header flex min-h-[86px] items-start justify-between gap-6 max-sm:mb-[22px] max-sm:min-h-0"
+    class="page-header flex min-h-21.5 items-start justify-between gap-6 max-sm:mb-5.5 max-sm:min-h-0"
   >
     <div class="page-header__copy">
       <h1
-        class="text-foreground m-0 text-[clamp(26px,2.4vw,34px)] leading-[1.2] font-[720] tracking-[-0.025em] max-sm:text-[27px]"
+        class="text-foreground m-0 text-[clamp(26px,2.4vw,34px)] leading-[1.2] font-[720] tracking-tight max-sm:text-[27px]"
       >
         {{ title }}
       </h1>

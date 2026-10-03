@@ -43,7 +43,7 @@ const showForkSelect = shallowRef(false)
       :active="activeNavigation"
       @create="showForkSelect = true"
     />
-    <main class="h-full min-w-0 overflow-hidden bg-dc-page [&>*]:mx-auto [&>*]:max-w-[1600px]">
+    <main class="h-full min-w-0 overflow-hidden bg-dc-page *:mx-auto *:max-w-[1600px]">
       <RouterView />
     </main>
   </div>

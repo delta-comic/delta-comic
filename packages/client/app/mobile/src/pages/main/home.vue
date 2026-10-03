@@ -61,7 +61,7 @@ const tabs = computed(() => [
           :src="app.activatedUser?.avatar ?? userIcon"
           :fallback="userIcon"
           round
-          :class="[isShowNavBar ? 'translate-y-0' : '-translate-y-[200%]']"
+          :class="[isShowNavBar ? 'translate-y-0' : 'translate-y-[-200%]']"
           class="fixed top-safe-offset-2 ml-1 size-10.25! transition-transform duration-200"
         />
       </Teleport>

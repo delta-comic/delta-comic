@@ -177,7 +177,7 @@ defineSlots<{ default(data: { data?: T }): any }>()
         :animate="animateOn"
         :class="
           cn(
-            'absolute flex scale-100 items-center justify-center bg-[var(--dc-content-indicator-background)] whitespace-nowrap shadow',
+            'absolute flex scale-100 items-center justify-center bg-(--dc-content-indicator-background) whitespace-nowrap shadow',
             isLoadingState && classLoading,
           )
         "

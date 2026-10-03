@@ -61,7 +61,9 @@ const eta = computed(() => (props.task ? formatDuration(taskEta(props.task)) : u
         <section>
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
-              <h2 class="text-base font-semibold break-words text-(--dc-text)">{{ task.title }}</h2>
+              <h2 class="text-base font-semibold wrap-break-word text-(--dc-text)">
+                {{ task.title }}
+              </h2>
               <p class="mt-1 text-xs break-all text-(--dc-text-secondary)">
                 {{ task.relativePath }}
               </p>
@@ -122,7 +124,7 @@ const eta = computed(() => (props.task ? formatDuration(taskEta(props.task)) : u
           class="rounded-lg bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-300"
         >
           <h3 class="font-semibold">{{ t('download.detail.error') }}</h3>
-          <p class="mt-1 break-words">{{ task.errorMessage }}</p>
+          <p class="mt-1 wrap-break-word">{{ task.errorMessage }}</p>
           <p v-if="task.errorCode" class="mt-1 font-mono text-xs">{{ task.errorCode }}</p>
         </section>
 

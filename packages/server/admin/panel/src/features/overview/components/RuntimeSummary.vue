@@ -57,7 +57,7 @@ const formatTime = (value: string | number): string =>
       </div>
       <ul
         v-if="overview.health.issues.length"
-        class="runtime-summary__issues text-warning-foreground mt-4 mb-0 pl-[18px] text-[11px]"
+        class="runtime-summary__issues text-warning-foreground mt-4 mb-0 pl-4.5 text-[11px]"
       >
         <li v-for="issue in overview.health.issues" :key="issue">{{ issue }}</li>
       </ul>

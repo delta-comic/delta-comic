@@ -14,7 +14,7 @@ const jsonUrl = computed(() =>
 </script>
 
 <template>
-  <div class="admin-page openapi-page max-w-[960px]">
+  <div class="admin-page openapi-page max-w-240">
     <PageHeader title="OpenAPI" description="查看 Worker 当前部署版本公开的接口说明与 schema" />
     <NCard title="接口文档" :bordered="true">
       <NAlert type="info" :show-icon="false">

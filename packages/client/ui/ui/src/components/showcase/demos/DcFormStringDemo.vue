@@ -40,17 +40,17 @@ const freeValue = shallowRef('Sci-Fi / 异世界')
       description="defaultValue 可表达预设内容，placeholder 为空值提供输入指引。"
     >
       <div class="grid gap-4 sm:grid-cols-2">
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">预设昵称</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">预设昵称</span>
           <DcFormString v-model="namedValue" :config="namedConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">
+          <code class="block text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(namedValue) }}
           </code>
         </label>
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">可选签名</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">可选签名</span>
           <DcFormString v-model="emptyValue" :config="emptyConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">
+          <code class="block text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(emptyValue) }}
           </code>
         </label>
@@ -64,17 +64,17 @@ const freeValue = shallowRef('Sci-Fi / 异世界')
       description="patten 正则可限制新输入，同时始终允许清空；未配置时接受任意文本。"
     >
       <div class="grid gap-4 sm:grid-cols-2">
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">仅数字</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">仅数字</span>
           <DcFormString v-model="digitsValue" :config="digitsConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">
+          <code class="block text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(digitsValue) }}
           </code>
         </label>
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">不限制内容</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">不限制内容</span>
           <DcFormString v-model="freeValue" :config="freeConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">
+          <code class="block text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(freeValue) }}
           </code>
         </label>

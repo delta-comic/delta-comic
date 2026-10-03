@@ -52,13 +52,13 @@ const requiredValues = reactive({ account: 'delta-reader', note: '' })
       description="DcFormItem 根据 config.type 分派到不同输入控件，并统一标签与路径。"
     >
       <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_16rem]">
-        <NForm :model="typeValues" class="rounded-lg bg-[var(--nui-card-color)] p-5">
+        <NForm :model="typeValues" class="rounded-lg bg-(--nui-card-color) p-5">
           <DcFormItem v-model="typeValues.name" path="name" :config="nameConfig" />
           <DcFormItem v-model="typeValues.count" path="count" :config="countConfig" />
           <DcFormItem v-model="typeValues.enabled" path="enabled" :config="switchConfig" />
         </NForm>
         <pre
-          class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-[var(--nui-text-color-2)] dark:bg-white/5"
+          class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-(--nui-text-color-2) dark:bg-white/5"
           >{{ JSON.stringify(typeValues, null, 2) }}</pre>
       </div>
       <template #note>示例同时覆盖 string、number 与 switch 三种鉴别类型。</template>
@@ -70,12 +70,12 @@ const requiredValues = reactive({ account: 'delta-reader', note: '' })
       description="required 会传递给表单项布局；info 作为标签，placeholder 描述输入预期。"
     >
       <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_16rem]">
-        <NForm :model="requiredValues" class="rounded-lg bg-[var(--nui-card-color)] p-5">
+        <NForm :model="requiredValues" class="rounded-lg bg-(--nui-card-color) p-5">
           <DcFormItem v-model="requiredValues.account" path="account" :config="requiredConfig" />
           <DcFormItem v-model="requiredValues.note" path="note" :config="optionalConfig" />
         </NForm>
         <pre
-          class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-[var(--nui-text-color-2)] dark:bg-white/5"
+          class="overflow-auto rounded-lg bg-black/5 p-4 text-xs leading-5 text-(--nui-text-color-2) dark:bg-white/5"
           >{{ JSON.stringify(requiredValues, null, 2) }}</pre>
       </div>
       <template #note>未声明 required 时组件按必填处理；显式 false 会移除必填标识。</template>

@@ -31,13 +31,13 @@ const pageInfo = computed(
 
 <template>
   <NScrollbar class="h-full!">
-    <div class="mx-auto flex w-full max-w-[1440px] items-start">
+    <div class="mx-auto flex w-full max-w-360 items-start">
       <article class="min-w-0 flex-1 px-4 py-8 sm:px-8 sm:py-12 lg:px-12">
-        <header class="mb-8 border-b border-[var(--nui-divider-color)] pb-7">
-          <h1 class="text-3xl font-bold tracking-tight text-[var(--nui-text-color-1)] sm:text-4xl">
+        <header class="mb-8 border-b border-(--nui-divider-color) pb-7">
+          <h1 class="text-3xl font-bold tracking-tight text-(--nui-text-color-1) sm:text-4xl">
             {{ pageInfo.label }}
           </h1>
-          <p class="mt-4 max-w-3xl text-base leading-7 text-[var(--nui-text-color-2)]">
+          <p class="mt-4 max-w-3xl text-base leading-7 text-(--nui-text-color-2)">
             {{ pageInfo.description }}
           </p>
           <div v-if="pageInfo.tags.length" class="mt-5 flex flex-wrap gap-2">
@@ -51,13 +51,13 @@ const pageInfo = computed(
       </article>
 
       <aside class="sticky top-0 hidden w-56 shrink-0 px-6 py-12 2xl:block">
-        <p class="mb-3 text-sm font-semibold text-[var(--nui-text-color-1)]">本页内容</p>
-        <nav aria-label="本页内容" class="space-y-1 border-l border-[var(--nui-divider-color)]">
+        <p class="mb-3 text-sm font-semibold text-(--nui-text-color-1)">本页内容</p>
+        <nav aria-label="本页内容" class="space-y-1 border-l border-(--nui-divider-color)">
           <a
             v-for="section in pageInfo.sections"
             :key="section.id"
             :href="`#${section.id}`"
-            class="block border-l border-transparent px-4 py-1.5 text-sm text-[var(--nui-text-color-3)] no-underline transition-colors hover:border-[var(--nui-primary-color)] hover:text-[var(--nui-primary-color)]"
+            class="block border-l border-transparent px-4 py-1.5 text-sm text-(--nui-text-color-3) no-underline transition-colors hover:border-(--nui-primary-color) hover:text-(--nui-primary-color)"
           >
             {{ section.label }}
           </a>

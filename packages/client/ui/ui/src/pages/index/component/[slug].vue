@@ -18,7 +18,7 @@ const DemoComponent = computed(() => (entry.value ? getShowcaseDemo(entry.value.
   <Suspense v-if="DemoComponent">
     <component :is="DemoComponent" />
     <template #fallback>
-      <div class="flex min-h-64 items-center justify-center text-sm text-[var(--nui-text-color-3)]">
+      <div class="flex min-h-64 items-center justify-center text-sm text-(--nui-text-color-3)">
         正在加载组件示例…
       </div>
     </template>

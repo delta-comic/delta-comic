@@ -50,17 +50,15 @@ const floatValue = shallowRef(1.25)
       description="range 同时设置 min 与 max，可表达正数区间或包含负数的范围。"
     >
       <div class="grid gap-4 sm:grid-cols-2">
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">并发数 · 1–8</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">并发数 · 1–8</span>
           <DcFormNumber v-model="boundedValue" :config="boundedConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]"
-            >model: {{ boundedValue }}</code
-          >
+          <code class="block text-xs text-(--nui-text-color-3)">model: {{ boundedValue }}</code>
         </label>
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">偏移 · -10–10</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">偏移 · -10–10</span>
           <DcFormNumber v-model="signedValue" :config="signedConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">model: {{ signedValue }}</code>
+          <code class="block text-xs text-(--nui-text-color-3)">model: {{ signedValue }}</code>
         </label>
       </div>
       <template #note>清空按钮会把当前模型更新为空值；上下界由输入控件直接约束。</template>
@@ -72,17 +70,15 @@ const floatValue = shallowRef(1.25)
       description="float=false 将 precision 固定为 0，float=true 则保留输入小数。"
     >
       <div class="grid gap-4 sm:grid-cols-2">
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">整数章节</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">整数章节</span>
           <DcFormNumber v-model="integerValue" :config="integerConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]"
-            >model: {{ integerValue }}</code
-          >
+          <code class="block text-xs text-(--nui-text-color-3)">model: {{ integerValue }}</code>
         </label>
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">小数缩放</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">小数缩放</span>
           <DcFormNumber v-model="floatValue" :config="floatConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">model: {{ floatValue }}</code>
+          <code class="block text-xs text-(--nui-text-color-3)">model: {{ floatValue }}</code>
         </label>
       </div>
       <template #note>小数示例同时使用 0.5–3 的范围，便于区分精度与边界两个配置。</template>

@@ -66,20 +66,18 @@ onScopeDispose(destroyMessage)
       title="可控状态消息"
       description="创建一个持续展示的 loading，再将同一个实例更新为成功或失败状态。"
     >
-      <div
-        class="rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)] p-4 sm:p-5"
-      >
+      <div class="rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color) p-4 sm:p-5">
         <div class="grid gap-4 md:grid-cols-3">
           <label class="space-y-2">
-            <span class="block text-xs font-medium text-[var(--nui-text-color-2)]">加载文本</span>
+            <span class="block text-xs font-medium text-(--nui-text-color-2)">加载文本</span>
             <NInput v-model:value="loadingText" placeholder="加载中的提示" />
           </label>
           <label class="space-y-2">
-            <span class="block text-xs font-medium text-[var(--nui-text-color-2)]">成功文本</span>
+            <span class="block text-xs font-medium text-(--nui-text-color-2)">成功文本</span>
             <NInput v-model:value="successText" placeholder="成功提示" />
           </label>
           <label class="space-y-2">
-            <span class="block text-xs font-medium text-[var(--nui-text-color-2)]">失败文本</span>
+            <span class="block text-xs font-medium text-(--nui-text-color-2)">失败文本</span>
             <NInput v-model:value="failText" placeholder="失败提示" />
           </label>
         </div>

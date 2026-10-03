@@ -36,7 +36,7 @@ const { t } = useI18n()
       <NEmpty
         v-if="!loading && items.length === 0 && !error"
         :description="t('plugin.market.empty')"
-        class="min-h-[260px] justify-center"
+        class="min-h-65 justify-center"
       />
 
       <TransitionGroup

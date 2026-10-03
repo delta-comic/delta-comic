@@ -13,7 +13,7 @@ const formatTime = (value: number): string =>
 <template>
   <section class="activity-panel min-w-0">
     <header
-      class="activity-panel__header border-border flex items-center justify-between border-b px-[22px] pt-5 pb-3.5"
+      class="activity-panel__header border-border flex items-center justify-between border-b px-5.5 pt-5 pb-3.5"
     >
       <h2 class="m-0 text-[15px] font-[650]">最近插件活动</h2>
       <RouterLink class="text-brand text-xs" to="/plugins?tab=activity">查看全部</RouterLink>
@@ -45,6 +45,6 @@ const formatTime = (value: number): string =>
         </tbody>
       </table>
     </div>
-    <div v-else class="admin-empty activity-panel__empty min-h-[250px]">暂无插件操作记录</div>
+    <div v-else class="admin-empty activity-panel__empty min-h-62.5">暂无插件操作记录</div>
   </section>
 </template>

@@ -49,15 +49,15 @@ const dottedValue = shallowRef('2026.07.17')
       description="time=true 选择纯日期，time=false 同时采集日期和时间。"
     >
       <div class="grid gap-4 sm:grid-cols-2">
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">纯日期</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">纯日期</span>
           <DcFormDate v-model="dateValue" :config="dateConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">model: {{ dateValue }}</code>
+          <code class="block text-xs text-(--nui-text-color-3)">model: {{ dateValue }}</code>
         </label>
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">日期时间</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">日期时间</span>
           <DcFormDate v-model="dateTimeValue" :config="dateTimeConfig" />
-          <code class="block text-xs break-all text-[var(--nui-text-color-3)]">
+          <code class="block text-xs break-all text-(--nui-text-color-3)">
             model: {{ dateTimeValue }}
           </code>
         </label>
@@ -73,15 +73,15 @@ const dottedValue = shallowRef('2026.07.17')
       description="同一日期模式可使用不同 format，v-model 会直接反映字符串差异。"
     >
       <div class="grid gap-4 sm:grid-cols-2">
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">MM/dd/yyyy</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">MM/dd/yyyy</span>
           <DcFormDate v-model="slashValue" :config="slashConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">model: {{ slashValue }}</code>
+          <code class="block text-xs text-(--nui-text-color-3)">model: {{ slashValue }}</code>
         </label>
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">yyyy.MM.dd</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">yyyy.MM.dd</span>
           <DcFormDate v-model="dottedValue" :config="dottedConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">model: {{ dottedValue }}</code>
+          <code class="block text-xs text-(--nui-text-color-3)">model: {{ dottedValue }}</code>
         </label>
       </div>
       <template #note>input-readonly 会阻止手动输入不符合格式的文本，日期由面板选择。</template>

@@ -40,7 +40,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="admin-page observability-page max-w-[1440px]">
+  <div class="admin-page observability-page max-w-360">
     <PageHeader
       title="运行指标"
       description="来自 D1 固定低基数查询的实时快照；不伪造 Worker uptime 或内存指标"
@@ -54,10 +54,10 @@ onMounted(() => {
     <div v-if="error" class="admin-error">{{ error }}</div>
     <section
       v-if="data"
-      class="observability-page__layout grid grid-cols-[minmax(0,1fr)_330px] gap-[22px] max-[1040px]:grid-cols-1"
+      class="observability-page__layout grid grid-cols-[minmax(0,1fr)_330px] gap-5.5 max-[1040px]:grid-cols-1"
     >
       <div class="admin-panel observability-page__metrics">
-        <header class="border-border flex items-center justify-between border-b px-5 py-[18px]">
+        <header class="border-border flex items-center justify-between border-b px-5 py-4.5">
           <h2 class="m-0 text-[15px]">数据规模</h2>
           <span class="text-muted-foreground text-[11px]">单位：count</span>
         </header>
@@ -65,7 +65,7 @@ onMounted(() => {
           <article
             v-for="metric in data.metrics"
             :key="metric.key"
-            class="border-border grid min-h-[150px] content-center border-r border-b p-5"
+            class="border-border grid min-h-37.5 content-center border-r border-b p-5"
           >
             <div class="text-foreground-secondary flex items-center justify-between gap-2 text-xs">
               <span>{{ metric.label }}</span>
@@ -82,10 +82,10 @@ onMounted(() => {
         </div>
       </div>
       <div class="admin-panel observability-page__readiness self-start pb-5">
-        <header class="border-border flex items-center justify-between border-b px-5 py-[18px]">
+        <header class="border-border flex items-center justify-between border-b px-5 py-4.5">
           <h2 class="m-0 text-[15px]">就绪检查</h2>
         </header>
-        <div class="mx-5 mt-[18px]">
+        <div class="mx-5 mt-4.5">
           <StatusMark
             :label="
               data.health.ready
@@ -104,7 +104,7 @@ onMounted(() => {
           />
         </div>
         <dl
-          class="text-foreground-secondary mx-5 mt-[18px] grid grid-cols-[1fr_auto] gap-[11px] text-[11px]"
+          class="text-foreground-secondary mx-5 mt-4.5 grid grid-cols-[1fr_auto] gap-2.75 text-[11px]"
         >
           <template v-for="(configured, key) in data.health.requiredSecrets" :key="key">
             <dt>{{ key }}</dt>
@@ -113,7 +113,7 @@ onMounted(() => {
         </dl>
         <NAlert
           v-if="data.health.issues.length"
-          class="mx-5 mt-[18px]"
+          class="mx-5 mt-4.5"
           type="warning"
           title="需要处理"
         >
@@ -122,7 +122,7 @@ onMounted(() => {
       </div>
     </section>
     <section class="admin-panel mt-5">
-      <header class="border-border flex items-center justify-between border-b px-5 py-[18px]">
+      <header class="border-border flex items-center justify-between border-b px-5 py-4.5">
         <div>
           <h2 class="m-0 text-[15px]">Worker 诊断快照</h2>
           <p class="text-muted-foreground mt-1 mb-0 text-[11px]">

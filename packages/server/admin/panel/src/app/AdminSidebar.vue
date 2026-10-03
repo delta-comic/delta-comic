@@ -32,7 +32,7 @@ const emit = defineEmits<{ close: []; navigate: [path: string] }>()
       <button
         v-for="item in items"
         :key="item.path"
-        class="admin-sidebar__item rounded-panel text-foreground-secondary hover:bg-surface-muted hover:text-brand relative flex min-h-11 cursor-pointer items-center gap-3.5 border-0 bg-transparent px-3.5 text-left text-sm before:absolute before:inset-y-2 before:-left-2.5 before:w-[3px] before:content-['']"
+        class="admin-sidebar__item rounded-panel text-foreground-secondary hover:bg-surface-muted hover:text-brand relative flex min-h-11 cursor-pointer items-center gap-3.5 border-0 bg-transparent px-3.5 text-left text-sm before:absolute before:inset-y-2 before:-left-2.5 before:w-0.75 before:content-['']"
         :class="[
           selectedPath === item.path &&
             'admin-sidebar__item--selected bg-brand-soft text-brand before:bg-brand font-[630]',
@@ -46,7 +46,7 @@ const emit = defineEmits<{ close: []; navigate: [path: string] }>()
     </nav>
 
     <div
-      class="admin-sidebar__footer border-border text-muted-foreground mt-auto flex items-center gap-2.5 border-t px-[22px] py-[18px] text-xs"
+      class="admin-sidebar__footer border-border text-muted-foreground mt-auto flex items-center gap-2.5 border-t px-5.5 py-4.5 text-xs"
     >
       <span
         class="admin-sidebar__status-dot bg-success size-2 rounded-[1px]"

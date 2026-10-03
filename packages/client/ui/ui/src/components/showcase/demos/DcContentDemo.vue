@@ -59,7 +59,7 @@ const retainedSources = [
         </NRadioGroup>
       </template>
       <div
-        class="h-72 overflow-hidden rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+        class="h-72 overflow-hidden rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color)"
       >
         <DcContent
           :source="stateSource"
@@ -72,7 +72,7 @@ const retainedSources = [
               <article
                 v-for="item in data"
                 :key="item"
-                class="rounded-lg bg-[var(--nui-action-color)] p-4 text-sm text-[var(--nui-text-color-1)]"
+                class="rounded-lg bg-(--nui-action-color) p-4 text-sm text-(--nui-text-color-1)"
               >
                 {{ item }}
               </article>
@@ -92,11 +92,11 @@ const retainedSources = [
         <article
           v-for="item in retainedSources"
           :key="item.label"
-          class="h-44 overflow-hidden rounded-lg border border-[var(--nui-divider-color)] bg-[var(--nui-card-color)]"
+          class="h-44 overflow-hidden rounded-lg border border-(--nui-divider-color) bg-(--nui-card-color)"
         >
           <DcContent :source="item.source" class="p-5">
             <template #default="{ data }">
-              <p class="text-xs text-[var(--nui-text-color-3)]">{{ item.label }}</p>
+              <p class="text-xs text-(--nui-text-color-3)">{{ item.label }}</p>
               <div class="mt-4 flex flex-wrap gap-2">
                 <NTag v-for="value in data" :key="value" :bordered="false">{{ value }}</NTag>
               </div>
@@ -133,9 +133,9 @@ const retainedSources = [
           :key="item.label"
           v-bind="item.props"
           :source="item.source as any"
-          class="flex h-28 items-center justify-center rounded-lg border border-dashed border-[var(--nui-divider-color)]"
+          class="flex h-28 items-center justify-center rounded-lg border border-dashed border-(--nui-divider-color)"
         >
-          <span class="text-xs text-[var(--nui-text-color-3)]">{{ item.label }}：由上层呈现</span>
+          <span class="text-xs text-(--nui-text-color-3)">{{ item.label }}：由上层呈现</span>
         </DcContent>
       </div>
     </DemoSection>

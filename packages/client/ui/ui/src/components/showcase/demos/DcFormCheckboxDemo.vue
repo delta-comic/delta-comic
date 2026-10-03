@@ -66,18 +66,18 @@ const broadSelectValue = ref<string[]>(['author', 'rating'])
       title="复选框组"
       description="comp=checkbox 直接展开 selects，模型以字符串数组保存所有选中值。"
     >
-      <div class="space-y-5 rounded-lg bg-[var(--nui-card-color)] p-5">
+      <div class="space-y-5 rounded-lg bg-(--nui-card-color) p-5">
         <label class="grid gap-2">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">预选功能</span>
+          <span class="text-sm font-medium text-(--nui-text-color-1)">预选功能</span>
           <DcFormCheckbox v-model="groupValue" :config="groupConfig" />
-          <code class="text-xs text-[var(--nui-text-color-3)]">
+          <code class="text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(groupValue) }}
           </code>
         </label>
         <label class="grid gap-2">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">无预选</span>
+          <span class="text-sm font-medium text-(--nui-text-color-1)">无预选</span>
           <DcFormCheckbox v-model="emptyGroupValue" :config="emptyGroupConfig" />
-          <code class="text-xs text-[var(--nui-text-color-3)]">
+          <code class="text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(emptyGroupValue) }}
           </code>
         </label>
@@ -91,17 +91,17 @@ const broadSelectValue = ref<string[]>(['author', 'rating'])
       description="comp=multipleSelect 使用可搜索的虚拟多选列表，适合选项较多的配置。"
     >
       <div class="grid gap-4 sm:grid-cols-2">
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">内容类型</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">内容类型</span>
           <DcFormCheckbox v-model="selectValue" :config="selectConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">
+          <code class="block text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(selectValue) }}
           </code>
         </label>
-        <label class="space-y-2 rounded-lg bg-[var(--nui-card-color)] p-4">
-          <span class="text-sm font-medium text-[var(--nui-text-color-1)]">显示字段</span>
+        <label class="space-y-2 rounded-lg bg-(--nui-card-color) p-4">
+          <span class="text-sm font-medium text-(--nui-text-color-1)">显示字段</span>
           <DcFormCheckbox v-model="broadSelectValue" :config="broadSelectConfig" />
-          <code class="block text-xs text-[var(--nui-text-color-3)]">
+          <code class="block text-xs text-(--nui-text-color-3)">
             model: {{ JSON.stringify(broadSelectValue) }}
           </code>
         </label>

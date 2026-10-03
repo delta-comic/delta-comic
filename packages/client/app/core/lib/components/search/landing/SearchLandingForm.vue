@@ -14,7 +14,7 @@ onMounted(() => input.value?.focus())
 
 <template>
   <form
-    class="sticky top-0 z-10 grid min-h-[calc(var(--dc-page-header-height)+var(--safe-area-inset-top))] grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-2 border-b border-dc-border bg-[color-mix(in_srgb,var(--dc-surface)_94%,transparent)] [padding:var(--safe-area-inset-top)_12px_0] backdrop-blur-2xl"
+    class="sticky top-0 z-10 grid min-h-[calc(var(--dc-page-header-height)+var(--safe-area-inset-top))] grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-2 border-b border-dc-border bg-[color-mix(in_srgb,var(--dc-surface)_94%,transparent)] p-[var(--safe-area-inset-top)_12px_0] backdrop-blur-2xl"
     action="/"
     @submit.prevent="emit('submit')"
   >
