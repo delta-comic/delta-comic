@@ -23,7 +23,7 @@ impl TracingBridge {
     let mut filter = Targets::new().with_default(LevelFilter::INFO);
     if cfg!(debug_assertions) {
       for target in ["app", "plugin", "database", "downloader"] {
-        filter = filter.with_target(target, LevelFilter::DEBUG);
+        filter = filter.with_target(target, LevelFilter::INFO);
       }
     }
     tracing_subscriber::registry()

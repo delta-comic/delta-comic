@@ -29,6 +29,7 @@ interface TauriLoggerOptions {
   maxQueueSize?: number
   rpc?: LoggerRpc
   native?: boolean
+  forwardToNative?: boolean
 }
 
 const isTauriRuntime = () => typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
@@ -36,6 +37,7 @@ const isTauriRuntime = () => typeof window !== 'undefined' && '__TAURI_INTERNALS
 /** Batched, non-blocking client for the native logger plugin. */
 export class TauriLoggerClient implements LoggerTransport {
   public readonly native: boolean
+  public readonly forwardToNative: boolean
   private readonly batchSize: number
   private readonly flushIntervalMs: number
   private readonly maxQueueSize: number
@@ -47,6 +49,7 @@ export class TauriLoggerClient implements LoggerTransport {
 
   constructor(options: TauriLoggerOptions = {}) {
     this.native = options.native ?? (Boolean(options.rpc) || isTauriRuntime())
+    this.forwardToNative = options.forwardToNative ?? true
     this.rpc = options.rpc ?? createTauRPCProxy().logger
     this.batchSize = Math.max(1, options.batchSize ?? 64)
     this.flushIntervalMs = Math.max(0, options.flushIntervalMs ?? 40)
@@ -54,7 +57,7 @@ export class TauriLoggerClient implements LoggerTransport {
   }
 
   public write(entries: readonly LogEntry[]): void {
-    if (!this.native || this.disposed || entries.length === 0) return
+    if (!this.native || !this.forwardToNative || this.disposed || entries.length === 0) return
     const remaining = this.maxQueueSize - this.queue.length
     if (remaining > 0) this.queue.push(...entries.slice(-remaining))
     if (this.queue.length >= this.batchSize) void this.flush()
@@ -63,7 +66,7 @@ export class TauriLoggerClient implements LoggerTransport {
 
   public async flush(): Promise<void> {
     this.clearTimer()
-    if (!this.native) return
+    if (!this.native || !this.forwardToNative) return
     if (this.inFlight) {
       await this.inFlight
       if (this.queue.length > 0) await this.flush()
