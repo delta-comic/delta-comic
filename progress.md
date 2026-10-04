@@ -18,6 +18,7 @@
 - 删除存在性断言后，将依赖这些值的可选调用改为非空调用，保持缺失行为在运行时失败；保留协议、边界、失败路径、生命周期和渲染断言。desktop/mobile 的同源测试继续保留，以覆盖独立构建入口。
 - `vp run lib-build`、受影响专项测试（80 tests，单独 db 测试 1 test）、`vp check --fix`、`vp run -r typecheck` 和 `git diff --check` 通过。
 - 全量 `vp test run`：169 files / 898 tests 通过，4 个文件 / 8 个测试失败；失败位于未修改的 UI Tailwind 类名断言和 release workspace 的 `@delta-comic/http` 发布配置。
+- 已签名提交 `cd1d47a2`（测试清理）与 `4c0ed81c`（覆盖率阈值调整），提交后工作树清洁。
 
 ## 会话记录
 
