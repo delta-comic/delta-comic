@@ -24,13 +24,10 @@
     "@commitlint/config-conventional": "catalog:",
     "@semantic-release/changelog": "catalog:",
     "@semantic-release/release-notes-generator": "catalog:",
-    "@typescript-eslint/parser": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vue/test-utils": "catalog:",
     "commitlint-plugin-cspell": "catalog:",
     "cspell": "catalog:",
-    "eslint": "catalog:",
-    "eslint-plugin-vue": "catalog:",
     "happy-dom": "catalog:",
     "kysely": "catalog:",
     "oxlint-tsgolint": "catalog:",
@@ -39,8 +36,7 @@
     "twlinter": "catalog:",
     "typebox": "catalog:",
     "typescript": "catalog:",
-    "vite-plus": "catalog:",
-    "vue-eslint-parser": "catalog:"
+    "vite-plus": "catalog:"
   },
   "badges": [
     {

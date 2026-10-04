@@ -3,6 +3,7 @@
     ".agents/**",
     "components.d.ts",
     "typed-router.d.ts",
+    "bindings.ts",
     "**/permissions/**",
     "**/worker-configuration.d.ts",
     "*.md",

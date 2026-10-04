@@ -25,8 +25,6 @@ export default defineConfig({
       'check': { command: 'vp check', cache: { output: [] } },
       'dev': { command: 'vp run mobile#dev', cache: false },
       'dev:web': { command: 'vp run mobile#dev:web', cache: false },
-      'lint:vue': { command: "vp exec eslint 'packages/**/*.vue' --max-warnings 0", cache: false },
-      'lint:tailwind': { command: 'vp exec twlinter --config .twlintrc.json', cache: false },
       'lib-build': {
         command: 'node -e ""',
         dependsOn: ['@delta-comic/http#build', 'mobile#build', 'desktop#build'],

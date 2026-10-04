@@ -1,24 +1,25 @@
 {
-  "plugins": ["unicorn", "typescript", "vue"],
-  "categories": { "correctness": "error" },
-  "rules": { "no-thenable": "allow" },
-  "settings": {
-    "jsx-a11y": { "components": {}, "attributes": {} },
-    "next": { "rootDir": [] },
-    "jsdoc": {
-      "ignorePrivate": false,
-      "ignoreInternal": false,
-      "ignoreReplacesDocs": true,
-      "overrideReplacesDocs": true,
-      "augmentsExtendsReplacesDocs": false,
-      "implementsReplacesDocs": false,
-      "exemptDestructuredRootsFromChecks": false,
-      "tagNamePreference": {}
-    },
-    "vitest": { "typecheck": true }
+  "jsPlugins": [
+    "twlinter"
+  ],
+  "plugins": [
+    "unicorn",
+    "typescript",
+    "vue"
+  ],
+  "categories": {
+    "correctness": "error"
   },
-  "env": { "builtin": true },
-  "globals": {},
+  "rules": {
+    "twlinter/no-duplicate-utilities": "error",
+    "twlinter/suggestCanonicalClasses": "error",
+    "no-thenable": "allow"
+  },
+  "settings": {
+    "vitest": {
+      "typecheck": true
+    }
+  },
   "ignorePatterns": [
     ".agents",
     ".vscode",
@@ -28,6 +29,8 @@
     "**/_lib/**",
     "packages/client/app/*/public/runtime/**"
   ],
-  "overrides": [],
-  "options": { "typeAware": false, "typeCheck": false }
+  "options": {
+    "typeAware": false,
+    "typeCheck": false
+  }
 }
