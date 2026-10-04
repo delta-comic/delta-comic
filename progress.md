@@ -10,6 +10,15 @@
 
 # Delta Comic 架构重构规划进度
 
+## 2026-10-04 — 测试质量审计
+
+- 已确认用户修改的覆盖率阈值位于 `vite.config.ts`，保持不动。
+- Luna 扫描约 173 个 TS 测试文件及 Rust/Kotlin 测试；未发现应整文件删除的高置信度套件。
+- 删除仅验证存在性的 `PluginManifestSchema`、数据库实例、Web dialect、动态 slot、`DcImage.imageIns` 断言；删除 desktop/mobile App、Router、平台适配中的冗余存在性与 void 返回断言；删除 server admin 路由中仅检查 not-found 组件存在的独立用例。
+- 删除存在性断言后，将依赖这些值的可选调用改为非空调用，保持缺失行为在运行时失败；保留协议、边界、失败路径、生命周期和渲染断言。desktop/mobile 的同源测试继续保留，以覆盖独立构建入口。
+- `vp run lib-build`、受影响专项测试（80 tests，单独 db 测试 1 test）、`vp check --fix`、`vp run -r typecheck` 和 `git diff --check` 通过。
+- 全量 `vp test run`：169 files / 898 tests 通过，4 个文件 / 8 个测试失败；失败位于未修改的 UI Tailwind 类名断言和 release workspace 的 `@delta-comic/http` 发布配置。
+
 ## 会话记录
 
 ### 2026-10-02 — 收敛文档与生命周期残留

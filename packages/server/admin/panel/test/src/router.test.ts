@@ -16,10 +16,4 @@ describe('admin router', () => {
   it('restores scroll position to the page origin', () => {
     expect(router.options.scrollBehavior?.({} as any, {} as any, null)).toEqual({ left: 0, top: 0 })
   })
-
-  it('exposes the resolved not-found page', () => {
-    const route = router.getRoutes().find(item => item.name === 'not-found')!
-    const component = route.components?.default
-    expect(component).toBeDefined()
-  })
 })

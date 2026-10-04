@@ -81,7 +81,7 @@ describe('TauriLoggerClient', () => {
     const client = new TauriLoggerClient({ invoke, native: false })
 
     client.write([entry('web')])
-    await expect(client.flush()).resolves.toBeUndefined()
+    await client.flush()
     await expect(client.listLogFiles()).rejects.toThrow('unavailable in a web browser')
     expect(invoke).not.toHaveBeenCalled()
   })
@@ -94,6 +94,6 @@ describe('TauriLoggerClient', () => {
     })
 
     client.write([entry('safe')])
-    await expect(client.flush()).resolves.toBeUndefined()
+    await client.flush()
   })
 })

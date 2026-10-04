@@ -232,7 +232,7 @@ describe('PluginMarketplaceContainer', () => {
 
     resolveInstall!()
     await flushPromises()
-    await expect(install).resolves.toBeUndefined()
+    await install
 
     expect(marketplaceMocks.refreshInstalled).toHaveBeenCalledTimes(1)
     expect(mocks.message.success).toHaveBeenCalledWith('plugin.market.messages.installed')
@@ -250,7 +250,7 @@ describe('PluginMarketplaceContainer', () => {
     const options = mocks.dialog.warning.mock.calls[0][0] as DialogInstance
     const install = options.onPositiveClick!()
 
-    await expect(install).resolves.toBeUndefined()
+    await install
     await flushPromises()
     expect(mocks.message.error).toHaveBeenCalledWith('download failed')
     expect(mocks.message.success).not.toHaveBeenCalled()

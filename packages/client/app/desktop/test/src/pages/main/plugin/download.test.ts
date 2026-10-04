@@ -151,7 +151,7 @@ describe('plugin download page', () => {
     resolveInstall!()
     await flushPromises()
 
-    await expect(install).resolves.toBeUndefined()
+    await install
     expect(installButtons(wrapper)[0].attributes('disabled')).toBeUndefined()
   })
 
@@ -198,7 +198,7 @@ describe('plugin download page', () => {
     const options = mocks.dialog.create.mock.calls[0][0] as DialogInstance
     const install = options.onPositiveClick!()
 
-    await expect(install).resolves.toBeUndefined()
+    await install
     await flushPromises()
     expect(installButtons(wrapper)[0].attributes('disabled')).toBeUndefined()
   })

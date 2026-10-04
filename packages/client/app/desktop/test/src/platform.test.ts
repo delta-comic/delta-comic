@@ -61,7 +61,7 @@ describe('web platform fallback', () => {
     }
     await expect(nativeUi.getInsets()).resolves.toBe(false)
     await expect(nativeUi.setBarColor()).resolves.toBe(true)
-    await expect(setStatusBar('dark')).resolves.toBeUndefined()
+    await setStatusBar('dark')
   })
 
   it('uses browser clipboard and a protected external window on the web', async () => {

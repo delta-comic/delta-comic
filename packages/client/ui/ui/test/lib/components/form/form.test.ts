@@ -152,7 +152,6 @@ describe('individual form controls', () => {
     expect((dynamic.props('onCreate') as () => unknown)()).toEqual(initial[0])
 
     const slot = dynamic.vm.$slots.default?.({ value: initial[0] })
-    expect(slot).toBeDefined()
     const rendered = mount(defineComponent(() => () => slot as any))
     const inputs = rendered.findAllComponents({ name: 'Input' })
     expect(inputs.map(input => input.props('placeholder'))).toEqual([

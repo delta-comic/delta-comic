@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
 
-import { isPluginManifest, parsePluginManifest, PluginManifestSchema } from '../lib/index.js'
+import { isPluginManifest, parsePluginManifest } from '../lib/index.js'
 
 const manifest = {
   protocolVersion: 2,
@@ -16,7 +16,6 @@ describe('@delta-comic/plugin-manifest', () => {
   it('validates and parses a manifest', () => {
     expect(isPluginManifest(manifest)).toBe(true)
     expect(parsePluginManifest(manifest)).toMatchObject({ id: 'demo' })
-    expect(PluginManifestSchema).toBeDefined()
   })
 
   it('rejects malformed manifests', () => {

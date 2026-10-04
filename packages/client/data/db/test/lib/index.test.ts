@@ -16,9 +16,8 @@ describe('db entry', () => {
       throw new Error(`unexpected IPC command: ${command}`)
     })
 
-    const { db } = await import('../../lib/index')
+    await import('../../lib/index')
 
-    expect(db).toBeDefined()
     expect(calls).toEqual([{ command: 'plugin:sql|load', payload: { db: 'sqlite:app.db' } }])
   })
 })

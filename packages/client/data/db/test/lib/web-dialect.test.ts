@@ -18,12 +18,11 @@ import { createWebDialect, WEB_SCHEMA_STATEMENTS } from '../../lib/web'
 
 describe('web database dialect', () => {
   it('enables foreign keys and applies the complete schema to new connections', async () => {
-    const dialect = createWebDialect()
+    createWebDialect()
     const executeQuery = vi.fn(async () => ({ rows: [{ name: 'config' }] }))
 
     await mocks.dialectOptions.onCreateConnection({ executeQuery })
 
-    expect(dialect).toBeDefined()
     expect(mocks.dialectOptions).toMatchObject({ fileName: 'delta-comic.db', preferOPFS: true })
     expect(mocks.raw).toHaveBeenNthCalledWith(1, 'PRAGMA foreign_keys = ON')
     expect(mocks.raw).toHaveBeenCalledTimes(WEB_SCHEMA_STATEMENTS.length + 2)

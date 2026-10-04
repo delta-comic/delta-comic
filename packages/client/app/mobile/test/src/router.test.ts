@@ -89,9 +89,7 @@ describe('application router', () => {
       .mockResolvedValueOnce('aborted' as never)
       .mockResolvedValueOnce(undefined)
 
-    await expect(
-      router.force.push({ path: '/default-a', query: { source: 'test' } }),
-    ).resolves.toBeUndefined()
+    await router.force.push({ path: '/default-a', query: { source: 'test' } })
 
     expect(push).toHaveBeenCalledTimes(2)
     expect(push.mock.calls[0][0]).toMatchObject({
@@ -121,10 +119,9 @@ describe('application router', () => {
           preload: unknown,
         ) => Promise<unknown>)
       | undefined
-    expect(routeToContent).toBeDefined()
     const preload = { id: 'preload' }
 
-    await routeToContent?.(['reader', 'comic'], 'comic id', 'chapter 1', preload)
+    await routeToContent!(['reader', 'comic'], 'comic id', 'chapter 1', preload)
 
     expect(contentLoad).toHaveBeenCalledExactlyOnceWith(
       ['reader', 'comic'],
@@ -148,10 +145,8 @@ describe('application router', () => {
           sort: string | undefined,
         ) => Promise<unknown>)
       | undefined
-    expect(routeToSearch).toBeDefined()
-
-    await routeToSearch?.('search text', ['reader', 'title'], 'popular')
-    await routeToSearch?.('fallback', undefined, undefined)
+    await routeToSearch!('search text', ['reader', 'title'], 'popular')
+    await routeToSearch!('fallback', undefined, undefined)
 
     expect(forcePush).toHaveBeenNthCalledWith(1, {
       name: '/search/[keyword]/[sort]/[method]',

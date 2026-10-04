@@ -216,9 +216,7 @@ describe('App share-token orchestration', () => {
     expect(router.push).toHaveBeenCalledExactlyOnceWith('/library?tab=recent')
     expect(downloads.connect).toHaveBeenCalledOnce()
     const pushShareToken = definitions.get('pushShareToken')
-    expect(pushShareToken).toBeDefined()
-
-    await pushShareToken?.('delta://shared/42')
+    await pushShareToken!('delta://shared/42')
     clipboard.read.mockResolvedValue('delta://shared/42')
     await intervalCallbacks[0]?.()
 

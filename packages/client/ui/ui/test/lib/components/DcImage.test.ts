@@ -88,7 +88,6 @@ describe('DcImage', () => {
 
     expect(resource.getUrl).toHaveBeenCalledOnce()
     expect(wrapper.getComponent(ImageStub).props('src')).toBe('https://cdn.example/resource.jpg')
-    expect((wrapper.vm as any).imageIns).toBeDefined()
   })
 
   it('retries transient errors and records terminal string-source failures', async () => {
