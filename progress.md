@@ -26,6 +26,8 @@
 - 删除 `DcTab`、基础组件、下拉刷新、虚拟瀑布流、配置提供器、Markdown、UI utils 和 admin shared components 中的类名、精确布局 style、主题 CSS 字符串和 Tailwind 合并实现断言；删除 `tailwind-components.test.ts` 样式架构约束套件。
 - 保留文本、事件、aria/role、data 属性、状态机、可见项顺序、导航和资源行为断言。UI/admin 专项 55 tests、类型检查和 `vp check --fix` 通过。
 - 全量 `vp test run`：171 files / 898 tests 通过，2 个文件 / 5 个测试失败；剩余失败全部来自未修改的 `@delta-comic/http` 发布配置检查。
+- 将 `packages/client/platform/http/package.json` 标记为 `private`，明确 HTTP bridge 不参与 npm 发布；release workspace 与 semantic-release 7 项测试全部通过。
+- 修复后全量 `vp test run` 通过：172 files / 901 tests；`vp check --fix` 通过且无 lint 警告，`git diff --check` 通过。
 
 ## 会话记录
 

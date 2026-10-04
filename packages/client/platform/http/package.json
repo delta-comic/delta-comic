@@ -1,6 +1,7 @@
 {
   "name": "@delta-comic/http",
   "version": "3.0.0-next.19",
+  "private": true,
   "description": "Delta Comic internal HTTP and CORS fetch bridge",
   "license": "AGPL-3.0-only",
   "author": {
