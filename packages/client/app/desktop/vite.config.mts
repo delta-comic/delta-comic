@@ -85,7 +85,7 @@ export default defineConfig(
             }),
             vueDevTools(),
             vue({
-              features: { vapor: !process.env.VITEST },
+              features: { vapor: false },
               template: { compilerOptions: { isCustomElement: tag => tag.startsWith('media-') } },
             }),
             vueJsx(),
