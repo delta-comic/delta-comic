@@ -65,9 +65,8 @@ reqwest = { workspace = true, features = ["cookies"] }
 serde.workspace = true
 serde_json.workspace = true
 specta.workspace = true
-specta-typescript.workspace = true
 tauri.workspace = true
-tauri-specta.workspace = true
+taurpc.workspace = true
 thiserror.workspace = true
 tokio = { workspace = true, features = ["sync", "macros"] }
 tracing = { workspace = true, optional = true }

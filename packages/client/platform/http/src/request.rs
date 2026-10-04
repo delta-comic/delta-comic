@@ -6,14 +6,14 @@ use specta::Type;
 
 use crate::{GlobalState, InstanceKey, Result};
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DangerousSettings {
   pub(crate) accept_invalid_certs: bool,
   pub(crate) accept_invalid_hostnames: bool,
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ContentConfig {
   pub(crate) method: String,
@@ -24,7 +24,7 @@ pub struct ContentConfig {
   pub(crate) client: ClientConfig,
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ClientConfig {
   #[specta(type = Option<f64>)]
@@ -37,7 +37,7 @@ pub struct ClientConfig {
   pub(crate) instance_key: InstanceKey,
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Proxy {
   pub(crate) all: Option<UrlOrConfig>,
@@ -71,7 +71,7 @@ impl ProxyHashKey {
   }
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 #[serde(untagged)]
 pub enum UrlOrConfig {
@@ -79,7 +79,7 @@ pub enum UrlOrConfig {
   Config(ProxyConfig),
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ProxyConfig {
   pub(crate) url: String,
@@ -87,7 +87,7 @@ pub struct ProxyConfig {
   pub(crate) no_proxy: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 pub struct BasicAuth {
   pub(crate) username: String,
   pub(crate) password: String,

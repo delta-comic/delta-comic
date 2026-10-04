@@ -1,4 +1,3 @@
-import type { InvokeArgs } from '@tauri-apps/api/core'
 import { mockIPC } from '@tauri-apps/api/mocks'
 import { describe, expect, it } from 'vite-plus/test'
 
@@ -6,7 +5,7 @@ import { CORSFetch, GLOBAL_INSTANCE_KEY } from './index'
 
 interface IpcCall {
   cmd: string
-  payload?: InvokeArgs
+  payload?: unknown
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -39,7 +38,7 @@ describe('CORSFetch', () => {
 
     const clientCall = calls.find(
       call =>
-        call.cmd === 'plugin:http|prepare_requester' &&
+        call.cmd === 'TauRPC__http.prepare_requester' &&
         isRecord(call.payload) &&
         'client' in call.payload,
     )
@@ -69,7 +68,7 @@ describe('CORSFetch', () => {
       secure: true,
     })
 
-    const cookieCall = calls.find(call => call.cmd === 'plugin:http|set_cookie')
+    const cookieCall = calls.find(call => call.cmd === 'TauRPC__http.set_cookie')
 
     expect(cookieCall?.payload).toEqual({
       config: {

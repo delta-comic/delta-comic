@@ -1,4 +1,3 @@
-import type { InvokeArgs } from '@tauri-apps/api/core'
 import { mockIPC } from '@tauri-apps/api/mocks'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
@@ -7,7 +6,7 @@ import type { CORSFetchConfig } from './fetch'
 
 interface IpcCall {
   cmd: string
-  payload?: InvokeArgs
+  payload?: unknown
 }
 
 function createConfig(config: Partial<CORSFetchConfig> = {}): CORSFetchConfig {
@@ -31,11 +30,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function getContentConfig(call: IpcCall) {
-  if (!isRecord(call.payload) || !isRecord(call.payload.contentConfig)) {
+  if (!isRecord(call.payload) || !isRecord(call.payload.content_config)) {
     throw new TypeError('missing contentConfig payload')
   }
 
-  return call.payload.contentConfig
+  return call.payload.content_config
 }
 
 describe('createCORSFetch', () => {
@@ -57,17 +56,17 @@ describe('createCORSFetch', () => {
     const calls: IpcCall[] = []
     const encoder = new TextEncoder()
     const chunks = [
-      new Uint8Array([...encoder.encode('proxied'), 0]).buffer,
-      new Uint8Array([1]).buffer,
+      { bytes: Array.from(encoder.encode('proxied')), done: false },
+      { bytes: [], done: true },
     ]
 
     mockIPC((cmd, payload) => {
       calls.push({ cmd, payload })
 
       switch (cmd) {
-        case 'plugin:http|fetch':
+        case 'TauRPC__http.fetch':
           return 1
-        case 'plugin:http|fetch_send':
+        case 'TauRPC__http.fetch_send':
           return {
             headers: [['content-type', 'text/plain']],
             rid: 2,
@@ -75,10 +74,10 @@ describe('createCORSFetch', () => {
             statusText: 'Created',
             url: 'https://api.example.com/items',
           }
-        case 'plugin:http|fetch_read_body':
+        case 'TauRPC__http.fetch_read_body':
           return chunks.shift()
-        case 'plugin:http|fetch_cancel':
-        case 'plugin:http|fetch_cancel_body':
+        case 'TauRPC__http.fetch_cancel':
+        case 'TauRPC__http.fetch_cancel_body':
           return undefined
         default:
           throw new Error(`unexpected IPC command: ${cmd}`)
@@ -98,7 +97,7 @@ describe('createCORSFetch', () => {
     expect(response.headers.get('content-type')).toBe('text/plain')
     await expect(response.text()).resolves.toBe('proxied')
 
-    const fetchCall = calls.find(call => call.cmd === 'plugin:http|fetch')
+    const fetchCall = calls.find(call => call.cmd === 'TauRPC__http.fetch')
     expect(fetchCall).toBeDefined()
 
     const contentConfig = getContentConfig(fetchCall!)
@@ -109,6 +108,6 @@ describe('createCORSFetch', () => {
     })
     expect(contentConfig.data).toEqual(Array.from(encoder.encode('hello')))
     expect(contentConfig.headers).toContainEqual(['x-test', '1'])
-    expect(calls.filter(call => call.cmd === 'plugin:http|fetch_read_body')).toHaveLength(2)
+    expect(calls.filter(call => call.cmd === 'TauRPC__http.fetch_read_body')).toHaveLength(2)
   })
 })

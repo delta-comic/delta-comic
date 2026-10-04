@@ -1,7 +1,7 @@
 import { isDate, isNumber, merge } from 'es-toolkit'
 
 import {
-  commands,
+  createTauRPCProxy,
   type ClearCookiesConfig,
   type ClientConfig,
   type CookieEntry,
@@ -11,9 +11,16 @@ import {
   type GetCookieConfig,
   type SetCookieConfig,
 } from './bindings'
+
 import { createCORSFetch } from './fetch'
 import type { CORSFetchConfig, CORSFetchInit } from './fetch'
 import { createCORSXMLHttpRequestConstructor } from './xhr'
+
+let commands: ReturnType<typeof createTauRPCProxy>['http'] | undefined
+
+function getCommands() {
+  return (commands ??= createTauRPCProxy().http)
+}
 
 declare global {
   interface Window {
@@ -56,7 +63,7 @@ export class CORSFetch {
 
     console.debug('Create cors instance.', instanceKey)
     const prepareConfig: ClientConfig = cors.config.request
-    await commands.prepareRequester(prepareConfig)
+    await getCommands().prepare_requester(prepareConfig)
 
     if (instanceKey == GLOBAL_INSTANCE_KEY && !window.CORSFetch) {
       const corsFetch = cors.fetch.bind(cors)
@@ -101,7 +108,7 @@ export class CORSFetch {
 
   public setConfig(newConfig: DeepPartial<CORSFetchConfig>): Promise<void> {
     merge(this._config, newConfig)
-    return commands.prepareRequester(this._config.request).catch(() => {})
+    return getCommands().prepare_requester(this._config.request).catch(() => {})
   }
 
   public fetch(
@@ -118,7 +125,7 @@ export class CORSFetch {
       content,
       instanceKey: this.config.request.instanceKey,
     }
-    return commands.setCookie(config).then(() => undefined)
+    return getCommands().set_cookie(config).then(() => undefined)
   }
 
   public getCookie(url: string | URL, name: string): Promise<string | null> {
@@ -127,7 +134,7 @@ export class CORSFetch {
       name,
       instanceKey: this.config.request.instanceKey,
     }
-    return commands.getCookie(config)
+    return getCommands().get_cookie(config)
   }
 
   public getAllDomainCookies(url: string | URL): Promise<CookieEntry[]> {
@@ -135,12 +142,12 @@ export class CORSFetch {
       url: String(url),
       instanceKey: this.config.request.instanceKey,
     }
-    return commands.getAllDomainCookies(config)
+    return getCommands().get_all_domain_cookies(config)
   }
 
   public getAllCookies(): Promise<CookieEntry[]> {
     const config: GetAllCookiesConfig = { instanceKey: this.config.request.instanceKey }
-    return commands.getAllCookies(config)
+    return getCommands().get_all_cookies(config)
   }
 
   public deleteCookie(url: string | URL, path = '/', name: string): Promise<boolean> {
@@ -150,12 +157,12 @@ export class CORSFetch {
       path,
       instanceKey: this.config.request.instanceKey,
     }
-    return commands.deleteCookie(config)
+    return getCommands().delete_cookie(config)
   }
 
   public clearCookie(): Promise<void> {
     const config: ClearCookiesConfig = { instanceKey: this.config.request.instanceKey }
-    return commands.clearCookie(config).then(() => undefined)
+    return getCommands().clear_cookie(config).then(() => undefined)
   }
 
   public setCookieByParts(

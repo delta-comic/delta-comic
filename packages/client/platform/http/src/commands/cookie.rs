@@ -2,11 +2,10 @@ use crate::{GlobalState, InstanceKey};
 use reqwest::cookie::CookieStore;
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::{Runtime, State, Webview, command};
 #[warn(unused_imports)]
 use tracing::warn;
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct SetCookieConfig {
   #[specta(type = String)]
@@ -15,13 +14,7 @@ pub struct SetCookieConfig {
   instance_key: InstanceKey,
 }
 
-#[command]
-#[specta::specta]
-pub async fn set_cookie<R: Runtime>(
-  _webview: Webview<R>,
-  state: State<'_, GlobalState>,
-  config: SetCookieConfig,
-) -> crate::Result<()> {
+pub async fn set_cookie(state: &GlobalState, config: SetCookieConfig) -> crate::Result<()> {
   let mut header_value = reqwest::header::HeaderValue::from_str(&config.content)?;
   header_value.set_sensitive(true);
   let mut header_values = std::iter::once(&header_value);
@@ -33,7 +26,7 @@ pub async fn set_cookie<R: Runtime>(
   Ok(())
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCookieConfig {
   #[specta(type = String)]
@@ -42,11 +35,8 @@ pub struct GetCookieConfig {
   instance_key: InstanceKey,
 }
 
-#[command]
-#[specta::specta]
-pub async fn get_cookie<R: Runtime>(
-  _webview: Webview<R>,
-  state: State<'_, GlobalState>,
+pub async fn get_cookie(
+  state: &GlobalState,
   config: GetCookieConfig,
 ) -> crate::Result<Option<String>> {
   Ok(
@@ -58,7 +48,7 @@ pub async fn get_cookie<R: Runtime>(
   )
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAllDomainCookiesConfig {
   #[specta(type = String)]
@@ -66,7 +56,7 @@ pub struct GetAllDomainCookiesConfig {
   instance_key: InstanceKey,
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CookieEntry {
   domain: String,
@@ -74,11 +64,8 @@ pub struct CookieEntry {
   value: String,
 }
 
-#[command]
-#[specta::specta]
-pub async fn get_all_domain_cookies<R: Runtime>(
-  _webview: Webview<R>,
-  state: State<'_, GlobalState>,
+pub async fn get_all_domain_cookies(
+  state: &GlobalState,
   config: GetAllDomainCookiesConfig,
 ) -> crate::Result<Vec<CookieEntry>> {
   let cookies = state
@@ -98,17 +85,14 @@ pub async fn get_all_domain_cookies<R: Runtime>(
   )
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAllCookiesConfig {
   instance_key: String,
 }
 
-#[command]
-#[specta::specta]
-pub async fn get_all_cookies<R: Runtime>(
-  _webview: Webview<R>,
-  state: State<'_, GlobalState>,
+pub async fn get_all_cookies(
+  state: &GlobalState,
   config: GetAllCookiesConfig,
 ) -> crate::Result<Vec<CookieEntry>> {
   let cookies = state
@@ -128,7 +112,7 @@ pub async fn get_all_cookies<R: Runtime>(
   )
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteCookieConfig {
   #[specta(type = String)]
@@ -138,13 +122,7 @@ pub struct DeleteCookieConfig {
   instance_key: String,
 }
 
-#[command]
-#[specta::specta]
-pub async fn delete_cookie<R: Runtime>(
-  _webview: Webview<R>,
-  state: State<'_, GlobalState>,
-  config: DeleteCookieConfig,
-) -> crate::Result<bool> {
+pub async fn delete_cookie(state: &GlobalState, config: DeleteCookieConfig) -> crate::Result<bool> {
   Ok(
     state
       .cookies_jar
@@ -158,19 +136,13 @@ pub async fn delete_cookie<R: Runtime>(
   )
 }
 
-#[derive(Debug, Deserialize, Serialize, Type)]
+#[derive(Debug, Deserialize, Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ClearCookiesConfig {
   instance_key: String,
 }
 
-#[command]
-#[specta::specta]
-pub async fn clear_cookie<R: Runtime>(
-  _webview: Webview<R>,
-  state: State<'_, GlobalState>,
-  config: ClearCookiesConfig,
-) -> crate::Result<()> {
+pub async fn clear_cookie(state: &GlobalState, config: ClearCookiesConfig) -> crate::Result<()> {
   Ok(
     state
       .cookies_jar

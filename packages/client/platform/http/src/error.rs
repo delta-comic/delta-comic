@@ -27,6 +27,8 @@ pub enum Error {
   SchemeNotSupport(String),
   #[error("User cancelled the request")]
   RequestCanceled,
+  #[error("request resource not found")]
+  RequestNotFound,
   #[error("failed to process data url")]
   DataUrlError,
   #[error("failed to decode data url into bytes")]

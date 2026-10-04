@@ -8,55 +8,45 @@ use http::{Method, StatusCode, header};
 use serde::Serialize;
 use specta::Type;
 use std::{future::Future, pin::Pin, sync::Arc, time::Duration};
-use tauri::{
-  Manager, ResourceId, ResourceTable, Runtime, State, Webview, async_runtime::Mutex, command,
-};
+use tauri::async_runtime::Mutex;
 use tokio::sync::oneshot::{Receiver, Sender, channel};
 use tracing::Level;
-
-struct ReqwestResponse(reqwest::Response);
-impl tauri::Resource for ReqwestResponse {}
 
 type CancelableResponseResult = Result<reqwest::Response>;
 type CancelableResponseFuture =
   Pin<Box<dyn Future<Output = CancelableResponseResult> + Send + Sync>>;
 
-const BODY_CHUNK_CONTINUES: u8 = 0;
-const BODY_CHUNK_DONE: u8 = 1;
-
-struct FetchRequest {
+pub(crate) struct FetchRequest {
   fut: Mutex<CancelableResponseFuture>,
   abort_tx: Mutex<Option<Sender<()>>>,
   abort_rx: Mutex<Option<Receiver<()>>>,
 }
-impl tauri::Resource for FetchRequest {}
 
-trait AddRequest {
-  fn add_request(&mut self, fut: CancelableResponseFuture) -> ResourceId;
+pub(crate) fn create_request(fut: CancelableResponseFuture) -> Arc<FetchRequest> {
+  let (tx, rx) = channel::<()>();
+
+  Arc::new(FetchRequest {
+    fut: Mutex::new(fut),
+    abort_tx: Mutex::new(Some(tx)),
+    abort_rx: Mutex::new(Some(rx)),
+  })
 }
 
-impl AddRequest for ResourceTable {
-  fn add_request(&mut self, fut: CancelableResponseFuture) -> ResourceId {
-    let (tx, rx) = channel::<()>();
-
-    let req = FetchRequest {
-      fut: Mutex::new(fut),
-      abort_tx: Mutex::new(Some(tx)),
-      abort_rx: Mutex::new(Some(rx)),
-    };
-
-    self.add(req)
-  }
-}
-
-#[derive(Serialize, Type)]
+#[derive(Serialize, Type, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchResponse {
   status: u16,
   status_text: String,
   headers: Vec<(String, String)>,
   url: String,
-  rid: ResourceId,
+  rid: u32,
+}
+
+#[derive(Serialize, Type, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct BodyChunk {
+  pub bytes: Vec<u8>,
+  pub done: bool,
 }
 
 struct DataUrlContent {
@@ -165,7 +155,7 @@ fn response_metadata(res: &reqwest::Response) -> Result<FetchResponseMetadata> {
   })
 }
 
-fn create_fetch_response(metadata: FetchResponseMetadata, rid: ResourceId) -> FetchResponse {
+fn create_fetch_response(metadata: FetchResponseMetadata, rid: u32) -> FetchResponse {
   FetchResponse {
     status: metadata.status.as_u16(),
     status_text: metadata
@@ -179,24 +169,7 @@ fn create_fetch_response(metadata: FetchResponseMetadata, rid: ResourceId) -> Fe
   }
 }
 
-fn encode_body_chunk(chunk: bytes::Bytes) -> Vec<u8> {
-  let mut encoded = Vec::with_capacity(chunk.len() + 1);
-  encoded.extend_from_slice(&chunk);
-  encoded.push(BODY_CHUNK_CONTINUES);
-  encoded
-}
-
-fn encode_body_done() -> Vec<u8> {
-  vec![BODY_CHUNK_DONE]
-}
-
-#[command]
-#[specta::specta]
-pub fn prepare_requester<R: Runtime>(
-  _webview: Webview<R>,
-  state: State<'_, GlobalState>,
-  client: ClientConfig,
-) {
+pub fn prepare_requester(state: &GlobalState, client: ClientConfig) {
   let jar =
     create_cookie_jar(&state.cache_dir, &client.instance_key).expect("fail to create cookie jar.");
   state
@@ -205,13 +178,7 @@ pub fn prepare_requester<R: Runtime>(
   request::prepare_requester(&state, &client);
 }
 
-#[command]
-#[specta::specta]
-pub async fn fetch<R: Runtime>(
-  webview: Webview<R>,
-  state: State<'_, GlobalState>,
-  content_config: ContentConfig,
-) -> crate::Result<ResourceId> {
+pub async fn fetch(state: &GlobalState, content_config: ContentConfig) -> crate::Result<u32> {
   if tracing::enabled!(Level::DEBUG) {
     tracing::debug!(
       "Fetch config\n{}",
@@ -220,19 +187,18 @@ pub async fn fetch<R: Runtime>(
   }
 
   let fut = create_fetch_future(&state, content_config)?;
-  let mut resources_table = webview.resources_table();
-  let rid = resources_table.add_request(fut);
+  let rid = state.next_request_id();
+  state.requests.insert(rid, create_request(fut));
 
   Ok(rid)
 }
 
-#[command]
-#[specta::specta]
-pub async fn fetch_cancel<R: Runtime>(webview: Webview<R>, rid: ResourceId) -> crate::Result<()> {
-  let req = {
-    let resources_table = webview.resources_table();
-    resources_table.get::<FetchRequest>(rid)?
-  };
+pub async fn fetch_cancel(state: &GlobalState, rid: u32) -> crate::Result<()> {
+  let req = state
+    .requests
+    .get(&rid)
+    .ok_or(Error::RequestNotFound)?
+    .clone();
 
   let mut abort_tx_guard = req.abort_tx.lock().await;
   if let Some(tx) = abort_tx_guard.take() {
@@ -242,16 +208,12 @@ pub async fn fetch_cancel<R: Runtime>(webview: Webview<R>, rid: ResourceId) -> c
   Ok(())
 }
 
-#[command]
-#[specta::specta]
-pub async fn fetch_send<R: Runtime>(
-  webview: Webview<R>,
-  rid: ResourceId,
-) -> crate::Result<FetchResponse> {
-  let req = {
-    let resources_table = webview.resources_table();
-    resources_table.get::<FetchRequest>(rid)?
-  };
+pub async fn fetch_send(state: &GlobalState, rid: u32) -> crate::Result<FetchResponse> {
+  let req = state
+    .requests
+    .get(&rid)
+    .ok_or(Error::RequestNotFound)?
+    .clone();
 
   let abort_rx = {
     let mut rx_guard = req.abort_rx.lock().await;
@@ -263,8 +225,7 @@ pub async fn fetch_send<R: Runtime>(
   let res = tokio::select! {
     res = fut.as_mut() => res?,
     _ = abort_rx => {
-      let mut resources_table = webview.resources_table();
-      resources_table.close(rid)?;
+      state.requests.remove(&rid);
       return Err(Error::RequestCanceled);
     }
   };
@@ -274,50 +235,39 @@ pub async fn fetch_send<R: Runtime>(
 
   let metadata = response_metadata(&res)?;
 
-  let mut resources_table = webview.resources_table();
-  let rid = resources_table.add(ReqwestResponse(res));
+  state.requests.remove(&rid);
+  let response_rid = state.next_response_id();
+  state
+    .responses
+    .insert(response_rid, Arc::new(Mutex::new(res)));
 
-  Ok(create_fetch_response(metadata, rid))
+  Ok(create_fetch_response(metadata, response_rid))
 }
 
-#[command]
-pub async fn fetch_read_body<R: Runtime>(
-  webview: Webview<R>,
-  rid: ResourceId,
-) -> crate::Result<tauri::ipc::Response> {
-  let res = {
-    let resources_table = webview.resources_table();
-    resources_table.get::<ReqwestResponse>(rid)?
-  };
-
-  // SAFETY: we can access the inner value mutably
-  // because we are the only ones with a reference to it
-  // and we don't want to use `Arc::into_inner` because we want to keep the value in the table
-  // for potential future calls to `fetch_cancel_body`
-  let res_ptr = Arc::as_ptr(&res) as *mut ReqwestResponse;
-  let res = unsafe { &mut *res_ptr };
-  let res = &mut res.0;
+pub async fn fetch_read_body(state: &GlobalState, rid: u32) -> crate::Result<BodyChunk> {
+  let res = state
+    .responses
+    .get(&rid)
+    .ok_or(Error::RequestNotFound)?
+    .clone();
+  let mut res = res.lock().await;
 
   let Some(chunk) = res.chunk().await? else {
-    let mut resources_table = webview.resources_table();
-    resources_table.close(rid)?;
-
-    // return a response with a single byte to indicate that the body is empty
-    return Ok(tauri::ipc::Response::new(encode_body_done()));
+    state.responses.remove(&rid);
+    return Ok(BodyChunk {
+      bytes: Vec::new(),
+      done: true,
+    });
   };
 
-  // append a 0 byte to indicate that the body is not empty
-  Ok(tauri::ipc::Response::new(encode_body_chunk(chunk)))
+  Ok(BodyChunk {
+    bytes: chunk.to_vec(),
+    done: false,
+  })
 }
 
-#[command]
-#[specta::specta]
-pub async fn fetch_cancel_body<R: Runtime>(
-  webview: Webview<R>,
-  rid: ResourceId,
-) -> crate::Result<()> {
-  let mut resources_table = webview.resources_table();
-  resources_table.close(rid)?;
+pub async fn fetch_cancel_body(state: &GlobalState, rid: u32) -> crate::Result<()> {
+  state.responses.remove(&rid);
   Ok(())
 }
 
@@ -369,14 +319,5 @@ mod tests {
         .headers
         .contains(&("x-test".to_string(), "ok".to_string()))
     );
-  }
-
-  #[test]
-  fn encodes_body_chunks_with_stream_markers() {
-    assert_eq!(
-      encode_body_chunk(bytes::Bytes::from_static(b"abc")),
-      b"abc\0"
-    );
-    assert_eq!(encode_body_done(), vec![1]);
   }
 }

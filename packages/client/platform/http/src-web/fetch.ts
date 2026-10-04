@@ -1,7 +1,12 @@
-import { invoke } from '@tauri-apps/api/core'
 import { AbortError, isString } from 'es-toolkit'
 
-import { commands, type ClientConfig, type ContentConfig } from './bindings'
+import { createTauRPCProxy, type ClientConfig, type ContentConfig } from './bindings'
+
+let commands: ReturnType<typeof createTauRPCProxy>['http'] | undefined
+
+function getCommands() {
+  return (commands ??= createTauRPCProxy().http)
+}
 
 export interface CORSFetchConfig {
   include: (string | RegExp)[]
@@ -83,12 +88,10 @@ async function readStream(
       chunkBuffer.length < streamConfig.bufferSize &&
       totalBufferedBytes.value < streamConfig.maxBufferBytes
     ) {
-      const data = await invoke<ArrayBuffer>('plugin:http|fetch_read_body', { rid: responseRid })
-      const dataUint8 = new Uint8Array(data)
-      const lastByte = dataUint8[dataUint8.byteLength - 1]
-      const actualData = dataUint8.subarray(0, dataUint8.byteLength - 1)
+      const data = await getCommands().fetch_read_body(responseRid!)
+      const actualData = new Uint8Array(data.bytes)
 
-      if (lastByte === 1) {
+      if (data.done) {
         if (chunkBuffer.length > 0) {
           const combined = combineChunks(chunkBuffer, totalBufferedBytes.value)
           controller.enqueue(combined)
@@ -154,12 +157,12 @@ export function createCORSFetch(getConfig: () => CORSFetchConfig) {
       signal?.removeEventListener('abort', onAbort)
 
       if (responseRid !== null) {
-        commands.fetchCancelBody(responseRid).catch(() => {})
+        getCommands().fetch_cancel_body(responseRid).catch(() => {})
         responseRid = null
       }
 
       if (rid !== null) {
-        commands.fetchCancel(rid).catch(() => {})
+        getCommands().fetch_cancel(rid).catch(() => {})
         rid = null
       }
     }
@@ -181,7 +184,7 @@ export function createCORSFetch(getConfig: () => CORSFetchConfig) {
         client: config.request,
       }
 
-      rid = await commands.fetch(contentConfig)
+      rid = await getCommands().fetch(contentConfig)
 
       if (signal?.aborted) throw cancelError
 
@@ -191,7 +194,7 @@ export function createCORSFetch(getConfig: () => CORSFetchConfig) {
         url,
         headers: responseHeaders,
         rid: _rid,
-      } = await commands.fetchSend(rid)
+      } = await getCommands().fetch_send(rid)
       responseRid = _rid
 
       if (signal?.aborted) throw cancelError
