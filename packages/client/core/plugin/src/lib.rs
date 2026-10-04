@@ -36,7 +36,10 @@ pub fn export_bindings(
     std::process::id()
   ));
   taurpc::Exporter::new().export(&commands::PluginApiImpl.into_handler(), &temp_path)?;
-  let generated = fs::read(&temp_path)?;
+  let mut generated = fs::read(&temp_path)?;
+  while generated.ends_with(b"\n\n") {
+    generated.pop();
+  }
   let current = fs::read(path).unwrap_or_default();
   if generated != current {
     fs::write(path, generated)?;

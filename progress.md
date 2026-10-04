@@ -532,3 +532,10 @@
 - 清理自有插件 command handler、旧权限文件、旧 bindings、业务层动态 invoke 与旧 Specta bridge 依赖；官方 SQL plugin 测试调用保留。
 - `vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`（172 files / 899 tests）、`cargo fmt --all --check`、`cargo clippy --workspace --all-targets --locked -- -D warnings`、`cargo test --workspace --locked -- --test-threads=2` 与 `git diff --check` 均通过。
 - 修复 HTTP fetch Rust clippy 的 needless borrow，并复核 db 与 plugin 生命周期测试；当前待创建签名提交。
+
+## 2026-10-04 TauRPC runtime 修复
+
+- 修复 desktop debug 启动时 HTTP bindings exporter 在 Tokio runtime 外合并 TauRPC handler 导致的 reactor panic。
+- app/core 统一 Router 与 HTTP exporter 在 `tauri::async_runtime::handle().inner().enter()` 作用域内合并 handler；各 exporter 统一裁剪尾部空行，保持 bindings 内容稳定。
+- 新增 Router 构造回归测试；desktop 二进制已启动至 `application runtime ready`。
+- HTTP/native Rust 定向测试、clippy、fmt 均通过。

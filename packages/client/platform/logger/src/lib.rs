@@ -156,9 +156,12 @@ pub fn export_bindings(
   ));
   taurpc::Exporter::new().export(&commands::LoggerApiImpl.into_handler(), &temp_path)?;
   let generated = fs::read(&temp_path)?;
-  let generated = String::from_utf8(generated)
+  let mut generated = String::from_utf8(generated)
     .map(|value| value.replace(", type UnlistenFn", ""))?
     .into_bytes();
+  while generated.ends_with(b"\n\n") {
+    generated.pop();
+  }
   let current = fs::read(path).unwrap_or_default();
   if generated != current {
     fs::write(path, generated)?;

@@ -43,9 +43,12 @@ pub fn export_bindings(
     std::process::id()
   ));
   taurpc::Exporter::new().export(&AppApiImpl.into_handler(), &temp_path)?;
-  let generated = fs::read_to_string(&temp_path)?
+  let mut generated = fs::read_to_string(&temp_path)?
     .replace(", type UnlistenFn", "")
     .into_bytes();
+  while generated.ends_with(b"\n\n") {
+    generated.pop();
+  }
   let current = fs::read(path).unwrap_or_default();
   if generated != current {
     fs::write(path, generated)?;
@@ -55,6 +58,7 @@ pub fn export_bindings(
 }
 
 pub fn rpc_router<R: tauri::Runtime>() -> taurpc::Router<R> {
+  let _runtime_guard = tauri::async_runtime::handle().inner().enter();
   taurpc::Router::new()
     .merge(rpc_handler())
     .merge(tauri_plugin_http::rpc_handler())
@@ -80,6 +84,14 @@ pub fn builder() -> tauri::Builder<tauri::Wry> {
     .plugin(tauri_plugin_plugin::init())
     .plugin(tauri_plugin_downloader::init());
   tauri_plugin_db::init(builder)
+}
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn builds_rpc_router_inside_tauri_runtime() {
+    super::rpc_router::<tauri::Wry>();
+  }
 }
 
 pub fn setup(app: &mut tauri::App) -> tauri::Result<()> {

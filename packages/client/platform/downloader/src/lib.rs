@@ -184,7 +184,10 @@ pub fn export_bindings(
   use commands::DownloaderApi;
   let handler = commands::DownloaderApiImpl.into_handler();
   taurpc::Exporter::new().export(&handler, &temp_path)?;
-  let generated = fs::read(&temp_path)?;
+  let mut generated = fs::read(&temp_path)?;
+  while generated.ends_with(b"\n\n") {
+    generated.pop();
+  }
   let current = fs::read(path).unwrap_or_default();
   if generated != current {
     fs::write(path, generated)?;
