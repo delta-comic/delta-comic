@@ -176,7 +176,6 @@ configureCoreHost({
   platform: {
     openExternal: async () => {},
     isNative: () => true,
-    invoke: async () => undefined,
     listenResume: async () => () => {},
   },
   navigation: { hasRoute: () => false, addRoute: () => () => {}, removeRoute: () => {} },

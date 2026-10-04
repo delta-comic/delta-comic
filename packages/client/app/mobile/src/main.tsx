@@ -10,7 +10,7 @@ import {
   type UiMessageParams,
 } from '@delta-comic/ui'
 import { PiniaColada } from '@pinia/colada'
-import { invoke, isTauri } from '@tauri-apps/api/core'
+import { isTauri } from '@tauri-apps/api/core'
 import { listen, TauriEvent } from '@tauri-apps/api/event'
 import { reactiveComputed, useDark } from '@vueuse/core'
 import Color from 'color'
@@ -49,7 +49,6 @@ configureCoreHost({
   platform: {
     openExternal,
     isNative: isTauri,
-    invoke,
     listenResume: callback => listen(TauriEvent.WINDOW_RESUMED, callback),
   },
   ui: { warning: message => window.$message.warning(message), createDownloadMessage },

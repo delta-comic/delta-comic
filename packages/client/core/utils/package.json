@@ -41,7 +41,8 @@
     "es-module-lexer": "catalog:",
     "es-toolkit": "catalog:",
     "magic-string": "catalog:",
-    "mitt": "catalog:"
+    "mitt": "catalog:",
+    "taurpc": "catalog:"
   },
   "devDependencies": {
     "vite-plus": "catalog:"

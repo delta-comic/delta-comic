@@ -40,6 +40,7 @@
     "kysely-plugin-serialize": "catalog:",
     "kysely-wasqlite-worker": "catalog:",
     "mitt": "catalog:",
+    "taurpc": "catalog:",
     "typebox": "catalog:"
   },
   "devDependencies": {

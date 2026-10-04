@@ -1,48 +1,111 @@
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
-import { Downloader, type DownloaderTransport } from '../../lib/index'
+import { Downloader, type DownloaderRpc, type DownloaderRouter } from '../../lib/index'
+
+type RpcTask = Awaited<ReturnType<DownloaderRpc['enqueue_url']>>
+
+const createRpc = () =>
+  ({
+    attention: { on: vi.fn() },
+    cancel_task: vi.fn(),
+    delete_secret: vi.fn(),
+    delete_task_files: vi.fn(),
+    download_ephemeral: vi.fn(),
+    enqueue_plan: vi.fn(),
+    enqueue_torrent: vi.fn(),
+    enqueue_url: vi.fn(),
+    forget_task: vi.fn(),
+    get_capabilities: vi.fn(),
+    get_collections: vi.fn(),
+    get_settings: vi.fn(),
+    get_task: vi.fn(),
+    get_task_detail: vi.fn(),
+    list_destinations: vi.fn(),
+    list_tasks: vi.fn(),
+    move_queue: vi.fn(),
+    pause_task: vi.fn(),
+    pick_destination: vi.fn(),
+    resume_task: vi.fn(),
+    retry_task: vi.fn(),
+    set_priority: vi.fn(),
+    store_secret: vi.fn(),
+    task_removed: { on: vi.fn() },
+    task_upsert: { on: vi.fn() },
+    update_settings: vi.fn(),
+    update_source: vi.fn(),
+  }) satisfies DownloaderRouter['downloader']
+
+const task = (): RpcTask => ({
+  id: 'task',
+  collectionKey: null,
+  assetKey: null,
+  kind: 'http',
+  title: 'file.zip',
+  source: {
+    type: 'http',
+    mirrors: [],
+    expectedSize: null,
+    etag: null,
+    lastModified: null,
+    expiresAt: null,
+  },
+  destinationId: 'default',
+  relativePath: 'file.zip',
+  status: 'queued',
+  priority: 0,
+  queuePosition: 0,
+  totalBytes: null,
+  downloadedBytes: 0,
+  speedBytesPerSecond: 0,
+  errorCode: null,
+  errorMessage: null,
+  checksum: null,
+  etag: null,
+  lastModified: null,
+  finalPath: null,
+  retryCount: 0,
+  createdAt: 0,
+  updatedAt: 0,
+  revision: 1,
+})
 
 describe('Downloader', () => {
-  const invoke = vi.fn()
-  const listen = vi.fn()
   let instanceSequence = 0
+  let rpc: ReturnType<typeof createRpc>
   let downloader: Downloader
 
   beforeEach(() => {
-    vi.clearAllMocks()
-    listen.mockResolvedValue(vi.fn())
-    downloader = Downloader.create({
-      key: `test-${++instanceSequence}`,
-      transport: { invoke, listen } as unknown as DownloaderTransport,
-    })
+    vi.restoreAllMocks()
+    vi.stubGlobal('window', { Proxy, __TAURI_INTERNALS__: { invoke: vi.fn() } })
+    rpc = createRpc()
+    downloader = Downloader.create({ key: `test-${++instanceSequence}`, rpc })
   })
 
   it('registers created instances for static retrieval and rejects duplicate keys', () => {
     expect(Downloader.get(downloader.key)).toBe(downloader)
-    expect(() =>
-      Downloader.create({
-        key: downloader.key,
-        transport: { invoke, listen } as unknown as DownloaderTransport,
-      }),
-    ).toThrow('already exists')
+    expect(() => Downloader.create({ key: downloader.key, rpc })).toThrow('already exists')
   })
 
-  it('uses namespaced downloader commands through instance methods', async () => {
-    invoke.mockResolvedValue({ id: 'task' })
+  it('passes route arguments through typed downloader methods', async () => {
+    const enqueueUrl = vi.spyOn(rpc, 'enqueue_url').mockResolvedValue(task())
+    const pauseTask = vi.spyOn(rpc, 'pause_task').mockResolvedValue(task())
+
     await downloader.enqueueUrl({ url: 'https://example.com/file.zip' })
     await downloader.pauseTask('task')
-    expect(invoke).toHaveBeenNthCalledWith(1, 'plugin:downloader|enqueue_url', {
-      input: { url: 'https://example.com/file.zip' },
+
+    expect(enqueueUrl).toHaveBeenCalledExactlyOnceWith({
+      url: 'https://example.com/file.zip',
+      title: null,
+      relativePath: null,
+      destinationId: null,
+      priority: null,
+      checksum: null,
     })
-    expect(invoke).toHaveBeenNthCalledWith(2, 'plugin:downloader|pause_task', { id: 'task' })
+    expect(pauseTask).toHaveBeenCalledExactlyOnceWith('task')
   })
 
-  it.each([
-    ['ArrayBuffer', new Uint8Array([1, 2, 3]).buffer],
-    ['Uint8Array', new Uint8Array([4, 5, 6])],
-    ['Android JSON bytes', [7, 8, 9]],
-  ])('normalizes %s ephemeral responses and forwards options', async (_, response) => {
-    invoke.mockResolvedValue(response)
+  it('normalizes JSON ephemeral bytes and forwards options', async () => {
+    const downloadEphemeral = vi.spyOn(rpc, 'download_ephemeral').mockResolvedValue([7, 8, 9])
 
     const bytes = await downloader.downloadEphemeral('https://plugins.test/plugin.zip', {
       headers: { 'x-plugin-channel': 'stable' },
@@ -51,46 +114,45 @@ describe('Downloader', () => {
     })
 
     expect(bytes).toBeInstanceOf(Uint8Array)
-    expect([...bytes]).toEqual(Array.from(new Uint8Array(response as never)))
-    expect(invoke).toHaveBeenCalledWith('plugin:downloader|download_ephemeral', {
-      headers: { 'x-plugin-channel': 'stable' },
-      maxBytes: 1024,
-      secretRef: 'plugin-download',
-      url: 'https://plugins.test/plugin.zip',
-    })
+    expect([...bytes]).toEqual([7, 8, 9])
+    expect(downloadEphemeral).toHaveBeenCalledExactlyOnceWith(
+      'https://plugins.test/plugin.zip',
+      { 'x-plugin-channel': 'stable' },
+      'plugin-download',
+      1024,
+    )
   })
 
-  it('propagates ephemeral download failures without another backend', async () => {
+  it('propagates ephemeral download failures', async () => {
     const failure = new Error('download failed')
-    invoke.mockRejectedValue(failure)
+    const downloadEphemeral = vi.spyOn(rpc, 'download_ephemeral').mockRejectedValue(failure)
 
     await expect(downloader.downloadEphemeral('https://plugins.test/plugin.zip')).rejects.toBe(
       failure,
     )
-    expect(invoke).toHaveBeenCalledOnce()
+    expect(downloadEphemeral).toHaveBeenCalledOnce()
   })
 
   it('creates and deletes opaque native credential references', async () => {
-    invoke.mockResolvedValueOnce('credential:550e8400-e29b-41d4-a716-446655440000')
-    invoke.mockResolvedValueOnce(undefined)
+    const storeSecret = vi
+      .spyOn(rpc, 'store_secret')
+      .mockResolvedValue('credential:550e8400-e29b-41d4-a716-446655440000')
+    const deleteSecret = vi.spyOn(rpc, 'delete_secret').mockResolvedValue(null)
 
     const secretRef = await downloader.storeSecret('Bearer private-token')
     await downloader.deleteSecret(secretRef)
 
-    expect(invoke).toHaveBeenNthCalledWith(1, 'plugin:downloader|store_secret', {
-      value: 'Bearer private-token',
-    })
-    expect(invoke).toHaveBeenNthCalledWith(2, 'plugin:downloader|delete_secret', {
-      secretRef: 'credential:550e8400-e29b-41d4-a716-446655440000',
-    })
+    expect(storeSecret).toHaveBeenCalledExactlyOnceWith('Bearer private-token')
+    expect(deleteSecret).toHaveBeenCalledExactlyOnceWith(
+      'credential:550e8400-e29b-41d4-a716-446655440000',
+    )
   })
 
-  it('rejects malformed ephemeral responses', async () => {
-    invoke.mockResolvedValue('not bytes')
-
-    await expect(downloader.downloadEphemeral('https://plugins.test/plugin.zip')).rejects.toThrow(
-      'invalid ephemeral response',
-    )
+  it('normalizes an empty ephemeral response', async () => {
+    const downloadEphemeral = vi.spyOn(rpc, 'download_ephemeral').mockResolvedValue([])
+    const result = await downloader.downloadEphemeral('https://plugins.test/plugin.zip')
+    expect(result).toEqual(new Uint8Array())
+    expect(downloadEphemeral).toHaveBeenCalledOnce()
   })
 
   it('merges settings patches with the current snapshot', async () => {
@@ -100,65 +162,96 @@ describe('Downloader', () => {
       perTaskConnections: 8,
       allowMetered: true,
       seedOnComplete: false,
+      seedRatio: null,
+      seedSeconds: null,
       revision: 2,
     }
-    invoke.mockResolvedValueOnce(settings).mockImplementationOnce((_command, args) => args.settings)
+    const getSettings = vi.spyOn(rpc, 'get_settings').mockResolvedValue(settings)
+    const updateSettings = vi.spyOn(rpc, 'update_settings').mockImplementation(async value => value)
+
     await expect(downloader.updateSettings({ maxActiveTasks: 6 })).resolves.toEqual({
       ...settings,
       maxActiveTasks: 6,
     })
+    expect(getSettings).toHaveBeenCalledOnce()
+    expect(updateSettings).toHaveBeenCalledExactlyOnceWith({ ...settings, maxActiveTasks: 6 })
   })
 
   it('reads settings and native platform limits', async () => {
-    invoke.mockResolvedValueOnce({ maxActiveTasks: 4 })
-    invoke.mockResolvedValueOnce({ connectionBudgetMax: 24, maxActiveTasks: 20 })
+    const getSettings = vi
+      .spyOn(rpc, 'get_settings')
+      .mockResolvedValue({
+        maxActiveTasks: 4,
+        connectionBudget: 16,
+        perTaskConnections: 8,
+        allowMetered: true,
+        seedOnComplete: false,
+        seedRatio: null,
+        seedSeconds: null,
+        revision: 1,
+      })
+    const getCapabilities = vi
+      .spyOn(rpc, 'get_capabilities')
+      .mockResolvedValue({ connectionBudgetMax: 24, maxActiveTasks: 20 })
 
-    await expect(downloader.getSettings()).resolves.toEqual({ maxActiveTasks: 4 })
+    await expect(downloader.getSettings()).resolves.toMatchObject({ maxActiveTasks: 4 })
     await expect(downloader.getCapabilities()).resolves.toEqual({
       connectionBudgetMax: 24,
       maxActiveTasks: 20,
     })
-    expect(invoke).toHaveBeenNthCalledWith(2, 'plugin:downloader|get_capabilities', {})
+    expect(getSettings).toHaveBeenCalledOnce()
+    expect(getCapabilities).toHaveBeenCalledOnce()
   })
 
   it('exposes collection, detail, and destination snapshots', async () => {
-    invoke.mockResolvedValue([])
+    const getCollections = vi.spyOn(rpc, 'get_collections').mockResolvedValue([])
+    const getTaskDetail = vi
+      .spyOn(rpc, 'get_task_detail')
+      .mockResolvedValue({ task: task(), completedRanges: [], torrent: null })
+    const listDestinations = vi.spyOn(rpc, 'list_destinations').mockResolvedValue([])
+
     await downloader.getCollections()
     await downloader.getTaskDetail('task')
     await downloader.listDestinations()
-    expect(invoke).toHaveBeenNthCalledWith(1, 'plugin:downloader|get_collections', {})
-    expect(invoke).toHaveBeenNthCalledWith(2, 'plugin:downloader|get_task_detail', { id: 'task' })
-    expect(invoke).toHaveBeenNthCalledWith(3, 'plugin:downloader|list_destinations', {})
+
+    expect(getCollections).toHaveBeenCalledOnce()
+    expect(getTaskDetail).toHaveBeenCalledExactlyOnceWith('task')
+    expect(listDestinations).toHaveBeenCalledOnce()
   })
 
   it('opens the native destination picker without accepting a renderer path', async () => {
-    invoke.mockResolvedValue(null)
+    const pickDestination = vi.spyOn(rpc, 'pick_destination').mockResolvedValue(null)
     await expect(downloader.pickDestination()).resolves.toBeNull()
-    expect(invoke).toHaveBeenCalledExactlyOnceWith('plugin:downloader|pick_destination', {})
+    expect(pickDestination).toHaveBeenCalledOnce()
   })
 
   it('owns event subscriptions and disposes each native listener once', async () => {
     const nativeUnlisten = vi.fn()
-    let upsertListener: ((event: { task: { id: string }; revision: number }) => void) | undefined
-    listen.mockImplementation(async (_event, handler) => {
-      upsertListener = handler
+    let upsertListener: Parameters<DownloaderRpc['task_upsert']['on']>[0] | undefined
+    const onTaskUpsert = vi.spyOn(rpc.task_upsert, 'on').mockImplementation(async listener => {
+      upsertListener = listener
       return nativeUnlisten
     })
     const upsert = vi.fn()
 
     const unlisten = await downloader.listen({ upsert })
-    upsertListener?.({ task: { id: 'task' }, revision: 1 })
-    expect(upsert).toHaveBeenCalledWith({ task: { id: 'task' }, revision: 1 })
+    upsertListener?.({ task: task(), revision: 1 })
+    expect(upsert).toHaveBeenCalledWith({
+      task: expect.objectContaining({ id: 'task', source: { type: 'http', mirrors: [] } }),
+      revision: 1,
+    })
 
     unlisten()
     unlisten()
     downloader.dispose()
+    expect(onTaskUpsert).toHaveBeenCalledOnce()
     expect(nativeUnlisten).toHaveBeenCalledOnce()
   })
 
   it('cleans partial event subscriptions when a later listener fails', async () => {
     const nativeUnlisten = vi.fn()
-    listen.mockResolvedValueOnce(nativeUnlisten).mockRejectedValueOnce(new Error('listen failed'))
+    vi.spyOn(rpc.task_upsert, 'on').mockResolvedValue(nativeUnlisten)
+    vi.spyOn(rpc.task_removed, 'on').mockRejectedValue(new Error('listen failed'))
 
     await expect(downloader.listen({ removed: vi.fn(), upsert: vi.fn() })).rejects.toThrow(
       'listen failed',
@@ -176,8 +269,8 @@ describe('Downloader', () => {
     replacement.dispose()
   })
 
-  it('fully unregisters even when a transport listener fails during disposal', async () => {
-    listen.mockResolvedValue(() => {
+  it('fully unregisters even when a native listener fails during disposal', async () => {
+    vi.spyOn(rpc.attention, 'on').mockResolvedValue(() => {
       throw new Error('unlisten failed')
     })
     const key = downloader.key

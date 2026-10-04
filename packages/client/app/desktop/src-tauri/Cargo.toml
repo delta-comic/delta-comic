@@ -16,7 +16,6 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 serde_json.workspace = true
 delta-comic-native.workspace = true
 tauri = { workspace = true, features = ["tray-icon", "protocol-asset"] }
-specta-typescript.workspace = true
 tracing.workspace = true
 tauri-plugin-downloader.workspace = true
 

@@ -37,9 +37,11 @@ rand = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+specta = { workspace = true }
 sha2 = { workspace = true }
 sqlx = { workspace = true }
 tauri = { workspace = true }
+taurpc = { workspace = true }
 tempfile = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = [

@@ -29,7 +29,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@tauri-apps/api": "catalog:"
+    "taurpc": "catalog:"
   },
   "devDependencies": {
     "typescript": "catalog:",

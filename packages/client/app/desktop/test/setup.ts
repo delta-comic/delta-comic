@@ -13,9 +13,6 @@ vi.mock('@pinia/colada', () => window.$$lib$$.Pc)
 configureCoreHost({
   platform: {
     isNative: () => false,
-    invoke: async () => {
-      throw new Error('Unexpected native command')
-    },
     openExternal: async url => (await import('../src/platform')).openExternal(url),
     listenResume: async () => () => {},
   },

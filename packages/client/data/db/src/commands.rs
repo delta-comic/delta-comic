@@ -4,7 +4,7 @@ use std::{
 };
 
 use percent_encoding::{AsciiSet, CONTROLS, utf8_percent_encode};
-use tauri::State;
+use tauri::{AppHandle, Manager, Runtime};
 
 use crate::NativeStore;
 
@@ -76,18 +76,16 @@ pub(crate) fn native_store_remove_value(
   }
 }
 
-#[tauri::command]
 pub(crate) fn native_store_get(
-  store: State<'_, NativeStore>,
+  store: &NativeStore,
   namespace: String,
   key: String,
 ) -> Result<Option<String>, String> {
   native_store_get_value(&store.root, &namespace, &key)
 }
 
-#[tauri::command]
 pub(crate) fn native_store_set(
-  store: State<'_, NativeStore>,
+  store: &NativeStore,
   namespace: String,
   key: String,
   value: String,
@@ -95,13 +93,73 @@ pub(crate) fn native_store_set(
   native_store_set_value(&store.root, &namespace, &key, &value)
 }
 
-#[tauri::command]
 pub(crate) fn native_store_remove(
-  store: State<'_, NativeStore>,
+  store: &NativeStore,
   namespace: String,
   key: String,
 ) -> Result<(), String> {
   native_store_remove_value(&store.root, &namespace, &key)
+}
+
+#[taurpc::procedures(path = "db")]
+pub trait DbApi {
+  async fn native_store_get<R: Runtime>(
+    app_handle: AppHandle<R>,
+    namespace: String,
+    key: String,
+  ) -> Result<Option<String>, String>;
+  async fn native_store_set<R: Runtime>(
+    app_handle: AppHandle<R>,
+    namespace: String,
+    key: String,
+    value: String,
+  ) -> Result<(), String>;
+  async fn native_store_remove<R: Runtime>(
+    app_handle: AppHandle<R>,
+    namespace: String,
+    key: String,
+  ) -> Result<(), String>;
+}
+
+#[derive(Clone, Copy)]
+pub struct DbApiImpl;
+
+#[taurpc::resolvers]
+impl DbApi for DbApiImpl {
+  async fn native_store_get<R: Runtime>(
+    self,
+    app_handle: AppHandle<R>,
+    namespace: String,
+    key: String,
+  ) -> Result<Option<String>, String> {
+    let state = app_handle.state::<NativeStore>();
+    native_store_get(&state, namespace, key)
+  }
+
+  async fn native_store_set<R: Runtime>(
+    self,
+    app_handle: AppHandle<R>,
+    namespace: String,
+    key: String,
+    value: String,
+  ) -> Result<(), String> {
+    let state = app_handle.state::<NativeStore>();
+    native_store_set(&state, namespace, key, value)
+  }
+
+  async fn native_store_remove<R: Runtime>(
+    self,
+    app_handle: AppHandle<R>,
+    namespace: String,
+    key: String,
+  ) -> Result<(), String> {
+    let state = app_handle.state::<NativeStore>();
+    native_store_remove(&state, namespace, key)
+  }
+}
+
+pub fn rpc_handler<R: Runtime>() -> impl taurpc::TauRpcHandler<R> {
+  DbApiImpl.into_handler()
 }
 
 #[cfg(test)]

@@ -1,0 +1,9 @@
+{
+  "name": "@delta-comic/logger-native",
+  "version": "3.0.0-next.19",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "taurpc": "catalog:"
+  }
+}

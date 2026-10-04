@@ -6,7 +6,9 @@ import {
 import { getTauriPluginRoot } from '@delta-comic/plugin'
 import { isTauri } from '@tauri-apps/api/core'
 
-import { commands } from './bindings'
+import { createTauRPCProxy } from './bindings'
+
+const rpc = createTauRPCProxy()
 
 export const isTauriRuntime = isTauri
 
@@ -17,7 +19,7 @@ export const resolveAppHostProfile = (): Promise<AppHostProfile> => {
     if (!isTauriRuntime()) {
       return createAppHostProfile({ platform: detectWebHostPlatform(), runtime: 'web' })
     }
-    await commands.getRuntimePlatform()
+    await rpc.app.get_runtime_platform()
     return createAppHostProfile({ platform: 'desktop', runtime: 'tauri' })
   })()
   return hostProfilePromise

@@ -1,6 +1,6 @@
 import type { LogEntry, LoggerTransport } from '@delta-comic/logger'
 
-import { getCoreHost } from '../ports'
+import { createTauRPCProxy } from './bindings'
 
 interface LogFileInfo {
   name: string
@@ -21,21 +21,17 @@ interface ExportLogsOptions {
   paths?: string[]
 }
 
-export type Invoke = (command: string, args?: Record<string, unknown>) => Promise<unknown>
+type LoggerRpc = ReturnType<typeof createTauRPCProxy>['logger']
 
 interface TauriLoggerOptions {
   batchSize?: number
   flushIntervalMs?: number
   maxQueueSize?: number
-  invoke?: Invoke
+  rpc?: LoggerRpc
   native?: boolean
 }
 
-const COMMAND_PREFIX = 'plugin:logger|'
-
 const isTauriRuntime = () => typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
-
-const loadTauriInvoke = (): Promise<Invoke> => Promise.resolve(getCoreHost().platform.invoke)
 
 /** Batched, non-blocking client for the native logger plugin. */
 export class TauriLoggerClient implements LoggerTransport {
@@ -43,16 +39,15 @@ export class TauriLoggerClient implements LoggerTransport {
   private readonly batchSize: number
   private readonly flushIntervalMs: number
   private readonly maxQueueSize: number
-  private readonly configuredInvoke?: Invoke
-  private invokePromise?: Promise<Invoke>
+  private readonly rpc: LoggerRpc
   private queue: LogEntry[] = []
   private timer?: ReturnType<typeof setTimeout>
   private inFlight?: Promise<void>
   private disposed = false
 
   constructor(options: TauriLoggerOptions = {}) {
-    this.native = options.native ?? (Boolean(options.invoke) || isTauriRuntime())
-    this.configuredInvoke = options.invoke
+    this.native = options.native ?? (Boolean(options.rpc) || isTauriRuntime())
+    this.rpc = options.rpc ?? createTauRPCProxy().logger
     this.batchSize = Math.max(1, options.batchSize ?? 64)
     this.flushIntervalMs = Math.max(0, options.flushIntervalMs ?? 40)
     this.maxQueueSize = Math.max(this.batchSize, options.maxQueueSize ?? 4096)
@@ -89,15 +84,18 @@ export class TauriLoggerClient implements LoggerTransport {
   }
 
   public async listLogFiles(): Promise<LogFileInfo[]> {
-    return this.call<LogFileInfo[]>('list_log_files')
+    this.assertNative()
+    return this.rpc.list_log_files()
   }
 
   public async readLogFile(path: string): Promise<LogFileContent> {
-    return this.call<LogFileContent>('read_log_file', { path })
+    this.assertNative()
+    return this.rpc.read_log_file(path)
   }
 
   public async exportLogs(options: ExportLogsOptions = {}): Promise<string> {
-    return this.call<string>('export_logs', { paths: options.paths })
+    this.assertNative()
+    return this.rpc.export_logs(options.paths ?? null)
   }
 
   public async dispose(): Promise<void> {
@@ -122,19 +120,10 @@ export class TauriLoggerClient implements LoggerTransport {
   }
 
   private async send(entries: LogEntry[]): Promise<void> {
-    await this.call<void>('write_logs', { entries })
+    await this.rpc.write_logs(entries)
   }
 
-  private async call<T>(command: string, args?: Record<string, unknown>): Promise<T> {
+  private assertNative(): void {
     if (!this.native) throw new Error('Native logger operations are unavailable in a web browser')
-    const invoke = await this.resolveInvoke()
-    return invoke(`${COMMAND_PREFIX}${command}`, args) as Promise<T>
-  }
-
-  private resolveInvoke(): Promise<Invoke> {
-    this.invokePromise ??= this.configuredInvoke
-      ? Promise.resolve(this.configuredInvoke)
-      : loadTauriInvoke()
-    return this.invokePromise
   }
 }

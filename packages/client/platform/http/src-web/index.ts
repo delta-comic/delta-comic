@@ -11,7 +11,6 @@ import {
   type GetCookieConfig,
   type SetCookieConfig,
 } from './bindings'
-
 import { createCORSFetch } from './fetch'
 import type { CORSFetchConfig, CORSFetchInit } from './fetch'
 import { createCORSXMLHttpRequestConstructor } from './xhr'
@@ -108,7 +107,9 @@ export class CORSFetch {
 
   public setConfig(newConfig: DeepPartial<CORSFetchConfig>): Promise<void> {
     merge(this._config, newConfig)
-    return getCommands().prepare_requester(this._config.request).catch(() => {})
+    return getCommands()
+      .prepare_requester(this._config.request)
+      .catch(() => {})
   }
 
   public fetch(
@@ -125,7 +126,9 @@ export class CORSFetch {
       content,
       instanceKey: this.config.request.instanceKey,
     }
-    return getCommands().set_cookie(config).then(() => undefined)
+    return getCommands()
+      .set_cookie(config)
+      .then(() => undefined)
   }
 
   public getCookie(url: string | URL, name: string): Promise<string | null> {
@@ -162,7 +165,9 @@ export class CORSFetch {
 
   public clearCookie(): Promise<void> {
     const config: ClearCookiesConfig = { instanceKey: this.config.request.instanceKey }
-    return getCommands().clear_cookie(config).then(() => undefined)
+    return getCommands()
+      .clear_cookie(config)
+      .then(() => undefined)
   }
 
   public setCookieByParts(

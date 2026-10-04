@@ -3,7 +3,8 @@ use thiserror::Error;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, specta::Type)]
+#[specta(type = String)]
 pub enum Error {
   #[error("logger I/O failed: {0}")]
   Io(#[from] std::io::Error),

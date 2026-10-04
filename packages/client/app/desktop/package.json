@@ -31,6 +31,7 @@
     "pinia": "catalog:",
     "semver": "catalog:",
     "tauri-plugin-m3": "catalog:",
+    "taurpc": "catalog:",
     "vue": "catalog:",
     "vue-i18n": "catalog:",
     "vue-router": "catalog:"

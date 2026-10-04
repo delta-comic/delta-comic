@@ -20,16 +20,6 @@
     "sql:default",
     "sql:allow-execute",
     "aptabase:allow-track-event",
-    "logger:default",
-    "plugin:default",
-    "utils:default",
-    "db:default",
-    "downloader:default",
-    "downloader:allow-delete-files",
-    "downloader:delete-secrets",
-    "downloader:manage-destinations",
-    "downloader:store-secrets",
-    "http:default",
     "shell:default"
   ]
 }

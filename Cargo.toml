@@ -79,7 +79,7 @@ tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", br
 ] }
 tauri-plugin-utils = { path = "packages/client/core/utils" }
 tauri-runtime-wry = "2.12.1"
-tauri-specta = { version = "=2.0.0-rc.25", features = ["derive", "typescript", "javascript"] }
+taurpc = "0.8.2"
 tempfile = "3.27.0"
 thiserror = "2.0.21"
 tokio = "1.53.1"

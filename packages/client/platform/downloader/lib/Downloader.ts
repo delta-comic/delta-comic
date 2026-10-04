@@ -1,10 +1,23 @@
-import { invoke } from '@tauri-apps/api/core'
-import { listen } from '@tauri-apps/api/event'
-
+import { createTauRPCProxy } from './bindings'
 import type {
+  AttentionEvent as RpcAttentionEvent,
+  Checksum as RpcChecksum,
+  ContentRefreshContext as RpcContentRefreshContext,
+  DownloadAsset as RpcDownloadAsset,
+  DownloadSource as RpcDownloadSource,
+  DownloadTask as RpcDownloadTask,
+  HttpMirror as RpcHttpMirror,
+  SeedPolicy as RpcSeedPolicy,
+  TaskRemovedEvent as RpcTaskRemovedEvent,
+  TaskUpsertEvent as RpcTaskUpsertEvent,
+} from './bindings'
+import type {
+  Checksum,
+  ContentRefreshContext,
   Destination,
   DownloadCollection,
   DownloadEphemeralOptions,
+  DownloadAsset,
   DownloaderCapabilities,
   DownloaderEventHandlers,
   DownloaderSettings,
@@ -14,41 +27,199 @@ import type {
   EnqueuePlanInput,
   EnqueueTorrentInput,
   EnqueueUrlInput,
+  HttpMirror,
+  SeedPolicy,
   TaskAttention,
   TaskRemovedEvent,
   TaskUpsertEvent,
 } from './types'
 
-export interface DownloaderTransport {
-  invoke<T>(command: string, args?: Record<string, unknown>): Promise<T>
-  listen<T>(event: string, handler: (payload: T) => void): Promise<DownloaderUnlisten>
-}
+export type DownloaderRpc = ReturnType<typeof createTauRPCProxy>['downloader']
 
 export type DownloaderUnlisten = () => void
 
+const toRpcChecksum = (checksum: Checksum | undefined): RpcChecksum | null =>
+  checksum ? { algorithm: checksum.algorithm, value: checksum.value } : null
+
+const toRpcMirror = (mirror: HttpMirror): RpcHttpMirror => ({
+  url: mirror.url,
+  priority: mirror.priority,
+  headers: mirror.headers
+    ? Object.fromEntries(
+        Object.entries(mirror.headers).map(([key, value]) => [
+          key,
+          value.type === 'secretRef' ? { type: 'secretRef', secret_ref: value.secretRef } : value,
+        ]),
+      )
+    : undefined,
+})
+
+const toRpcSource = (source: DownloadSource): RpcDownloadSource =>
+  source.type === 'http'
+    ? {
+        type: 'http',
+        mirrors: source.mirrors.map(toRpcMirror),
+        expectedSize: source.expectedSize ?? null,
+        etag: source.etag ?? null,
+        lastModified: source.lastModified ?? null,
+        expiresAt: source.expiresAt ?? null,
+      }
+    : {
+        type: 'torrent',
+        input: source.input,
+        onlyFiles: source.onlyFiles,
+        seedPolicy: toRpcSeedPolicy(source.seedPolicy),
+      }
+
+const toRpcSeedPolicy = (policy: SeedPolicy | undefined): RpcSeedPolicy | null => {
+  if (!policy) return null
+  switch (policy.mode) {
+    case 'none':
+      return policy
+    case 'ratio':
+      return { mode: 'ratio', ratio: policy.ratio }
+    case 'duration':
+      return { mode: 'duration', duration_seconds: policy.durationSeconds }
+    case 'ratioOrDuration':
+      return {
+        mode: 'ratioOrDuration',
+        ratio: policy.ratio,
+        duration_seconds: policy.durationSeconds,
+      }
+  }
+}
+
+const toRpcRefreshContext = (
+  context: ContentRefreshContext | undefined,
+): RpcContentRefreshContext | null =>
+  context
+    ? {
+        plugin: context.plugin,
+        contentType: context.contentType,
+        contentId: context.contentId,
+        episodeId: context.episodeId,
+        contentPageFingerprint: context.contentPageFingerprint ?? null,
+        providerFingerprint: context.providerFingerprint,
+        pluginVersion: context.pluginVersion ?? null,
+        pluginIntegrity: context.pluginIntegrity ?? null,
+      }
+    : null
+
+const toRpcAsset = (asset: DownloadAsset): RpcDownloadAsset => ({
+  key: asset.key,
+  relativePath: asset.relativePath,
+  size: asset.size ?? null,
+  checksum: toRpcChecksum(asset.checksum),
+  source: toRpcSource(asset.source),
+})
+
+const toClientTaskUpsert = (event: RpcTaskUpsertEvent): TaskUpsertEvent => ({
+  task: toClientTask(event.task),
+  revision: event.revision,
+})
+
+const toClientTaskRemoved = (event: RpcTaskRemovedEvent): TaskRemovedEvent => ({
+  taskId: event.taskId,
+  revision: event.revision,
+})
+
+const toClientAttention = (event: RpcAttentionEvent): TaskAttention => ({
+  taskId: event.taskId,
+  code: event.code,
+  message: event.message,
+  revision: event.revision,
+})
+
+const toClientSource = (source: RpcDownloadSource): DownloadSource =>
+  source.type === 'http'
+    ? {
+        type: 'http',
+        mirrors: source.mirrors.map(mirror => ({
+          url: mirror.url,
+          priority: mirror.priority,
+          headers: mirror.headers
+            ? Object.fromEntries(
+                Object.entries(mirror.headers).map(([key, value]) => [
+                  key,
+                  value.type === 'secretRef'
+                    ? { type: 'secretRef', secretRef: value.secret_ref }
+                    : value,
+                ]),
+              )
+            : undefined,
+        })),
+        expectedSize: source.expectedSize ?? undefined,
+        etag: source.etag ?? undefined,
+        lastModified: source.lastModified ?? undefined,
+        expiresAt: source.expiresAt ?? undefined,
+      }
+    : {
+        type: 'torrent',
+        input: source.input,
+        onlyFiles: source.onlyFiles,
+        seedPolicy:
+          source.seedPolicy?.mode === 'duration'
+            ? { mode: 'duration', durationSeconds: source.seedPolicy.duration_seconds }
+            : source.seedPolicy?.mode === 'ratio'
+              ? { mode: 'ratio', ratio: source.seedPolicy.ratio ?? 0 }
+              : source.seedPolicy?.mode === 'ratioOrDuration'
+                ? {
+                    mode: 'ratioOrDuration',
+                    ratio: source.seedPolicy.ratio ?? 0,
+                    durationSeconds: source.seedPolicy.duration_seconds,
+                  }
+                : source.seedPolicy?.mode === 'none'
+                  ? { mode: 'none' }
+                  : undefined,
+      }
+
+const toClientTask = (task: RpcDownloadTask): DownloadTask => ({
+  id: task.id,
+  collectionKey: task.collectionKey ?? undefined,
+  assetKey: task.assetKey ?? undefined,
+  kind: task.kind,
+  title: task.title,
+  source: toClientSource(task.source),
+  destinationId: task.destinationId,
+  relativePath: task.relativePath,
+  status: task.status,
+  priority: task.priority,
+  queuePosition: task.queuePosition,
+  totalBytes: task.totalBytes ?? undefined,
+  downloadedBytes: task.downloadedBytes,
+  speedBytesPerSecond: task.speedBytesPerSecond,
+  errorCode: task.errorCode ?? undefined,
+  errorMessage: task.errorMessage ?? undefined,
+  checksum: task.checksum ?? undefined,
+  etag: task.etag ?? undefined,
+  lastModified: task.lastModified ?? undefined,
+  finalPath: task.finalPath ?? undefined,
+  retryCount: task.retryCount,
+  createdAt: task.createdAt,
+  updatedAt: task.updatedAt,
+  revision: task.revision,
+})
+
 export interface CreateDownloaderOptions {
   key?: string
-  transport?: DownloaderTransport
+  rpc?: DownloaderRpc
 }
 
 export class Downloader {
   static readonly #defaultKey = 'default'
   static readonly #instances = new Map<string, Downloader>()
-  static readonly #tauriTransport: DownloaderTransport = {
-    invoke: async <T>(command: string, args?: Record<string, unknown>) =>
-      await invoke<T>(command, args),
-    listen: async <T>(event: string, handler: (payload: T) => void) =>
-      await listen<T>(event, ({ payload }) => handler(payload)),
+  static #createRpc(): DownloaderRpc {
+    return createTauRPCProxy().downloader
   }
 
   readonly #key: string
   readonly #subscriptions = new Set<DownloaderUnlisten>()
-  readonly #transport: DownloaderTransport
+  #rpc: DownloaderRpc | undefined
   #disposed = false
 
-  private constructor(key: string, transport: DownloaderTransport) {
+  private constructor(key: string, rpc?: DownloaderRpc) {
     this.#key = key
-    this.#transport = transport
+    this.#rpc = rpc
   }
 
   /** Creates and registers a downloader instance under a stable runtime key. */
@@ -57,7 +228,7 @@ export class Downloader {
     if (this.#instances.has(key)) {
       throw new Error(`downloader instance already exists: ${key}`)
     }
-    const downloader = new Downloader(key, options.transport ?? this.#tauriTransport)
+    const downloader = new Downloader(key, options.rpc)
     this.#instances.set(key, downloader)
     return downloader
   }
@@ -72,6 +243,10 @@ export class Downloader {
     const normalized = key.trim()
     if (!normalized) throw new TypeError('downloader instance key must not be empty')
     return normalized
+  }
+
+  #getRpc(): DownloaderRpc {
+    return (this.#rpc ??= Downloader.#createRpc())
   }
 
   get key(): string {
@@ -107,121 +282,175 @@ export class Downloader {
     url: string,
     options: DownloadEphemeralOptions = {},
   ): Promise<Uint8Array<ArrayBuffer>> {
-    const bytes = await this.#command<ArrayBuffer | Uint8Array | number[]>('download_ephemeral', {
-      url,
-      ...options,
-    })
+    const bytes = await this.#request(() =>
+      this.#getRpc().download_ephemeral(
+        url,
+        options.headers ?? null,
+        options.secretRef ?? null,
+        options.maxBytes ?? null,
+      ),
+    )
     return Downloader.#normalizeRawBytes(bytes)
   }
 
   /** Stores a header, cookie, or token in the operating system credential vault. */
   async storeSecret(value: string): Promise<string> {
-    return await this.#command('store_secret', { value })
+    return await this.#request(() => this.#getRpc().store_secret(value))
   }
 
   /** Deletes a native credential reference. Deletion is idempotent. */
   async deleteSecret(secretRef: string): Promise<void> {
-    await this.#command('delete_secret', { secretRef })
+    await this.#request(() => this.#getRpc().delete_secret(secretRef))
   }
 
   async listTasks(): Promise<DownloadTask[]> {
-    return await this.#command('list_tasks')
+    return (await this.#request(() => this.#getRpc().list_tasks())) as DownloadTask[]
   }
 
   async getTask(id: string): Promise<DownloadTask | null> {
-    return await this.#command('get_task', { id })
+    return (await this.#request(() => this.#getRpc().get_task(id))) as DownloadTask | null
   }
 
   async getTaskDetail(id: string): Promise<DownloadTaskDetail> {
-    return await this.#command('get_task_detail', { id })
+    return (await this.#request(() => this.#getRpc().get_task_detail(id))) as DownloadTaskDetail
   }
 
   async getCollections(): Promise<DownloadCollection[]> {
-    return await this.#command('get_collections')
+    return (await this.#request(() => this.#getRpc().get_collections())) as DownloadCollection[]
   }
 
   async listDestinations(): Promise<Destination[]> {
-    return await this.#command('list_destinations')
+    return (await this.#request(() => this.#getRpc().list_destinations())) as Destination[]
   }
 
   async getSettings(): Promise<DownloaderSettings> {
-    return await this.#command('get_settings')
+    return (await this.#request(() => this.#getRpc().get_settings())) as DownloaderSettings
   }
 
   async getCapabilities(): Promise<DownloaderCapabilities> {
-    return await this.#command('get_capabilities')
+    return (await this.#request(() => this.#getRpc().get_capabilities())) as DownloaderCapabilities
   }
 
   async updateSettings(
     patch: Partial<Omit<DownloaderSettings, 'revision'>>,
   ): Promise<DownloaderSettings> {
     const settings = { ...(await this.getSettings()), ...patch }
-    return await this.#command('update_settings', { settings })
+    return (await this.#request(() =>
+      this.#getRpc().update_settings({
+        ...settings,
+        seedRatio: settings.seedRatio ?? null,
+        seedSeconds: settings.seedSeconds ?? null,
+      }),
+    )) as DownloaderSettings
   }
 
   async enqueueUrl(input: EnqueueUrlInput): Promise<DownloadTask> {
-    return await this.#command('enqueue_url', { input })
+    return (await this.#request(() =>
+      this.#getRpc().enqueue_url({
+        url: input.url,
+        mirrors: input.mirrors?.map(toRpcMirror),
+        title: input.title ?? null,
+        relativePath: input.relativePath ?? null,
+        destinationId: input.destinationId ?? null,
+        priority: input.priority ?? null,
+        checksum: toRpcChecksum(input.checksum),
+      }),
+    )) as DownloadTask
   }
 
   async enqueueTorrent(input: EnqueueTorrentInput): Promise<DownloadTask> {
-    return await this.#command('enqueue_torrent', { input })
+    return (await this.#request(() =>
+      this.#getRpc().enqueue_torrent({
+        source: {
+          input: input.source.input,
+          onlyFiles: input.source.onlyFiles,
+          seedPolicy: toRpcSeedPolicy(input.source.seedPolicy),
+        },
+        title: input.title ?? null,
+        relativePath: input.relativePath ?? null,
+        destinationId: input.destinationId ?? null,
+        priority: input.priority ?? null,
+      }),
+    )) as DownloadTask
   }
 
   async enqueuePlan(input: EnqueuePlanInput): Promise<DownloadTask[]> {
-    return await this.#command('enqueue_plan', { input })
+    return (await this.#request(() =>
+      this.#getRpc().enqueue_plan({
+        key: input.key,
+        title: input.title,
+        assets: input.assets.map(toRpcAsset),
+        destinationId: input.destinationId ?? null,
+        priority: input.priority ?? null,
+        refreshContext: toRpcRefreshContext(input.refreshContext),
+      }),
+    )) as DownloadTask[]
   }
 
   async pauseTask(id: string): Promise<DownloadTask> {
-    return await this.#command('pause_task', { id })
+    return (await this.#request(() => this.#getRpc().pause_task(id))) as DownloadTask
   }
 
   async resumeTask(id: string): Promise<DownloadTask> {
-    return await this.#command('resume_task', { id })
+    return (await this.#request(() => this.#getRpc().resume_task(id))) as DownloadTask
   }
 
   async retryTask(id: string): Promise<DownloadTask> {
-    return await this.#command('retry_task', { id })
+    return (await this.#request(() => this.#getRpc().retry_task(id))) as DownloadTask
   }
 
   async cancelTask(id: string): Promise<DownloadTask> {
-    return await this.#command('cancel_task', { id })
+    return (await this.#request(() => this.#getRpc().cancel_task(id))) as DownloadTask
   }
 
   async forgetTask(id: string): Promise<void> {
-    await this.#command('forget_task', { id })
+    await this.#request(() => this.#getRpc().forget_task(id))
   }
 
   async deleteTaskFiles(id: string): Promise<void> {
-    await this.#command('delete_task_files', { id })
+    await this.#request(() => this.#getRpc().delete_task_files(id))
   }
 
   async setPriority(id: string, priority: number): Promise<DownloadTask> {
-    return await this.#command('set_priority', { id, priority })
+    return (await this.#request(() => this.#getRpc().set_priority(id, priority))) as DownloadTask
   }
 
   async moveQueue(id: string, beforeTaskId?: string | null): Promise<DownloadTask> {
-    return await this.#command('move_queue', { id, beforeTaskId })
+    return (await this.#request(() =>
+      this.#getRpc().move_queue(id, beforeTaskId ?? null),
+    )) as DownloadTask
   }
 
   /** Opens the platform-owned directory picker and registers the granted destination. */
   async pickDestination(): Promise<Destination | null> {
-    return await this.#command('pick_destination')
+    return (await this.#request(() => this.#getRpc().pick_destination())) as Destination | null
   }
 
   async updateSource(id: string, source: DownloadSource): Promise<DownloadTask> {
-    return await this.#command('update_source', { id, source })
+    return (await this.#request(() =>
+      this.#getRpc().update_source(id, toRpcSource(source)),
+    )) as DownloadTask
   }
 
   async onTaskUpsert(handler: (event: TaskUpsertEvent) => void): Promise<DownloaderUnlisten> {
-    return await this.#listen('downloader://task-upsert', handler)
+    return await this.#subscribe(
+      listener => this.#getRpc().task_upsert.on(event => listener(toClientTaskUpsert(event))),
+      handler,
+    )
   }
 
   async onTaskRemoved(handler: (event: TaskRemovedEvent) => void): Promise<DownloaderUnlisten> {
-    return await this.#listen('downloader://task-removed', handler)
+    return await this.#subscribe(
+      listener => this.#getRpc().task_removed.on(event => listener(toClientTaskRemoved(event))),
+      handler,
+    )
   }
 
   async onAttention(handler: (event: TaskAttention) => void): Promise<DownloaderUnlisten> {
-    return await this.#listen('downloader://attention', handler)
+    return await this.#subscribe(
+      listener => this.#getRpc().attention.on(event => listener(toClientAttention(event))),
+      handler,
+    )
   }
 
   async listen(handlers: DownloaderEventHandlers): Promise<DownloaderUnlisten> {
@@ -242,14 +471,17 @@ export class Downloader {
     }
   }
 
-  async #command<T>(name: string, args: Record<string, unknown> = {}): Promise<T> {
+  async #request<T>(request: () => Promise<T>): Promise<T> {
     this.#assertActive()
-    return await this.#transport.invoke<T>(`plugin:downloader|${name}`, args)
+    return await request()
   }
 
-  async #listen<T>(event: string, handler: (event: T) => void): Promise<DownloaderUnlisten> {
+  async #subscribe<T>(
+    subscribe: (handler: (event: T) => void) => Promise<DownloaderUnlisten>,
+    handler: (event: T) => void,
+  ): Promise<DownloaderUnlisten> {
     this.#assertActive()
-    const nativeUnlisten = await this.#transport.listen<T>(event, handler)
+    const nativeUnlisten = await subscribe(handler)
     if (this.#disposed) {
       nativeUnlisten()
       throw new Error(`downloader instance is disposed: ${this.#key}`)

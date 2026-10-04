@@ -7,7 +7,7 @@ use std::{
 };
 
 #[derive(Clone, Debug, Default)]
-pub(crate) struct WebviewRegistry {
+pub struct WebviewRegistry {
   inner: Arc<WebviewRegistryInner>,
 }
 

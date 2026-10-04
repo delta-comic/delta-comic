@@ -1,12 +1,9 @@
 import type { createDownloadMessage } from '@delta-comic/ui'
 import type { RouteRecordRaw } from 'vue-router'
 
-import type { Invoke } from './logger/TauriLoggerClient'
-
 export interface PlatformPort {
   openExternal: (url: string) => Promise<void>
   isNative: () => boolean
-  invoke: Invoke
   listenResume: (callback: () => void) => Promise<() => void>
 }
 

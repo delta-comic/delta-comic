@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::{Error, Result};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum TaskKind {
   Http,
@@ -28,7 +28,7 @@ impl TaskKind {
   }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum TaskStatus {
   Queued,
@@ -86,14 +86,14 @@ impl TaskStatus {
   }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Checksum {
   pub algorithm: ChecksumAlgorithm,
   pub value: String,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ChecksumAlgorithm {
   Sha256,
@@ -119,7 +119,7 @@ impl ChecksumAlgorithm {
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HttpMirror {
   pub url: String,
@@ -129,14 +129,14 @@ pub struct HttpMirror {
   pub headers: BTreeMap<String, HttpHeaderValue>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum HttpHeaderValue {
   Value { value: String },
   SecretRef { secret_ref: String },
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HttpSource {
   pub mirrors: Vec<HttpMirror>,
@@ -146,7 +146,7 @@ pub struct HttpSource {
   pub expires_at: Option<i64>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum TorrentInput {
   Magnet { uri: String },
@@ -154,7 +154,7 @@ pub enum TorrentInput {
   Bytes { base64: String },
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "mode", rename_all = "camelCase")]
 pub enum SeedPolicy {
   None,
@@ -163,7 +163,7 @@ pub enum SeedPolicy {
   RatioOrDuration { ratio: f64, duration_seconds: u64 },
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TorrentSource {
   pub input: TorrentInput,
@@ -172,14 +172,14 @@ pub struct TorrentSource {
   pub seed_policy: Option<SeedPolicy>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DownloadSource {
   Http(HttpSource),
   Torrent(TorrentSource),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DownloadTask {
   pub id: String,
@@ -208,7 +208,7 @@ pub struct DownloadTask {
   pub revision: i64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DownloadCollection {
   pub key: String,
@@ -222,7 +222,7 @@ pub struct DownloadCollection {
   pub created_at: i64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ContentRefreshContext {
   pub plugin: String,
@@ -235,14 +235,14 @@ pub struct ContentRefreshContext {
   pub plugin_integrity: Option<String>,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ByteRange {
   pub start: u64,
   pub end: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TorrentTaskDetail {
   pub info_hash: Option<String>,
@@ -251,7 +251,7 @@ pub struct TorrentTaskDetail {
   pub seed_started_at: Option<i64>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DownloadTaskDetail {
   pub task: DownloadTask,
@@ -259,7 +259,7 @@ pub struct DownloadTaskDetail {
   pub torrent: Option<TorrentTaskDetail>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DownloadAsset {
   pub key: String,
@@ -269,7 +269,7 @@ pub struct DownloadAsset {
   pub source: DownloadSource,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EnqueuePlanInput {
   pub key: String,
@@ -280,7 +280,7 @@ pub struct EnqueuePlanInput {
   pub refresh_context: Option<ContentRefreshContext>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EnqueueUrlInput {
   pub url: String,
@@ -293,7 +293,7 @@ pub struct EnqueueUrlInput {
   pub mirrors: Vec<HttpMirror>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EnqueueTorrentInput {
   pub source: TorrentSource,
@@ -303,7 +303,7 @@ pub struct EnqueueTorrentInput {
   pub priority: Option<u8>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DownloaderSettings {
   pub max_active_tasks: u8,
@@ -316,7 +316,7 @@ pub struct DownloaderSettings {
   pub revision: i64,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DownloaderCapabilities {
   pub connection_budget_max: u16,
@@ -385,7 +385,7 @@ impl DownloaderSettings {
   }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Destination {
   pub id: String,
@@ -396,7 +396,7 @@ pub struct Destination {
   pub is_default: bool,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DestinationKind {
   Managed,
@@ -425,21 +425,21 @@ impl DestinationKind {
   }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TaskUpsertEvent {
   pub task: DownloadTask,
   pub revision: i64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TaskRemovedEvent {
   pub task_id: String,
   pub revision: i64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(taurpc::specta::Type, Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AttentionEvent {
   pub task_id: String,

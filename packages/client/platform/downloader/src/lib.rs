@@ -1,7 +1,11 @@
-use std::{path::PathBuf, sync::Arc};
+use std::{
+  fs,
+  path::{Path, PathBuf},
+  sync::Arc,
+};
 
 use tauri::{
-  AppHandle, Emitter, Manager, Runtime,
+  AppHandle, Manager, Runtime,
   plugin::{Builder as PluginBuilder, TauriPlugin},
 };
 
@@ -22,6 +26,8 @@ mod persistence;
 mod saf_contract;
 mod target_file;
 mod torrent;
+
+pub use commands::DownloaderEventTrigger;
 
 pub use domain::*;
 pub use engine::{DownloaderHandle, EngineEvent};
@@ -63,32 +69,6 @@ impl Builder {
 
   pub fn build<R: Runtime>(self) -> TauriPlugin<R> {
     PluginBuilder::<R>::new("downloader")
-      .invoke_handler(tauri::generate_handler![
-        commands::cancel_task,
-        commands::delete_secret,
-        commands::delete_task_files,
-        commands::download_ephemeral,
-        commands::enqueue_plan,
-        commands::enqueue_torrent,
-        commands::enqueue_url,
-        commands::forget_task,
-        commands::get_collections,
-        commands::get_capabilities,
-        commands::get_settings,
-        commands::get_task,
-        commands::get_task_detail,
-        commands::list_destinations,
-        commands::list_tasks,
-        commands::move_queue,
-        commands::pause_task,
-        commands::pick_destination,
-        commands::resume_task,
-        commands::retry_task,
-        commands::set_priority,
-        commands::store_secret,
-        commands::update_settings,
-        commands::update_source,
-      ])
       .setup(move |app, api| {
         let app_data = app
           .path()
@@ -119,16 +99,16 @@ impl Builder {
             .download_dir()
             .map_err(|error| format!("failed to resolve Downloads directory: {error}"))?,
         };
-        let event_app = app.clone();
+        let event_trigger = DownloaderEventTrigger::new(app.clone());
         let event_sink = move |event| match event {
           EngineEvent::TaskUpsert(payload) => {
-            let _ = event_app.emit("downloader://task-upsert", payload);
+            let _ = event_trigger.task_upsert(*payload);
           }
           EngineEvent::TaskRemoved(payload) => {
-            let _ = event_app.emit("downloader://task-removed", payload);
+            let _ = event_trigger.task_removed(payload);
           }
           EngineEvent::Attention(payload) => {
-            let _ = event_app.emit("downloader://attention", payload);
+            let _ = event_trigger.attention(payload);
           }
         };
 
@@ -186,6 +166,31 @@ impl Default for Builder {
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
   Builder::new().build()
+}
+
+pub fn rpc_handler<R: Runtime>() -> impl taurpc::TauRpcHandler<R> {
+  use commands::DownloaderApi;
+  commands::DownloaderApiImpl.into_handler()
+}
+
+pub fn export_bindings(
+  path: impl AsRef<Path>,
+) -> std::result::Result<(), Box<dyn std::error::Error>> {
+  let path = path.as_ref();
+  let temp_path = std::env::temp_dir().join(format!(
+    "delta-comic-downloader-bindings-{}.ts",
+    std::process::id()
+  ));
+  use commands::DownloaderApi;
+  let handler = commands::DownloaderApiImpl.into_handler();
+  taurpc::Exporter::new().export(&handler, &temp_path)?;
+  let generated = fs::read(&temp_path)?;
+  let current = fs::read(path).unwrap_or_default();
+  if generated != current {
+    fs::write(path, generated)?;
+  }
+  let _ = fs::remove_file(temp_path);
+  Ok(())
 }
 
 pub trait DownloaderExt<R: Runtime> {

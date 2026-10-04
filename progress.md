@@ -2,7 +2,7 @@
 
 ### 2026-10-03 - HTTP 插件 Specta 过渡适配
 
-- HTTP 插件 Rust 类型和 Tauri 命令改用 `specta::Type`、`#[specta::specta]` 与 `tauri_specta::Builder`。
+- HTTP 插件 Rust 类型和 Tauri 命令改用 `specta::Type`、`#[specta::specta]` 与旧 Specta builder。
 - 桌面/移动端 debug 入口导出 HTTP bindings；导出先写临时文件并比较内容，避免 Vite 热重载循环。
 - 绑定将 `u64`/`usize` 映射为 TypeScript `number`，前端沿用直接返回值模式；流式 body 的原始二进制 IPC 保留。
 - 已移除旧 `ts-rs` 绑定目录，前端请求体适配 Specta 生成的 `number[]`。
@@ -107,8 +107,8 @@
 
 ### 2026-09-26 — 阶段 6C Tauri Specta 类型生成
 
-- 为 Tauri 应用接入 `specta`、`specta-typescript` 和 `tauri-specta`，新增 `get_runtime_platform` typed command。
-- 使用 `Builder`、`collect_commands!` 与 `#[specta::specta]`，debug 构建和 Rust 单元测试都会生成 `packages/client/app/app/src/bindings.ts`。
+- 为 Tauri 应用接入旧 Specta bridge 依赖，新增 `get_runtime_platform` typed command。
+- 使用旧命令收集宏与 `#[specta::specta]`，debug 构建和 Rust 单元测试都会生成旧 bindings。
 - 将生成绑定纳入 app 源码，后续宿主迁移可直接通过 `commands.getRuntimePlatform()` 调用。
 - `cargo check -p delta-comic --locked`、`cargo fmt --all --check` 和绑定导出单元测试通过。
 
@@ -510,3 +510,25 @@
 - Rust crate 内化为 `tauri-plugin-http`，TypeScript 包内化为 `@delta-comic/http`，Tauri IPC 命名空间与 capability 更新为 `http`。
 - desktop/mobile/core、workspace Cargo、pnpm、Vite+ 构建、TypeScript project references、版本同步脚本已完成迁移。
 - 包构建、包类型检查、包测试（3 files / 9 tests）、双端相关测试（32 files / 139 tests）、Rust fmt、包级 clippy/check 已通过。
+# 2026-10-04 TauRPC IPC migration
+
+- 用户批准并要求实现 TauRPC 全量自有 IPC 重构计划。
+- 已完成只读盘点：七个自有 Rust plugin/host command 域、前端动态 invoke、HTTP Specta bindings、downloader raw events、capability/permission 生成链。
+- 已核对 TauRPC 0.8.2 API：procedures/resolvers、Router::merge、Exporter、typed events、Channel、TauRPC__ 命令前缀；TauRPC 仍使用 Specta v2，并绕开旧 Tauri Specta bridge。
+- 关键约束：TauRPC procedure 不能直接返回 tauri::ipc::Response；HTTP Webview ResourceTable 需改为自有 request registry；Vec<u8> 走 JSON number[]。
+- 当前阶段：依赖与基础 Router。
+- 已更新根 Cargo/pnpm workspace 依赖、app/core `rpc_router`/`AppApi`/exporter，以及 mobile/desktop 对七个 bindings exporter 的 debug 接线。
+- 已并行委派 simple plugin、HTTP、downloader 三个包域的 TauRPC 迁移，宿主文件由主 agent 收口。
+
+## 2026-10-04 TauRPC 全量自有 IPC 重构续接
+
+- 接续已有子代理迁移结果，确认 `d027866c` 已在当前历史中，工作树仍有未提交 TauRPC 迁移文件。
+- 下一步先清理旧 IPC 残留与权限文件，再按仓库顺序执行完整验证并签名保存。
+
+## 2026-10-04 TauRPC 全量自有 IPC 重构验收
+
+- 完成 app、http、downloader、logger、utils、db、plugin 七个域的 TauRPC procedures、resolvers、typed events、exporters 与前端 bindings；app/core 统一合并 Router，desktop/mobile 注册唯一 TauRPC invoke handler。
+- HTTP 使用请求 registry、取消状态与 `BodyChunk`/JSON `number[]`；downloader 使用 typed RPC/events，默认 proxy 延迟创建以支持无 WebView 的宿主测试。
+- 清理自有插件 command handler、旧权限文件、旧 bindings、业务层动态 invoke 与旧 Specta bridge 依赖；官方 SQL plugin 测试调用保留。
+- `vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`（172 files / 899 tests）、`cargo fmt --all --check`、`cargo clippy --workspace --all-targets --locked -- -D warnings`、`cargo test --workspace --locked -- --test-threads=2` 与 `git diff --check` 均通过。
+- 修复 HTTP fetch Rust clippy 的 needless borrow，并复核 db 与 plugin 生命周期测试；当前待创建签名提交。

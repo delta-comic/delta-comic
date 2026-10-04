@@ -19,15 +19,14 @@ macos = { level = "full", notes = "" }
 android = { level = "full", notes = "" }
 ios = { level = "full", notes = "" }
 
-[build-dependencies]
-tauri-plugin = { workspace = true, features = ["build"] }
-
 [dependencies]
 chrono = { workspace = true }
 flate2 = { workspace = true }
 log = { workspace = true }
 serde = { workspace = true }
+specta = { workspace = true }
 tauri = { workspace = true }
+taurpc = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["fs", "io-std", "io-util", "sync", "time"] }
 tracing = { workspace = true }

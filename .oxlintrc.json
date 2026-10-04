@@ -1,25 +1,13 @@
 {
-  "jsPlugins": [
-    "twlinter"
-  ],
-  "plugins": [
-    "unicorn",
-    "typescript",
-    "vue"
-  ],
-  "categories": {
-    "correctness": "error"
-  },
+  "jsPlugins": ["twlinter"],
+  "plugins": ["unicorn", "typescript", "vue"],
+  "categories": { "correctness": "error" },
   "rules": {
     "twlinter/no-duplicate-utilities": "error",
     "twlinter/suggestCanonicalClasses": "error",
     "no-thenable": "allow"
   },
-  "settings": {
-    "vitest": {
-      "typecheck": true
-    }
-  },
+  "settings": { "vitest": { "typecheck": true } },
   "ignorePatterns": [
     ".agents",
     ".vscode",
@@ -29,8 +17,5 @@
     "**/_lib/**",
     "packages/client/app/*/public/runtime/**"
   ],
-  "options": {
-    "typeAware": false,
-    "typeCheck": false
-  }
+  "options": { "typeAware": false, "typeCheck": false }
 }

@@ -23,6 +23,7 @@ use crate::{
 pub(crate) const DEFAULT_MAX_BYTES: u64 = 64 * 1024 * 1024;
 pub(crate) const HARD_MAX_BYTES: u64 = 128 * 1024 * 1024;
 
+#[derive(Clone)]
 pub(crate) struct EphemeralRoot(PathBuf);
 
 impl EphemeralRoot {

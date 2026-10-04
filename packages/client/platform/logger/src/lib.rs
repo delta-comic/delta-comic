@@ -9,7 +9,10 @@
 //!   .plugin(other_plugin);
 //! ```
 
-use std::path::PathBuf;
+use std::{
+  fs,
+  path::{Path, PathBuf},
+};
 
 use tauri::{
   Manager, Runtime,
@@ -25,6 +28,8 @@ mod repository;
 mod storage;
 mod tracing_bridge;
 
+use commands::LoggerApi;
+
 pub use error::{Error, Result};
 pub use model::{FrontendLogEntry, LogFileContent, LogFileInfo, LogLevel};
 pub use storage::LoggerHandle;
@@ -38,6 +43,7 @@ use tracing_bridge::{PanicCapture, TracingBridge};
 pub const DEFAULT_MAX_FILE_SIZE: u64 = 5 * 1024 * 1024;
 pub const DEFAULT_CHANNEL_CAPACITY: usize = 4096;
 
+#[derive(Clone)]
 struct LoggerState {
   handle: LoggerHandle,
   repository: LogRepository,
@@ -77,12 +83,6 @@ impl Builder {
 
   pub fn build<R: Runtime>(self) -> TauriPlugin<R> {
     PluginBuilder::<R>::new("logger")
-      .invoke_handler(tauri::generate_handler![
-        commands::write_logs,
-        commands::list_log_files,
-        commands::read_log_file,
-        commands::export_logs,
-      ])
       .setup(move |app, _api| {
         let directory = match self.directory {
           Some(directory) => directory,
@@ -140,4 +140,29 @@ impl Default for Builder {
 /// Creates the logger plugin with production defaults.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
   Builder::new().build()
+}
+
+pub fn rpc_handler<R: Runtime>() -> impl taurpc::TauRpcHandler<R> {
+  commands::rpc_handler()
+}
+
+pub fn export_bindings(
+  path: impl AsRef<Path>,
+) -> std::result::Result<(), Box<dyn std::error::Error>> {
+  let path = path.as_ref();
+  let temp_path = std::env::temp_dir().join(format!(
+    "delta-comic-logger-bindings-{}",
+    std::process::id()
+  ));
+  taurpc::Exporter::new().export(&commands::LoggerApiImpl.into_handler(), &temp_path)?;
+  let generated = fs::read(&temp_path)?;
+  let generated = String::from_utf8(generated)
+    .map(|value| value.replace(", type UnlistenFn", ""))?
+    .into_bytes();
+  let current = fs::read(path).unwrap_or_default();
+  if generated != current {
+    fs::write(path, generated)?;
+  }
+  let _ = fs::remove_file(temp_path);
+  Ok(())
 }

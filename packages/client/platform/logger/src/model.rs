@@ -3,7 +3,7 @@ use std::path::Path;
 use chrono::{DateTime, Local, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq, specta::Type)]
 #[serde(rename_all = "lowercase")]
 pub enum LogLevel {
   Trace,
@@ -51,7 +51,7 @@ impl From<&tracing::Level> for LogLevel {
   }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[taurpc::ipc_type]
 #[serde(rename_all = "camelCase")]
 pub struct FrontendLogEntry {
   pub timestamp: String,
@@ -123,13 +123,14 @@ fn sanitize_inline(value: &str) -> String {
   value.replace('\r', "\\r").replace('\n', "\\n")
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[taurpc::ipc_type]
 #[serde(rename_all = "camelCase")]
 pub struct LogFileInfo {
   /// Safe relative path accepted by `read_log_file` and `export_logs`.
   pub path: String,
   pub name: String,
   pub size: u64,
+  #[specta(type = String)]
   pub modified_at: DateTime<Utc>,
   pub archived: bool,
 }
@@ -147,7 +148,7 @@ impl LogFileInfo {
   }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[taurpc::ipc_type]
 #[serde(rename_all = "camelCase")]
 pub struct LogFileContent {
   pub path: String,

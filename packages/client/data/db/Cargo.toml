@@ -16,11 +16,12 @@ macos = { level = "full", notes = "" }
 android = { level = "full", notes = "" }
 ios = { level = "full", notes = "" }
 
-[build-dependencies]
-tauri-plugin = { workspace = true, features = ["build"] }
-
 [dependencies]
 percent-encoding = { workspace = true }
+serde = { workspace = true }
+specta = { workspace = true }
 tauri = { workspace = true }
+taurpc = { workspace = true }
+tokio = { workspace = true }
 tracing = { workspace = true }
 tauri-plugin-sql = { workspace = true }

@@ -148,6 +148,32 @@
 
 第 10、11 章实现、文档、构建、类型、测试和发布协同验收均已完成。
 
+## 2026-10-04：TauRPC 全量自有 IPC 重构
+
+### 目标
+
+将 app、http、downloader、logger、utils、db、plugin 七个自有 IPC 域迁移到 TauRPC 0.8.2/2.0.0，移除旧 Tauri Specta bridge，保留官方 Tauri 插件 API。
+
+### 阶段
+
+1. **依赖与基础 Router**：complete。已加入 TauRPC workspace 依赖，建立 app/core root Router、app route exporter 和 mobile/desktop exporter 接线。
+2. **简单插件路由**：complete。已迁移 db、logger、plugin、utils 及各自前端 proxy/bindings。
+3. **HTTP 路由**：complete。已建立请求 registry、取消状态和 JSON BodyChunk，并完成 Web fetch/XHR 适配。
+4. **Downloader 路由**：complete。已迁移全部 commands、typed events、前端 transport 和 dispose 语义。
+5. **宿主收口与权限清理**：complete。已统一 mobile/desktop builder，清理自有命令权限、旧 bindings 和业务层动态 invoke。
+6. **验证与签名提交**：in_progress。Web、Rust 验证已通过，待提交本轮最终变更。
+
+### 已确认决策
+
+- 迁移范围为全部 Delta Comic 自有命令、事件和流式通道；官方插件 JS API 保持不变。
+- 每个包定义带固定 path 的 TauRPC procedures，app/core 在 Rust 侧 Router::merge；bindings 按包生成。
+- HTTP 保留 request/send/read/cancel 生命周期，二进制改为 Vec<u8>/BodyChunk JSON 数组。
+- 使用 TauRPC 默认 Promise reject 错误模式；不保留 Raw command 兼容层。
+
+### Next Step
+
+完成最终静态检查并创建签名 Conventional 中文提交。
+
 ## 阶段 7 决策
 
 - 现行协议使用 `@delta-comic/plugin-manifest` 的 `protocolVersion/id/entry/resources`，旧 `@delta-comic/model` Manifest 只在现有数据库/宿主适配边界保留。
@@ -350,3 +376,14 @@
 - [ ] 构建、版本同步、CI 路径迁移
 - [ ] Vapor 组件与性能基准
 - [ ] 完整验证与签名提交
+
+## 2026-10-04 TauRPC 全量自有 IPC 重构
+
+- **状态：** 验证完成，待提交
+- 已完成：TauRPC 依赖、app Router、HTTP/downloader/logger/db/plugin/utils 路由与 bindings、双端平台识别和主要前端调用迁移。
+- 已完成：旧 IPC 测试/权限残留清理、稳定 bindings 生成、全量 Web 与 Rust 串行验证。
+- 待完成：创建本轮签名提交。
+
+### 当前下一步
+
+创建签名提交并记录提交哈希。

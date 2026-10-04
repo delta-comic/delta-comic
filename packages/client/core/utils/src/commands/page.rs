@@ -1,13 +1,12 @@
-use tauri::{AppHandle, Manager, Runtime, State, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
+use tauri::{AppHandle, Manager, Runtime, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
 use crate::webview_registry::{WebviewRegistry, validate_page_label};
 
 use super::{InjectCodeOptions, OpenPageOptions, OpenedPage, scripts, storage::get_webview_window};
 
-#[tauri::command]
 pub(crate) async fn webview_open_page<R: Runtime>(
-  app: AppHandle<R>,
-  registry: State<'_, WebviewRegistry>,
+  app_handle: AppHandle<R>,
+  registry: &WebviewRegistry,
   options: OpenPageOptions,
 ) -> Result<OpenedPage, String> {
   let label = match options.label {
@@ -16,7 +15,7 @@ pub(crate) async fn webview_open_page<R: Runtime>(
   };
   validate_page_label(&label)?;
 
-  if app.get_webview_window(&label).is_some() {
+  if app_handle.get_webview_window(&label).is_some() {
     return Err(format!("webview page already exists: {label}"));
   }
 
@@ -25,7 +24,7 @@ pub(crate) async fn webview_open_page<R: Runtime>(
   let init_script =
     scripts::install_bridge_script(options.css.as_deref(), options.js.as_deref(), callback_name);
 
-  let mut builder = WebviewWindowBuilder::new(&app, &label, webview_url);
+  let mut builder = WebviewWindowBuilder::new(&app_handle, &label, webview_url);
   builder = if options.all_frames.unwrap_or(true) {
     builder.initialization_script_for_all_frames(init_script)
   } else {
@@ -62,15 +61,14 @@ pub(crate) async fn webview_open_page<R: Runtime>(
   })
 }
 
-#[tauri::command]
 pub(crate) async fn webview_inject_code<R: Runtime>(
-  app: AppHandle<R>,
-  current: WebviewWindow<R>,
+  app_handle: AppHandle<R>,
+  webview_window: WebviewWindow<R>,
   options: InjectCodeOptions,
 ) -> Result<(), String> {
   let target = match options.label {
-    Some(label) => get_webview_window(&app, &label)?,
-    None => current,
+    Some(label) => get_webview_window(&app_handle, &label)?,
+    None => webview_window,
   };
   let callback_name = scripts::callback_name(options.callback_name.as_deref());
   let script =
@@ -80,25 +78,23 @@ pub(crate) async fn webview_inject_code<R: Runtime>(
     .map_err(|err| format!("failed to inject webview code: {err}"))
 }
 
-#[tauri::command]
 pub(crate) fn webview_close_current_page<R: Runtime>(
-  current: WebviewWindow<R>,
-  registry: State<'_, WebviewRegistry>,
+  webview_window: WebviewWindow<R>,
+  registry: &WebviewRegistry,
 ) -> Result<(), String> {
-  let label = current.label().to_string();
+  let label = webview_window.label().to_string();
   registry.remove(&label);
-  current
+  webview_window
     .close()
     .map_err(|err| format!("failed to close current webview page: {err}"))
 }
 
-#[tauri::command]
 pub(crate) fn webview_close_page<R: Runtime>(
-  app: AppHandle<R>,
-  registry: State<'_, WebviewRegistry>,
+  app_handle: AppHandle<R>,
+  registry: &WebviewRegistry,
   label: String,
 ) -> Result<(), String> {
-  let webview = get_webview_window(&app, &label)?;
+  let webview = get_webview_window(&app_handle, &label)?;
   registry.remove(&label);
   webview
     .close()

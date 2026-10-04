@@ -4,27 +4,24 @@ use std::{
   path::{Path, PathBuf},
 };
 
-use serde::Serialize;
 use serde_json::Value;
-use tauri::{AppHandle, Emitter, Manager, Runtime};
+use tauri::{AppHandle, Manager, Runtime};
 use zip::ZipArchive;
 
-const PROGRESS_EVENT: &str = "plugin://install-progress";
-
-#[derive(Serialize)]
+#[taurpc::ipc_type]
 pub struct LocalFile {
-  bytes: Vec<u8>,
-  name: String,
+  pub bytes: Vec<u8>,
+  pub name: String,
 }
 
-#[derive(Clone, Serialize)]
+#[taurpc::ipc_type]
 #[serde(rename_all = "camelCase")]
-struct InstallProgress {
-  current: usize,
-  op_id: String,
-  path: Option<String>,
-  phase: &'static str,
-  total: usize,
+pub struct InstallProgress {
+  pub current: usize,
+  pub op_id: String,
+  pub path: Option<String>,
+  pub phase: String,
+  pub total: usize,
 }
 
 fn read_zip(zip_path: &str) -> Result<ZipArchive<fs::File>, String> {
@@ -74,19 +71,15 @@ fn emit_progress<R: Runtime>(
   if op_id.is_empty() {
     return;
   }
-  let _ = app.emit(
-    PROGRESS_EVENT,
-    InstallProgress {
-      current,
-      op_id: op_id.to_string(),
-      path,
-      phase,
-      total,
-    },
-  );
+  let _ = PluginEventTrigger::new(app.clone()).install_progress(InstallProgress {
+    current,
+    op_id: op_id.to_string(),
+    path,
+    phase: phase.to_string(),
+    total,
+  });
 }
 
-#[tauri::command]
 pub fn read_local_file(path: String) -> Result<LocalFile, String> {
   let path = Path::new(&path);
   let name = path
@@ -98,13 +91,11 @@ pub fn read_local_file(path: String) -> Result<LocalFile, String> {
   Ok(LocalFile { bytes, name })
 }
 
-#[tauri::command]
 pub fn decode_zip_meta(zip_path: String) -> Result<Value, String> {
   let mut zip = read_zip(&zip_path)?;
   decode_zip_meta_value(&mut zip)
 }
 
-#[tauri::command]
 pub fn install_zip<R: Runtime>(
   app: AppHandle<R>,
   zip_path: String,
@@ -159,4 +150,45 @@ pub fn install_zip<R: Runtime>(
 
   emit_progress(&app, &op_id, "done", total, total, None);
   Ok(meta)
+}
+
+#[taurpc::procedures(path = "plugin", event_trigger = PluginEventTrigger)]
+pub trait PluginApi {
+  #[taurpc(event)]
+  async fn install_progress(event: InstallProgress);
+  async fn read_local_file(path: String) -> Result<LocalFile, String>;
+  async fn decode_zip_meta(zip_path: String) -> Result<String, String>;
+  async fn install_zip<R: Runtime>(
+    app_handle: AppHandle<R>,
+    zip_path: String,
+    op_id: String,
+  ) -> Result<String, String>;
+}
+
+#[derive(Clone, Copy)]
+pub struct PluginApiImpl;
+
+#[taurpc::resolvers]
+impl PluginApi for PluginApiImpl {
+  async fn read_local_file(self, path: String) -> Result<LocalFile, String> {
+    read_local_file(path)
+  }
+
+  async fn decode_zip_meta(self, zip_path: String) -> Result<String, String> {
+    serde_json::to_string(&decode_zip_meta(zip_path)?).map_err(|error| error.to_string())
+  }
+
+  async fn install_zip<R: Runtime>(
+    self,
+    app_handle: AppHandle<R>,
+    zip_path: String,
+    op_id: String,
+  ) -> Result<String, String> {
+    serde_json::to_string(&install_zip(app_handle, zip_path, op_id)?)
+      .map_err(|error| error.to_string())
+  }
+}
+
+pub fn rpc_handler<R: Runtime>() -> impl taurpc::TauRpcHandler<R> {
+  PluginApiImpl.into_handler()
 }

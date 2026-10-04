@@ -175,7 +175,7 @@ pub fn prepare_requester(state: &GlobalState, client: ClientConfig) {
   state
     .cookies_jar
     .insert(client.instance_key.clone(), Arc::new(jar));
-  request::prepare_requester(&state, &client);
+  request::prepare_requester(state, &client);
 }
 
 pub async fn fetch(state: &GlobalState, content_config: ContentConfig) -> crate::Result<u32> {
@@ -186,7 +186,7 @@ pub async fn fetch(state: &GlobalState, content_config: ContentConfig) -> crate:
     );
   }
 
-  let fut = create_fetch_future(&state, content_config)?;
+  let fut = create_fetch_future(state, content_config)?;
   let rid = state.next_request_id();
   state.requests.insert(rid, create_request(fut));
 

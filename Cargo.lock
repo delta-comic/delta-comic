@@ -1160,7 +1160,6 @@ dependencies = [
  "delta-comic-native",
  "objc2-foundation",
  "serde_json",
- "specta-typescript",
  "tauri",
  "tauri-build",
  "tauri-plugin-aptabase",
@@ -1184,7 +1183,6 @@ version = "3.0.0-next.19"
 dependencies = [
  "delta-comic-native",
  "serde_json",
- "specta-typescript",
  "tauri",
  "tauri-build",
  "tauri-plugin-aptabase",
@@ -1211,7 +1209,6 @@ dependencies = [
  "serde",
  "serde_json",
  "specta",
- "specta-typescript",
  "tauri",
  "tauri-plugin-aptabase",
  "tauri-plugin-clipboard-manager",
@@ -1225,7 +1222,8 @@ dependencies = [
  "tauri-plugin-shell",
  "tauri-plugin-sql",
  "tauri-plugin-utils",
- "tauri-specta",
+ "taurpc",
+ "tokio",
  "tracing",
 ]
 
@@ -2798,6 +2796,15 @@ dependencies = [
 
 [[package]]
 name = "itertools"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b4baf93f58d4425749ca49a51c50ebab072c5df6994d08fed93541c331481dc"
@@ -3133,7 +3140,7 @@ dependencies = [
  "hex",
  "http",
  "intervaltree",
- "itertools",
+ "itertools 0.15.0",
  "librqbit-bencode",
  "librqbit-buffers",
  "librqbit-clone-to-owned",
@@ -3225,7 +3232,7 @@ dependencies = [
  "directories",
  "encoding_rs",
  "hex",
- "itertools",
+ "itertools 0.15.0",
  "librqbit-bencode",
  "librqbit-buffers",
  "librqbit-clone-to-owned",
@@ -3320,7 +3327,7 @@ dependencies = [
  "bitvec",
  "byteorder",
  "bytes",
- "itertools",
+ "itertools 0.15.0",
  "librqbit-bencode",
  "librqbit-buffers",
  "librqbit-clone-to-owned",
@@ -3352,7 +3359,7 @@ dependencies = [
  "backon",
  "byteorder",
  "futures",
- "itertools",
+ "itertools 0.15.0",
  "librqbit-bencode",
  "librqbit-buffers",
  "librqbit-core",
@@ -6479,9 +6486,12 @@ name = "tauri-plugin-db"
 version = "3.0.0-next.19"
 dependencies = [
  "percent-encoding",
+ "serde",
+ "specta",
  "tauri",
- "tauri-plugin",
  "tauri-plugin-sql",
+ "taurpc",
+ "tokio",
  "tracing",
 ]
 
@@ -6510,9 +6520,11 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2 0.11.0",
+ "specta",
  "sqlx 0.9.0",
  "tauri",
  "tauri-plugin",
+ "taurpc",
  "tempfile",
  "thiserror 2.0.21",
  "tokio",
@@ -6563,10 +6575,9 @@ dependencies = [
  "serde",
  "serde_json",
  "specta",
- "specta-typescript",
  "tauri",
  "tauri-plugin",
- "tauri-specta",
+ "taurpc",
  "thiserror 2.0.21",
  "tokio",
  "tracing",
@@ -6581,8 +6592,9 @@ dependencies = [
  "flate2",
  "log",
  "serde",
+ "specta",
  "tauri",
- "tauri-plugin",
+ "taurpc",
  "tempfile",
  "thiserror 2.0.21",
  "tokio",
@@ -6627,8 +6639,10 @@ dependencies = [
  "percent-encoding",
  "serde",
  "serde_json",
+ "specta",
  "tauri",
- "tauri-plugin",
+ "taurpc",
+ "tokio",
  "tracing",
  "zip",
 ]
@@ -6682,8 +6696,11 @@ dependencies = [
  "percent-encoding",
  "serde",
  "serde_json",
+ "specta",
+ "specta-typescript",
  "tauri",
- "tauri-plugin",
+ "taurpc",
+ "tokio",
  "tracing",
 ]
 
@@ -6748,37 +6765,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tauri-specta"
-version = "2.0.0-rc.25"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee080f36d2ac17ce2f3a82fb53f02d664e8345457de51b56dad3c394dacc41a2"
-dependencies = [
- "heck 0.5.0",
- "serde",
- "serde_json",
- "specta",
- "specta-serde",
- "specta-typescript",
- "specta-util",
- "tauri",
- "tauri-specta-macros",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "tauri-specta-macros"
-version = "2.0.0-rc.25"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a59dfdce06c98d8d211619bea5fdb39486d8a8c558e12b2d2ce255972320012"
-dependencies = [
- "darling",
- "heck 0.5.0",
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
-
-[[package]]
 name = "tauri-utils"
 version = "2.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6825,6 +6811,38 @@ dependencies = [
  "dunce",
  "embed-resource",
  "toml 1.1.4+spec-1.1.0",
+]
+
+[[package]]
+name = "taurpc"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eda059893933b703c94ef627ea4c3c647478c2a0bc414799a0250f5bc261dacc"
+dependencies = [
+ "heck 0.5.0",
+ "itertools 0.14.0",
+ "serde",
+ "serde_json",
+ "specta",
+ "specta-serde",
+ "specta-typescript",
+ "specta-util",
+ "tauri",
+ "taurpc-macros",
+ "tokio",
+]
+
+[[package]]
+name = "taurpc-macros"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd8488f9eeadb836408011a2f8633aa4c24de99dc6a77610b8e7c345230e64e8"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_json",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -6976,7 +6994,9 @@ dependencies = [
  "bytes",
  "libc",
  "mio",
+ "parking_lot",
  "pin-project-lite",
+ "signal-hook-registry",
  "socket2",
  "tokio-macros",
  "windows-sys 0.61.2",

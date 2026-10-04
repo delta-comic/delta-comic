@@ -4,9 +4,23 @@ import type { WebviewAuthResult } from '../../lib/webviewAuth'
 
 import './setup'
 
-const mocks = vi.hoisted(() => ({ invoke: vi.fn(), isTauri: vi.fn() }))
+const mocks = vi.hoisted(() => ({
+  isTauri: vi.fn(),
+  rpc: {
+    webview_open_page: vi.fn(),
+    webview_inject_code: vi.fn(),
+    webview_close_current_page: vi.fn(),
+    webview_close_page: vi.fn(),
+    webview_auth_data_current: vi.fn(),
+    webview_auth_data: vi.fn(),
+    webview_auth_data_all: vi.fn(),
+    webview_iframe_auth_data: vi.fn(),
+  },
+}))
 
-vi.mock('@tauri-apps/api/core', () => ({ invoke: mocks.invoke, isTauri: mocks.isTauri }))
+vi.mock('@tauri-apps/api/core', () => ({ isTauri: mocks.isTauri }))
+
+vi.mock('taurpc', () => ({ createTauRPCProxy: () => ({ utils: mocks.rpc }) }))
 
 const storage = (entries: Record<string, string>) =>
   Object.entries(entries).map(([key, value]) => ({ key, value }))
@@ -28,7 +42,7 @@ const snapshot = (callback: unknown = null) => ({
 
 describe('webviewAuth', () => {
   beforeEach(() => {
-    mocks.invoke.mockReset()
+    Object.values(mocks.rpc).forEach(mock => mock.mockReset())
     mocks.isTauri.mockReset().mockReturnValue(false)
   })
 
@@ -36,9 +50,9 @@ describe('webviewAuth', () => {
     vi.useRealTimers()
   })
 
-  it('calls the utils plugin command wrapper with camelCase options', async () => {
+  it('calls the utils TauRPC proxy with camelCase options', async () => {
     const page = { label: 'delta-auth-1', url: 'https://auth.test/login' }
-    mocks.invoke.mockResolvedValue(page)
+    mocks.rpc.webview_open_page.mockResolvedValue(page)
 
     const { openWebviewPage } = await import('../../lib/webviewAuth')
     const result = await openWebviewPage({
@@ -50,19 +64,22 @@ describe('webviewAuth', () => {
     })
 
     expect(result).toBe(page)
-    expect(mocks.invoke).toHaveBeenCalledWith('plugin:utils|webview_open_page', {
-      options: {
+    expect(mocks.rpc.webview_open_page).toHaveBeenCalledWith(
+      expect.objectContaining({
         callbackName: 'authCallback',
         css: 'body { color: red; }',
         js: 'callback(true)',
         title: 'Login',
         url: page.url,
-      },
-    })
+      }),
+    )
   })
 
   it('forwards every data and lifecycle command through the plugin boundary', async () => {
-    mocks.invoke.mockResolvedValue(undefined)
+    mocks.rpc.webview_auth_data_current.mockResolvedValue(undefined)
+    mocks.rpc.webview_auth_data.mockResolvedValue(undefined)
+    mocks.rpc.webview_auth_data_all.mockResolvedValue(undefined)
+    mocks.rpc.webview_iframe_auth_data.mockResolvedValue(undefined)
 
     const {
       closeCurrentWebviewPage,
@@ -83,18 +100,15 @@ describe('webviewAuth', () => {
     await getAllWebviewAuthData()
     await getWebviewIframeAuthData('auth', 250)
 
-    expect(mocks.invoke.mock.calls).toEqual([
-      [
-        'plugin:utils|webview_inject_code',
-        { options: { callbackName: 'complete', label: 'auth', js: 'complete()' } },
-      ],
-      ['plugin:utils|webview_close_current_page', {}],
-      ['plugin:utils|webview_close_page', { label: 'auth' }],
-      ['plugin:utils|webview_auth_data_current', {}],
-      ['plugin:utils|webview_auth_data', { label: 'auth' }],
-      ['plugin:utils|webview_auth_data_all', {}],
-      ['plugin:utils|webview_iframe_auth_data', { label: 'auth', waitMs: 250 }],
-    ])
+    expect(mocks.rpc.webview_inject_code).toHaveBeenCalledWith(
+      expect.objectContaining({ callbackName: 'complete', label: 'auth', js: 'complete()' }),
+    )
+    expect(mocks.rpc.webview_close_current_page).toHaveBeenCalledOnce()
+    expect(mocks.rpc.webview_close_page).toHaveBeenCalledWith('auth')
+    expect(mocks.rpc.webview_auth_data_current).toHaveBeenCalledOnce()
+    expect(mocks.rpc.webview_auth_data).toHaveBeenCalledWith('auth')
+    expect(mocks.rpc.webview_auth_data_all).toHaveBeenCalledOnce()
+    expect(mocks.rpc.webview_iframe_auth_data).toHaveBeenCalledWith('auth', 250)
     expect(
       storageEntriesToRecord([
         { key: 'duplicate', value: 'old' },
@@ -156,34 +170,31 @@ describe('webviewAuth', () => {
   it('opens a page, waits for callback data, normalizes storage, and closes the page', async () => {
     mocks.isTauri.mockReturnValue(true)
     let reads = 0
-    mocks.invoke.mockImplementation(async (command: string) => {
-      if (command === 'plugin:utils|webview_open_page') {
-        return { label: 'delta-auth-1', url: 'https://auth.test/login' }
+    mocks.rpc.webview_open_page.mockResolvedValue({
+      label: 'delta-auth-1',
+      url: 'https://auth.test/login',
+    })
+    mocks.rpc.webview_auth_data.mockImplementation(async () => {
+      reads += 1
+      return {
+        cookies: [],
+        frames: [],
+        inaccessibleFrames: [],
+        label: 'delta-auth-1',
+        storage:
+          reads === 1
+            ? snapshot()
+            : snapshot({
+                collectedAt: 2,
+                cookie: 'sid=1',
+                href: 'https://auth.test/callback',
+                localStorage: storage({ token: 'abc' }),
+                sessionStorage: storage({ nonce: 'xyz' }),
+                title: 'Done',
+                value: { ok: true },
+              }),
+        url: 'https://auth.test/login',
       }
-      if (command === 'plugin:utils|webview_auth_data') {
-        reads += 1
-        return {
-          cookies: [],
-          frames: [],
-          inaccessibleFrames: [],
-          label: 'delta-auth-1',
-          storage:
-            reads === 1
-              ? snapshot()
-              : snapshot({
-                  collectedAt: 2,
-                  cookie: 'sid=1',
-                  href: 'https://auth.test/callback',
-                  localStorage: storage({ token: 'abc' }),
-                  sessionStorage: storage({ nonce: 'xyz' }),
-                  title: 'Done',
-                  value: { ok: true },
-                }),
-          url: 'https://auth.test/login',
-        }
-      }
-      if (command === 'plugin:utils|webview_close_page') return undefined
-      throw new Error(`unexpected command: ${command}`)
     })
 
     const { PageWebviewAuth } = await import('../../lib/webviewAuth')
@@ -206,47 +217,41 @@ describe('webviewAuth', () => {
       title: 'Done',
     })
     expect(onDone).toHaveBeenCalledWith(result)
-    expect(mocks.invoke).toHaveBeenCalledWith('plugin:utils|webview_open_page', {
-      options: expect.objectContaining({
+    expect(mocks.rpc.webview_open_page).toHaveBeenCalledWith(
+      expect.objectContaining({
         allFrames: true,
         callbackName: 'authCallback',
         title: 'Login',
         url: 'https://auth.test/login',
       }),
-    })
-    expect(mocks.invoke).toHaveBeenCalledWith('plugin:utils|webview_close_page', {
-      label: 'delta-auth-1',
-    })
+    )
+    expect(mocks.rpc.webview_close_page).toHaveBeenCalledWith('delta-auth-1')
   })
 
   it('uses the page snapshot when callback storage is incomplete and tolerates close failure', async () => {
     mocks.isTauri.mockReturnValue(true)
     const closeError = new Error('native close failed')
-    mocks.invoke.mockImplementation(async (command: string) => {
-      if (command === 'plugin:utils|webview_open_page') {
-        return { label: 'delta-auth-fallback', url: 'https://auth.test/login' }
-      }
-      if (command === 'plugin:utils|webview_auth_data') {
-        return {
-          cookies: [],
-          frames: [],
-          inaccessibleFrames: [],
-          label: 'delta-auth-fallback',
-          storage: snapshot({
-            collectedAt: 2,
-            cookie: '',
-            href: '',
-            localStorage: [],
-            sessionStorage: [],
-            title: '',
-            value: 'token',
-          }),
-          url: 'https://auth.test/login',
-        }
-      }
-      if (command === 'plugin:utils|webview_close_page') throw closeError
-      throw new Error(`unexpected command: ${command}`)
+    mocks.rpc.webview_open_page.mockResolvedValue({
+      label: 'delta-auth-fallback',
+      url: 'https://auth.test/login',
     })
+    mocks.rpc.webview_auth_data.mockResolvedValue({
+      cookies: [],
+      frames: [],
+      inaccessibleFrames: [],
+      label: 'delta-auth-fallback',
+      storage: snapshot({
+        collectedAt: 2,
+        cookie: '',
+        href: '',
+        localStorage: [],
+        sessionStorage: [],
+        title: '',
+        value: 'token',
+      }),
+      url: 'https://auth.test/login',
+    })
+    mocks.rpc.webview_close_page.mockRejectedValue(closeError)
     const { Logger } = await import('@delta-comic/logger')
     const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
 
@@ -278,14 +283,11 @@ describe('webviewAuth', () => {
     const read = new Promise<unknown>(resolve => {
       resolveRead = resolve
     })
-    mocks.invoke.mockImplementation(async (command: string) => {
-      if (command === 'plugin:utils|webview_open_page') {
-        return { label: 'delta-auth-cancelled', url: 'https://auth.test/login' }
-      }
-      if (command === 'plugin:utils|webview_auth_data') return read
-      if (command === 'plugin:utils|webview_close_page') return undefined
-      throw new Error(`unexpected command: ${command}`)
+    mocks.rpc.webview_open_page.mockResolvedValue({
+      label: 'delta-auth-cancelled',
+      url: 'https://auth.test/login',
     })
+    mocks.rpc.webview_auth_data.mockReturnValue(read)
 
     const { PageWebviewAuth } = await import('../../lib/webviewAuth')
     const auth = new PageWebviewAuth(
@@ -297,9 +299,7 @@ describe('webviewAuth', () => {
     auth.onError(onError)
     const pending = auth.mount()
     await vi.waitFor(() =>
-      expect(mocks.invoke).toHaveBeenCalledWith('plugin:utils|webview_auth_data', {
-        label: 'delta-auth-cancelled',
-      }),
+      expect(mocks.rpc.webview_auth_data).toHaveBeenCalledWith('delta-auth-cancelled'),
     )
 
     await auth.unmount()
@@ -317,9 +317,7 @@ describe('webviewAuth', () => {
     const lateError = vi.fn()
     auth.onError(lateError)
     expect(lateError).toHaveBeenCalledExactlyOnceWith(onError.mock.calls[0][0])
-    expect(mocks.invoke).toHaveBeenCalledWith('plugin:utils|webview_close_page', {
-      label: 'delta-auth-cancelled',
-    })
+    expect(mocks.rpc.webview_close_page).toHaveBeenCalledWith('delta-auth-cancelled')
   })
 
   it('uses a popup and postMessage callback in a normal browser', async () => {

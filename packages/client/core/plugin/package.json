@@ -50,7 +50,8 @@
     "jszip": "catalog:",
     "ky": "catalog:",
     "lz-string": "catalog:",
-    "semver": "catalog:"
+    "semver": "catalog:",
+    "taurpc": "catalog:"
   },
   "devDependencies": {
     "@types/semver": "catalog:",

@@ -70,7 +70,7 @@ class MemoryDocument {
 }
 
 beforeEach(() => {
-  const window = { $api: {} }
+  const window = { $api: {}, Proxy: globalThis.Proxy }
   Object.defineProperty(globalThis, 'window', { configurable: true, value: window })
   Object.defineProperty(globalThis, 'document', { configurable: true, value: new MemoryDocument() })
 })

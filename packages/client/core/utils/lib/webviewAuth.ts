@@ -1,15 +1,38 @@
 import { logger } from '@delta-comic/logger'
 import { isTauri } from '@tauri-apps/api/core'
 
+import { createTauRPCProxy } from './bindings'
+import type { InjectCodeOptions, OpenPageOptions } from './bindings'
+
 const webviewAuthLogger = logger.scoped('utils:webview-auth')
 
 const CALLBACK_NAME = 'authCallback'
 const DEFAULT_POLL_INTERVAL = 300
 
-const call = async <T>(command: string, args: Record<string, unknown> = {}) => {
-  const { invoke } = await import('@tauri-apps/api/core')
-  return await invoke<T>(`plugin:utils|${command}`, args)
-}
+const rpc = createTauRPCProxy()
+
+const toRpcOpenPageOptions = (options: OpenWebviewPageOptions): OpenPageOptions => ({
+  url: options.url,
+  label: options.label ?? null,
+  title: options.title ?? null,
+  css: options.css ?? null,
+  js: options.js ?? null,
+  callbackName: options.callbackName ?? null,
+  allFrames: options.allFrames ?? null,
+  visible: options.visible ?? null,
+  width: options.width ?? null,
+  height: options.height ?? null,
+  userAgent: options.userAgent ?? null,
+  incognito: options.incognito ?? null,
+  devtools: options.devtools ?? null,
+})
+
+const toRpcInjectCodeOptions = (options: InjectWebviewCodeOptions): InjectCodeOptions => ({
+  label: options.label ?? null,
+  css: options.css ?? null,
+  js: options.js ?? null,
+  callbackName: options.callbackName ?? null,
+})
 
 export interface InjectCode {
   js: string
@@ -122,26 +145,26 @@ export interface PageWebviewAuthOptions extends Pick<
 }
 
 export const openWebviewPage = (options: OpenWebviewPageOptions) =>
-  call<OpenedWebviewPage>('webview_open_page', { options })
+  rpc.utils.webview_open_page(toRpcOpenPageOptions(options))
 
 export const injectWebviewCode = (options: InjectWebviewCodeOptions) =>
-  call<void>('webview_inject_code', { options })
+  rpc.utils.webview_inject_code(toRpcInjectCodeOptions(options))
 
-export const closeCurrentWebviewPage = () => call<void>('webview_close_current_page')
+export const closeCurrentWebviewPage = () => rpc.utils.webview_close_current_page()
 
-export const closeWebviewPage = (label: string) => call<void>('webview_close_page', { label })
+export const closeWebviewPage = (label: string) => rpc.utils.webview_close_page(label)
 
 export const getCurrentWebviewAuthData = <T = unknown>() =>
-  call<WebviewAuthData<T>>('webview_auth_data_current')
+  rpc.utils.webview_auth_data_current() as Promise<WebviewAuthData<T>>
 
 export const getWebviewAuthData = <T = unknown>(label: string) =>
-  call<WebviewAuthData<T>>('webview_auth_data', { label })
+  rpc.utils.webview_auth_data(label) as Promise<WebviewAuthData<T>>
 
 export const getAllWebviewAuthData = <T = unknown>() =>
-  call<WebviewAuthData<T>[]>('webview_auth_data_all')
+  rpc.utils.webview_auth_data_all() as Promise<WebviewAuthData<T>[]>
 
 export const getWebviewIframeAuthData = <T = unknown>(label: string, waitMs?: number) =>
-  call<WebviewAuthData<T>>('webview_iframe_auth_data', { label, waitMs })
+  rpc.utils.webview_iframe_auth_data(label, waitMs ?? null) as Promise<WebviewAuthData<T>>
 
 export const storageEntriesToRecord = (entries: StorageEntry[]) =>
   Object.fromEntries(entries.map(entry => [entry.key, entry.value]))

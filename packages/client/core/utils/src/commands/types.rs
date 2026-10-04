@@ -1,9 +1,9 @@
-use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Debug, Deserialize)]
+#[taurpc::ipc_type]
+#[derive(Debug, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct OpenPageOptions {
+pub struct OpenPageOptions {
   pub(crate) url: String,
   pub(crate) label: Option<String>,
   pub(crate) title: Option<String>,
@@ -19,33 +19,38 @@ pub(crate) struct OpenPageOptions {
   pub(crate) devtools: Option<bool>,
 }
 
-#[derive(Debug, Serialize)]
+#[taurpc::ipc_type]
+#[derive(Debug, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct OpenedPage {
+pub struct OpenedPage {
   pub(crate) label: String,
   pub(crate) url: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[taurpc::ipc_type]
+#[derive(Debug, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct InjectCodeOptions {
+pub struct InjectCodeOptions {
   pub(crate) label: Option<String>,
   pub(crate) css: Option<String>,
   pub(crate) js: Option<String>,
   pub(crate) callback_name: Option<String>,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[taurpc::ipc_type]
+#[derive(Debug, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct StorageEntry {
+pub struct StorageEntry {
   pub(crate) key: String,
   pub(crate) value: String,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[taurpc::ipc_type]
+#[derive(Debug, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct AuthCallbackSnapshot {
+pub struct AuthCallbackSnapshot {
   #[serde(default)]
+  #[specta(type = specta_typescript::Unknown)]
   pub(crate) value: Value,
   #[serde(default)]
   pub(crate) href: String,
@@ -61,9 +66,10 @@ pub(crate) struct AuthCallbackSnapshot {
   pub(crate) collected_at: u64,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[taurpc::ipc_type]
+#[derive(Debug, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct WebStorageSnapshot {
+pub struct WebStorageSnapshot {
   #[serde(default)]
   pub(crate) frame_id: String,
   #[serde(default)]
@@ -90,18 +96,20 @@ pub(crate) struct WebStorageSnapshot {
   pub(crate) collected_at: u64,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[taurpc::ipc_type]
+#[derive(Debug, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct InaccessibleFrame {
+pub struct InaccessibleFrame {
   pub(crate) index: usize,
   #[serde(default)]
   pub(crate) src: String,
   pub(crate) error: String,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[taurpc::ipc_type]
+#[derive(Debug, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct IframeCollection {
+pub struct IframeCollection {
   #[serde(default)]
   pub(crate) top: WebStorageSnapshot,
   #[serde(default)]
@@ -110,9 +118,10 @@ pub(crate) struct IframeCollection {
   pub(crate) inaccessible_frames: Vec<InaccessibleFrame>,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[taurpc::ipc_type]
+#[derive(Debug, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct WebviewCookie {
+pub struct WebviewCookie {
   pub(crate) name: String,
   pub(crate) value: String,
   #[serde(default)]
@@ -131,9 +140,9 @@ pub(crate) struct WebviewCookie {
   pub(crate) source: String,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[taurpc::ipc_type]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct WebviewAuthData {
+pub struct WebviewAuthData {
   pub(crate) label: String,
   pub(crate) url: String,
   #[serde(default)]

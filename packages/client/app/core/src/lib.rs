@@ -1,34 +1,74 @@
+use std::{fs, path::Path};
+
 use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_downloader::DownloaderExt;
-use tauri_specta::{Builder, collect_commands};
 
-#[tauri::command]
-#[specta::specta]
-fn get_runtime_platform() -> String {
-  if cfg!(target_os = "android") {
-    "android".to_string()
-  } else if cfg!(target_os = "ios") {
-    "ios".to_string()
-  } else if cfg!(target_os = "windows") {
-    "windows".to_string()
-  } else if cfg!(target_os = "macos") {
-    "macos".to_string()
-  } else if cfg!(target_os = "linux") {
-    "linux".to_string()
-  } else {
-    "unknown".to_string()
+#[taurpc::procedures(path = "app")]
+pub trait AppApi {
+  async fn get_runtime_platform() -> String;
+}
+
+#[derive(Clone)]
+struct AppApiImpl;
+
+#[taurpc::resolvers]
+impl AppApi for AppApiImpl {
+  async fn get_runtime_platform(self) -> String {
+    if cfg!(target_os = "android") {
+      "android".to_string()
+    } else if cfg!(target_os = "ios") {
+      "ios".to_string()
+    } else if cfg!(target_os = "windows") {
+      "windows".to_string()
+    } else if cfg!(target_os = "macos") {
+      "macos".to_string()
+    } else if cfg!(target_os = "linux") {
+      "linux".to_string()
+    } else {
+      "unknown".to_string()
+    }
   }
 }
 
-pub fn specta_builder() -> Builder<tauri::Wry> {
-  Builder::<tauri::Wry>::new().commands(collect_commands![get_runtime_platform])
+pub fn rpc_handler<R: tauri::Runtime>() -> impl taurpc::TauRpcHandler<R> {
+  AppApiImpl.into_handler()
+}
+
+pub fn export_bindings(
+  path: impl AsRef<Path>,
+) -> std::result::Result<(), Box<dyn std::error::Error>> {
+  let path = path.as_ref();
+  let temp_path = std::env::temp_dir().join(format!(
+    "delta-comic-app-bindings-{}.ts",
+    std::process::id()
+  ));
+  taurpc::Exporter::new().export(&AppApiImpl.into_handler(), &temp_path)?;
+  let generated = fs::read_to_string(&temp_path)?
+    .replace(", type UnlistenFn", "")
+    .into_bytes();
+  let current = fs::read(path).unwrap_or_default();
+  if generated != current {
+    fs::write(path, generated)?;
+  }
+  let _ = fs::remove_file(temp_path);
+  Ok(())
+}
+
+pub fn rpc_router<R: tauri::Runtime>() -> taurpc::Router<R> {
+  taurpc::Router::new()
+    .merge(rpc_handler())
+    .merge(tauri_plugin_http::rpc_handler())
+    .merge(tauri_plugin_downloader::rpc_handler())
+    .merge(tauri_plugin_logger::rpc_handler())
+    .merge(tauri_plugin_utils::rpc_handler())
+    .merge(tauri_plugin_db::rpc_handler())
+    .merge(tauri_plugin_plugin::rpc_handler())
 }
 
 pub fn builder() -> tauri::Builder<tauri::Wry> {
-  let specta_builder = specta_builder();
   let builder = tauri_plugin_utils::init(
     tauri::Builder::default()
-      .invoke_handler(specta_builder.invoke_handler())
+      .invoke_handler(rpc_router::<tauri::Wry>().into_handler())
       .plugin(tauri_plugin_logger::init())
       .plugin(tauri_plugin_fs::init()),
   );

@@ -11,17 +11,17 @@ workspace = true
 [dependencies.serde_json]
 workspace = true
 
-[dependencies.specta]
-workspace = true
-
-[dependencies.specta-typescript]
-workspace = true
-
 [dependencies.tauri]
 workspace = true
 features = ["protocol-asset"]
 
-[dependencies.tauri-specta]
+[dependencies.taurpc]
+workspace = true
+
+[dependencies.specta]
+workspace = true
+
+[dependencies.tokio]
 workspace = true
 
 [dependencies.tauri-plugin-aptabase]

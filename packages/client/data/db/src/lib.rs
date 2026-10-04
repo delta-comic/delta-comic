@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::{fs, path::Path};
 
 use tauri::{
   Manager, Runtime,
@@ -8,6 +9,9 @@ use tauri::{
 mod commands;
 mod migrations;
 
+use commands::DbApi;
+
+#[derive(Clone)]
 pub(crate) struct NativeStore {
   root: PathBuf,
 }
@@ -55,11 +59,6 @@ impl Builder {
 
   fn db_plugin<R: Runtime>(self) -> TauriPlugin<R> {
     PluginBuilder::new("db")
-      .invoke_handler(tauri::generate_handler![
-        commands::native_store_get,
-        commands::native_store_remove,
-        commands::native_store_set,
-      ])
       .setup(move |app, _api| {
         let root = match self.native_store_dir {
           Some(path) => path,
@@ -82,4 +81,26 @@ impl Builder {
 /// Initializes the Delta Comic database runtime integration.
 pub fn init<R: Runtime>(builder: tauri::Builder<R>) -> tauri::Builder<R> {
   Builder::new().build(builder)
+}
+
+pub fn rpc_handler<R: Runtime>() -> impl taurpc::TauRpcHandler<R> {
+  commands::rpc_handler()
+}
+
+pub fn export_bindings(
+  path: impl AsRef<Path>,
+) -> std::result::Result<(), Box<dyn std::error::Error>> {
+  let path = path.as_ref();
+  let temp_path =
+    std::env::temp_dir().join(format!("delta-comic-db-bindings-{}", std::process::id()));
+  taurpc::Exporter::new().export(&commands::DbApiImpl.into_handler(), &temp_path)?;
+  let generated = fs::read_to_string(&temp_path)?
+    .replace(", type UnlistenFn", "")
+    .into_bytes();
+  let current = fs::read(path).unwrap_or_default();
+  if generated != current {
+    fs::write(path, generated)?;
+  }
+  let _ = fs::remove_file(temp_path);
+  Ok(())
 }

@@ -157,12 +157,16 @@ export function createCORSFetch(getConfig: () => CORSFetchConfig) {
       signal?.removeEventListener('abort', onAbort)
 
       if (responseRid !== null) {
-        getCommands().fetch_cancel_body(responseRid).catch(() => {})
+        getCommands()
+          .fetch_cancel_body(responseRid)
+          .catch(() => {})
         responseRid = null
       }
 
       if (rid !== null) {
-        getCommands().fetch_cancel(rid).catch(() => {})
+        getCommands()
+          .fetch_cancel(rid)
+          .catch(() => {})
         rid = null
       }
     }
