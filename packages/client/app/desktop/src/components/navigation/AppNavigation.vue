@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { appNavigation } from '@delta-comic/core/clientHost'
 import { Icons } from '@delta-comic/core/icons'
+import { useAppStore } from '@delta-comic/core/stores/app'
 import { computed, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -51,6 +52,10 @@ const items = computed<
       to: item.path,
     })),
 ])
+
+import userIcon from '@/assets/images/userIcon.webp'
+
+const app = useAppStore()
 </script>
 
 <template>
@@ -58,11 +63,8 @@ const items = computed<
     class="app-navigation grid h-full w-22 grid-cols-1 grid-rows-[64px_repeat(2,64px)_72px_repeat(2,64px)_1fr] items-center gap-1 border-r border-dc-border bg-dc-surface px-2.5 py-3"
     :aria-label="t('navigation.aria.main')"
   >
-    <div
-      class="mx-auto grid size-11 place-items-center rounded-[15px] bg-dc-primary text-2xl font-extrabold text-white"
-      aria-hidden="true"
-    >
-      Δ
+    <div class="ml-1 size-10.25!">
+      <DcImage :src="app.activatedUser?.avatar ?? userIcon" :fallback="userIcon" round class="" />
     </div>
     <AppNavigationItem
       v-for="item in items"

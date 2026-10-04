@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import MainPageSearchBar from '@delta-comic/core/components/home/mainPageSearchBar.vue'
 import { Icons } from '@delta-comic/core/icons'
-import { useAppStore } from '@delta-comic/core/stores/app'
 import { isShowMainHomeNavBar } from '@delta-comic/core/symbol'
 import { usePluginStore } from '@delta-comic/plugin'
 import { computed, provide, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import userIcon from '@/assets/images/userIcon.webp'
 const $router = useRouter()
 const { t } = useI18n()
 const isShowNavBar = shallowRef(true)
@@ -18,7 +16,6 @@ definePage({ redirect: { name: '/main/home/random' } })
 
 const openSearch = () => $router.force.push({ name: '/main/search' })
 
-const app = useAppStore()
 const pluginStore = usePluginStore()
 
 const tabItem = computed(() =>
@@ -55,17 +52,6 @@ const tabs = computed(() => [
     ]"
     class="relative flex h-13.5 w-full items-center overflow-hidden bg-(--dc-surface) transition-transform duration-200 *:overflow-hidden"
   >
-    <div class="ml-1 size-10.25!">
-      <Teleport to="#popups">
-        <DcImage
-          :src="app.activatedUser?.avatar ?? userIcon"
-          :fallback="userIcon"
-          round
-          :class="[isShowNavBar ? 'translate-y-0' : 'translate-y-[-200%]']"
-          class="fixed top-safe-offset-2 ml-1 size-10.25! transition-transform duration-200"
-        />
-      </Teleport>
-    </div>
     <MainPageSearchBar @activate="openSearch" />
     <div class="ml-auto flex shrink-0 items-center gap-3 px-3">
       <button
