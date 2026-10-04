@@ -37,14 +37,6 @@ export default defineConfig(
     ({
       devtools: { apply: 'serve' },
       plugins: [
-        {
-          name: 'delta-comic:vapor-baseline',
-          enforce: 'pre',
-          transform(code, id) {
-            if ((process.env.DELTA_VAPOR === 'false' || process.env.VITEST) && id.endsWith('.vue'))
-              return code.replace(/<script setup vapor/g, '<script setup')
-          },
-        },
         decoratorPlugin as any,
         lazyPlugins(async () => {
           const [

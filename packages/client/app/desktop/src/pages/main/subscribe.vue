@@ -2,7 +2,6 @@
 import AuthorList from '@delta-comic/core/components/subscribe/subAuthorList.vue'
 import { Icons } from '@delta-comic/core/icons'
 import { SubscribeDB } from '@delta-comic/db'
-import { logger } from '@delta-comic/logger'
 import { DcState } from '@delta-comic/ui'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -10,14 +9,13 @@ const isOnAllPage = shallowRef(true)
 const { t } = useI18n()
 const subscribeQuery = SubscribeDB.useQuery(db =>
   db.where('type', 'is', 'author').selectAll().execute(),
-) // computedAsync(() => SubscribeDB.getAll(), [])
+)
 
 const select = shallowRef<string>()
-const selectItem = computed(() => {
-  const sub = subscribeQuery
-  logger.info(sub)
-  return sub.data.value.find(v => v.key == select.value) as SubscribeDB.Item | undefined
-})
+const selectItem = computed(
+  () =>
+    subscribeQuery?.data?.value?.find(v => v.key == select.value) as SubscribeDB.Item | undefined,
+)
 
 const isShowAllList = shallowRef(false)
 </script>
