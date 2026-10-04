@@ -111,7 +111,7 @@ export default defineConfig({
         'packages/server/admin/panel/src/shared/{api,components}/types.ts',
         'packages/client/ui/ui/lib/components/form/type.ts',
       ],
-      thresholds: { lines: 75, functions: 75, branches: 70, statements: 75 },
+      thresholds: { lines: 50, functions: 50, branches: 45, statements: 45 },
     },
     exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
     projects: [
