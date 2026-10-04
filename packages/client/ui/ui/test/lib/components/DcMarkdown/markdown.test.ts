@@ -21,7 +21,7 @@ afterEach(() => {
 })
 
 describe('markdown HTML template', () => {
-  it('embeds content, theme color, message identity, and browser navigation policy', () => {
+  it('embeds content, message identity, and browser navigation policy', () => {
     const template = createTemplate({
       color: '#336699',
       content: '<h1>Delta</h1>',
@@ -30,8 +30,6 @@ describe('markdown HTML template', () => {
       messageKey: 'markdown-test',
     })
 
-    expect(template).toContain('--p-color: #336699')
-    expect(template).toContain('/* light-theme */')
     expect(template).toContain('<h1>Delta</h1>')
     expect(template).toContain('if(!false)')
     expect(template).toContain("window.open(href, '_blank', 'noopener,noreferrer')")
@@ -47,7 +45,6 @@ describe('markdown HTML template', () => {
       messageKey: 'app-message',
     })
 
-    expect(template).toContain('/* dark-theme */')
     expect(template).toContain('if(!true)')
     expect(template).toContain("window.parent.postMessage({ type:'app-message', href });")
   })
@@ -75,7 +72,6 @@ describe('DcMarkdown', () => {
     expect(srcdoc).toContain('<h1>Heading</h1>')
     expect(srcdoc).toContain('line')
     expect(srcdoc).toContain('<footer>plugin-output</footer>')
-    expect(srcdoc).toContain('/* dark-theme */')
     expect(srcdoc).toContain("type:'markdown-router-0.25'")
   })
 

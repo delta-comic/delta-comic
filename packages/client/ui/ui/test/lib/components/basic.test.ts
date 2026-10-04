@@ -62,16 +62,13 @@ describe('small UI contracts', () => {
 
     expect(wrapper.get('svg').attributes()).toMatchObject({ height: '24px', width: '24px' })
     expect(wrapper.get('path').attributes('stroke-width')).toBe('3')
-    expect(wrapper.get('svg').classes()).not.toContain('animate-spin')
     expect(wrapper.find('span').exists()).toBe(false)
 
     await wrapper.setProps({ size: '2rem', spinning: true, textSize: '1rem' })
     expect(wrapper.get('svg').attributes('width')).toBe('2rem')
-    expect(wrapper.get('svg').classes()).toContain('animate-spin')
 
     const withText = mount(DcLoading, { slots: { default: () => 'Loading comic' } })
     expect(withText.get('span').text()).toBe('Loading comic')
-    expect(withText.get('span').attributes('style')).toContain('font-size: 14px')
   })
 
   it('renders data while reflecting loading and error states', async () => {
@@ -143,28 +140,11 @@ describe('DcCell', () => {
       },
     })
 
-    expect(wrapper.classes()).toEqual(
-      expect.arrayContaining([
-        'relative',
-        'flex',
-        "after:content-['']",
-        'active:bg-[var(--dc-cell-active-color,var(--dc-color-active))]',
-        'dc-cell--borderless',
-        'dc-cell--center',
-        'dc-cell--clickable',
-        'dc-cell--large',
-        'dc-cell--required',
-        'py-[var(--dc-cell-large-vertical-padding,var(--dc-space-3))]',
-      ]),
-    )
     expect(wrapper.attributes()).toMatchObject({ role: 'button', tabindex: '0' })
     expect(wrapper.text()).toContain('slot title')
     expect(wrapper.text()).toContain('slot label')
     expect(wrapper.text()).toContain('slot value')
     expect(wrapper.find('.extra').exists()).toBe(true)
-    expect(wrapper.find('.dc-cell__icon').classes()).toEqual(
-      expect.arrayContaining(['dc-', 'book']),
-    )
 
     await wrapper.trigger('click')
     expect(push).toHaveBeenCalledWith('/details')
@@ -201,12 +181,6 @@ describe('DcCellGroup', () => {
     })
     expect(wrapper.attributes('id')).toBe('settings-group')
     expect(wrapper.get('.dc-cell-group__title').text()).toBe('Settings')
-    expect(wrapper.get('.dc-cell-group').classes()).toEqual(
-      expect.arrayContaining([
-        '[background:var(--dc-cell-group-background,var(--dc-color-surface))]',
-        'dc-hairline-top-bottom',
-      ]),
-    )
   })
 
   it('uses the named title slot and inset layout', () => {
@@ -215,15 +189,6 @@ describe('DcCellGroup', () => {
       slots: { default: () => 'content', title: () => 'Slot title' },
     })
     expect(wrapper.get('.dc-cell-group__title').text()).toBe('Slot title')
-    expect(wrapper.get('.dc-cell-group__title').classes()).toContain('dc-cell-group__title--inset')
-    expect(wrapper.get('.dc-cell-group').classes()).toEqual(
-      expect.arrayContaining([
-        'dc-cell-group--inset',
-        '[margin:var(--dc-cell-group-inset-padding,0_var(--dc-space-4))]',
-        'rounded-[var(--dc-cell-group-inset-radius,var(--dc-radius-lg))]',
-      ]),
-    )
-    expect(wrapper.get('.dc-cell-group').classes()).not.toContain('dc-hairline-top-bottom')
   })
 })
 

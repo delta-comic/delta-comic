@@ -20,6 +20,13 @@
 - 全量 `vp test run`：169 files / 898 tests 通过，4 个文件 / 8 个测试失败；失败位于未修改的 UI Tailwind 类名断言和 release workspace 的 `@delta-comic/http` 发布配置。
 - 已签名提交 `cd1d47a2`（测试清理）与 `4c0ed81c`（覆盖率阈值调整），提交后工作树清洁。
 
+## 2026-10-04 — UI 样式实现断言清理
+
+- 用户确认类名断言限制 UI 自由，启动第二轮 Luna 扫描，重点处理 Tailwind 类名和 CSS 实现细节断言。
+- 删除 `DcTab`、基础组件、下拉刷新、虚拟瀑布流、配置提供器、Markdown、UI utils 和 admin shared components 中的类名、精确布局 style、主题 CSS 字符串和 Tailwind 合并实现断言；删除 `tailwind-components.test.ts` 样式架构约束套件。
+- 保留文本、事件、aria/role、data 属性、状态机、可见项顺序、导航和资源行为断言。UI/admin 专项 55 tests、类型检查和 `vp check --fix` 通过。
+- 全量 `vp test run`：171 files / 898 tests 通过，2 个文件 / 5 个测试失败；剩余失败全部来自未修改的 `@delta-comic/http` 发布配置检查。
+
 ## 会话记录
 
 ### 2026-10-02 — 收敛文档与生命周期残留

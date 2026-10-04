@@ -76,29 +76,6 @@ describe('DcTab', () => {
     })
     await flushPromises()
 
-    expect(wrapper.get('.dc-tabs__nav').classes()).toEqual(
-      expect.arrayContaining(['flex', 'h-[var(--dc-tabs-height,44px)]', 'bg-(--dc-color-surface)']),
-    )
-    expect(wrapper.findAll('.dc-tabs__tab')[1].classes()).toEqual(
-      expect.arrayContaining(['dc-tabs__tab--active', 'cursor-pointer', 'touch-manipulation']),
-    )
-    expect(wrapper.findAll('.dc-tabs__tab-text')[1].classes()).toEqual(
-      expect.arrayContaining([
-        'font-medium',
-        'text-(--dc-color-text)',
-        'transition-[color,font-weight]',
-      ]),
-    )
-    expect(wrapper.get('.dc-tabs__indicator').classes()).toEqual(
-      expect.arrayContaining([
-        'absolute',
-        'bg-[var(--dc-tabs-indicator-color,var(--dc-color-primary))]',
-        'transition-[transform,width]',
-      ]),
-    )
-    expect(wrapper.findAll('.dc-tabs__slide')[0].classes()).toEqual(
-      expect.arrayContaining(['flex!', 'w-auto!']),
-    )
     expect(swiper.slideTo).toHaveBeenCalledWith(1)
     expect(wrapper.text()).toContain('left')
     expect(wrapper.text()).toContain('right')
@@ -118,8 +95,6 @@ describe('DcTab', () => {
         router: false,
       },
     })
-    expect(wrapper.findAll('.dc-tabs__tab')[0].classes()).toContain('dc-tabs__tab--active')
-
     await wrapper.findAll('.dc-tabs__tab')[1].trigger('click')
     expect(wrapper.emitted('update:modelValue')).toEqual([['b']])
     expect(router.force.replace).not.toHaveBeenCalled()

@@ -7,6 +7,8 @@
 - 用户已将前端覆盖率阈值下调，目标是删除明显凑数测试，保留能表达稳定行为、抽象契约和重要失败路径的测试。
 - 当前工作树已有用户对 `vite.config.ts` 的未提交修改；审计与后续提交必须保留该修改。
 - 全仓测试入口分布在 `script/test`、`packages/client`、`packages/server`、`packages/shared`，另有 Rust/Kotlin 测试；Luna 负责先做全仓候选扫描，主代理负责最终复核。
+- 用户进一步确认，Tailwind 生成类名和样式实现细节不属于 UI 测试契约；后续 UI 测试只保留语义、状态、交互、内容和可访问性行为。
+- 第二轮扫描确认，精确 CSS transform/height、主题 CSS 字符串、Tailwind 类名合并结果和样式架构约束都属于实现细节，已从测试中移除；VirtualWaterfall 保留可见数量与源顺序，配置/手势组件保留生命周期和状态行为。
 
 ## 2026-10-02 免费计划与启动复核
 

@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, nextTick, shallowRef } from 'vue'
 
-import { cn, toUnionSource } from '../../../lib/utils/index'
+import { toUnionSource } from '../../../lib/utils/index'
 import { usePreventBack } from '../../../lib/utils/layout'
 
 describe('toUnionSource', () => {
@@ -85,10 +85,6 @@ describe('toUnionSource', () => {
 })
 
 describe('layout utilities', () => {
-  it('merges conflicting Tailwind classes predictably', () => {
-    expect(cn('px-2 text-sm', ['hidden px-4'])).toBe('text-sm hidden px-4')
-  })
-
   it('closes the active overlay before navigation and disposes the guard', async () => {
     let guard: ((to: { query: Record<string, string> }) => boolean) | undefined
     const stop = vi.fn()

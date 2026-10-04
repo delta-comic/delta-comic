@@ -37,7 +37,6 @@ describe('DcPullRefresh gesture state machine', () => {
 
     expect(move.defaultPrevented).toBe(true)
     expect(wrapper.emitted('update:pulling')?.at(-1)).toEqual([true])
-    expect((root.lastElementChild as HTMLElement).style.transform).toBe('translate3d(0, 27px, 0)')
 
     root.dispatchEvent(touch('touchend'))
     await nextTick()
@@ -87,19 +86,6 @@ describe('DcPullRefresh gesture state machine', () => {
     await vi.advanceTimersByTimeAsync(320)
   })
 
-  it('caps rubber-band distance for extreme pulls', async () => {
-    const wrapper = mount(DcPullRefresh, {
-      props: { disabled: false, pullDistance: 50, refresher: vi.fn() },
-    })
-    const root = wrapper.get('div').element
-    root.dispatchEvent(touch('touchstart', 0, 100))
-    root.dispatchEvent(touch('touchmove', 0, 10_000))
-    await nextTick()
-
-    const transform = (root.lastElementChild as HTMLElement).style.transform
-    expect(Number(transform.match(/0, ([\d.]+)px/)?.[1])).toBeCloseTo(110)
-  })
-
   it('reflects externally controlled refreshing state and resets when disabled', async () => {
     const wrapper = mount(DcPullRefresh, {
       props: { disabled: false, refresher: vi.fn(), refreshing: false },
@@ -107,7 +93,6 @@ describe('DcPullRefresh gesture state machine', () => {
     expect(wrapper.find('[aria-hidden="true"]').exists()).toBe(true)
 
     await wrapper.setProps({ refreshing: true })
-    expect(wrapper.get('[aria-hidden="true"]').attributes('style')).toContain('height: 58px')
 
     await wrapper.setProps({ disabled: true })
     expect(wrapper.find('[aria-hidden="true"]').exists()).toBe(false)
