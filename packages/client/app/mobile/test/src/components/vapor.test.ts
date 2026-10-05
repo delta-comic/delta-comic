@@ -1,6 +1,7 @@
 // cspell:ignore VDOM
 import { afterEach, describe, expect, it } from 'vite-plus/test'
-const { createApp, defineComponent, h, nextTick, shallowRef } = window.$$lib$$.Vue
+const { createApp, defineComponent, h, nextTick, shallowRef, vaporInteropPlugin } =
+  window.$$lib$$.Vue
 
 import DownloadTaskInfo from '@delta-comic/core/components/download/DownloadTaskInfo.vue'
 import LogText from '@delta-comic/core/components/logs/LogText.vue'
@@ -20,6 +21,7 @@ function mountFragment(kind: 'downloads' | 'logs') {
           : h(DownloadTaskInfo, { title: text.value, path: 'downloads/file.zip' }),
     ),
   )
+  app.use(vaporInteropPlugin)
   app.mount(container)
   cleanups.push(() => {
     app.unmount()

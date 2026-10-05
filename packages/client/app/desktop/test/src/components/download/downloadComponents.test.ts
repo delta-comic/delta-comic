@@ -239,6 +239,7 @@ const harness = await vi.hoisted(async () => {
   return {
     TaskActions: taskStub('DownloadTaskActions', 'nav'),
     TaskCard: taskStub('DownloadTaskCard', 'article'),
+    TaskInfo: taskStub('DownloadTaskInfo', 'div'),
     Vue,
     actionEvents,
     desktop: Vue.shallowRef(false),
@@ -615,7 +616,11 @@ describe('DownloadList', () => {
     mount(DownloadList, {
       props: { disabled: true, tasks },
       global: {
-        stubs: { DownloadTaskActions: harness.TaskActions, DownloadTaskCard: harness.TaskCard },
+        stubs: {
+          DownloadTaskActions: harness.TaskActions,
+          DownloadTaskCard: harness.TaskCard,
+          DownloadTaskInfo: harness.TaskInfo,
+        },
       },
     })
 

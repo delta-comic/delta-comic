@@ -106,6 +106,12 @@ import LogFileList from '../../../../src/components/logs/LogFileList.vue'
 import LogReaderPanel from '../../../../src/components/logs/LogReaderPanel.vue'
 import LogToolbar from '../../../../src/components/logs/LogToolbar.vue'
 
+const LogTextStub = {
+  name: 'LogText',
+  props: { content: String },
+  template: '<pre>{{ content }}</pre>',
+}
+
 describe('LogReaderPanel', () => {
   it('offers an explicit close action', async () => {
     const wrapper = mount(LogReaderPanel)
@@ -186,6 +192,7 @@ describe('LogContentViewer', () => {
     const content = '<script>alert("safe")</script>'
     const wrapper = mount(LogContentViewer, {
       props: { content, filtered: false, loading: false, selected: true, truncated: true },
+      global: { stubs: { LogText: LogTextStub } },
     })
 
     expect(wrapper.get('pre').text()).toBe(content)
@@ -196,6 +203,7 @@ describe('LogContentViewer', () => {
   it('distinguishes no matches from an unselected file', async () => {
     const wrapper = mount(LogContentViewer, {
       props: { content: '', filtered: true, loading: false, selected: true, truncated: false },
+      global: { stubs: { LogText: LogTextStub } },
     })
     expect(wrapper.text()).toContain('settings.logs.content.noMatches')
 

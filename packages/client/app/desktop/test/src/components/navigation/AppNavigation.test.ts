@@ -21,6 +21,10 @@ vi.mock('@delta-comic/core/icons', () => {
 
 vi.mock('@delta-comic/core/clientHost', () => ({ appNavigation: [] }))
 
+vi.mock('@delta-comic/core/stores/app', () => ({ useAppStore: () => ({ activatedUser: null }) }))
+
+vi.mock('@delta-comic/ui', () => ({ DcImage: { name: 'DcImage', render: () => null } }))
+
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }))
 
 const RouterLinkStub = defineComponent({

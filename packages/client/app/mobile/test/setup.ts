@@ -1,8 +1,11 @@
 import { configureCoreHost } from '@delta-comic/core'
+import { config } from '@vue/test-utils'
 import { vi } from 'vite-plus/test'
 
 // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
 await import('../public/runtime/host-libraries.umd.js')
+const { vaporInteropPlugin } = window.$$lib$$.Vue
+config.global.plugins = [vaporInteropPlugin]
 
 vi.mock('vue', () => window.$$lib$$.Vue)
 vi.mock('naive-ui', () => window.$$lib$$.Naive)
