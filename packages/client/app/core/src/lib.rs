@@ -1,5 +1,3 @@
-use std::fs;
-
 use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_downloader::DownloaderExt;
 
@@ -32,27 +30,6 @@ impl AppApi for AppApiImpl {
 
 pub fn rpc_handler<R: tauri::Runtime>() -> impl taurpc::TauRpcHandler<R> {
   AppApiImpl.into_handler()
-}
-
-pub fn export_bindings() -> std::result::Result<(), Box<dyn std::error::Error>> {
-  let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src/bindings.ts");
-  let temp_path = std::env::temp_dir().join(format!(
-    "delta-comic-app-bindings-{}.ts",
-    std::process::id()
-  ));
-  taurpc::Exporter::new().export(&AppApiImpl.into_handler(), &temp_path)?;
-  let mut generated = fs::read_to_string(&temp_path)?
-    .replace(", type UnlistenFn", "")
-    .into_bytes();
-  while generated.ends_with(b"\n\n") {
-    generated.pop();
-  }
-  let current = fs::read(&path).unwrap_or_default();
-  if generated != current {
-    fs::write(&path, generated)?;
-  }
-  let _ = fs::remove_file(temp_path);
-  Ok(())
 }
 
 pub fn rpc_router<R: tauri::Runtime>() -> taurpc::Router<R> {
@@ -123,6 +100,10 @@ pub fn on_event(handler: &tauri::AppHandle, event: tauri::RunEvent) {
     _ => {}
   }
 }
+
+#[cfg(test)]
+#[path = "../test/src/bindings.rs"]
+mod bindings_tests;
 
 #[cfg(test)]
 mod tests {

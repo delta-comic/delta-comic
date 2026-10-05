@@ -539,3 +539,5 @@
 - app/core 统一 Router 与 HTTP exporter 在 `tauri::async_runtime::handle().inner().enter()` 作用域内合并 handler；各 exporter 统一裁剪尾部空行，保持 bindings 内容稳定。
 - 新增 Router 构造回归测试；desktop 二进制已启动至 `application runtime ready`。
 - HTTP/native Rust 定向测试、clippy、fmt 均通过。
+
+- 2026-10-06：将 TauRPC bindings 生成触发器从 app 桌面/移动启动路径拆回 app/core、db、http、downloader、logger、utils、plugin 各自的 Rust 测试模块；删除生产库导出函数与跨包调用。七个包的 lib tests 全部通过，桌面/移动 crate cargo check、cargo fmt --check 和 git diff --check 通过。

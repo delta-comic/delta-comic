@@ -172,7 +172,7 @@
 
 ### Next Step
 
-完成最终静态检查并创建签名 Conventional 中文提交。
+本轮 TauRPC bindings 生成归属调整已完成并已通过 Rust 验证，提交签名 Conventional 中文提交。
 
 ## 阶段 7 决策
 
@@ -387,3 +387,11 @@
 ### 当前下一步
 
 创建签名提交并记录提交哈希。
+
+
+## 2026-10-06：TauRPC bindings 生成归属调整
+
+- **状态：** complete
+- 将七个 TauRPC 包的生成触发器移入各自 `test/src/bindings.rs`，测试运行时生成并校验包内 bindings 文件。
+- 删除应用桌面/移动入口的集中生成调用，以及生产库中的 `export_bindings()`。
+- `cargo fmt --all --check`、`cargo clippy --workspace --all-targets --locked -- -D warnings`、`cargo check -p delta-comic-desktop -p delta-comic-mobile --locked` 与 `cargo test --workspace --locked -- --test-threads=2` 通过。
