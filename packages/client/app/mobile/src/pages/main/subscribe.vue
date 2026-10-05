@@ -13,7 +13,8 @@ const subscribeQuery = SubscribeDB.useQuery(db =>
 
 const select = shallowRef<string>()
 const selectItem = computed(
-  () => subscribeQuery?.data?.value?.find(v => v.key == select.value) as SubscribeDB.Item | undefined,
+  () =>
+    subscribeQuery?.data?.value?.find(v => v.key == select.value) as SubscribeDB.Item | undefined,
 )
 
 const isShowAllList = shallowRef(false)

@@ -75,8 +75,8 @@
     "vue-tsc": "catalog:"
   },
   "peerDependencies": {
-    "@delta-comic/model": "workspace:*",
-    "@delta-comic/utils": "workspace:*",
+    "@delta-comic/model": "workspace:",
+    "@delta-comic/utils": "workspace:",
     "@pinia/colada": "catalog:",
     "naive-ui": "catalog:",
     "pinia": "catalog:",

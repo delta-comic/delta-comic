@@ -24,6 +24,10 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.mts",
+      "import": "./dist/adapters/index.mjs"
+    },
     "./vite": {
       "types": "./dist/vite.d.mts",
       "import": "./dist/vite.mjs"
@@ -60,10 +64,10 @@
     "vue-component-type-helpers": "catalog:"
   },
   "peerDependencies": {
-    "@delta-comic/db": "workspace:*",
-    "@delta-comic/model": "workspace:*",
-    "@delta-comic/ui": "workspace:*",
-    "@delta-comic/utils": "workspace:*",
+    "@delta-comic/db": "workspace:",
+    "@delta-comic/model": "workspace:",
+    "@delta-comic/ui": "workspace:",
+    "@delta-comic/utils": "workspace:",
     "naive-ui": "catalog:",
     "vue": "catalog:"
   }

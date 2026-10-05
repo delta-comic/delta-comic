@@ -5,6 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./lib/index.ts",
+    "./components": "./components.d.ts",
+    "./tailwind.css": "./tailwind.css",
     "./*": "./lib/*.ts",
     "./icons": "./lib/icons.tsx",
     "./components/*": "./lib/components/*"
@@ -35,6 +37,7 @@
     "vue-router": "catalog:"
   },
   "devDependencies": {
+    "@delta-comic/runtime": "workspace:",
     "@types/semver": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",

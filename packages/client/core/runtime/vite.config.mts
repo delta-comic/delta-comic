@@ -1,10 +1,9 @@
-import { cp } from 'node:fs/promises'
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite-plus'
 
 const root = fileURLToPath(new URL('.', import.meta.url))
-const output = fileURLToPath(new URL('../../app/mobile/public/runtime', import.meta.url))
+const output = fileURLToPath(new URL('./dist', import.meta.url))
 
 export default defineConfig(({ mode }) => {
   const isDevelopment = mode === 'development'
@@ -13,32 +12,12 @@ export default defineConfig(({ mode }) => {
     root,
     run: {
       tasks: {
-        'build': {
-          command: 'vp build',
-          cache: {
-            output: [{ pattern: 'packages/client/app/*/public/runtime/**', base: 'workspace' }],
-          },
-        },
-        'build:dev': {
-          command: 'vp build --mode development',
-          cache: {
-            output: [{ pattern: 'packages/client/app/*/public/runtime/**', base: 'workspace' }],
-          },
-        },
+        'build': { command: 'vp build', cache: { output: ['dist/**'] } },
+        'build:dev': { command: 'vp build --mode development', cache: { output: ['dist/**'] } },
         'typecheck': { command: 'tsc -p tsconfig.json --noEmit', cache: { output: [] } },
       },
     },
     plugins: [
-      {
-        name: 'delta-comic:copy-desktop-runtime',
-        async closeBundle() {
-          await cp(
-            output,
-            fileURLToPath(new URL('../../app/desktop/public/runtime', import.meta.url)),
-            { recursive: true },
-          )
-        },
-      },
       {
         name: 'delta-comic:validate-single-umd',
         generateBundle(_options, bundle) {

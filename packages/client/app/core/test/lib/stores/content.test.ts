@@ -5,7 +5,7 @@ import { isProxy } from 'vue'
 
 await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
-  await import('../../../../mobile/public/runtime/host-libraries.umd.js')
+  await import('@delta-comic/runtime/host-libraries.umd.js')
 })
 
 const { pageTypes } = vi.hoisted(() => ({

@@ -2,13 +2,65 @@ import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/model'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
-import { MemoryPluginFileStore } from '../../../../plugin/lib/adapters'
 import type {
   PluginArchiveRepository,
+  PluginFileReplacement,
+  PluginFileStore,
   PluginPackageCodec,
   PluginSourceResolver,
 } from '../../../lib'
 import { PluginInstallService } from '../../../lib'
+
+class MemoryPluginFileStore implements PluginFileStore {
+  readonly #files = new Map<string, Map<string, Uint8Array>>()
+
+  public async replace(
+    plugin: string,
+    files: ReadonlyMap<string, Uint8Array>,
+  ): Promise<PluginFileReplacement> {
+    const previous = new Map(
+      [...(this.#files.get(plugin) ?? new Map())].map(([path, bytes]) => [
+        path,
+        Uint8Array.from(bytes),
+      ]),
+    )
+    this.#files.set(
+      plugin,
+      new Map([...files].map(([path, bytes]) => [path, Uint8Array.from(bytes)])),
+    )
+    let settled = false
+    return {
+      commit: async () => {
+        settled = true
+      },
+      rollback: async () => {
+        if (settled) return
+        settled = true
+        this.#files.set(plugin, previous)
+      },
+    }
+  }
+
+  public async remove(plugin: string) {
+    this.#files.delete(plugin)
+  }
+
+  public async read(plugin: string, path: string) {
+    const bytes = this.#files.get(plugin)?.get(path)
+    if (!bytes) throw new Error(`plugin file not found: ${plugin}/${path}`)
+    return Uint8Array.from(bytes)
+  }
+
+  public async createAssetUrl() {
+    throw new Error('asset URLs are not available in this test store')
+  }
+
+  public async createModuleUrl() {
+    throw new Error('module URLs are not available in this test store')
+  }
+
+  public release() {}
+}
 
 const manifest = (version: string): PluginManifest => ({
   protocolVersion: 2,

@@ -8,4 +8,4 @@
 @plugin '@delta-comic/ui/tailwind';
 
 @import '@delta-comic/ui/style.css';
-@source '../../core/lib/components';
+@import '@delta-comic/core/tailwind.css';

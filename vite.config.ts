@@ -25,11 +25,8 @@ export default defineConfig({
       'check': { command: 'vp check', cache: { output: [] } },
       'dev': { command: 'vp run mobile#dev', cache: false },
       'dev:web': { command: 'vp run mobile#dev:web', cache: false },
-      'lib-build': {
-        command: 'node -e ""',
-        dependsOn: ['@delta-comic/http#build', 'mobile#build', 'desktop#build'],
-        cache: { output: [] },
-      },
+      'lib-build': { command: 'node -e ""', dependsOn: ['build:packages'], cache: { output: [] } },
+      'build:packages': { command: 'vp run -r build', cache: { output: [] } },
       'release': { command: 'node ./script/release.mts', cache: false },
       'release:dry-run': { command: 'node ./script/release.mts --dry-run', cache: false },
       'release:preview': { command: 'node ./script/release-branches.mts preview', cache: false },

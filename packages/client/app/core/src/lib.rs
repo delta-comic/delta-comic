@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::fs;
 
 use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_downloader::DownloaderExt;
@@ -34,10 +34,8 @@ pub fn rpc_handler<R: tauri::Runtime>() -> impl taurpc::TauRpcHandler<R> {
   AppApiImpl.into_handler()
 }
 
-pub fn export_bindings(
-  path: impl AsRef<Path>,
-) -> std::result::Result<(), Box<dyn std::error::Error>> {
-  let path = path.as_ref();
+pub fn export_bindings() -> std::result::Result<(), Box<dyn std::error::Error>> {
+  let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src/bindings.ts");
   let temp_path = std::env::temp_dir().join(format!(
     "delta-comic-app-bindings-{}.ts",
     std::process::id()
@@ -49,9 +47,9 @@ pub fn export_bindings(
   while generated.ends_with(b"\n\n") {
     generated.pop();
   }
-  let current = fs::read(path).unwrap_or_default();
+  let current = fs::read(&path).unwrap_or_default();
   if generated != current {
-    fs::write(path, generated)?;
+    fs::write(&path, generated)?;
   }
   let _ = fs::remove_file(temp_path);
   Ok(())
@@ -84,14 +82,6 @@ pub fn builder() -> tauri::Builder<tauri::Wry> {
     .plugin(tauri_plugin_plugin::init())
     .plugin(tauri_plugin_downloader::init());
   tauri_plugin_db::init(builder)
-}
-
-#[cfg(test)]
-mod tests {
-  #[test]
-  fn builds_rpc_router_inside_tauri_runtime() {
-    super::rpc_router::<tauri::Wry>();
-  }
 }
 
 pub fn setup(app: &mut tauri::App) -> tauri::Result<()> {
@@ -131,5 +121,13 @@ pub fn on_event(handler: &tauri::AppHandle, event: tauri::RunEvent) {
       let _ = handler.track_event("app_started", None);
     }
     _ => {}
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn builds_rpc_router_inside_tauri_runtime() {
+    super::rpc_router::<tauri::Wry>();
   }
 }

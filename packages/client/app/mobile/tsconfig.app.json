@@ -7,6 +7,7 @@
     "rootDir": "../../../../",
     "types": [
       "./components.d.ts",
+      "@delta-comic/core/components",
       "vue-component-type-helpers",
       "./typed-router.d.ts",
       "vite-plus/client",
@@ -16,5 +17,5 @@
   "vueCompilerOptions": {
     "plugins": ["vue-router/volar/sfc-typed-router", "vue-router/volar/sfc-route-blocks"]
   },
-  "include": ["./src/**/*", "./test/**/*", "../core/lib/**/*"]
+  "include": ["./src/**/*", "./test/**/*"]
 }

@@ -4,7 +4,7 @@ import { effectScope, type EffectScope } from 'vue'
 
 const mocks = await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
-  await import('../../../../../mobile/public/runtime/host-libraries.umd.js')
+  await import('@delta-comic/runtime/host-libraries.umd.js')
   const vueRuntimePath = '../../../../node_modules/vue/dist/vue.esm-bundler.js'
   const Vue = (await import(/* @vite-ignore */ vueRuntimePath)) as typeof import('vue')
   window.$$lib$$ = { ...window.$$lib$$, Vue } as typeof window.$$lib$$

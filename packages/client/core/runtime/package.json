@@ -3,7 +3,14 @@
   "version": "2.3.0",
   "private": true,
   "description": "Delta Comic 宿主与外部插件共享的预构建 UMD 运行时。",
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "exports": {
+    ".": "./dist/host-libraries.umd.js",
+    "./host-libraries.umd.js": "./dist/host-libraries.umd.js"
+  },
   "dependencies": {
     "@pinia/colada": "catalog:",
     "cordis": "catalog:",

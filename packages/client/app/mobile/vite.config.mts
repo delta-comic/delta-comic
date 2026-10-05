@@ -1,4 +1,6 @@
-import { resolve } from 'node:path'
+import { readFileSync } from 'node:fs'
+import { copyFile, mkdir } from 'node:fs/promises'
+import { relative, resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 import { transform } from '@swc/core'
@@ -8,6 +10,26 @@ import type { UserConfig } from 'vite-plus'
 import { defineConfig, lazyPlugins } from 'vite-plus'
 
 const host = process.env.TAURI_DEV_HOST
+const corePackageLib = fileURLToPath(new URL('.', import.meta.resolve('@delta-comic/core')))
+const coreComponentsDir = resolve(corePackageLib, 'components')
+const coreComponentsDeclaration = fileURLToPath(import.meta.resolve('@delta-comic/core/components'))
+const coreComponentImports = new Map(
+  [
+    ...readFileSync(coreComponentsDeclaration, 'utf8').matchAll(
+      /^\s+(\w+): typeof import\('\.\/lib\/components\/(.+)'\)\['default'\]/gm,
+    ),
+  ].map(match => [match[1], `@delta-comic/core/components/${match[2]}`]),
+)
+const coreComponentResolver = {
+  type: 'component' as const,
+  resolve: (name: string) => coreComponentImports.get(name),
+}
+const coreComponentImportPathTransform = (path: string) =>
+  path.startsWith(`${coreComponentsDir}/`)
+    ? `@delta-comic/core/components/${relative(coreComponentsDir, path)}`
+    : path
+const runtimeFile = fileURLToPath(import.meta.resolve('@delta-comic/runtime/host-libraries.umd.js'))
+const appRuntimeFile = resolve(import.meta.dirname, 'public/runtime/host-libraries.umd.js')
 // Release CI builds the workspace libraries and the shared runtime once in the `plan` job and
 // downloads the artifacts into place; skip rebuilding them on each platform runner.
 const skipLibBuild = process.env.DELTA_SKIP_LIB_BUILD === 'true'
@@ -38,6 +60,13 @@ export default defineConfig(
       devtools: { apply: 'serve' },
       plugins: [
         decoratorPlugin as any,
+        {
+          name: 'delta-comic:copy-runtime',
+          async buildStart() {
+            await mkdir(resolve(import.meta.dirname, 'public/runtime'), { recursive: true })
+            await copyFile(runtimeFile, appRuntimeFile)
+          },
+        },
         lazyPlugins(async () => {
           const [
             { exposeHostLibraries },
@@ -82,15 +111,15 @@ export default defineConfig(
             }),
             vueJsx(),
             Components({
-              dirs: ['src/components', '../core/lib/components'],
+              dirs: ['src/components', coreComponentsDir],
               dts: resolve(import.meta.dirname, 'components.d.ts'),
-              resolvers: [MotionResolver(), NaiveUiResolver(), DeltaComicUiResolver()],
-              dtsTsx: false,
-            }),
-            Components({
-              dirs: ['../core/lib/components'],
-              dts: resolve(import.meta.dirname, '../core/components.d.ts'),
-              resolvers: [MotionResolver(), NaiveUiResolver(), DeltaComicUiResolver()],
+              importPathTransform: coreComponentImportPathTransform,
+              resolvers: [
+                coreComponentResolver,
+                MotionResolver(),
+                NaiveUiResolver(),
+                DeltaComicUiResolver(),
+              ],
               dtsTsx: false,
             }),
             tailwindcss(),
