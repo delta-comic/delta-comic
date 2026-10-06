@@ -1,10 +1,10 @@
-import { db, validateReadRow, type PluginArchiveDB } from '@delta-comic/db'
-import { logger } from '@delta-comic/logger'
 import {
   pluginCatalog as defaultCatalog,
   type PluginCatalog,
   type PluginCatalogIndex,
-} from '@delta-comic/plugin'
+} from '@delta-comic/client-core-plugin'
+import { db, validateReadRow, type PluginArchiveDB } from '@delta-comic/client-data-db'
+import { logger } from '@delta-comic/shared-core-logger'
 import { refDebounced } from '@vueuse/core'
 import { computed, readonly, shallowRef } from 'vue'
 

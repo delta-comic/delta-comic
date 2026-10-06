@@ -1,4 +1,4 @@
-import { configureCoreHost } from '@delta-comic/core'
+import { configureCoreHost } from '@delta-comic/client-app-core'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, Suspense } from 'vue'
@@ -65,7 +65,7 @@ await vi.hoisted(async () => {
   }
 })
 
-vi.mock('@delta-comic/plugin', () => ({
+vi.mock('@delta-comic/client-core-plugin', () => ({
   configurePluginHost: vi.fn(),
   pluginI18n: { install: vi.fn() },
   loadEnabledPlugins,
@@ -75,14 +75,16 @@ vi.mock('@delta-comic/plugin', () => ({
     },
   }),
 }))
-vi.mock('@delta-comic/ui', () => ({ DcImage: { name: 'DcImage', render: () => null } }))
-vi.mock('@delta-comic/utils', () => ({
+vi.mock('@delta-comic/client-ui-ui', () => ({ DcImage: { name: 'DcImage', render: () => null } }))
+vi.mock('@delta-comic/client-core-utils', () => ({
   SharedFunction: {
     define: (handler: (...args: unknown[]) => unknown, _plugin: string, name: string) =>
       definitions.set(name, handler),
   },
 }))
-vi.mock('@delta-comic/core/stores/downloads', () => ({ useDownloadsStore: () => downloads }))
+vi.mock('@delta-comic/client-app-core/stores/downloads', () => ({
+  useDownloadsStore: () => downloads,
+}))
 vi.mock('@tauri-apps/api/core', () => ({ isTauri: () => true }))
 vi.mock('@tauri-apps/api/event', () => ({
   TauriEvent: { WINDOW_RESUMED: 'tauri://resumed' },

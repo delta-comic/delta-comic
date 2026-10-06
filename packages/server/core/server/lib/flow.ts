@@ -208,7 +208,7 @@ export interface FlowMetrics {
   durationMs: number
 }
 export interface FlowInstallation {
-  manifest: import('@delta-comic/plugin-manifest').PluginManifest
+  manifest: import('@delta-comic/shared-plugin-manifest').PluginManifest
   document: FlowDocument
   config: Record<string, unknown>
   enabled: boolean

@@ -1,4 +1,4 @@
-import type { PluginManifest } from '@delta-comic/model'
+import type { PluginManifest } from '@delta-comic/client-core-model'
 import {
   defineMutation,
   useMutation,

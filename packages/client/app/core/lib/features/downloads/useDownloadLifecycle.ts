@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/shared-core-logger'
 import { onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

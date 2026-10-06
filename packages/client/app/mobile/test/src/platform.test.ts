@@ -21,8 +21,8 @@ const {
 }))
 
 vi.mock('@tauri-apps/api/core', () => ({ isTauri }))
-vi.mock('@delta-comic/plugin', () => ({ getTauriPluginRoot }))
-vi.mock('@delta-comic/http', () => ({ CORSFetch: { init: corsInit } }))
+vi.mock('@delta-comic/client-core-plugin', () => ({ getTauriPluginRoot }))
+vi.mock('@delta-comic/client-platform-http', () => ({ CORSFetch: { init: corsInit } }))
 vi.mock('tauri-plugin-m3', () => ({ M3: { getInsets, setBarColor: m3SetBarColor } }))
 vi.mock('@tauri-apps/plugin-clipboard-manager', () => ({
   readText: nativeReadText,

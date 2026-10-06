@@ -1,5 +1,5 @@
 import type { DiagnosticRecorder } from '@delta-comic/both'
-import type { DB } from '@delta-comic/db'
+import type { DB } from '@delta-comic/client-data-db'
 
 import type { ClientDownloader } from './downloader.js'
 import type { ClientDatabase, ClientUi } from './host.js'

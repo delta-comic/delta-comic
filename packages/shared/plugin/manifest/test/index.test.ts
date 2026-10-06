@@ -12,7 +12,7 @@ const manifest = {
   resources: [],
 }
 
-describe('@delta-comic/plugin-manifest', () => {
+describe('@delta-comic/shared-plugin-manifest', () => {
   it('validates and parses a manifest', () => {
     expect(isPluginManifest(manifest)).toBe(true)
     expect(parsePluginManifest(manifest)).toMatchObject({ id: 'demo' })

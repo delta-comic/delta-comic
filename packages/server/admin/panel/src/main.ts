@@ -1,5 +1,5 @@
 import './index.css'
-import { installGlobalLogger, logger } from '@delta-comic/logger'
+import { installGlobalLogger, logger } from '@delta-comic/shared-core-logger'
 import { usePreferredDark } from '@vueuse/core'
 import {
   NConfigProvider,

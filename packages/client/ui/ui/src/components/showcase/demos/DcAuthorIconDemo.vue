@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UniItem } from '@delta-comic/model'
+import { UniItem } from '@delta-comic/client-core-model'
 import { NTag } from 'naive-ui'
 import { h } from 'vue'
 

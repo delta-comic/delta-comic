@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import DownloadTaskActions from '@delta-comic/core/components/download/DownloadTaskActions.vue'
-import type { DownloadTask } from '@delta-comic/core/features/downloads/downloaderClient'
+import DownloadTaskActions from '@delta-comic/client-app-core/components/download/DownloadTaskActions.vue'
+import type { DownloadTask } from '@delta-comic/client-app-core/features/downloads/downloaderClient'
 import {
   formatBytes,
   formatDuration,
@@ -8,7 +8,7 @@ import {
   taskEta,
   taskProgress,
   taskProgressIsIndeterminate,
-} from '@delta-comic/core/features/downloads/format'
+} from '@delta-comic/client-app-core/features/downloads/format'
 import { NProgress, NTag } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

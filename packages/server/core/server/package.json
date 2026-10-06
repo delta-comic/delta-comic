@@ -32,8 +32,6 @@
   },
   "dependencies": {
     "@delta-comic/both": "workspace:",
-    "@delta-comic/logger": "workspace:",
-    "@delta-comic/plugin-manifest": "workspace:",
     "@elysia/eden": "catalog:",
     "cordis": "catalog:",
     "json-logic-js": "catalog:",
@@ -45,6 +43,8 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:",
+    "@delta-comic/shared-core-logger": "workspace:",
+    "@delta-comic/shared-plugin-manifest": "workspace:",
     "@elysiajs/bearer": "catalog:",
     "@elysiajs/cors": "catalog:",
     "@elysiajs/openapi": "catalog:",

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import DestinationSelect from '@delta-comic/core/components/download/DestinationSelect.vue'
-import { resolveDestinationId } from '@delta-comic/core/features/downloads/destination'
+import DestinationSelect from '@delta-comic/client-app-core/components/download/DestinationSelect.vue'
+import { resolveDestinationId } from '@delta-comic/client-app-core/features/downloads/destination'
 import type {
   AddDownloadRequest,
   Destination,
-} from '@delta-comic/core/features/downloads/downloaderClient'
+} from '@delta-comic/client-app-core/features/downloads/downloaderClient'
 import { NButton, NForm, NFormItem, NInput, NInputNumber, NModal, NSelect } from 'naive-ui'
 import { computed, reactive, shallowRef, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

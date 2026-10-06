@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/shared-core-logger'
 import { isEmpty, isString } from 'es-toolkit/compat'
 import { shallowReactive } from 'vue'
 

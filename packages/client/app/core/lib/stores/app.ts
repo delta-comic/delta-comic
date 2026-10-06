@@ -1,4 +1,4 @@
-import type { UniUser } from '@delta-comic/model'
+import type { UniUser } from '@delta-comic/client-core-model'
 import { defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 

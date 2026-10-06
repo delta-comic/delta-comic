@@ -3,8 +3,8 @@ import { afterEach, describe, expect, it } from 'vite-plus/test'
 const { createApp, defineComponent, h, nextTick, shallowRef, vaporInteropPlugin } =
   window.$$lib$$.Vue
 
-import DownloadTaskInfo from '@delta-comic/core/components/download/DownloadTaskInfo.vue'
-import LogText from '@delta-comic/core/components/logs/LogText.vue'
+import DownloadTaskInfo from '@delta-comic/client-app-core/components/download/DownloadTaskInfo.vue'
+import LogText from '@delta-comic/client-app-core/components/logs/LogText.vue'
 
 const cleanups: Array<() => void> = []
 afterEach(() => cleanups.splice(0).forEach(cleanup => cleanup()))

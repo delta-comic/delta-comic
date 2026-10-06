@@ -1,4 +1,7 @@
 export * from '@delta-comic/both'
+export * from '@delta-comic/client-core-model'
+export * from '@delta-comic/shared-plugin-manifest'
+export * from '@delta-comic/client-platform-downloader'
 export * from './host.js'
 export * from './downloader.js'
 export * from './manifest.js'

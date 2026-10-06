@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { parsePluginManifest } from '@delta-comic/plugin-manifest'
 import { parseFlowDocument, type FlowInstallation } from '@delta-comic/server'
+import { parsePluginManifest } from '@delta-comic/shared-plugin-manifest'
 import dayjs from 'dayjs'
 import { useDialog, useMessage } from 'naive-ui'
 import { computed, onMounted, shallowRef, watch } from 'vue'

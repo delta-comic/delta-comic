@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/core",
+  "name": "@delta-comic/client-app-core",
   "version": "3.0.0-next.19",
   "private": true,
   "type": "module",
@@ -14,14 +14,14 @@
   "dependencies": {
     "@delta-comic/both": "workspace:",
     "@delta-comic/client": "workspace:",
-    "@delta-comic/db": "workspace:",
-    "@delta-comic/downloader": "workspace:",
-    "@delta-comic/logger": "workspace:",
-    "@delta-comic/model": "workspace:",
-    "@delta-comic/plugin": "workspace:",
+    "@delta-comic/client-core-model": "workspace:",
+    "@delta-comic/client-core-plugin": "workspace:",
+    "@delta-comic/client-core-utils": "workspace:",
+    "@delta-comic/client-data-db": "workspace:",
+    "@delta-comic/client-platform-downloader": "workspace:",
+    "@delta-comic/client-ui-ui": "workspace:",
     "@delta-comic/server": "workspace:",
-    "@delta-comic/ui": "workspace:",
-    "@delta-comic/utils": "workspace:",
+    "@delta-comic/shared-core-logger": "workspace:",
     "@pinia/colada": "catalog:",
     "@vueuse/core": "catalog:",
     "cordis": "catalog:",
@@ -37,7 +37,7 @@
     "vue-router": "catalog:"
   },
   "devDependencies": {
-    "@delta-comic/runtime": "workspace:",
+    "@delta-comic/client-core-runtime": "workspace:",
     "@types/semver": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",

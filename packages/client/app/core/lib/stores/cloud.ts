@@ -1,5 +1,4 @@
-import { logger } from '@delta-comic/logger'
-import { Core, useConfig } from '@delta-comic/plugin'
+import { Core, useConfig } from '@delta-comic/client-core-plugin'
 import {
   CloudClientError,
   CloudDisabledError,
@@ -10,6 +9,7 @@ import {
   type SyncPullRequest,
   type SyncPushOperation,
 } from '@delta-comic/server/api'
+import { logger } from '@delta-comic/shared-core-logger'
 import { defineStore } from 'pinia'
 import { computed, shallowRef } from 'vue'
 

@@ -1,5 +1,5 @@
-import { useConfig as useDbConfig } from '@delta-comic/db'
-import type { FormDefaultValue, FormResult } from '@delta-comic/model'
+import type { FormDefaultValue, FormResult } from '@delta-comic/client-core-model'
+import { useConfig as useDbConfig } from '@delta-comic/client-data-db'
 import { shallowReactive, type Ref } from 'vue'
 
 import type { ConfigPointer, UnwrapConfigPointer } from '../api'

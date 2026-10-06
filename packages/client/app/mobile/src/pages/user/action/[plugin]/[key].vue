@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { usePluginStore } from '@delta-comic/plugin'
+import { usePluginStore } from '@delta-comic/client-core-plugin'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 

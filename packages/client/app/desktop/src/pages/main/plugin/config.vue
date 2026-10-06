@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { translateText } from '@delta-comic/core/i18n/index'
-import { Core, useConfig } from '@delta-comic/plugin'
+import { translateText } from '@delta-comic/client-app-core/i18n/index'
+import { Core, useConfig } from '@delta-comic/client-core-plugin'
 import { NDynamicInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 

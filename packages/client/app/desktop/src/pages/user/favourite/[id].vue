@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import Action from '@delta-comic/core/components/listAction.vue'
-import Searcher from '@delta-comic/core/components/listSearcher.vue'
-import FavouriteItem from '@delta-comic/core/components/user/favouriteItem.vue'
-import FavouriteSelect from '@delta-comic/core/components/user/userFavouriteSelect.vue'
-import { Icons } from '@delta-comic/core/icons'
-import { pluginName } from '@delta-comic/core/symbol'
-import { db, DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/db'
-import { createLoadingMessage, DcState } from '@delta-comic/ui'
+import Action from '@delta-comic/client-app-core/components/listAction.vue'
+import Searcher from '@delta-comic/client-app-core/components/listSearcher.vue'
+import FavouriteItem from '@delta-comic/client-app-core/components/user/favouriteItem.vue'
+import FavouriteSelect from '@delta-comic/client-app-core/components/user/userFavouriteSelect.vue'
+import { Icons } from '@delta-comic/client-app-core/icons'
+import { pluginName } from '@delta-comic/client-app-core/symbol'
+import { db, DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/client-data-db'
+import { createLoadingMessage, DcState } from '@delta-comic/client-ui-ui'
 import { useDialog } from 'naive-ui'
 import { computed, shallowRef } from 'vue'
 import { useTemplateRef } from 'vue'
@@ -25,7 +25,9 @@ const { state: cardState } = FavouriteDB.useQueryCard<FavouriteDB.Card | undefin
   [cardKey],
 )
 const { state: itemsState } = FavouriteDB.useQueryItem<
-  Array<FavouriteDB.Item & { item: import('@delta-comic/model').UniItemRaw; key: string }>
+  Array<
+    FavouriteDB.Item & { item: import('@delta-comic/client-core-model').UniItemRaw; key: string }
+  >
 >(
   db =>
     db

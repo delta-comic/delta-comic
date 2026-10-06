@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/core/icons'
-import { SubscribeDB } from '@delta-comic/db'
-import { usePreventBack, DcState } from '@delta-comic/ui'
+import { Icons } from '@delta-comic/client-app-core/icons'
+import { SubscribeDB } from '@delta-comic/client-data-db'
+import { usePreventBack, DcState } from '@delta-comic/client-ui-ui'
 import { motion } from 'motion-v'
 import { NButton, NIcon, NTabPane, NTabs } from 'naive-ui'
 import { computed } from 'vue'

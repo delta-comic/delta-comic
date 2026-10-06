@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormPairs } from '@delta-comic/model'
+import type { FormPairs } from '@delta-comic/client-core-model'
 import { ref } from 'vue'
 
 import { DcFormPairs } from '@/index'

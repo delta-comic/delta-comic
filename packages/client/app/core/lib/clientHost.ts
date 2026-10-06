@@ -1,6 +1,10 @@
 import { type ClientRouteRegistration, type ClientUiRegistrars } from '@delta-comic/client'
-import { db, PluginDiagnosticLogDB } from '@delta-comic/db'
-import { configurePluginHost, disposePluginHost, preparePluginHost } from '@delta-comic/plugin'
+import {
+  configurePluginHost,
+  disposePluginHost,
+  preparePluginHost,
+} from '@delta-comic/client-core-plugin'
+import { db, PluginDiagnosticLogDB } from '@delta-comic/client-data-db'
 import { shallowReactive } from 'vue'
 import type { Component } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'

@@ -116,7 +116,7 @@ describe('useNativeStore', () => {
 
   it('falls back to a cloned default value when stored JSON is invalid', async () => {
     const defaultValue = { mode: 'light' }
-    const { Logger } = await import('@delta-comic/logger')
+    const { Logger } = await import('@delta-comic/shared-core-logger')
     const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => {})
     const { useNativeStore } = await mockSqliteStore([['settings:theme', '{bad json']])
 
@@ -136,7 +136,7 @@ describe('useNativeStore', () => {
 
   it('recovers from sqlite load failures without exposing a mutable default object', async () => {
     const defaultValue = { mode: 'light' }
-    const { Logger } = await import('@delta-comic/logger')
+    const { Logger } = await import('@delta-comic/shared-core-logger')
     const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
     const { useNativeStore } = await mockSqliteStore([], {
       loadError: new Error('database unavailable'),
@@ -158,7 +158,7 @@ describe('useNativeStore', () => {
 
   it('contains asynchronous persistence failures after state changes', async () => {
     vi.useFakeTimers()
-    const { Logger } = await import('@delta-comic/logger')
+    const { Logger } = await import('@delta-comic/shared-core-logger')
     const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
     const { useNativeStore } = await mockSqliteStore(
       [['settings:theme', JSON.stringify({ mode: 'dark' })]],

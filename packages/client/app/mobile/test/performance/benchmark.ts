@@ -1,5 +1,5 @@
-import DownloadTaskInfo from '@delta-comic/core/components/download/DownloadTaskInfo.vue'
-import LogText from '@delta-comic/core/components/logs/LogText.vue'
+import DownloadTaskInfo from '@delta-comic/client-app-core/components/download/DownloadTaskInfo.vue'
+import LogText from '@delta-comic/client-app-core/components/logs/LogText.vue'
 import { createApp, defineComponent, h, nextTick, shallowRef, vaporInteropPlugin } from 'vue'
 
 interface Sample {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PluginMarketplaceFilter } from '@delta-comic/core/features/pluginMarketplace/model'
+import type { PluginMarketplaceFilter } from '@delta-comic/client-app-core/features/pluginMarketplace/model'
 import { NButton, NInput, NSelect, NTag } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

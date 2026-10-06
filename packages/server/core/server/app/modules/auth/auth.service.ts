@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/shared-core-logger'
 
 import { readNumberVar } from '@/env'
 import { AppError } from '@/shared/errors'

@@ -1,5 +1,5 @@
 import { DiagnosticRecorder } from '@delta-comic/both'
-import type { DownloaderRpc } from '@delta-comic/downloader'
+import type { DownloaderRpc } from '@delta-comic/client-platform-downloader'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import { createClientDownloader, createClientNetwork } from '../lib/index.js'

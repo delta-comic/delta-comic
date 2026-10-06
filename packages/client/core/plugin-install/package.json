@@ -1,6 +1,7 @@
 {
-  "name": "@delta-comic/plugin-install",
+  "name": "@delta-comic/client-core-plugin-install",
   "version": "3.0.0-next.19",
+  "private": true,
   "description": "Plugin installation contracts and source adapters",
   "files": [
     "dist"
@@ -19,10 +20,10 @@
     "test": "vp test run"
   },
   "dependencies": {
-    "@delta-comic/logger": "workspace:",
-    "@delta-comic/model": "workspace:",
-    "@delta-comic/plugin-artifact": "workspace:",
-    "@delta-comic/plugin-manifest": "workspace:",
+    "@delta-comic/client-core-model": "workspace:",
+    "@delta-comic/client-core-plugin-artifact": "workspace:",
+    "@delta-comic/shared-core-logger": "workspace:",
+    "@delta-comic/shared-plugin-manifest": "workspace:",
     "@octokit/rest": "catalog:",
     "cordis": "catalog:",
     "es-module-lexer": "catalog:",
@@ -31,7 +32,7 @@
     "semver": "catalog:"
   },
   "devDependencies": {
-    "@delta-comic/db": "workspace:",
+    "@delta-comic/client-data-db": "workspace:",
     "@types/semver": "catalog:",
     "vite-plus": "catalog:"
   }

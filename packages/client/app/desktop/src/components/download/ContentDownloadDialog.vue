@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import DestinationSelect from '@delta-comic/core/components/download/DestinationSelect.vue'
+import DestinationSelect from '@delta-comic/client-app-core/components/download/DestinationSelect.vue'
 import {
   resolveDestinationId,
   type ContentDownloadRequest,
-} from '@delta-comic/core/features/downloads/destination'
-import type { Destination } from '@delta-comic/core/features/downloads/downloaderClient'
-import { loadContentEpisodes } from '@delta-comic/core/features/downloads/loadContentEpisodes'
-import { type UniContentPage, type UniEp } from '@delta-comic/model'
+} from '@delta-comic/client-app-core/features/downloads/destination'
+import type { Destination } from '@delta-comic/client-app-core/features/downloads/downloaderClient'
+import { loadContentEpisodes } from '@delta-comic/client-app-core/features/downloads/loadContentEpisodes'
+import { type UniContentPage, type UniEp } from '@delta-comic/client-core-model'
 import {
   NAlert,
   NButton,

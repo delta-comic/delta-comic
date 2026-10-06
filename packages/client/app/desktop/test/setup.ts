@@ -1,4 +1,4 @@
-import { configureCoreHost } from '@delta-comic/core'
+import { configureCoreHost } from '@delta-comic/client-app-core'
 import { config } from '@vue/test-utils'
 import { vi } from 'vite-plus/test'
 

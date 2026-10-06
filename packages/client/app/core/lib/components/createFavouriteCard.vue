@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FavouriteDB } from '@delta-comic/db'
+import { FavouriteDB } from '@delta-comic/client-data-db'
 import {
   NButton,
   NDrawer,

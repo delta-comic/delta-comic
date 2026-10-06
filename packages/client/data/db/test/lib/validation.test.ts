@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vite-plus/test'
 
 const mocks = vi.hoisted(() => ({ warns: [] as unknown[], errors: [] as unknown[] }))
 
-vi.mock('@delta-comic/logger', () => ({
+vi.mock('@delta-comic/shared-core-logger', () => ({
   logger: {
     scoped: () => ({
       warn: (...args: unknown[]) => mocks.warns.push(args),

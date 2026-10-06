@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/http",
+  "name": "@delta-comic/client-platform-http",
   "version": "3.0.0-next.19",
   "private": true,
   "description": "Delta Comic internal HTTP and CORS fetch bridge",

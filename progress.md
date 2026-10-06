@@ -1,5 +1,10 @@
 <!-- cspell:ignore Cordis deepseek subrequest specta -->
 
+### 2026-10-06 — SDK 发布边界收敛
+
+- 用户确认仅 `@delta-comic/both`、`@delta-comic/client`、`@delta-comic/server` 对外发布。
+- 已将 model、db、downloader、logger、plugin-manifest、plugin-artifact、plugin-install、plugin-vite、plugin、ui、utils 标记为私有候选，并开始收敛 SDK 构建与 re-export 边界。
+
 ### 2026-10-03 - HTTP 插件 Specta 过渡适配
 
 - HTTP 插件 Rust 类型和 Tauri 命令改用 `specta::Type`、`#[specta::specta]` 与旧 Specta builder。
@@ -17,7 +22,7 @@
 - 删除仅验证存在性的 `PluginManifestSchema`、数据库实例、Web dialect、动态 slot、`DcImage.imageIns` 断言；删除 desktop/mobile App、Router、平台适配中的冗余存在性与 void 返回断言；删除 server admin 路由中仅检查 not-found 组件存在的独立用例。
 - 删除存在性断言后，将依赖这些值的可选调用改为非空调用，保持缺失行为在运行时失败；保留协议、边界、失败路径、生命周期和渲染断言。desktop/mobile 的同源测试继续保留，以覆盖独立构建入口。
 - `vp run lib-build`、受影响专项测试（80 tests，单独 db 测试 1 test）、`vp check --fix`、`vp run -r typecheck` 和 `git diff --check` 通过。
-- 全量 `vp test run`：169 files / 898 tests 通过，4 个文件 / 8 个测试失败；失败位于未修改的 UI Tailwind 类名断言和 release workspace 的 `@delta-comic/http` 发布配置。
+- 全量 `vp test run`：169 files / 898 tests 通过，4 个文件 / 8 个测试失败；失败位于未修改的 UI Tailwind 类名断言和 release workspace 的 `@delta-comic/client-platform-http` 发布配置。
 - 已签名提交 `cd1d47a2`（测试清理）与 `4c0ed81c`（覆盖率阈值调整），提交后工作树清洁。
 
 ## 2026-10-04 — UI 样式实现断言清理
@@ -25,7 +30,7 @@
 - 用户确认类名断言限制 UI 自由，启动第二轮 Luna 扫描，重点处理 Tailwind 类名和 CSS 实现细节断言。
 - 删除 `DcTab`、基础组件、下拉刷新、虚拟瀑布流、配置提供器、Markdown、UI utils 和 admin shared components 中的类名、精确布局 style、主题 CSS 字符串和 Tailwind 合并实现断言；删除 `tailwind-components.test.ts` 样式架构约束套件。
 - 保留文本、事件、aria/role、data 属性、状态机、可见项顺序、导航和资源行为断言。UI/admin 专项 55 tests、类型检查和 `vp check --fix` 通过。
-- 全量 `vp test run`：171 files / 898 tests 通过，2 个文件 / 5 个测试失败；剩余失败全部来自未修改的 `@delta-comic/http` 发布配置检查。
+- 全量 `vp test run`：171 files / 898 tests 通过，2 个文件 / 5 个测试失败；剩余失败全部来自未修改的 `@delta-comic/client-platform-http` 发布配置检查。
 - 将 `packages/client/platform/http/package.json` 标记为 `private`，明确 HTTP bridge 不参与 npm 发布；release workspace 与 semantic-release 7 项测试全部通过。
 - 修复后全量 `vp test run` 通过：172 files / 901 tests；`vp check --fix` 通过且无 lint 警告，`git diff --check` 通过。
 
@@ -82,9 +87,9 @@
 
 ### 2026-09-27 — 阶段 6G Install 与 Vite Adapter
 
-- 新增 `@delta-comic/plugin-install`，迁移 Install contracts、service、source resolver、ZIP codec、stored/dev module reader、candidate provider、artifact reader 和 marketplace ports。
-- 新增 `@delta-comic/plugin-vite`，迁移构建与开发适配器，保留原生 Vite HMR、CSS bridge、Vue SFC style 聚合、CORS/no-store endpoint 和 ZIP 产物行为。
-- 聚合 `@delta-comic/plugin` 的 composition 改用新 Install/Vite 包；数据库 archive repository 保留在聚合 adapters，旧 `lib/install` 与 `vite` 源码及测试已移除。
+- 新增 `@delta-comic/client-core-plugin-install`，迁移 Install contracts、service、source resolver、ZIP codec、stored/dev module reader、candidate provider、artifact reader 和 marketplace ports。
+- 新增 `@delta-comic/client-core-plugin-vite`，迁移构建与开发适配器，保留原生 Vite HMR、CSS bridge、Vue SFC style 聚合、CORS/no-store endpoint 和 ZIP 产物行为。
+- 聚合 `@delta-comic/client-core-plugin` 的 composition 改用新 Install/Vite 包；数据库 archive repository 保留在聚合 adapters，旧 `lib/install` 与 `vite` 源码及测试已移除。
 - 发布工作区和版本同步清单纳入 `plugin-loader`、`plugin-kernel`、`plugin-install`、`plugin-runtime`、`plugin-vite`，并为新公共包补齐 `publishConfig.access`。
 - 验证通过：Install build/typecheck/24 tests，Vite build/typecheck/26 tests，plugin aggregate 13 files/40 tests，release workspace 3 tests，semantic release command 4 tests，`git diff --check`。
 - 阶段 6D/6E 的完整旧宿主迁移、发布身份/CAS、WfP provisioning、应用/admin 重组和完整部署流水线仍未完成。
@@ -94,7 +99,7 @@
 - 新增 `CordisArtifactModuleReader`，使用共享 `@delta-comic/both/artifact` 校验 Manifest、资源依赖图、路径和 SHA-256 完整性。
 - 复用现有 `PluginFileStore` 的 Blob URL + dynamic import 和资源释放边界，保留旧配置工厂 Loader 的独立行为。
 - 对 `plugin` 与 `plugin-set` 入口执行运行时形状校验，并覆盖提交、释放、错误和入口类型测试。
-- `@delta-comic/plugin` 接入 `@delta-comic/both` 依赖；插件 typecheck 与 module reader 测试（6/6）通过。
+- `@delta-comic/client-core-plugin` 接入 `@delta-comic/both` 依赖；插件 typecheck 与 module reader 测试（6/6）通过。
 
 ### 2026-09-26 — 阶段 6B Server SDK 发布构建
 
@@ -116,7 +121,7 @@
 
 - 客户端 SDK 新增 `ClientDownloader`，复用现有 Downloader 的任务、设置、下载、凭证和事件 API，并在命令边界统一写入诊断记录。
 - ClientRuntime 为每个插件提供独立 downloader key；外部注入的 downloader 由调用方管理，SDK 自建实例随 runtime dispose 释放。
-- ClientUi 接入 `@delta-comic/ui` 的 EnvironmentRegistry，以插件 ID 作为 owner；显式 disposer 和 runtime dispose 都会清理环境注册。
+- ClientUi 接入 `@delta-comic/client-ui-ui` 的 EnvironmentRegistry，以插件 ID 作为 owner；显式 disposer 和 runtime dispose 都会清理环境注册。
 - UI 新增 `./environment` 公共出口，library build 生成独立 environment 入口并保持既有 `./style.css` 对应 `dist/index.css`。
 - 客户端 SDK 新增 `./ui` 出口和 UI 生命周期测试；客户端专项测试 4/4、UI/client typecheck 与 `vp check --fix` 通过。
 - routes、导航项和 command 的真实宿主注册仍待迁移；诊断 harness、网络宿主、服务端宿主迁移和阶段 6E 保持未完成。
@@ -235,10 +240,10 @@
 
 ## 2026-10-01：6G 过渡 Kernel 清理
 
-- 审阅阶段 6G 实现后，确认聚合包仍有一套与 `@delta-comic/plugin-kernel` 重复的本地 candidate/capability/dependency/scope，以及 `runtimeAdapter` 转换层。
+- 审阅阶段 6G 实现后，确认聚合包仍有一套与 `@delta-comic/client-core-plugin-kernel` 重复的本地 candidate/capability/dependency/scope，以及 `runtimeAdapter` 转换层。
 - 插件能力、聚合入口和运行时已直接使用新 Kernel；保留插件专属的多 channel `ContributionHub`，它承载宿主模型贡献类型，不再复制通用 Kernel 协议。
 - 删除旧 Kernel 实现、对应重复测试和 capability adapter；更新 capability state 进度事件映射，并移除旧的报告字段。
-- `vp run lib-build`、`vp check --fix`、插件 architecture/capability 专项测试（4 个文件、15 个测试）、`@delta-comic/plugin` typecheck 与 `@delta-comic/plugin-kernel` typecheck 通过。
+- `vp run lib-build`、`vp check --fix`、插件 architecture/capability 专项测试（4 个文件、15 个测试）、`@delta-comic/client-core-plugin` typecheck 与 `@delta-comic/client-core-plugin-kernel` typecheck 通过。
 - 工作树中的 `AGENTS.md` 为用户提供的修改，继续保留且不纳入提交。
 ## 2026-09-27：6E Artifact 发布元数据边界
 
@@ -304,7 +309,7 @@
 
 ## 2026-09-27：阶段 6G 第一批协议包拆分
 
-- 新增公开包 `@delta-comic/plugin-manifest`、`@delta-comic/plugin-artifact` 和 `@delta-comic/plugin-api`，分别承载 Manifest 协议、artifact 校验和 platform-neutral plugin contract。
+- 新增公开包 `@delta-comic/shared-plugin-manifest`、`@delta-comic/client-core-plugin-artifact` 和 `@delta-comic/client-core-plugin-api`，分别承载 Manifest 协议、artifact 校验和 platform-neutral plugin contract。
 - client/server SDK 与现有 artifact reader 已切换到新包；`@delta-comic/both` 移除 Manifest 与 artifact 实现及对应导出，旧导入路径全量清理。
 - 新包专项测试、`vp run lib-build`、`vp check --fix`、递归 typecheck 已通过；发布 workspace 测试同步覆盖新增公开包和构建顺序。
 - loader、install、runtime、Vite adapter、聚合包后续迁移及市场管理界面仍保持未完成/暂停。
@@ -331,8 +336,8 @@
 
 ## 2026-09-27：6G-2 Runtime 完成
 
-- 完成 `@delta-comic/plugin-runtime` 的 engine/providers/store 拆分，新增 4 个 Runtime 行为测试；Runtime test、build 和检查均通过。
-- 完成聚合 composition 接线：新增 legacy Install reader/manifest/capability adapter，内置插件改用新 Kernel 定义，聚合入口导出新 Runtime；`vp run --filter '@delta-comic/plugin' typecheck`、plugin build 和 `vp run lib-build` 通过。
+- 完成 `@delta-comic/client-core-plugin-runtime` 的 engine/providers/store 拆分，新增 4 个 Runtime 行为测试；Runtime test、build 和检查均通过。
+- 完成聚合 composition 接线：新增 legacy Install reader/manifest/capability adapter，内置插件改用新 Kernel 定义，聚合入口导出新 Runtime；`vp run --filter '@delta-comic/client-core-plugin' typecheck`、plugin build 和 `vp run lib-build` 通过。
 - 删除旧聚合 Runtime 实现及 engine/providers/store 测试；聚合包没有独立 test task，使用指定 capability/install/architecture 测试验证，3 files / 15 tests 通过。
 - Runtime standalone typecheck 的 12 个 tsgo 陈旧诊断已记录为工具链限制；当前 Runtime 源码和依赖解析路径已核对。
 - 当前进度停止在 Runtime；6G-3 Install、6G-4 Vite Adapter 与完整聚合收敛保持 pending。
@@ -350,13 +355,13 @@
 ## 2026-10-01：阶段 7 启动
 
 - 阶段 6 已完成，现按 ARCHITECTURE.md 第 7 章推进 Manifest、Artifact、安装/升级与模块解析。
-- 已确认当前仓库的 `@delta-comic/plugin-manifest` 与 `@delta-comic/plugin-artifact` 是现行协议基线，`@delta-comic/plugin-install` 和数据库仍保留旧 Manifest 适配边界。
+- 已确认当前仓库的 `@delta-comic/shared-plugin-manifest` 与 `@delta-comic/client-core-plugin-artifact` 是现行协议基线，`@delta-comic/client-core-plugin-install` 和数据库仍保留旧 Manifest 适配边界。
 - 阶段 7 先收敛协议和资源图校验，再补安装兼容性、升级事务和动态 chunk 模块解析；所有结果写入本规划文件并在最终阶段签名提交。
 
 ## 2026-10-01：阶段 7 实现完成
 
-- `@delta-comic/plugin-artifact` 增加按目标平台筛选资源的校验选项；入口、资源 imports、重复路径、完整性和路径安全仍在动态加载前统一校验。
-- `@delta-comic/plugin-install` 增加 `ArtifactZipPackageCodec`、Artifact Manifest 兼容性与依赖校验、安装阶段 `afterStage` 事务钩子，以及 Blob 资源图模块 URL 解析。
+- `@delta-comic/client-core-plugin-artifact` 增加按目标平台筛选资源的校验选项；入口、资源 imports、重复路径、完整性和路径安全仍在动态加载前统一校验。
+- `@delta-comic/client-core-plugin-install` 增加 `ArtifactZipPackageCodec`、Artifact Manifest 兼容性与依赖校验、安装阶段 `afterStage` 事务钩子，以及 Blob 资源图模块 URL 解析。
 - 资源图为相对静态/动态 import 建立 URL 映射，生成的临时和最终 URL 在 dispose/失败路径统一回收；Node runner 不支持直接 import blob URL，专项测试验证了转换内容。
 - 聚合插件更新入口在新文件和数据库元数据阶段提交前执行 runtime reload，激活失败时由安装服务恢复旧版本并由宿主尝试重载旧候选。
 - 阶段专项测试已通过：artifact 3 tests、install 4 files/22 tests、manifest 2 tests；`vp check --fix` 通过。
@@ -391,7 +396,7 @@
 
 ## 2026-10-01：管理面板命名与网络测试收尾
 
-- 管理面板包由 `@delta-comic/server-admin` 更名为 `@delta-comic/admin`，源码目录由 `packages/server/admin/server-admin` 调整为 `packages/server/admin/panel`。
+- 管理面板包由 `@delta-comic/server-admin` 更名为 `@delta-comic/server-admin-panel`，源码目录由 `packages/server/admin/server-admin` 调整为 `packages/server/admin/panel`。
 - 同步 Vite+ workspace、部署 workflow、Pages 项目名 `delta-comic-admin`、日志 scope、审计 actor、浏览器存储键、服务端文档与架构引用。
 - 管理面板测试地址统一使用可解析的 `https://example.com`；运行指标页面注入离线 API 响应，测试退出时无悬挂网络请求。
 - `vp check --fix`、`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp run codegen:check` 通过；管理面板定向测试 3 files / 42 tests 通过，页面测试无 AbortError 输出。
@@ -507,7 +512,7 @@
 ## 2026-10-03：内化 HTTP 插件
 
 - 从 `tauri-plugin-better-cors-fetch` 1.8.0 clone 到 `packages/client/platform/http`，移除嵌套 `.git` 与独立项目工程化文件。
-- Rust crate 内化为 `tauri-plugin-http`，TypeScript 包内化为 `@delta-comic/http`，Tauri IPC 命名空间与 capability 更新为 `http`。
+- Rust crate 内化为 `tauri-plugin-http`，TypeScript 包内化为 `@delta-comic/client-platform-http`，Tauri IPC 命名空间与 capability 更新为 `http`。
 - desktop/mobile/core、workspace Cargo、pnpm、Vite+ 构建、TypeScript project references、版本同步脚本已完成迁移。
 - 包构建、包类型检查、包测试（3 files / 9 tests）、双端相关测试（32 files / 139 tests）、Rust fmt、包级 clippy/check 已通过。
 # 2026-10-04 TauRPC IPC migration

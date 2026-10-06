@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/core/icons'
+import { Icons } from '@delta-comic/client-app-core/icons'
 import { NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 

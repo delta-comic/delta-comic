@@ -1,4 +1,4 @@
-import type { PluginInstallOptions, PluginInstallProgress } from '@delta-comic/plugin'
+import type { PluginInstallOptions, PluginInstallProgress } from '@delta-comic/client-core-plugin'
 import { useI18n } from 'vue-i18n'
 
 import { getCoreHost } from '../../ports'

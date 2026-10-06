@@ -1,15 +1,15 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
-import type { PluginCatalog } from '@delta-comic/plugin'
+import type { PluginCatalog } from '@delta-comic/client-core-plugin'
+import type { PluginArchiveDB } from '@delta-comic/client-data-db'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 
 await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
-  await import('@delta-comic/runtime/host-libraries.umd.js')
+  await import('@delta-comic/client-core-runtime/host-libraries.umd.js')
 })
 
 const { installedRows } = vi.hoisted(() => ({ installedRows: [] as PluginArchiveDB.Archive[] }))
 
-vi.mock('@delta-comic/db', () => ({
+vi.mock('@delta-comic/client-data-db', () => ({
   db: {
     selectFrom: vi.fn(() => ({
       selectAll: vi.fn(() => ({ execute: vi.fn(async () => [...installedRows]) })),
@@ -18,7 +18,7 @@ vi.mock('@delta-comic/db', () => ({
   validateReadRow: (_table: string, row: unknown) => row,
 }))
 
-vi.mock('@delta-comic/plugin', () => ({
+vi.mock('@delta-comic/client-core-plugin', () => ({
   isPluginManifestCompatible: vi.fn(() => true),
   pluginCatalog: {},
 }))

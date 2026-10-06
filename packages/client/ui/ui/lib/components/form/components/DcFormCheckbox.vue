@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormCheckbox, FormSingleResult } from '@delta-comic/model'
+import type { FormCheckbox, FormSingleResult } from '@delta-comic/client-core-model'
 import { NCheckbox, NCheckboxGroup, NSelect, NSpace } from 'naive-ui'
 
 defineProps<{ config: FormCheckbox }>()

@@ -37,7 +37,7 @@ describe('SharedFunction', () => {
   })
 
   it('calls the only registered random implementation and errors when none exist', async () => {
-    const { Logger } = await import('@delta-comic/logger')
+    const { Logger } = await import('@delta-comic/shared-core-logger')
     const log = vi.spyOn(Logger.prototype, 'debug').mockImplementation(() => {})
     const { SharedFunction } = await import('../../lib/ipc')
 

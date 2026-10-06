@@ -1,8 +1,8 @@
-import { validateArtifact } from '@delta-comic/plugin-artifact'
+import { validateArtifact } from '@delta-comic/client-core-plugin-artifact'
 import {
   assertPluginManifestCompatible,
   type PluginManifestCompatibility,
-} from '@delta-comic/plugin-manifest'
+} from '@delta-comic/shared-plugin-manifest'
 import JSZip from 'jszip'
 
 import type { DecodedPluginPackage, PluginPackageCodec } from './contracts'

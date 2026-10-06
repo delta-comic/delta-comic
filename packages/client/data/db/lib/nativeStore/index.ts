@@ -1,5 +1,5 @@
-import { logger } from '@delta-comic/logger'
-import { SourcedValue } from '@delta-comic/model'
+import { SourcedValue } from '@delta-comic/client-core-model'
+import { logger } from '@delta-comic/shared-core-logger'
 import { ref, toValue, watch, type MaybeRefOrGetter, type Ref } from 'vue'
 
 import type { NativeStoreTable } from '../generated/native_store.table'

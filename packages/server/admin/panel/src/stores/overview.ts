@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/shared-core-logger'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { shallowRef } from 'vue'
 

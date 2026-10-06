@@ -1,4 +1,4 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
+import type { PluginArchiveDB } from '@delta-comic/client-data-db'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
@@ -10,7 +10,9 @@ const pluginMocks = vi.hoisted(() => ({
   }),
 }))
 
-vi.mock('@delta-comic/plugin', () => ({ resolvePluginIconUrl: pluginMocks.resolvePluginIconUrl }))
+vi.mock('@delta-comic/client-core-plugin', () => ({
+  resolvePluginIconUrl: pluginMocks.resolvePluginIconUrl,
+}))
 
 await vi.hoisted(async () => {
   const vueRuntimePath = '../../../../../node_modules/vue/dist/vue.esm-bundler.js'
@@ -117,12 +119,12 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 
-import PluginMarketplaceCard from '@delta-comic/core/components/plugin/marketplace/PluginMarketplaceCard.vue'
-import PluginMarketplaceFilters from '@delta-comic/core/components/plugin/marketplace/PluginMarketplaceFilters.vue'
+import PluginMarketplaceCard from '@delta-comic/client-app-core/components/plugin/marketplace/PluginMarketplaceCard.vue'
+import PluginMarketplaceFilters from '@delta-comic/client-app-core/components/plugin/marketplace/PluginMarketplaceFilters.vue'
 import type {
   PluginMarketplaceEntry,
   PluginMarketplaceItem,
-} from '@delta-comic/core/features/pluginMarketplace/model'
+} from '@delta-comic/client-app-core/features/pluginMarketplace/model'
 
 const marketplaceItem = (overrides: Partial<PluginMarketplaceItem> = {}): PluginMarketplaceItem => {
   const entry: PluginMarketplaceEntry = {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { formatBytes } from '@delta-comic/core/features/downloads/format'
-import type { DownloadFilter } from '@delta-comic/core/features/downloads/useDownloadManager'
+import { formatBytes } from '@delta-comic/client-app-core/features/downloads/format'
+import type { DownloadFilter } from '@delta-comic/client-app-core/features/downloads/useDownloadManager'
 import { NButton, NInput, NSelect } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

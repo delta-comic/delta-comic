@@ -2,7 +2,7 @@ import type {
   Destination,
   DownloadTask,
   DownloaderSettings,
-} from '@delta-comic/core/features/downloads/downloaderClient'
+} from '@delta-comic/client-app-core/features/downloads/downloaderClient'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { nextTick } from 'vue'

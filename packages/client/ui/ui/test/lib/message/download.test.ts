@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, nextTick, type VNode } from 'vue'
 
-vi.mock('@delta-comic/utils', () => ({ useGlobalVar: (value: unknown) => value }))
+vi.mock('@delta-comic/client-core-utils', () => ({ useGlobalVar: (value: unknown) => value }))
 vi.mock('motion-v', async () => {
   const { defineComponent, h } = await import('vue')
   return {

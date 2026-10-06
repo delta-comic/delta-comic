@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/core/icons'
-import { usePreventBack } from '@delta-comic/ui'
+import { Icons } from '@delta-comic/client-app-core/icons'
+import { usePreventBack } from '@delta-comic/client-ui-ui'
 import { isEmpty, uniq } from 'es-toolkit/compat'
 import { motion } from 'motion-v'
 import { NIcon } from 'naive-ui'

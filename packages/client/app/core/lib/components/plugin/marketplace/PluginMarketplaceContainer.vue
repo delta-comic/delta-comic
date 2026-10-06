@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { usePluginInstall } from '@delta-comic/core/features/pluginInstall/usePluginInstall'
+import { usePluginInstall } from '@delta-comic/client-app-core/features/pluginInstall/usePluginInstall'
 import {
   pluginMarketplaceInstallInput,
   pluginMarketplaceSourceUrl,
   type PluginMarketplaceItem,
-} from '@delta-comic/core/features/pluginMarketplace/model'
-import { usePluginMarketplace } from '@delta-comic/core/features/pluginMarketplace/usePluginMarketplace'
-import { installPlugin, updatePluginByName } from '@delta-comic/plugin'
+} from '@delta-comic/client-app-core/features/pluginMarketplace/model'
+import { usePluginMarketplace } from '@delta-comic/client-app-core/features/pluginMarketplace/usePluginMarketplace'
+import { installPlugin, updatePluginByName } from '@delta-comic/client-core-plugin'
 import { useDialog, useMessage } from 'naive-ui'
 import { computed, onMounted, shallowReactive, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'

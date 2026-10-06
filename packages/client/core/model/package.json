@@ -1,6 +1,7 @@
 {
-  "name": "@delta-comic/model",
+  "name": "@delta-comic/client-core-model",
   "version": "3.0.0-next.19",
+  "private": true,
   "description": "空阙虱楼",
   "homepage": "https://github.com/delta-comic/delta-comic",
   "license": "AGPL-3.0-only",
@@ -18,10 +19,10 @@
   "type": "module",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/lib/index.d.mts",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
-      "types": "./dist/lib/index.d.mts",
+      "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     }
   },
@@ -29,8 +30,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@delta-comic/logger": "workspace:",
-    "@delta-comic/plugin-manifest": "workspace:",
+    "@delta-comic/shared-core-logger": "workspace:",
+    "@delta-comic/shared-plugin-manifest": "workspace:",
     "es-toolkit": "catalog:"
   },
   "devDependencies": {

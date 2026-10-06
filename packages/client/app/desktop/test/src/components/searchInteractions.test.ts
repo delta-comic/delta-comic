@@ -30,8 +30,8 @@ await vi.hoisted(async () => {
   lib.Naive = { ...lib.Naive, NIcon: passthrough('NIcon', 'span') }
 })
 
-vi.mock('@delta-comic/db', () => ({ useNativeStore: () => history }))
-vi.mock('@delta-comic/ui', () => {
+vi.mock('@delta-comic/client-data-db', () => ({ useNativeStore: () => history }))
+vi.mock('@delta-comic/client-ui-ui', () => {
   const { defineComponent, h } = window.$$lib$$.Vue
   return {
     DcCell: defineComponent({
@@ -58,7 +58,7 @@ vi.mock('@delta-comic/ui', () => {
     usePreventBack: (state: { value: boolean }) => preventBackRefs.push(state),
   }
 })
-vi.mock('@delta-comic/utils', () => ({
+vi.mock('@delta-comic/client-core-utils', () => ({
   ReuseableAbortController: class ReuseableAbortController {
     private controller = new AbortController()
     get signal() {
@@ -100,13 +100,13 @@ vi.mock('motion-v', () => {
   }
 })
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }))
-vi.mock('@delta-comic/core/icons', () => ({
+vi.mock('@delta-comic/client-app-core/icons', () => ({
   Icons: { material: { CloseRound: {}, SearchFilled: {} } },
 }))
 vi.mock('@/utils/search', () => ({ getBarcodeList: barcode }))
 
-import MainPageSearchBar from '@delta-comic/core/components/home/mainPageSearchBar.vue'
-import ListSearcher from '@delta-comic/core/components/listSearcher.vue'
+import MainPageSearchBar from '@delta-comic/client-app-core/components/home/mainPageSearchBar.vue'
+import ListSearcher from '@delta-comic/client-app-core/components/listSearcher.vue'
 
 describe('ListSearcher', () => {
   let wrapper: VueWrapper | undefined

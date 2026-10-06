@@ -2,7 +2,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import type { PluginArchiveDB } from '@delta-comic/db'
+import type { PluginArchiveDB } from '@delta-comic/client-data-db'
 import JSZip from 'jszip'
 import { describe, expect, it } from 'vite-plus/test'
 
@@ -175,7 +175,7 @@ describe('deltaComic vite plugin', () => {
     }
     const result = await externals.transform?.call(
       context,
-      `import { createApp } from 'vue'\nconst db = import('@delta-comic/db')`,
+      `import { createApp } from 'vue'\nconst db = import('@delta-comic/client-data-db')`,
       '\0virtual:plugin-entry',
     )
 

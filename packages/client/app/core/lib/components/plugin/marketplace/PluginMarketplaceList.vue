@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PluginMarketplaceItem } from '@delta-comic/core/features/pluginMarketplace/model'
+import type { PluginMarketplaceItem } from '@delta-comic/client-app-core/features/pluginMarketplace/model'
 import { NAlert, NButton, NEmpty, NSpin } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 

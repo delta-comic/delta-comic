@@ -2,7 +2,7 @@ import {
   parsePluginManifest,
   type PluginManifest,
   type PluginResource,
-} from '@delta-comic/plugin-manifest'
+} from '@delta-comic/shared-plugin-manifest'
 
 export interface ArtifactFile {
   path: string

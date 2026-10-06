@@ -3,7 +3,7 @@ import {
   parsePluginManifest as parseManifest,
   type PluginManifest,
   type PluginManifestCompatibility,
-} from '@delta-comic/plugin-manifest'
+} from '@delta-comic/shared-plugin-manifest'
 
 export class PluginManifestError extends Error {
   public constructor(message: string) {

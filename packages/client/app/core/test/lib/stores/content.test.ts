@@ -1,18 +1,18 @@
-import { Logger } from '@delta-comic/logger'
+import { Logger } from '@delta-comic/shared-core-logger'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import { isProxy } from 'vue'
 
 await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
-  await import('@delta-comic/runtime/host-libraries.umd.js')
+  await import('@delta-comic/client-core-runtime/host-libraries.umd.js')
 })
 
 const { pageTypes } = vi.hoisted(() => ({
   pageTypes: new Map<string, new (...args: never[]) => unknown>(),
 }))
 
-vi.mock('@delta-comic/model', () => ({
+vi.mock('@delta-comic/client-core-model', () => ({
   UniContentPage: {
     contentPages: {
       get: (key: string | [string, string]) =>

@@ -2,7 +2,7 @@
 
 ## 1. 目标与范围
 
-阶段 6G 将现有 `@delta-comic/plugin` 中混合的协议、Loader、安装、运行时和 Vite 开发适配职责拆分为独立 workspace 包，同时保留现有客户端插件行为、安装格式、运行时生命周期和 Vite 原生 HMR 行为。
+阶段 6G 将现有 `@delta-comic/client-core-plugin` 中混合的协议、Loader、安装、运行时和 Vite 开发适配职责拆分为独立 workspace 包，同时保留现有客户端插件行为、安装格式、运行时生命周期和 Vite 原生 HMR 行为。
 
 本阶段交付：
 
@@ -10,7 +10,7 @@
 - Install 契约、安装服务、来源/codec/module reader 组合包
 - Runtime 生命周期与 provider/store 包
 - Vite build/dev adapter 包
-- `@delta-comic/plugin` 聚合入口和唯一 composition root
+- `@delta-comic/client-core-plugin` 聚合入口和唯一 composition root
 - 对应测试、包导出、依赖、发布清单和架构约束迁移
 
 阶段 6E 中的 marketplace 管理界面、发布者身份、CAS、artifact 上传、Workers for Platforms provisioning 和完整部署流水线继续作为后续事项记录，不混入 6G 的包边界迁移。
@@ -32,11 +32,11 @@ plugin-vite ──> plugin-manifest + plugin-install contracts + Vite
 plugin (composition/aggregate) ──> all public plugin packages + app adapters
 ```
 
-包内代码禁止通过 `@delta-comic/plugin` 或自身 `@/index` 反向导入。每个独立包的 `index.ts` 只负责导出，具体组合只允许出现在 `composition.ts` 或对应 adapter entry。
+包内代码禁止通过 `@delta-comic/client-core-plugin` 或自身 `@/index` 反向导入。每个独立包的 `index.ts` 只负责导出，具体组合只允许出现在 `composition.ts` 或对应 adapter entry。
 
 ### 2.2 公共协议复用
 
-`@delta-comic/plugin-manifest` 是 Manifest 类型、schema 和 parser 的唯一来源；`@delta-comic/plugin-artifact` 是 artifact 文件、完整性和资源依赖校验的唯一来源。旧 `@delta-comic/model` 中与插件协议重复的类型在迁移过程中通过明确的类型别名或字段适配消除，避免形成双协议。
+`@delta-comic/shared-plugin-manifest` 是 Manifest 类型、schema 和 parser 的唯一来源；`@delta-comic/client-core-plugin-artifact` 是 artifact 文件、完整性和资源依赖校验的唯一来源。旧 `@delta-comic/client-core-model` 中与插件协议重复的类型在迁移过程中通过明确的类型别名或字段适配消除，避免形成双协议。
 
 ### 2.3 行为保持
 
@@ -48,31 +48,31 @@ plugin (composition/aggregate) ──> all public plugin packages + app adapters
 
 ## 3. 包职责
 
-### 3.1 `@delta-comic/plugin-kernel`
+### 3.1 `@delta-comic/client-core-plugin-kernel`
 
 承载 source-agnostic 核心模型：candidate、provider、dependency planner、capability、contribution hub 和 scope。它只依赖协议/API 所需的纯类型，不依赖 Vue、数据库、Tauri、文件系统、网络或 Vite。
 
-### 3.2 `@delta-comic/plugin-loader`
+### 3.2 `@delta-comic/client-core-plugin-loader`
 
 承载 candidate module loading 的最小契约和通用 helper：`LoadedPluginModule`、module reader 组合、入口形状检查以及 loader 相关错误/结果类型。Loader 不获取来源、不访问数据库、不决定安装顺序；它接收 candidate 或已经解码的模块输入，并把模块交给 runtime。
 
 若现有 candidate 类型与 Loader 契约存在循环依赖，则 Loader 复用 kernel 的 candidate/module 类型，具体 stored/dev reader 留在 Install 包，由 composition 注入 `PluginModuleReader`。
 
-### 3.3 `@delta-comic/plugin-runtime`
+### 3.3 `@delta-comic/client-core-plugin-runtime`
 
 迁移 `PluginRuntime`、provider、store 及运行时报告/操作类型。Runtime 只依赖 API、kernel 和 loader contracts；Vue 作为 runtime 的宿主渲染依赖保留在该包的 peerDependencies。它不导入 install repository、codec、source resolver、数据库、Tauri 或具体文件存储。
 
-### 3.4 `@delta-comic/plugin-install`
+### 3.4 `@delta-comic/client-core-plugin-install`
 
 承载 Install public contracts、`PluginInstallService`、来源 resolver、package codec、stored/dev module reader、candidate provider 和通用 repository/file-store ports。所有输入来源通过 resolver/codec/reader port 注入；安装服务不直接导入应用 presentation 或 runtime engine。
 
-数据库 repository、Tauri 文件存储、市场客户端和 Awesome Registry client 作为 `@delta-comic/plugin` 的 concrete adapters 保留在 composition 侧，或拆为 adapter-only 子包；它们不得进入 install core 的依赖图。
+数据库 repository、Tauri 文件存储、市场客户端和 Awesome Registry client 作为 `@delta-comic/client-core-plugin` 的 concrete adapters 保留在 composition 侧，或拆为 adapter-only 子包；它们不得进入 install core 的依赖图。
 
-### 3.5 `@delta-comic/plugin-vite`
+### 3.5 `@delta-comic/client-core-plugin-vite`
 
 承载 Vite build/dev adapter、manifest wiring、plugin ZIP 输出、host external 配置和原生 HMR/CSS bridge。它依赖 Vite、Manifest、artifact 相关协议和通用 install/dev contracts，不依赖 runtime engine、数据库或 app services。
 
-### 3.6 `@delta-comic/plugin`
+### 3.6 `@delta-comic/client-core-plugin`
 
 作为聚合包和应用组合入口：保留公共 re-export、capabilities、builtins、具体 adapters、`composition.ts` 和宿主 integration。它负责组装数据库 repository、文件存储、source resolver、codec、module reader、runtime provider 和 runtime；具体 app service 依赖集中在这里。
 
@@ -116,6 +116,6 @@ plugin (composition/aggregate) ──> all public plugin packages + app adapters
 
 1. 新包职责和依赖图与本 spec 一致，且所有包可独立构建与类型检查。
 2. 现有插件安装、加载、运行、停用、重载、卸载和开发 HMR 测试全部通过。
-3. `@delta-comic/plugin` 仅保留聚合/组合和应用 concrete adapters，不再承载重复的 Loader/Install/Runtime/Vite 核心实现。
+3. `@delta-comic/client-core-plugin` 仅保留聚合/组合和应用 concrete adapters，不再承载重复的 Loader/Install/Runtime/Vite 核心实现。
 4. 发布清单、版本同步和 lockfile 已更新，工作区无未提交变更。
 5. 每个阶段提交均使用签名 Conventional/Angular 中文提交信息，并在规划文件中记录验证结果和遗留事项。

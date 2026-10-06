@@ -1,4 +1,4 @@
-import { parsePluginManifest } from '@delta-comic/plugin-manifest'
+import { parsePluginManifest } from '@delta-comic/shared-plugin-manifest'
 
 import type { ServerPluginPackage } from '@/infrastructure/d1/generated/server_plugin_packages.table'
 import type { ServerPluginRun } from '@/infrastructure/d1/generated/server_plugin_runs.table'

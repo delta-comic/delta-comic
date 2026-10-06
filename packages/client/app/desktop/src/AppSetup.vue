@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { configurePluginHost, loadEnabledPlugins } from '@delta-comic/plugin'
+import { configurePluginHost, loadEnabledPlugins } from '@delta-comic/client-core-plugin'
 import { useDialog, useLoadingBar, useMessage } from 'naive-ui'
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'

@@ -10,15 +10,19 @@ import type { UserConfig } from 'vite-plus'
 import { defineConfig, lazyPlugins } from 'vite-plus'
 
 const host = process.env.TAURI_DEV_HOST
-const corePackageLib = fileURLToPath(new URL('.', import.meta.resolve('@delta-comic/core')))
+const corePackageLib = fileURLToPath(
+  new URL('.', import.meta.resolve('@delta-comic/client-app-core')),
+)
 const coreComponentsDir = resolve(corePackageLib, 'components')
-const coreComponentsDeclaration = fileURLToPath(import.meta.resolve('@delta-comic/core/components'))
+const coreComponentsDeclaration = fileURLToPath(
+  import.meta.resolve('@delta-comic/client-app-core/components'),
+)
 const coreComponentImports = new Map(
   [
     ...readFileSync(coreComponentsDeclaration, 'utf8').matchAll(
       /^\s+(\w+): typeof import\('\.\/lib\/components\/(.+)'\)\['default'\]/gm,
     ),
-  ].map(match => [match[1], `@delta-comic/core/components/${match[2]}`]),
+  ].map(match => [match[1], `@delta-comic/client-app-core/components/${match[2]}`]),
 )
 const coreComponentResolver = {
   type: 'component' as const,
@@ -26,9 +30,11 @@ const coreComponentResolver = {
 }
 const coreComponentImportPathTransform = (path: string) =>
   path.startsWith(`${coreComponentsDir}/`)
-    ? `@delta-comic/core/components/${relative(coreComponentsDir, path)}`
+    ? `@delta-comic/client-app-core/components/${relative(coreComponentsDir, path)}`
     : path
-const runtimeFile = fileURLToPath(import.meta.resolve('@delta-comic/runtime/host-libraries.umd.js'))
+const runtimeFile = fileURLToPath(
+  import.meta.resolve('@delta-comic/client-core-runtime/host-libraries.umd.js'),
+)
 const appRuntimeFile = resolve(import.meta.dirname, 'public/runtime/host-libraries.umd.js')
 // Release CI builds the workspace libraries and the shared runtime once in the `plan` job and
 // downloads the artifacts into place; skip rebuilding them on each platform runner.
@@ -82,7 +88,7 @@ export default defineConfig(
             { default: VueRouter },
             { DeltaComicUiResolver },
           ] = await Promise.all([
-            import('@delta-comic/utils/vite'),
+            import('@delta-comic/client-core-utils/vite'),
             import('@tailwindcss/vite'),
             import('@vitejs/plugin-legacy'),
             import('@vitejs/plugin-vue'),
@@ -93,7 +99,7 @@ export default defineConfig(
             import('vite-plugin-vue-devtools'),
             import('vite-plugin-wasm'),
             import('vue-router/vite'),
-            import('@delta-comic/ui/vite'),
+            import('@delta-comic/client-ui-ui/vite'),
           ])
 
           return [
@@ -182,14 +188,17 @@ export default defineConfig(
             command: 'vp build',
             dependsOn: skipLibBuild
               ? []
-              : [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build'],
+              : [{ task: 'build', from: 'dependencies' }, '@delta-comic/client-core-runtime#build'],
             cache: { output: ['dist/**', 'components.d.ts', 'typed-router.d.ts'] },
           },
           'dev': { command: 'tauri android dev', cache: false },
           'dev:web': {
             command: 'vp dev',
             cache: false,
-            dependsOn: [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build:dev'],
+            dependsOn: [
+              { task: 'build', from: 'dependencies' },
+              '@delta-comic/client-core-runtime#build:dev',
+            ],
           },
           'tauri': { command: 'vp exec tauri', cache: false },
           'typecheck': {

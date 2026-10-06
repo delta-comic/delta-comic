@@ -1,4 +1,4 @@
-import type { FormConfigure, FormSingleConfigure } from '@delta-comic/model'
+import type { FormConfigure, FormSingleConfigure } from '@delta-comic/client-core-model'
 
 import { translateText } from './index'
 

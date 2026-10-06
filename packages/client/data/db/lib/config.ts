@@ -1,5 +1,5 @@
-import { logger } from '@delta-comic/logger'
-import type { FormResult, FormSingleConfigure } from '@delta-comic/model'
+import type { FormResult, FormSingleConfigure } from '@delta-comic/client-core-model'
+import { logger } from '@delta-comic/shared-core-logger'
 import { fromPairs } from 'es-toolkit/compat'
 import { ref, watch, type Ref } from 'vue'
 

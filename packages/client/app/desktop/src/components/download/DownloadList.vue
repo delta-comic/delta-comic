@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import DownloadTaskActions from '@delta-comic/core/components/download/DownloadTaskActions.vue'
-import DownloadTaskInfo from '@delta-comic/core/components/download/DownloadTaskInfo.vue'
-import type { DownloadTask } from '@delta-comic/core/features/downloads/downloaderClient'
+import DownloadTaskActions from '@delta-comic/client-app-core/components/download/DownloadTaskActions.vue'
+import DownloadTaskInfo from '@delta-comic/client-app-core/components/download/DownloadTaskInfo.vue'
+import type { DownloadTask } from '@delta-comic/client-app-core/features/downloads/downloaderClient'
 import {
   formatBytes,
   taskDisplayName,
   taskProgress,
   taskProgressIsIndeterminate,
-} from '@delta-comic/core/features/downloads/format'
+} from '@delta-comic/client-app-core/features/downloads/format'
 import { useVirtualList } from '@vueuse/core'
 import { NEmpty, NProgress, NTag } from 'naive-ui'
 import { computed, toRef } from 'vue'

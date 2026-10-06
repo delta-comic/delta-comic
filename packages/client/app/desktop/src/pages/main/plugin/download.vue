@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { usePluginInstall } from '@delta-comic/core/features/pluginInstall/usePluginInstall'
-import { logger } from '@delta-comic/logger'
-import { installPlugin } from '@delta-comic/plugin'
+import { usePluginInstall } from '@delta-comic/client-app-core/features/pluginInstall/usePluginInstall'
+import { installPlugin } from '@delta-comic/client-core-plugin'
+import { logger } from '@delta-comic/shared-core-logger'
 import { toReactive, useFileDialog } from '@vueuse/core'
 import { useDialog, useMessage } from 'naive-ui'
 import { ref } from 'vue'

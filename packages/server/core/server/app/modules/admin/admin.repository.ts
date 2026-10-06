@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/shared-core-logger'
 import { sql } from 'kysely'
 
 import { serverPluginRunsRowSchema } from '@/infrastructure/d1/generated/schemas'

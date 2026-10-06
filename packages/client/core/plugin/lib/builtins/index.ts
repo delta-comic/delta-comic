@@ -1,4 +1,4 @@
-import type { PluginManifest } from '@delta-comic/plugin-manifest'
+import type { PluginManifest } from '@delta-comic/shared-plugin-manifest'
 import type { Plugin } from 'cordis'
 
 export { manifest as coreManifest } from './core.builtin'

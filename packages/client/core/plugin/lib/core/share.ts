@@ -1,5 +1,5 @@
-import { UniContentPage } from '@delta-comic/model'
-import { SharedFunction } from '@delta-comic/utils'
+import { UniContentPage } from '@delta-comic/client-core-model'
+import { SharedFunction } from '@delta-comic/client-core-utils'
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
 
 import { pluginI18n } from '../adapters'

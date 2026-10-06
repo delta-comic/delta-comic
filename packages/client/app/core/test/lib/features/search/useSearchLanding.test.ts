@@ -4,7 +4,7 @@ import { effectScope, type EffectScope } from 'vue'
 
 const mocks = await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
-  await import('@delta-comic/runtime/host-libraries.umd.js')
+  await import('@delta-comic/client-core-runtime/host-libraries.umd.js')
   const vueRuntimePath = '../../../../node_modules/vue/dist/vue.esm-bundler.js'
   const Vue = (await import(/* @vite-ignore */ vueRuntimePath)) as typeof import('vue')
   window.$$lib$$ = { ...window.$$lib$$, Vue } as typeof window.$$lib$$
@@ -15,8 +15,8 @@ const mocks = await vi.hoisted(async () => {
   }
 })
 
-vi.mock('@delta-comic/db', () => ({ useNativeStore: () => mocks.history }))
-vi.mock('@delta-comic/plugin', () => ({
+vi.mock('@delta-comic/client-data-db', () => ({ useNativeStore: () => mocks.history }))
+vi.mock('@delta-comic/client-core-plugin', () => ({
   usePluginStore: () => ({
     displayName: (plugin: string) => `${plugin} trending`,
     get content() {
@@ -24,7 +24,7 @@ vi.mock('@delta-comic/plugin', () => ({
     },
   }),
 }))
-vi.mock('@delta-comic/utils', () => ({ SharedFunction: { call: mocks.routeCall } }))
+vi.mock('@delta-comic/client-core-utils', () => ({ SharedFunction: { call: mocks.routeCall } }))
 vi.mock('../../../../lib/symbol', () => ({ pluginName: 'app' }))
 
 import { useSearchLanding } from '../../../../lib/features/search/useSearchLanding'

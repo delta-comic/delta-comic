@@ -65,18 +65,19 @@ describe('host external libraries', () => {
 
   it('does not externalize host ESM modules in the application', async () => {
     const plugin = exposeHostLibraries({ entry: '/repo/src/main.tsx' })
-    const source = `const database = import('@delta-comic/db')`
+    const source = `const database = import('@delta-comic/client-data-db')`
     const result = await plugin.transform.call(context, source, '/repo/src/feature.ts')
 
     expect(result).toBeUndefined()
-    expect(umdDepends).not.toHaveProperty('@delta-comic/db')
+    expect(umdDepends).not.toHaveProperty('@delta-comic/client-data-db')
   })
 
   it('externalizes all ABI modules for third-party plugin bundles', async () => {
     const plugin = externalizeSharedRuntime()
-    const source = [`import { ref } from 'vue'`, `const database = import('@delta-comic/db')`].join(
-      '\n',
-    )
+    const source = [
+      `import { ref } from 'vue'`,
+      `const database = import('@delta-comic/client-data-db')`,
+    ].join('\n')
     const result = await plugin.transform.call(context, source, '\0virtual:plugin-entry')
 
     expect(result?.code).toContain('const ref = window.$$lib$$.Vue.ref')

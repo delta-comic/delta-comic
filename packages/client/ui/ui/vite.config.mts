@@ -8,10 +8,10 @@ import { defineConfig, lazyPlugins } from 'vite-plus'
 
 const extendsDepends = await (async () => {
   try {
-    const { extendsDepends } = await import('@delta-comic/utils/vite')
+    const { extendsDepends } = await import('@delta-comic/client-core-utils/vite')
     return extendsDepends
   } catch (error) {
-    console.warn(error, 'Fail to import `@delta-comic/utils/vite`')
+    console.warn(error, 'Fail to import `@delta-comic/client-core-utils/vite`')
     return {}
   }
 })()

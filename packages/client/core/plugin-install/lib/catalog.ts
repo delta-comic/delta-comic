@@ -1,4 +1,4 @@
-import type { PluginManifest } from '@delta-comic/model'
+import type { PluginManifest } from '@delta-comic/client-core-model'
 
 export type PluginCatalogSource =
   | { readonly type: 'github'; readonly repository: string }

@@ -1,6 +1,6 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
-import { sha256Integrity } from '@delta-comic/plugin-artifact'
-import type { PluginManifest } from '@delta-comic/plugin-manifest'
+import { sha256Integrity } from '@delta-comic/client-core-plugin-artifact'
+import type { PluginArchiveDB } from '@delta-comic/client-data-db'
+import type { PluginManifest } from '@delta-comic/shared-plugin-manifest'
 import { Context } from 'cordis'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 

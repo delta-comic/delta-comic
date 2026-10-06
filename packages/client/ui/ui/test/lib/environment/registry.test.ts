@@ -1,4 +1,4 @@
-import { Logger } from '@delta-comic/logger'
+import { Logger } from '@delta-comic/shared-core-logger'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent } from 'vue'

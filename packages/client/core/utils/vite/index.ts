@@ -19,11 +19,11 @@ export const umdLibraryNames = {
 /** Host-owned ESM modules exposed to plugins after the UMD runtime has loaded. */
 export const hostExposedLibraryNames = {
   '@delta-comic/client': 'DcClient',
-  '@delta-comic/ui': 'DcUi',
-  '@delta-comic/model': 'DcModel',
-  '@delta-comic/plugin': 'DcPlugin',
-  '@delta-comic/utils': 'DcUtils',
-  '@delta-comic/db': 'DcDb',
+  '@delta-comic/client-ui-ui': 'DcUi',
+  '@delta-comic/client-core-model': 'DcModel',
+  '@delta-comic/client-core-plugin': 'DcPlugin',
+  '@delta-comic/client-core-utils': 'DcUtils',
+  '@delta-comic/client-data-db': 'DcDb',
 } as const
 
 export const externalLibraryNames = { ...umdLibraryNames, ...hostExposedLibraryNames } as const

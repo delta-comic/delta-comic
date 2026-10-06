@@ -4,7 +4,7 @@ import {
   type CreateDownloaderOptions,
   type DownloaderEventHandlers,
   type DownloaderUnlisten,
-} from '@delta-comic/downloader'
+} from '@delta-comic/client-platform-downloader'
 
 export interface ClientDownloader {
   readonly key: string

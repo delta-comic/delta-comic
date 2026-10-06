@@ -31,7 +31,7 @@
 - `PluginScope` 当前只管理 disposer 和 AbortSignal，缺少安全调用、失败状态与诊断绑定。
 - 客户端和服务端 runtime 已把诊断记录接入 DB、store、网络、下载器、路由与任务，但插件失败隔离和丰富运行时实体快照仍需补齐。
 - 服务端 Worker provisioner 已传递 CPU/subrequest 限制，默认值为 50/50；第 8 章要求同时声明内存限制并将默认 subrequest 收敛到 10。
-- 共享 `@delta-comic/logger` 已提供跨 Web/Tauri 的结构化日志传输与序列化，适合作为诊断日志出口，避免再引入重复日志基础设施。
+- 共享 `@delta-comic/shared-core-logger` 已提供跨 Web/Tauri 的结构化日志传输与序列化，适合作为诊断日志出口，避免再引入重复日志基础设施。
 
 ## 当前仓库与基线
 
@@ -279,13 +279,13 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 
 ## 2026-09-27：阶段 6G 第一批协议包
 
-- Manifest、artifact 和 platform-neutral plugin API 已从 `@delta-comic/both` 拆分为独立公开包：`@delta-comic/plugin-manifest`、`@delta-comic/plugin-artifact`、`@delta-comic/plugin-api`。
+- Manifest、artifact 和 platform-neutral plugin API 已从 `@delta-comic/both` 拆分为独立公开包：`@delta-comic/shared-plugin-manifest`、`@delta-comic/client-core-plugin-artifact`、`@delta-comic/client-core-plugin-api`。
 - 现有 client SDK、server SDK 和 artifact reader 已迁移到新包；`@delta-comic/both/manifest` 与 `@delta-comic/both/artifact` 路径已移除。
 - 发布 workspace 测试需要覆盖三个新包及其按依赖拓扑排序的构建顺序；loader、install、runtime、Vite adapter 等后续 6G 包继续保留为未完成事项。
 
 ## 2026-09-27：阶段 6G 拆包设计结论
 
-- 目标公开包为 `@delta-comic/plugin-kernel`、`@delta-comic/plugin-loader`、`@delta-comic/plugin-runtime`、`@delta-comic/plugin-install`、`@delta-comic/plugin-vite`，现有 `@delta-comic/plugin` 收敛为聚合与 concrete composition 包。
+- 目标公开包为 `@delta-comic/client-core-plugin-kernel`、`@delta-comic/client-core-plugin-loader`、`@delta-comic/client-core-plugin-runtime`、`@delta-comic/client-core-plugin-install`、`@delta-comic/client-core-plugin-vite`，现有 `@delta-comic/client-core-plugin` 收敛为聚合与 concrete composition 包。
 - Kernel 负责 source-agnostic candidate/provider/dependency/capability/contribution/scope；Loader 负责模块加载契约与通用 helper；Runtime 负责生命周期引擎；Install 负责 provider-neutral 安装端口和流程；Vite 包负责构建、ZIP、host externals 与原生 HMR/CSS bridge。
 - Runtime 不依赖 install、数据库或 Tauri；具体 DB、市场、文件存储和宿主服务 adapter 保留在 composition。所有包禁止反向依赖聚合包，入口文件保持 export-only，concrete assembly 集中于 composition。
 
@@ -299,17 +299,17 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 
 - Kernel 的 candidate 类型需要脱离旧聚合 API/model 依赖，改用新 Manifest 包与 platform-neutral config contract；实现保持 source-agnostic。
 - Loader 提供 `LoadedPluginModule` 与 `PluginModuleReader` 契约及通用模块读取类型；具体 ZIP stored reader、dev-server reader 和文件存储仍留在 Install/composition。
-- 新包入口仅 re-export；旧 `@delta-comic/plugin` 实现暂时保留，待 Kernel/Loader 专项构建、类型检查和测试通过后再迁移后续 Runtime。
+- 新包入口仅 re-export；旧 `@delta-comic/client-core-plugin` 实现暂时保留，待 Kernel/Loader 专项构建、类型检查和测试通过后再迁移后续 Runtime。
 
 ## 2026-09-27：6G-1 类型边界确认
 
-- 新 `@delta-comic/plugin-api` 当前只提供 Cordis plugin contract，因此补充中性的 `PluginConfig`、`PluginConfigEnvironment` 和 `PluginConfigFactory`，供 Kernel/Runtime 共享。
+- 新 `@delta-comic/client-core-plugin-api` 当前只提供 Cordis plugin contract，因此补充中性的 `PluginConfig`、`PluginConfigEnvironment` 和 `PluginConfigFactory`，供 Kernel/Runtime 共享。
 - Loader 以 `PluginScopeLike` 结构契约描述激活阶段所需的 `defer` 能力，避免 Loader 反向依赖聚合包；Kernel candidate 使用 Loader 的 `LoadedPluginModule` 类型。
-- Kernel candidate 改用 `@delta-comic/plugin-manifest` 的 `PluginManifest`，具体存储、网络和来源 reader 继续留在 Install 阶段。
+- Kernel candidate 改用 `@delta-comic/shared-plugin-manifest` 的 `PluginManifest`，具体存储、网络和来源 reader 继续留在 Install 阶段。
 
 ## 2026-09-27：6G-1 Kernel/Loader 源码核查
 
-- `candidate.ts` 的迁移依赖可压缩为三条公共边界：`@delta-comic/plugin-manifest` 提供 `PluginManifest`，`@delta-comic/plugin-api` 提供中性 `PluginConfigFactory`，`@delta-comic/plugin-loader` 提供 `LoadedPluginModule`。
+- `candidate.ts` 的迁移依赖可压缩为三条公共边界：`@delta-comic/shared-plugin-manifest` 提供 `PluginManifest`，`@delta-comic/client-core-plugin-api` 提供中性 `PluginConfigFactory`，`@delta-comic/client-core-plugin-loader` 提供 `LoadedPluginModule`。
 - `capability.ts` 的激活管线只需要中性插件配置、`PluginScope` 和 `AbortSignal`；`contribution.ts`、`dependency.ts`、`scope.ts` 均可保持来源无关。
 - 旧聚合包中的 Kernel 文件继续保留，首阶段新包采用独立源码与测试；完成专项验证后再由 Runtime/Install 迁移调用方，避免提前破坏聚合包构建。
 
@@ -321,29 +321,29 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 ## 2026-09-27：6G-1 构建任务拓扑
 
 - Vite+ 的 `run.tasks` 已提供新包的 `build` 与 `typecheck` 任务，package scripts 不能重复声明同名任务；Kernel/Loader 的重复 `build` 与 `typecheck` scripts 已移除。
-- Loader 类型检查依赖 `@delta-comic/plugin-api` 的 dist 声明产物，专项验证需先构建 API，再构建或检查下游包；API 的任务图已声明依赖构建。
+- Loader 类型检查依赖 `@delta-comic/client-core-plugin-api` 的 dist 声明产物，专项验证需先构建 API，再构建或检查下游包；API 的任务图已声明依赖构建。
 - Kernel 类型检查发现新包迁移时需显式将 `Map.delete` 包装为 `void` disposer，测试中的 `Array.push` 也需使用块体避免返回 number；两处已按 `PluginDisposer` 契约修正。
 
 ## 2026-09-27：6G-2 Runtime 实施边界
 
-- Runtime 独立包迁移 `engine`、`providers`、`store`，依赖收敛到 `@delta-comic/plugin-api`、`@delta-comic/plugin-kernel`、`@delta-comic/plugin-loader`、Vue 和 logger。
+- Runtime 独立包迁移 `engine`、`providers`、`store`，依赖收敛到 `@delta-comic/client-core-plugin-api`、`@delta-comic/client-core-plugin-kernel`、`@delta-comic/client-core-plugin-loader`、Vue 和 logger。
 - 新 Manifest 使用 `id` 与 `dependencies`；Runtime display name 使用 Manifest 的字符串 `name`。Install、数据库、Tauri、文件存储和市场适配器继续留在聚合包 composition。
 - Runtime 的 config、i18n、hooks 通过 API 中性类型表达，保留聚合包后续适配现有宿主配置的边界。
 - 根级 `vp test run` 当前只加载既有 workspace 的测试项目，新 Kernel/Loader 测试路径被根配置排除；专项测试应通过各新包的 Vite+ `test` 任务执行。
 
 ## 2026-09-27：6G-2 Runtime 完成与聚合接线
 
-- `@delta-comic/plugin-runtime` 已完成 engine、providers、store 迁移；包内 `runtime/test/index.test.ts` 的 4 个测试通过，Runtime build 与 `vp check --fix` 通过。
+- `@delta-comic/client-core-plugin-runtime` 已完成 engine、providers、store 迁移；包内 `runtime/test/index.test.ts` 的 4 个测试通过，Runtime build 与 `vp check --fix` 通过。
 - 聚合 composition 通过 `runtimeAdapter.ts` 适配现有 Install 的 legacy manifest、module reader 和 capabilities：legacy `name.id`/`version.plugin`/`require` 映射到新 Manifest 的 `id`/`version`/`dependencies`，旧 scope/config 在 adapter 边界转换；Install 内部协议保持原状，后续迁移仍待执行。
-- `core.builtin.ts`、builtins 导出和 InstalledPluginCandidateProvider 已切换到新 Kernel/Runtime 契约；聚合包继续负责 concrete assembly，并通过 `@delta-comic/plugin-runtime` 对外导出 Runtime。
+- `core.builtin.ts`、builtins 导出和 InstalledPluginCandidateProvider 已切换到新 Kernel/Runtime 契约；聚合包继续负责 concrete assembly，并通过 `@delta-comic/client-core-plugin-runtime` 对外导出 Runtime。
 - 旧聚合 Runtime engine/providers/store 源码及对应三组测试已删除，新 Runtime 测试作为规范测试；聚合 plugin typecheck、plugin build、选定 capability/install/architecture 测试和全仓 `vp run lib-build` 均通过。聚合 package 没有独立 `test` task，因此使用 `vp test run` 指定既有相关测试文件。
 - tsgo-backed Runtime standalone typecheck 仍报告 12 个与当前源码不一致的陈旧 `PluginConfig<DCPluginConfig>`/`DCPluginConfig` 诊断；listFiles、当前源码、dist 声明、symlink 和 tsconfig 均已核对，作为工具链限制记录，不改变正确 Runtime 源码。
 
 ## 2026-09-27：6G-3 Install 与 Vite 包边界
 
-- `@delta-comic/plugin-install` 承载安装服务、来源 resolver、ZIP codec、stored/dev module reader、candidate provider、artifact reader 和安装协议；数据库 archive repository、Tauri 文件存储与市场 client 仍由聚合 composition 注入。
-- `@delta-comic/plugin-vite` 承载构建和开发服务器适配器，依赖 Install 的 dev 协议常量与通用构建工具，不依赖 Runtime、数据库或应用服务。
-- 聚合 `@delta-comic/plugin` 通过新包导出 Install/Vite，删除旧 `lib/install`、`vite` 实现和对应测试，发布工作区与版本同步路径已纳入五个新增公共包。
+- `@delta-comic/client-core-plugin-install` 承载安装服务、来源 resolver、ZIP codec、stored/dev module reader、candidate provider、artifact reader 和安装协议；数据库 archive repository、Tauri 文件存储与市场 client 仍由聚合 composition 注入。
+- `@delta-comic/client-core-plugin-vite` 承载构建和开发服务器适配器，依赖 Install 的 dev 协议常量与通用构建工具，不依赖 Runtime、数据库或应用服务。
+- 聚合 `@delta-comic/client-core-plugin` 通过新包导出 Install/Vite，删除旧 `lib/install`、`vite` 实现和对应测试，发布工作区与版本同步路径已纳入五个新增公共包。
 - Install 专项 24 测试、Vite 专项 26 测试、聚合插件 40 测试、发布工作区 3 测试和 semantic release command 4 测试通过。
 
 ## 2026-10-01：6E 目录发布 CAS 边界
@@ -390,8 +390,8 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 
 ### 包边界复核
 
-- Shared 已收敛为 client/server 均有消费者的 `@delta-comic/both`、`@delta-comic/logger` 日志核心和 `@delta-comic/plugin-manifest` 协议；Tauri logger transport/crate 与其它客户端模型、工具、插件 API/runtime/install/Vite/host 已迁移到 client。
-- `@delta-comic/plugin-manifest` 由 client SDK 和 server SDK 同时依赖；`@delta-comic/both` 的 Cordis/诊断/runtime 契约由两端 SDK 同时依赖；`@delta-comic/logger` 被 client app、server Worker 和 server admin 使用。
+- Shared 已收敛为 client/server 均有消费者的 `@delta-comic/both`、`@delta-comic/shared-core-logger` 日志核心和 `@delta-comic/shared-plugin-manifest` 协议；Tauri logger transport/crate 与其它客户端模型、工具、插件 API/runtime/install/Vite/host 已迁移到 client。
+- `@delta-comic/shared-plugin-manifest` 由 client SDK 和 server SDK 同时依赖；`@delta-comic/both` 的 Cordis/诊断/runtime 契约由两端 SDK 同时依赖；`@delta-comic/shared-core-logger` 被 client app、server Worker 和 server admin 使用。
 
 ## 2026-10-02：shared 的双端必要性边界
 
@@ -403,7 +403,7 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 ## Splash 启动复现（2026-10-02）
 
 - Tauri 原生实际运行后只显示 splash；Vite 捕获 `__vite__injectQuery` 重复声明的 SyntaxError。
-- 浏览器检查确认错误模块为 Vite Node 实现；`@delta-comic/plugin` 顶层 re-export `plugin-vite`，且 `/vite` 指向同一运行时产物。
+- 浏览器检查确认错误模块为 Vite Node 实现；`@delta-comic/client-core-plugin` 顶层 re-export `plugin-vite`，且 `/vite` 指向同一运行时产物。
 - 原主入口使用静态 import，依赖图解析失败时 logger 尚未初始化，原生日志无法显示该错误。日志还分别在 JS 与 Rust 层强制 info 过滤。
 - 排除构建入口后出现 `React is not defined`：应用装饰器 SWC transform 处理 TSX，产生 React 调用；应用 TSX 由 Vue JSX 插件负责。
 - 14:06:04 与 14:09:14 原生启动均记录 `plugins preloaded`（failureCount 0）、`frontend application mounted` 与 `main entry revealed`。主窗口需要进一步可见内容验收。
@@ -450,7 +450,7 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - Rust `fmt`、严格 `clippy` 与 workspace tests 全部通过。
 - Android Gradle 任务未完成，错误为 `project :tauri-android` 在 AGP 8.11.0 下没有匹配 variant；这是当前生成工程/工具链状态，需要重新生成工程后复核。
 
-- **HTTP 插件内化**：外部 `tauri-plugin-better-cors-fetch` 1.8.0 已纳入 `packages/client/platform/http`。内部 crate 使用 `tauri-plugin-http`，前端入口使用 `@delta-comic/http`，插件标识与权限使用 `http`；保留运行源码、权限定义、许可证和必要测试，移除上游独立仓库配置、发布/CI 文件、锁文件与文档资源。
+- **HTTP 插件内化**：外部 `tauri-plugin-better-cors-fetch` 1.8.0 已纳入 `packages/client/platform/http`。内部 crate 使用 `tauri-plugin-http`，前端入口使用 `@delta-comic/client-platform-http`，插件标识与权限使用 `http`；保留运行源码、权限定义、许可证和必要测试，移除上游独立仓库配置、发布/CI 文件、锁文件与文档资源。
 ## HTTP 插件 Specta 过渡适配（2026-10-03）
 
 - Tauri Specta 默认禁止 `u64`/`usize` 导出为 TypeScript，HTTP 配置字段映射为 `number` 后保持 Rust 运行时类型不变。

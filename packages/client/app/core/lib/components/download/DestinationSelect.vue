@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Destination } from '@delta-comic/core/features/downloads/downloaderClient'
+import type { Destination } from '@delta-comic/client-app-core/features/downloads/downloaderClient'
 import { NFormItem, NSelect } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

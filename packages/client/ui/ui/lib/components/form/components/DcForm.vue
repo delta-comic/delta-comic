@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends FormConfigure, O extends (keyof T)[] = (keyof T)[]">
-import type { FormConfigure, FormResult } from '@delta-comic/model'
+import type { FormConfigure, FormResult } from '@delta-comic/client-core-model'
 import { isArray } from 'es-toolkit/compat'
 import { NForm } from 'naive-ui'
 import { computed } from 'vue'

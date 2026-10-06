@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import PluginIcon from '@delta-comic/core/components/plugin/PluginIcon.vue'
+import PluginIcon from '@delta-comic/client-app-core/components/plugin/PluginIcon.vue'
 import {
   pluginMarketplaceInstallInput,
   pluginMarketplaceSourceUrl,
   type PluginMarketplaceItem,
-} from '@delta-comic/core/features/pluginMarketplace/model'
-import { formatDate } from '@delta-comic/core/i18n/index'
+} from '@delta-comic/client-app-core/features/pluginMarketplace/model'
+import { formatDate } from '@delta-comic/client-app-core/i18n/index'
 import { NAlert, NButton, NModal, NTag } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

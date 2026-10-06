@@ -1,5 +1,9 @@
 <script setup lang="ts" generic="T extends FormSingleConfigure">
-import type { FormDefaultValue, FormSingleConfigure, FormSingleResult } from '@delta-comic/model'
+import type {
+  FormDefaultValue,
+  FormSingleConfigure,
+  FormSingleResult,
+} from '@delta-comic/client-core-model'
 import { NFormItem } from 'naive-ui'
 
 import DcFormCheckbox from './DcFormCheckbox.vue'

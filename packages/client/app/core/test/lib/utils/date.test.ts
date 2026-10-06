@@ -3,10 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
-  await import('@delta-comic/runtime/host-libraries.umd.js')
+  await import('@delta-comic/client-core-runtime/host-libraries.umd.js')
 })
 
-vi.mock('@delta-comic/utils', () => ({
+vi.mock('@delta-comic/client-core-utils', () => ({
   PageWebviewAuth: class {},
   SharedFunction: { call: vi.fn() },
 }))

@@ -16,7 +16,7 @@ const { configState, contentLoad, definitions, setStatusBar } = vi.hoisted(() =>
   setStatusBar: vi.fn(async () => undefined),
 }))
 
-vi.mock('@delta-comic/model', () => ({
+vi.mock('@delta-comic/client-core-model', () => ({
   SourcedValue: class SourcedValue {
     toString(value: string | [string, string]) {
       return typeof value === 'string' ? value : value.join(':')
@@ -32,7 +32,7 @@ vi.mock('@delta-comic/model', () => ({
   },
 }))
 
-vi.mock('@delta-comic/plugin', () => ({
+vi.mock('@delta-comic/client-core-plugin', () => ({
   useConfig: () => ({
     get isDark() {
       return configState.dark
@@ -40,7 +40,7 @@ vi.mock('@delta-comic/plugin', () => ({
   }),
 }))
 
-vi.mock('@delta-comic/utils', () => ({
+vi.mock('@delta-comic/client-core-utils', () => ({
   SharedFunction: {
     define: (handler: (...args: never[]) => unknown, _plugin: string, name: string) =>
       definitions.set(name, handler),
@@ -48,7 +48,7 @@ vi.mock('@delta-comic/utils', () => ({
 }))
 
 vi.mock('@/platform', () => ({ setStatusBar }))
-vi.mock('@delta-comic/core/stores/content', () => ({
+vi.mock('@delta-comic/client-app-core/stores/content', () => ({
   useContentStore: () => ({ $load: contentLoad }),
 }))
 vi.mock('vue-router/auto-routes', () => ({

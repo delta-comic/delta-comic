@@ -40,16 +40,16 @@ await vi.hoisted(async () => {
   } as typeof window.$$lib$$
 })
 
-vi.mock('@delta-comic/plugin', () => ({
+vi.mock('@delta-comic/client-core-plugin', () => ({
   installPlugin: mocks.installPlugin,
   isPluginManifestCompatible: () => true,
   pluginCatalogInstallInput: (pluginId: string) => `catalog:${pluginId}`,
   updatePluginByName: mocks.updatePluginByName,
 }))
-vi.mock('@delta-comic/core/features/pluginInstall/usePluginInstall', () => ({
+vi.mock('@delta-comic/client-app-core/features/pluginInstall/usePluginInstall', () => ({
   usePluginInstall: () => ({ runPluginInstall: mocks.runPluginInstall }),
 }))
-vi.mock('@delta-comic/core/features/pluginMarketplace/usePluginMarketplace', () => ({
+vi.mock('@delta-comic/client-app-core/features/pluginMarketplace/usePluginMarketplace', () => ({
   usePluginMarketplace: () => ({
     error: { value: undefined },
     filter: { value: 'all' },
@@ -76,7 +76,7 @@ vi.mock('vue-i18n', () => ({
 }))
 
 vi.mock(
-  '@delta-comic/core/components/plugin/marketplace/PluginMarketplaceFilters.vue',
+  '@delta-comic/client-app-core/components/plugin/marketplace/PluginMarketplaceFilters.vue',
   async () => {
     const { defineComponent, h } = await import('vue')
     return {
@@ -87,31 +87,42 @@ vi.mock(
     }
   },
 )
-vi.mock('@delta-comic/core/components/plugin/marketplace/PluginMarketplaceList.vue', async () => {
-  const { defineComponent, h } = await import('vue')
-  return {
-    default: defineComponent({
-      name: 'PluginMarketplaceList',
-      props: { items: Array },
-      emits: ['details', 'install'],
-      setup:
-        (props, { emit }) =>
-        () =>
-          h(
-            'section',
-            { class: 'marketplace-list' },
-            (props.items as PluginMarketplaceItem[] | undefined)?.map(item =>
-              h('div', [
-                h('button', { class: 'install', onClick: () => emit('install', item) }, 'install'),
-                h('button', { class: 'details', onClick: () => emit('details', item) }, 'details'),
-              ]),
-            ),
-          ),
-    }),
-  }
-})
 vi.mock(
-  '@delta-comic/core/components/plugin/marketplace/PluginMarketplaceDetails.vue',
+  '@delta-comic/client-app-core/components/plugin/marketplace/PluginMarketplaceList.vue',
+  async () => {
+    const { defineComponent, h } = await import('vue')
+    return {
+      default: defineComponent({
+        name: 'PluginMarketplaceList',
+        props: { items: Array },
+        emits: ['details', 'install'],
+        setup:
+          (props, { emit }) =>
+          () =>
+            h(
+              'section',
+              { class: 'marketplace-list' },
+              (props.items as PluginMarketplaceItem[] | undefined)?.map(item =>
+                h('div', [
+                  h(
+                    'button',
+                    { class: 'install', onClick: () => emit('install', item) },
+                    'install',
+                  ),
+                  h(
+                    'button',
+                    { class: 'details', onClick: () => emit('details', item) },
+                    'details',
+                  ),
+                ]),
+              ),
+            ),
+      }),
+    }
+  },
+)
+vi.mock(
+  '@delta-comic/client-app-core/components/plugin/marketplace/PluginMarketplaceDetails.vue',
   async () => {
     const { defineComponent, h } = await import('vue')
     return {
@@ -131,11 +142,11 @@ vi.mock(
   },
 )
 
-import PluginMarketplaceContainer from '@delta-comic/core/components/plugin/marketplace/PluginMarketplaceContainer.vue'
+import PluginMarketplaceContainer from '@delta-comic/client-app-core/components/plugin/marketplace/PluginMarketplaceContainer.vue'
 import type {
   PluginMarketplaceEntry,
   PluginMarketplaceItem,
-} from '@delta-comic/core/features/pluginMarketplace/model'
+} from '@delta-comic/client-app-core/features/pluginMarketplace/model'
 
 const marketplaceItem = (overrides: Partial<PluginMarketplaceItem> = {}): PluginMarketplaceItem => {
   const entry: PluginMarketplaceEntry = {

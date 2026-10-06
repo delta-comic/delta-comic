@@ -15,7 +15,7 @@ import {
   type TaskAttention,
   type TaskRemovedEvent,
   type TaskUpsertEvent,
-} from '@delta-comic/downloader'
+} from '@delta-comic/client-platform-downloader'
 
 export type {
   ContentRefreshContext,

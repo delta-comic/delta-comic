@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormCheckbox } from '@delta-comic/model'
+import type { FormCheckbox } from '@delta-comic/client-core-model'
 import { ref } from 'vue'
 
 import { DcFormCheckbox } from '@/index'

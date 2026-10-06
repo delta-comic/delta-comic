@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/core/icons'
-import { DBUtils, FavouriteDB } from '@delta-comic/db'
-import { DcState } from '@delta-comic/ui'
+import { Icons } from '@delta-comic/client-app-core/icons'
+import { DBUtils, FavouriteDB } from '@delta-comic/client-data-db'
+import { DcState } from '@delta-comic/client-ui-ui'
 import { useMessage } from 'naive-ui'
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { useI18n } from 'vue-i18n'

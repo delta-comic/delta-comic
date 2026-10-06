@@ -1,5 +1,5 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
-import { validateArtifact } from '@delta-comic/plugin-artifact'
+import { validateArtifact } from '@delta-comic/client-core-plugin-artifact'
+import type { PluginArchiveDB } from '@delta-comic/client-data-db'
 import type { Context, Plugin } from 'cordis'
 
 import type { LoadedPluginModule, PluginFileStore, PluginModuleReader } from './contracts'

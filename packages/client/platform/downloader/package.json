@@ -1,6 +1,7 @@
 {
-  "name": "@delta-comic/downloader",
+  "name": "@delta-comic/client-platform-downloader",
   "version": "3.0.0-next.19",
+  "private": true,
   "description": "Delta Comic high-performance native download manager",
   "homepage": "https://github.com/delta-comic/delta-comic",
   "license": "AGPL-3.0-only",

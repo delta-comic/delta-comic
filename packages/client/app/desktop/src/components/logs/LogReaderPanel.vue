@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useLogReader } from '@delta-comic/core/features/logs/useLogReader'
+import { useLogReader } from '@delta-comic/client-app-core/features/logs/useLogReader'
 import { NAlert, NButton } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

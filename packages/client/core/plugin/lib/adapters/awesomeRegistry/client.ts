@@ -1,13 +1,13 @@
-import { logger } from '@delta-comic/logger'
-import type { PluginManifest } from '@delta-comic/model'
+import type { PluginManifest } from '@delta-comic/client-core-model'
 import type {
   PluginCatalog,
   PluginCatalogIndex,
   PluginCatalogListing,
   PluginCatalogPage,
   PluginCatalogResult,
-} from '@delta-comic/plugin-install'
-import { parsePluginManifest } from '@delta-comic/plugin-install'
+} from '@delta-comic/client-core-plugin-install'
+import { parsePluginManifest } from '@delta-comic/client-core-plugin-install'
+import { logger } from '@delta-comic/shared-core-logger'
 import ky from 'ky'
 
 import { AwesomeRegistryCache } from './cache'

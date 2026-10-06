@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { isAbsolute, relative, resolve } from 'node:path'
 
-import type { PluginManifest } from '@delta-comic/model'
-import { exposeHostLibraries, extendsDepends } from '@delta-comic/utils/vite'
+import type { PluginManifest } from '@delta-comic/client-core-model'
+import { exposeHostLibraries, extendsDepends } from '@delta-comic/client-core-utils/vite'
 import JSZip from 'jszip'
 import type { Plugin, PluginOption } from 'vite-plus'
 

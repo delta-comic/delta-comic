@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormPairs, FormSingleResult } from '@delta-comic/model'
+import type { FormPairs, FormSingleResult } from '@delta-comic/client-core-model'
 import { NDynamicInput, NInput } from 'naive-ui'
 import { watch } from 'vue'
 

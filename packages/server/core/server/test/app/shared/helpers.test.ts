@@ -1,4 +1,4 @@
-import { Logger } from '@delta-comic/logger'
+import { Logger } from '@delta-comic/shared-core-logger'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
 import { bindRuntime, getRuntime, readNumberVar, type AppRuntime } from '../../../app/env'

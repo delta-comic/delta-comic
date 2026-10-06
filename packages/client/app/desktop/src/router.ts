@@ -1,9 +1,9 @@
-import { useContentStore } from '@delta-comic/core/stores/content'
-import { pluginName } from '@delta-comic/core/symbol'
-import { UniContentPage } from '@delta-comic/model'
-import { useConfig } from '@delta-comic/plugin'
-import { SharedFunction } from '@delta-comic/utils'
-import type { DeltaRouter } from '@delta-comic/utils'
+import { useContentStore } from '@delta-comic/client-app-core/stores/content'
+import { pluginName } from '@delta-comic/client-app-core/symbol'
+import { UniContentPage } from '@delta-comic/client-core-model'
+import { useConfig } from '@delta-comic/client-core-plugin'
+import { SharedFunction } from '@delta-comic/client-core-utils'
+import type { DeltaRouter } from '@delta-comic/client-core-utils'
 import { toValue } from 'vue'
 import {
   createRouter,

@@ -1,4 +1,4 @@
-import type { PluginManifest } from '@delta-comic/plugin-manifest'
+import type { PluginManifest } from '@delta-comic/shared-plugin-manifest'
 
 import pkg from '../../package.json'
 import core from '../core'

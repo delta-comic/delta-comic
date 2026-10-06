@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/core/icons'
-import type { FavouriteDB } from '@delta-comic/db'
+import { Icons } from '@delta-comic/client-app-core/icons'
+import type { FavouriteDB } from '@delta-comic/client-data-db'
 import { useI18n } from 'vue-i18n'
 
 import FavouriteCard from '../favouriteCard.vue'

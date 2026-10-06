@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import LogText from '@delta-comic/core/components/logs/LogText.vue'
+import LogText from '@delta-comic/client-app-core/components/logs/LogText.vue'
 import { NEmpty, NSpin } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 

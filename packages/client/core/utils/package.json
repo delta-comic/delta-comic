@@ -1,6 +1,7 @@
 {
-  "name": "@delta-comic/utils",
+  "name": "@delta-comic/client-core-utils",
   "version": "3.0.0-next.19",
+  "private": true,
   "description": "空阙虱楼",
   "homepage": "https://github.com/delta-comic/delta-comic",
   "license": "AGPL-3.0-only",
@@ -34,7 +35,7 @@
   },
   "dependencies": {
     "@aptabase/tauri": "catalog:",
-    "@delta-comic/logger": "workspace:",
+    "@delta-comic/shared-core-logger": "workspace:",
     "@tauri-apps/api": "catalog:",
     "@vue/language-core": "catalog:",
     "acorn": "catalog:",

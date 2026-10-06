@@ -25,12 +25,20 @@ export default defineConfig({
       entry: './app/index.ts',
       outDir: './dist/app',
       dts: { tsconfig: './tsconfig.app.json' },
+      deps: {
+        alwaysBundle: [/^@delta-comic\//],
+        dts: { alwaysBundle: id => id.startsWith('@delta-comic/') || id.includes('/packages/') },
+      },
       plugins: [decoratorPlugin as any],
     },
     {
       entry: ['./lib/index.ts', './lib/api.ts', './lib/flow.ts'],
       outDir: './dist/lib',
       dts: { tsconfig: './tsconfig.lib.json' },
+      deps: {
+        alwaysBundle: [/^@delta-comic\//],
+        dts: { alwaysBundle: id => id.startsWith('@delta-comic/') || id.includes('/packages/') },
+      },
       plugins: [decoratorPlugin as any],
     },
   ],
@@ -43,7 +51,15 @@ export default defineConfig({
     }) as any),
   ],
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./app', import.meta.url)) },
+    alias: {
+      '@': fileURLToPath(new URL('./app', import.meta.url)),
+      '@delta-comic/shared-core-logger': fileURLToPath(
+        new URL('../../../shared/core/logger/lib/index.ts', import.meta.url),
+      ),
+      '@delta-comic/shared-plugin-manifest': fileURLToPath(
+        new URL('../../../shared/plugin/manifest/lib/index.ts', import.meta.url),
+      ),
+    },
     extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],
   },
   root,

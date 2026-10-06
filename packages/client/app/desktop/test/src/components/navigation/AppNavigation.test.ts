@@ -9,7 +9,7 @@ await vi.hoisted(async () => {
 
 import AppNavigation from '../../../../src/components/navigation/AppNavigation.vue'
 
-vi.mock('@delta-comic/core/icons', () => {
+vi.mock('@delta-comic/client-app-core/icons', () => {
   const icon = { render: () => null }
   return {
     Icons: {
@@ -19,11 +19,13 @@ vi.mock('@delta-comic/core/icons', () => {
   }
 })
 
-vi.mock('@delta-comic/core/clientHost', () => ({ appNavigation: [] }))
+vi.mock('@delta-comic/client-app-core/clientHost', () => ({ appNavigation: [] }))
 
-vi.mock('@delta-comic/core/stores/app', () => ({ useAppStore: () => ({ activatedUser: null }) }))
+vi.mock('@delta-comic/client-app-core/stores/app', () => ({
+  useAppStore: () => ({ activatedUser: null }),
+}))
 
-vi.mock('@delta-comic/ui', () => ({ DcImage: { name: 'DcImage', render: () => null } }))
+vi.mock('@delta-comic/client-ui-ui', () => ({ DcImage: { name: 'DcImage', render: () => null } }))
 
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }))
 

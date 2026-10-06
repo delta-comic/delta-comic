@@ -82,7 +82,7 @@ describe('kysely codegen', () => {
   it('maps JSON columns to the declared imported model type', () => {
     const table = defineTable(
       'item_store',
-      { item: jsonColumn('UniItemRaw', '@delta-comic/model') },
+      { item: jsonColumn('UniItemRaw', '@delta-comic/client-core-model') },
       { primaryKey: ['item'] },
     )
     expect(generateTableInterface(table)).toContain('  item: JSONColumnType<UniItemRaw>')

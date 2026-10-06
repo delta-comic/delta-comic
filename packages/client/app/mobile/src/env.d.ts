@@ -1,5 +1,5 @@
-import type { AppMessageSchema } from '@delta-comic/core/i18n/locales/index'
-import type { DeltaRouter } from '@delta-comic/utils'
+import type { AppMessageSchema } from '@delta-comic/client-app-core/i18n/locales/index'
+import type { DeltaRouter } from '@delta-comic/client-core-utils'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -11,7 +11,7 @@ declare module 'vue-i18n' {
   export interface DefineLocaleMessage extends AppMessageSchema {}
 }
 
-declare module '@delta-comic/utils' {
+declare module '@delta-comic/client-core-utils' {
   interface AppApiRegistry {
     M3: Pick<typeof import('tauri-plugin-m3').M3, 'getInsets' | 'setBarColor'>
   }
@@ -22,11 +22,11 @@ declare module '@delta-comic/utils' {
     VR: typeof import('vue-router')
     Pinia: typeof import('pinia')
     Pc: typeof import('@pinia/colada')
-    DcUi: typeof import('@delta-comic/ui')
-    DcModel: typeof import('@delta-comic/model')
-    DcPlugin: typeof import('@delta-comic/plugin')
-    DcUtils: typeof import('@delta-comic/utils')
-    DcDb: typeof import('@delta-comic/db')
+    DcUi: typeof import('@delta-comic/client-ui-ui')
+    DcModel: typeof import('@delta-comic/client-core-model')
+    DcPlugin: typeof import('@delta-comic/client-core-plugin')
+    DcUtils: typeof import('@delta-comic/client-core-utils')
+    DcDb: typeof import('@delta-comic/client-data-db')
   }
 }
 

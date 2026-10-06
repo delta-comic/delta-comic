@@ -1,5 +1,5 @@
 import { DiagnosticRecorder } from '@delta-comic/both'
-import { parsePluginManifest } from '@delta-comic/plugin-manifest'
+import { parsePluginManifest } from '@delta-comic/shared-plugin-manifest'
 import { Context } from 'cordis'
 
 import { AppError } from '@/shared/errors'

@@ -4,7 +4,7 @@ import { defineComponent, h } from 'vue'
 
 await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
-  await import('@delta-comic/runtime/host-libraries.umd.js')
+  await import('@delta-comic/client-core-runtime/host-libraries.umd.js')
 })
 
 const mocks = vi.hoisted(() => ({

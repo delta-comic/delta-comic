@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { resolvePluginIconUrl } from '@delta-comic/plugin'
+import { resolvePluginIconUrl } from '@delta-comic/client-core-plugin'
 import { computed, shallowRef, watch } from 'vue'
 
 type PluginIconSize = 'large' | 'medium' | 'small'

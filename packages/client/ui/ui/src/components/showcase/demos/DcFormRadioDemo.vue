@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormRadio } from '@delta-comic/model'
+import type { FormRadio } from '@delta-comic/client-core-model'
 import { shallowRef } from 'vue'
 
 import { DcFormRadio } from '@/index'

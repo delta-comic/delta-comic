@@ -1,4 +1,4 @@
-import type { DeltaRouter } from '@delta-comic/utils'
+import type { DeltaRouter } from '@delta-comic/client-core-utils'
 import {
   createRouter,
   createWebHistory,

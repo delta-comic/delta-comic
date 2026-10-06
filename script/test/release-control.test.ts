@@ -22,13 +22,13 @@ const fixtures: string[] = []
 const publishablePackages: PublishableWorkspacePackage[] = [
   {
     dependencies: [],
-    name: '@delta-comic/model',
+    name: '@delta-comic/client-core-model',
     path: 'packages/client/core/model/package.json',
     version: '3.0.0',
   },
   {
-    dependencies: ['@delta-comic/model'],
-    name: '@delta-comic/ui',
+    dependencies: ['@delta-comic/client-core-model'],
+    name: '@delta-comic/client-ui-ui',
     path: 'packages/client/ui/ui/package.json',
     version: '3.0.0',
   },
@@ -163,8 +163,8 @@ describe('semantic-release monorepo plugin', () => {
     await plugin.publish({}, { env: {}, nextRelease: { version: '3.0.0' } })
 
     expect(publishCommand.mock.calls).toEqual([
-      ['vp', ['run', '--filter', '@delta-comic/model', '--fail-if-no-match', 'build']],
-      ['vp', ['run', '--filter', '@delta-comic/ui', '--fail-if-no-match', 'build']],
+      ['vp', ['run', '--filter', '@delta-comic/client-core-model', '--fail-if-no-match', 'build']],
+      ['vp', ['run', '--filter', '@delta-comic/client-ui-ui', '--fail-if-no-match', 'build']],
       [
         'vp',
         [
@@ -271,7 +271,7 @@ describe('semantic-release monorepo plugin', () => {
     expect(publishCommand).toHaveBeenCalledExactlyOnceWith('vp', [
       'run',
       '--filter',
-      '@delta-comic/model',
+      '@delta-comic/client-core-model',
       '--fail-if-no-match',
       'build',
     ])
@@ -286,7 +286,7 @@ describe('semantic-release monorepo plugin', () => {
 
     await expect(
       plugin.publish({}, { env: {}, nextRelease: { version: '3.0.0' } }),
-    ).rejects.toThrow('@delta-comic/model@2.9.0')
+    ).rejects.toThrow('@delta-comic/client-core-model@2.9.0')
     expect(publishCommand).not.toHaveBeenCalled()
   })
 

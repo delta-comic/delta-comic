@@ -1,4 +1,4 @@
-import type { PluginManifest } from '@delta-comic/plugin-manifest'
+import type { PluginManifest } from '@delta-comic/shared-plugin-manifest'
 import { init, parse } from 'es-module-lexer'
 
 import { safePluginPath } from './manifest'

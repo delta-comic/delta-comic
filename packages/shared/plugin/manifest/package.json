@@ -1,6 +1,7 @@
 {
-  "name": "@delta-comic/plugin-manifest",
+  "name": "@delta-comic/shared-plugin-manifest",
   "version": "3.0.0-next.19",
+  "private": true,
   "description": "Cordis plugin manifest protocol",
   "files": [
     "dist"

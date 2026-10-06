@@ -4,7 +4,7 @@ import {
   UniContentPage,
   type UniItem,
   type UniItemRaw,
-} from '@delta-comic/model'
+} from '@delta-comic/client-core-model'
 import { defineMutation, useMutation, useQueryCache } from '@pinia/colada'
 import type { Kysely, Selectable } from 'kysely'
 

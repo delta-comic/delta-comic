@@ -5,7 +5,7 @@ import type { Destination } from '../../../lib/features/downloads/downloaderClie
 
 await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
-  await import('@delta-comic/runtime/host-libraries.umd.js')
+  await import('@delta-comic/client-core-runtime/host-libraries.umd.js')
 })
 
 const { client, handlers, sourceRefresh } = vi.hoisted(() => {
@@ -78,10 +78,12 @@ const { client, handlers, sourceRefresh } = vi.hoisted(() => {
 })
 
 vi.mock('../../../lib/features/downloads/downloaderClient', () => ({ downloaderClient: client }))
-vi.mock('@delta-comic/model', () => ({
+vi.mock('@delta-comic/client-core-model', () => ({
   UniContentPage: { contentPages: { get: vi.fn() }, downloadProviders: { get: vi.fn() } },
 }))
-vi.mock('@delta-comic/plugin', () => ({ usePluginStore: () => sourceRefresh.pluginStore }))
+vi.mock('@delta-comic/client-core-plugin', () => ({
+  usePluginStore: () => sourceRefresh.pluginStore,
+}))
 vi.mock('../../../lib/features/downloads/contentPlan', () => ({
   getPluginDownloadIdentity: sourceRefresh.getPluginDownloadIdentity,
 }))

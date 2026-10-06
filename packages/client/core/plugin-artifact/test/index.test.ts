@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vite-plus/test'
 
 import { sha256Integrity, validateArtifact } from '../lib/index.js'
 
-describe('@delta-comic/plugin-artifact', () => {
+describe('@delta-comic/client-core-plugin-artifact', () => {
   it('validates declared resources and integrity', async () => {
     const bytes = new TextEncoder().encode('export default () => undefined')
     const artifact = {

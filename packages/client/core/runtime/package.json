@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/runtime",
+  "name": "@delta-comic/client-core-runtime",
   "version": "2.3.0",
   "private": true,
   "description": "Delta Comic 宿主与外部插件共享的预构建 UMD 运行时。",

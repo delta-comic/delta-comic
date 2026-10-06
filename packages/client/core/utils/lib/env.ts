@@ -14,7 +14,7 @@ export type DeltaRouter = Pick<_RouterClassic, RouterClassicPublicKey> & { force
 
 /**
  * 宿主应用可注册的全局 API 类型。通过 Module Augmentation 扩展：
- * `declare module '@delta-comic/utils' { interface AppApiRegistry { ... } }`
+ * `declare module '@delta-comic/client-core-utils' { interface AppApiRegistry { ... } }`
  */
 export interface AppApiRegistry {
   /** `useGlobalVar` 共享状态存储，勿直接依赖 */
@@ -23,7 +23,7 @@ export interface AppApiRegistry {
 
 /**
  * 宿主应用暴露给插件的 UMD 库类型。通过 Module Augmentation 扩展：
- * `declare module '@delta-comic/utils' { interface AppLibRegistry { Vue: typeof import('vue') } }`
+ * `declare module '@delta-comic/client-core-utils' { interface AppLibRegistry { Vue: typeof import('vue') } }`
  */
 export interface AppLibRegistry {}
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import HotSearchPanel from '@delta-comic/core/components/search/landing/HotSearchPanel.vue'
-import SearchHistoryPanel from '@delta-comic/core/components/search/landing/SearchHistoryPanel.vue'
-import SearchLandingForm from '@delta-comic/core/components/search/landing/SearchLandingForm.vue'
-import { useSearchLanding } from '@delta-comic/core/features/search/useSearchLanding'
+import HotSearchPanel from '@delta-comic/client-app-core/components/search/landing/HotSearchPanel.vue'
+import SearchHistoryPanel from '@delta-comic/client-app-core/components/search/landing/SearchHistoryPanel.vue'
+import SearchLandingForm from '@delta-comic/client-app-core/components/search/landing/SearchLandingForm.vue'
+import { useSearchLanding } from '@delta-comic/client-app-core/features/search/useSearchLanding'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 

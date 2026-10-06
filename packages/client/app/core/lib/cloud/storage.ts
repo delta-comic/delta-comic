@@ -1,5 +1,5 @@
-import { logger } from '@delta-comic/logger'
 import type { CloudSession, CloudSessionStorage, CloudTerminalInput } from '@delta-comic/server/api'
+import { logger } from '@delta-comic/shared-core-logger'
 
 const cloudStorageLogger = logger.scoped('app:cloud:storage')
 const namespace = 'cloud'
@@ -8,7 +8,7 @@ const checkpointKey = 'sync-checkpoint'
 const terminalUuidKey = 'terminal-uuid'
 
 const readValue = async (key: string): Promise<string | null> => {
-  const { db } = await import('@delta-comic/db')
+  const { db } = await import('@delta-comic/client-data-db')
   return (
     (
       await db
@@ -22,12 +22,12 @@ const readValue = async (key: string): Promise<string | null> => {
 }
 
 const writeValue = async (key: string, value: string): Promise<void> => {
-  const { db } = await import('@delta-comic/db')
+  const { db } = await import('@delta-comic/client-data-db')
   await db.replaceInto('nativeStore').values({ key, namespace, value }).execute()
 }
 
 const removeValue = async (key: string): Promise<void> => {
-  const { db } = await import('@delta-comic/db')
+  const { db } = await import('@delta-comic/client-data-db')
   await db
     .deleteFrom('nativeStore')
     .where('namespace', '=', namespace)

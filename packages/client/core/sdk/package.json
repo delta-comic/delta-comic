@@ -36,16 +36,16 @@
   },
   "dependencies": {
     "@delta-comic/both": "workspace:",
-    "@delta-comic/db": "workspace:",
-    "@delta-comic/downloader": "workspace:",
-    "@delta-comic/model": "workspace:",
-    "@delta-comic/plugin-manifest": "workspace:",
-    "@delta-comic/ui": "workspace:",
     "cordis": "catalog:",
     "kysely": "catalog:",
     "typebox": "catalog:"
   },
   "devDependencies": {
+    "@delta-comic/client-core-model": "workspace:",
+    "@delta-comic/client-data-db": "workspace:",
+    "@delta-comic/client-platform-downloader": "workspace:",
+    "@delta-comic/client-ui-ui": "workspace:",
+    "@delta-comic/shared-plugin-manifest": "workspace:",
     "@swc/core": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",

@@ -25,7 +25,7 @@
 | `packages/client/core/plugin-install` | 来源、安装记录、ZIP、模块读取、开发服务器 |
 | `packages/client/core/plugin-artifact` | 客户端资源与模块图完整性校验 |
 | `packages/client/core/plugin-vite` | 插件构建、ZIP 输出、CSS 与 HMR 协议 |
-| `packages/client/core/runtime` | `@delta-comic/runtime` UMD 宿主模块桥接 |
+| `packages/client/core/runtime` | `@delta-comic/client-core-runtime` UMD 宿主模块桥接 |
 | `packages/client/core/{model,utils}` | 内容模型、客户端工具 |
 | `packages/client/data/db` | 客户端 SQLite/Web 数据库和生成表类型 |
 | `packages/client/platform/{downloader,logger}` | 原生下载、日志传输 |
@@ -36,11 +36,11 @@
 | `packages/shared/plugin/manifest` | 双端 manifest v2 schema 与兼容性检查 |
 
 共享模块由两端实际消费。宿主实现归属对应端；模块读取契约位于安装模块。
-`@delta-comic/runtime` 的职责是外部插件依赖桥接。
+`@delta-comic/client-core-runtime` 的职责是外部插件依赖桥接。
 
 ## Manifest 与产物
 
-`@delta-comic/plugin-manifest` 提供 TypeBox schema，协议版本为 `2`。两端 SDK 导出同一协议。
+`@delta-comic/shared-plugin-manifest` 提供 TypeBox schema，协议版本为 `2`。两端 SDK 导出同一协议。
 
 ```json
 {

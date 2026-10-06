@@ -9,7 +9,7 @@ export default defineConfig({
     },
   },
   test: {
-    name: '@delta-comic/plugin-install',
+    name: '@delta-comic/client-core-plugin-install',
     environment: 'node',
     include: ['test/**/*.test.ts'],
   },

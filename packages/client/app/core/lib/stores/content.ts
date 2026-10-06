@@ -1,5 +1,5 @@
-import { logger } from '@delta-comic/logger'
-import { UniContentPage, type UniContentType_, type UniItem } from '@delta-comic/model'
+import { UniContentPage, type UniContentType_, type UniItem } from '@delta-comic/client-core-model'
+import { logger } from '@delta-comic/shared-core-logger'
 import { defineStore } from 'pinia'
 import { markRaw, shallowReactive, type Raw } from 'vue'
 

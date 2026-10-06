@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/logger-native",
+  "name": "@delta-comic/client-platform-logger",
   "version": "3.0.0-next.19",
   "private": true,
   "files": [

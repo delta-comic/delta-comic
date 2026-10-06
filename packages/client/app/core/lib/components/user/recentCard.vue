@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/core/icons'
-import { createDateString } from '@delta-comic/core/utils/date'
-import type { ItemStoreDB, RecentDB } from '@delta-comic/db'
-import { UniItem } from '@delta-comic/model'
+import { Icons } from '@delta-comic/client-app-core/icons'
+import { createDateString } from '@delta-comic/client-app-core/utils/date'
+import { UniItem } from '@delta-comic/client-core-model'
+import type { ItemStoreDB, RecentDB } from '@delta-comic/client-data-db'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 const $props = defineProps<{ item: ItemStoreDB.StoredItem & RecentDB.Item }>()

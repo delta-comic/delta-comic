@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormDateRange } from '@delta-comic/model'
+import type { FormDateRange } from '@delta-comic/client-core-model'
 import { ref } from 'vue'
 
 import { DcFormDateRange } from '@/index'

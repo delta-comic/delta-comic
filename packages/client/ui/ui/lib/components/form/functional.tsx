@@ -1,4 +1,4 @@
-import type { FormConfigure, FormResult, FormSingleResult } from '@delta-comic/model'
+import type { FormConfigure, FormResult, FormSingleResult } from '@delta-comic/client-core-model'
 import { NButton } from 'naive-ui'
 import { ref } from 'vue'
 

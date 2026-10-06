@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/shared-core-logger'
 import { isTauri } from '@tauri-apps/api/core'
 import { useCssVar, useEventListener } from '@vueuse/core'
 import MarkdownIt, { type Env, type MarkdownItOptions } from 'markdown-it'

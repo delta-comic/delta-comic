@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormRadio, FormSingleResult } from '@delta-comic/model'
+import type { FormRadio, FormSingleResult } from '@delta-comic/client-core-model'
 import { NRadio, NRadioGroup, NSelect, NSpace } from 'naive-ui'
 
 defineProps<{ config: FormRadio }>()

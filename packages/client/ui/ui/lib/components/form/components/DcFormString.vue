@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormSingleResult, FormString } from '@delta-comic/model'
+import type { FormSingleResult, FormString } from '@delta-comic/client-core-model'
 import { isEmpty } from 'es-toolkit/compat'
 import { NInput } from 'naive-ui'
 

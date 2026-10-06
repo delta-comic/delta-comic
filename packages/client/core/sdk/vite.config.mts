@@ -1,3 +1,5 @@
+import { fileURLToPath, URL } from 'node:url'
+
 import { transform } from '@swc/core'
 import { defineConfig } from 'vite-plus'
 import type { Plugin } from 'vite-plus'
@@ -20,6 +22,31 @@ const decoratorPlugin: Plugin = { name: 'delta-comic:lower-decorators', transfor
 
 export default defineConfig({
   plugins: [decoratorPlugin],
+  resolve: {
+    alias: {
+      '@delta-comic/client-data-db': fileURLToPath(
+        new URL('../../data/db/lib/index.ts', import.meta.url),
+      ),
+      '@delta-comic/client-platform-downloader': fileURLToPath(
+        new URL('../../platform/downloader/lib/index.ts', import.meta.url),
+      ),
+      '@delta-comic/shared-core-logger': fileURLToPath(
+        new URL('../../../shared/core/logger/lib/index.ts', import.meta.url),
+      ),
+      '@delta-comic/client-core-model': fileURLToPath(
+        new URL('../model/lib/index.ts', import.meta.url),
+      ),
+      '@delta-comic/shared-plugin-manifest': fileURLToPath(
+        new URL('../../../shared/plugin/manifest/lib/index.ts', import.meta.url),
+      ),
+      '@delta-comic/client-ui-ui': fileURLToPath(
+        new URL('../../ui/ui/lib/index.ts', import.meta.url),
+      ),
+      '@delta-comic/client-core-utils': fileURLToPath(
+        new URL('../utils/lib/index.ts', import.meta.url),
+      ),
+    },
+  },
   pack: {
     entry: [
       './lib/index.ts',
@@ -30,6 +57,10 @@ export default defineConfig({
     ],
     sourcemap: true,
     dts: { tsconfig: './tsconfig.json' },
+    deps: {
+      alwaysBundle: [/^@delta-comic\//],
+      dts: { alwaysBundle: id => id.startsWith('@delta-comic/') || id.includes('/packages/') },
+    },
     plugins: [decoratorPlugin],
   },
   run: {

@@ -99,7 +99,7 @@ vi.mock('vue-i18n', () => ({
   useI18n: () => ({ locale: { value: 'en-US' }, t: (key: string) => key }),
 }))
 
-vi.mock('@delta-comic/core/i18n/index', () => ({ formatDate: () => 'formatted' }))
+vi.mock('@delta-comic/client-app-core/i18n/index', () => ({ formatDate: () => 'formatted' }))
 
 import LogContentViewer from '../../../../src/components/logs/LogContentViewer.vue'
 import LogFileList from '../../../../src/components/logs/LogFileList.vue'

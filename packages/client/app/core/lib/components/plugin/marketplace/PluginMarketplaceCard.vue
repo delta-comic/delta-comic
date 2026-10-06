@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import PluginIcon from '@delta-comic/core/components/plugin/PluginIcon.vue'
-import type { PluginMarketplaceItem } from '@delta-comic/core/features/pluginMarketplace/model'
+import PluginIcon from '@delta-comic/client-app-core/components/plugin/PluginIcon.vue'
+import type { PluginMarketplaceItem } from '@delta-comic/client-app-core/features/pluginMarketplace/model'
 import { NButton, NCard, NTag } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

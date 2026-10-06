@@ -8,5 +8,9 @@ export default defineConfig({
       typecheck: { command: 'tsc -p tsconfig.json --noEmit', cache: { output: [] } },
     },
   },
-  test: { name: '@delta-comic/plugin-vite', environment: 'node', include: ['test/**/*.test.ts'] },
+  test: {
+    name: '@delta-comic/client-core-plugin-vite',
+    environment: 'node',
+    include: ['test/**/*.test.ts'],
+  },
 })

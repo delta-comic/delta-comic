@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { logger } from '@delta-comic/logger'
-import { type UniImage_, UniResource } from '@delta-comic/model'
-import { useTemp } from '@delta-comic/utils'
+import { type UniImage_, UniResource } from '@delta-comic/client-core-model'
+import { useTemp } from '@delta-comic/client-core-utils'
+import { logger } from '@delta-comic/shared-core-logger'
 import { computedAsync } from '@vueuse/core'
 import { isString } from 'es-toolkit/compat'
 import { type ImageProps, NIcon, NImage } from 'naive-ui'

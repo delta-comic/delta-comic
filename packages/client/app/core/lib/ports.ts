@@ -1,4 +1,4 @@
-import type { createDownloadMessage } from '@delta-comic/ui'
+import type { createDownloadMessage } from '@delta-comic/client-ui-ui'
 import type { RouteRecordRaw } from 'vue-router'
 
 export interface PlatformPort {

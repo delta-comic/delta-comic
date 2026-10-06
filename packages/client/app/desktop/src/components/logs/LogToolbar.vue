@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LOG_LEVELS, type LogLevelFilter } from '@delta-comic/core/features/logs/model'
+import { LOG_LEVELS, type LogLevelFilter } from '@delta-comic/client-app-core/features/logs/model'
 import { NButton, NInput, NSelect } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

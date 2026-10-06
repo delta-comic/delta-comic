@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/shared-core-logger'
 import { Octokit } from '@octokit/rest'
 
 import { pluginCatalogIdFromInstallInput, type PluginInstallCatalog } from './catalog'

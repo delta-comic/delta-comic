@@ -1,7 +1,7 @@
-import type { DB, InsertObject, Kysely } from '@delta-comic/db'
-import { assertWriteRow, filterValidRowsFor } from '@delta-comic/db'
-import { logger } from '@delta-comic/logger'
+import type { DB, InsertObject, Kysely } from '@delta-comic/client-data-db'
+import { assertWriteRow, filterValidRowsFor } from '@delta-comic/client-data-db'
 import { syncCollectionNames, type SyncChange, type SyncCollection } from '@delta-comic/server/api'
+import { logger } from '@delta-comic/shared-core-logger'
 
 const syncAdapterLogger = logger.scoped('app:cloud:sync-adapter')
 
@@ -36,7 +36,7 @@ const splitEntityId = (entityId: string): [string, string] => {
 export class DbCloudSyncAdapter {
   async collectSnapshot(): Promise<SnapshotCollections> {
     syncAdapterLogger.info('collecting local sync snapshot')
-    const { db } = await import('@delta-comic/db')
+    const { db } = await import('@delta-comic/client-data-db')
     const collections = await Promise.all(
       syncCollectionNames.map(
         async collection =>
@@ -63,7 +63,7 @@ export class DbCloudSyncAdapter {
         right.action === 'delete' ? deleteOrder[right.collection] : upsertOrder[right.collection]
       return leftOrder - rightOrder || left.serverSeq - right.serverSeq
     })
-    const { DBUtils, db } = await import('@delta-comic/db')
+    const { DBUtils, db } = await import('@delta-comic/client-data-db')
     await DBUtils.withTransition(async trx => {
       for (const change of sorted) {
         if (change.action === 'delete') {

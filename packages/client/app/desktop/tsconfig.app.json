@@ -7,11 +7,11 @@
     "rootDir": "../../../../",
     "types": [
       "./components.d.ts",
-      "@delta-comic/core/components",
+      "@delta-comic/client-app-core/components",
       "vue-component-type-helpers",
       "./typed-router.d.ts",
       "vite-plus/client",
-      "@delta-comic/utils"
+      "@delta-comic/client-core-utils"
     ]
   },
   "vueCompilerOptions": {

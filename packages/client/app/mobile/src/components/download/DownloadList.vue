@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DownloadTask } from '@delta-comic/core/features/downloads/downloaderClient'
+import type { DownloadTask } from '@delta-comic/client-app-core/features/downloads/downloaderClient'
 import { useVirtualList } from '@vueuse/core'
 import { NEmpty } from 'naive-ui'
 import { computed, toRef } from 'vue'

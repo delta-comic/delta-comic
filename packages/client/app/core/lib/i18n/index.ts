@@ -1,4 +1,4 @@
-import { pluginI18n, type PluginI18nAdapter } from '@delta-comic/plugin'
+import { pluginI18n, type PluginI18nAdapter } from '@delta-comic/client-core-plugin'
 import dayjs, { type Dayjs } from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
 import 'dayjs/locale/zh-cn'

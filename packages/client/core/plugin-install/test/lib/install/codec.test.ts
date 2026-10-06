@@ -1,4 +1,4 @@
-import { sha256Integrity } from '@delta-comic/plugin-artifact'
+import { sha256Integrity } from '@delta-comic/client-core-plugin-artifact'
 import JSZip from 'jszip'
 import { describe, expect, it } from 'vite-plus/test'
 

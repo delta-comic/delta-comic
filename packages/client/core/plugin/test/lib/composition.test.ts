@@ -1,5 +1,5 @@
-import { db } from '@delta-comic/db'
-import type { PluginManifest } from '@delta-comic/plugin-manifest'
+import { db } from '@delta-comic/client-data-db'
+import type { PluginManifest } from '@delta-comic/shared-plugin-manifest'
 import type { Context, Plugin } from 'cordis'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
@@ -19,7 +19,7 @@ const state = vi.hoisted(() => ({
   builtins: new Array<{ manifest: PluginManifest; functions: readonly Plugin.Function[] }>(),
 }))
 
-vi.mock('@delta-comic/db', () => ({ db: {} }))
+vi.mock('@delta-comic/client-data-db', () => ({ db: {} }))
 vi.mock('../../lib/adapters', () => ({
   AwesomeRegistryClient: class {},
   ConfigStore: class {
@@ -55,8 +55,8 @@ vi.mock('../../lib/builtins', () => ({
   builtinPlugins: state.builtins,
   coreManifest: { id: 'core', name: 'Core', version: '1.0.0' },
 }))
-vi.mock('@delta-comic/plugin-install', async importOriginal => ({
-  ...(await importOriginal<typeof import('@delta-comic/plugin-install')>()),
+vi.mock('@delta-comic/client-core-plugin-install', async importOriginal => ({
+  ...(await importOriginal<typeof import('@delta-comic/client-core-plugin-install')>()),
   StoredPluginModuleReader: class {
     async read(archive: { pluginName: string }) {
       const functions = state.modules.get(archive.pluginName)

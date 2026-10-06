@@ -1,6 +1,6 @@
-import type { UniContentType_, UniItem } from '@delta-comic/model'
+import type { UniContentType_, UniItem } from '@delta-comic/client-core-model'
 
-declare module '@delta-comic/utils' {
+declare module '@delta-comic/client-core-utils' {
   export interface SharedFunctions {
     routeToContent(
       contentType: UniContentType_,

@@ -1,4 +1,4 @@
-import type { PluginManifest, PluginUserConfig } from '@delta-comic/plugin-manifest'
+import type { PluginManifest, PluginUserConfig } from '@delta-comic/shared-plugin-manifest'
 import type { Insertable, Selectable, Updateable, JSONColumnType } from 'kysely'
 
 export interface PluginTable {

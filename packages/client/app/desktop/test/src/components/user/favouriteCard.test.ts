@@ -32,7 +32,7 @@ await vi.hoisted(async () => {
   }
 })
 
-vi.mock('@delta-comic/db', () => ({
+vi.mock('@delta-comic/client-data-db', () => ({
   FavouriteDB: {
     useQueryItem: () => ({
       state: window.$$lib$$.Vue.computed(() => ({ data: favouriteItems.value, status: 'success' }))
@@ -40,8 +40,10 @@ vi.mock('@delta-comic/db', () => ({
     }),
   },
 }))
-vi.mock('@delta-comic/model', () => ({ UniImage: { create: (cover: unknown) => cover } }))
-vi.mock('@delta-comic/ui', () => {
+vi.mock('@delta-comic/client-core-model', () => ({
+  UniImage: { create: (cover: unknown) => cover },
+}))
+vi.mock('@delta-comic/client-ui-ui', () => {
   const { defineComponent, h } = window.$$lib$$.Vue
   return {
     DcImage: defineComponent({
@@ -59,11 +61,11 @@ vi.mock('@delta-comic/ui', () => {
   }
 })
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }))
-vi.mock('@delta-comic/core/icons', () => ({
+vi.mock('@delta-comic/client-app-core/icons', () => ({
   Icons: { antd: { FolderOutlined: {}, LockOutlined: {} }, material: { ArrowForwardIosRound: {} } },
 }))
 
-import FavouriteCard from '@delta-comic/core/components/user/favouriteCard.vue'
+import FavouriteCard from '@delta-comic/client-app-core/components/user/favouriteCard.vue'
 
 const card = { createAt: 1, description: '', private: true, title: 'Default' }
 

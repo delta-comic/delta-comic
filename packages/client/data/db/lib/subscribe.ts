@@ -1,4 +1,4 @@
-import { SourcedValue, type SourcedKeyType } from '@delta-comic/model'
+import { SourcedValue, type SourcedKeyType } from '@delta-comic/client-core-model'
 import {
   defineMutation,
   useMutation,

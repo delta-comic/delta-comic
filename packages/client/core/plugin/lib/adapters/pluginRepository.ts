@@ -1,5 +1,10 @@
-import { assertWriteRow, db, validateReadRow, type PluginArchiveDB } from '@delta-comic/db'
-import type { PluginArchiveRepository } from '@delta-comic/plugin-install'
+import type { PluginArchiveRepository } from '@delta-comic/client-core-plugin-install'
+import {
+  assertWriteRow,
+  db,
+  validateReadRow,
+  type PluginArchiveDB,
+} from '@delta-comic/client-data-db'
 
 export class DatabasePluginArchiveRepository implements PluginArchiveRepository {
   public async find(plugin: string) {

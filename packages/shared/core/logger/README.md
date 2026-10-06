@@ -1,9 +1,9 @@
-# @delta-comic/logger
+# @delta-comic/shared-core-logger
 
 Delta Comic 的跨端结构化日志核心。核心提供 scoped logger、console 捕获、错误捕获和可注入 transport；服务端与客户端共用同一条日志记录契约。
 
 ```ts
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/shared-core-logger'
 
 const log = logger.scoped('my-plugin:sync')
 log.info('sync started', { itemCount: 12 })
@@ -13,7 +13,7 @@ log.error('sync failed', error)
 宿主应用应尽早安装全局捕获，用于复制 `console` 输出并捕获未处理错误。客户端应用向 logger 注入 Tauri transport：
 
 ```ts
-import { installGlobalLogger, logger } from '@delta-comic/logger'
+import { installGlobalLogger, logger } from '@delta-comic/shared-core-logger'
 import { TauriLoggerClient } from './logger/TauriLoggerClient'
 
 logger.setTransport(new TauriLoggerClient())

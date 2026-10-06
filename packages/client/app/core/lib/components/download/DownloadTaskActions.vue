@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { DownloadTask } from '@delta-comic/core/features/downloads/downloaderClient'
+import type { DownloadTask } from '@delta-comic/client-app-core/features/downloads/downloaderClient'
 import {
   activeDownloadStatuses,
   resumableDownloadStatuses,
-} from '@delta-comic/core/features/downloads/format'
+} from '@delta-comic/client-app-core/features/downloads/format'
 import { NButton, NDropdown, NSpace } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

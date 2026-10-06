@@ -3,7 +3,7 @@ import { createServer as createHttpServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import type { PluginManifest } from '@delta-comic/model'
+import type { PluginManifest } from '@delta-comic/client-core-model'
 import vue from '@vitejs/plugin-vue'
 import type { InlineConfig } from 'vite-plus'
 import { createServer } from 'vite-plus'

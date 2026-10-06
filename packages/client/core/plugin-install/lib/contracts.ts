@@ -1,5 +1,5 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
-import type { PluginManifest } from '@delta-comic/plugin-manifest'
+import type { PluginArchiveDB } from '@delta-comic/client-data-db'
+import type { PluginManifest } from '@delta-comic/shared-plugin-manifest'
 import type { Context, Plugin } from 'cordis'
 
 export type PluginInstallInput = File | string

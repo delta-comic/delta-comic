@@ -20,6 +20,12 @@
 
 本轮四阶段已完成。最终串行验收通过：lib-build、check、递归 typecheck、155 files / 833 tests、codegen 和 diff；Rust 检查与 Web/Tauri 实际启动复核通过。资源测量已记录，生产免费计划 CPU 结果需部署环境补测，详见 `docs/plugin-flow-acceptance.md`。
 
+### 2026-10-06 SDK 发布边界收敛
+
+- 用户确认仅 `@delta-comic/both`、`@delta-comic/client`、`@delta-comic/server` 保持公开。
+- 其他 workspace 包标记为 `private: true`；客户端/服务端 SDK 将必要的内部能力内联到发布产物，并从 SDK 入口 re-export 对外 API。
+- 当前下一步：完成发布边界实现并运行构建、类型检查、发布专项测试。
+
 ## 目标
 
 完成 Delta Comic 全仓架构重构的需求发现、方案设计与分阶段实施。参考仓库上一级目录的 `/Users/wenxig/Documents/deepseek-harness` 中 Cordis 与 capability-family monorepo 组织方式。保留既有产品能力，允许数据库迁移，不承诺旧插件/API 兼容；依赖升级至最新版本（包含预发布版本）。最终公共 npm SDK 包包括 `@delta-comic/both`、`@delta-comic/client`、`@delta-comic/server`。
@@ -96,7 +102,7 @@
 
 - **状态：** complete
 - 目标：按第 12 章现行 API 基线完成架构第 7 章的可执行实现；覆盖新 Manifest/Artifact 校验、ZIP 资源图、安装依赖与兼容性检查、原子升级回滚、Blob/协议 URL 模块解析和动态 chunk。
-- 约束：保留已有插件宿主与旧数据库迁移边界，优先在 `@delta-comic/plugin-manifest`、`@delta-comic/plugin-artifact`、`@delta-comic/plugin-install` 和文件存储适配器内完成最小改动；不把架构中的历史伪代码当作 API。
+- 约束：保留已有插件宿主与旧数据库迁移边界，优先在 `@delta-comic/shared-plugin-manifest`、`@delta-comic/client-core-plugin-artifact`、`@delta-comic/client-core-plugin-install` 和文件存储适配器内完成最小改动；不把架构中的历史伪代码当作 API。
 
 ### 阶段 7 子阶段
 
@@ -176,7 +182,7 @@
 
 ## 阶段 7 决策
 
-- 现行协议使用 `@delta-comic/plugin-manifest` 的 `protocolVersion/id/entry/resources`，旧 `@delta-comic/model` Manifest 只在现有数据库/宿主适配边界保留。
+- 现行协议使用 `@delta-comic/shared-plugin-manifest` 的 `protocolVersion/id/entry/resources`，旧 `@delta-comic/client-core-model` Manifest 只在现有数据库/宿主适配边界保留。
 - 新 Artifact 的校验在动态 import 之前完成；资源 integrity 使用 SHA-256 SRI，资源 imports 必须落在同一 artifact 的声明资源集合中。
 - 模块解析采用资源图和宿主注入的 module URL 工厂；不依赖 Blob URL 的相对路径行为，动态 chunk 也必须经过同一解析边界。
 
@@ -187,7 +193,7 @@
 | 当前安装包同时存在新 Artifact Manifest 与旧数据库 Manifest 类型 | 1 | 保留旧数据库适配边界，在安装协议增加显式新 Artifact 类型与转换函数，避免隐式断言和全仓无关迁移 |
 | 根级 `vp test run` 未收集 plugin-install 测试路径 | 1 | 按仓库现有测试项目边界切换到 `packages/client/core/plugin-install` 目录执行包内测试 |
 | Node Vite+ runner 无法直接 import `blob:` URL | 1 | 测试改为读取生成 Blob 内容并断言相对动态 import 已重写；浏览器/Tauri 负责实际 Blob 模块执行 |
-| 递归 typecheck 在 plugin-vite 任务先于新 install dist 生成时无法解析包声明 | 1 | 单独完成 `@delta-comic/plugin-install` build 后重跑递归 typecheck |
+| 递归 typecheck 在 plugin-vite 任务先于新 install dist 生成时无法解析包声明 | 1 | 单独完成 `@delta-comic/client-core-plugin-install` build 后重跑递归 typecheck |
 | 全量 `vp test run` 并行冷启动时 3 个既有 db/plugin 测试触发 5 秒超时 | 1 | 改用两个包的独立测试入口复核，6 个 db 测试和 4 个 plugin fileStore 测试均通过；记录为全量 runner 冷启动限制 |
 
 ## 阶段 6D StaticPluginExecutor 生命周期迁移
@@ -231,7 +237,7 @@
 | `writing-plans` 技能不在当前可用技能列表 | 1 | 按已批准 6G spec 在本文件记录等价的分阶段实施计划，继续执行既定流程 |
 | app `vue-tsc` 报告旧 `DCPluginConfig` model/hooks 字段缺失 | 1 | 聚合包已恢复可解析；记录为 6D 旧宿主类型迁移遗留，不扩大本次 6G Install/Vite 包拆分范围 |
 | 聚合包架构测试将多行 `export type` 续行误判为可执行代码 | 1 | 聚合入口改为通过 `lib/kernel` 统一导出新 Kernel，并移除旧 Kernel 的重复实现 |
-| 插件专项测试在依赖 dist 尚未重建时无法解析 `@delta-comic/plugin-kernel` | 1 | 先运行 `vp run lib-build`，再重新执行专项测试并通过 |
+| 插件专项测试在依赖 dist 尚未重建时无法解析 `@delta-comic/client-core-plugin-kernel` | 1 | 先运行 `vp run lib-build`，再重新执行专项测试并通过 |
 | `vp run -r typecheck` 报告 `packages/client/core/plugin-runtime/lib/store.ts:70` 及 `test/index.test.ts:37,42` 的 3 个类型错误 | 1 | 通过 store typed overload、Reflect.get 和测试模型泛型修复，递归 typecheck 已通过 |
 | 修改 API 的默认模型为 Record 导致 55 个宿主约束错误 | 1 | 恢复 API，使用 store 的 typed overload 与 Reflect.get，测试提供具体模型泛型 |
 | 泛型模型属性索引和 Exclude 返回值无法通过 TypeScript 检查 | 3 | 将公开签名与属性读取实现放在同一重载方法，值先标注 unknown 并过滤 undefined；Runtime 独立类型检查通过 |
@@ -246,7 +252,7 @@
 
 ## 6G 过渡设计清理
 
-- 聚合包能力已直接使用 `@delta-comic/plugin-kernel` 的 `CapabilityModule`、`ActivationPipeline` 和 `PluginScope`。
+- 聚合包能力已直接使用 `@delta-comic/client-core-plugin-kernel` 的 `CapabilityModule`、`ActivationPipeline` 和 `PluginScope`。
 - 删除聚合包重复的 candidate/capability/dependency/scope 实现、运行时 capability adapter 及其重复测试；插件特有的多 channel `ContributionHub` 保留为宿主能力服务。
 - 更新运行时进度报告以消费新 Kernel 的 capability state 事件，移除旧报告结构。
 
@@ -302,7 +308,7 @@
 
 | Error | Attempt | Resolution |
 |---|---|---|
-| `@delta-comic/http` 被 release workspace 当作公共包 | 1 | 在包清单加入 `private: true`，release 专项恢复通过 |
+| `@delta-comic/client-platform-http` 被 release workspace 当作公共包 | 1 | 在包清单加入 `private: true`，release 专项恢复通过 |
 | 删除 UI 样式架构测试后全量测试缓存仍引用旧套件 | 1 | 重新运行完整 `vp test run`，旧套件引用消失 |
 
 ## 2026-10-04 测试质量审计错误记录
@@ -311,7 +317,7 @@
 |---|---|---|
 | 多项目并行专项测试中 `db/index.test.ts` 超过 5 秒 | 1 | 单文件串行重跑通过，判定为并行启动边界 |
 | 全量测试 UI 组件类名断言失败 | 1 | 失败位于未修改的 `DcTab`/`basic` 测试与 Tailwind 类名输出，记录为既有问题 |
-| 全量测试 release workspace 失败 | 1 | 失败位于未修改的 `@delta-comic/http` 发布配置，记录为既有问题 |
+| 全量测试 release workspace 失败 | 1 | 失败位于未修改的 `@delta-comic/client-platform-http` 发布配置，记录为既有问题 |
 | `vp check --fix` 改写 `.oxlintrc.json` 格式 | 1 | 恢复该未相关文件，保留本轮文件格式修复 |
 
 ## 第 12 章错误记录

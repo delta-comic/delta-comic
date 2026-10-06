@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/core/icons'
-import { UniItem } from '@delta-comic/model'
-import { Core, useConfig, usePluginStore, type Content } from '@delta-comic/plugin'
-import { SharedFunction } from '@delta-comic/utils'
+import { Icons } from '@delta-comic/client-app-core/icons'
+import { UniItem } from '@delta-comic/client-core-model'
+import { Core, useConfig, usePluginStore, type Content } from '@delta-comic/client-core-plugin'
+import { SharedFunction } from '@delta-comic/client-core-utils'
 import { useInfiniteQuery } from '@pinia/colada'
 import { isEmpty } from 'es-toolkit/compat'
 import { computed, shallowRef } from 'vue'

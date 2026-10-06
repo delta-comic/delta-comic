@@ -1,5 +1,5 @@
 import { DiagnosticRecorder } from '@delta-comic/both'
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/shared-core-logger'
 import { cors as elysiaCors } from '@elysiajs/cors'
 import { openapi } from '@elysiajs/openapi'
 import { Elysia, t } from 'elysia'

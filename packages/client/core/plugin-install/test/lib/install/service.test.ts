@@ -1,5 +1,5 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
-import type { PluginManifest } from '@delta-comic/model'
+import type { PluginManifest } from '@delta-comic/client-core-model'
+import type { PluginArchiveDB } from '@delta-comic/client-data-db'
 import { describe, expect, it, vi } from 'vite-plus/test'
 
 import type {

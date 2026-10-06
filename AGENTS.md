@@ -115,7 +115,7 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 - `packages/client/app/app`：Vue/Tauri 客户端。Web 入口为 `src/main.tsx`；原生入口为
   `src-tauri/src/main.rs`。`vp run --filter app dev` 启动 Tauri；`dev:web` 仅启动 Web
   客户端。Tauri 必须使用端口 `5173`，端口不可用时会直接失败，而不会选择其他端口。
-- 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/runtime`，它是供外部插件使用的
+- 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/client-core-runtime`，它是供外部插件使用的
   UMD 宿主库桥接层。请保持此依赖顺序。
 - `packages/server/core/server/app/index.ts`：Elysia Cloudflare Worker 入口。
   `packages/server/core/server/lib/index.ts` 是客户端/共享公共 API，并非 Worker 入口。本地启动前必须先运行

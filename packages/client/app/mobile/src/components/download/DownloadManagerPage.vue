@@ -3,8 +3,8 @@ import type {
   AddDownloadRequest,
   DownloadTask,
   DownloaderSettings,
-} from '@delta-comic/core/features/downloads/downloaderClient'
-import { useDownloadManager } from '@delta-comic/core/features/downloads/useDownloadManager'
+} from '@delta-comic/client-app-core/features/downloads/downloaderClient'
+import { useDownloadManager } from '@delta-comic/client-app-core/features/downloads/useDownloadManager'
 import { NAlert, useDialog, useMessage } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { shallowRef } from 'vue'

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { type UniContentType_, UniItem } from '@delta-comic/model'
-import type { Content } from '@delta-comic/plugin'
+import { type UniContentType_, UniItem } from '@delta-comic/client-core-model'
+import type { Content } from '@delta-comic/client-core-plugin'
 import { useQuery } from '@pinia/colada'
 import { chunk } from 'es-toolkit'
 

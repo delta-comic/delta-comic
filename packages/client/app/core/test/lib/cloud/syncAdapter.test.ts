@@ -39,7 +39,7 @@ const trx = {
   })),
 }
 
-vi.mock('@delta-comic/db', () => ({
+vi.mock('@delta-comic/client-data-db', () => ({
   DBUtils: { withTransition },
   assertWriteRow: (_table: string, value: unknown) => value,
   db: {

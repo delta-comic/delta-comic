@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-import { useConfig } from '@delta-comic/plugin'
+import { useConfig } from '@delta-comic/client-core-plugin'
 import { createReusableTemplate } from '@vueuse/core'
 import { motion } from 'motion-v'
 import { NButton, NCheckbox, NDropdown, type DropdownOption } from 'naive-ui'

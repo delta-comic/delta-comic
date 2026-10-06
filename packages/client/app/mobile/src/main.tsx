@@ -1,14 +1,14 @@
-import { configureCoreHost } from '@delta-comic/core'
-import { prepareAppPluginHost, disposeAppPluginHost } from '@delta-comic/core/clientHost'
-import { i18n } from '@delta-comic/core/i18n/index'
-import { useConfig } from '@delta-comic/plugin'
+import { configureCoreHost } from '@delta-comic/client-app-core'
+import { prepareAppPluginHost, disposeAppPluginHost } from '@delta-comic/client-app-core/clientHost'
+import { i18n } from '@delta-comic/client-app-core/i18n/index'
+import { useConfig } from '@delta-comic/client-core-plugin'
 import {
   configureUiI18n,
   createDownloadMessage,
   DcConfigProvider,
   type UiMessageKey,
   type UiMessageParams,
-} from '@delta-comic/ui'
+} from '@delta-comic/client-ui-ui'
 import { PiniaColada } from '@pinia/colada'
 import { isTauri } from '@tauri-apps/api/core'
 import { listen, TauriEvent } from '@tauri-apps/api/event'

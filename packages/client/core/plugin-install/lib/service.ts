@@ -1,4 +1,4 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
+import type { PluginArchiveDB } from '@delta-comic/client-data-db'
 
 import type {
   DecodedPluginPackage,

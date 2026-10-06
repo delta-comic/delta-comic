@@ -1,10 +1,10 @@
-import type { PluginArchiveDB } from '@delta-comic/db'
 import {
   isPluginManifestCompatible,
   pluginCatalogInstallInput,
   type PluginCatalogListing,
   type PluginManifest,
-} from '@delta-comic/plugin'
+} from '@delta-comic/client-core-plugin'
+import type { PluginArchiveDB } from '@delta-comic/client-data-db'
 import semver from 'semver'
 
 export type PluginMarketplaceFilter = 'all' | 'available' | 'installed' | 'updates'

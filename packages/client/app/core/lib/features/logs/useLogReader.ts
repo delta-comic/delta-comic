@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/shared-core-logger'
 import { computed, onMounted, readonly, shallowRef } from 'vue'
 
 import { loggerClient, type LogReaderClient } from './loggerClient'

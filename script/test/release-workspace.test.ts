@@ -20,31 +20,18 @@ async function writeManifest(cwd: string, directory: string, manifest: Record<st
 }
 
 describe('ReleaseWorkspace', () => {
-  it('discovers all current public packages including UI and excludes private applications', async () => {
+  it('discovers only the three public SDK packages', async () => {
     const packages = await new ReleaseWorkspace(rootDir).publishablePackages()
 
     expect(packages.map(pkg => pkg.name)).toEqual([
-      '@delta-comic/logger',
-      '@delta-comic/plugin-manifest',
-      '@delta-comic/model',
       '@delta-comic/both',
-      '@delta-comic/db',
-      '@delta-comic/downloader',
-      '@delta-comic/utils',
-      '@delta-comic/ui',
       '@delta-comic/client',
-      '@delta-comic/plugin-artifact',
-      '@delta-comic/plugin-install',
-      '@delta-comic/plugin-vite',
-      '@delta-comic/plugin',
       '@delta-comic/server',
     ])
     expect(packages.map(pkg => pkg.path).toSorted()).toEqual(
       jsonVersionPaths
         .filter(path =>
-          /^packages\/(?:client\/(?:core\/(?:sdk|plugin|plugin-artifact|plugin-install|plugin-vite|model|utils)|data\/db|platform\/downloader|ui\/ui)|server\/core\/server|shared\/(?:core\/(?:both|logger)|plugin\/manifest))\//.test(
-            path,
-          ),
+          /^packages\/(?:client\/core\/sdk|server\/core\/server|shared\/core\/both)\//.test(path),
         )
         .toSorted(),
     )

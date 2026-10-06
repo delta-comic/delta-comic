@@ -62,11 +62,11 @@ await vi.hoisted(async () => {
   } as typeof window.$$lib$$
 })
 
-vi.mock('@delta-comic/logger', () => ({
+vi.mock('@delta-comic/shared-core-logger', () => ({
   logger: { scoped: () => ({ debug: vi.fn(), error: vi.fn(), info: vi.fn() }) },
 }))
-vi.mock('@delta-comic/plugin', () => ({ installPlugin: mocks.installPlugin }))
-vi.mock('@delta-comic/core/features/pluginInstall/usePluginInstall', () => ({
+vi.mock('@delta-comic/client-core-plugin', () => ({ installPlugin: mocks.installPlugin }))
+vi.mock('@delta-comic/client-app-core/features/pluginInstall/usePluginInstall', () => ({
   usePluginInstall: () => ({ runPluginInstall: mocks.runPluginInstall }),
 }))
 vi.mock('@vueuse/core', () => ({

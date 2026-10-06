@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import AuthorList from '@delta-comic/core/components/subscribe/subAuthorList.vue'
-import { Icons } from '@delta-comic/core/icons'
-import { SubscribeDB } from '@delta-comic/db'
-import { DcState } from '@delta-comic/ui'
+import AuthorList from '@delta-comic/client-app-core/components/subscribe/subAuthorList.vue'
+import { Icons } from '@delta-comic/client-app-core/icons'
+import { SubscribeDB } from '@delta-comic/client-data-db'
+import { DcState } from '@delta-comic/client-ui-ui'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 const isOnAllPage = shallowRef(true)

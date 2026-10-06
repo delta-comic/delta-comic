@@ -1,4 +1,4 @@
-import { useGlobalVar } from '@delta-comic/utils'
+import { useGlobalVar } from '@delta-comic/client-core-utils'
 import { until } from '@vueuse/core'
 import { isUndefined, isError, delay } from 'es-toolkit'
 import { isNumber, toString } from 'es-toolkit/compat'

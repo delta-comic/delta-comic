@@ -35,7 +35,7 @@ await vi.hoisted(async () => {
   } as typeof window.$$lib$$
 })
 
-vi.mock('@delta-comic/core/icons', async () => {
+vi.mock('@delta-comic/client-app-core/icons', async () => {
   const { defineComponent } = await import('vue')
   const EmptyIcon = defineComponent({ name: 'EmptyIcon', template: '<i />' })
   return { Icons: { antd: { CloudSyncOutlined: EmptyIcon }, material: { CheckRound: EmptyIcon } } }
@@ -43,7 +43,7 @@ vi.mock('@delta-comic/core/icons', async () => {
 
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }))
 
-import type { SourceRefreshWarning } from '@delta-comic/core/features/downloads/sourceRefresh'
+import type { SourceRefreshWarning } from '@delta-comic/client-app-core/features/downloads/sourceRefresh'
 
 import DownloadSourceRefreshWarnings from '../../../../src/components/download/DownloadSourceRefreshWarnings.vue'
 

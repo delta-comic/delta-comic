@@ -1,13 +1,13 @@
 {
-  "name": "@delta-comic/admin",
+  "name": "@delta-comic/server-admin-panel",
   "private": true,
   "description": "Cloudflare Pages admin panel for Delta Comic server.",
   "type": "module",
   "dependencies": {
-    "@delta-comic/logger": "workspace:",
-    "@delta-comic/plugin-manifest": "workspace:",
+    "@delta-comic/client-ui-ui": "workspace:",
     "@delta-comic/server": "workspace:",
-    "@delta-comic/ui": "workspace:",
+    "@delta-comic/shared-core-logger": "workspace:",
+    "@delta-comic/shared-plugin-manifest": "workspace:",
     "@vueuse/core": "catalog:",
     "dayjs": "catalog:",
     "naive-ui": "catalog:",

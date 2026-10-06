@@ -6,8 +6,8 @@
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5174",
-    "beforeDevCommand": "vp run --filter desktop dev:web",
-    "beforeBuildCommand": "vp run --filter desktop build:web"
+    "beforeDevCommand": "vp run --filter @delta-comic/client-app-desktop dev:web",
+    "beforeBuildCommand": "vp run --filter @delta-comic/client-app-desktop build:web"
   },
   "app": {
     "windows": [

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UniUser } from '@delta-comic/model'
+import { UniUser } from '@delta-comic/client-core-model'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'

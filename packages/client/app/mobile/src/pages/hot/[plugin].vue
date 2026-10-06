@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { SourcedValue, UniItem } from '@delta-comic/model'
-import { usePluginStore } from '@delta-comic/plugin'
+import { SourcedValue, UniItem } from '@delta-comic/client-core-model'
+import { usePluginStore } from '@delta-comic/client-core-plugin'
 import { useQuery } from '@pinia/colada'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

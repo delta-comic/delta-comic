@@ -31,7 +31,7 @@ discovered from `builtins/*.builtin.ts`; each file supplies its manifest and fun
 
 ## Installation And Management
 
-`@delta-comic/plugin-install` owns source resolution, manifest validation, ZIP integrity,
+`@delta-comic/client-core-plugin-install` owns source resolution, manifest validation, ZIP integrity,
 persistence transactions, module graph rewriting, and development-server module reading.
 Database/file/catalog adapters live in this package. Vite tooling emits manifest resources and
 integrity, JSON flow files, icons, and client chunks. Development loading uses Vite's HMR and CSS

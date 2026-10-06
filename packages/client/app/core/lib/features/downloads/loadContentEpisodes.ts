@@ -1,5 +1,5 @@
-import type { UniContentPage, UniEp } from '@delta-comic/model'
-import type { PageKey } from '@delta-comic/model'
+import type { UniContentPage, UniEp } from '@delta-comic/client-core-model'
+import type { PageKey } from '@delta-comic/client-core-model'
 
 export class EpisodePaginationError extends Error {
   constructor(message = 'episode pagination returned a repeated cursor') {

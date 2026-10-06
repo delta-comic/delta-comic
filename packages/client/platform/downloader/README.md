@@ -1,6 +1,6 @@
 # `tauri-plugin-downloader`
 
-Delta Comic 的跨平台下载引擎。Rust crate、Tauri 命令与 `@delta-comic/downloader`
+Delta Comic 的跨平台下载引擎。Rust crate、Tauri 命令与 `@delta-comic/client-platform-downloader`
 TypeScript SDK 位于同一个 workspace package 中，下载状态只由 Rust 引擎维护。
 
 ## 架构
@@ -48,7 +48,7 @@ tauri::Builder::default()
 TypeScript：
 
 ```ts
-import { Downloader } from '@delta-comic/downloader'
+import { Downloader } from '@delta-comic/client-platform-downloader'
 
 const downloader = Downloader.get()
 const secretRef = await downloader.storeSecret('Bearer private-token')

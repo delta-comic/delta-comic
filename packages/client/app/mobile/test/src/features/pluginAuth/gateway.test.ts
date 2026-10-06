@@ -1,4 +1,4 @@
-import { pluginI18n, type User } from '@delta-comic/plugin'
+import { pluginI18n, type User } from '@delta-comic/client-core-plugin'
 import type { DialogOptions } from 'naive-ui'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 import type { VNode } from 'vue'
@@ -14,14 +14,14 @@ await vi.hoisted(async () => {
   await import('../../../../public/runtime/host-libraries.umd.js')
 })
 
-vi.mock('@delta-comic/ui', () => ({ createForm: createFormMock }))
-vi.mock('@delta-comic/utils', () => ({
+vi.mock('@delta-comic/client-ui-ui', () => ({ createForm: createFormMock }))
+vi.mock('@delta-comic/client-core-utils', () => ({
   PageWebviewAuth: pageWebviewAuth,
   SharedFunction: sharedFunction,
 }))
 
 // 加载宿主 i18n 实例，触发 pluginI18n.install 安装适配器。
-import '@delta-comic/core/i18n/index'
+import '@delta-comic/client-app-core/i18n/index'
 import { createPluginAuthGateway } from '../../../../src/features/pluginAuth/gateway'
 
 const fixtureMessages = {

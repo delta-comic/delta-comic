@@ -1,6 +1,7 @@
 {
-  "name": "@delta-comic/ui",
+  "name": "@delta-comic/client-ui-ui",
   "version": "3.0.0-next.19",
+  "private": true,
   "description": "空阙虱楼",
   "homepage": "https://github.com/delta-comic/delta-comic",
   "license": "AGPL-3.0-only",
@@ -44,7 +45,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@delta-comic/logger": "workspace:",
+    "@delta-comic/shared-core-logger": "workspace:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-shell": "catalog:",
     "@vueuse/core": "catalog:",
@@ -75,8 +76,8 @@
     "vue-tsc": "catalog:"
   },
   "peerDependencies": {
-    "@delta-comic/model": "workspace:",
-    "@delta-comic/utils": "workspace:",
+    "@delta-comic/client-core-model": "workspace:",
+    "@delta-comic/client-core-utils": "workspace:",
     "@pinia/colada": "catalog:",
     "naive-ui": "catalog:",
     "pinia": "catalog:",

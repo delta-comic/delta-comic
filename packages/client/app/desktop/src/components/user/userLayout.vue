@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/core/icons'
+import { Icons } from '@delta-comic/client-app-core/icons'
 import { useResizeObserver } from '@vueuse/core'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'

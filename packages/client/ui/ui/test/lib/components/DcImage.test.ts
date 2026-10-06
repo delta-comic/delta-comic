@@ -1,12 +1,12 @@
-import { Logger } from '@delta-comic/logger'
-import { UniImage, UniItem } from '@delta-comic/model'
+import { UniImage, UniItem } from '@delta-comic/client-core-model'
+import { Logger } from '@delta-comic/shared-core-logger'
 import { flushPromises, mount, shallowMount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
 import { defineComponent, h, nextTick } from 'vue'
 
 // cspell:ignore fetchpriority
 
-vi.mock('@delta-comic/utils', () => ({
+vi.mock('@delta-comic/client-core-utils', () => ({
   useTemp: () => ({ $apply: (_key: string, create: () => unknown) => create() }),
 }))
 

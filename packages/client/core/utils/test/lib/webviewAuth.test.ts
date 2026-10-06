@@ -252,7 +252,7 @@ describe('webviewAuth', () => {
       url: 'https://auth.test/login',
     })
     mocks.rpc.webview_close_page.mockRejectedValue(closeError)
-    const { Logger } = await import('@delta-comic/logger')
+    const { Logger } = await import('@delta-comic/shared-core-logger')
     const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)
 
     const { PageWebviewAuth } = await import('../../lib/webviewAuth')

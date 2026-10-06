@@ -1,7 +1,7 @@
-import { i18n } from '@delta-comic/core/i18n/index'
-import { usePluginStore } from '@delta-comic/plugin'
-import { DcCell } from '@delta-comic/ui'
-import { SharedFunction } from '@delta-comic/utils'
+import { i18n } from '@delta-comic/client-app-core/i18n/index'
+import { usePluginStore } from '@delta-comic/client-core-plugin'
+import { SharedFunction } from '@delta-comic/client-core-utils'
+import { DcCell } from '@delta-comic/client-ui-ui'
 import type { Component } from 'vue'
 
 export type ThinkList = ({ text: string; value: string } | Component)[]

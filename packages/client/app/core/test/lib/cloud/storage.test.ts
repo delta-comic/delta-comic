@@ -1,5 +1,5 @@
-import { Logger } from '@delta-comic/logger'
 import type { CloudSession } from '@delta-comic/server/api'
+import { Logger } from '@delta-comic/shared-core-logger'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const { nativeStore } = vi.hoisted(() => ({ nativeStore: new Map<string, string>() }))
@@ -22,7 +22,7 @@ const makeWhereBuilder = (execute: (where: Map<string, unknown>) => unknown) => 
   return builder
 }
 
-vi.mock('@delta-comic/db', () => ({
+vi.mock('@delta-comic/client-data-db', () => ({
   db: {
     deleteFrom: vi.fn(() =>
       makeWhereBuilder(where => {
