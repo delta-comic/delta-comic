@@ -87,7 +87,7 @@ export default defineConfig(({ command }) => ({
   pack: {
     entry: './vite/index.ts',
     outDir: 'dist-vite',
-    dts: { oxc: {}, tsconfig: './tsconfig.node.json' },
+    dts: { generator: 'oxc', oxc: {}, tsconfig: './tsconfig.node.json' },
     sourcemap: true,
     deps: { neverBundle: ['unplugin-vue-components'] },
   },

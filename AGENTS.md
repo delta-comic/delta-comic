@@ -85,7 +85,7 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 
 - 依赖版本统一定义于根`pnpm-workspace.yaml`和`Cargo.toml`，除此之外的位置只能引用(如:`catalog:`/`{ workspace = true }`)。
 - 使用 Vite+（`vp`），不要直接运行 `pnpm`、`vite`、`vitest`、`oxlint` 或 `oxfmt`
-  命令。仓库固定使用 Node `25.9.0`、pnpm `12.0.0-rc.3` 和
+  命令。仓库固定使用 Node `26.10.0`、pnpm `12.0.0-rc.3` 和
   `nightly-2026-08-12` Rust 工具链（MSRV `1.95.0`，2024 edition）。
 - 拉取依赖变更后运行 `vp install`。CI 使用 `vp install --frozen-lockfile`。
 - Vite+ 并非 Vite：工作区脚本通过 `vp run` 运行，例如
