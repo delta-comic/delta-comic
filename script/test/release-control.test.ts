@@ -157,7 +157,7 @@ describe('semantic-release monorepo plugin', () => {
     expect(publishCommand).toHaveBeenCalledTimes(publishablePackages.length)
   })
 
-  it('builds every publishable package before publishing to npm and GitHub Packages', async () => {
+  it('builds every publishable package before publishing to GitHub Packages', async () => {
     const publishCommand = vi.fn<CommandRunner>().mockResolvedValue()
     const plugin = createReleasePlugin({ publishCommand, resolvePublishablePackages })
     await plugin.publish({}, { env: {}, nextRelease: { version: '3.0.0' } })
@@ -172,22 +172,6 @@ describe('semantic-release monorepo plugin', () => {
           'publish',
           '-r',
           '--no-git-checks',
-          '--provenance',
-          '--tag',
-          'latest',
-          '--',
-          '--registry=https://registry.npmjs.org/',
-          '--config.@delta-comic:registry=https://registry.npmjs.org/',
-        ],
-      ],
-      [
-        'vp',
-        [
-          'pm',
-          'publish',
-          '-r',
-          '--no-git-checks',
-          '--provenance',
           '--tag',
           'latest',
           '--',
@@ -212,19 +196,6 @@ describe('semantic-release monorepo plugin', () => {
       'publish',
       '-r',
       '--no-git-checks',
-      '--provenance',
-      '--tag',
-      'next',
-      '--',
-      '--registry=https://registry.npmjs.org/',
-      '--config.@delta-comic:registry=https://registry.npmjs.org/',
-    ])
-    expect(publishCommand).toHaveBeenLastCalledWith('vp', [
-      'pm',
-      'publish',
-      '-r',
-      '--no-git-checks',
-      '--provenance',
       '--tag',
       'next',
       '--',
@@ -233,7 +204,7 @@ describe('semantic-release monorepo plugin', () => {
     ])
   })
 
-  it('requires the GitHub token while npm authentication uses OIDC', async () => {
+  it('requires the GitHub token for GitHub Packages authentication', async () => {
     const publishCommand = vi.fn<CommandRunner>().mockResolvedValue()
     const plugin = createReleasePlugin({ publishCommand, resolvePublishablePackages })
 

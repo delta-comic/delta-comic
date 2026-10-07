@@ -37,55 +37,25 @@ beforeEach(() => {
 
 describe('semantic-release command runner', () => {
   it('runs ordered package builds and recursive publish through inherited stdio', async () => {
-    mocks.statuses = Array.from({ length: 16 }, () => 0)
+    mocks.statuses = Array.from({ length: 4 }, () => 0)
     const { publish } = await import('../semantic-release-plugin.mts')
 
     await publish({}, { env: {}, nextRelease: { version: workspaceVersion } })
 
-    expect(mocks.spawn.mock.calls.slice(0, 14).map(([command, args]) => [command, args])).toEqual(
-      [
-        '@delta-comic/shared-core-logger',
-        '@delta-comic/shared-plugin-manifest',
-        '@delta-comic/client-core-model',
-        '@delta-comic/both',
-        '@delta-comic/client-data-db',
-        '@delta-comic/client-platform-downloader',
-        '@delta-comic/client-core-utils',
-        '@delta-comic/client-ui-ui',
-        '@delta-comic/client',
-        '@delta-comic/client-core-plugin-artifact',
-        '@delta-comic/client-core-plugin-install',
-        '@delta-comic/client-core-plugin-vite',
-        '@delta-comic/client-core-plugin',
-        '@delta-comic/server',
-      ].map(name => ['vp', ['run', '--filter', name, '--fail-if-no-match', 'build']]),
+    expect(mocks.spawn.mock.calls.slice(0, 3).map(([command, args]) => [command, args])).toEqual(
+      ['@delta-comic/both', '@delta-comic/client', '@delta-comic/server'].map(name => [
+        'vp',
+        ['run', '--filter', name, '--fail-if-no-match', 'build'],
+      ]),
     )
     expect(mocks.spawn).toHaveBeenNthCalledWith(
-      15,
+      4,
       'vp',
       [
         'pm',
         'publish',
         '-r',
         '--no-git-checks',
-        '--provenance',
-        '--tag',
-        'latest',
-        '--',
-        '--registry=https://registry.npmjs.org/',
-        '--config.@delta-comic:registry=https://registry.npmjs.org/',
-      ],
-      expect.objectContaining({ stdio: 'inherit' }),
-    )
-    expect(mocks.spawn).toHaveBeenNthCalledWith(
-      16,
-      'vp',
-      [
-        'pm',
-        'publish',
-        '-r',
-        '--no-git-checks',
-        '--provenance',
         '--tag',
         'latest',
         '--',
@@ -97,14 +67,8 @@ describe('semantic-release command runner', () => {
   })
 
   it.each([
-    [
-      1,
-      'Command failed (1): vp run --filter @delta-comic/shared-core-logger --fail-if-no-match build',
-    ],
-    [
-      null,
-      'Command failed (1): vp run --filter @delta-comic/shared-core-logger --fail-if-no-match build',
-    ],
+    [1, 'Command failed (1): vp run --filter @delta-comic/both --fail-if-no-match build'],
+    [null, 'Command failed (1): vp run --filter @delta-comic/both --fail-if-no-match build'],
   ] as const)('reports non-zero command status %s', async (status, message) => {
     mocks.statuses = [status]
     const { publish } = await import('../semantic-release-plugin.mts')

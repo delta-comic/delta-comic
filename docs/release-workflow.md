@@ -14,9 +14,9 @@ release note 与 changelog 使用 semantic-release 内置的 Angular preset 和�
 
 发布 npm workspace 时，脚本会从 `packages/*/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。当前公开发布面固定为 `@delta-comic/both`、`@delta-comic/client` 和 `@delta-comic/server`；其他 workspace 包均为内部实现，由对应 SDK 在构建产物和入口中统一提供需要对外使用的能力。
 
-workspace 包会同时发布到 npmjs 和 GitHub Packages。发布脚本会显式覆盖 `.npmrc` 中的 scope registry，避免两个目标互相干扰；递归发布会跳过目标 registry 中已经存在的版本，因此任一 registry 短暂失败后可以安全重跑。CI 使用 GitHub Actions OIDC 和 `id-token: write` 权限可信发布到 npmjs，并使用当前工作流的短期 `GITHUB_TOKEN` 和 `packages: write` 权限发布 GitHub Packages，不保存长期 npm token。
+workspace 包发布到 GitHub Packages。发布脚本会显式覆盖 `.npmrc` 中的 scope registry；递归发布会跳过目标 registry 中已经存在的版本，因此发布短暂失败后可以安全重跑。CI 使用当前工作流的短期 `GITHUB_TOKEN` 和 `packages: write` 权限发布 GitHub Packages，不保存长期发布 token。
 
-npm 可信发布只能配置到已经存在的包。新增公共 workspace 包时，维护者必须先用短期 CLI 登录手动发布一次预览版本，在 npm 包设置中为 `delta-comic/delta-comic` 的 `release.yaml` 添加 GitHub Actions 可信发布，然后才能将包纳入自动发布。首次发布完成后应撤销临时登录 token。
+GitHub Packages 发布使用 `release.yaml` 中的 `GITHUB_TOKEN`。新增公共 workspace 包时，确认仓库工作流具备 `packages: write` 权限，并通过现有 release workflow 发布。
 
 ## 首次建立分支
 
