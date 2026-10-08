@@ -30,13 +30,13 @@
     "cspell": "catalog:",
     "happy-dom": "catalog:",
     "kysely": "catalog:",
-    "oxlint-tsgolint": "catalog:",
     "semantic-release": "catalog:",
     "tailwindcss": "catalog:",
     "twlinter": "catalog:",
     "typebox": "catalog:",
     "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
   "badges": [
     {
