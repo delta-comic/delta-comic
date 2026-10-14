@@ -6,6 +6,7 @@
 - 远端 `next` 已推进到 `5a2a59cb`，CI 识别版本 `3.0.0-next.20`。
 - CI 桌面/Android 发布任务失败；桌面日志确认 workspace artifact 缺少 `client-core-runtime/dist`，Android 因前置构建失败而未继续。
 - 已在 release workflow artifact 清单加入 `packages/client/core/runtime/dist`。
+- 第二轮日志确认 runtime 已恢复，新增缺口为公开 SDK dist；已补齐 `packages/shared/core/both/dist`、`packages/client/core/sdk/dist` 与 `packages/server/core/server/dist`。
 - `vp check`、`git diff --check` 和 `release:preview:dry-run` 通过。
 - 下一步：创建签名提交并推送 `develop`，重新晋级预览发布。
 

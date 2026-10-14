@@ -405,7 +405,7 @@
 
 ### 当前下一步
 
-修复已通过 `vp check`、`git diff --check` 和预览 dry run；创建签名提交并推送 `develop`。
+补齐公开 SDK artifact 路径，运行检查后创建签名提交并推送 `develop`。
 
 ## 2026-10-06：TauRPC bindings 生成归属调整
 
