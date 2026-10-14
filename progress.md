@@ -8,6 +8,8 @@
 - 已在 release workflow artifact 清单加入 `packages/client/core/runtime/dist`。
 - 第二轮日志确认 runtime 已恢复，新增缺口为公开 SDK dist；已补齐 `packages/shared/core/both/dist`、`packages/client/core/sdk/dist` 与 `packages/server/core/server/dist`。
 - 第三轮日志确认 SDK 已恢复，新增缺口为 `client-core-plugin-install`；已补齐插件辅助包、平台包和 shared manifest dist。
+- 第四轮 plan 与三个桌面目标成功；Android 在旧 setup-android action 的 `sdkmanager tools` 初始化步骤失败，已取消剩余 Windows/release 任务。
+- 已将 release workflow 的 Android setup 升级到 `setup-android@v4`，并加入 `platforms;android-36`、`build-tools;36.0.0` 安装步骤。
 - `vp check`、`git diff --check` 和 `release:preview:dry-run` 通过。
 - 下一步：创建签名提交并推送 `develop`，重新晋级预览发布。
 
