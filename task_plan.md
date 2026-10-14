@@ -2,6 +2,12 @@
 
 # Delta Comic 全仓架构重构规划
 
+## 2026-10-14 预览发布修复
+
+1. **定位 CI 失败**：complete。确认 Android job 因 `--filter mobile` 找不到 workspace 包而未生成 APK。
+2. **修复发布工作流**：complete。改用 `@delta-comic/client-app-mobile` 并启用 `--fail-if-no-match`。
+3. **重新发布预览版**：in_progress。提交、推送 `develop`，执行预览晋级并核验 GitHub Actions、GitHub Release 和 GitHub Packages。
+
 ## 2026-10-02 原生 Cordis 与 JSON 流程实施
 
 用户已批准本轮四阶段方案并要求按计划实现。本节为当前执行计划。

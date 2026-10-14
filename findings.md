@@ -13,6 +13,12 @@
 - 第三轮确认公开 SDK 已恢复，桌面构建继续因 `@delta-comic/client-core-plugin-install` 缺少 dist 失败；插件的 artifact/install/vite、HTTP/logger 平台包和 shared manifest dist 也必须随 workspace libraries 上传。
 - 第四轮 plan 与三个桌面目标成功；Android 在 `android-actions/setup-android@v3.2.2` 执行 `sdkmanager tools` 时失败，当前仓库无 `tools` 包。lint/test workflow 已采用 `setup-android@v4` 并显式安装 Android 36 平台与构建工具，release workflow 应保持一致。
 
+## 2026-10-14 Android 过滤器修复
+
+- 最近一次预览发布运行 `38575263111` 的 plan 和 Android SDK 初始化通过。
+- Android 步骤使用 `vp run --filter mobile`，Vite+ 提示 `No packages matched the filter: mobile`，因此没有执行 Tauri 构建，后续找不到 APK。
+- 当前移动端 workspace 包名为 `@delta-comic/client-app-mobile`；发布工作流的初始化和构建命令已统一使用完整包名，并启用 `--fail-if-no-match`。
+
 ## 2026-10-04 测试质量审计
 
 - 用户已将前端覆盖率阈值下调，目标是删除明显凑数测试，保留能表达稳定行为、抽象契约和重要失败路径的测试。
