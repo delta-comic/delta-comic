@@ -181,6 +181,7 @@ jobs:
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
           cd packages/client/app/mobile
           vp run --filter @delta-comic/client-app-mobile --fail-if-no-match tauri android init --ci --skip-targets-install
+          git restore src-tauri/gen/android/buildSrc/src/main/java/org/wenxig/delta_comic/kotlin/BuildTask.kt
       - name: Make Gradle wrapper executable
         run: chmod +x ./packages/client/app/mobile/src-tauri/gen/android/gradlew
 
