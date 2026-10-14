@@ -19,6 +19,13 @@
 - `.github/workflows/release.yaml` 的 Android 初始化和构建均改为 `@delta-comic/client-app-mobile`，并增加 `--fail-if-no-match`。
 - 下一步：完成本地工作流检查和签名提交，重新执行 develop -> next 预览晋级，主动停止失效的旧 CI 任务并核验新构建产物。
 
+### 2026-10-14：修复 Android Gradle projectDir
+
+- 新预览运行 `38578737388` 的 Android 过滤器、SDK/NDK、Tauri 初始化和 Rust 编译已通过。
+- 定位并修复生成 Android 工程中 `BuildTask.projectDir` 未赋值导致的 Gradle 8.14 配置错误。
+- 旧 Windows job 已主动取消；本地补齐 Tauri 初始化临时脚本后，`./gradlew :app:tasks --no-daemon` 成功并确认 `rustBuildArm64Release` 任务配置正常。
+- 下一步：签名提交，再次执行预览晋级。
+
 ### 2026-10-06 — SDK 发布边界收敛
 
 - 用户确认仅 `@delta-comic/both`、`@delta-comic/client`、`@delta-comic/server` 对外发布。
