@@ -6,7 +6,7 @@
 
 1. **定位 CI 失败**：complete。确认 Android job 因 `--filter mobile` 找不到 workspace 包而未生成 APK。
 2. **修复发布工作流**：complete。改用 `@delta-comic/client-app-mobile` 并启用 `--fail-if-no-match`。
-3. **重新发布预览版**：in_progress。提交、推送 `develop`，执行预览晋级并核验 GitHub Actions、GitHub Release 和 GitHub Packages。
+3. **重新发布预览版**：in_progress。已完成一次晋级并主动取消 Android 失败后的无效 Windows job；修复 `BuildTask.projectDir` 后再次提交、推送和核验发布产物。
 
 ## 2026-10-02 原生 Cordis 与 JSON 流程实施
 

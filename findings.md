@@ -19,6 +19,12 @@
 - Android 步骤使用 `vp run --filter mobile`，Vite+ 提示 `No packages matched the filter: mobile`，因此没有执行 Tauri 构建，后续找不到 APK。
 - 当前移动端 workspace 包名为 `@delta-comic/client-app-mobile`；发布工作流的初始化和构建命令已统一使用完整包名，并启用 `--fail-if-no-match`。
 
+## 2026-10-14 Android Gradle 构建修复
+
+- 新运行 `38578737388` 已验证过滤器修复生效：Android SDK、NDK、Tauri Android 初始化和 Rust release 编译均通过。
+- Android Gradle 在 `:app:rustBuildArm64Release` 配置校验阶段失败，原因是生成的 `BuildTask.projectDir` 没有赋值。
+- `RustPlugin` 创建每个 `BuildTask` 时已绑定 Android 工程的绝对目录；失败后已主动取消仍在执行的 Windows job，避免无效消耗。
+
 ## 2026-10-04 测试质量审计
 
 - 用户已将前端覆盖率阈值下调，目标是删除明显凑数测试，保留能表达稳定行为、抽象契约和重要失败路径的测试。
