@@ -405,7 +405,7 @@
 
 ### 当前下一步
 
-补齐公开 SDK artifact 路径，运行检查后创建签名提交并推送 `develop`。
+修复 Android SDK setup，运行检查后创建签名提交并推送 `develop`。
 
 ## 2026-10-06：TauRPC bindings 生成归属调整
 
