@@ -84,8 +84,14 @@ jobs:
             packages/server/core/server/dist
             packages/client/data/db/dist
             packages/client/platform/downloader/dist
+            packages/client/platform/http/dist
+            packages/client/platform/logger/dist
             packages/shared/core/logger/dist
+            packages/shared/plugin/manifest/dist
             packages/client/core/model/dist
+            packages/client/core/plugin-artifact/dist
+            packages/client/core/plugin-install/dist
+            packages/client/core/plugin-vite/dist
             packages/client/core/plugin/dist
             packages/client/ui/ui/dist
             packages/client/ui/ui/dist-vite
