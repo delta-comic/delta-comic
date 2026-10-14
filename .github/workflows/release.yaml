@@ -78,6 +78,7 @@ jobs:
           path: |
             packages/client/app/mobile/public/runtime
             packages/client/app/desktop/public/runtime
+            packages/client/core/runtime/dist
             packages/client/data/db/dist
             packages/client/platform/downloader/dist
             packages/shared/core/logger/dist

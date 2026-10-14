@@ -1,5 +1,14 @@
 <!-- cspell:ignore Cordis deepseek subrequest specta -->
 
+## 2026-10-14 预览版发布
+
+- 已切换到 `develop`，执行预览晋级 dry run 和实际晋级。
+- 远端 `next` 已推进到 `5a2a59cb`，CI 识别版本 `3.0.0-next.20`。
+- CI 桌面/Android 发布任务失败；桌面日志确认 workspace artifact 缺少 `client-core-runtime/dist`，Android 因前置构建失败而未继续。
+- 已在 release workflow artifact 清单加入 `packages/client/core/runtime/dist`。
+- `vp check`、`git diff --check` 和 `release:preview:dry-run` 通过。
+- 下一步：创建签名提交并推送 `develop`，重新晋级预览发布。
+
 ### 2026-10-06 — SDK 发布边界收敛
 
 - 用户确认仅 `@delta-comic/both`、`@delta-comic/client`、`@delta-comic/server` 对外发布。

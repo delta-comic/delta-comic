@@ -395,6 +395,18 @@
 创建签名提交并记录提交哈希。
 
 
+## 2026-10-14：预览版发布修复
+
+- [x] 切换到 `develop` 并确认与 `origin/develop` 同步
+- [x] 执行 `release:preview:dry-run` 与实际晋级
+- [x] 定位 CI 桌面构建失败：发布 artifact 遗漏 `client-core-runtime/dist`
+- [in_progress] 提交修复并重新触发预览发布
+- [ ] 验证 GitHub Actions 与 GitHub Packages 预览版本
+
+### 当前下一步
+
+修复已通过 `vp check`、`git diff --check` 和预览 dry run；创建签名提交并推送 `develop`。
+
 ## 2026-10-06：TauRPC bindings 生成归属调整
 
 - **状态：** complete

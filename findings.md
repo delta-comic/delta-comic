@@ -2,6 +2,14 @@
 
 # Delta Comic 全仓重构：研究与需求发现
 
+## 2026-10-14 预览版发布调查
+
+- 已从 `next` 切换到 `develop`；`develop` 与 `origin/develop` 均为 `46670f79`。
+- `release:preview:dry-run` 通过；实际晋级将 `develop` 合入 `next`，远端提交为 `5a2a59cb`。
+- CI run `38564521575` 的 plan 阶段成功解析版本 `3.0.0-next.20` 并构建 workspace libraries。
+- 桌面矩阵均在 `delta-comic:copy-runtime` 失败，缺失 `packages/client/core/runtime/dist/host-libraries.umd.js`。
+- 根因是 `.github/workflows/release.yaml` 的 artifact 上传清单遗漏 `packages/client/core/runtime/dist`。
+
 ## 2026-10-04 测试质量审计
 
 - 用户已将前端覆盖率阈值下调，目标是删除明显凑数测试，保留能表达稳定行为、抽象契约和重要失败路径的测试。
