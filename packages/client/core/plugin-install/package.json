@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/client-core-plugin-install",
-  "version": "3.0.0-next.19",
+  "version": "3.0.0-next.20",
   "private": true,
   "description": "Plugin installation contracts and source adapters",
   "files": [
