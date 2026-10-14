@@ -13,6 +13,12 @@
 - `vp check`、`git diff --check` 和 `release:preview:dry-run` 通过。
 - 下一步：创建签名提交并推送 `develop`，重新晋级预览发布。
 
+### 2026-10-14：修复预览发布 Android 过滤器
+
+- 在 `develop` 分支定位预览发布运行 `38575263111` 的 Android 失败原因：工作流过滤器 `mobile` 不对应任何 workspace 包。
+- `.github/workflows/release.yaml` 的 Android 初始化和构建均改为 `@delta-comic/client-app-mobile`，并增加 `--fail-if-no-match`。
+- 下一步：完成本地工作流检查和签名提交，重新执行 develop -> next 预览晋级，主动停止失效的旧 CI 任务并核验新构建产物。
+
 ### 2026-10-06 — SDK 发布边界收敛
 
 - 用户确认仅 `@delta-comic/both`、`@delta-comic/client`、`@delta-comic/server` 对外发布。

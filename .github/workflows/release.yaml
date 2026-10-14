@@ -180,7 +180,7 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
           cd packages/client/app/mobile
-          vp run --filter mobile tauri android init --ci --skip-targets-install
+          vp run --filter @delta-comic/client-app-mobile --fail-if-no-match tauri android init --ci --skip-targets-install
       - name: Make Gradle wrapper executable
         run: chmod +x ./packages/client/app/mobile/src-tauri/gen/android/gradlew
 
@@ -192,7 +192,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
           cd packages/client/app/mobile
-          vp run --filter mobile tauri android build --ci --target aarch64 armv7
+          vp run --filter @delta-comic/client-app-mobile --fail-if-no-match tauri android build --ci --target aarch64 armv7
       - name: Restore Android keystore
         env:
           KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
