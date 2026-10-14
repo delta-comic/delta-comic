@@ -11,7 +11,10 @@
 - 第四轮 plan 与三个桌面目标成功；Android 在旧 setup-android action 的 `sdkmanager tools` 初始化步骤失败，已取消剩余 Windows/release 任务。
 - 已将 release workflow 的 Android setup 升级到 `setup-android@v4`，并加入 `platforms;android-36`、`build-tools;36.0.0` 安装步骤。
 - `vp check`、`git diff --check` 和 `release:preview:dry-run` 通过。
-- 下一步：创建签名提交并推送 `develop`，重新晋级预览发布。
+- 首次完整构建的 Android 日志显示 `tauri android init` 覆盖了仓库中的自定义 `BuildTask.kt`，已在初始化步骤后恢复该文件。
+- 修复已由签名提交 `a1867bd8` 保存并推送 `develop`；重新晋级和预览 CI `38592685253` 全部通过。
+- GitHub Release `3.0.0-next.20` 已创建，包含 Android APK、macOS、Windows 和 Ubuntu 产物；GitHub Packages 的 `client`、`both`、`server` 均为 `3.0.0-next.20`。
+- 本地 `develop` 与 `origin/develop` 同步，工作区干净。
 
 ### 2026-10-14：修复预览发布 Android 过滤器
 
