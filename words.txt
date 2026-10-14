@@ -3,6 +3,7 @@ androideabi
 APPLOCALDATA
 androidx
 antd
+Artplayer
 apksigner
 aptabase
 armv
@@ -17,9 +18,11 @@ codegen
 autoincrement
 AUTOINCREMENT
 colada
+cordis
 cosav
 daterange
 datetimerange
+deepseek
 disretry
 dtolnay
 elysia
@@ -86,10 +89,13 @@ rustls
 sdkmanager
 serde
 sider
+specta
 splited
 staticlib
 Swatinem
 subframe
+subrequest
+subrequests
 Strs
 stylesheet
 swipeable
@@ -101,6 +107,7 @@ tlds
 topbar
 tsgo
 tsgolint
+tslog
 typebox
 UIDT
 unplugin
@@ -128,3 +135,12 @@ Anson
 Insertable
 Updateable
 Schemable
+miniflare
+Blocklisted
+twlinter
+twlintrc
+alpn
+Redirections
+CORSXML
+Nlcjpw
+taurpc

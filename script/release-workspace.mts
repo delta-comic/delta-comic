@@ -28,6 +28,23 @@ interface LoadedWorkspacePackage {
   path: string
 }
 
+async function findPackageManifests(directory: string): Promise<string[]> {
+  const entries = await readdir(directory, { withFileTypes: true })
+  const manifests: string[] = []
+
+  for (const entry of entries.toSorted((left, right) => left.name.localeCompare(right.name))) {
+    if (entry.name === 'node_modules' || entry.name === 'dist') continue
+    const path = join(directory, entry.name)
+    if (entry.isDirectory()) {
+      manifests.push(...(await findPackageManifests(path)))
+    } else if (entry.isFile() && entry.name === 'package.json') {
+      manifests.push(path)
+    }
+  }
+
+  return manifests
+}
+
 function workspaceDependencies(manifest: WorkspaceManifest) {
   return [
     ...Object.keys(manifest.dependencies ?? {}),
@@ -71,12 +88,9 @@ export class ReleaseWorkspace {
 
   private async loadPackages() {
     const packagesDir = join(this.cwd, 'packages')
-    const entries = await readdir(packagesDir, { withFileTypes: true })
     const packages: LoadedWorkspacePackage[] = []
 
-    for (const entry of entries.toSorted((left, right) => left.name.localeCompare(right.name))) {
-      if (!entry.isDirectory()) continue
-      const manifestPath = join(packagesDir, entry.name, 'package.json')
+    for (const manifestPath of await findPackageManifests(packagesDir)) {
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as WorkspaceManifest
       packages.push({ manifest, path: relative(this.cwd, manifestPath) })
     }

@@ -1,0 +1,91 @@
+import { SourcedValue, type SourcedKeyType } from '@delta-comic/client-core-model'
+import {
+  defineMutation,
+  useMutation,
+  useQueryCache,
+  useQuery as useColadaQuery,
+  type EntryKey,
+} from '@pinia/colada'
+import type { Kysely, Selectable, SelectQueryBuilder } from 'kysely'
+
+import type { SubscribeTable } from './generated/subscribe.table'
+import { CommonQueryKey, withTransition } from './utils'
+
+import type { DB } from '.'
+
+export const key = new SourcedValue<[plugin: string, label: string]>()
+export type Key_ = SourcedKeyType<typeof key>
+export type Key = Exclude<Key_, string>
+
+export type AuthorTable = Omit<SubscribeTable, 'itemKey' | 'author' | 'type'> & {
+  author: Selectable<SubscribeTable>['author']
+  itemKey: null
+  type: 'author'
+}
+export type AuthorItem = AuthorTable
+
+export type EpTable = Omit<SubscribeTable, 'itemKey' | 'author' | 'type'> & {
+  author: null
+  itemKey: string // not f key
+  type: 'ep'
+}
+export type EpItem = EpTable
+
+export type Table = SubscribeTable
+export type Item = AuthorItem | EpItem
+
+export enum QueryKey {
+  item = 'db:subscribe:',
+}
+
+export const useUpsert = defineMutation(() => {
+  const queryCache = useQueryCache()
+  const key = [CommonQueryKey.common, QueryKey.item]
+  const { mutateAsync, ...mutation } = useMutation({
+    mutation: async ({ items, trx }: { items: Item[]; trx?: Kysely<DB> }) =>
+      withTransition(async trx => {
+        await trx
+          .replaceInto('subscribe')
+          .values(items.map(item => ({ ...item, author: JSON.stringify(item.author) })))
+          .execute()
+      }, trx),
+    onSettled: () => {
+      void queryCache.invalidateQueries({ key })
+    },
+    key,
+  })
+  return { ...mutation, upsert: mutateAsync, key }
+})
+
+export const useRemove = defineMutation(() => {
+  const queryCache = useQueryCache()
+  const key = [CommonQueryKey.common, QueryKey.item]
+  const { mutateAsync, ...mutation } = useMutation({
+    mutation: async ({ keys, trx }: { keys: Item['key'][]; trx?: Kysely<DB> }) =>
+      withTransition(async trx => {
+        await trx.deleteFrom('subscribe').where('subscribe.key', 'is', keys).execute()
+      }, trx),
+    onSettled: () => {
+      void queryCache.invalidateQueries({ key })
+    },
+    key,
+  })
+  return { ...mutation, remove: mutateAsync, key }
+})
+
+export const useQuery = <T>(
+  query: (db: SelectQueryBuilder<DB, 'subscribe', {}>) => Promise<T>,
+  otherKeys: readonly EntryKey[] = [],
+  initialData?: () => T,
+) =>
+  useColadaQuery({
+    query: async () => {
+      const { db } = await import('.')
+      return await query(db.selectFrom('subscribe'))
+    },
+    key: () => [CommonQueryKey.common, QueryKey.item, query, ...otherKeys],
+    staleTime: 15000,
+    refetchOnMount: 'always',
+    initialData,
+    initialDataUpdatedAt: 0,
+  })

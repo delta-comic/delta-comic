@@ -46,7 +46,7 @@ jobs:
           fetch-depth: 1
 
       - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@v1
+        uses: voidzero-dev/setup-vp@v1.21.1
         with:
           node-version-file: .node-version
           cache: true
@@ -133,9 +133,9 @@ jobs:
 
       - name: Check Android lint and Kotlin formatting
         run: |
-          chmod +x ./packages/app/src-tauri/gen/android/gradlew
-          ./packages/app/src-tauri/gen/android/gradlew \
-            -p packages/downloader/android \
+          chmod +x ./packages/client/app/mobile/src-tauri/gen/android/gradlew
+          ./packages/client/app/mobile/src-tauri/gen/android/gradlew \
+            -p packages/client/platform/downloader/android \
             ktlintCheck \
             lintDebug \
             --no-daemon \

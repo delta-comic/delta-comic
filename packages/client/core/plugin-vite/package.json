@@ -1,0 +1,34 @@
+{
+  "name": "@delta-comic/client-core-plugin-vite",
+  "version": "3.0.0-next.19",
+  "private": true,
+  "description": "Vite build and development adapter for Delta Comic plugins",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "@delta-comic/client-core-model": "workspace:",
+    "@delta-comic/client-core-plugin-install": "workspace:",
+    "@delta-comic/client-core-utils": "workspace:",
+    "es-toolkit": "catalog:",
+    "jszip": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "devDependencies": {
+    "@delta-comic/client-data-db": "workspace:",
+    "@vitejs/plugin-vue": "catalog:"
+  }
+}

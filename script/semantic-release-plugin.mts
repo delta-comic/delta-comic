@@ -24,8 +24,6 @@ export type ReleaseCommitter = (
   branch: string,
 ) => Promise<void>
 
-const packageRegistries = ['https://registry.npmjs.org/', 'https://npm.pkg.github.com/'] as const
-
 async function runCommand(command: string, args: string[]) {
   await new Promise<void>((resolve, reject) => {
     const child = spawn(command, args, { cwd: rootDir, stdio: 'inherit' })
@@ -138,20 +136,17 @@ export function createReleasePlugin({
       for (const pkg of packages) {
         await publishCommand('vp', ['run', '--filter', pkg.name, '--fail-if-no-match', 'build'])
       }
-      for (const registry of packageRegistries) {
-        await publishCommand('vp', [
-          'pm',
-          'publish',
-          '-r',
-          '--no-git-checks',
-          '--provenance',
-          '--tag',
-          distTag,
-          '--',
-          `--registry=${registry}`,
-          `--config.@delta-comic:registry=${registry}`,
-        ])
-      }
+      await publishCommand('vp', [
+        'pm',
+        'publish',
+        '-r',
+        '--no-git-checks',
+        '--tag',
+        distTag,
+        '--',
+        '--registry=https://npm.pkg.github.com/',
+        '--config.@delta-comic:registry=https://npm.pkg.github.com/',
+      ])
     },
 
     async success(_pluginConfig: unknown, { branch, nextRelease }: ReleaseContext) {

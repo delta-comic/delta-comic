@@ -1,0 +1,122 @@
+import { describe, expect, it } from 'vite-plus/test'
+
+import type { AppEnv } from '../../app/env'
+import worker from '../../app/index'
+
+const createExecutionContext = (): ExecutionContext =>
+  ({ passThroughOnException() {}, waitUntil() {} }) as unknown as ExecutionContext
+
+const createEnv = (overrides: Partial<AppEnv> = {}): AppEnv => ({
+  ACCESS_TOKEN_TTL_SECONDS: '900',
+  AUTH_PEPPER: 'auth-pepper',
+  CF_VERSION_METADATA: { id: 'test-version', tag: 'test', timestamp: '2026-07-10T00:00:00.000Z' },
+  DB: {} as D1Database,
+  REFRESH_TOKEN_TTL_SECONDS: '2592000',
+  SYNC_MAX_PULL_CHANGES: '500',
+  SYNC_MAX_PUSH_OPS: '100',
+  TOKEN_PEPPER: 'token-pepper',
+  ...overrides,
+})
+
+const createCatalog = () => {
+  let stored: string | undefined
+  return {
+    async get() {
+      return stored ? { text: async () => stored } : null
+    },
+    async put(_key: string, value: string) {
+      stored = value
+    },
+  } as unknown as R2Bucket
+}
+
+const request = (path: string, init?: RequestInit) =>
+  new Request(`https://delta.example${path}`, init)
+
+const fetchWorker = (path: string, init?: RequestInit, env = createEnv()) =>
+  worker.fetch(request(path, init), env, createExecutionContext())
+
+describe('server Elysia app', () => {
+  it('returns the health payload', async () => {
+    const response = await fetchWorker('/api/health')
+
+    await expect(response.json()).resolves.toEqual({
+      data: { service: 'delta-comic-server', status: 'ok' },
+      ok: true,
+    })
+    expect(response.status).toBe(200)
+  })
+
+  it('maps body validation failures to the unified API error shape', async () => {
+    const response = await fetchWorker('/api/auth/login', {
+      body: JSON.stringify({ loginName: 'ab' }),
+      headers: { 'content-type': 'application/json' },
+      method: 'POST',
+    })
+
+    const payload = (await response.json()) as { error: { code: string }; ok: boolean }
+
+    expect(response.status).toBe(400)
+    expect(payload.ok).toBe(false)
+    expect(payload.error.code).toBe('REQUEST_VALIDATION_FAILED')
+  })
+
+  it('uses the Elysia auth guard for protected routes', async () => {
+    const response = await fetchWorker('/api/auth/me')
+
+    await expect(response.json()).resolves.toMatchObject({
+      error: { code: 'AUTH_MISSING_TOKEN' },
+      ok: false,
+    })
+    expect(response.status).toBe(401)
+  })
+
+  it('exposes OpenAPI schema under the API prefix', async () => {
+    const response = await fetchWorker('/api/openapi/json')
+    const payload = (await response.json()) as {
+      info?: { title?: string }
+      paths?: Record<string, unknown>
+    }
+
+    expect(response.status).toBe(200)
+    expect(payload.info?.title).toBe('Delta Comic Server API')
+    expect(payload.paths).toHaveProperty('/api/health')
+  })
+
+  it('serves and protects the optional plugin catalog binding', async () => {
+    const env = createEnv({ PLUGIN_CATALOG: createCatalog(), SERVER_ADMIN_TOKEN: 'catalog-secret' })
+    const catalogRequest = (init?: RequestInit) =>
+      fetchWorker('/plugins/catalog/index.json', init, env)
+
+    await expect(catalogRequest()).resolves.toMatchObject({ status: 404 })
+    await expect(
+      catalogRequest({
+        body: JSON.stringify({ protocolVersion: 1, generatedAt: 'now', entries: [] }),
+        headers: { 'content-type': 'application/json' },
+        method: 'PUT',
+      }),
+    ).resolves.toMatchObject({ status: 401 })
+    await expect(
+      catalogRequest({
+        body: JSON.stringify({ protocolVersion: 1, generatedAt: 'now', entries: [] }),
+        headers: { 'authorization': 'Bearer catalog-secret', 'content-type': 'application/json' },
+        method: 'PUT',
+      }),
+    ).resolves.toMatchObject({ status: 200 })
+    await expect(catalogRequest()).resolves.toMatchObject({ status: 200 })
+  })
+
+  it('exposes an authorized worker diagnostic snapshot', async () => {
+    await expect(fetchWorker('/api/admin/diagnostics')).resolves.toMatchObject({ status: 401 })
+    const response = await fetchWorker(
+      '/api/admin/diagnostics',
+      { headers: { authorization: 'Bearer diagnostic-secret' } },
+      createEnv({ SERVER_ADMIN_TOKEN: 'diagnostic-secret' }),
+    )
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toMatchObject({
+      data: { runtime: 'server-worker' },
+      ok: true,
+    })
+  })
+})

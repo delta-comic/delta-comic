@@ -1,0 +1,65 @@
+{
+  "name": "@delta-comic/server",
+  "version": "3.0.0-next.19",
+  "description": "南天门直梯",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/lib/index.mjs",
+  "module": "./dist/lib/index.mjs",
+  "types": "./dist/lib/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/lib/index.d.mts",
+      "import": "./dist/lib/index.mjs"
+    },
+    "./app": {
+      "types": "./dist/app/index.d.mts",
+      "import": "./dist/app/index.mjs"
+    },
+    "./api": {
+      "types": "./dist/lib/api.d.mts",
+      "import": "./dist/lib/api.mjs"
+    },
+    "./flow": {
+      "types": "./dist/lib/flow.d.mts",
+      "import": "./dist/lib/flow.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@delta-comic/both": "workspace:",
+    "@elysia/eden": "catalog:",
+    "cordis": "catalog:",
+    "json-logic-js": "catalog:",
+    "ky": "catalog:",
+    "kysely": "catalog:",
+    "kysely-d1": "catalog:",
+    "semver": "catalog:",
+    "typebox": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "catalog:",
+    "@delta-comic/shared-core-logger": "workspace:",
+    "@delta-comic/shared-plugin-manifest": "workspace:",
+    "@elysiajs/bearer": "catalog:",
+    "@elysiajs/cors": "catalog:",
+    "@elysiajs/openapi": "catalog:",
+    "@sinclair/typebox": "catalog:",
+    "@swc/core": "catalog:",
+    "@types/json-logic-js": "catalog:",
+    "@types/node": "catalog:",
+    "@types/semver": "catalog:",
+    "miniflare": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:",
+    "wrangler": "catalog:"
+  },
+  "peerDependencies": {
+    "elysia": "catalog:",
+    "openapi-types": "catalog:"
+  }
+}

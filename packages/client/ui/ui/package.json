@@ -1,0 +1,93 @@
+{
+  "name": "@delta-comic/client-ui-ui",
+  "version": "3.0.0-next.19",
+  "private": true,
+  "description": "空阙虱楼",
+  "homepage": "https://github.com/delta-comic/delta-comic",
+  "license": "AGPL-3.0-only",
+  "author": {
+    "name": "wenxig",
+    "email": "wenxinguo12@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/delta-comic/delta-comic.git"
+  },
+  "files": [
+    "dist",
+    "dist-vite",
+    "tailwind"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./vite": {
+      "types": "./dist-vite/index.d.mts",
+      "import": "./dist-vite/index.mjs"
+    },
+    "./tailwind": {
+      "types": "./tailwind/index.ts",
+      "import": "./tailwind/index.ts"
+    },
+    "./style.css": "./dist/index.css",
+    "./environment": {
+      "types": "./dist/environment.d.ts",
+      "import": "./dist/environment.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@delta-comic/shared-core-logger": "workspace:",
+    "@tauri-apps/api": "catalog:",
+    "@tauri-apps/plugin-shell": "catalog:",
+    "@vueuse/core": "catalog:",
+    "dayjs": "catalog:",
+    "es-toolkit": "catalog:",
+    "linkify-it": "catalog:",
+    "markdown-it": "catalog:",
+    "mitt": "catalog:",
+    "motion-v": "catalog:",
+    "swiper": "catalog:",
+    "tailwind-merge": "catalog:",
+    "tailwindcss-safe-area-capacitor": "catalog:",
+    "tlds": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@types/linkify-it": "catalog:",
+    "@types/markdown-it": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitejs/plugin-vue-jsx": "catalog:",
+    "browserslist": "catalog:",
+    "lightningcss": "catalog:",
+    "rolldown-plugin-dts": "catalog:",
+    "tailwindcss": "catalog:",
+    "unplugin-vue-components": "catalog:",
+    "vite-plus": "catalog:",
+    "vue-component-type-helpers": "catalog:",
+    "vue-tsc": "catalog:"
+  },
+  "peerDependencies": {
+    "@delta-comic/client-core-model": "workspace:",
+    "@delta-comic/client-core-utils": "workspace:",
+    "@pinia/colada": "catalog:",
+    "naive-ui": "catalog:",
+    "pinia": "catalog:",
+    "tailwindcss": "catalog:",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
+  }
+}

@@ -1,0 +1,84 @@
+<script setup lang="ts">
+import { logger } from '@delta-comic/shared-core-logger'
+import { isTauri } from '@tauri-apps/api/core'
+import { useCssVar, useEventListener } from '@vueuse/core'
+import MarkdownIt, { type Env, type MarkdownItOptions } from 'markdown-it'
+import { computed } from 'vue'
+
+import { cn, type StyleProps } from '../../utils'
+
+import { createTemplate } from './helper'
+
+const markdownLogger = logger.scoped('ui:markdown')
+
+const $props = withDefaults(
+  defineProps<
+    {
+      markdown: string
+      plugins?: Parameters<InstanceType<typeof MarkdownIt>['use']>[]
+      config?: MarkdownItOptions
+      env?: Env
+      isDarkMode?: boolean
+    } & StyleProps
+  >(),
+  { plugins: () => [], config: () => ({}) },
+)
+
+const md = computed(() => {
+  let md = new MarkdownIt({ ...$props.config, linkify: true })
+  md = $props.plugins.reduce((md, plugin) => md.use(...plugin), md)
+
+  return md
+})
+
+const messageKey = `markdown-router-${Math.random()}`
+
+const pColor = useCssVar('--p-color')
+const htmlTemplateUrl = computed(() =>
+  createTemplate({
+    color: pColor.value ?? '',
+    isDark: !!$props.isDarkMode,
+    content: md.value.render($props.markdown, $props.env ?? {}),
+    messageKey,
+    delegateLinkOpen: isTauri(),
+  }),
+)
+
+const openInBrowser = (href: string) => {
+  window.open(href, '_blank', 'noopener,noreferrer')
+}
+
+const openExternalLink = (href: string) => {
+  if (!isTauri()) {
+    openInBrowser(href)
+    return
+  }
+
+  void import('@tauri-apps/plugin-shell')
+    .then(({ open }) => open(href))
+    .catch(error => {
+      markdownLogger.warn('native external link open failed; using browser fallback', error)
+      openInBrowser(href)
+    })
+}
+
+useEventListener('message', ev => {
+  const data: unknown = ev.data
+  if (
+    typeof data !== 'object' ||
+    data === null ||
+    !('type' in data) ||
+    data.type !== messageKey ||
+    !('href' in data) ||
+    typeof data.href !== 'string'
+  ) {
+    return
+  }
+  markdownLogger.debug('opening delegated markdown link')
+  openExternalLink(data.href)
+})
+</script>
+
+<template>
+  <iframe :srcdoc="htmlTemplateUrl" :class="cn('border-0 border-none', $props.class)" :style />
+</template>

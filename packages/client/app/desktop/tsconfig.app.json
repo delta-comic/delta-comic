@@ -1,0 +1,21 @@
+{
+  "extends": ["./tsconfig.json", "../../../../tsconfig.base.json"],
+  "compilerOptions": {
+    "composite": true,
+    "lib": ["ESNext", "DOM"],
+    "paths": { "@/*": ["./src/*"] },
+    "rootDir": "../../../../",
+    "types": [
+      "./components.d.ts",
+      "@delta-comic/client-app-core/components",
+      "vue-component-type-helpers",
+      "./typed-router.d.ts",
+      "vite-plus/client",
+      "@delta-comic/client-core-utils"
+    ]
+  },
+  "vueCompilerOptions": {
+    "plugins": ["vue-router/volar/sfc-typed-router", "vue-router/volar/sfc-route-blocks"]
+  },
+  "include": ["./src/**/*", "./test/**/*"]
+}

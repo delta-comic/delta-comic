@@ -4,24 +4,38 @@ import { pathToFileURL } from 'node:url'
 
 export const jsonVersionPaths = [
   'package.json',
-  'packages/app/package.json',
-  'packages/app/src-tauri/tauri.conf.json',
-  'packages/db/package.json',
-  'packages/downloader/package.json',
-  'packages/logger/package.json',
-  'packages/model/package.json',
-  'packages/plugin/package.json',
-  'packages/ui/package.json',
-  'packages/utils/package.json',
+  'packages/client/app/mobile/package.json',
+  'packages/client/app/desktop/package.json',
+  'packages/client/app/core/package.json',
+  'packages/client/core/sdk/package.json',
+  'packages/client/app/mobile/src-tauri/tauri.conf.json',
+  'packages/client/app/desktop/src-tauri/tauri.conf.json',
+  'packages/client/data/db/package.json',
+  'packages/client/platform/downloader/package.json',
+  'packages/client/platform/http/package.json',
+  'packages/shared/core/logger/package.json',
+  'packages/client/core/model/package.json',
+  'packages/shared/plugin/manifest/package.json',
+  'packages/client/core/plugin-artifact/package.json',
+  'packages/client/core/plugin-install/package.json',
+  'packages/client/core/plugin-vite/package.json',
+  'packages/client/core/plugin/package.json',
+  'packages/server/core/server/package.json',
+  'packages/shared/core/both/package.json',
+  'packages/client/ui/ui/package.json',
+  'packages/client/core/utils/package.json',
 ] as const
 
 export const cargoTomlVersionPaths = [
-  ['packages/app/src-tauri/Cargo.toml', 'package'],
+  ['packages/client/app/mobile/src-tauri/Cargo.toml', 'package'],
+  ['packages/client/app/desktop/src-tauri/Cargo.toml', 'package'],
   ['Cargo.toml', 'workspace.package'],
 ] as const
 
 export const cargoLockPackageNames = [
-  'delta-comic',
+  'delta-comic-mobile',
+  'delta-comic-desktop',
+  'delta-comic-native',
   'tauri-plugin-db',
   'tauri-plugin-downloader',
   'tauri-plugin-logger',
@@ -31,7 +45,7 @@ export const cargoLockPackageNames = [
 
 export const versionAssetPaths = [
   ...jsonVersionPaths,
-  'packages/*/package.json',
+  'packages/*/*/*/package.json',
   ...cargoTomlVersionPaths.map(([path]) => path),
   'Cargo.lock',
 ] as const
@@ -61,16 +75,25 @@ export class VersionSynchronizer {
   private async versionedJsonPaths() {
     const paths = new Set<string>(jsonVersionPaths)
     const packagesDir = join(this.cwd, 'packages')
-    const entries = await readdir(packagesDir, { withFileTypes: true })
 
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue
-      const path = join('packages', entry.name, 'package.json')
-      const manifest = JSON.parse(await readFile(join(this.cwd, path), 'utf-8')) as {
-        private?: boolean
+    const visit = async (directory: string) => {
+      const entries = await readdir(directory, { withFileTypes: true })
+      for (const entry of entries) {
+        if (entry.name === 'node_modules' || entry.name === 'dist') continue
+        const path = join(directory, entry.name)
+        if (entry.isDirectory()) {
+          await visit(path)
+          continue
+        }
+        if (!entry.isFile() || entry.name !== 'package.json') continue
+        const relativePath = path.slice(this.cwd.length + 1)
+        if (jsonVersionPaths.includes(relativePath as (typeof jsonVersionPaths)[number])) return
+        const manifest = JSON.parse(await readFile(path, 'utf-8')) as { private?: boolean }
+        if (manifest.private !== true) paths.add(relativePath)
       }
-      if (manifest.private !== true) paths.add(path)
     }
+
+    await visit(packagesDir)
 
     return [...paths]
   }

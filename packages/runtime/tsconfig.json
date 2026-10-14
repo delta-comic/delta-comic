@@ -1,5 +1,0 @@
-{
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": { "lib": ["ESNext", "DOM"], "types": ["vite-plus/client"] },
-  "include": ["lib"]
-}

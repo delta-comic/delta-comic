@@ -1,0 +1,21 @@
+[package]
+name = "downloader-performance-baseline"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+axum = { workspace = true }
+futures-util = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tauri = { workspace = true, features = ["test"] }
+tauri-plugin-downloader = { workspace = true, default-features = false }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["net", "time"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+mach2 = { workspace = true }

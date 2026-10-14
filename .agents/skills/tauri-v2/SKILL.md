@@ -1,7 +1,8 @@
 ---
 name: tauri-v2
 description: "Tauri v2+ cross-platform app development with Rust backend. Use when configuring tauri.conf.json, implementing Rust commands (#[tauri::command]), setting up IPC patterns (invoke, emit, channels), configuring permissions/capabilities, troubleshooting build issues, or deploying desktop/mobile apps. Triggers on Tauri, src-tauri, invoke, emit, capabilities.json."
-version: 1.0.1
+metadata:
+  version: 1.0.1
 ---
 
 # Tauri v2+ Development Skill
@@ -9,6 +10,14 @@ version: 1.0.1
 > Build cross-platform desktop and mobile apps with web frontends and Rust backends.
 
 ## Before You Start
+
+### Delta Comic Workspace
+
+Read repository `AGENTS.md` before applying the examples. Define Rust dependency versions in root `Cargo.toml`; package manifests use `{ workspace = true }` with local features or optional flags. Define npm versions in root `pnpm-workspace.yaml` and reference `catalog:`. Run Tauri through `vp run --filter app dev`, with port 5173, and Web checks through Vite+.
+
+For JNI 0.22 native methods, accept `EnvUnowned` at the FFI boundary and call `with_env` to acquire `Env` for JNI operations. Store retained references as `Global<JObject<'static>>`, read Java strings with `JString::try_to_string`, and resolve the JNI outcome with an explicit error policy. Check the installed JNI migration guide and compile the Android target when updating the bridge.
+
+Validate Rust with `cargo fmt --all --check`, `cargo clippy --workspace --all-targets --locked -- -D warnings`, and `cargo test --workspace --locked -- --test-threads=2`. Downloader Android changes additionally require the Gradle tasks listed in `AGENTS.md`.
 
 **This skill prevents 8+ common errors and saves ~60% tokens.**
 

@@ -1,0 +1,73 @@
+import { logger } from '@delta-comic/shared-core-logger'
+import { isTauri } from '@tauri-apps/api/core'
+import { CamelCasePlugin, type Dialect, Kysely } from 'kysely'
+import { SerializePlugin } from 'kysely-plugin-serialize'
+
+import type * as FavouriteDB from './favourite'
+export * as PluginArchiveDB from './plugin'
+import type * as HistoryDB from './history'
+export * as FavouriteDB from './favourite'
+import type * as ConfigDB from './config'
+import type { PluginTable } from './generated/plugin.table'
+import type * as ItemStoreDB from './itemStore'
+import type * as NativeStoreDB from './nativeStore'
+import type * as PluginDiagnosticLogDB from './pluginDiagnosticLog'
+export type { PluginTable } from './generated/plugin.table'
+export * as HistoryDB from './history'
+export * as ItemStoreDB from './itemStore'
+import type * as RecentDB from './recentView'
+export * as SubscribeDB from './subscribe'
+import type * as SubscribeDB from './subscribe'
+export * as RecentDB from './recentView'
+export * as ConfigDB from './config'
+export * as PluginDiagnosticLogDB from './pluginDiagnosticLog'
+import { WriteValidationPlugin } from './writeValidation'
+export { WriteValidationPlugin } from './writeValidation'
+export * from './validation'
+
+export interface DB {
+  itemStore: ItemStoreDB.Table
+  favouriteCard: FavouriteDB.CardTable
+  favouriteItem: FavouriteDB.ItemTable
+  history: HistoryDB.Table
+  recentView: RecentDB.Table
+  subscribe: SubscribeDB.Table
+  plugin: PluginTable
+  nativeStore: NativeStoreDB.Table
+  config: ConfigDB.Table
+  pluginDiagnosticLog: PluginDiagnosticLogDB.Table
+}
+
+const databaseLogger = logger.scoped('db:lifecycle')
+
+databaseLogger.info('database initialization started')
+
+export const isTauriRuntime = isTauri
+
+const createDialect = async (): Promise<Dialect> => {
+  if (isTauriRuntime()) {
+    const [{ default: Database }, { TauriSqliteDialect }] = await Promise.all([
+      import('@tauri-apps/plugin-sql'),
+      import('kysely-dialect-tauri'),
+    ])
+    const database = await Database.load('sqlite:app.db')
+    databaseLogger.info('native sqlite dialect initialized')
+    return new TauriSqliteDialect({ database })
+  }
+
+  const { createWebDialect } = await import('./web')
+  databaseLogger.info('web sqlite dialect initialized')
+  return createWebDialect()
+}
+
+export const db = new Kysely<DB>({
+  dialect: await createDialect(),
+  plugins: [new WriteValidationPlugin(), new CamelCasePlugin(), new SerializePlugin()],
+})
+
+export * as DBUtils from './utils'
+
+export type { InsertObject, Kysely } from 'kysely'
+
+export * from './nativeStore'
+export { useConfig } from './config'

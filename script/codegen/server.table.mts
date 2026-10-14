@@ -19,23 +19,6 @@ const syncOperationResult = Type.Union([
   Type.Literal('conflict'),
   Type.Literal('failed'),
 ])
-const pluginAction = Type.Union([
-  Type.Literal('configure'),
-  Type.Literal('disable'),
-  Type.Literal('enable'),
-  Type.Literal('health'),
-  Type.Literal('install'),
-  Type.Literal('register'),
-  Type.Literal('uninstall'),
-  Type.Literal('update'),
-])
-const pluginJobStatus = Type.Union([
-  Type.Literal('failed'),
-  Type.Literal('queued'),
-  Type.Literal('running'),
-  Type.Literal('succeeded'),
-])
-
 const authUsersTable = defineTable(
   'auth_users',
   {
@@ -210,188 +193,93 @@ const syncTerminalCursorsTable = defineTable(
   { primaryKey: ['user_id', 'terminal_uuid'] },
 )
 
-const pluginRegistryTable = defineTable(
-  'server_plugin_registry',
+const pluginPackagesTable = defineTable(
+  'server_plugin_packages',
   {
+    tenant_id: Type.String(),
     plugin_id: Type.String(),
     manifest_json: Type.String(),
-    source: Type.String(),
-    trusted: Type.Boolean({ default: true }),
-    registered_at: Type.Integer(),
-    updated_at: Type.Integer(),
-  },
-  {
-    primaryKey: ['plugin_id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_registry_updated',
-        columns: [{ column: 'updated_at', order: 'DESC' }],
-      },
-    ],
-  },
-)
-
-const pluginInstallationsTable = defineTable(
-  'server_plugin_installations',
-  {
-    plugin_id: Type.String(),
-    installed_version: Type.String(),
-    desired_state: Type.Union([Type.Literal('disabled'), Type.Literal('enabled')]),
-    observed_state: Type.Union([
-      Type.Literal('disabled'),
-      Type.Literal('enabled'),
-      Type.Literal('failed'),
-      Type.Literal('installed'),
-    ]),
+    document_json: Type.String(),
     config_json: Type.String({ default: '{}' }),
-    installed_at: Type.Integer(),
-    updated_at: Type.Integer(),
-    last_error: Type.Optional(Type.String()),
-    last_health_json: Type.Optional(Type.String()),
-    last_health_at: Type.Optional(Type.Integer()),
-  },
-  {
-    primaryKey: ['plugin_id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_installations_state',
-        columns: ['desired_state', 'observed_state', { column: 'updated_at', order: 'DESC' }],
-      },
-    ],
-    foreignKeys: [
-      {
-        columns: ['plugin_id'],
-        refTable: 'server_plugin_registry',
-        refColumns: ['plugin_id'],
-        onDelete: 'cascade',
-      },
-    ],
-  },
-)
-
-const pluginJobsTable = defineTable(
-  'server_plugin_jobs',
-  {
-    id: Type.String(),
-    plugin_id: Type.String(),
-    action: pluginAction,
-    status: pluginJobStatus,
-    result_json: Type.Optional(Type.String()),
-    error_message: Type.Optional(Type.String()),
+    enabled: Type.Boolean({ default: true }),
     created_at: Type.Integer(),
-    started_at: Type.Optional(Type.Integer()),
-    completed_at: Type.Optional(Type.Integer()),
     updated_at: Type.Integer(),
   },
-  {
-    primaryKey: ['id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_jobs_plugin_created',
-        columns: ['plugin_id', { column: 'created_at', order: 'DESC' }],
-      },
-      {
-        name: 'idx_server_plugin_jobs_status_updated',
-        columns: ['status', { column: 'updated_at', order: 'DESC' }],
-      },
-    ],
-  },
+  { primaryKey: ['tenant_id', 'plugin_id'] },
 )
 
-const pluginAuditTable = defineTable(
-  'server_plugin_audit',
+const pluginSchedulesTable = defineTable(
+  'server_plugin_schedules',
   {
-    id: Type.String(),
+    tenant_id: Type.String(),
     plugin_id: Type.String(),
-    job_id: Type.String(),
-    action: pluginAction,
-    outcome: Type.Union([Type.Literal('failed'), Type.Literal('succeeded')]),
-    actor_id: Type.String(),
-    detail_json: Type.Optional(Type.String()),
-    created_at: Type.Integer(),
-  },
-  {
-    primaryKey: ['id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_audit_created',
-        columns: [
-          { column: 'created_at', order: 'DESC' },
-          { column: 'id', order: 'DESC' },
-        ],
-      },
-      {
-        name: 'idx_server_plugin_audit_plugin_created',
-        columns: ['plugin_id', { column: 'created_at', order: 'DESC' }],
-      },
-    ],
-    foreignKeys: [
-      {
-        columns: ['job_id'],
-        refTable: 'server_plugin_jobs',
-        refColumns: ['id'],
-        onDelete: 'cascade',
-      },
-    ],
-  },
-)
-
-const pluginScriptsTable = defineTable(
-  'server_plugin_scripts',
-  {
-    plugin_id: Type.String(),
-    source: Type.String(),
+    flow_id: Type.String(),
     enabled: Type.Boolean({ default: false }),
-    interval_hours: Type.Integer({ minimum: 1, maximum: 168, default: 1 }),
+    interval_hours: Type.Integer({ minimum: 1, maximum: 168 }),
     next_run_at: Type.Integer(),
-    created_at: Type.Integer(),
     updated_at: Type.Integer(),
   },
   {
-    primaryKey: ['plugin_id'],
-    indexes: [
-      {
-        name: 'idx_server_plugin_scripts_due',
-        columns: ['enabled', { column: 'next_run_at', order: 'ASC' }],
-      },
-    ],
+    primaryKey: ['tenant_id', 'plugin_id'],
+    indexes: [{ name: 'idx_server_plugin_schedules_due', columns: ['enabled', 'next_run_at'] }],
     foreignKeys: [
       {
-        columns: ['plugin_id'],
-        refTable: 'server_plugin_installations',
-        refColumns: ['plugin_id'],
+        columns: ['tenant_id', 'plugin_id'],
+        refTable: 'server_plugin_packages',
+        refColumns: ['tenant_id', 'plugin_id'],
         onDelete: 'cascade',
       },
     ],
   },
 )
 
-const pluginScriptRunsTable = defineTable(
-  'server_plugin_script_runs',
+const pluginRunsTable = defineTable(
+  'server_plugin_runs',
   {
     id: Type.String(),
+    tenant_id: Type.String(),
     plugin_id: Type.String(),
+    flow_id: Type.String(),
     trigger: Type.Union([Type.Literal('manual'), Type.Literal('scheduled')]),
-    status: Type.Union([Type.Literal('failed'), Type.Literal('succeeded')]),
+    status: Type.Union([
+      Type.Literal('running'),
+      Type.Literal('succeeded'),
+      Type.Literal('failed'),
+    ]),
     input_json: Type.Optional(Type.String()),
     result_json: Type.Optional(Type.String()),
+    step_id: Type.Optional(Type.String()),
     error_message: Type.Optional(Type.String()),
+    metrics_json: Type.String(),
     started_at: Type.Integer(),
-    completed_at: Type.Integer(),
+    completed_at: Type.Optional(Type.Integer()),
   },
   {
     primaryKey: ['id'],
     indexes: [
       {
-        name: 'idx_server_plugin_script_runs_plugin_started',
-        columns: ['plugin_id', { column: 'started_at', order: 'DESC' }],
+        name: 'idx_server_plugin_runs_tenant_plugin_started',
+        columns: ['tenant_id', 'plugin_id', { column: 'started_at', order: 'DESC' }],
       },
     ],
+  },
+)
+
+const pluginStoreTable = defineTable(
+  'server_plugin_store',
+  {
+    tenant_id: Type.String(),
+    plugin_id: Type.String(),
+    key: Type.String(),
+    value_json: Type.String(),
+  },
+  {
+    primaryKey: ['tenant_id', 'plugin_id', 'key'],
     foreignKeys: [
       {
-        columns: ['plugin_id'],
-        refTable: 'server_plugin_scripts',
-        refColumns: ['plugin_id'],
+        columns: ['tenant_id', 'plugin_id'],
+        refTable: 'server_plugin_packages',
+        refColumns: ['tenant_id', 'plugin_id'],
         onDelete: 'cascade',
       },
     ],
@@ -406,10 +294,8 @@ export const serverTables: readonly TableSchema[] = [
   syncChangesTable,
   syncOpsTable,
   syncTerminalCursorsTable,
-  pluginRegistryTable,
-  pluginInstallationsTable,
-  pluginJobsTable,
-  pluginAuditTable,
-  pluginScriptsTable,
-  pluginScriptRunsTable,
+  pluginPackagesTable,
+  pluginSchedulesTable,
+  pluginRunsTable,
+  pluginStoreTable,
 ]

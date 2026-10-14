@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "no-duplicate-utilities": "off",
+    "prefer-truncate-shorthand": "off",
+    "no-important-abuse": "off",
+    "no-sr-only-display-conflict": "off",
+    "consistent-negative-arbitrary-values": "off",
+    "require-flex-for-flex-utilities": "off",
+    "prefer-theme-scale": "off",
+    "no-magic-spacing": "off",
+    "detect-conflicts-in-template-literals": "off",
+    "prefer-design-tokens": "off",
+    "no-raw-colors": "off",
+    "cssConflict": "off",
+    "usedBlocklistedClass": "off",
+    "shorthand-classes": "off",
+    "no-unknown-classes": "off",
+    "suggestCanonicalClasses": "error"
+  }
+}

@@ -1,0 +1,29 @@
+[package]
+name = "tauri-plugin-utils"
+description = "Delta Comic utility runtime integration"
+authors = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+links = "tauri-plugin-utils"
+
+[package.metadata.platforms]
+windows = { level = "full", notes = "" }
+linux = { level = "full", notes = "" }
+macos = { level = "full", notes = "" }
+android = { level = "full", notes = "" }
+ios = { level = "full", notes = "" }
+
+[dependencies]
+mime_guess = { workspace = true }
+percent-encoding = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+specta = { workspace = true }
+specta-typescript = { workspace = true }
+tauri = { workspace = true }
+taurpc = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }

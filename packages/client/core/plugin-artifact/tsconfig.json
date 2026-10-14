@@ -1,0 +1,5 @@
+{
+  "extends": ["../../../../tsconfig.base.json"],
+  "compilerOptions": { "declaration": true, "composite": true, "lib": ["ESNext", "DOM"] },
+  "include": ["lib", "test"]
+}
