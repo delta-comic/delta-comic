@@ -10,6 +10,7 @@
 - 桌面矩阵均在 `delta-comic:copy-runtime` 失败，缺失 `packages/client/core/runtime/dist/host-libraries.umd.js`。
 - 根因是 `.github/workflows/release.yaml` 的 artifact 上传清单遗漏 `packages/client/core/runtime/dist`。
 - 第二轮补齐 runtime 后，桌面构建继续因 `packages/client/core/plugin/dist/index.mjs` 无法解析 `@delta-comic/client` 失败；发布 artifact 同样遗漏 `@delta-comic/both`、`@delta-comic/client`、`@delta-comic/server` 的 dist 输出。
+- 第三轮确认公开 SDK 已恢复，桌面构建继续因 `@delta-comic/client-core-plugin-install` 缺少 dist 失败；插件的 artifact/install/vite、HTTP/logger 平台包和 shared manifest dist 也必须随 workspace libraries 上传。
 
 ## 2026-10-04 测试质量审计
 
