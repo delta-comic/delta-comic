@@ -26,6 +26,12 @@
 - 旧 Windows job 已主动取消；本地补齐 Tauri 初始化临时脚本后，`./gradlew :app:tasks --no-daemon` 成功并确认 `rustBuildArm64Release` 任务配置正常。
 - 下一步：签名提交，再次执行预览晋级。
 
+### 2026-10-14：修复 Android CLI 启动方式
+
+- 运行 `38583800092` 的 Android Rust/Gradle 阶段通过，失败定位为 `node tauri` 的模块解析错误。
+- `BuildTask` 已改为直接执行 `tauri android android-studio-script`，下一步重新检查并提交。
+- 本地带 workspace `node_modules/.bin` PATH 运行 `rustBuildArm64Release` 已能启动 Tauri CLI，后续仅因缺少由外层 `tauri android build` 生成的 `.tauri/cli-options-server.json` 停止。
+
 ### 2026-10-06 — SDK 发布边界收敛
 
 - 用户确认仅 `@delta-comic/both`、`@delta-comic/client`、`@delta-comic/server` 对外发布。
