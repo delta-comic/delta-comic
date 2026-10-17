@@ -1,5 +1,15 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.21](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.20...3.0.0-next.21) (2026-10-17)
+
+
+### Bug Fixes
+
+* **client:** 修复了内部包导出错误的问题 ([134aef1](https://github.com/delta-comic/delta-comic/commit/134aef1658ffbc3648485eabc7b4468d17357cb1))
+* **client:** 修复公开 SDK 打包与构建工具出口 ([4ef0a21](https://github.com/delta-comic/delta-comic/commit/4ef0a21b6827e858f2d603a15b97609d0417214d))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.20](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.19...3.0.0-next.20) (2026-10-14)
 
 
