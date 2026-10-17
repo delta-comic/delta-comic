@@ -1109,6 +1109,9 @@ importers:
         specifier: 'catalog:'
         version: 1.3.34
     devDependencies:
+      '@delta-comic/client-core-plugin-vite':
+        specifier: 'workspace:'
+        version: link:../plugin-vite
       '@delta-comic/client-core-model':
         specifier: 'workspace:'
         version: link:../model

@@ -10,6 +10,10 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "exports": {
+    "./vite": {
+      "types": "./dist/vite.d.mts",
+      "import": "./dist/vite.mjs"
+    },
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
@@ -42,6 +46,7 @@
   },
   "devDependencies": {
     "@delta-comic/client-core-model": "workspace:",
+    "@delta-comic/client-core-plugin-vite": "workspace:",
     "@delta-comic/client-data-db": "workspace:",
     "@delta-comic/client-platform-downloader": "workspace:",
     "@delta-comic/client-ui-ui": "workspace:",
@@ -52,6 +57,12 @@
     "vue": "catalog:"
   },
   "peerDependencies": {
+    "vite-plus": "catalog:",
     "vue": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "vite-plus": {
+      "optional": true
+    }
   }
 }
