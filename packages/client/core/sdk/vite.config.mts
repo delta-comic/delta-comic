@@ -47,22 +47,25 @@ export default defineConfig({
       ),
     },
   },
-  pack: {
-    entry: [
-      './lib/index.ts',
-      './lib/manifest.ts',
-      './lib/ui.ts',
-      './lib/network.ts',
-      './lib/diagnostics.ts',
-    ],
-    sourcemap: true,
-    dts: { tsconfig: './tsconfig.json' },
-    deps: {
-      alwaysBundle: [/^@delta-comic\//],
-      dts: { alwaysBundle: id => id.startsWith('@delta-comic/') || id.includes('/packages/') },
+  pack: [
+    {
+      entry: [
+        './lib/index.ts',
+        './lib/manifest.ts',
+        './lib/ui.ts',
+        './lib/network.ts',
+        './lib/diagnostics.ts',
+        './lib/vite.ts',
+      ],
+      sourcemap: true,
+      dts: { tsconfig: './tsconfig.json', resolver: 'tsc' },
+      deps: {
+        alwaysBundle: [/^@delta-comic\//],
+        neverBundle: ['vite-plus'],
+        dts: { alwaysBundle: id => id.startsWith('@delta-comic/') || id.includes('/packages/') },
+      },
     },
-    plugins: [decoratorPlugin],
-  },
+  ],
   run: {
     tasks: {
       build: {

@@ -1,0 +1,1 @@
+export { deltaComic, createDevPlugin } from '@delta-comic/client-core-plugin-vite'

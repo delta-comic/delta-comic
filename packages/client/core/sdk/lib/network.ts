@@ -1,7 +1,7 @@
 import { withDiagnostic, type DiagnosticRecorder } from '@delta-comic/both'
 
 export interface ClientNetworkRequest {
-  readonly url: string | URL
+  readonly url: RequestInfo | URL
   readonly init?: RequestInit
 }
 
