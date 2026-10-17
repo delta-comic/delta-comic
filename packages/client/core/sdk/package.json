@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@delta-comic/client-core-model": "workspace:",
+    "@delta-comic/client-core-utils": "workspace:",
     "@delta-comic/client-core-plugin-vite": "workspace:",
     "@delta-comic/client-data-db": "workspace:",
     "@delta-comic/client-platform-downloader": "workspace:",
