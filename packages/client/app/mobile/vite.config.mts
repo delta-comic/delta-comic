@@ -7,7 +7,7 @@ import { transform } from '@swc/core'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
 import type { UserConfig } from 'vite-plus'
-import { defineConfig, lazyPlugins } from 'vite-plus'
+import { defaultClientConditions, defineConfig, lazyPlugins } from 'vite-plus'
 
 const host = process.env.TAURI_DEV_HOST
 const corePackageLib = fileURLToPath(
@@ -136,6 +136,7 @@ export default defineConfig(
         }),
       ],
       resolve: {
+        conditions: ['delta-comic-workspace', ...defaultClientConditions],
         alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
         extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],
       },
