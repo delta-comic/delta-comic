@@ -523,3 +523,10 @@ DeepSeek Harness 以 capability family 组织 workspace，强调服务定义/提
 - 七个自有 TauRPC 包各自把 bindings 导出触发器放入 `test/src/bindings.rs`，测试编译时可直接访问包内 API 实现并生成对应 `bindings.ts`。
 - `app/desktop` 与 `app/mobile` 的启动函数不再调用其他包的 `export_bindings()`；应用层只负责运行时 Router 组装。
 - 生成测试保留原有临时文件、尾部清理和内容比较逻辑，因此测试运行会在内容变化时写回包内生成文件。
+
+
+## 2026-10-18：CI 测试回归
+
+- CI Web 失败来源为 SDK 源码导入链提前初始化 fullscreen，Node 环境缺少 `document`。当前 `1d0427f0` 已将导航工具改为动态加载，完整本地测试通过。
+- CI Rust 与 Android metadata 在发布版本中触发 `--locked` 失败：`script/set-version.mts` 的 Cargo 包列表缺少 `tauri-plugin-http`。源码清单与锁文件当前均为 `3.0.0-next.19`；遗漏在统一升版时显现。
+- 新增真实清单临时目录升版回归测试，修复前确认 HTTP crate 保持旧版而测试失败，加入同步列表后通过。

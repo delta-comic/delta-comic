@@ -58,7 +58,11 @@ export default defineConfig({
         './lib/vite.ts',
       ],
       sourcemap: true,
-      dts: { tsconfig: './tsconfig.json', resolver: 'tsc' },
+      dts: {
+        tsconfig: './tsconfig.json',
+        resolver: 'tsc',
+        compilerOptions: { stripInternal: true },
+      },
       deps: {
         alwaysBundle: [/^@delta-comic\//],
         neverBundle: ['vite-plus'],
