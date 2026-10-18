@@ -1,5 +1,6 @@
 import type { UniContentType_, UniItem } from '@delta-comic/client-core-model'
 
+/** @internal Host navigation registration types. */
 declare module '@delta-comic/client-core-utils' {
   interface SharedFunctions {
     routeToContent(
