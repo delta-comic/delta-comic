@@ -1,5 +1,15 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.22](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.21...3.0.0-next.22) (2026-10-18)
+
+
+### Bug Fixes
+
+* **client:** 收敛公开 SDK 声明依赖 ([0fa6190](https://github.com/delta-comic/delta-comic/commit/0fa6190c89bb2ec573ee60f2c725841a585f1dad))
+* **client:** 统一宿主 SDK 模型类型与源码实例 ([1d0427f](https://github.com/delta-comic/delta-comic/commit/1d0427f072df2bc4086688719a37774aa74e8714))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.21](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.20...3.0.0-next.21) (2026-10-17)
 
 
