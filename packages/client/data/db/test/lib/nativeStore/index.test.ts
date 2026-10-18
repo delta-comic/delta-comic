@@ -115,6 +115,7 @@ describe('useNativeStore', () => {
   })
 
   it('falls back to a cloned default value when stored JSON is invalid', async () => {
+    vi.useFakeTimers()
     const defaultValue = { mode: 'light' }
     const { Logger } = await import('@delta-comic/shared-core-logger')
     const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => {})
@@ -135,6 +136,7 @@ describe('useNativeStore', () => {
   })
 
   it('recovers from sqlite load failures without exposing a mutable default object', async () => {
+    vi.useFakeTimers()
     const defaultValue = { mode: 'light' }
     const { Logger } = await import('@delta-comic/shared-core-logger')
     const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined)

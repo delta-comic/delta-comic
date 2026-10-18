@@ -38,6 +38,7 @@ export const cargoLockPackageNames = [
   'delta-comic-native',
   'tauri-plugin-db',
   'tauri-plugin-downloader',
+  'tauri-plugin-http',
   'tauri-plugin-logger',
   'tauri-plugin-plugin',
   'tauri-plugin-utils',

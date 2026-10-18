@@ -581,3 +581,16 @@
 - HTTP/native Rust 定向测试、clippy、fmt 均通过。
 
 - 2026-10-06：将 TauRPC bindings 生成触发器从 app 桌面/移动启动路径拆回 app/core、db、http、downloader、logger、utils、plugin 各自的 Rust 测试模块；删除生产库导出函数与跨包调用。七个包的 lib tests 全部通过，桌面/移动 crate cargo check、cargo fmt --check 和 git diff --check 通过。
+
+
+## 2026-10-18：CI 测试回归续接
+
+- 对照 CI 日志确认 Web 的 DOM 初始化失败和 Rust/Android 的版本锁定失败。当前 SDK 按需加载修复已在本地提交中。
+- 保留仓库 `3.0.0-next.19` 版本，增加 HTTP crate 锁文件同步和临时目录升版测试；专项测试修复前失败、修复后通过。
+- 下一步验证隔离副本升到 `.20` 后的 `cargo metadata --locked`，再串行完成全量 Web 与 Rust 验证。
+
+- 隔离副本升到 `3.0.0-next.20`：修复前完整 Cargo metadata 复现 CI 锁文件错误，修复后 `cargo metadata --locked --format-version 1` 通过，HTTP crate 为 `.20`。
+- 当前最终 lib-build、vp check、Rust fmt 已通过；正在完成递归 typecheck 和全量测试。
+
+- 最终无缓存递归 typecheck 与全量 Web 测试通过（160 files / 802 tests）。覆盖率首轮同样全部用例通过，但 nativeStore 测试退出时出现 `EnvironmentTeardownError`：控制台 RPC 仍有挂起消息，退出码为 1。
+- nativeStore 的 JSON 解析失败、SQLite 加载失败两项测试使用真实定时器，状态恢复后的防抖持久化任务会在测试结束后继续执行；与同文件其余用例一致改用虚拟定时器，现有 afterEach 统一释放。正在复测专项与全量覆盖率。

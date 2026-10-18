@@ -419,3 +419,14 @@
 - 将七个 TauRPC 包的生成触发器移入各自 `test/src/bindings.rs`，测试运行时生成并校验包内 bindings 文件。
 - 删除应用桌面/移动入口的集中生成调用，以及生产库中的 `export_bindings()`。
 - `cargo fmt --all --check`、`cargo clippy --workspace --all-targets --locked -- -D warnings`、`cargo check -p delta-comic-desktop -p delta-comic-mobile --locked` 与 `cargo test --workspace --locked -- --test-threads=2` 通过。
+
+## 2026-10-18：宿主 SDK 测试回归修复
+
+- [x] 对照 CI 日志和本地全量验证，定位 SDK 导入时的 DOM 初始化及升版锁文件遗漏。
+- [x] 补齐版本同步中的 HTTP crate 并验证临时目录升版。
+- [ ] 串行完成构建、check、工作区类型检查与全量测试。
+- [ ] 更新验收记录并签名提交。
+
+### Next Step
+
+完成全量 Web 检查与 Rust fmt、Clippy、workspace tests，记录结果后签名提交。
