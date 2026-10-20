@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/client-platform-downloader",
-  "version": "3.0.0-next.22",
+  "version": "3.0.0-next.23",
   "private": true,
   "description": "Delta Comic high-performance native download manager",
   "homepage": "https://github.com/delta-comic/delta-comic",

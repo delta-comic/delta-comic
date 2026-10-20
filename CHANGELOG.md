@@ -1,5 +1,14 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.23](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.22...3.0.0-next.23) (2026-10-20)
+
+
+### Bug Fixes
+
+* **ci:** 同步 Tauri HTTP 插件锁定版本 ([86f8fb9](https://github.com/delta-comic/delta-comic/commit/86f8fb95f12eb5e3458433f0ee1322cfaec72fa9))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.22](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.21...3.0.0-next.22) (2026-10-18)
 
 

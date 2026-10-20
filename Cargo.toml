@@ -19,7 +19,7 @@ edition = "2024"
 license = "AGPL-3.0-only"
 repository = "https://github.com/delta-comic/delta-comic"
 rust-version = "1.95.0"
-version = "3.0.0-next.22"
+version = "3.0.0-next.23"
 
 [workspace.dependencies]
 delta-comic-native = { path = "packages/client/app/core" }
