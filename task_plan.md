@@ -19,6 +19,20 @@
 
 每阶段完成后立即签名提交。新增代码优先落入现有安装、客户端宿主与服务端 plugins 模块。
 
+## 2026-10-21 jmcomic SDK 宿主类型声明审计
+
+- [x] 确认宿主源码构建能否将私有 client-core-model 合入公开 SDK 声明。
+- [x] 修复构建或发布边界并通过宿主定向验证。当前源码构建无需改动且产物正确；next.23 需发布新版本。
+- [x] 插件使用修复产物通过类型检查和全量测试；整理两仓进度记录。
+- [ ] 提交宿主审计记录。
+
+### 宿主待处理清单
+
+1. 发布新的 `@delta-comic/client` 版本：已发布 `3.0.0-next.23` 声明依赖私有 `@delta-comic/client-core-model`；按当前源码重建后声明已内联该模型类型，插件类型检查通过。发布操作尚未执行。
+2. 修正全工作区递归 typecheck 的 plugin-vite 构建顺序：本轮 `vp run -r typecheck` 在 `packages/client/core/sdk/lib/vite.ts` 报缺少 `@delta-comic/client-core-plugin-vite` 声明；SDK 定向 typecheck、lib-build、vp check 均通过。
+
+当前发现：`@delta-comic/client@3.0.0-next.23` 公开声明引用私有模型包导致 201 个级联错误。重建当前源码后声明类型内联且插件 typecheck 通过；余下宿主事项见待处理清单。
+
 - 阶段 1A 服务与桥接：complete。客户端 SDK 持有业务类型与 Context 扩展；原生集合/UI/i18n 注册绑定调用方 effect；Cordis 与客户端 SDK 接入宿主共享桥接。
 - 阶段 1B 协议、安装和内置插件：complete。
 

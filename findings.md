@@ -2,6 +2,13 @@
 
 # Delta Comic 全仓重构：研究与需求发现
 
+## 2026-10-21 jmcomic SDK 类型声明审计
+
+- jmcomic-sdk 全量 typecheck 在 27 个文件报告 201 个错误，首个根因是宿主 `@delta-comic/client@3.0.0-next.23` 的 `dist/index.d.mts` 引用私有 `@delta-comic/client-core-model`，但该包仅在 SDK `devDependencies`，插件安装图中不存在。
+- Delta Comic 源码模型包仍公开 `UniItem`、`UniContentPage`、`UniComment`、`StreamQuery` 等类型；宿主 SDK 源码已设置声明打包规则，待实际构建产物核验。
+- 运行 `vp run --no-cache --filter @delta-comic/client build` 后，新的 `dist/index.d.mts` 以相对 `.d.mts` 文件导入模型声明，已不再出现 `@delta-comic/client-core-model` 等内部包 specifier；源码层无需修改，`next.23` 发布物需要更新版本。
+- 全仓递归 typecheck 的剩余错误为 `packages/client/core/sdk/lib/vite.ts` 无法解析 `@delta-comic/client-core-plugin-vite`，因该 workspace 包 dist 不在本轮递归 typecheck 执行前生成；运行 SDK 定向 typecheck 通过。
+
 ## 2026-10-14 预览版发布调查
 
 - 已从 `next` 切换到 `develop`；`develop` 与 `origin/develop` 均为 `46670f79`。
