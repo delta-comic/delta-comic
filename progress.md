@@ -3,10 +3,9 @@
 ## 2026-10-21 jmcomic SDK 类型声明审计
 
 - jmcomic-sdk 的 `vp run -r typecheck` 暴露 201 个错误。确认已安装的 `@delta-comic/client@3.0.0-next.23` 声明引用未随公开 SDK 安装的私有 `@delta-comic/client-core-model`。
-- 当前宿主源码声明打包配置疑似已修复该边界；下一步重建宿主 SDK，并检查生成声明中是否仍出现私有包 specifier。
-- 重建后的 SDK 声明不再含私有 `client-core-model` specifier；宿主 `lib-build`、`vp check`、SDK 定向 typecheck 通过。全递归 typecheck 留有 plugin-vite dist 构建顺序问题，已列出具体清单。
-- jmcomic 插件在覆盖本地新 SDK dist 后递归类型检查、105 项测试、插件构建均通过；无需修改插件生产代码。
-- 当前阶段完成，保留宿主两项待办供发布/构建链修复阶段跟进。
+- 重建后的 SDK 声明不再含私有 `client-core-model` specifier；宿主 `lib-build`、`vp check`、SDK 定向 typecheck 通过。依项目架构文档先完成 `lib-build` 后，宿主全递归 typecheck 通过。
+- jmcomic 插件在覆盖本地新 SDK dist 后递归类型检查、105 项测试、插件构建均通过；未修改插件生产代码。覆盖产物不是已发布版本。
+- 当前源码层没有待修复项；已发布 SDK 版本仍需通过正常预览发布流程更新声明产物。
 
 ## 2026-10-14 预览版发布
 
