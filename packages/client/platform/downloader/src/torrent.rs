@@ -122,6 +122,11 @@ impl TorrentManager {
           }),
           #[cfg(any(target_os = "android", test))]
           dht: None,
+          #[cfg(not(any(target_os = "android", test)))]
+          dht: Some(librqbit::DhtSessionConfig {
+            persistence: None,
+            ..Default::default()
+          }),
           #[cfg(target_os = "android")]
           disable_local_service_discovery: true,
           ..Default::default()
