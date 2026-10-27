@@ -19,6 +19,9 @@
     "url": "https://github.com/delta-comic/delta-comic.git"
   },
   "type": "module",
+  "scripts": {
+    "dev:desktop": "vp run @delta-comic/client-app-desktop#dev"
+  },
   "devDependencies": {
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
