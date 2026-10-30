@@ -12,7 +12,6 @@
     "./components/*": "./lib/components/*"
   },
   "dependencies": {
-    "@delta-comic/both": "workspace:",
     "@delta-comic/client": "workspace:",
     "@delta-comic/client-core-model": "workspace:",
     "@delta-comic/client-core-plugin": "workspace:",
@@ -24,7 +23,6 @@
     "@delta-comic/shared-core-logger": "workspace:",
     "@pinia/colada": "catalog:",
     "@vueuse/core": "catalog:",
-    "cordis": "catalog:",
     "dayjs": "catalog:",
     "es-toolkit": "catalog:",
     "motion-v": "catalog:",

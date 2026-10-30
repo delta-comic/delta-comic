@@ -34,10 +34,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@aptabase/tauri": "catalog:",
     "@delta-comic/shared-core-logger": "workspace:",
     "@tauri-apps/api": "catalog:",
-    "@vue/language-core": "catalog:",
     "acorn": "catalog:",
     "es-module-lexer": "catalog:",
     "es-toolkit": "catalog:",
