@@ -121,7 +121,10 @@ impl TorrentManager {
             folder: Some(session_dir),
           }),
           #[cfg(any(target_os = "android", test))]
-          dht: None,
+          dht: Some(librqbit::DhtSessionConfig {
+            persistence: None,
+            ..Default::default()
+          }),
           #[cfg(not(any(target_os = "android", test)))]
           dht: Some(librqbit::DhtSessionConfig {
             persistence: None,
