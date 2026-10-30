@@ -23,7 +23,6 @@
     "@delta-comic/client-core-model": "workspace:",
     "@delta-comic/client-core-plugin-install": "workspace:",
     "@delta-comic/client-core-utils": "workspace:",
-    "es-toolkit": "catalog:",
     "jszip": "catalog:",
     "vite-plus": "catalog:"
   },

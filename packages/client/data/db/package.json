@@ -32,7 +32,6 @@
   "dependencies": {
     "@delta-comic/shared-core-logger": "workspace:",
     "@delta-comic/shared-plugin-manifest": "workspace:",
-    "@subframe7536/sqlite-wasm": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-sql": "catalog:",
     "es-toolkit": "catalog:",

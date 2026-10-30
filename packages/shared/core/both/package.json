@@ -21,8 +21,7 @@
     "access": "public"
   },
   "dependencies": {
-    "cordis": "catalog:",
-    "typebox": "catalog:"
+    "cordis": "catalog:"
   },
   "devDependencies": {
     "@swc/core": "catalog:",

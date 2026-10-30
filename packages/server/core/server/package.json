@@ -38,7 +38,6 @@
     "ky": "catalog:",
     "kysely": "catalog:",
     "kysely-d1": "catalog:",
-    "semver": "catalog:",
     "typebox": "catalog:"
   },
   "devDependencies": {
@@ -59,7 +58,6 @@
     "wrangler": "catalog:"
   },
   "peerDependencies": {
-    "elysia": "catalog:",
-    "openapi-types": "catalog:"
+    "elysia": "catalog:"
   }
 }

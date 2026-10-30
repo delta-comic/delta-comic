@@ -42,8 +42,7 @@
   "dependencies": {
     "@delta-comic/both": "workspace:",
     "cordis": "catalog:",
-    "kysely": "catalog:",
-    "typebox": "catalog:"
+    "kysely": "catalog:"
   },
   "devDependencies": {
     "@delta-comic/client-core-model": "workspace:",

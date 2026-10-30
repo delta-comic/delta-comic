@@ -28,12 +28,10 @@
     "cordis": "catalog:",
     "es-module-lexer": "catalog:",
     "jszip": "catalog:",
-    "ky": "catalog:",
     "semver": "catalog:"
   },
   "devDependencies": {
     "@delta-comic/client-data-db": "workspace:",
-    "@types/semver": "catalog:",
     "vite-plus": "catalog:"
   }
 }

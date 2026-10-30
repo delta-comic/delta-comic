@@ -4,7 +4,6 @@
   "description": "Cloudflare Pages admin panel for Delta Comic server.",
   "type": "module",
   "dependencies": {
-    "@delta-comic/client-ui-ui": "workspace:",
     "@delta-comic/server": "workspace:",
     "@delta-comic/shared-core-logger": "workspace:",
     "@delta-comic/shared-plugin-manifest": "workspace:",
@@ -17,7 +16,6 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
-    "@vitejs/devtools": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "@vitejs/plugin-vue-jsx": "catalog:",
     "lightningcss": "catalog:",
@@ -26,7 +24,6 @@
     "unplugin-vue-components": "catalog:",
     "vite-plugin-vue-devtools": "catalog:",
     "vite-plus": "catalog:",
-    "vue-component-type-helpers": "catalog:",
     "vue-tsc": "catalog:",
     "wrangler": "catalog:"
   }

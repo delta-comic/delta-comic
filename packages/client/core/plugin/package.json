@@ -38,38 +38,27 @@
     "access": "public"
   },
   "dependencies": {
-    "@delta-comic/both": "workspace:",
     "@delta-comic/client": "workspace:",
-    "@delta-comic/client-core-plugin-artifact": "workspace:",
     "@delta-comic/client-core-plugin-install": "workspace:",
     "@delta-comic/client-core-plugin-vite": "workspace:",
-    "@delta-comic/client-platform-downloader": "workspace:",
     "@delta-comic/shared-core-logger": "workspace:",
     "@delta-comic/shared-plugin-manifest": "workspace:",
-    "@octokit/rest": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-fs": "catalog:",
-    "blake3-wasm": "catalog:",
     "cordis": "catalog:",
     "es-toolkit": "catalog:",
-    "jszip": "catalog:",
     "ky": "catalog:",
     "lz-string": "catalog:",
-    "semver": "catalog:",
     "taurpc": "catalog:"
   },
   "devDependencies": {
-    "@types/semver": "catalog:",
-    "@vitejs/plugin-vue": "catalog:",
-    "typescript": "catalog:",
-    "vue-component-type-helpers": "catalog:"
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "@delta-comic/client-core-model": "workspace:",
     "@delta-comic/client-core-utils": "workspace:",
     "@delta-comic/client-data-db": "workspace:",
     "@delta-comic/client-ui-ui": "workspace:",
-    "naive-ui": "catalog:",
     "vue": "catalog:"
   }
 }
