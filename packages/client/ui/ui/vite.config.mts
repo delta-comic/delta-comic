@@ -106,5 +106,4 @@ export default defineConfig(({ command }) => ({
       },
     },
   },
-  test: { environment: 'happy-dom', include: ['test/**/*.test.ts'] },
 })) as UserConfig

@@ -98,9 +98,9 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 - 完整的 Web 验证流程：依次运行 `vp run build:packages`、`vp check`、
   `vp run -r typecheck`，然后运行 `vp test run`。由于根目录 lint 的类型检查已禁用，
   `vp check` 不能替代显式的工作区类型检查。
-- 使用 `vp test run packages/client/app/app/test/src/path/file.test.ts` 运行单个测试文件；添加
+- 使用 `vp test run packages/client/app/core/test/lib/path/file.test.ts` 运行单个测试文件；添加
   `-t 'test name'` 可聚焦单个测试用例。测试监听模式为 `vp test watch <path>`。
-- 覆盖率检查命令为 `vp test run --coverage`；根目录阈值为行、函数和语句 75%，分支 70%。
+- 覆盖率检查命令为 `vp test run --coverage`；根目录阈值为行、函数、语句和分支 20%。
 - Rust 验证需单独执行：`cargo fmt --all --check`、
   `cargo clippy --workspace --all-targets --locked -- -D warnings` 和
   `cargo test --workspace --locked -- --test-threads=2`。

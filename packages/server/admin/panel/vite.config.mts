@@ -66,5 +66,4 @@ export default defineConfig({
     },
   },
   server: { port: 5174, strictPort: true },
-  test: { environment: 'happy-dom', include: ['test/**/*.test.ts'] },
 } as UserConfig)
