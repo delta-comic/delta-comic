@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 
 import formIndexSource from '../../../../lib/components/form/index.ts?raw'
 import rootIndexSource from '../../../../lib/index.ts?raw'

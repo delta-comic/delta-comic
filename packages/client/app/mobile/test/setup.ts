@@ -1,6 +1,6 @@
 import { configureCoreHost } from '@delta-comic/client-app-core'
 import { config } from '@vue/test-utils'
-import { vi } from 'vite-plus/test'
+import { vi } from 'vitest'
 
 // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
 await import('../public/runtime/host-libraries.umd.js')

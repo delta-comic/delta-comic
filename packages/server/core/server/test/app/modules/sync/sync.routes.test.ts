@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 import { syncRoutes } from '../../../../app/modules/sync/sync.routes'
 

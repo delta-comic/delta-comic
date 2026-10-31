@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 
 import type { PluginManifest } from '@delta-comic/client-core-model'
 import type { ModuleNode, ViteDevServer } from 'vite-plus'
-import { describe, expect, it, vi, type Mock } from 'vite-plus/test'
+import { describe, expect, it, vi, type Mock } from 'vitest'
 
 import {
   DEV_CSS_PATH,

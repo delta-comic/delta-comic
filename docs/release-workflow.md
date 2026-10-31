@@ -18,13 +18,25 @@ workspace 包发布到 GitHub Packages。发布脚本会显式覆盖 `.npmrc` �
 
 GitHub Packages 发布使用 `release.yaml` 中的 `GITHUB_TOKEN`。新增公共 workspace 包时，确认仓库工作流具备 `packages: write` 权限，并通过现有 release workflow 发布。
 
+## 安装与使用 `dr`
+
+维护者可以从 GitHub Packages 安装独立的 CLI：
+
+```sh
+echo "@delta-comic:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+npm install --global @delta-comic/release-cli
+dr --help
+```
+
+在仓库内执行时，`dr` 会从当前目录向上寻找项目根目录，也可以用 `--cwd` 指定目标仓库，用 `--config` 指定配置文件。项目配置默认位于 `.release-cli.config.ts`，负责版本文件、workspace 根目录、MSI 文件和发布 registry；CLI 包自身的版本使用 `dr package version set <version>` 管理。
+
 ## 首次建立分支
 
 仓库只有 `main` 时，在干净工作区执行：
 
 ```sh
-vp run --no-cache branch:develop:dry-run
-vp run --no-cache branch:develop
+dr branch prepare develop --dry-run
+dr branch prepare develop
 ```
 
 该命令从 `origin/main` 创建并推送 `develop`。第一次执行预览晋级时会自动从 `develop` 创建 `next`。
@@ -35,20 +47,20 @@ vp run --no-cache branch:develop
 
 ```sh
 # develop -> next，推送 next 后自动发布预览版
-vp run --no-cache release:preview:dry-run
-vp run --no-cache release:preview
+dr branch promote preview --dry-run
+dr branch promote preview
 
 # next -> main，推送 main 后自动发布正式版
-vp run --no-cache release:stable:dry-run
-vp run --no-cache release:stable
+dr branch promote stable --dry-run
+dr branch promote stable
 ```
 
-仓库配置已关闭 Vite+ package script 缓存，命令仍显式保留 `--no-cache`，避免未来配置变化或命令行覆盖导致副作用命令只重放旧输出。命令会拒绝脏工作区；本地源分支或目标分支只要含有尚未同步到远端的提交，也会停止。晋级使用普通合并保留分支历史，不会 force push。若合并发生冲突，命令会停留在目标分支，由维护者检查、解决并自行继续推送。
+仓库配置已关闭发布任务缓存。命令会拒绝脏工作区；本地源分支或目标分支只要含有尚未同步到远端的提交，也会停止。晋级使用普通合并保留分支历史，不会 force push。若合并发生冲突，命令会停留在目标分支，由维护者检查、解决并自行继续推送。
 
 semantic-release 会先完成 tag、npm 包和 GitHub Release，再将版本与 changelog 提交回发布分支。正式版 CI 完成后，将该提交从 `main` 合并回开发线：
 
 ```sh
-vp run --no-cache branch:develop
+dr branch prepare develop
 ```
 
 这一步会同步 `develop`、合并 `origin/main` 并推送 `develop`，避免下一轮预览版继续基于旧的正式版本。

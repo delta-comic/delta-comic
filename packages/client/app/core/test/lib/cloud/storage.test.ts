@@ -1,6 +1,6 @@
 import type { CloudSession } from '@delta-comic/server/api'
 import { Logger } from '@delta-comic/shared-core-logger'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { nativeStore } = vi.hoisted(() => ({ nativeStore: new Map<string, string>() }))
 const storageId = (namespace: unknown, key: unknown) => `${String(namespace)}:${String(key)}`

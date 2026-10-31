@@ -1,6 +1,6 @@
 import { pluginI18n, type User } from '@delta-comic/client-core-plugin'
 import type { DialogOptions } from 'naive-ui'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { VNode } from 'vue'
 
 const { createFormMock, pageWebviewAuth, sharedFunction } = vi.hoisted(() => ({

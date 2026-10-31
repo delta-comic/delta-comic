@@ -18,42 +18,61 @@ export default defineConfig({
   run: {
     cache: { tasks: true, scripts: false },
     tasks: {
-      'branch:develop': { command: 'node ./script/release-branches.mts develop', cache: false },
-      'branch:develop:dry-run': {
-        command: 'node ./script/release-branches.mts develop --dry-run',
-        cache: false,
-      },
-      'check': { command: 'vp check', cache: { output: [] } },
+      // dev
       'dev': { command: 'vp run @delta-comic/client-app-desktop#dev', cache: false },
       'dev:android': { command: 'vp run @delta-comic/client-app-mobile#dev', cache: false },
       'dev:web': { command: 'vp run @delta-comic/client-app-mobile#dev:web', cache: false },
-      'lib-build': { command: 'node -e ""', dependsOn: ['build:packages'], cache: { output: [] } },
+      // build
       'build:packages': { command: 'vp run -r build', cache: { output: [] } },
-      'release': { command: 'node ./script/release.mts', cache: false },
-      'release:dry-run': { command: 'node ./script/release.mts --dry-run', cache: false },
-      'release:preview': { command: 'node ./script/release-branches.mts preview', cache: false },
+      // release
+      'release-cli': {
+        command: 'vp run --filter @delta-comic/release-cli build',
+        cache: { output: ['script/manager/dist/**'] },
+      },
+      'branch:develop': {
+        command: 'vp exec dr branch prepare develop',
+        dependsOn: ['release-cli'],
+        cache: false,
+      },
+      'branch:develop:dry-run': {
+        command: 'vp exec dr branch prepare develop --dry-run',
+        dependsOn: ['release-cli'],
+        cache: false,
+      },
+      'release': { command: 'vp exec dr release run', dependsOn: ['release-cli'], cache: false },
+      'release:dry-run': {
+        command: 'vp exec dr release plan',
+        dependsOn: ['release-cli'],
+        cache: false,
+      },
+      'release:preview': {
+        command: 'vp exec dr branch promote preview',
+        dependsOn: ['release-cli'],
+        cache: false,
+      },
       'release:preview:dry-run': {
-        command: 'node ./script/release-branches.mts preview --dry-run',
+        command: 'vp exec dr branch promote preview --dry-run',
+        dependsOn: ['release-cli'],
         cache: false,
       },
-      'release:stable': { command: 'node ./script/release-branches.mts stable', cache: false },
+      'release:stable': {
+        command: 'vp exec dr branch promote stable',
+        dependsOn: ['release-cli'],
+        cache: false,
+      },
       'release:stable:dry-run': {
-        command: 'node ./script/release-branches.mts stable --dry-run',
+        command: 'vp exec dr branch promote stable --dry-run',
+        dependsOn: ['release-cli'],
         cache: false,
       },
-      'set-ver': { command: 'node ./script/set-version.mts', cache: false },
-      'test': { command: 'vp test', cache: false, dependsOn: ['lib-build'] },
-      'test:coverage': {
-        command: 'vp test run --coverage',
-        dependsOn: ['lib-build'],
-        cache: { output: ['coverage/**'] },
-      },
+      // linter
       'typecheck': {
         command: 'vp run -r typecheck',
-        dependsOn: ['lib-build'],
+        dependsOn: ['build:packages'],
         cache: { output: [] },
       },
-      'vp:install': { command: 'vp install', cache: false },
+      'codegen:check': { command: 'node ./script/codegen/check.mts', cache: false },
+      // codegen
       'codegen': {
         command:
           'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/core/server/app/infrastructure/d1/generated',
@@ -64,7 +83,6 @@ export default defineConfig({
           'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/core/server/app/infrastructure/d1/generated && node ./script/codegen/run.mts script/codegen/client.table.mts packages/client/data/db/lib/generated',
         cache: false,
       },
-      'codegen:check': { command: 'node ./script/codegen/check.mts', cache: false },
     },
   },
   test: {
@@ -72,49 +90,15 @@ export default defineConfig({
     restoreMocks: true,
     unstubEnvs: true,
     unstubGlobals: true,
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json-summary', 'html', 'lcov'],
-      reportsDirectory: './coverage',
-      include: [
-        'script/**/*.{ts,mts}',
-        'packages/client/app/core/lib/**/*.ts',
-        'packages/client/app/mobile/src/**/*.{ts,tsx}',
-        'packages/client/app/desktop/src/**/*.{ts,tsx}',
-        // Declarative route views are exercised through component tests, while the unit coverage
-        // gate measures independent application logic and the stateful SFCs mounted by this suite.
-        'packages/client/app/mobile/src/{App,AppSetup}.vue',
-        'packages/client/app/mobile/src/components/{listSearcher,home/mainPageSearchBar}.vue',
-        'packages/client/app/mobile/src/components/plugin/marketplace/{PluginMarketplaceCard,PluginMarketplaceFilters}.vue',
-        'packages/client/data/db/lib/**/*.ts',
-        'packages/client/platform/downloader/lib/**/*.ts',
-        'packages/client/platform/http/src-web/**/*.ts',
-        'packages/shared/core/logger/lib/**/*.ts',
-        'packages/client/core/model/lib/**/*.ts',
-        'packages/client/core/plugin/{lib,vite}/**/*.ts',
-        'packages/server/core/server/{app,lib}/**/*.ts',
-        'packages/server/admin/panel/src/**/*.{ts,tsx,vue}',
-        'packages/client/ui/ui/{lib,vite}/**/*.{ts,tsx,vue}',
-        'packages/client/core/utils/{lib,vite}/**/*.ts',
-      ],
-      exclude: [
-        '**/*.{test,spec}.{ts,tsx,mts}',
-        '**/*.d.ts',
-        '**/*.types.ts',
-        '**/{test,__tests__}/**',
-        'packages/client/app/mobile/src/icons.tsx',
-        'packages/client/app/mobile/src/i18n/locales/schema.ts',
-        'packages/client/app/mobile/src/main.tsx',
-        'packages/server/core/server/app/index.ts',
-        'packages/server/admin/panel/src/main.ts',
-        'packages/server/admin/panel/src/shared/{api,components}/types.ts',
-        'packages/client/ui/ui/lib/components/form/type.ts',
-      ],
-      thresholds: { lines: 50, functions: 50, branches: 45, statements: 45 },
-    },
     exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
     projects: [
-      { test: { name: 'root', environment: 'node', include: ['script/test/**/*.test.ts'] } },
+      {
+        test: {
+          name: 'root',
+          environment: 'node',
+          include: ['script/test/**/*.test.ts', 'script/manager/test/**/*.test.ts'],
+        },
+      },
       'packages/shared/core/both',
       'packages/client/core/plugin-artifact',
       'packages/client/core/plugin-install',

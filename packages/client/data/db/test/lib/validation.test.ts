@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({ warns: [] as unknown[], errors: [] as unknown[] }))
 

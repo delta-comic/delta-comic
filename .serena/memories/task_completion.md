@@ -1,4 +1,4 @@
-- Standard Web completion gate: `vp run lib-build`, `vp check`, `vp run -r typecheck`, then `vp test run`.
+- Standard Web completion gate: `vp run build:packages`, `vp check`, `vp run -r typecheck`, then `vp test run`.
 - For codegen changes, run the relevant codegen check before the standard gate.
 - Coverage: `vp test run --coverage`; root thresholds are 75% lines/functions/statements and 70% branches.
 - Rust changes additionally require `cargo fmt --all --check`, locked Clippy with `-D warnings`, and locked workspace tests with two test threads.

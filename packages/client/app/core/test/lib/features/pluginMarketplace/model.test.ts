@@ -1,5 +1,5 @@
 import type { PluginArchiveDB } from '@delta-comic/client-data-db'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@delta-comic/client-core-plugin', () => ({
   isPluginManifestCompatible: (_manifest: unknown, coreVersion: string) => coreVersion === '2.3.0',

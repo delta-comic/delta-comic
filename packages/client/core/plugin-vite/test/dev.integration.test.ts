@@ -7,7 +7,7 @@ import type { PluginManifest } from '@delta-comic/client-core-model'
 import vue from '@vitejs/plugin-vue'
 import type { InlineConfig } from 'vite-plus'
 import { createServer } from 'vite-plus'
-import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH, createDevPlugin } from '../lib/dev'
 

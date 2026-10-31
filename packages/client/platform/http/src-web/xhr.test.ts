@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 import { createCORSXMLHttpRequestConstructor } from './xhr'
 import type { CORSFetchFunction } from './xhr'

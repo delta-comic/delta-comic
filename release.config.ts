@@ -1,7 +1,7 @@
 import type { GlobalConfig } from 'semantic-release'
 
 import pkg from './package.json' with { type: 'json' }
-import { createReleaseNameTemplate } from './script/release-notes.mts'
+import { createReleaseNameTemplate } from './script/manager/src/release-notes.mts'
 export const releaseBranches = ['main', { name: 'next', channel: 'next', prerelease: 'next' }]
 
 export default {
@@ -10,7 +10,7 @@ export default {
   tagFormat: '${version}',
   plugins: [
     ['@semantic-release/commit-analyzer', { preset: 'angular' }],
-    './script/semantic-release-plugin.mts',
+    '@delta-comic/release-cli/semantic-release',
     ['@semantic-release/release-notes-generator', { preset: 'angular' }],
     ['@semantic-release/changelog', { changelogFile: 'CHANGELOG.md' }],
     [

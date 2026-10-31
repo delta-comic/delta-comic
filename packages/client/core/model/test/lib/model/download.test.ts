@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it, vi } from 'vite-plus/test'
+import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 // cspell:ignore btih
 
 import type { UniContentPage } from '../../../lib/model/content'

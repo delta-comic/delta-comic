@@ -1,6 +1,6 @@
 import type { PluginArchiveDB } from '@delta-comic/client-data-db'
 import { flushPromises, mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 const pluginMocks = vi.hoisted(() => ({
   resolvePluginIconUrl: vi.fn(async (pluginId: string | undefined, icon: string | undefined) => {

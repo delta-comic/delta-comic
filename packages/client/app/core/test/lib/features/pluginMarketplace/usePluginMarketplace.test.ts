@@ -1,6 +1,6 @@
 import type { PluginCatalog } from '@delta-comic/client-core-plugin'
 import type { PluginArchiveDB } from '@delta-comic/client-data-db'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 await vi.hoisted(async () => {
   // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.

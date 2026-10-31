@@ -1,5 +1,5 @@
 import type { DownloadMessageBind } from '@delta-comic/client-ui-ui'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 import { runPluginInstallPhases } from '../../../../lib/features/pluginInstall/runPluginInstallPhases'
 

@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AdminApiClient } from '@/shared/api/AdminApiClient'
 import type { AdminCapabilities, AdminOverview } from '@/shared/api/types'

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 
 import { PluginCatalogConflictError } from '../../lib/catalogProtocol/index.js'
 import { createR2PluginCatalogStore } from '../../lib/catalogStore'

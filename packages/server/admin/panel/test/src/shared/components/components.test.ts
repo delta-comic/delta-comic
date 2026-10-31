@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 import { defineComponent, h } from 'vue'
 
 import AdminSidebar from '@/app/AdminSidebar.vue'

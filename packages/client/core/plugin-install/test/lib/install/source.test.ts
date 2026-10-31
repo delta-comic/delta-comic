@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { PluginInstallCatalog } from '../../../lib/catalog'
 import type { PluginSourceResolver } from '../../../lib/contracts'

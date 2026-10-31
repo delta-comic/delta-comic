@@ -1,5 +1,5 @@
 import { clearMocks } from '@tauri-apps/api/mocks'
-import { afterEach, beforeAll, vi } from 'vite-plus/test'
+import { afterEach, beforeAll, vi } from 'vitest'
 
 const nativeFetch = globalThis.fetch
 const NativeXMLHttpRequest = class NativeXMLHttpRequest {}

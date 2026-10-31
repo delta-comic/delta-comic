@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, vi } from 'vitest'
 
 type Listener = () => void
 

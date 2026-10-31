@@ -1,6 +1,6 @@
 import { Logger } from '@delta-comic/shared-core-logger'
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { isProxy } from 'vue'
 
 await vi.hoisted(async () => {

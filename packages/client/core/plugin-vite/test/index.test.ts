@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 import type { PluginArchiveDB } from '@delta-comic/client-data-db'
 import JSZip from 'jszip'
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 
 import { deltaComic } from '../lib/plugin'
 

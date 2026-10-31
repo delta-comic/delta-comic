@@ -7,7 +7,7 @@ description: Create backend with ElysiaJS, a type-safe, high-performance framewo
 
 ## Delta Comic repository
 
-Apply [AGENTS.md](../../../AGENTS.md): dependency versions in root `pnpm-workspace.yaml`, package references via `catalog:`, installation with `vp install`, and scripts through `vp run`. Import test APIs from `vite-plus/test` and run `vp test run` after `vp run lib-build`. The Worker entry is `packages/server/core/server/app/index.ts`; use installed Elysia/Eden types and existing route tests to verify upgraded APIs.
+Apply [AGENTS.md](../../../AGENTS.md): dependency versions in root `pnpm-workspace.yaml`, package references via `catalog:`, installation with `vp install`, and scripts through `vp run`. Import test APIs from `vitest` and run `vp test run` after `vp run build:packages`. The Worker entry is `packages/server/core/server/app/index.ts`; use installed Elysia/Eden types and existing route tests to verify upgraded APIs.
 
 Always consult [elysiajs.com/llms.txt](https://elysiajs.com/llms.txt) for code examples and latest API.
 

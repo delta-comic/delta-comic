@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 await vi.hoisted(async () => {
   const vueRuntimePath = '../../../../node_modules/vue/dist/vue.esm-bundler.js'

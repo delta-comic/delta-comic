@@ -1,5 +1,5 @@
 import { flushPromises, mount, shallowMount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick } from 'vue'
 // cspell:ignore borderless
 

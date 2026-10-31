@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createLogger, formatLogEntry, installGlobalLogger, Logger } from '../../lib/logger'
 import type { LogEntry, LoggerTransport } from '../../lib/types'

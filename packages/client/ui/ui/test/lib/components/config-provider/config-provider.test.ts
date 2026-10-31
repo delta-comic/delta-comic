@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { useThemeVars } from 'naive-ui'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
 
 import { useDcConfig } from '../../../../lib/components/config-provider/context'

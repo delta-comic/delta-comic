@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 
 import { createPluginArtifactUploadHandler } from '../../lib/catalogArtifactHandler'
 import { createR2PluginArtifactStore } from '../../lib/catalogArtifacts'

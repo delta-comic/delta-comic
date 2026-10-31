@@ -1,6 +1,6 @@
 import { Logger } from '@delta-comic/shared-core-logger'
 import { flushPromises, mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 
 import DcEnvironment from '../../../lib/environment/DcEnvironment.vue'

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 
 import { resolveDestinationId } from '../../../../lib/features/downloads/destination'
 import type { Destination } from '../../../../lib/features/downloads/downloaderClient'

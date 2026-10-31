@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { pathToFileURL } from 'node:url'
 
+import type { ReleaseCliConfig } from './config.mts'
 import { assertVersion, rootDir } from './set-version.mts'
 
 const stableBuild = 65_535
@@ -41,8 +41,15 @@ export function toWindowsMsiVersion(version: string) {
   return `${core.join('.')}.${build}`
 }
 
-export async function writeWindowsMsiConfig(version: string, cwd = rootDir) {
-  const target = join(cwd, 'packages/client/app/desktop/src-tauri/tauri.windows.conf.json')
+export async function writeWindowsMsiConfig(
+  version: string,
+  cwd = rootDir,
+  configuredPath?: ReleaseCliConfig['msiConfigPath'],
+) {
+  if (!configuredPath) {
+    throw new Error('msiConfigPath is required in .release-cli.config.ts')
+  }
+  const target = join(cwd, configuredPath)
   await mkdir(join(target, '..'), { recursive: true })
   await writeFile(
     target,
@@ -53,11 +60,4 @@ export async function writeWindowsMsiConfig(version: string, cwd = rootDir) {
     )}\n`,
   )
   return target
-}
-
-const isCli = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href
-if (isCli) {
-  const version = process.argv[2]
-  if (!version) throw new Error('Usage: node ./script/windows-msi-version.mts <version>')
-  await writeWindowsMsiConfig(version)
 }

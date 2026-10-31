@@ -1,5 +1,5 @@
 import { mockIPC } from '@tauri-apps/api/mocks'
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 
 import { CORSFetch, GLOBAL_INSTANCE_KEY } from './index'
 

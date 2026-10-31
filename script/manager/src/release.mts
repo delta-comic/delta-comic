@@ -1,5 +1,4 @@
 import { spawn } from 'node:child_process'
-import { pathToFileURL } from 'node:url'
 
 import { ReleaseEnvironment, type ReleasePreparation } from './release-environment.mts'
 import { rootDir } from './set-version.mts'
@@ -11,13 +10,9 @@ interface PreparedReleaseEnvironment {
   prepare(): Promise<ReleasePreparation>
 }
 
-async function runSemanticRelease(args: string[], env: NodeJS.ProcessEnv) {
+export async function runSemanticRelease(args: string[], env: NodeJS.ProcessEnv, cwd = rootDir) {
   await new Promise<void>((resolve, reject) => {
-    const child = spawn('vp', ['exec', 'semantic-release', ...args], {
-      cwd: rootDir,
-      env,
-      stdio: 'inherit',
-    })
+    const child = spawn('vp', ['exec', 'semantic-release', ...args], { cwd, env, stdio: 'inherit' })
     child.on('error', reject)
     child.on('close', status => {
       if (status === 0) resolve()
@@ -47,9 +42,4 @@ export async function executeRelease(
     await environment.cleanup(preparation.ephemeralTag)
   }
   return true
-}
-
-const isCli = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href
-if (isCli) {
-  await executeRelease(process.argv.slice(2))
 }

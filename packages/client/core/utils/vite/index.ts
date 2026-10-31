@@ -145,19 +145,19 @@ const transformSharedRuntimeImports = async (
   let output: MagicString | undefined
 
   for (const imported of imports) {
-    if (!imported.n) continue
-    const externalPath = libraries[imported.n]
+    if (!imported.specifier) continue
+    const externalPath = libraries[imported.specifier]
     if (!externalPath) continue
 
     output ??= new MagicString(code)
-    if (imported.d >= 0) {
-      output.overwrite(imported.ss, imported.se, `Promise.resolve(${externalPath})`)
+    if (imported.type === 'dynamic') {
+      output.overwrite(imported.importStart, imported.importEnd, `Promise.resolve(${externalPath})`)
       continue
     }
 
-    const raw = code.slice(imported.ss, imported.se)
+    const raw = code.slice(imported.importStart, imported.importEnd)
     const replacement = transformStaticImport(raw, externalPath, message => context.error(message))
-    output.overwrite(imported.ss, imported.se, replacement)
+    output.overwrite(imported.importStart, imported.importEnd, replacement)
   }
 
   if (!output && !prefix) return

@@ -1,5 +1,5 @@
 - Install dependencies after dependency changes: `vp install`; CI uses `vp install --frozen-lockfile`.
-- Build shared libraries before Web checks/tests: `vp run lib-build`.
+- Build shared libraries before Web checks/tests: `vp run build:packages`.
 - Web dev: `vp run --filter app dev:web`; Tauri dev: `vp run --filter app dev` (Tauri requires port 5173).
 - Server local setup: `vp run --filter @delta-comic/server migrate:local`, then the package dev command.
 - Checks: `vp check`; workspace typecheck: `vp run -r typecheck`; tests: `vp test run`; one test file: `vp test run packages/client/app/app/test/src/path/file.test.ts`; focused test: append `-t 'test name'`.

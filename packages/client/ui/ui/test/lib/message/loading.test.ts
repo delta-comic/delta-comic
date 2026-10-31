@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick, shallowRef } from 'vue'
 
 import { createLoadingMessage } from '../../../lib/message/loading'

@@ -1,6 +1,6 @@
 import { configureCoreHost } from '@delta-comic/client-app-core'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, Suspense } from 'vue'
 import type { SetupContext } from 'vue'
 

@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick, type VNode } from 'vue'
 
 vi.mock('@delta-comic/client-core-utils', () => ({ useGlobalVar: (value: unknown) => value }))

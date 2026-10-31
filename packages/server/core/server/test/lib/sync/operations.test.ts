@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createSyncOperation, createSyncSnapshotRequest } from '../../../lib/sync/operations'
 

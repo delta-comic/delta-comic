@@ -226,7 +226,7 @@ Context 内收集；宿主观测与归档回放使用管理 API。
 串行验收顺序：
 
 ```sh
-vp run lib-build
+vp run build:packages
 vp check
 vp run -r typecheck
 vp test run

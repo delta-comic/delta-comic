@@ -49,7 +49,7 @@ D1 查询数包含流程安装读取和执行记录写入；认证另有 3 条�
 
 ## 最终检查
 
-IndexedDB 文件删除修正后的最终串行验收于 19:14 完成，全部通过：`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`（155 files / 833 tests）、`vp run codegen:check`、`git diff --check`。
+IndexedDB 文件删除修正后的最终串行验收于 19:14 完成，全部通过：`vp run build:packages`、`vp check`、`vp run -r typecheck`、`vp test run`（155 files / 833 tests）、`vp run codegen:check`、`git diff --check`。
 
 Rust `cargo fmt --all --check`、全工作区 clippy（含 all-targets、locked、-D warnings）及工作区测试通过，共 132 单元测试；1 个既有文档示例跳过。
 
