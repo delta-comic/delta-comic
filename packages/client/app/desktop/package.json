@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/client-app-desktop",
-  "version": "3.0.0-next.23",
+  "version": "3.0.0-next.24",
   "private": true,
   "description": "阿赖耶识",
   "dependencies": {

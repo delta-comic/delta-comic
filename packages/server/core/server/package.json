@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/server",
-  "version": "3.0.0-next.23",
+  "version": "3.0.0-next.24",
   "description": "南天门直梯",
   "files": [
     "dist"
