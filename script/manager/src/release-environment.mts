@@ -17,23 +17,22 @@ export interface GitResult {
 
 export type GitRunner = (args: string[], options?: { allowFailure?: boolean }) => Promise<GitResult>
 
-async function runGit(
-  args: string[],
-  options: { allowFailure?: boolean } = {},
-): Promise<GitResult> {
-  try {
-    const result = await execFileAsync('git', args, { cwd: rootDir, encoding: 'utf-8' })
-    return { status: 0, stderr: result.stderr, stdout: result.stdout }
-  } catch (error) {
-    const result = {
-      status: typeof error === 'object' && error && 'code' in error ? Number(error.code) : 1,
-      stderr:
-        typeof error === 'object' && error && 'stderr' in error ? String(error.stderr ?? '') : '',
-      stdout:
-        typeof error === 'object' && error && 'stdout' in error ? String(error.stdout ?? '') : '',
+export function createGitRunner(cwd = rootDir): GitRunner {
+  return async (args, options = {}) => {
+    try {
+      const result = await execFileAsync('git', args, { cwd, encoding: 'utf-8' })
+      return { status: 0, stderr: result.stderr, stdout: result.stdout }
+    } catch (error) {
+      const result = {
+        status: typeof error === 'object' && error && 'code' in error ? Number(error.code) : 1,
+        stderr:
+          typeof error === 'object' && error && 'stderr' in error ? String(error.stderr ?? '') : '',
+        stdout:
+          typeof error === 'object' && error && 'stdout' in error ? String(error.stdout ?? '') : '',
+      }
+      if (options.allowFailure) return result
+      throw error
     }
-    if (options.allowFailure) return result
-    throw error
   }
 }
 
@@ -68,6 +67,7 @@ export interface ReleasePreparation {
 }
 
 interface ReleaseEnvironmentOptions {
+  cwd?: string
   env?: NodeJS.ProcessEnv
   git?: GitRunner
   writeOutput?: (path: string, contents: string) => Promise<void>
@@ -80,7 +80,8 @@ export class ReleaseEnvironment {
 
   constructor({
     env = process.env,
-    git = runGit,
+    cwd = rootDir,
+    git = createGitRunner(cwd),
     writeOutput = async (path, contents) => appendFile(path, contents, { encoding: 'utf-8' }),
   }: ReleaseEnvironmentOptions = {}) {
     this.env = env
@@ -175,7 +176,10 @@ export class ReleaseEnvironment {
   }
 }
 
-export async function removeEphemeralReleaseTag(env: NodeJS.ProcessEnv, git: GitRunner = runGit) {
+export async function removeEphemeralReleaseTag(
+  env: NodeJS.ProcessEnv,
+  git: GitRunner = createGitRunner(),
+) {
   const tag = env.DELTA_RELEASE_EPHEMERAL_TAG
   if (!tag) return
   if (tag !== withdrawnRelease.version) {

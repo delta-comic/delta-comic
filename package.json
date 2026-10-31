@@ -22,6 +22,7 @@
   "devDependencies": {
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
+    "@delta-comic/release-cli": "workspace:*",
     "@semantic-release/changelog": "catalog:",
     "@semantic-release/release-notes-generator": "catalog:",
     "@vue/test-utils": "catalog:",

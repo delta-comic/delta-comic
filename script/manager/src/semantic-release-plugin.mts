@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process'
 import { appendFile, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
+import { loadReleaseCliConfig } from './config.mts'
 import { removeEphemeralReleaseTag } from './release-environment.mts'
 import { prereleaseWarning } from './release-notes.mts'
 import {
@@ -9,7 +10,7 @@ import {
   type PublishableWorkspacePackage,
   ReleaseWorkspace,
 } from './release-workspace.mts'
-import { assertVersion, rootDir, setVersion, versionAssetPaths } from './set-version.mts'
+import { assertVersion, rootDir, VersionSynchronizer, versionAssetPaths } from './set-version.mts'
 
 interface ReleaseContext {
   branch?: { name: string }
@@ -33,6 +34,10 @@ async function runCommand(command: string, args: string[]) {
       else reject(new Error(`Command failed (${status ?? 1}): ${command} ${args.join(' ')}`))
     })
   })
+}
+
+async function projectConfig() {
+  return loadReleaseCliConfig(rootDir)
 }
 
 async function runCommandStatus(command: string, args: string[]) {
@@ -91,10 +96,14 @@ export function resolveDistTag(channel?: string | null) {
 export function createReleasePlugin({
   cleanPendingRelease = removePendingChangelogRelease,
   commitPreparedRelease = commitRelease,
-  resolvePublishablePackages = () => new ReleaseWorkspace().publishablePackages(),
+  resolvePublishablePackages = async () =>
+    new ReleaseWorkspace(rootDir, (await projectConfig()).workspace).publishablePackages(),
   removeEphemeralTag = removeEphemeralReleaseTag,
   publishCommand = runCommand,
-  synchronizeVersion = setVersion,
+  synchronizeVersion = async (version: string) => {
+    const config = await projectConfig()
+    await new VersionSynchronizer(rootDir, config).setVersion(version)
+  },
   writeOutput = async (path, contents) => appendFile(path, contents, { encoding: 'utf-8' }),
 }: ReleasePluginDependencies = {}) {
   return {
@@ -103,8 +112,16 @@ export function createReleasePlugin({
         throw new Error('GITHUB_TOKEN is required to publish workspace packages')
       }
       const packages = await resolvePublishablePackages()
+      const config = await projectConfig()
       for (const pkg of packages) {
-        await publishCommand('vp', ['run', '--filter', pkg.name, '--fail-if-no-match', 'build'])
+        if (config.buildCommand) {
+          await publishCommand(config.buildCommand.command, [
+            ...(config.buildCommand.args ?? []),
+            pkg.name,
+          ])
+        } else {
+          await publishCommand('vp', ['run', '--filter', pkg.name, '--fail-if-no-match', 'build'])
+        }
       }
     },
 
@@ -133,20 +150,37 @@ export function createReleasePlugin({
       const distTag = resolveDistTag(nextRelease.channel)
       const packages = await resolvePublishablePackages()
       assertWorkspaceVersion(packages, nextRelease.version)
+      const config = await projectConfig()
       for (const pkg of packages) {
-        await publishCommand('vp', ['run', '--filter', pkg.name, '--fail-if-no-match', 'build'])
+        if (config.buildCommand) {
+          await publishCommand(config.buildCommand.command, [
+            ...(config.buildCommand.args ?? []),
+            pkg.name,
+          ])
+        } else {
+          await publishCommand('vp', ['run', '--filter', pkg.name, '--fail-if-no-match', 'build'])
+        }
       }
-      await publishCommand('vp', [
-        'pm',
-        'publish',
-        '-r',
-        '--no-git-checks',
-        '--tag',
-        distTag,
-        '--',
-        '--registry=https://npm.pkg.github.com/',
-        '--config.@delta-comic:registry=https://npm.pkg.github.com/',
-      ])
+      if (config.publishCommand) {
+        await publishCommand(config.publishCommand.command, [
+          ...(config.publishCommand.args ?? []),
+          '--tag',
+          distTag,
+        ])
+      } else {
+        const registry = config.registry ?? 'https://npm.pkg.github.com/'
+        await publishCommand('vp', [
+          'pm',
+          'publish',
+          '-r',
+          '--no-git-checks',
+          '--tag',
+          distTag,
+          '--',
+          `--registry=${registry}`,
+          `--config.@delta-comic:registry=${registry}`,
+        ])
+      }
     },
 
     async success(_pluginConfig: unknown, { branch, nextRelease }: ReleaseContext) {

@@ -1,6 +1,6 @@
 packages:
   - packages/*/*/*
-  - script/*
+  - script/manager
 
 allowBuilds:
   '@swc/core': true
@@ -10,6 +10,7 @@ allowBuilds:
   workerd: true
 
 catalog:
+  commander: ^15.0.0
   '@semantic-release/changelog': ^6.0.3
   '@semantic-release/release-notes-generator': ^14.1.1
   semantic-release: ^25.0.7

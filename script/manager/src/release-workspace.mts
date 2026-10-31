@@ -1,6 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 
+import type { ReleaseCliConfig } from './config.mts'
 import { rootDir } from './set-version.mts'
 
 type DependencyBlock = Record<string, string>
@@ -81,18 +82,22 @@ function sortByWorkspaceDependencies(packages: PublishableWorkspacePackage[]) {
 
 export class ReleaseWorkspace {
   private readonly cwd: string
+  private readonly roots: readonly string[]
 
-  constructor(cwd = rootDir) {
+  constructor(cwd = rootDir, config: ReleaseCliConfig['workspace'] = {}) {
     this.cwd = cwd
+    this.roots = config?.roots?.length ? config.roots : ['packages']
   }
 
   private async loadPackages() {
-    const packagesDir = join(this.cwd, 'packages')
     const packages: LoadedWorkspacePackage[] = []
 
-    for (const manifestPath of await findPackageManifests(packagesDir)) {
-      const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as WorkspaceManifest
-      packages.push({ manifest, path: relative(this.cwd, manifestPath) })
+    for (const root of this.roots) {
+      const packagesDir = join(this.cwd, root)
+      for (const manifestPath of await findPackageManifests(packagesDir)) {
+        const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as WorkspaceManifest
+        packages.push({ manifest, path: relative(this.cwd, manifestPath) })
+      }
     }
 
     return packages

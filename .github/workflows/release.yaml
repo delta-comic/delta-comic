@@ -51,6 +51,9 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
+      - name: Build release CLI
+        run: vp run --filter @delta-comic/release-cli build
+
       - name: Build workspace libraries
         run: vp run build:packages
 
@@ -60,11 +63,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DELTA_RELEASE_RECOVERY: ${{ inputs.recover_withdrawn_2x && 'withdrawn-2x' || '' }}
-        run: vp run --no-cache release:dry-run
+        run: vp exec dr release plan
 
       - name: Synchronize release build version
         if: steps.release-plan.outputs.has-release == 'true'
-        run: node ./script/set-version.mts "${{ steps.release-plan.outputs.version }}"
+        run: vp exec dr version sync "${{ steps.release-plan.outputs.version }}"
 
       - name: Build release workspace libraries
         if: steps.release-plan.outputs.has-release == 'true'
@@ -133,8 +136,11 @@ jobs:
       - name: Setup pnpm for Android Tauri lifecycle
         uses: pnpm/action-setup@v4
 
+      - name: Build release CLI
+        run: vp run --filter @delta-comic/release-cli build
+
       - name: Synchronize build version
-        run: node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
+        run: vp exec dr version sync "${{ needs.plan.outputs.version }}"
 
       - name: Download workspace libraries
         uses: actions/download-artifact@v7
@@ -282,12 +288,15 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
+      - name: Build release CLI
+        run: vp run --filter @delta-comic/release-cli build
+
       - name: Synchronize build version
-        run: node ./script/set-version.mts "${{ needs.plan.outputs.version }}"
+        run: vp exec dr version sync "${{ needs.plan.outputs.version }}"
 
       - name: Configure Windows MSI version
         if: matrix.platform == 'windows-latest'
-        run: node ./script/windows-msi-version.mts "${{ needs.plan.outputs.version }}"
+        run: vp exec dr version msi "${{ needs.plan.outputs.version }}"
 
       - name: Download workspace libraries
         uses: actions/download-artifact@v7
@@ -339,6 +348,9 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
+      - name: Build release CLI
+        run: vp run --filter @delta-comic/release-cli build
+
       - name: Download release artifacts
         uses: actions/download-artifact@v7
         with:
@@ -364,4 +376,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
           DELTA_RELEASE_RECOVERY: ${{ inputs.recover_withdrawn_2x && 'withdrawn-2x' || '' }}
-        run: vp run --no-cache release
+        run: vp exec dr release run

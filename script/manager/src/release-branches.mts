@@ -1,5 +1,4 @@
 import { execFile } from 'node:child_process'
-import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
 
 import { rootDir } from './set-version.mts'
@@ -15,13 +14,26 @@ export interface GitResult {
 
 export type GitRunner = (args: string[], options?: { allowFailure?: boolean }) => Promise<GitResult>
 
+export function createGitRunner(cwd = rootDir): GitRunner {
+  return async (args, options = {}) => {
+    try {
+      const result = await execFileAsync('git', args, { cwd, encoding: 'utf-8' })
+      return { status: 0, stdout: result.stdout }
+    } catch (error) {
+      const status = typeof error === 'object' && error && 'code' in error ? Number(error.code) : 1
+      if (options.allowFailure) return { status, stdout: '' }
+      throw error
+    }
+  }
+}
+
 export interface ReleaseBranchOptions {
   action: ReleaseBranchAction
   dryRun: boolean
   help: boolean
 }
 
-export const releaseBranchUsage = `Usage: node ./script/release-branches.mts <action> [--dry-run]
+export const releaseBranchUsage = `Usage: dr branch prepare|promote <action> [--dry-run]
 
 Actions:
   develop  Switch to develop, creating it or merging stable main back into it
@@ -36,20 +48,6 @@ const promotionBranches = {
   preview: { source: 'develop', target: 'next' },
   stable: { source: 'next', target: 'main' },
 } as const
-
-async function runGit(
-  args: string[],
-  options: { allowFailure?: boolean } = {},
-): Promise<GitResult> {
-  try {
-    const result = await execFileAsync('git', args, { cwd: rootDir, encoding: 'utf-8' })
-    return { status: 0, stdout: result.stdout }
-  } catch (error) {
-    const status = typeof error === 'object' && error && 'code' in error ? Number(error.code) : 1
-    if (options.allowFailure) return { status, stdout: '' }
-    throw error
-  }
-}
 
 export function parseReleaseBranchArgs(args: string[]): ReleaseBranchOptions {
   if (args.includes('--help') || args.includes('-h')) {
@@ -96,8 +94,8 @@ export function describeReleaseBranchAction(action: ReleaseBranchAction) {
 export class ReleaseBranchManager {
   private readonly git: GitRunner
 
-  constructor(git: GitRunner = runGit) {
-    this.git = git
+  constructor(git?: GitRunner, cwd = rootDir) {
+    this.git = git ?? createGitRunner(cwd)
   }
 
   private async branchExists(ref: string) {
@@ -194,22 +192,5 @@ export class ReleaseBranchManager {
   async execute(action: ReleaseBranchAction) {
     if (action === 'develop') await this.prepareDevelop()
     else await this.promote(action)
-  }
-}
-
-const isCli = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href
-if (isCli) {
-  try {
-    const options = parseReleaseBranchArgs(process.argv.slice(2))
-    if (options.help) console.log(releaseBranchUsage)
-    else if (options.dryRun) console.log(describeReleaseBranchAction(options.action))
-    else {
-      await new ReleaseBranchManager().execute(options.action)
-      console.log(`Release branch action completed: ${options.action}`)
-    }
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    console.error(`\n${releaseBranchUsage}`)
-    process.exitCode = 1
   }
 }

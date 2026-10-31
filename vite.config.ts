@@ -25,21 +25,44 @@ export default defineConfig({
       // build
       'build:packages': { command: 'vp run -r build', cache: { output: [] } },
       // release
-      'branch:develop': { command: 'node ./script/release-branches.mts develop', cache: false },
+      'release-cli': {
+        command: 'vp run --filter @delta-comic/release-cli build',
+        cache: { output: ['script/manager/dist/**'] },
+      },
+      'branch:develop': {
+        command: 'vp exec dr branch prepare develop',
+        dependsOn: ['release-cli'],
+        cache: false,
+      },
       'branch:develop:dry-run': {
-        command: 'node ./script/release-branches.mts develop --dry-run',
+        command: 'vp exec dr branch prepare develop --dry-run',
+        dependsOn: ['release-cli'],
         cache: false,
       },
-      'release': { command: 'node ./script/release.mts', cache: false },
-      'release:dry-run': { command: 'node ./script/release.mts --dry-run', cache: false },
-      'release:preview': { command: 'node ./script/release-branches.mts preview', cache: false },
+      'release': { command: 'vp exec dr release run', dependsOn: ['release-cli'], cache: false },
+      'release:dry-run': {
+        command: 'vp exec dr release plan',
+        dependsOn: ['release-cli'],
+        cache: false,
+      },
+      'release:preview': {
+        command: 'vp exec dr branch promote preview',
+        dependsOn: ['release-cli'],
+        cache: false,
+      },
       'release:preview:dry-run': {
-        command: 'node ./script/release-branches.mts preview --dry-run',
+        command: 'vp exec dr branch promote preview --dry-run',
+        dependsOn: ['release-cli'],
         cache: false,
       },
-      'release:stable': { command: 'node ./script/release-branches.mts stable', cache: false },
+      'release:stable': {
+        command: 'vp exec dr branch promote stable',
+        dependsOn: ['release-cli'],
+        cache: false,
+      },
       'release:stable:dry-run': {
-        command: 'node ./script/release-branches.mts stable --dry-run',
+        command: 'vp exec dr branch promote stable --dry-run',
+        dependsOn: ['release-cli'],
         cache: false,
       },
       // linter
@@ -69,7 +92,13 @@ export default defineConfig({
     unstubGlobals: true,
     exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
     projects: [
-      { test: { name: 'root', environment: 'node', include: ['script/test/**/*.test.ts'] } },
+      {
+        test: {
+          name: 'root',
+          environment: 'node',
+          include: ['script/test/**/*.test.ts', 'script/manager/test/**/*.test.ts'],
+        },
+      },
       'packages/shared/core/both',
       'packages/client/core/plugin-artifact',
       'packages/client/core/plugin-install',
