@@ -1,131 +1,22 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex, PoisonError};
 
-#[cfg(any(
-  test,
-  target_os = "macos",
-  target_os = "windows",
-  target_os = "android"
-))]
-use keyring_core::{CredentialStore, api::CredentialStoreApi};
-#[cfg(any(
-  test,
-  target_os = "macos",
-  target_os = "windows",
-  target_os = "android"
-))]
-use std::sync::Mutex;
+use keyring_core::{CredentialStore, Entry, api::CredentialStoreApi};
 use uuid::Uuid;
 
 use crate::{Error, Result, SecretResolver};
 
 const CREDENTIAL_PREFIX: &str = "credential:";
-#[cfg(any(
-  test,
-  target_os = "macos",
-  target_os = "windows",
-  target_os = "android"
-))]
 const CREDENTIAL_SERVICE: &str = "org.wenxig.delta-comic.downloader";
 // Windows Credential Manager limits generic credential blobs to 2560 bytes. Keeping a small
 // margin gives every supported platform the same predictable contract.
 const MAX_SECRET_BYTES: usize = 2400;
 
-trait CredentialBackend: Send + Sync + 'static {
-  fn set(&self, id: &str, value: &str) -> Result<()>;
-  fn get(&self, id: &str) -> Result<Option<String>>;
-  fn delete(&self, id: &str) -> Result<()>;
-}
-
-#[cfg(any(
-  test,
-  target_os = "macos",
-  target_os = "windows",
-  target_os = "android"
-))]
-struct KeyringBackend {
-  store: Arc<CredentialStore>,
-  // Some native stores do not reliably order operations on the same entry across threads.
-  gate: Mutex<()>,
-}
-
-#[cfg(any(
-  test,
-  target_os = "macos",
-  target_os = "windows",
-  target_os = "android"
-))]
-impl KeyringBackend {
-  fn entry(&self, id: &str) -> Result<keyring_core::Entry> {
-    self
-      .store
-      .build(CREDENTIAL_SERVICE, id, None)
-      .map_err(|_| credential_error("open an entry"))
-  }
-}
-
-#[cfg(any(
-  test,
-  target_os = "macos",
-  target_os = "windows",
-  target_os = "android"
-))]
-impl CredentialBackend for KeyringBackend {
-  fn set(&self, id: &str, value: &str) -> Result<()> {
-    let _guard = self
-      .gate
-      .lock()
-      .unwrap_or_else(std::sync::PoisonError::into_inner);
-    self
-      .entry(id)?
-      .set_password(value)
-      .map_err(|_| credential_error("store a secret"))
-  }
-
-  fn get(&self, id: &str) -> Result<Option<String>> {
-    let _guard = self
-      .gate
-      .lock()
-      .unwrap_or_else(std::sync::PoisonError::into_inner);
-    match self.entry(id)?.get_password() {
-      Ok(value) => Ok(Some(value)),
-      Err(keyring_core::Error::NoEntry) => Ok(None),
-      Err(_) => Err(credential_error("read a secret")),
-    }
-  }
-
-  fn delete(&self, id: &str) -> Result<()> {
-    let _guard = self
-      .gate
-      .lock()
-      .unwrap_or_else(std::sync::PoisonError::into_inner);
-    match self.entry(id)?.delete_credential() {
-      Ok(()) | Err(keyring_core::Error::NoEntry) => Ok(()),
-      Err(_) => Err(credential_error("delete a secret")),
-    }
-  }
-}
-
-#[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "android")))]
-struct UnsupportedBackend;
-
-#[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "android")))]
-impl CredentialBackend for UnsupportedBackend {
-  fn set(&self, _id: &str, _value: &str) -> Result<()> {
-    Err(credential_error("store a secret on this platform"))
-  }
-
-  fn get(&self, _id: &str) -> Result<Option<String>> {
-    Err(credential_error("read a secret on this platform"))
-  }
-
-  fn delete(&self, _id: &str) -> Result<()> {
-    Err(credential_error("delete a secret on this platform"))
-  }
-}
-
 #[derive(Clone)]
 pub(crate) struct CredentialVault {
-  backend: Arc<dyn CredentialBackend>,
+  /// `None` on platforms without a supported native credential store.
+  store: Option<Arc<CredentialStore>>,
+  // Some native stores do not reliably order operations on the same entry across threads.
+  gate: Arc<Mutex<()>>,
 }
 
 impl std::fmt::Debug for CredentialVault {
@@ -158,28 +49,38 @@ impl CredentialVault {
     #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "android")))]
     {
       Ok(Self {
-        backend: Arc::new(UnsupportedBackend),
+        store: None,
+        gate: Arc::default(),
       })
     }
   }
 
-  #[cfg(any(
-    test,
-    target_os = "macos",
-    target_os = "windows",
-    target_os = "android"
-  ))]
+  #[cfg_attr(
+    not(any(
+      test,
+      target_os = "macos",
+      target_os = "windows",
+      target_os = "android"
+    )),
+    allow(dead_code)
+  )]
   fn from_keyring_store<S>(store: Arc<S>) -> Self
   where
     S: CredentialStoreApi + Send + Sync + 'static,
   {
-    let store: Arc<CredentialStore> = store;
     Self {
-      backend: Arc::new(KeyringBackend {
-        store,
-        gate: Mutex::new(()),
-      }),
+      store: Some(store),
+      gate: Arc::default(),
     }
+  }
+
+  fn entry(&self, id: &str, operation: &str) -> Result<Entry> {
+    self
+      .store
+      .as_ref()
+      .ok_or_else(|| credential_error(&format!("{operation} on this platform")))?
+      .build(CREDENTIAL_SERVICE, id, None)
+      .map_err(|_| credential_error("open an entry"))
   }
 
   pub(crate) fn store(&self, value: &str) -> Result<String> {
@@ -192,18 +93,33 @@ impl CredentialVault {
       )));
     }
     let id = Uuid::new_v4().to_string();
-    self.backend.set(&id, value)?;
+    let entry = self.entry(&id, "store a secret")?;
+    let _guard = self.gate.lock().unwrap_or_else(PoisonError::into_inner);
+    entry
+      .set_password(value)
+      .map_err(|_| credential_error("store a secret"))?;
     Ok(format!("{CREDENTIAL_PREFIX}{id}"))
   }
 
   pub(crate) fn delete(&self, secret_ref: &str) -> Result<()> {
-    self.backend.delete(&credential_id(secret_ref)?)
+    let entry = self.entry(&credential_id(secret_ref)?, "delete a secret")?;
+    let _guard = self.gate.lock().unwrap_or_else(PoisonError::into_inner);
+    match entry.delete_credential() {
+      Ok(()) | Err(keyring_core::Error::NoEntry) => Ok(()),
+      Err(_) => Err(credential_error("delete a secret")),
+    }
   }
 }
 
 impl SecretResolver for CredentialVault {
   fn resolve(&self, secret_ref: &str) -> Result<Option<String>> {
-    self.backend.get(&credential_id(secret_ref)?)
+    let entry = self.entry(&credential_id(secret_ref)?, "read a secret")?;
+    let _guard = self.gate.lock().unwrap_or_else(PoisonError::into_inner);
+    match entry.get_password() {
+      Ok(value) => Ok(Some(value)),
+      Err(keyring_core::Error::NoEntry) => Ok(None),
+      Err(_) => Err(credential_error("read a secret")),
+    }
   }
 }
 

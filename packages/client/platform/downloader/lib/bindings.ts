@@ -204,9 +204,9 @@ export type TorrentTaskDetail = {
 	peerCount: number,
 	seedStartedAt: number | null,
 };
-const ARGS_MAP = {"downloader":{"attention":["event"],"cancel_task":["id"],"delete_secret":["secret_ref"],"delete_task_files":["id"],"download_ephemeral":["url","headers","secret_ref","max_bytes"],"enqueue_plan":["input"],"enqueue_torrent":["input"],"enqueue_url":["input"],"forget_task":["id"],"get_capabilities":[],"get_collections":[],"get_settings":[],"get_task":["id"],"get_task_detail":["id"],"list_destinations":[],"list_tasks":[],"move_queue":["id","before_task_id"],"pause_task":["id"],"pick_destination":[],"resume_task":["id"],"retry_task":["id"],"set_priority":["id","priority"],"store_secret":["value"],"task_removed":["event"],"task_upsert":["event"],"update_settings":["settings"],"update_source":["id","source"]}};
+const ARGS_MAP = {"downloader":{"attention":["event"],"cancel_task":["id"],"delete_secret":["secret_ref"],"delete_task_files":["id"],"download_ephemeral":["url","headers","secret_ref","max_bytes"],"enqueue_plan":["input"],"enqueue_torrent":["input"],"enqueue_url":["input"],"forget_task":["id"],"get_capabilities":[],"get_collections":[],"get_settings":[],"get_task_detail":["id"],"list_destinations":[],"list_tasks":[],"move_queue":["id","before_task_id"],"pause_task":["id"],"pick_destination":[],"resume_task":["id"],"retry_task":["id"],"set_priority":["id","priority"],"store_secret":["value"],"task_removed":["event"],"task_upsert":["event"],"update_settings":["settings"],"update_source":["id","source"]}};
 
-const RESULT_MAP = {"downloader":{"attention":false,"cancel_task":true,"delete_secret":true,"delete_task_files":true,"download_ephemeral":true,"enqueue_plan":true,"enqueue_torrent":true,"enqueue_url":true,"forget_task":true,"get_capabilities":true,"get_collections":true,"get_settings":true,"get_task":true,"get_task_detail":true,"list_destinations":true,"list_tasks":true,"move_queue":true,"pause_task":true,"pick_destination":true,"resume_task":true,"retry_task":true,"set_priority":true,"store_secret":true,"task_removed":false,"task_upsert":false,"update_settings":true,"update_source":true}};
+const RESULT_MAP = {"downloader":{"attention":false,"cancel_task":true,"delete_secret":true,"delete_task_files":true,"download_ephemeral":true,"enqueue_plan":true,"enqueue_torrent":true,"enqueue_url":true,"forget_task":true,"get_capabilities":true,"get_collections":true,"get_settings":true,"get_task_detail":true,"list_destinations":true,"list_tasks":true,"move_queue":true,"pause_task":true,"pick_destination":true,"resume_task":true,"retry_task":true,"set_priority":true,"store_secret":true,"task_removed":false,"task_upsert":false,"update_settings":true,"update_source":true}};
 
 export type Router = {
 	downloader: {
@@ -222,32 +222,6 @@ export type Router = {
 		get_capabilities: () => Promise<DownloaderCapabilities>,
 		get_collections: () => Promise<DownloadCollection[]>,
 		get_settings: () => Promise<DownloaderSettings>,
-		get_task: (id: string) => Promise<{
-	id: string,
-	collectionKey: string | null,
-	assetKey: string | null,
-	kind: TaskKind,
-	title: string,
-	source: DownloadSource,
-	destinationId: string,
-	relativePath: string,
-	status: TaskStatus,
-	priority: number,
-	queuePosition: number,
-	totalBytes: number | null,
-	downloadedBytes: number,
-	speedBytesPerSecond: number,
-	errorCode: string | null,
-	errorMessage: string | null,
-	checksum: Checksum | null,
-	etag: string | null,
-	lastModified: string | null,
-	finalPath: string | null,
-	retryCount: number,
-	createdAt: number,
-	updatedAt: number,
-	revision: number,
-} | null>,
 		get_task_detail: (id: string) => Promise<DownloadTaskDetail>,
 		list_destinations: () => Promise<Destination_Serialize[]>,
 		list_tasks: () => Promise<DownloadTask[]>,

@@ -37,10 +37,6 @@ pub trait DownloaderApi {
   async fn list_tasks<R: tauri::Runtime>(
     #[app_handle] app_handle: tauri::AppHandle<R>,
   ) -> std::result::Result<Vec<DownloadTask>, String>;
-  async fn get_task<R: tauri::Runtime>(
-    #[app_handle] app_handle: tauri::AppHandle<R>,
-    id: String,
-  ) -> std::result::Result<Option<DownloadTask>, String>;
   async fn get_task_detail<R: tauri::Runtime>(
     #[app_handle] app_handle: tauri::AppHandle<R>,
     id: String,
@@ -127,6 +123,42 @@ pub trait DownloaderApi {
 #[derive(Clone)]
 pub(crate) struct DownloaderApiImpl;
 
+fn engine<R: tauri::Runtime>(app_handle: &tauri::AppHandle<R>) -> Engine {
+  app_handle.state::<Engine>().inner().clone()
+}
+
+fn credentials<R: tauri::Runtime>(app_handle: &tauri::AppHandle<R>) -> CredentialVault {
+  app_handle.state::<CredentialVault>().inner().clone()
+}
+
+fn ipc<T>(result: Result<T>) -> std::result::Result<T, String> {
+  result.map_err(|error| error.to_string())
+}
+
+/// Hands newly runnable tasks to the Android foreground service; a no-op elsewhere.
+#[cfg_attr(not(target_os = "android"), allow(unused_variables))]
+async fn schedule<R: tauri::Runtime>(
+  app: &tauri::AppHandle<R>,
+  engine: &Engine,
+  tasks: &[DownloadTask],
+) -> Result<()> {
+  #[cfg(target_os = "android")]
+  for task in tasks {
+    schedule_android(app, engine, task).await?;
+  }
+  Ok(())
+}
+
+async fn scheduled<R: tauri::Runtime>(
+  app: &tauri::AppHandle<R>,
+  engine: &Engine,
+  task: Result<DownloadTask>,
+) -> std::result::Result<DownloadTask, String> {
+  let task = ipc(task)?;
+  ipc(schedule(app, engine, std::slice::from_ref(&task)).await)?;
+  Ok(task)
+}
+
 #[taurpc::resolvers]
 impl DownloaderApi for DownloaderApiImpl {
   async fn store_secret<R: tauri::Runtime>(
@@ -134,9 +166,15 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     value: String,
   ) -> std::result::Result<String, String> {
-    store_secret(app_handle.state::<CredentialVault>().inner().clone(), value)
-      .await
-      .map_err(|error| error.to_string())
+    // Wrap before the first await so the IPC-owned allocation is cleared on every exit path.
+    let value = Zeroizing::new(value);
+    let credentials = credentials(&app_handle);
+    ipc(
+      tauri::async_runtime::spawn_blocking(move || credentials.store(value.as_str()))
+        .await
+        .map_err(|_| credential_worker_error())
+        .and_then(|result| result),
+    )
   }
 
   async fn delete_secret<R: tauri::Runtime>(
@@ -144,12 +182,14 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     secret_ref: String,
   ) -> std::result::Result<(), String> {
-    delete_secret(
-      app_handle.state::<CredentialVault>().inner().clone(),
-      secret_ref,
+    let secret_ref = Zeroizing::new(secret_ref);
+    let credentials = credentials(&app_handle);
+    ipc(
+      tauri::async_runtime::spawn_blocking(move || credentials.delete(secret_ref.as_str()))
+        .await
+        .map_err(|_| credential_worker_error())
+        .and_then(|result| result),
     )
-    .await
-    .map_err(|error| error.to_string())
   }
 
   async fn download_ephemeral<R: tauri::Runtime>(
@@ -160,35 +200,28 @@ impl DownloaderApi for DownloaderApiImpl {
     secret_ref: Option<String>,
     max_bytes: Option<u64>,
   ) -> std::result::Result<Vec<u8>, String> {
-    download_ephemeral(
-      app_handle.state::<Engine>().inner().clone(),
-      app_handle.state::<EphemeralRoot>().inner().clone(),
-      url,
-      headers,
-      secret_ref,
-      max_bytes,
+    let temporary_root = app_handle.state::<EphemeralRoot>();
+    ipc(
+      engine(&app_handle)
+        .download_ephemeral(
+          temporary_root.path(),
+          EphemeralDownloadRequest {
+            url,
+            headers: headers.unwrap_or_default(),
+            secret_ref,
+            max_bytes,
+          },
+          CancellationToken::new(),
+        )
+        .await,
     )
-    .await
-    .map_err(|error| error.to_string())
   }
 
   async fn list_tasks<R: tauri::Runtime>(
     self,
     app_handle: tauri::AppHandle<R>,
   ) -> std::result::Result<Vec<DownloadTask>, String> {
-    list_tasks(app_handle.state::<Engine>().inner().clone())
-      .await
-      .map_err(|error| error.to_string())
-  }
-
-  async fn get_task<R: tauri::Runtime>(
-    self,
-    app_handle: tauri::AppHandle<R>,
-    id: String,
-  ) -> std::result::Result<Option<DownloadTask>, String> {
-    get_task(app_handle.state::<Engine>().inner().clone(), id)
-      .await
-      .map_err(|error| error.to_string())
+    ipc(engine(&app_handle).repository.list_tasks().await)
   }
 
   async fn get_task_detail<R: tauri::Runtime>(
@@ -196,43 +229,35 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     id: String,
   ) -> std::result::Result<DownloadTaskDetail, String> {
-    get_task_detail(app_handle.state::<Engine>().inner().clone(), id)
-      .await
-      .map_err(|error| error.to_string())
+    ipc(get_task_detail(&engine(&app_handle), id).await)
   }
 
   async fn get_collections<R: tauri::Runtime>(
     self,
     app_handle: tauri::AppHandle<R>,
   ) -> std::result::Result<Vec<DownloadCollection>, String> {
-    get_collections(app_handle.state::<Engine>().inner().clone())
-      .await
-      .map_err(|error| error.to_string())
+    ipc(engine(&app_handle).repository.list_collections().await)
   }
 
   async fn list_destinations<R: tauri::Runtime>(
     self,
     app_handle: tauri::AppHandle<R>,
   ) -> std::result::Result<Vec<Destination>, String> {
-    list_destinations(app_handle.state::<Engine>().inner().clone())
-      .await
-      .map_err(|error| error.to_string())
+    ipc(engine(&app_handle).repository.list_destinations().await)
   }
 
   async fn get_settings<R: tauri::Runtime>(
     self,
     app_handle: tauri::AppHandle<R>,
   ) -> std::result::Result<DownloaderSettings, String> {
-    get_settings(app_handle.state::<Engine>().inner().clone())
-      .await
-      .map_err(|error| error.to_string())
+    ipc(engine(&app_handle).repository.get_settings().await)
   }
 
   async fn get_capabilities<R: tauri::Runtime>(
     self,
     _app_handle: tauri::AppHandle<R>,
   ) -> std::result::Result<DownloaderCapabilities, String> {
-    Ok(get_capabilities())
+    Ok(DownloaderCapabilities::platform())
   }
 
   async fn update_settings<R: tauri::Runtime>(
@@ -240,9 +265,7 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     settings: DownloaderSettings,
   ) -> std::result::Result<DownloaderSettings, String> {
-    update_settings(app_handle.state::<Engine>().inner().clone(), settings)
-      .await
-      .map_err(|error| error.to_string())
+    ipc(engine(&app_handle).update_settings(settings).await)
   }
 
   async fn enqueue_url<R: tauri::Runtime>(
@@ -250,12 +273,8 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     input: EnqueueUrlInput,
   ) -> std::result::Result<DownloadTask, String> {
-    let engine = app_handle.state::<Engine>().inner().clone();
-    #[cfg(target_os = "android")]
-    let result = enqueue_url(engine, app_handle, input).await;
-    #[cfg(not(target_os = "android"))]
-    let result = enqueue_url(engine, input).await;
-    result.map_err(|error| error.to_string())
+    let engine = engine(&app_handle);
+    scheduled(&app_handle, &engine, engine.enqueue_url(input).await).await
   }
 
   async fn enqueue_torrent<R: tauri::Runtime>(
@@ -263,12 +282,8 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     input: EnqueueTorrentInput,
   ) -> std::result::Result<DownloadTask, String> {
-    let engine = app_handle.state::<Engine>().inner().clone();
-    #[cfg(target_os = "android")]
-    let result = enqueue_torrent(engine, app_handle, input).await;
-    #[cfg(not(target_os = "android"))]
-    let result = enqueue_torrent(engine, input).await;
-    result.map_err(|error| error.to_string())
+    let engine = engine(&app_handle);
+    scheduled(&app_handle, &engine, engine.enqueue_torrent(input).await).await
   }
 
   async fn enqueue_plan<R: tauri::Runtime>(
@@ -276,12 +291,10 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     input: EnqueuePlanInput,
   ) -> std::result::Result<Vec<DownloadTask>, String> {
-    let engine = app_handle.state::<Engine>().inner().clone();
-    #[cfg(target_os = "android")]
-    let result = enqueue_plan(engine, app_handle, input).await;
-    #[cfg(not(target_os = "android"))]
-    let result = enqueue_plan(engine, input).await;
-    result.map_err(|error| error.to_string())
+    let engine = engine(&app_handle);
+    let tasks = ipc(engine.enqueue_plan(input).await)?;
+    ipc(schedule(&app_handle, &engine, &tasks).await)?;
+    Ok(tasks)
   }
 
   async fn pause_task<R: tauri::Runtime>(
@@ -289,9 +302,7 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     id: String,
   ) -> std::result::Result<DownloadTask, String> {
-    pause_task(app_handle.state::<Engine>().inner().clone(), id)
-      .await
-      .map_err(|error| error.to_string())
+    ipc(engine(&app_handle).pause(&id).await)
   }
 
   async fn resume_task<R: tauri::Runtime>(
@@ -299,12 +310,8 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     id: String,
   ) -> std::result::Result<DownloadTask, String> {
-    let engine = app_handle.state::<Engine>().inner().clone();
-    #[cfg(target_os = "android")]
-    let result = resume_task(engine, app_handle, id).await;
-    #[cfg(not(target_os = "android"))]
-    let result = resume_task(engine, id).await;
-    result.map_err(|error| error.to_string())
+    let engine = engine(&app_handle);
+    scheduled(&app_handle, &engine, engine.resume(&id).await).await
   }
 
   async fn retry_task<R: tauri::Runtime>(
@@ -312,12 +319,8 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     id: String,
   ) -> std::result::Result<DownloadTask, String> {
-    let engine = app_handle.state::<Engine>().inner().clone();
-    #[cfg(target_os = "android")]
-    let result = retry_task(engine, app_handle, id).await;
-    #[cfg(not(target_os = "android"))]
-    let result = retry_task(engine, id).await;
-    result.map_err(|error| error.to_string())
+    let engine = engine(&app_handle);
+    scheduled(&app_handle, &engine, engine.retry(&id).await).await
   }
 
   async fn cancel_task<R: tauri::Runtime>(
@@ -325,9 +328,7 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     id: String,
   ) -> std::result::Result<DownloadTask, String> {
-    cancel_task(app_handle.state::<Engine>().inner().clone(), id)
-      .await
-      .map_err(|error| error.to_string())
+    ipc(engine(&app_handle).cancel(&id).await)
   }
 
   async fn forget_task<R: tauri::Runtime>(
@@ -335,9 +336,7 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     id: String,
   ) -> std::result::Result<(), String> {
-    forget_task(app_handle.state::<Engine>().inner().clone(), id)
-      .await
-      .map_err(|error| error.to_string())
+    ipc(engine(&app_handle).forget(&id).await)
   }
 
   async fn delete_task_files<R: tauri::Runtime>(
@@ -345,12 +344,12 @@ impl DownloaderApi for DownloaderApiImpl {
     app_handle: tauri::AppHandle<R>,
     id: String,
   ) -> std::result::Result<(), String> {
-    let engine = app_handle.state::<Engine>().inner().clone();
+    let engine = engine(&app_handle);
     #[cfg(target_os = "android")]
     let result = delete_task_files(engine, app_handle, id).await;
     #[cfg(not(target_os = "android"))]
-    let result = delete_task_files(engine, id).await;
-    result.map_err(|error| error.to_string())
+    let result = engine.delete_files(&id).await;
+    ipc(result)
   }
 
   async fn set_priority<R: tauri::Runtime>(
@@ -359,9 +358,7 @@ impl DownloaderApi for DownloaderApiImpl {
     id: String,
     priority: u8,
   ) -> std::result::Result<DownloadTask, String> {
-    set_priority(app_handle.state::<Engine>().inner().clone(), id, priority)
-      .await
-      .map_err(|error| error.to_string())
+    ipc(engine(&app_handle).set_priority(&id, priority).await)
   }
 
   async fn move_queue<R: tauri::Runtime>(
@@ -370,22 +367,18 @@ impl DownloaderApi for DownloaderApiImpl {
     id: String,
     before_task_id: Option<String>,
   ) -> std::result::Result<DownloadTask, String> {
-    move_queue(
-      app_handle.state::<Engine>().inner().clone(),
-      id,
-      before_task_id,
+    ipc(
+      engine(&app_handle)
+        .move_queue(&id, before_task_id.as_deref())
+        .await,
     )
-    .await
-    .map_err(|error| error.to_string())
   }
 
   async fn pick_destination<R: tauri::Runtime>(
     self,
     app_handle: tauri::AppHandle<R>,
   ) -> std::result::Result<Option<Destination>, String> {
-    pick_destination(app_handle.state::<Engine>().inner().clone(), app_handle)
-      .await
-      .map_err(|error| error.to_string())
+    ipc(pick_destination(engine(&app_handle), app_handle).await)
   }
 
   async fn update_source<R: tauri::Runtime>(
@@ -394,57 +387,18 @@ impl DownloaderApi for DownloaderApiImpl {
     id: String,
     source: DownloadSource,
   ) -> std::result::Result<DownloadTask, String> {
-    let engine = app_handle.state::<Engine>().inner().clone();
-    #[cfg(target_os = "android")]
-    let result = update_source(engine, app_handle, id, source).await;
-    #[cfg(not(target_os = "android"))]
-    let result = update_source(engine, id, source).await;
-    result.map_err(|error| error.to_string())
+    let engine = engine(&app_handle);
+    scheduled(
+      &app_handle,
+      &engine,
+      engine.update_source(&id, &source).await,
+    )
+    .await
   }
 }
 
-pub(crate) async fn store_secret(credentials: CredentialVault, value: String) -> Result<String> {
-  // Wrap before the first await so the IPC-owned allocation is cleared on every exit path.
-  let value = Zeroizing::new(value);
-  let credentials = credentials.clone();
-  tauri::async_runtime::spawn_blocking(move || credentials.store(value.as_str()))
-    .await
-    .map_err(|_| {
-      crate::Error::CredentialStore("native credential worker could not complete".into())
-    })?
-}
-
-pub(crate) async fn delete_secret(credentials: CredentialVault, secret_ref: String) -> Result<()> {
-  let secret_ref = Zeroizing::new(secret_ref);
-  let credentials = credentials.clone();
-  tauri::async_runtime::spawn_blocking(move || credentials.delete(secret_ref.as_str()))
-    .await
-    .map_err(|_| {
-      crate::Error::CredentialStore("native credential worker could not complete".into())
-    })?
-}
-
-pub(crate) async fn download_ephemeral(
-  engine: Engine,
-  temporary_root: EphemeralRoot,
-  url: String,
-  headers: Option<BTreeMap<String, String>>,
-  secret_ref: Option<String>,
-  max_bytes: Option<u64>,
-) -> Result<Vec<u8>> {
-  let bytes = engine
-    .download_ephemeral(
-      temporary_root.path(),
-      EphemeralDownloadRequest {
-        url,
-        headers: headers.unwrap_or_default(),
-        secret_ref,
-        max_bytes,
-      },
-      CancellationToken::new(),
-    )
-    .await?;
-  Ok(bytes)
+fn credential_worker_error() -> crate::Error {
+  crate::Error::CredentialStore("native credential worker could not complete".into())
 }
 
 #[cfg(target_os = "android")]
@@ -472,15 +426,7 @@ async fn schedule_android<R: tauri::Runtime>(
   Ok(())
 }
 
-pub(crate) async fn list_tasks(engine: Engine) -> Result<Vec<DownloadTask>> {
-  engine.repository.list_tasks().await
-}
-
-pub(crate) async fn get_task(engine: Engine, id: String) -> Result<Option<DownloadTask>> {
-  engine.repository.get_task(&id).await
-}
-
-pub(crate) async fn get_task_detail(engine: Engine, id: String) -> Result<DownloadTaskDetail> {
+async fn get_task_detail(engine: &Engine, id: String) -> Result<DownloadTaskDetail> {
   let task = engine
     .repository
     .get_task(&id)
@@ -504,136 +450,8 @@ pub(crate) async fn get_task_detail(engine: Engine, id: String) -> Result<Downlo
   })
 }
 
-pub(crate) async fn get_collections(engine: Engine) -> Result<Vec<DownloadCollection>> {
-  engine.repository.list_collections().await
-}
-
-pub(crate) async fn list_destinations(engine: Engine) -> Result<Vec<Destination>> {
-  engine.repository.list_destinations().await
-}
-
-pub(crate) async fn get_settings(engine: Engine) -> Result<DownloaderSettings> {
-  engine.repository.get_settings().await
-}
-
-pub(crate) fn get_capabilities() -> DownloaderCapabilities {
-  DownloaderCapabilities::platform()
-}
-
-pub(crate) async fn update_settings(
-  engine: Engine,
-  settings: DownloaderSettings,
-) -> Result<DownloaderSettings> {
-  engine.update_settings(settings).await
-}
-
-#[cfg(not(target_os = "android"))]
-pub(crate) async fn enqueue_url(engine: Engine, input: EnqueueUrlInput) -> Result<DownloadTask> {
-  engine.enqueue_url(input).await
-}
-
 #[cfg(target_os = "android")]
-pub(crate) async fn enqueue_url<R: tauri::Runtime>(
-  engine: Engine,
-  app: tauri::AppHandle<R>,
-  input: EnqueueUrlInput,
-) -> Result<DownloadTask> {
-  let task = engine.enqueue_url(input).await?;
-  schedule_android(&app, &engine, &task).await?;
-  Ok(task)
-}
-
-#[cfg(not(target_os = "android"))]
-pub(crate) async fn enqueue_torrent(
-  engine: Engine,
-  input: EnqueueTorrentInput,
-) -> Result<DownloadTask> {
-  engine.enqueue_torrent(input).await
-}
-
-#[cfg(target_os = "android")]
-pub(crate) async fn enqueue_torrent<R: tauri::Runtime>(
-  engine: Engine,
-  app: tauri::AppHandle<R>,
-  input: EnqueueTorrentInput,
-) -> Result<DownloadTask> {
-  let task = engine.enqueue_torrent(input).await?;
-  schedule_android(&app, &engine, &task).await?;
-  Ok(task)
-}
-
-#[cfg(not(target_os = "android"))]
-pub(crate) async fn enqueue_plan(
-  engine: Engine,
-  input: EnqueuePlanInput,
-) -> Result<Vec<DownloadTask>> {
-  engine.enqueue_plan(input).await
-}
-
-#[cfg(target_os = "android")]
-pub(crate) async fn enqueue_plan<R: tauri::Runtime>(
-  engine: Engine,
-  app: tauri::AppHandle<R>,
-  input: EnqueuePlanInput,
-) -> Result<Vec<DownloadTask>> {
-  let tasks = engine.enqueue_plan(input).await?;
-  for task in &tasks {
-    schedule_android(&app, &engine, task).await?;
-  }
-  Ok(tasks)
-}
-
-pub(crate) async fn pause_task(engine: Engine, id: String) -> Result<DownloadTask> {
-  engine.pause(&id).await
-}
-
-#[cfg(not(target_os = "android"))]
-pub(crate) async fn resume_task(engine: Engine, id: String) -> Result<DownloadTask> {
-  engine.resume(&id).await
-}
-
-#[cfg(target_os = "android")]
-pub(crate) async fn resume_task<R: tauri::Runtime>(
-  engine: Engine,
-  app: tauri::AppHandle<R>,
-  id: String,
-) -> Result<DownloadTask> {
-  let task = engine.resume(&id).await?;
-  schedule_android(&app, &engine, &task).await?;
-  Ok(task)
-}
-
-#[cfg(not(target_os = "android"))]
-pub(crate) async fn retry_task(engine: Engine, id: String) -> Result<DownloadTask> {
-  engine.retry(&id).await
-}
-
-#[cfg(target_os = "android")]
-pub(crate) async fn retry_task<R: tauri::Runtime>(
-  engine: Engine,
-  app: tauri::AppHandle<R>,
-  id: String,
-) -> Result<DownloadTask> {
-  let task = engine.retry(&id).await?;
-  schedule_android(&app, &engine, &task).await?;
-  Ok(task)
-}
-
-pub(crate) async fn cancel_task(engine: Engine, id: String) -> Result<DownloadTask> {
-  engine.cancel(&id).await
-}
-
-pub(crate) async fn forget_task(engine: Engine, id: String) -> Result<()> {
-  engine.forget(&id).await
-}
-
-#[cfg(not(target_os = "android"))]
-pub(crate) async fn delete_task_files(engine: Engine, id: String) -> Result<()> {
-  engine.delete_files(&id).await
-}
-
-#[cfg(target_os = "android")]
-pub(crate) async fn delete_task_files<R: tauri::Runtime>(
+async fn delete_task_files<R: tauri::Runtime>(
   engine: Engine,
   app: tauri::AppHandle<R>,
   id: String,
@@ -664,20 +482,8 @@ pub(crate) async fn delete_task_files<R: tauri::Runtime>(
     .await
 }
 
-pub(crate) async fn set_priority(engine: Engine, id: String, priority: u8) -> Result<DownloadTask> {
-  engine.set_priority(&id, priority).await
-}
-
-pub(crate) async fn move_queue(
-  engine: Engine,
-  id: String,
-  before_task_id: Option<String>,
-) -> Result<DownloadTask> {
-  engine.move_queue(&id, before_task_id.as_deref()).await
-}
-
 #[cfg(not(target_os = "android"))]
-pub(crate) async fn pick_destination<R: tauri::Runtime>(
+async fn pick_destination<R: tauri::Runtime>(
   engine: Engine,
   app: tauri::AppHandle<R>,
 ) -> Result<Option<Destination>> {
@@ -712,7 +518,7 @@ pub(crate) async fn pick_destination<R: tauri::Runtime>(
 }
 
 #[cfg(target_os = "android")]
-pub(crate) async fn pick_destination<R: tauri::Runtime>(
+async fn pick_destination<R: tauri::Runtime>(
   engine: Engine,
   app: tauri::AppHandle<R>,
 ) -> Result<Option<Destination>> {
@@ -738,25 +544,4 @@ pub(crate) async fn pick_destination<R: tauri::Runtime>(
   };
   engine.repository.register_destination(&destination).await?;
   Ok(Some(destination))
-}
-
-#[cfg(not(target_os = "android"))]
-pub(crate) async fn update_source(
-  engine: Engine,
-  id: String,
-  source: DownloadSource,
-) -> Result<DownloadTask> {
-  engine.update_source(&id, &source).await
-}
-
-#[cfg(target_os = "android")]
-pub(crate) async fn update_source<R: tauri::Runtime>(
-  engine: Engine,
-  app: tauri::AppHandle<R>,
-  id: String,
-  source: DownloadSource,
-) -> Result<DownloadTask> {
-  let task = engine.update_source(&id, &source).await?;
-  schedule_android(&app, &engine, &task).await?;
-  Ok(task)
 }

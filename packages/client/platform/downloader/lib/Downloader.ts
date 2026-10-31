@@ -290,10 +290,6 @@ export class Downloader {
     return (await this.#getRpc().list_tasks()) as DownloadTask[]
   }
 
-  async getTask(id: string): Promise<DownloadTask | null> {
-    return (await this.#getRpc().get_task(id)) as DownloadTask | null
-  }
-
   async getTaskDetail(id: string): Promise<DownloadTaskDetail> {
     return (await this.#getRpc().get_task_detail(id)) as DownloadTaskDetail
   }
