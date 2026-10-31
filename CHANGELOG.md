@@ -1,5 +1,22 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.24](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.23...3.0.0-next.24) (2026-10-31)
+
+
+### Bug Fixes
+
+* **ci:** 修复工作区测试并精简检查 ([f3fee8d](https://github.com/delta-comic/delta-comic/commit/f3fee8dbc73311ac7476e88250040aae1efabbbc))
+* **desktop:** 修复桌面开发任务入口 ([a50667b](https://github.com/delta-comic/delta-comic/commit/a50667b4ba94d4de28a428697fcd90bef42e49a8))
+* **downloader:** 禁用安卓DHT持久化 ([6132d70](https://github.com/delta-comic/delta-comic/commit/6132d70f9814a1cc72224441cf3ad94445ef5c76))
+* **downloader:** 避免持久化DHT阻断桌面启动 ([1ebc021](https://github.com/delta-comic/delta-comic/commit/1ebc021bb7fa64b8a1ebaa36c53b3a02c96ac583))
+
+
+### Features
+
+* **release:** 重构独立版本发布 CLI ([87a02bb](https://github.com/delta-comic/delta-comic/commit/87a02bbadbe0ddf8ab9e0d8a5b8eae244077b18f))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.23](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.22...3.0.0-next.23) (2026-10-20)
 
 
