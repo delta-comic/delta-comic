@@ -31,17 +31,23 @@ export const createArtifactModuleGraph = async (
     let source = new TextDecoder().decode(bytes)
     const [imports] = parse(source)
     for (const imported of [...imports].reverse()) {
-      if (imported.d === -2) continue
-      if (!imported.n) throw new Error(`module import requires a literal path: ${path}`)
-      if (!imported.n.startsWith('./') && !imported.n.startsWith('../')) {
-        throw new Error(`module import must be packaged: ${imported.n}`)
+      if (imported.type === 'import-meta') continue
+      if (!imported.specifier) throw new Error(`module import requires a literal path: ${path}`)
+      if (!imported.specifier.startsWith('./') && !imported.specifier.startsWith('../')) {
+        throw new Error(`module import must be packaged: ${imported.specifier}`)
       }
-      const resolved = new URL(imported.n, `https://artifact.local/${path}`)
+      const resolved = new URL(imported.specifier, `https://artifact.local/${path}`)
       const target = safePluginPath(decodeURIComponent(resolved.pathname.slice(1)), 'module import')
       if (!resource.imports.includes(target)) throw new Error(`undeclared module import: ${target}`)
       const url = build(target)
-      const replacement = imported.d >= 0 ? JSON.stringify(url) : url
-      source = source.slice(0, imported.s) + replacement + source.slice(imported.e)
+      if (imported.type === 'dynamic') {
+        source =
+          source.slice(0, imported.importStart) +
+          `import(${JSON.stringify(url)})` +
+          source.slice(imported.importEnd)
+      } else {
+        source = source.slice(0, imported.start) + url + source.slice(imported.end)
+      }
     }
     const url = URL.createObjectURL(new Blob([source], { type: resource.mimeType }))
     urls.set(path, url)

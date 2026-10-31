@@ -24,7 +24,6 @@
     "@commitlint/config-conventional": "catalog:",
     "@semantic-release/changelog": "catalog:",
     "@semantic-release/release-notes-generator": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
     "@vue/test-utils": "catalog:",
     "commitlint-plugin-cspell": "catalog:",
     "cspell": "catalog:",
