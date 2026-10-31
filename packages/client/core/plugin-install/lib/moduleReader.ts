@@ -3,7 +3,7 @@ import type { PluginArchiveDB } from '@delta-comic/client-data-db'
 import type { Context, Plugin } from 'cordis'
 
 import type { LoadedPluginModule, PluginFileStore, PluginModuleReader } from './contracts'
-import { DEV_CSS_PATH, DEV_SERVER_LOADER_ID, devServerUrl, parseDevServerPort } from './dev'
+import { DEV_CSS_PATH, devServerUrl, parseDevServerPort } from './dev'
 import { safePluginPath } from './manifest'
 import { createArtifactModuleGraph } from './moduleGraph'
 
@@ -38,8 +38,6 @@ const styleActivator = (plugin: string, text: string) => (ctx: Context) => {
 }
 
 export class StoredPluginModuleReader implements PluginModuleReader {
-  public readonly id = 'stored'
-
   public constructor(private readonly files: PluginFileStore) {}
 
   public async read(
@@ -82,12 +80,7 @@ export class StoredPluginModuleReader implements PluginModuleReader {
 }
 
 export class DevServerPluginModuleReader implements PluginModuleReader {
-  public readonly id = DEV_SERVER_LOADER_ID
   readonly #versions = new Map<string, number>()
-
-  public matches(archive: PluginArchiveDB.Archive) {
-    return archive.loaderName === this.id
-  }
 
   public async read(
     archive: PluginArchiveDB.Archive,

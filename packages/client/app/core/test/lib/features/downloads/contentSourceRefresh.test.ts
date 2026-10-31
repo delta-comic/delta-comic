@@ -139,7 +139,6 @@ describe('content source refresh preparation', () => {
     const getContentPage = vi.fn()
     const getDownloadProvider = vi.fn()
     const getPluginIdentity = vi.fn()
-    const fingerprintProvider = vi.fn()
     const invalidContext = {
       ...context,
       contentType: ['other-plugin', 'manga'],
@@ -148,13 +147,7 @@ describe('content source refresh preparation', () => {
     await expect(
       prepareContentSourceRefresh(
         invalidContext,
-        runtime({
-          isPluginLoaded,
-          getContentPage,
-          getDownloadProvider,
-          getPluginIdentity,
-          fingerprintProvider,
-        }),
+        runtime({ isPluginLoaded, getContentPage, getDownloadProvider, getPluginIdentity }),
       ),
     ).resolves.toEqual({
       status: 'refresh-context-identity-mismatch',
@@ -165,7 +158,7 @@ describe('content source refresh preparation', () => {
     expect(getContentPage).not.toHaveBeenCalled()
     expect(getDownloadProvider).not.toHaveBeenCalled()
     expect(getPluginIdentity).not.toHaveBeenCalled()
-    expect(fingerprintProvider).not.toHaveBeenCalled()
+    expect(mocks.fingerprintProvider).not.toHaveBeenCalled()
   })
 
   it('distinguishes missing page classes, providers and source refresh support', async () => {
@@ -278,14 +271,8 @@ describe('content source refresh preparation', () => {
 
   it('reports provider fingerprint failures without exposing a refresh candidate', async () => {
     const error = new Error('fingerprint failed')
-    const result = await prepareContentSourceRefresh(
-      context,
-      runtime({
-        fingerprintProvider: () => {
-          throw error
-        },
-      }),
-    )
+    mocks.fingerprintProvider.mockRejectedValue(error)
+    const result = await prepareContentSourceRefresh(context, runtime())
 
     expect(result).toEqual({
       status: 'provider-fingerprint-unavailable',
@@ -297,14 +284,8 @@ describe('content source refresh preparation', () => {
 
   it('reports ContentPage fingerprint failures without exposing a refresh candidate', async () => {
     const error = new Error('content page fingerprint failed')
-    const result = await prepareContentSourceRefresh(
-      context,
-      runtime({
-        fingerprintContentPage: () => {
-          throw error
-        },
-      }),
-    )
+    mocks.fingerprintContentPage.mockRejectedValue(error)
+    const result = await prepareContentSourceRefresh(context, runtime())
 
     expect(result).toEqual({
       status: 'content-page-fingerprint-unavailable',
@@ -357,13 +338,11 @@ describe('content source refresh preparation', () => {
       pluginVersion: '2.0.0',
       pluginIntegrity: 'blake3:archive-v2',
     }
+    mocks.fingerprintContentPage.mockResolvedValue('content-page-v2')
+    mocks.fingerprintProvider.mockResolvedValue('provider-v2')
     const result = await prepareContentSourceRefresh(
       context,
-      runtime({
-        getPluginIdentity: () => identity,
-        fingerprintContentPage: () => 'content-page-v2',
-        fingerprintProvider: () => 'provider-v2',
-      }),
+      runtime({ getPluginIdentity: () => identity }),
     )
 
     expect(result).toMatchObject({
@@ -388,12 +367,17 @@ describe('content source refresh preparation', () => {
   })
 
   it.each([
-    ['content-page-fingerprint-changed', { fingerprintContentPage: () => 'content-page-v2' }],
+    [
+      'content-page-fingerprint-changed',
+      {},
+      () => mocks.fingerprintContentPage.mockResolvedValue('content-page-v2'),
+    ],
     [
       'plugin-version-changed',
       {
         getPluginIdentity: () => ({ pluginVersion: '2', pluginIntegrity: context.pluginIntegrity }),
       },
+      () => {},
     ],
     [
       'plugin-integrity-changed',
@@ -403,9 +387,15 @@ describe('content source refresh preparation', () => {
           pluginIntegrity: undefined,
         }),
       },
+      () => {},
     ],
-    ['provider-fingerprint-changed', { fingerprintProvider: () => 'changed' }],
-  ] as const)('distinguishes an isolated %s warning', async (code, overrides) => {
+    [
+      'provider-fingerprint-changed',
+      {},
+      () => mocks.fingerprintProvider.mockResolvedValue('changed'),
+    ],
+  ] as const)('distinguishes an isolated %s warning', async (code, overrides, arrange) => {
+    arrange()
     const result = await prepareContentSourceRefresh(context, runtime(overrides))
 
     expect(result.status).toBe('confirmation-required')

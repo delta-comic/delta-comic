@@ -25,9 +25,8 @@ import {
   type LoadedPluginModule,
   type PluginCatalog,
   type PluginInstallReporter,
-  type PluginModuleReader,
 } from '@delta-comic/client-core-plugin-install'
-import type { DB } from '@delta-comic/client-data-db'
+import type { DB, PluginArchiveDB } from '@delta-comic/client-data-db'
 import { isPluginManifest, type PluginManifest } from '@delta-comic/shared-plugin-manifest'
 import {
   Context,
@@ -114,10 +113,13 @@ export const pluginDiagnostics = new DiagnosticRecorder({
 
 const pluginFiles = createDefaultPluginFileStore()
 const repository = new DatabasePluginArchiveRepository()
-const readers: readonly PluginModuleReader[] = [
-  new DevServerPluginModuleReader(),
-  new StoredPluginModuleReader(pluginFiles),
-]
+const devServerReader = new DevServerPluginModuleReader()
+const storedReader = new StoredPluginModuleReader(pluginFiles)
+const readModule = (archive: PluginArchiveDB.Archive) =>
+  (archive.loaderName === DEV_SERVER_LOADER_ID ? devServerReader : storedReader).read(
+    archive,
+    new AbortController().signal,
+  )
 const internalIds = new Set(builtinPlugins.map(plugin => plugin.manifest.id))
 const httpSource = new HttpSourceResolver()
 const githubSource = new GitHubSourceResolver({
@@ -262,9 +264,7 @@ const mount = async (id: string, override?: readonly Plugin.Function[]) => {
   else {
     const archive = await repository.find(id)
     if (!archive) throw new Error(`installed plugin not found: ${id}`)
-    const reader = readers.find(reader => reader.matches?.(archive)) ?? readers.at(-1)
-    if (!reader) throw new Error('no client module reader')
-    module = await reader.read(archive, new AbortController().signal)
+    module = await readModule(archive)
   }
   if (override) module = { ...module, functions: override }
   if (failedGeneration === generation) {
@@ -428,11 +428,7 @@ export const setPluginConfig = (id: string, config: Record<string, unknown>) =>
   managed(async () => {
     const archive = await repository.find(id)
     if (!archive) throw new Error(`installed plugin not found: ${id}`)
-    const module =
-      loadedModules.get(id) ??
-      (await (
-        readers.find(reader => reader.matches?.(archive)) ?? readers[readers.length - 1]
-      ).read(archive, new AbortController().signal))
+    const module = loadedModules.get(id) ?? (await readModule(archive))
     try {
       for (const fn of module.functions) {
         resolveConfig(

@@ -108,10 +108,6 @@ export class Logger {
     return Logger.fromRuntime(joinScope(this.scope, scope), this.runtime)
   }
 
-  public group(scope: string): Logger {
-    return this.scoped(scope)
-  }
-
   public trace(...values: unknown[]): void {
     this.emit('trace', values)
   }

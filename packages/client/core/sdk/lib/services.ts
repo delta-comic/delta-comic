@@ -1,7 +1,7 @@
 import type { DiagnosticRecorder } from '@delta-comic/both'
 import type { DB } from '@delta-comic/client-data-db'
+import type { Downloader } from '@delta-comic/client-platform-downloader'
 
-import type { ClientDownloader } from './downloader.js'
 import type { ClientDatabase, ClientUi } from './host.js'
 import type { ContentModel } from './model/content.js'
 import type { RemoteModel } from './model/remote.js'
@@ -68,7 +68,7 @@ declare module 'cordis' {
     remote: ClientRemote
     share: ClientCollection<SocialModel>
     network: ClientNetwork
-    downloader: ClientDownloader
+    downloader: Downloader
     database: ClientDatabase<DB>
     diagnostics: DiagnosticRecorder
   }

@@ -1,22 +1,12 @@
 import { validateArtifact } from '@delta-comic/client-core-plugin-artifact'
-import {
-  assertPluginManifestCompatible,
-  type PluginManifestCompatibility,
-} from '@delta-comic/shared-plugin-manifest'
+import { assertPluginManifestCompatible } from '@delta-comic/shared-plugin-manifest'
 import JSZip from 'jszip'
 
 import type { DecodedPluginPackage, PluginPackageCodec } from './contracts'
 import { parsePluginManifest, safePluginPath } from './manifest'
 
-export interface ZipPackageCodecOptions {
-  readonly compatibility?: PluginManifestCompatibility
-  readonly platform?: string
-}
-
 export class ZipPackageCodec implements PluginPackageCodec {
   public readonly id = 'zip'
-
-  public constructor(private readonly options: ZipPackageCodecOptions = {}) {}
 
   public matches(file: File) {
     return file.name.toLowerCase().endsWith('.zip') || file.type === 'application/zip'
@@ -29,7 +19,7 @@ export class ZipPackageCodec implements PluginPackageCodec {
     const manifestFile = archive.file('manifest.json')
     if (!manifestFile) throw new Error('plugin archive does not contain manifest.json')
     const manifest = parsePluginManifest(JSON.parse(await manifestFile.async('text')))
-    assertPluginManifestCompatible(manifest, this.options.compatibility ?? {})
+    assertPluginManifestCompatible(manifest, {})
     const files = new Map<string, Uint8Array>()
     for (const entry of Object.values(archive.files)) {
       signal.throwIfAborted()
@@ -38,10 +28,10 @@ export class ZipPackageCodec implements PluginPackageCodec {
       if (files.has(path)) throw new Error(`duplicate archive entry: ${path}`)
       files.set(path, await entry.async('uint8array'))
     }
-    await validateArtifact(
-      { manifest, files: [...files].map(([path, bytes]) => ({ path, bytes })) },
-      { platform: this.options.platform },
-    )
+    await validateArtifact({
+      manifest,
+      files: [...files].map(([path, bytes]) => ({ path, bytes })),
+    })
     signal.throwIfAborted()
     return { codecId: this.id, files, manifest }
   }

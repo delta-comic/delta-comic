@@ -6,13 +6,6 @@ export interface ClientDatabase<DB extends object> {
   query<Result>(name: string, operation: (db: Kysely<DB>) => Promise<Result>): Promise<Result>
 }
 
-export interface ClientStore {
-  get<T>(key: string): T | undefined
-  set<T>(key: string, value: T): void
-  delete(key: string): boolean
-  keys(): readonly string[]
-}
-
 export interface ClientRouteRegistration {
   path: string
   title: string

@@ -69,11 +69,6 @@ export interface ContentSourceRefreshRuntime {
   getContentPage(contentType: [string, string]): UniContentPageLike | undefined
   getDownloadProvider(contentType: [string, string]): UniContentDownloadProvider | undefined
   getPluginIdentity(plugin: string): MaybePromise<ContentRefreshPluginIdentity | undefined>
-  fingerprintProvider?: (
-    provider: UniContentDownloadProvider,
-    ContentPage: UniContentPageLike,
-  ) => MaybePromise<string>
-  fingerprintContentPage?: (ContentPage: UniContentPageLike) => MaybePromise<string>
 }
 
 export function isContentSourceRefreshCandidateCurrent(
@@ -205,19 +200,14 @@ export async function prepareContentSourceRefresh(
 
   let providerFingerprint: string
   try {
-    providerFingerprint = await (
-      runtime.fingerprintProvider ??
-      (currentProvider => fingerprintContentDownloadProvider(currentProvider))
-    )(provider, ContentPage)
+    providerFingerprint = await fingerprintContentDownloadProvider(provider)
   } catch (error) {
     return { status: 'provider-fingerprint-unavailable', contentType: context.contentType, error }
   }
 
   let contentPageFingerprint: string
   try {
-    contentPageFingerprint = await (runtime.fingerprintContentPage ?? fingerprintContentPage)(
-      ContentPage,
-    )
+    contentPageFingerprint = await fingerprintContentPage(ContentPage)
   } catch (error) {
     return {
       status: 'content-page-fingerprint-unavailable',
