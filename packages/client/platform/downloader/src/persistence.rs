@@ -112,6 +112,17 @@ pub struct Repository {
   writer: SqlitePool,
 }
 
+async fn migrate(pool: &SqlitePool) -> Result<()> {
+  for migration in [
+    include_str!("../migrations/0001_init.sql"),
+    include_str!("../migrations/0002_integrity_samples.sql"),
+    include_str!("../migrations/0003_saf_exports.sql"),
+  ] {
+    sqlx::raw_sql(migration).execute(pool).await?;
+  }
+  Ok(())
+}
+
 impl Repository {
   pub async fn open(path: &Path) -> Result<Self> {
     if let Some(parent) = path.parent() {
@@ -134,15 +145,7 @@ impl Repository {
       .max_connections(4)
       .connect_with(options)
       .await?;
-    sqlx::raw_sql(include_str!("../migrations/0001_init.sql"))
-      .execute(&writer)
-      .await?;
-    sqlx::raw_sql(include_str!("../migrations/0002_integrity_samples.sql"))
-      .execute(&writer)
-      .await?;
-    sqlx::raw_sql(include_str!("../migrations/0003_saf_exports.sql"))
-      .execute(&writer)
-      .await?;
+    migrate(&writer).await?;
     Ok(Self { pool, writer })
   }
 
@@ -155,15 +158,7 @@ impl Repository {
       .max_connections(1)
       .connect_with(options)
       .await?;
-    sqlx::raw_sql(include_str!("../migrations/0001_init.sql"))
-      .execute(&pool)
-      .await?;
-    sqlx::raw_sql(include_str!("../migrations/0002_integrity_samples.sql"))
-      .execute(&pool)
-      .await?;
-    sqlx::raw_sql(include_str!("../migrations/0003_saf_exports.sql"))
-      .execute(&pool)
-      .await?;
+    migrate(&pool).await?;
     Ok(Self {
       writer: pool.clone(),
       pool,

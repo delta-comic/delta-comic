@@ -104,7 +104,7 @@ fn register_system_secret_resolver_if_missing() -> crate::Result<()> {
     .unwrap_or_else(std::sync::PoisonError::into_inner);
   if resolver.is_none() {
     let credentials = crate::credentials::CredentialVault::system()?;
-    *resolver = Some(crate::credentials::resolver(credentials, None));
+    *resolver = Some(crate::credentials::resolver(credentials));
   }
   Ok(())
 }

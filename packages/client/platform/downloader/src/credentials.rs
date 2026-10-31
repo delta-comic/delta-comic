@@ -123,31 +123,21 @@ impl SecretResolver for CredentialVault {
   }
 }
 
-struct ChainedSecretResolver {
-  credentials: CredentialVault,
-  custom: Option<Arc<dyn SecretResolver>>,
-}
+/// Resolves native credential references; any other reference is reported as unresolved.
+struct NativeSecretResolver(CredentialVault);
 
-impl SecretResolver for ChainedSecretResolver {
+impl SecretResolver for NativeSecretResolver {
   fn resolve(&self, secret_ref: &str) -> Result<Option<String>> {
     if secret_ref.starts_with(CREDENTIAL_PREFIX) {
-      return self.credentials.resolve(secret_ref);
-    }
-    match &self.custom {
-      Some(custom) => custom.resolve(secret_ref),
-      None => Ok(None),
+      self.0.resolve(secret_ref)
+    } else {
+      Ok(None)
     }
   }
 }
 
-pub(crate) fn resolver(
-  credentials: CredentialVault,
-  custom: Option<Arc<dyn SecretResolver>>,
-) -> Arc<dyn SecretResolver> {
-  Arc::new(ChainedSecretResolver {
-    credentials,
-    custom,
-  })
+pub(crate) fn resolver(credentials: CredentialVault) -> Arc<dyn SecretResolver> {
+  Arc::new(NativeSecretResolver(credentials))
 }
 
 fn credential_id(secret_ref: &str) -> Result<String> {
