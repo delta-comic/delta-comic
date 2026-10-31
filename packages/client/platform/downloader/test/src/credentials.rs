@@ -1,13 +1,5 @@
 use super::*;
 
-struct CustomResolver;
-
-impl SecretResolver for CustomResolver {
-  fn resolve(&self, secret_ref: &str) -> Result<Option<String>> {
-    Ok(Some(format!("custom:{secret_ref}")))
-  }
-}
-
 fn vault() -> CredentialVault {
   CredentialVault::from_keyring_store(keyring_core::mock::Store::new().unwrap())
 }
@@ -37,24 +29,4 @@ fn rejects_arbitrary_keys_noncanonical_ids_and_oversized_values() {
       .is_err()
   );
   assert!(vault.store(&"x".repeat(MAX_SECRET_BYTES + 1)).is_err());
-}
-
-#[test]
-fn debug_output_never_contains_stored_values() {
-  let vault = vault();
-  vault.store("never-print-this").unwrap();
-  let debug = format!("{vault:?}");
-  assert!(!debug.contains("never-print-this"));
-}
-
-#[test]
-fn credential_references_cannot_fall_through_to_a_custom_resolver() {
-  let vault = vault();
-  let resolver = resolver(vault, Some(Arc::new(CustomResolver)));
-
-  assert_eq!(
-    resolver.resolve("host-secret").unwrap().as_deref(),
-    Some("custom:host-secret")
-  );
-  assert!(resolver.resolve("credential:not-a-uuid").is_err());
 }

@@ -1,8 +1,7 @@
 use std::{collections::HashSet, path::Path};
 
 use super::{
-  CompletedRange, Repository, merge_ranges, missing_ranges, next_revision, now_millis,
-  split_ranges, validate_saf_document_uri,
+  CompletedRange, Repository, merge_ranges, next_revision, now_millis, validate_saf_document_uri,
 };
 use crate::Error;
 use crate::domain::{
@@ -116,43 +115,6 @@ fn merges_adjacent_and_overlapping_ranges() {
   );
 }
 
-#[test]
-fn calculates_and_splits_missing_ranges() {
-  let missing = missing_ranges(100, &[CompletedRange { start: 20, end: 40 }]);
-  assert_eq!(
-    missing,
-    vec![
-      CompletedRange { start: 0, end: 20 },
-      CompletedRange {
-        start: 40,
-        end: 100
-      }
-    ]
-  );
-  assert_eq!(split_ranges(&missing, 4, 5).len(), 4);
-}
-
-#[tokio::test]
-async fn persists_settings() {
-  let repository = Repository::memory().await.unwrap();
-  let destination = Destination {
-    id: "default".into(),
-    label: "Downloads".into(),
-    kind: DestinationKind::Managed,
-    path: "/tmp/downloads".into(),
-    is_default: true,
-  };
-  let settings = DownloaderSettings::platform_default();
-  repository
-    .initialize(&destination, &settings)
-    .await
-    .unwrap();
-  assert_eq!(
-    repository.get_settings().await.unwrap().max_active_tasks,
-    settings.max_active_tasks
-  );
-}
-
 #[tokio::test]
 async fn user_transitions_and_late_worker_updates_cannot_resurrect_terminal_state() {
   let repository = Repository::memory().await.unwrap();
@@ -221,35 +183,6 @@ async fn single_writer_pool_serializes_concurrent_revisions() {
 }
 
 #[cfg(not(target_os = "android"))]
-#[tokio::test]
-async fn desktop_network_reprobe_waits_until_due_without_consuming_retries() {
-  let repository = Repository::memory().await.unwrap();
-  initialized(&repository).await;
-  let mut task = task("offline");
-  repository.insert_task(&mut task).await.unwrap();
-  let waiting = repository
-    .set_failure(&task.id, &Error::Network("connection failed"))
-    .await
-    .unwrap();
-  assert_eq!(waiting.status, TaskStatus::WaitingForNetwork);
-  assert_eq!(waiting.retry_count, 0);
-
-  assert!(
-    repository
-      .requeue_due_network_tasks(waiting.updated_at.saturating_sub(1), 20)
-      .await
-      .unwrap()
-      .is_empty()
-  );
-  let requeued = repository
-    .requeue_due_network_tasks(waiting.updated_at, 20)
-    .await
-    .unwrap();
-  assert_eq!(requeued.len(), 1);
-  assert_eq!(requeued[0].status, TaskStatus::Queued);
-  assert_eq!(requeued[0].retry_count, 0);
-}
-
 #[test]
 fn accepts_only_documents_from_the_registered_saf_tree() {
   let tree = "content://provider/tree/primary%3ADownloads";

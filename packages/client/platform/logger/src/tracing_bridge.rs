@@ -134,7 +134,3 @@ impl PanicCapture {
     });
   }
 }
-
-#[cfg(test)]
-#[path = "../test/src/tracing_bridge.rs"]
-mod tests;

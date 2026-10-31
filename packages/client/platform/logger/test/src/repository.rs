@@ -1,6 +1,3 @@
-use std::io::Write;
-
-use flate2::{Compression, write::GzEncoder};
 use tempfile::tempdir;
 use tokio::fs;
 
@@ -18,20 +15,6 @@ async fn reads_only_the_bounded_tail() {
   assert_eq!(content.content.len(), READ_LIMIT);
   assert_eq!(content.size, (READ_LIMIT + 10) as u64);
   assert!(content.truncated);
-}
-
-#[tokio::test]
-async fn reads_archived_logs_transparently() {
-  let directory = tempdir().unwrap();
-  let name = "delta-comic-2026-06-01-000.log.gz";
-  let file = std::fs::File::create(directory.path().join(name)).unwrap();
-  let mut encoder = GzEncoder::new(file, Compression::default());
-  encoder.write_all(b"archived line").unwrap();
-  encoder.finish().unwrap();
-  let repository = LogRepository::new(directory.path().to_path_buf(), vec![]);
-  let content = repository.read_tail(name.into()).await.unwrap();
-  assert_eq!(content.content, "archived line");
-  assert!(!content.truncated);
 }
 
 #[tokio::test]

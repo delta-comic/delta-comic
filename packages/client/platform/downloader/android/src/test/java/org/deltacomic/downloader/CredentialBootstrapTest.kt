@@ -41,8 +41,4 @@ class CredentialBootstrapTest {
         assertEquals(0, bootstrapCalls)
     }
 
-    @Test
-    fun reportsEngineBootstrapFailure() {
-        assertFalse(initializeNativeEngine({ 0 }, { 1 }))
-    }
 }

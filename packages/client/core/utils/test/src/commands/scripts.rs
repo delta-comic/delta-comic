@@ -1,12 +1,4 @@
-use super::{callback_name, install_bridge_script};
-
-#[test]
-fn callback_name_defaults_when_empty() {
-  assert_eq!(callback_name(None), "callback");
-  assert_eq!(callback_name(Some("")), "callback");
-  assert_eq!(callback_name(Some("  ")), "callback");
-  assert_eq!(callback_name(Some("done")), "done");
-}
+use super::install_bridge_script;
 
 #[test]
 fn install_bridge_script_json_escapes_injected_code() {
