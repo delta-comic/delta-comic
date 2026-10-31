@@ -5,7 +5,7 @@ description: Reviews and authors Cloudflare Workers code against production best
 
 ## Delta Comic repository
 
-Apply [AGENTS.md](../../../AGENTS.md) to the examples below. Define dependency versions in root `pnpm-workspace.yaml`, reference `catalog:` in manifests, install with `vp install`, and invoke workspace scripts with `vp run`. Tests import `vite-plus/test` and run through `vp test run` after `vp run lib-build`. Inspect existing server tests and root Vite+ projects before adding a Worker testing integration. Compare retrieved API examples with installed package types.
+Apply [AGENTS.md](../../../AGENTS.md) to the examples below. Define dependency versions in root `pnpm-workspace.yaml`, reference `catalog:` in manifests, install with `vp install`, and invoke workspace scripts with `vp run`. Tests import `vitest` and run through `vp test run` after `vp run build:packages`. Inspect existing server tests and root Vite+ projects before adding a Worker testing integration. Compare retrieved API examples with installed package types.
 
 Your knowledge of Cloudflare Workers APIs, types, and configuration may be outdated. **Prefer retrieval over pre-training** for any Workers code task — writing or reviewing.
 

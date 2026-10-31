@@ -1,5 +1,5 @@
 import { syncCollectionNames, type SyncChange } from '@delta-comic/server/api'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 interface DbAction {
   collection: string

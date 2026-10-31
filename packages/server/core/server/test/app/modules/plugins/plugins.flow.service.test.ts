@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { RegistryService } from 'cordis'
 import { Miniflare } from 'miniflare'
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vite-plus/test'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { claimDueFlows } from '../../../../app/modules/plugins/plugins.flow.repository'
 import {

@@ -1,5 +1,5 @@
 import { Logger } from '@delta-comic/shared-core-logger'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { UniComment, type UniCommentRaw } from '../../../lib/model/comment'
 import { UniContentPage } from '../../../lib/model/content'

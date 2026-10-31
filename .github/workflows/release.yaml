@@ -52,7 +52,7 @@ jobs:
         run: vp install --frozen-lockfile
 
       - name: Build workspace libraries
-        run: vp run lib-build
+        run: vp run build:packages
 
       - name: Resolve semantic release plan
         id: release-plan
@@ -68,7 +68,7 @@ jobs:
 
       - name: Build release workspace libraries
         if: steps.release-plan.outputs.has-release == 'true'
-        run: vp run lib-build
+        run: vp run build:packages
 
       - name: Upload workspace libraries
         if: steps.release-plan.outputs.has-release == 'true'

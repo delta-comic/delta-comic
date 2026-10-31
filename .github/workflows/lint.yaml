@@ -56,7 +56,7 @@ jobs:
 
       - name: Lint and format check
         run: |
-          vp run lib-build
+          vp run build:packages
           vp check
 
   rust:

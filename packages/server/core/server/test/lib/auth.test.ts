@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CloudAuthClient } from '../../lib/auth'
 import { CloudConfigurationError, CloudUnauthenticatedError } from '../../lib/errors'

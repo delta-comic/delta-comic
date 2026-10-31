@@ -54,7 +54,7 @@ jobs:
 
       - name: Test
         run: |
-          vp run lib-build
+          vp run build:packages
           vp test run
 
   rust:

@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createTemplate } from '../../../../lib/components/DcMarkdown/helper'
 import DcMarkdown from '../../../../lib/components/DcMarkdown/index.vue'

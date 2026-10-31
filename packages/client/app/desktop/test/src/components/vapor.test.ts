@@ -1,5 +1,5 @@
 // cspell:ignore VDOM
-import { afterEach, describe, expect, it } from 'vite-plus/test'
+import { afterEach, describe, expect, it } from 'vitest'
 const { createApp, defineComponent, h, nextTick, shallowRef, vaporInteropPlugin } =
   window.$$lib$$.Vue
 

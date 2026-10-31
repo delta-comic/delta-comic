@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it } from 'vite-plus/test'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import * as publicModel from '../../lib/index'
 import { UniComment } from '../../lib/model/comment'

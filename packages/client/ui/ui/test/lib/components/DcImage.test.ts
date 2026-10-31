@@ -1,7 +1,7 @@
 import { UniImage, UniItem } from '@delta-comic/client-core-model'
 import { Logger } from '@delta-comic/shared-core-logger'
 import { flushPromises, mount, shallowMount } from '@vue/test-utils'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick } from 'vue'
 
 // cspell:ignore fetchpriority

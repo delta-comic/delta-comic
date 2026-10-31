@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 import { AwesomeRegistryClient } from '../../../../lib/adapters/awesomeRegistry/client'
 import type { AwesomeRegistryStorage } from '../../../../lib/adapters/awesomeRegistry/types'

@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
       - name: Build workspace libraries
-        run: vp run lib-build
+        run: vp run build:packages
       - name: Check formatting and lint
         run: vp check
       - name: Check TypeScript
@@ -64,7 +64,7 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
       - name: Build workspace libraries
-        run: vp run lib-build
+        run: vp run build:packages
       - name: Apply remote migrations
         run: vp run --filter @delta-comic/server migrate:remote
       - name: Deploy Worker
@@ -90,7 +90,7 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
       - name: Build workspace libraries
-        run: vp run lib-build
+        run: vp run build:packages
       - name: Build admin
         run: vp run --filter @delta-comic/admin build
       - name: Deploy Pages

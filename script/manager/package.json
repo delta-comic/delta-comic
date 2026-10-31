@@ -1,0 +1,5 @@
+{
+  "name": "@delta-comic/script-manager",
+  "description": "管理应用版本的命令行程序",
+  "private": true
+}

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 import { shallowRef } from 'vue'
 
 import { ConfigStore } from '../../../lib/adapters/configStore'

@@ -9,7 +9,7 @@ import { Miniflare } from 'miniflare'
 import { Type } from 'typebox'
 import { Value } from 'typebox/value'
 import { build } from 'vite-plus'
-import { expect, it } from 'vite-plus/test'
+import { expect, it } from 'vitest'
 
 const profileSchema = Type.Object({
   nodes: Type.Array(

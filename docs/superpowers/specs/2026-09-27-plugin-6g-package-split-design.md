@@ -108,7 +108,7 @@ plugin (composition/aggregate) ──> all public plugin packages + app adapters
 - install：source matching、codec/path/integrity、递归依赖、重复安装、补偿回滚、archive/file-store ports、stored/dev module readers
 - Vite：manifest wiring、ZIP 输出、host externals、native HMR、CSS bridge、Vue SFC style aggregation、relative assets
 - architecture：依赖方向、index export-only、无 self-import、无 legacy global/export/module、composition 唯一 concrete assembly
-- workspace：`vp install`、`vp run lib-build`、`vp check`、`vp run -r typecheck`、`vp test run`、`vp run codegen:check`、`git diff --check`
+- workspace：`vp install`、`vp run build:packages`、`vp check`、`vp run -r typecheck`、`vp test run`、`vp run codegen:check`、`git diff --check`
 
 ## 7. 完成标准
 

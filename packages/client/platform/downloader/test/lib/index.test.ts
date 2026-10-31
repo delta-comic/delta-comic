@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Downloader, type DownloaderRpc, type DownloaderRouter } from '../../lib/index'
 

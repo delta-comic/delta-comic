@@ -18,17 +18,18 @@ export default defineConfig({
   run: {
     cache: { tasks: true, scripts: false },
     tasks: {
+      // dev
+      'dev': { command: 'vp run @delta-comic/client-app-desktop#dev', cache: false },
+      'dev:android': { command: 'vp run @delta-comic/client-app-mobile#dev', cache: false },
+      'dev:web': { command: 'vp run @delta-comic/client-app-mobile#dev:web', cache: false },
+      // build
+      'build:packages': { command: 'vp run -r build', cache: { output: [] } },
+      // release
       'branch:develop': { command: 'node ./script/release-branches.mts develop', cache: false },
       'branch:develop:dry-run': {
         command: 'node ./script/release-branches.mts develop --dry-run',
         cache: false,
       },
-      'check': { command: 'vp check', cache: { output: [] } },
-      'dev': { command: 'vp run @delta-comic/client-app-desktop#dev', cache: false },
-      'dev:android': { command: 'vp run @delta-comic/client-app-mobile#dev', cache: false },
-      'dev:web': { command: 'vp run @delta-comic/client-app-mobile#dev:web', cache: false },
-      'lib-build': { command: 'node -e ""', dependsOn: ['build:packages'], cache: { output: [] } },
-      'build:packages': { command: 'vp run -r build', cache: { output: [] } },
       'release': { command: 'node ./script/release.mts', cache: false },
       'release:dry-run': { command: 'node ./script/release.mts --dry-run', cache: false },
       'release:preview': { command: 'node ./script/release-branches.mts preview', cache: false },
@@ -41,14 +42,14 @@ export default defineConfig({
         command: 'node ./script/release-branches.mts stable --dry-run',
         cache: false,
       },
-      'set-ver': { command: 'node ./script/set-version.mts', cache: false },
-      'test': { command: 'vp test', cache: false, dependsOn: ['lib-build'] },
+      // linter
       'typecheck': {
         command: 'vp run -r typecheck',
-        dependsOn: ['lib-build'],
+        dependsOn: ['build:packages'],
         cache: { output: [] },
       },
-      'vp:install': { command: 'vp install', cache: false },
+      'codegen:check': { command: 'node ./script/codegen/check.mts', cache: false },
+      // codegen
       'codegen': {
         command:
           'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/core/server/app/infrastructure/d1/generated',
@@ -59,7 +60,6 @@ export default defineConfig({
           'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/core/server/app/infrastructure/d1/generated && node ./script/codegen/run.mts script/codegen/client.table.mts packages/client/data/db/lib/generated',
         cache: false,
       },
-      'codegen:check': { command: 'node ./script/codegen/check.mts', cache: false },
     },
   },
   test: {

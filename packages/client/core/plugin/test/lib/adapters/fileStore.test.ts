@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const convertFileSrc = vi.fn(() => 'plugin://localhost/')
 const appLocalDataDir = vi.fn(async () => '/app/local-data')

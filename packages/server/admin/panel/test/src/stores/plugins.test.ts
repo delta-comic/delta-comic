@@ -1,6 +1,6 @@
 import type { FlowInstallation } from '@delta-comic/server'
 import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AdminApiClient } from '@/shared/api/AdminApiClient'
 import { useConnectionStore } from '@/stores/connection'

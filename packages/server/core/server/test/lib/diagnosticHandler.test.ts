@@ -1,5 +1,5 @@
 import { DiagnosticRecorder } from '@delta-comic/both'
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 
 import { createDiagnosticHandler } from '../../lib/diagnosticHandler'
 

@@ -1,5 +1,5 @@
 import { mockIPC } from '@tauri-apps/api/mocks'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import './setup'
 

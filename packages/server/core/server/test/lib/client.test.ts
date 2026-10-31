@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 
 import { createCloudClient } from '../../lib/client'
 import { CloudApiError, CloudDisabledError } from '../../lib/errors'

@@ -6,7 +6,7 @@ import {
   type UniDownloadPlan,
 } from '@delta-comic/client-core-model'
 import type { PluginArchiveDB } from '@delta-comic/client-data-db'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const database = vi.hoisted(() => {
   const executeTakeFirst = vi.fn()

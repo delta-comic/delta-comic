@@ -7,7 +7,7 @@ description: Use when writing, loading, composing, hot-reloading, or debugging C
 
 ## Delta Comic repository
 
-Apply [AGENTS.md](../../../AGENTS.md) for tooling: root `pnpm-workspace.yaml` owns dependency versions, manifests reference `catalog:`, and installation uses `vp install`. Tests import `vite-plus/test`; build dependencies with `vp run lib-build` before `vp test run`. Check framework examples against the installed Cordis types and current repository services when diagnosing an upgrade.
+Apply [AGENTS.md](../../../AGENTS.md) for tooling: root `pnpm-workspace.yaml` owns dependency versions, manifests reference `catalog:`, and installation uses `vp install`. Tests import `vitest`; build dependencies with `vp run build:packages` before `vp test run`. Check framework examples against the installed Cordis types and current repository services when diagnosing an upgrade.
 
 Distilled from the Cordis documentation ([docs/cordis-primer.md](../../../docs/cordis-primer.md), [docs/cordis-api/](../../../docs/cordis-api/context.md), [docs/cordis-tutorial/](../../../docs/cordis-tutorial/index.md)) and the framework source, cross-checked against field-tested usage patterns. Everything below is about the framework itself and uses the upstream names throughout: the `cordis` core package and its `@cordisjs/plugin-*` companions.
 

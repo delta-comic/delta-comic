@@ -4,7 +4,7 @@ import type {
   DownloaderSettings,
 } from '@delta-comic/client-app-core/features/downloads/downloaderClient'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 
 const harness = await vi.hoisted(async () => {

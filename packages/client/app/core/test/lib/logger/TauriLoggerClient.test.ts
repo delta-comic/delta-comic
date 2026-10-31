@@ -1,5 +1,5 @@
 import type { LogEntry } from '@delta-comic/shared-core-logger'
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createTauRPCProxy } from '../../../lib/logger/bindings'
 import { TauriLoggerClient } from '../../../lib/logger/TauriLoggerClient'

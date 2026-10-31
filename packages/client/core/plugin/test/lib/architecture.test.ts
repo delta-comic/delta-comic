@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 
 const sourceModules = import.meta.glob('../../lib/**/*.ts', {
   eager: true,

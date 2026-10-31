@@ -1,5 +1,5 @@
 import { Context } from 'cordis'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 
 import { createFlowHttp, executeFlow } from '../../app/modules/plugins/plugins.flow'
 import { FLOW_LIMITS, parseFlowDocument, type FlowStep } from '../../lib/flow'

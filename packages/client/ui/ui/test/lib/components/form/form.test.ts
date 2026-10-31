@@ -1,5 +1,5 @@
 import { mount, shallowMount } from '@vue/test-utils'
-import { describe, expect, it } from 'vite-plus/test'
+import { describe, expect, it } from 'vitest'
 import { defineComponent, h, nextTick, type VNode } from 'vue'
 
 import DcForm from '../../../../lib/components/form/components/DcForm.vue'

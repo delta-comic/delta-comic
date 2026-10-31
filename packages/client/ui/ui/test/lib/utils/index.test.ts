@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vite-plus/test'
+import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, nextTick, shallowRef } from 'vue'
 
 import { toUnionSource } from '../../../lib/utils/index'

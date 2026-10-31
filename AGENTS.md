@@ -90,14 +90,12 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 - 拉取依赖变更后运行 `vp install`。CI 使用 `vp install --frozen-lockfile`。
 - Vite+ 并非 Vite：工作区脚本通过 `vp run` 运行，例如
   `vp run --filter app dev:web`。本地 Vite+ 文档位于 `node_modules/vite-plus/docs`。
-- 本地会话中使用全局 `vp`；仅在没有全局 CLI 时使用 `pnpm exec vp`。
-- js测试使用`vite-plus/test`而不是`vitest`，`vite-plus/test`是`vitest`的re-export。
 
 ## 验证
 
-- 执行 Web 检查或测试前，先构建应用依赖：`vp run lib-build`。多个包导出构建后的
+- 执行 Web 检查或测试前，先构建应用依赖：`vp run build:packages`。多个包导出构建后的
   `dist` 文件，否则全新检出的仓库可能无法解析这些依赖。
-- 完整的 Web 验证流程：依次运行 `vp run lib-build`、`vp check`、
+- 完整的 Web 验证流程：依次运行 `vp run build:packages`、`vp check`、
   `vp run -r typecheck`，然后运行 `vp test run`。由于根目录 lint 的类型检查已禁用，
   `vp check` 不能替代显式的工作区类型检查。
 - 使用 `vp test run packages/client/app/app/test/src/path/file.test.ts` 运行单个测试文件；添加

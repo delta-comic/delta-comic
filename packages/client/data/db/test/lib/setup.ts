@@ -1,5 +1,5 @@
 import { clearMocks } from '@tauri-apps/api/mocks'
-import { afterEach, beforeEach, vi } from 'vite-plus/test'
+import { afterEach, beforeEach, vi } from 'vitest'
 
 class MemoryStorage implements Storage {
   private values = new Map<string, string>()

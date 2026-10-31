@@ -2,7 +2,7 @@ import { cp, mkdir, mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 
-import { expect, it } from 'vite-plus/test'
+import { expect, it } from 'vitest'
 
 import {
   cargoTomlVersionPaths,
