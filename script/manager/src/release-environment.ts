@@ -2,7 +2,7 @@ import { execFile } from 'node:child_process'
 import { appendFile } from 'node:fs/promises'
 import { promisify } from 'node:util'
 
-import { rootDir } from './set-version.mts'
+import { rootDir } from './set-version'
 
 const execFileAsync = promisify(execFile)
 

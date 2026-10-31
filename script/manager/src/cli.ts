@@ -7,12 +7,12 @@ import { Command, InvalidArgumentError } from 'commander'
 
 import packageJson from '../package.json' with { type: 'json' }
 
-import { findProjectRoot, loadReleaseCliConfig } from './config.mts'
-import { describeReleaseBranchAction, ReleaseBranchManager } from './release-branches.mts'
-import { ReleaseEnvironment } from './release-environment.mts'
-import { executeRelease, runSemanticRelease } from './release.mts'
-import { assertVersion, VersionSynchronizer } from './set-version.mts'
-import { toWindowsMsiVersion, writeWindowsMsiConfig } from './windows-msi-version.mts'
+import { findProjectRoot, loadReleaseCliConfig } from './config'
+import { executeRelease, runSemanticRelease } from './release'
+import { describeReleaseBranchAction, ReleaseBranchManager } from './release-branches'
+import { ReleaseEnvironment } from './release-environment'
+import { assertVersion, VersionSynchronizer } from './set-version'
+import { toWindowsMsiVersion, writeWindowsMsiConfig } from './windows-msi-version'
 
 function projectRoot(program: Command) {
   const cwd = program.opts<{ cwd: string }>().cwd

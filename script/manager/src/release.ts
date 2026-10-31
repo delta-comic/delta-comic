@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process'
 
-import { ReleaseEnvironment, type ReleasePreparation } from './release-environment.mts'
-import { rootDir } from './set-version.mts'
+import { ReleaseEnvironment, type ReleasePreparation } from './release-environment'
+import { rootDir } from './set-version'
 
 export type SemanticReleaseRunner = (args: string[], env: NodeJS.ProcessEnv) => Promise<void>
 

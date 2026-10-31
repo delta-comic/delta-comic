@@ -1,8 +1,8 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 
-import type { ReleaseCliConfig } from './config.mts'
-import { rootDir } from './set-version.mts'
+import type { ReleaseCliConfig } from './config'
+import { rootDir } from './set-version'
 
 type DependencyBlock = Record<string, string>
 

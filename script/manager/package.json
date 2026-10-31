@@ -11,8 +11,8 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./dist/cli.mjs",
-    "./semantic-release": "./dist/semantic-release-plugin.mjs"
+    ".": "./dist/index.mjs",
+    "./cli": "./dist/cli.mjs"
   },
   "publishConfig": {
     "access": "public",

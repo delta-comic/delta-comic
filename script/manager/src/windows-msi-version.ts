@@ -1,8 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import type { ReleaseCliConfig } from './config.mts'
-import { assertVersion, rootDir } from './set-version.mts'
+import type { ReleaseCliConfig } from './config'
+import { assertVersion, rootDir } from './set-version'
 
 const stableBuild = 65_535
 const maximumPrereleaseBuild = stableBuild - 1

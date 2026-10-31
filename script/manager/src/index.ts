@@ -1,0 +1,1 @@
+export { type ReleaseCliConfig, defineReleaseCliConfig } from './config'
