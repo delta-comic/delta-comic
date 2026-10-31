@@ -173,9 +173,6 @@ catalogs:
     '@commitlint/config-conventional':
       specifier: ^21.2.3
       version: 21.2.3
-    '@elysia/eden':
-      specifier: ^1.4.10
-      version: 1.4.10
     '@elysiajs/bearer':
       specifier: ^1.4.4
       version: 1.4.4
@@ -1359,9 +1356,6 @@ importers:
       '@delta-comic/both':
         specifier: 'workspace:'
         version: link:../../../shared/core/both
-      '@elysia/eden':
-        specifier: 'catalog:'
-        version: 1.4.10(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.34))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))
       cordis:
         specifier: 'catalog:'
         version: 4.0.0-rc.10
@@ -2636,11 +2630,6 @@ packages:
         optional: true
       vite:
         optional: true
-
-  '@elysia/eden@1.4.10':
-    resolution: {integrity: sha512-vcZXQcW6wZj6rhTxaiTkuCbVuS/yAJQ9jqCM6b83a5hu99F5Aj3HOyWXL17iod2Rz+pJpYsQGX0XaeoCsMpw2g==}
-    peerDependencies:
-      elysia: '>=1.4.19'
 
   '@elysiajs/bearer@1.4.4':
     resolution: {integrity: sha512-NCMiTEwLmqfxkbaTHYvZXvmO+CHmHVNlLLNa+0RcJviK88abVeSnn6wswgABGGTRJJTkfw3Ks3fw/7um3bxeRQ==}
@@ -9418,10 +9407,6 @@ snapshots:
       '@devframes/hub': 1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0)
       '@devframes/hub-ui': 1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(@devframes/json-render@1.1.0(@devframes/hub@1.1.0(@devframes/agentic@1.1.0)(crossws@0.4.12(srvx@1.0.5))(devframe@1.1.0))(devframe@1.1.0))(devframe@1.1.0)
       vite: '@voidzero-dev/vite-plus-core@1.0.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.0)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)(yaml@2.9.1)'
-
-  '@elysia/eden@1.4.10(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.34))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))':
-    dependencies:
-      elysia: 1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.34))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2)
 
   '@elysiajs/bearer@1.4.4(elysia@1.4.29(@sinclair/typebox@0.34.52)(exact-mirror@1.2.2(typebox@1.3.34))(file-type@22.0.1(supports-color@10.2.2))(openapi-types@12.1.3)(typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2))':
     dependencies:

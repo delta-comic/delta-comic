@@ -1,6 +1,6 @@
-import { defineAdminFeature } from '@/app/featureRegistry'
+import type { AdminFeature } from '@/app/featureRegistry'
 
-export default defineAdminFeature({
+export default {
   key: 'modules',
   navigation: { icon: 'cube', label: '服务模块', order: 30, path: '/modules' },
   routes: [
@@ -11,4 +11,4 @@ export default defineAdminFeature({
       meta: { title: '服务模块' },
     },
   ],
-})
+} satisfies AdminFeature

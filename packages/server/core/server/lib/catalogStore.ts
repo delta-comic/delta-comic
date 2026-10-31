@@ -23,11 +23,6 @@ export const createR2PluginCatalogStore = (
   bucket: PluginCatalogBucket,
   key = 'catalog/index.json',
 ): PluginCatalogStore => ({
-  async load() {
-    const object = await bucket.get(key)
-    if (!object) return undefined
-    return parsePluginCatalogIndex(JSON.parse(await object.text()))
-  },
   async loadSnapshot() {
     const object = await bucket.get(key)
     if (!object) return { index: undefined, version: null }

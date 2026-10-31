@@ -43,14 +43,13 @@ describe('concurrent release updates', () => {
         status: 'rejected',
         reason: expect.any(PluginCatalogConflictError),
       })
-      expect((await store.load())?.entries[0]?.releases.map(item => item.version)).toEqual([
-        '1.0.0',
-      ])
+      expect(
+        (await store.loadSnapshot()).index?.entries[0]?.releases.map(item => item.version),
+      ).toEqual(['1.0.0'])
       await second.publish(release('2.0.0'), metadata)
-      expect((await store.load())?.entries[0]?.releases.map(item => item.version)).toEqual([
-        '1.0.0',
-        '2.0.0',
-      ])
+      expect(
+        (await store.loadSnapshot()).index?.entries[0]?.releases.map(item => item.version),
+      ).toEqual(['1.0.0', '2.0.0'])
     },
   )
 
@@ -68,20 +67,9 @@ describe('concurrent release updates', () => {
       reason: expect.any(PluginCatalogConflictError),
     })
     await otherPublisher.yank('demo', '1.0.0')
-    expect((await store.load())?.entries[0]?.releases).toMatchObject([
+    expect((await store.loadSnapshot()).index?.entries[0]?.releases).toMatchObject([
       { version: '1.0.0', yanked: true },
       { version: '2.0.0' },
     ])
-  })
-
-  it('publishes through a load/save store', async () => {
-    const memory = createMemoryPluginCatalogStore()
-    const publisher = createPluginReleasePublisher({
-      load: () => memory.load(),
-      save: index => memory.save(index),
-    })
-    await publisher.publish(release('1.0.0'), { name: 'Demo' })
-    await publisher.yank('demo', '1.0.0')
-    expect((await memory.load())?.entries[0]?.releases[0]?.yanked).toBe(true)
   })
 })

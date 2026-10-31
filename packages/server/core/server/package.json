@@ -32,7 +32,6 @@
   },
   "dependencies": {
     "@delta-comic/both": "workspace:",
-    "@elysia/eden": "catalog:",
     "cordis": "catalog:",
     "json-logic-js": "catalog:",
     "ky": "catalog:",

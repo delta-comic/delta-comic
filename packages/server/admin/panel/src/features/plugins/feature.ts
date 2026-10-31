@@ -1,6 +1,6 @@
-import { defineAdminFeature } from '@/app/featureRegistry'
+import type { AdminFeature } from '@/app/featureRegistry'
 
-export default defineAdminFeature({
+export default {
   key: 'plugins',
   navigation: { icon: 'plugins', label: '插件中心', order: 10, path: '/plugins' },
   routes: [
@@ -11,4 +11,4 @@ export default defineAdminFeature({
       meta: { title: '插件中心' },
     },
   ],
-})
+} satisfies AdminFeature

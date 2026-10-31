@@ -1,6 +1,6 @@
-import { defineAdminFeature } from '@/app/featureRegistry'
+import type { AdminFeature } from '@/app/featureRegistry'
 
-export default defineAdminFeature({
+export default {
   key: 'openapi',
   navigation: { icon: 'api', label: 'OpenAPI', order: 40, path: '/openapi' },
   routes: [
@@ -11,4 +11,4 @@ export default defineAdminFeature({
       meta: { title: 'OpenAPI' },
     },
   ],
-})
+} satisfies AdminFeature

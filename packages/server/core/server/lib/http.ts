@@ -3,7 +3,6 @@ import type { KyInstance, Options, RetryOptions } from 'ky'
 
 import { CLOUD_API_PREFIX, DEFAULT_REQUEST_TIMEOUT } from './constants'
 import {
-  CloudApiError,
   CloudClientError,
   CloudConfigurationError,
   CloudDisabledError,
@@ -135,6 +134,3 @@ export class CloudHttpClient {
     }
   }
 }
-
-export const isCloudApiError = (error: unknown): error is CloudApiError =>
-  error instanceof CloudApiError

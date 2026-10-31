@@ -20,9 +20,7 @@ export interface PluginReleaseMetadata {
 const catalogError = (message: string) => new Error(`Plugin release update failed: ${message}`)
 
 const loadCatalog = async (store: PluginCatalogStore) => {
-  const snapshot = store.loadSnapshot
-    ? await store.loadSnapshot()
-    : { index: await store.load(), version: undefined }
+  const snapshot = await store.loadSnapshot()
   return {
     version: snapshot.version,
     index: parsePluginCatalogIndex(

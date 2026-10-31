@@ -4,13 +4,17 @@ import { getRuntime } from '@/env'
 import { adminGuard } from '@/shared/http/adminGuard'
 import { ok } from '@/shared/response'
 
+import { D1AdminMetricsRepository } from './admin.repository'
 import { adminModels } from './admin.schemas'
-import { createAdminMetricsService } from './admin.service'
+import { AdminMetricsService } from './admin.service'
 
 export const adminRoutes = new Elysia({ name: 'dc-admin-routes', prefix: '/admin' })
   .use(adminModels)
   .use(adminGuard)
-  .resolve(({ request }) => ({ adminMetrics: createAdminMetricsService(getRuntime(request).env) }))
+  .resolve(({ request }) => {
+    const { env } = getRuntime(request)
+    return { adminMetrics: new AdminMetricsService(new D1AdminMetricsRepository(env.DB), env) }
+  })
   .get('/capabilities', ({ adminMetrics }) => ok(adminMetrics.capabilities()), {
     detail: { summary: 'Describe server capabilities and runtime configuration', tags: ['Admin'] },
     response: { 200: 'Response.AdminCapabilities' },

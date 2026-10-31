@@ -8,7 +8,7 @@ import {
   type ServerModuleDefinition,
 } from '../../../lib/config'
 
-import { D1AdminMetricsRepository, type AdminMetricsRepository } from './admin.repository'
+import type { AdminMetricsRepository } from './admin.repository'
 import type {
   AdminCapabilities,
   AdminDeployment,
@@ -79,11 +79,9 @@ export class AdminMetricsService {
   constructor(
     private readonly repository: AdminMetricsRepository,
     private readonly env: AppEnv,
-    private readonly modules: readonly ServerModuleDefinition[] = serverModules,
-    private readonly now: () => number = Date.now,
   ) {}
 
-  capabilities(observedAt = this.now()): AdminCapabilities {
+  capabilities(observedAt = Date.now()): AdminCapabilities {
     const metadata = versionMetadata(this.env)
     return {
       features: {
@@ -93,7 +91,7 @@ export class AdminMetricsService {
         pluginAudit: true,
         versionMetadata: metadata.available,
       },
-      modules: this.modules.map(module => describeModuleRuntime(module, this.env)),
+      modules: serverModules.map(module => describeModuleRuntime(module, this.env)),
       observedAt,
       server: {
         adminPath: defaultServerRuntimeConfig.adminPath,
@@ -113,7 +111,7 @@ export class AdminMetricsService {
     }
   }
 
-  async readiness(checkedAt = this.now()): Promise<AdminReadiness> {
+  async readiness(checkedAt = Date.now()): Promise<AdminReadiness> {
     adminLogger.debug('readiness probe started')
     let databaseHealthy = true
     try {
@@ -149,7 +147,7 @@ export class AdminMetricsService {
     }
   }
 
-  async overview(observedAt = this.now()): Promise<AdminOverview> {
+  async overview(observedAt = Date.now()): Promise<AdminOverview> {
     const [readiness, metrics, recentActivity] = await Promise.all([
       this.readiness(observedAt),
       this.repository.readMetrics(observedAt),
@@ -168,6 +166,3 @@ export class AdminMetricsService {
     return { deployment: versionMetadata(this.env), health, metrics, observedAt, recentActivity }
   }
 }
-
-export const createAdminMetricsService = (env: AppEnv): AdminMetricsService =>
-  new AdminMetricsService(new D1AdminMetricsRepository(env.DB), env)

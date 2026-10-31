@@ -5,10 +5,10 @@ import { openapi } from '@elysiajs/openapi'
 import { Elysia, t } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
 
-import { createPluginArtifactUploadHandler } from '../lib/catalogArtifactHandler'
+import { handlePluginArtifactUpload } from '../lib/catalogArtifactHandler'
 import { createR2PluginArtifactStore } from '../lib/catalogArtifacts'
-import { createPluginCatalogHandler } from '../lib/catalogHandler'
-import { createPluginCatalogPublishHandler } from '../lib/catalogPublishHandler'
+import { handlePluginCatalogRequest } from '../lib/catalogHandler'
+import { handlePluginPublishRequest } from '../lib/catalogPublishHandler'
 import { createR2PluginCatalogStore } from '../lib/catalogStore'
 import { serverModules } from '../lib/config'
 
@@ -111,6 +111,7 @@ const compiled = app.compile()
 
 const catalogPath = '/plugins/catalog/index.json'
 const publishPath = '/plugins/catalog/releases'
+const yankPath = '/plugins/catalog/releases/yank'
 const artifactPath = '/plugins/catalog/artifacts'
 const diagnosticPath = '/api/admin/diagnostics'
 export const workerDiagnostics = new DiagnosticRecorder({ capacity: 1000, source: 'server-worker' })
@@ -124,27 +125,17 @@ const isAdminRequest = async (request: Request, env: AppEnv) => {
 
 const route = (request: Request, env: AppEnv) => {
   const pathname = new URL(request.url).pathname
-  const authorizeWrite = (request: Request) => isAdminRequest(request, env)
-  if (env.PLUGIN_CATALOG && pathname === catalogPath) {
-    return createPluginCatalogHandler({
-      store: createR2PluginCatalogStore(env.PLUGIN_CATALOG),
-      pathname: catalogPath,
-      authorizeWrite,
-    }).fetch(request)
-  }
-  if (env.PLUGIN_CATALOG && pathname.startsWith(publishPath)) {
-    return createPluginCatalogPublishHandler({
-      store: createR2PluginCatalogStore(env.PLUGIN_CATALOG),
-      publishPath,
-      authorizeWrite,
-    }).fetch(request)
+  const authorize = (request: Request) => isAdminRequest(request, env)
+  if (env.PLUGIN_CATALOG) {
+    const store = createR2PluginCatalogStore(env.PLUGIN_CATALOG)
+    if (pathname === catalogPath) return handlePluginCatalogRequest(request, store, authorize)
+    if (pathname === publishPath || pathname === yankPath) {
+      return handlePluginPublishRequest(request, store, authorize, pathname === yankPath)
+    }
   }
   if (env.PLUGIN_ARTIFACTS && env.PLUGIN_PUBLIC_BASE_URL && pathname === artifactPath) {
-    return createPluginArtifactUploadHandler({
-      store: createR2PluginArtifactStore(env.PLUGIN_ARTIFACTS, env.PLUGIN_PUBLIC_BASE_URL),
-      uploadPath: artifactPath,
-      authorizeWrite: async request => ((await authorizeWrite(request)) ? 'admin' : false),
-    }).fetch(request)
+    const store = createR2PluginArtifactStore(env.PLUGIN_ARTIFACTS, env.PLUGIN_PUBLIC_BASE_URL)
+    return handlePluginArtifactUpload(request, store, authorize)
   }
   if (pathname === diagnosticPath) return diagnosticResponse(request, env)
   return compiled.fetch(request)

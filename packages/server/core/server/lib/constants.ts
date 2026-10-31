@@ -1,5 +1,3 @@
-export const OFFICIAL_SERVER_URL = ''
-
 export const CLOUD_API_PREFIX = 'api'
 
 export const CLOUD_SCHEMA_VERSION = 1

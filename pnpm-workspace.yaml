@@ -18,7 +18,6 @@ catalog:
   es-module-lexer: ^3.0.4
   magic-string: ^1.1.0
   cordis: ^4.0.0-rc.10
-  '@elysia/eden': '^1.4.10'
   '@swc/core': ^1.16.0
   # https://github.com/vuejs/language-tools/issues/6237
   vue-tsc: 3.3.11
