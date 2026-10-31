@@ -24,7 +24,6 @@
     "cordis": "catalog:"
   },
   "devDependencies": {
-    "@swc/core": "catalog:",
     "vite-plus": "catalog:"
   }
 }

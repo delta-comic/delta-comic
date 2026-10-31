@@ -54,7 +54,6 @@ export default defineConfig({
         './lib/manifest.ts',
         './lib/ui.ts',
         './lib/network.ts',
-        './lib/diagnostics.ts',
         './lib/vite.ts',
       ],
       sourcemap: true,

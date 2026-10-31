@@ -1,4 +1,4 @@
-import { DiagnosticRecorder } from '@delta-comic/both'
+import { DiagnosticRecorder, withDiagnostic } from '@delta-comic/both'
 import { logger } from '@delta-comic/shared-core-logger'
 import { cors as elysiaCors } from '@elysiajs/cors'
 import { openapi } from '@elysiajs/openapi'
@@ -11,8 +11,6 @@ import { createPluginCatalogHandler } from '../lib/catalogHandler'
 import { createPluginCatalogPublishHandler } from '../lib/catalogPublishHandler'
 import { createR2PluginCatalogStore } from '../lib/catalogStore'
 import { serverModules } from '../lib/config'
-import { createDiagnosticHandler } from '../lib/diagnosticHandler'
-import { createServerWorkerAdapter } from '../lib/serverAdapter'
 
 import { bindRuntime, type AppEnv } from './env'
 import { adminModule } from './modules/admin/admin.module'
@@ -115,95 +113,63 @@ const catalogPath = '/plugins/catalog/index.json'
 const publishPath = '/plugins/catalog/releases'
 const artifactPath = '/plugins/catalog/artifacts'
 const diagnosticPath = '/api/admin/diagnostics'
-const workerDiagnosticRecorder = new DiagnosticRecorder({ capacity: 1000, source: 'server-worker' })
+export const workerDiagnostics = new DiagnosticRecorder({ capacity: 1000, source: 'server-worker' })
 
-const catalogHandler = (env: AppEnv) => {
-  if (!env.PLUGIN_CATALOG) return undefined
-  return createPluginCatalogHandler({
-    store: createR2PluginCatalogStore(env.PLUGIN_CATALOG),
-    pathname: catalogPath,
-    authorizeWrite: async request => {
-      const expected = env.SERVER_ADMIN_TOKEN
-      const provided = request.headers.get('authorization')
-      if (!expected || !provided?.startsWith('Bearer ')) return false
-      return await constantTimeTokenEqual(provided.slice('Bearer '.length), expected)
-    },
-  })
+const isAdminRequest = async (request: Request, env: AppEnv) => {
+  const expected = env.SERVER_ADMIN_TOKEN
+  const provided = request.headers.get('authorization')
+  if (!expected || !provided?.startsWith('Bearer ')) return false
+  return await constantTimeTokenEqual(provided.slice('Bearer '.length), expected)
 }
 
-const catalogPublishHandler = (env: AppEnv) => {
-  if (!env.PLUGIN_CATALOG) return undefined
-  const store = createR2PluginCatalogStore(env.PLUGIN_CATALOG)
-  return createPluginCatalogPublishHandler({
-    store,
-    publishPath,
-    authorizeWrite: async request => {
-      const expected = env.SERVER_ADMIN_TOKEN
-      const provided = request.headers.get('authorization')
-      if (!expected || !provided?.startsWith('Bearer ')) return false
-      return constantTimeTokenEqual(provided.slice('Bearer '.length), expected)
-    },
-  })
+const route = (request: Request, env: AppEnv) => {
+  const pathname = new URL(request.url).pathname
+  const authorizeWrite = (request: Request) => isAdminRequest(request, env)
+  if (env.PLUGIN_CATALOG && pathname === catalogPath) {
+    return createPluginCatalogHandler({
+      store: createR2PluginCatalogStore(env.PLUGIN_CATALOG),
+      pathname: catalogPath,
+      authorizeWrite,
+    }).fetch(request)
+  }
+  if (env.PLUGIN_CATALOG && pathname.startsWith(publishPath)) {
+    return createPluginCatalogPublishHandler({
+      store: createR2PluginCatalogStore(env.PLUGIN_CATALOG),
+      publishPath,
+      authorizeWrite,
+    }).fetch(request)
+  }
+  if (env.PLUGIN_ARTIFACTS && env.PLUGIN_PUBLIC_BASE_URL && pathname === artifactPath) {
+    return createPluginArtifactUploadHandler({
+      store: createR2PluginArtifactStore(env.PLUGIN_ARTIFACTS, env.PLUGIN_PUBLIC_BASE_URL),
+      uploadPath: artifactPath,
+      authorizeWrite: async request => ((await authorizeWrite(request)) ? 'admin' : false),
+    }).fetch(request)
+  }
+  if (pathname === diagnosticPath) return diagnosticResponse(request, env)
+  return compiled.fetch(request)
 }
 
-const artifactUploadHandler = (env: AppEnv) => {
-  if (!env.PLUGIN_ARTIFACTS || !env.PLUGIN_PUBLIC_BASE_URL) return undefined
-  return createPluginArtifactUploadHandler({
-    store: createR2PluginArtifactStore(env.PLUGIN_ARTIFACTS, env.PLUGIN_PUBLIC_BASE_URL),
-    uploadPath: artifactPath,
-    authorizeWrite: async request => {
-      const expected = env.SERVER_ADMIN_TOKEN
-      const provided = request.headers.get('authorization')
-      if (!expected || !provided?.startsWith('Bearer ')) return false
-      return (await constantTimeTokenEqual(provided.slice('Bearer '.length), expected))
-        ? 'admin'
-        : false
-    },
-  })
+const diagnosticResponse = async (request: Request, env: AppEnv) => {
+  if (!(await isAdminRequest(request, env))) return new Response(null, { status: 401 })
+  if (request.method !== 'GET')
+    return new Response(null, { status: 405, headers: { allow: 'GET' } })
+  return Response.json({ ok: true, data: workerDiagnostics.snapshot() })
 }
 
-const workerAdapter = createServerWorkerAdapter<AppEnv>({
-  diagnostics: workerDiagnosticRecorder,
-  fetch(request, env, ctx) {
-    serverLogger.debug('request received', {
-      method: request.method,
-      path: new URL(request.url).pathname,
-    })
+export default {
+  ...compiled,
+  fetch(request: Request, env: AppEnv, ctx: ExecutionContext) {
+    const path = new URL(request.url).pathname
+    serverLogger.debug('request received', { method: request.method, path })
     bindRuntime(request, { ctx, env })
-    const catalog = catalogHandler(env)
-    if (catalog && new URL(request.url).pathname === catalogPath) return catalog.fetch(request)
-    const publisher = catalogPublishHandler(env)
-    if (publisher && new URL(request.url).pathname.startsWith(publishPath)) {
-      return publisher.fetch(request)
-    }
-    const artifacts = artifactUploadHandler(env)
-    if (artifacts && new URL(request.url).pathname === artifactPath) {
-      return artifacts.fetch(request)
-    }
-    if (new URL(request.url).pathname === diagnosticPath) {
-      return createDiagnosticHandler({
-        diagnostics: workerDiagnosticRecorder,
-        path: diagnosticPath,
-        authorize: async request => {
-          const expected = env.SERVER_ADMIN_TOKEN
-          const provided = request.headers.get('authorization')
-          if (!expected || !provided?.startsWith('Bearer ')) return false
-          return await constantTimeTokenEqual(provided.slice('Bearer '.length), expected)
-        },
-      }).fetch(request)
-    }
-    return compiled.fetch(request)
+    return withDiagnostic(workerDiagnostics, 'server worker fetch', () => route(request, env), {
+      method: request.method,
+      path,
+    })
   },
   scheduled(controller, env, ctx) {
     serverLogger.info('scheduled plugin run started', { cron: controller.cron })
     ctx.waitUntil(runScheduledFlows(env.DB, controller.scheduledTime))
   },
-})
-
-export default {
-  ...compiled,
-  fetch: workerAdapter.fetch,
-  scheduled: workerAdapter.scheduled,
 } satisfies ExportedHandler<AppEnv>
-
-export const workerDiagnostics = workerAdapter.diagnostics

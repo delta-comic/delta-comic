@@ -1,7 +1,7 @@
 import {
-  createClientDownloader,
   createClientNetwork,
   DiagnosticRecorder,
+  Downloader,
   type ClientDatabase,
   type ClientNetwork,
   type ClientUiRegistrars,
@@ -329,7 +329,7 @@ export const preparePluginHost = async (options: PreparePluginHostOptions) => {
       new UiService(ctx, owner, options.uiRegistrars ?? {})
       ctx.provide('database', options.database)
       ctx.provide('network', options.network ?? createClientNetwork(pluginDiagnostics, 'app'))
-      const downloader = createClientDownloader(pluginDiagnostics, 'app', { key: 'app:plugins' })
+      const downloader = Downloader.create({ key: 'app:plugins' })
       ctx.provide('downloader', downloader)
       ctx.provide('diagnostics', pluginDiagnostics)
       ctx.effect(() => () => downloader.dispose())
