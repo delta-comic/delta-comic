@@ -1456,18 +1456,8 @@ fn configure_no_follow(options: &mut OpenOptions) {
 fn configure_no_follow(_options: &mut OpenOptions) {}
 
 #[cfg(unix)]
-fn read_exact_at(file: &File, mut bytes: &mut [u8], mut offset: u64) -> std::io::Result<()> {
-  use std::os::unix::fs::FileExt;
-  while !bytes.is_empty() {
-    let read = file.read_at(bytes, offset)?;
-    if read == 0 {
-      return Err(std::io::Error::from(std::io::ErrorKind::UnexpectedEof));
-    }
-    let (_, remaining) = bytes.split_at_mut(read);
-    bytes = remaining;
-    offset += read as u64;
-  }
-  Ok(())
+fn read_exact_at(file: &File, bytes: &mut [u8], offset: u64) -> std::io::Result<()> {
+  std::os::unix::fs::FileExt::read_exact_at(file, bytes, offset)
 }
 
 #[cfg(windows)]
@@ -1486,17 +1476,10 @@ fn read_exact_at(file: &File, mut bytes: &mut [u8], mut offset: u64) -> std::io:
 }
 
 #[cfg(unix)]
-fn write_all_at(file: &File, mut bytes: &[u8], mut offset: u64) -> Result<()> {
-  use std::os::unix::fs::FileExt;
-  while !bytes.is_empty() {
-    let written = file.write_at(bytes, offset)?;
-    if written == 0 {
-      return Err(std::io::Error::from(std::io::ErrorKind::WriteZero).into());
-    }
-    bytes = &bytes[written..];
-    offset += written as u64;
-  }
-  Ok(())
+fn write_all_at(file: &File, bytes: &[u8], offset: u64) -> Result<()> {
+  Ok(std::os::unix::fs::FileExt::write_all_at(
+    file, bytes, offset,
+  )?)
 }
 
 #[cfg(windows)]
