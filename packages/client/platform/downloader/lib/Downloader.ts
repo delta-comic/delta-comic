@@ -4,8 +4,11 @@ import type {
   Checksum as RpcChecksum,
   ContentRefreshContext as RpcContentRefreshContext,
   DownloadAsset as RpcDownloadAsset,
+  DownloadCollection as RpcDownloadCollection,
+  DownloaderSettings as RpcDownloaderSettings,
   DownloadSource as RpcDownloadSource,
   DownloadTask as RpcDownloadTask,
+  DownloadTaskDetail as RpcDownloadTaskDetail,
   HttpMirror as RpcHttpMirror,
   SeedPolicy as RpcSeedPolicy,
   TaskRemovedEvent as RpcTaskRemovedEvent,
@@ -200,6 +203,44 @@ const toClientTask = (task: RpcDownloadTask): DownloadTask => ({
   revision: task.revision,
 })
 
+const toClientRefreshContext = (context: RpcContentRefreshContext): ContentRefreshContext => ({
+  plugin: context.plugin,
+  contentType: context.contentType,
+  contentId: context.contentId,
+  episodeId: context.episodeId,
+  contentPageFingerprint: context.contentPageFingerprint ?? undefined,
+  providerFingerprint: context.providerFingerprint,
+  pluginVersion: context.pluginVersion ?? undefined,
+  pluginIntegrity: context.pluginIntegrity ?? undefined,
+})
+
+const toClientCollection = (collection: RpcDownloadCollection): DownloadCollection => ({
+  ...collection,
+  refreshContext: collection.refreshContext
+    ? toClientRefreshContext(collection.refreshContext)
+    : undefined,
+  totalBytes: collection.totalBytes ?? undefined,
+})
+
+const toClientTaskDetail = (detail: RpcDownloadTaskDetail): DownloadTaskDetail => ({
+  task: toClientTask(detail.task),
+  completedRanges: detail.completedRanges,
+  torrent: detail.torrent
+    ? {
+        infoHash: detail.torrent.infoHash ?? undefined,
+        uploadedBytes: detail.torrent.uploadedBytes,
+        peerCount: detail.torrent.peerCount,
+        seedStartedAt: detail.torrent.seedStartedAt ?? undefined,
+      }
+    : undefined,
+})
+
+const toClientSettings = (settings: RpcDownloaderSettings): DownloaderSettings => ({
+  ...settings,
+  seedRatio: settings.seedRatio ?? undefined,
+  seedSeconds: settings.seedSeconds ?? undefined,
+})
+
 export interface CreateDownloaderOptions {
   key?: string
 }
@@ -287,91 +328,98 @@ export class Downloader {
   }
 
   async listTasks(): Promise<DownloadTask[]> {
-    return (await this.#getRpc().list_tasks()) as DownloadTask[]
+    return (await this.#getRpc().list_tasks()).map(toClientTask)
   }
 
   async getTaskDetail(id: string): Promise<DownloadTaskDetail> {
-    return (await this.#getRpc().get_task_detail(id)) as DownloadTaskDetail
+    return toClientTaskDetail(await this.#getRpc().get_task_detail(id))
   }
 
   async getCollections(): Promise<DownloadCollection[]> {
-    return (await this.#getRpc().get_collections()) as DownloadCollection[]
+    return (await this.#getRpc().get_collections()).map(toClientCollection)
   }
 
   async listDestinations(): Promise<Destination[]> {
-    return (await this.#getRpc().list_destinations()) as Destination[]
+    return await this.#getRpc().list_destinations()
   }
 
   async getSettings(): Promise<DownloaderSettings> {
-    return (await this.#getRpc().get_settings()) as DownloaderSettings
+    return toClientSettings(await this.#getRpc().get_settings())
   }
 
   async getCapabilities(): Promise<DownloaderCapabilities> {
-    return (await this.#getRpc().get_capabilities()) as DownloaderCapabilities
+    return await this.#getRpc().get_capabilities()
   }
 
   async updateSettings(
     patch: Partial<Omit<DownloaderSettings, 'revision'>>,
   ): Promise<DownloaderSettings> {
     const settings = { ...(await this.getSettings()), ...patch }
-    return (await this.#getRpc().update_settings({
-      ...settings,
-      seedRatio: settings.seedRatio ?? null,
-      seedSeconds: settings.seedSeconds ?? null,
-    })) as DownloaderSettings
+    return toClientSettings(
+      await this.#getRpc().update_settings({
+        ...settings,
+        seedRatio: settings.seedRatio ?? null,
+        seedSeconds: settings.seedSeconds ?? null,
+      }),
+    )
   }
 
   async enqueueUrl(input: EnqueueUrlInput): Promise<DownloadTask> {
-    return (await this.#getRpc().enqueue_url({
-      url: input.url,
-      mirrors: input.mirrors?.map(toRpcMirror),
-      title: input.title ?? null,
-      relativePath: input.relativePath ?? null,
-      destinationId: input.destinationId ?? null,
-      priority: input.priority ?? null,
-      checksum: toRpcChecksum(input.checksum),
-    })) as DownloadTask
+    return toClientTask(
+      await this.#getRpc().enqueue_url({
+        url: input.url,
+        mirrors: input.mirrors?.map(toRpcMirror),
+        title: input.title ?? null,
+        relativePath: input.relativePath ?? null,
+        destinationId: input.destinationId ?? null,
+        priority: input.priority ?? null,
+        checksum: toRpcChecksum(input.checksum),
+      }),
+    )
   }
 
   async enqueueTorrent(input: EnqueueTorrentInput): Promise<DownloadTask> {
-    return (await this.#getRpc().enqueue_torrent({
-      source: {
-        input: input.source.input,
-        onlyFiles: input.source.onlyFiles,
-        seedPolicy: toRpcSeedPolicy(input.source.seedPolicy),
-      },
-      title: input.title ?? null,
-      relativePath: input.relativePath ?? null,
-      destinationId: input.destinationId ?? null,
-      priority: input.priority ?? null,
-    })) as DownloadTask
+    return toClientTask(
+      await this.#getRpc().enqueue_torrent({
+        source: {
+          input: input.source.input,
+          onlyFiles: input.source.onlyFiles,
+          seedPolicy: toRpcSeedPolicy(input.source.seedPolicy),
+        },
+        title: input.title ?? null,
+        relativePath: input.relativePath ?? null,
+        destinationId: input.destinationId ?? null,
+        priority: input.priority ?? null,
+      }),
+    )
   }
 
   async enqueuePlan(input: EnqueuePlanInput): Promise<DownloadTask[]> {
-    return (await this.#getRpc().enqueue_plan({
+    const tasks = await this.#getRpc().enqueue_plan({
       key: input.key,
       title: input.title,
       assets: input.assets.map(toRpcAsset),
       destinationId: input.destinationId ?? null,
       priority: input.priority ?? null,
       refreshContext: toRpcRefreshContext(input.refreshContext),
-    })) as DownloadTask[]
+    })
+    return tasks.map(toClientTask)
   }
 
   async pauseTask(id: string): Promise<DownloadTask> {
-    return (await this.#getRpc().pause_task(id)) as DownloadTask
+    return toClientTask(await this.#getRpc().pause_task(id))
   }
 
   async resumeTask(id: string): Promise<DownloadTask> {
-    return (await this.#getRpc().resume_task(id)) as DownloadTask
+    return toClientTask(await this.#getRpc().resume_task(id))
   }
 
   async retryTask(id: string): Promise<DownloadTask> {
-    return (await this.#getRpc().retry_task(id)) as DownloadTask
+    return toClientTask(await this.#getRpc().retry_task(id))
   }
 
   async cancelTask(id: string): Promise<DownloadTask> {
-    return (await this.#getRpc().cancel_task(id)) as DownloadTask
+    return toClientTask(await this.#getRpc().cancel_task(id))
   }
 
   async forgetTask(id: string): Promise<void> {
@@ -383,20 +431,20 @@ export class Downloader {
   }
 
   async setPriority(id: string, priority: number): Promise<DownloadTask> {
-    return (await this.#getRpc().set_priority(id, priority)) as DownloadTask
+    return toClientTask(await this.#getRpc().set_priority(id, priority))
   }
 
   async moveQueue(id: string, beforeTaskId?: string | null): Promise<DownloadTask> {
-    return (await this.#getRpc().move_queue(id, beforeTaskId ?? null)) as DownloadTask
+    return toClientTask(await this.#getRpc().move_queue(id, beforeTaskId ?? null))
   }
 
   /** Opens the platform-owned directory picker and registers the granted destination. */
   async pickDestination(): Promise<Destination | null> {
-    return (await this.#getRpc().pick_destination()) as Destination | null
+    return await this.#getRpc().pick_destination()
   }
 
   async updateSource(id: string, source: DownloadSource): Promise<DownloadTask> {
-    return (await this.#getRpc().update_source(id, toRpcSource(source))) as DownloadTask
+    return toClientTask(await this.#getRpc().update_source(id, toRpcSource(source)))
   }
 
   async onTaskUpsert(handler: (event: TaskUpsertEvent) => void): Promise<DownloaderUnlisten> {
