@@ -1,10 +1,6 @@
 use std::{
   io::IsTerminal,
   path::{Path, PathBuf},
-  sync::{
-    Arc,
-    atomic::{AtomicU64, Ordering},
-  },
 };
 
 use chrono::{Local, NaiveDate};
@@ -16,7 +12,7 @@ use tokio::{
 
 use crate::{
   error::{Error, Result},
-  model::{FrontendLogEntry, LogLevel, LogRecord},
+  model::{FrontendLogEntry, LogRecord},
 };
 
 const FILE_PREFIX: &str = "delta-comic-";
@@ -27,37 +23,19 @@ pub(crate) enum WorkerMessage {
 }
 
 #[derive(Clone)]
-pub struct LoggerHandle {
+pub(crate) struct LoggerHandle {
   sender: mpsc::Sender<WorkerMessage>,
-  dropped: Arc<AtomicU64>,
 }
 
 impl LoggerHandle {
   pub(crate) fn new(sender: mpsc::Sender<WorkerMessage>) -> Self {
-    Self {
-      sender,
-      dropped: Arc::new(AtomicU64::new(0)),
-    }
+    Self { sender }
   }
 
-  /// Enqueues a native or plugin log without blocking the caller.
-  ///
-  /// Returns `false` only when the bounded queue is full or the logger has
-  /// already shut down. Tracing events use this same path.
-  pub fn log(&self, scope: impl Into<String>, level: LogLevel, content: impl Into<String>) -> bool {
-    self.try_record(LogRecord::new(scope, level, content))
-  }
-
-  pub(crate) fn try_record(&self, record: LogRecord) -> bool {
-    if !record.level.meets_minimum_level() {
-      return true;
-    }
-    match self.sender.try_send(WorkerMessage::Write(record)) {
-      Ok(()) => true,
-      Err(_) => {
-        self.dropped.fetch_add(1, Ordering::Relaxed);
-        false
-      }
+  /// Enqueues a record without blocking; it is dropped when the bounded queue is full.
+  pub(crate) fn try_record(&self, record: LogRecord) {
+    if record.level.meets_minimum_level() {
+      let _ = self.sender.try_send(WorkerMessage::Write(record));
     }
   }
 
@@ -83,10 +61,6 @@ impl LoggerHandle {
       .await
       .map_err(|_| Error::WorkerUnavailable)?;
     receiver.await.map_err(|_| Error::WorkerUnavailable)?
-  }
-
-  pub fn dropped_records(&self) -> u64 {
-    self.dropped.load(Ordering::Relaxed)
   }
 }
 

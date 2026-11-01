@@ -4,8 +4,8 @@ import { join } from 'node:path'
 
 import { expect, it } from 'vitest'
 
-import { VersionSynchronizer } from '../src/set-version.mts'
-import { writeWindowsMsiConfig } from '../src/windows-msi-version.mts'
+import { VersionSynchronizer } from '../src/set-version.ts'
+import { writeWindowsMsiConfig } from '../src/windows-msi-version.ts'
 
 it('synchronizes configured JSON, Cargo, lockfile and MSI targets', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'delta-release-fixture-'))

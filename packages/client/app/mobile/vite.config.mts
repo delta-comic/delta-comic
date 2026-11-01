@@ -168,11 +168,6 @@ export default defineConfig(
           ignored: ['**/src-tauri/**', 'src-tauri'],
         },
       },
-      test: {
-        environment: 'happy-dom',
-        include: ['test/**/*.test.ts'],
-        setupFiles: ['./test/setup.ts'],
-      },
       run: {
         tasks: {
           'build': {

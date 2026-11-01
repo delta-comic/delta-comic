@@ -6,6 +6,7 @@ import { useDialog, useMessage } from 'naive-ui'
 import { computed, onMounted, shallowRef, watch } from 'vue'
 
 import { flowText as text } from '@/i18n/flows'
+import { readableApiError } from '@/shared/api/AdminApiClient'
 import AppIcon from '@/shared/components/AppIcon.vue'
 import PageHeader from '@/shared/components/PageHeader.vue'
 import { useConnectionStore } from '@/stores/connection'
@@ -105,7 +106,7 @@ const save = async () => {
       message.success(text.success)
     }
   } catch (error) {
-    message.error(error instanceof Error ? error.message : String(error))
+    message.error(readableApiError(error))
   }
 }
 const run = async () => {
@@ -113,7 +114,7 @@ const run = async () => {
     const result = await store.run(store.selectedId, flowId.value, JSON.parse(inputText.value))
     if (result?.status === 'failed') message.error(result.error ?? text.failed)
   } catch (error) {
-    message.error(error instanceof Error ? error.message : String(error))
+    message.error(readableApiError(error))
   }
 }
 const remove = (installation: FlowInstallation) =>

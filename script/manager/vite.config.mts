@@ -2,9 +2,10 @@ import { defineConfig } from 'vite-plus'
 
 export default defineConfig({
   pack: {
-    entry: ['./src/cli.mts', './src/semantic-release-plugin.mts'],
+    entry: ['./src/cli.ts', './src/index.ts'],
     format: 'esm',
     sourcemap: true,
+    dts: true,
   },
   run: {
     tasks: {

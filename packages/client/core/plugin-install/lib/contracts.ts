@@ -62,8 +62,6 @@ export interface LoadedPluginModule {
 }
 
 export interface PluginModuleReader {
-  readonly id: string
-  matches?(archive: PluginArchiveDB.Archive): boolean
   read(archive: PluginArchiveDB.Archive, signal: AbortSignal): Promise<LoadedPluginModule>
 }
 

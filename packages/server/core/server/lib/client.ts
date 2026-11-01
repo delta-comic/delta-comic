@@ -1,7 +1,4 @@
-import { treaty } from '@elysia/eden'
-
 import { CloudAuthClient } from './auth'
-import { OFFICIAL_SERVER_URL } from './constants'
 import { CloudHttpClient } from './http'
 import type { CloudHttpClientOptions } from './http'
 import { MemoryCloudSessionStorage } from './storage'
@@ -46,10 +43,3 @@ export class DeltaComicCloudClient {
 
 export const createCloudClient = (options: CreateCloudClientOptions = {}): DeltaComicCloudClient =>
   new DeltaComicCloudClient(options)
-
-export type RawCloudServerClient = unknown
-
-export const createRawCloudServerClient = (url = OFFICIAL_SERVER_URL): RawCloudServerClient =>
-  treaty(url) as RawCloudServerClient
-
-export const useCloudServer = createCloudClient

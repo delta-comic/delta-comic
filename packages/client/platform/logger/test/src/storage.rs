@@ -1,20 +1,8 @@
-use chrono::{Local, NaiveDate};
+use chrono::Local;
 use tempfile::tempdir;
-use tokio::fs;
 
-use super::{FileSink, select_chunk};
+use super::FileSink;
 use crate::model::{LogLevel, LogRecord};
-
-#[tokio::test]
-async fn appends_to_the_latest_non_full_chunk() {
-  let directory = tempdir().unwrap();
-  let day = NaiveDate::from_ymd_opt(2026, 7, 22).unwrap();
-  let old = directory.path().join("delta-comic-2026-07-22-002.log");
-  fs::write(&old, b"hello").await.unwrap();
-  let (selected, size) = select_chunk(directory.path(), day, 100).await.unwrap();
-  assert_eq!(selected, old);
-  assert_eq!(size, 5);
-}
 
 #[tokio::test]
 async fn rotates_when_the_size_limit_would_be_exceeded() {

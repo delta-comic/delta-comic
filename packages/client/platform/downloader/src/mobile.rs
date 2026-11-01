@@ -104,7 +104,7 @@ fn register_system_secret_resolver_if_missing() -> crate::Result<()> {
     .unwrap_or_else(std::sync::PoisonError::into_inner);
   if resolver.is_none() {
     let credentials = crate::credentials::CredentialVault::system()?;
-    *resolver = Some(crate::credentials::resolver(credentials, None));
+    *resolver = Some(crate::credentials::resolver(credentials));
   }
   Ok(())
 }
@@ -198,7 +198,6 @@ impl<R: Runtime> MobileDownloader<R> {
       .map_err(|error| format!("failed to persist Android downloader configuration: {error}"))
   }
 
-  #[allow(dead_code)]
   pub(crate) fn schedule(
     &self,
     task_id: String,

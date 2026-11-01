@@ -5,37 +5,22 @@ export interface ClientNetworkRequest {
   readonly init?: RequestInit
 }
 
-export interface ClientNetworkTransport {
-  fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>
-}
-
 export interface ClientNetwork {
   request(request: ClientNetworkRequest): Promise<Response>
   get(url: string | URL, init?: RequestInit): Promise<Response>
   post(url: string | URL, body?: BodyInit | null, init?: RequestInit): Promise<Response>
 }
 
-export interface ClientNetworkOptions {
-  readonly transport?: ClientNetworkTransport
-}
-
-const defaultTransport: ClientNetworkTransport = {
-  fetch: (input, init) => globalThis.fetch(input, init),
-}
-
 export const createClientNetwork = (
   diagnostics: DiagnosticRecorder,
   pluginId: string,
-  options: ClientNetworkOptions = {},
 ): ClientNetwork => {
-  const transport = options.transport ?? defaultTransport
-  const request = (request: ClientNetworkRequest) =>
-    withDiagnostic(
-      diagnostics,
-      'client network request',
-      () => transport.fetch(request.url, request.init),
-      { pluginId, method: request.init?.method ?? 'GET', url: String(request.url) },
-    )
+  const request = ({ url, init }: ClientNetworkRequest) =>
+    withDiagnostic(diagnostics, 'client network request', () => fetch(url, init), {
+      pluginId,
+      method: init?.method ?? 'GET',
+      url: String(url),
+    })
 
   return {
     request,

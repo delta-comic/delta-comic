@@ -1,5 +1,3 @@
-import { syncCollectionNames, type SyncCollection } from './sync/collections'
-
 export type ServerModuleKey =
   | 'admin'
   | 'auth'
@@ -105,7 +103,3 @@ export const defaultServerRuntimeConfig = {
   openapiJsonPath: '/api/openapi/json',
   healthPath: '/api/health',
 } as const satisfies ServerRuntimeConfig
-
-export const serverCollections = syncCollectionNames
-
-export type ServerCollection = SyncCollection

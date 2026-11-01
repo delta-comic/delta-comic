@@ -3,7 +3,7 @@ use std::{
   fs::{File, OpenOptions},
   path::{Component, Path, PathBuf},
   sync::{
-    Arc, Mutex as StdMutex,
+    Arc, Mutex as StdMutex, MutexGuard, PoisonError,
     atomic::{AtomicU64, Ordering},
   },
   time::{Duration, Instant, SystemTime},
@@ -11,17 +11,16 @@ use std::{
 
 use futures_util::StreamExt;
 use reqwest::{
-  Client, Response, StatusCode,
+  Client, RequestBuilder, Response, StatusCode,
   header::{
     AUTHORIZATION, CONTENT_LENGTH, CONTENT_RANGE, COOKIE, ETAG, HeaderMap, HeaderName, HeaderValue,
     IF_RANGE, LAST_MODIFIED, PROXY_AUTHORIZATION, RANGE,
   },
 };
-use tokio::sync::Mutex;
 use tokio_util::sync::CancellationToken;
 
 use crate::{
-  domain::{DownloadTask, DownloaderSettings, HttpHeaderValue, HttpMirror, HttpSource},
+  domain::{DownloadTask, DownloaderSettings, HttpHeaderValue, HttpMirror, HttpSource, TaskStatus},
   error::{Error, Result},
   persistence::{
     CompletedRange, IntegritySample, Repository, merge_ranges, missing_ranges, split_ranges,
@@ -32,55 +31,30 @@ const MINIMUM_SEGMENT_SIZE: u64 = 4 * 1024 * 1024;
 const MINIMUM_REBALANCE_REMAINING: u64 = 8 * 1024 * 1024;
 const MINIMUM_WORKER_AGE: Duration = Duration::from_secs(2);
 const REBALANCE_COOLDOWN: Duration = Duration::from_secs(1);
-const CHECKPOINT_BYTES: u64 = 1024 * 1024;
+const CHECKPOINT_INTERVAL: Duration = Duration::from_millis(500);
+const WRITE_BUFFER_BYTES: usize = 512 * 1024;
 const INTEGRITY_SAMPLE_BYTES: u64 = 64 * 1024;
 const MAX_INTEGRITY_SAMPLES: usize = 16;
-const PROGRESS_EVENT_INTERVAL: Duration = Duration::from_millis(250);
 
 pub(crate) type ProgressSink = Arc<dyn Fn(DownloadTask) + Send + Sync>;
 
-#[derive(Clone)]
-struct ProgressReporter {
-  sink: Option<ProgressSink>,
-  last_report: Arc<StdMutex<Option<Instant>>>,
+fn lock<T>(mutex: &StdMutex<T>) -> MutexGuard<'_, T> {
+  mutex.lock().unwrap_or_else(PoisonError::into_inner)
 }
 
-impl ProgressReporter {
-  fn new(sink: Option<ProgressSink>) -> Self {
-    Self {
-      sink,
-      last_report: Arc::new(StdMutex::new(None)),
-    }
-  }
-
-  fn report(&self, task: DownloadTask, force: bool) {
-    let Some(sink) = &self.sink else { return };
-    let now = Instant::now();
-    let mut last_report = self
-      .last_report
-      .lock()
-      .unwrap_or_else(std::sync::PoisonError::into_inner);
-    if !force && last_report.is_some_and(|last| now.duration_since(last) < PROGRESS_EVENT_INTERVAL)
-    {
-      return;
-    }
-    *last_report = Some(now);
-    sink(task);
-  }
-}
-
-#[derive(Debug, Clone)]
-pub struct ProbeResult {
-  pub total_bytes: Option<u64>,
-  pub supports_ranges: bool,
-  pub etag: Option<String>,
-  pub last_modified: Option<String>,
+struct Probe {
+  total_bytes: Option<u64>,
+  supports_ranges: bool,
+  etag: Option<String>,
+  last_modified: Option<String>,
+  /// Complete response kept when the server ignored the probe range, so its body is not fetched twice.
+  full_response: Option<Response>,
 }
 
 #[derive(Debug)]
 pub struct DownloadReport {
   pub total_bytes: u64,
-  pub elapsed: std::time::Duration,
+  pub elapsed: Duration,
 }
 
 #[derive(Default)]
@@ -121,12 +95,12 @@ impl RangeLedger {
   }
 
   fn completed_bytes(&self) -> u64 {
-    self
-      .completed
-      .iter()
-      .map(|range| range.end - range.start)
-      .sum()
+    range_bytes(&self.completed)
   }
+}
+
+fn range_bytes(ranges: &[CompletedRange]) -> u64 {
+  ranges.iter().map(|range| range.end - range.start).sum()
 }
 
 enum SegmentOutcome {
@@ -254,25 +228,101 @@ fn overlapping_worker_to_cancel(workers: &[WorkerTelemetry]) -> Option<u64> {
   None
 }
 
-#[derive(Clone)]
-struct SegmentBase {
+struct CheckpointState {
+  completed_bytes: u64,
+  at: Instant,
+}
+
+impl CheckpointState {
+  fn new(completed_bytes: u64) -> Self {
+    Self {
+      completed_bytes,
+      at: Instant::now(),
+    }
+  }
+
+  fn elapsed(&self) -> bool {
+    self.at.elapsed() >= CHECKPOINT_INTERVAL
+  }
+
+  /// Returns the transfer rate since the previous checkpoint when a new checkpoint is due.
+  fn due(&mut self, completed_bytes: u64) -> Option<u64> {
+    let now = Instant::now();
+    let elapsed = now.saturating_duration_since(self.at);
+    if elapsed < CHECKPOINT_INTERVAL {
+      return None;
+    }
+    let speed = completed_bytes.saturating_sub(self.completed_bytes) as f64 / elapsed.as_secs_f64();
+    self.completed_bytes = completed_bytes;
+    self.at = now;
+    Some(speed as u64)
+  }
+}
+
+/// State shared by every range worker of one mirror transfer.
+struct Transfer {
   client: Client,
   url: String,
   headers: HeaderMap,
   file: Arc<File>,
   repository: Repository,
   task_id: String,
-  ledger: Arc<Mutex<RangeLedger>>,
-  checkpoint: Arc<Mutex<CheckpointState>>,
-  reporter: ProgressReporter,
+  progress: Option<ProgressSink>,
+  ledger: StdMutex<RangeLedger>,
+  checkpoint: StdMutex<CheckpointState>,
   total: u64,
   validator: Option<String>,
-  started: Instant,
 }
 
-struct CheckpointState {
-  completed_bytes: u64,
-  elapsed_millis: u64,
+impl Transfer {
+  /// Writes the unclaimed parts of a buffered response chunk and returns the buffer for reuse.
+  async fn write(&self, start: u64, buffer: Vec<u8>) -> Result<Vec<u8>> {
+    let claims = lock(&self.ledger).claim(start, start + buffer.len() as u64);
+    let file = self.file.clone();
+    let claimed = claims.clone();
+    let result = tokio::task::spawn_blocking(move || {
+      write_claims(&file, start, &buffer, &claimed)?;
+      Ok(buffer)
+    })
+    .await
+    .map_err(std::io::Error::from)
+    .map_err(Error::from)
+    .and_then(|result| result);
+    let mut ledger = lock(&self.ledger);
+    match result {
+      Ok(buffer) => {
+        ledger.commit(&claims);
+        Ok(buffer)
+      }
+      Err(error) => {
+        ledger.release(&claims);
+        Err(error)
+      }
+    }
+  }
+
+  async fn checkpoint_if_due(&self) -> Result<()> {
+    let completed_bytes = lock(&self.ledger).completed_bytes();
+    let due = lock(&self.checkpoint).due(completed_bytes);
+    match due {
+      Some(speed) => self.save(speed).await,
+      None => Ok(()),
+    }
+  }
+
+  async fn save(&self, speed: u64) -> Result<()> {
+    let completed = lock(&self.ledger).completed.clone();
+    save_checkpoint(
+      &self.repository,
+      &self.task_id,
+      &self.file,
+      completed,
+      None,
+      speed,
+      self.progress.as_ref(),
+    )
+    .await
+  }
 }
 
 struct ActiveWorker {
@@ -307,24 +357,14 @@ pub(crate) async fn download(
   {
     return Err(Error::SourceExpired);
   }
-  let mut mirrors = request
-    .source
-    .mirrors
-    .iter()
-    .enumerate()
-    .collect::<Vec<_>>();
-  mirrors.sort_by(|(left_index, left), (right_index, right)| {
-    right
-      .priority
-      .cmp(&left.priority)
-      .then_with(|| left_index.cmp(right_index))
-  });
+  let mut mirrors = request.source.mirrors.iter().collect::<Vec<_>>();
+  mirrors.sort_by_key(|mirror| std::cmp::Reverse(mirror.priority));
   if mirrors.is_empty() {
     return Err(Error::InvalidInput("HTTP source has no mirrors".into()));
   }
 
   let mut last_error = None;
-  for (_, mirror) in mirrors {
+  for mirror in mirrors {
     if request.cancellation.is_cancelled() {
       return Err(Error::Cancelled);
     }
@@ -335,7 +375,6 @@ pub(crate) async fn download(
       .unwrap_or_else(|| request.task.clone());
     match download_from_mirror(client, mirror, &current_task, &request).await {
       Ok(report) => return Ok(report),
-      Err(Error::Cancelled) => return Err(Error::Cancelled),
       Err(error) if is_mirror_failure(&error) => last_error = Some(error),
       Err(error) => return Err(error),
     }
@@ -349,7 +388,6 @@ async fn download_from_mirror(
   task: &DownloadTask,
   request: &DownloadRequest<'_>,
 ) -> Result<DownloadReport> {
-  let reporter = ProgressReporter::new(request.progress.clone());
   let url = url::Url::parse(&mirror.url)?;
   if !matches!(url.scheme(), "http" | "https") {
     return Err(Error::InvalidInput(
@@ -358,16 +396,19 @@ async fn download_from_mirror(
   }
 
   let headers = build_headers(&mirror.headers, request.secret_resolver)?;
-  let probe =
-    probe_with_headers(client, &mirror.url, request.source.expected_size, &headers).await?;
-  if probe
-    .total_bytes
-    .zip(request.maximum_bytes)
-    .is_some_and(|(total, maximum)| total > maximum)
+  let probe = probe(
+    client,
+    &mirror.url,
+    &headers,
+    request.source.expected_size,
+    &request.cancellation,
+  )
+  .await?;
+  if let Some(maximum_bytes) = request.maximum_bytes
+    && probe.total_bytes.is_some_and(|total| total > maximum_bytes)
   {
     return Err(Error::InvalidInput(format!(
       "download exceeds the {maximum_bytes} byte IPC limit",
-      maximum_bytes = request.maximum_bytes.expect("checked above"),
     )));
   }
   if request
@@ -405,21 +446,23 @@ async fn download_from_mirror(
   };
 
   let mut completed = request.repository.completed_ranges(&task.id).await?;
-  if !completed.is_empty() {
-    let reusable = can_reuse_completed(
-      client,
-      &mirror.url,
-      &headers,
-      &file,
-      request.repository,
-      task,
-      &probe,
-    )
-    .await?;
-    if !reusable {
-      request.repository.clear_progress(&task.id).await?;
-      completed.clear();
-    }
+  if !completed.is_empty()
+    && (!probe.supports_ranges
+      || !can_reuse_completed(
+        client,
+        &mirror.url,
+        &headers,
+        &file,
+        &completed,
+        request.repository,
+        task,
+        &probe,
+        &request.cancellation,
+      )
+      .await?)
+  {
+    request.repository.clear_progress(&task.id).await?;
+    completed.clear();
   }
   let probing = request
     .repository
@@ -430,7 +473,9 @@ async fn download_from_mirror(
       probe.last_modified.as_deref(),
     )
     .await?;
-  reporter.report(probing, true);
+  if let Some(progress) = &request.progress {
+    progress(probing);
+  }
   if let Some(total_bytes) = probe.total_bytes {
     file.set_len(total_bytes)?;
   }
@@ -443,30 +488,39 @@ async fn download_from_mirror(
     });
   }
 
-  if !probe.supports_ranges {
-    request.repository.clear_progress(&task.id).await?;
-    let report = sequential_download(
+  let (Some(total_bytes), true) = (probe.total_bytes, probe.supports_ranges) else {
+    let total_bytes = sequential_download(
       client,
       &mirror.url,
       &headers,
       &file,
       probe.total_bytes,
+      probe.full_response,
       request,
-      &reporter,
     )
     .await?;
-    return Ok(report);
-  }
+    return Ok(DownloadReport {
+      total_bytes,
+      elapsed: started.elapsed(),
+    });
+  };
 
-  let total_bytes = probe
-    .total_bytes
-    .ok_or_else(|| Error::InvalidInput("range response did not provide a total length".into()))?;
-
-  let ledger = Arc::new(Mutex::new(RangeLedger::new(completed)));
-  let checkpoint = Arc::new(Mutex::new(CheckpointState {
-    completed_bytes: ledger.lock().await.completed_bytes(),
-    elapsed_millis: 0,
-  }));
+  let ledger = RangeLedger::new(completed);
+  let transfer = Arc::new(Transfer {
+    client: client.clone(),
+    url: mirror.url.clone(),
+    headers,
+    file: file.clone(),
+    repository: request.repository.clone(),
+    task_id: task.id.clone(),
+    progress: request.progress.clone(),
+    checkpoint: StdMutex::new(CheckpointState::new(ledger.completed_bytes())),
+    ledger: StdMutex::new(ledger),
+    total: total_bytes,
+    validator: strong_etag(probe.etag.as_deref())
+      .map(str::to_owned)
+      .or(probe.last_modified),
+  });
   let workers = usize::from(request.settings.per_task_connections)
     .min(usize::from(request.settings.connection_budget))
     .max(1);
@@ -476,48 +530,27 @@ async fn download_from_mirror(
     if request.cancellation.is_cancelled() {
       return Err(Error::Cancelled);
     }
-    let before = ledger.lock().await.completed_bytes();
-    let missing = {
-      let guard = ledger.lock().await;
-      missing_ranges(total_bytes, &guard.completed)
+    let (before, missing) = {
+      let ledger = lock(&transfer.ledger);
+      (
+        ledger.completed_bytes(),
+        missing_ranges(total_bytes, &ledger.completed),
+      )
     };
     if missing.is_empty() {
       break;
     }
     let planned = split_ranges(&missing, workers, MINIMUM_SEGMENT_SIZE);
-    let range_ignored = run_segment_round(
-      SegmentBase {
-        client: client.clone(),
-        url: mirror.url.clone(),
-        headers: headers.clone(),
-        file: file.clone(),
-        repository: request.repository.clone(),
-        task_id: task.id.clone(),
-        ledger: ledger.clone(),
-        checkpoint: checkpoint.clone(),
-        reporter: reporter.clone(),
-        total: total_bytes,
-        validator: strong_etag(probe.etag.as_deref())
-          .map(str::to_owned)
-          .or_else(|| probe.last_modified.clone()),
-        started,
-      },
-      planned,
-      workers,
-      &request.cancellation,
-    )
-    .await?;
-    if range_ignored {
-      file.set_len(0)?;
+    if run_segment_round(&transfer, planned, workers, &request.cancellation).await? {
       request.repository.clear_progress(&task.id).await?;
       sequential_download(
         client,
         &mirror.url,
-        &headers,
+        &transfer.headers,
         &file,
         Some(total_bytes),
+        None,
         request,
-        &reporter,
       )
       .await?;
       return Ok(DownloadReport {
@@ -526,8 +559,7 @@ async fn download_from_mirror(
       });
     }
 
-    let after = ledger.lock().await.completed_bytes();
-    if after == before {
+    if lock(&transfer.ledger).completed_bytes() == before {
       no_progress_rounds += 1;
       if no_progress_rounds >= 2 {
         return Err(Error::RangeRejected);
@@ -537,19 +569,7 @@ async fn download_from_mirror(
     }
   }
 
-  let completed = ledger.lock().await.completed.clone();
-  file.sync_data()?;
-  request
-    .repository
-    .replace_completed_ranges(&task.id, &completed)
-    .await?;
-  persist_integrity_samples(request.repository, &task.id, &file, &completed).await?;
-  let completed = request
-    .repository
-    .update_progress(&task.id, total_bytes, 0)
-    .await?;
-  reporter.report(completed, true);
-  file.sync_all()?;
+  transfer.save(0).await?;
   Ok(DownloadReport {
     total_bytes,
     elapsed: started.elapsed(),
@@ -584,7 +604,7 @@ fn is_mirror_failure(error: &Error) -> bool {
 }
 
 async fn run_segment_round(
-  base: SegmentBase,
+  transfer: &Arc<Transfer>,
   planned: Vec<CompletedRange>,
   worker_limit: usize,
   cancellation: &CancellationToken,
@@ -607,23 +627,13 @@ async fn run_segment_round(
       let id = next_worker_id;
       let worker_token = round_token.child_token();
       let progress = Arc::new(WorkerProgress::new(range));
-      let context = SegmentContext {
-        client: base.client.clone(),
-        url: base.url.clone(),
-        headers: base.headers.clone(),
-        file: base.file.clone(),
-        repository: base.repository.clone(),
-        task_id: base.task_id.clone(),
-        ledger: base.ledger.clone(),
-        checkpoint: base.checkpoint.clone(),
-        reporter: base.reporter.clone(),
-        total: base.total,
-        validator: base.validator.clone(),
-        cancellation: worker_token.clone(),
-        progress: progress.clone(),
-        started: base.started,
-      };
-      handles.spawn(async move { (id, download_segment(context, range).await) });
+      let segment = download_segment(
+        transfer.clone(),
+        progress.clone(),
+        worker_token.clone(),
+        range,
+      );
+      handles.spawn(async move { (id, segment.await) });
       active.insert(
         id,
         ActiveWorker {
@@ -675,7 +685,7 @@ async fn run_segment_round(
       () = cancellation.cancelled() => {
         round_token.cancel();
         while handles.join_next().await.is_some() {}
-        checkpoint_segment_round(&base).await?;
+        transfer.save(0).await?;
         return Err(Error::Cancelled);
       }
       joined = handles.join_next() => {
@@ -696,7 +706,7 @@ async fn run_segment_round(
           Err(error) => {
             round_token.cancel();
             while handles.join_next().await.is_some() {}
-            checkpoint_segment_round(&base).await?;
+            transfer.save(0).await?;
             return Err(error);
           }
         }
@@ -706,66 +716,24 @@ async fn run_segment_round(
   }
 }
 
-async fn checkpoint_segment_round(base: &SegmentBase) -> Result<()> {
-  let (completed, downloaded) = {
-    let ledger = base.ledger.lock().await;
-    (ledger.completed.clone(), ledger.completed_bytes())
-  };
-  base.file.sync_data()?;
-  base
-    .repository
-    .replace_completed_ranges(&base.task_id, &completed)
-    .await?;
-  persist_integrity_samples(&base.repository, &base.task_id, &base.file, &completed).await?;
-  let elapsed = base.started.elapsed().as_secs_f64().max(0.001);
-  let task = base
-    .repository
-    .update_progress(
-      &base.task_id,
-      downloaded,
-      (downloaded as f64 / elapsed) as u64,
-    )
-    .await?;
-  base.reporter.report(task, false);
-  Ok(())
-}
-
-struct SegmentContext {
-  client: Client,
-  url: String,
-  headers: HeaderMap,
-  file: Arc<File>,
-  repository: Repository,
-  task_id: String,
-  ledger: Arc<Mutex<RangeLedger>>,
-  checkpoint: Arc<Mutex<CheckpointState>>,
-  reporter: ProgressReporter,
-  total: u64,
-  validator: Option<String>,
-  cancellation: CancellationToken,
-  progress: Arc<WorkerProgress>,
-  started: Instant,
-}
-
 async fn download_segment(
-  context: SegmentContext,
+  transfer: Arc<Transfer>,
+  progress: Arc<WorkerProgress>,
+  cancellation: CancellationToken,
   requested: CompletedRange,
 ) -> Result<SegmentOutcome> {
-  let mut request = context
+  let mut request = transfer
     .client
-    .get(&context.url)
-    .headers(context.headers.clone())
+    .get(&transfer.url)
+    .headers(transfer.headers.clone())
     .header(
       RANGE,
       format!("bytes={}-{}", requested.start, requested.end - 1),
     );
-  if let Some(validator) = &context.validator {
+  if let Some(validator) = &transfer.validator {
     request = request.header(IF_RANGE, validator);
   }
-  let response = tokio::select! {
-    () = context.cancellation.cancelled() => return Err(Error::Cancelled),
-    response = request.send() => response?,
-  };
+  let response = send(request, &cancellation).await?;
   if let Some(error) = retryable_response_error(&response) {
     return Err(error);
   }
@@ -783,103 +751,61 @@ async fn download_segment(
   let content_range = header_text(&response, CONTENT_RANGE)
     .and_then(|value| parse_content_range(&value))
     .ok_or(Error::RangeRejected)?;
-  if content_range.total != context.total || content_range.start >= context.total {
-    return Err(Error::RemoteChanged);
-  }
-  if context
-    .validator
-    .as_ref()
-    .is_some_and(|expected| response_validator_changed(&response, expected))
+  if content_range.total != transfer.total
+    || transfer
+      .validator
+      .as_ref()
+      .is_some_and(|expected| response_validator_changed(&response, expected))
   {
     return Err(Error::RemoteChanged);
   }
-  context
-    .progress
-    .set_response_range(content_range.start, content_range.end);
+  progress.set_response_range(content_range.start, content_range.end);
 
   let mut stream = response.bytes_stream();
-  let mut offset = content_range.start;
-  while let Some(next) = tokio::select! {
-    () = context.cancellation.cancelled() => return Err(Error::Cancelled),
-    value = stream.next() => value,
-  } {
-    let bytes = next?;
-    if bytes.is_empty() {
-      continue;
-    }
-    let response_chunk_end = offset
-      .checked_add(bytes.len() as u64)
-      .ok_or_else(|| Error::InvalidInput("response offset overflow".into()))?;
-    if response_chunk_end > content_range.end || response_chunk_end > context.total {
+  let mut flushed = content_range.start;
+  let mut buffer = Vec::with_capacity(WRITE_BUFFER_BYTES);
+  let mut last_flush = Instant::now();
+  let outcome = loop {
+    let next = tokio::select! {
+      () = cancellation.cancelled() => break Err(Error::Cancelled),
+      value = stream.next() => value,
+    };
+    let Some(next) = next else {
+      break Ok(SegmentOutcome::Completed);
+    };
+    let bytes = match next {
+      Ok(bytes) => bytes,
+      Err(error) => break Err(error.into()),
+    };
+    if flushed + (buffer.len() + bytes.len()) as u64 > content_range.end {
       return Err(Error::InvalidInput(
         "response body exceeded Content-Range".into(),
       ));
     }
-    let chunk_end = response_chunk_end;
-    if chunk_end <= offset {
-      break;
+    buffer.extend_from_slice(&bytes);
+    progress.advance(flushed, bytes.len() as u64);
+    if buffer.len() >= WRITE_BUFFER_BYTES || last_flush.elapsed() >= CHECKPOINT_INTERVAL {
+      let length = buffer.len() as u64;
+      buffer = transfer.write(flushed, buffer).await?;
+      buffer.clear();
+      flushed += length;
+      last_flush = Instant::now();
+      progress.advance(flushed, 0);
+      transfer.checkpoint_if_due().await?;
     }
-    let claims = context.ledger.lock().await.claim(offset, chunk_end);
-    let write_result = write_claims(&context.file, offset, &bytes, &claims);
-    let mut ledger = context.ledger.lock().await;
-    if let Err(error) = write_result {
-      ledger.release(&claims);
-      return Err(error);
-    }
-    ledger.commit(&claims);
-    context.progress.advance(chunk_end, bytes.len() as u64);
-    let downloaded = ledger.completed_bytes();
-    let snapshot = ledger.completed.clone();
-    drop(ledger);
-
-    let elapsed_millis = u64::try_from(context.started.elapsed().as_millis()).unwrap_or(u64::MAX);
-    let should_checkpoint = {
-      let mut checkpoint = context.checkpoint.lock().await;
-      let bytes_due = downloaded.saturating_sub(checkpoint.completed_bytes) >= CHECKPOINT_BYTES;
-      let time_due = elapsed_millis.saturating_sub(checkpoint.elapsed_millis) >= 500;
-      if bytes_due || time_due {
-        checkpoint.completed_bytes = downloaded;
-        checkpoint.elapsed_millis = elapsed_millis;
-        true
-      } else {
-        false
-      }
-    };
-    if should_checkpoint {
-      context.file.sync_data()?;
-      context
-        .repository
-        .replace_completed_ranges(&context.task_id, &snapshot)
-        .await?;
-      persist_integrity_samples(
-        &context.repository,
-        &context.task_id,
-        &context.file,
-        &snapshot,
-      )
-      .await?;
-      let elapsed = context.started.elapsed().as_secs_f64().max(0.001);
-      let task = context
-        .repository
-        .update_progress(
-          &context.task_id,
-          downloaded,
-          (downloaded as f64 / elapsed) as u64,
-        )
-        .await?;
-      context.reporter.report(task, false);
-    }
-    offset = offset.saturating_add(bytes.len() as u64);
-    if offset >= content_range.end || offset >= context.total {
-      break;
-    }
+  };
+  // Bytes already received are kept on cancellation and transport errors so resume skips them.
+  if !buffer.is_empty() {
+    let length = buffer.len() as u64;
+    transfer.write(flushed, buffer).await?;
+    flushed += length;
   }
-  if offset < content_range.end.min(context.total) {
+  if outcome.is_ok() && flushed < content_range.end {
     return Err(Error::InvalidInput(
       "range response ended before Content-Range".into(),
     ));
   }
-  Ok(SegmentOutcome::Completed)
+  outcome
 }
 
 async fn sequential_download(
@@ -888,182 +814,151 @@ async fn sequential_download(
   headers: &HeaderMap,
   file: &Arc<File>,
   expected_total: Option<u64>,
+  response: Option<Response>,
   request: &DownloadRequest<'_>,
-  reporter: &ProgressReporter,
-) -> Result<DownloadReport> {
-  let response = client.get(url).headers(headers.clone()).send().await?;
-  if let Some(error) = retryable_response_error(&response) {
-    return Err(error);
-  }
-  match response.status() {
-    StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => return Err(Error::SourceExpired),
-    status if !status.is_success() => {
-      return Err(Error::InvalidInput(format!(
-        "download request returned {status}"
-      )));
+) -> Result<u64> {
+  let response = match response {
+    Some(response) => response,
+    None => {
+      let response = send(
+        client.get(url).headers(headers.clone()),
+        &request.cancellation,
+      )
+      .await?;
+      if let Some(error) = retryable_response_error(&response) {
+        return Err(error);
+      }
+      match response.status() {
+        StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => return Err(Error::SourceExpired),
+        status if !status.is_success() => {
+          return Err(Error::InvalidInput(format!(
+            "download request returned {status}"
+          )));
+        }
+        _ => response,
+      }
     }
-    _ => {}
-  }
+  };
   file.set_len(0)?;
-  let mut offset = 0_u64;
-  let started = Instant::now();
-  let mut checkpoint_bytes = 0_u64;
-  let mut checkpoint_at = Instant::now();
+  let prefix = |end: u64| {
+    (end > 0)
+      .then_some(CompletedRange { start: 0, end })
+      .into_iter()
+      .collect::<Vec<_>>()
+  };
+  let mut checkpoint = CheckpointState::new(0);
+  let mut flushed = 0_u64;
+  let mut buffer = Vec::with_capacity(WRITE_BUFFER_BYTES);
   let mut stream = response.bytes_stream();
   while let Some(next) = tokio::select! {
     () = request.cancellation.cancelled() => return Err(Error::Cancelled),
     value = stream.next() => value,
   } {
     let bytes = next?;
-    if request.maximum_bytes.is_some_and(|maximum| {
-      offset
-        .checked_add(bytes.len() as u64)
-        .is_none_or(|end| end > maximum)
-    }) {
+    let end = flushed + (buffer.len() + bytes.len()) as u64;
+    if let Some(maximum_bytes) = request.maximum_bytes
+      && end > maximum_bytes
+    {
       return Err(Error::InvalidInput(format!(
         "download exceeds the {maximum_bytes} byte IPC limit",
-        maximum_bytes = request.maximum_bytes.expect("checked above"),
       )));
     }
-    if expected_total.is_some_and(|total| offset + bytes.len() as u64 > total) {
+    if expected_total.is_some_and(|total| end > total) {
       return Err(Error::RemoteChanged);
     }
-    write_all_at(file, &bytes, offset)?;
-    offset += bytes.len() as u64;
-    if offset.saturating_sub(checkpoint_bytes) >= CHECKPOINT_BYTES
-      || checkpoint_at.elapsed() >= Duration::from_millis(500)
-    {
-      file.sync_data()?;
-      request
-        .repository
-        .replace_completed_ranges(
-          &request.task.id,
-          &[CompletedRange {
-            start: 0,
-            end: offset,
-          }],
-        )
-        .await?;
-      persist_integrity_samples(
+    buffer.extend_from_slice(&bytes);
+    if buffer.len() >= WRITE_BUFFER_BYTES || checkpoint.elapsed() {
+      let length = buffer.len() as u64;
+      buffer = write_at(file, buffer, flushed).await?;
+      buffer.clear();
+      flushed += length;
+    }
+    if let Some(speed) = checkpoint.due(flushed) {
+      save_checkpoint(
         request.repository,
         &request.task.id,
         file,
-        &[CompletedRange {
-          start: 0,
-          end: offset,
-        }],
+        prefix(flushed),
+        None,
+        speed,
+        request.progress.as_ref(),
       )
       .await?;
-      let speed = (offset as f64 / started.elapsed().as_secs_f64().max(0.001)) as u64;
-      let task = request
-        .repository
-        .update_progress(&request.task.id, offset, speed)
-        .await?;
-      reporter.report(task, false);
-      checkpoint_bytes = offset;
-      checkpoint_at = Instant::now();
     }
   }
-  if expected_total.is_some_and(|total| offset != total) {
+  if !buffer.is_empty() {
+    let length = buffer.len() as u64;
+    write_at(file, buffer, flushed).await?;
+    flushed += length;
+  }
+  if expected_total.is_some_and(|total| flushed != total) {
     return Err(Error::RemoteChanged);
   }
-  file.sync_data()?;
-  request
-    .repository
-    .replace_completed_ranges(
-      &request.task.id,
-      &[CompletedRange {
-        start: 0,
-        end: offset,
-      }],
-    )
-    .await?;
-  persist_integrity_samples(
+  save_checkpoint(
     request.repository,
     &request.task.id,
     file,
-    &[CompletedRange {
-      start: 0,
-      end: offset,
-    }],
+    prefix(flushed),
+    Some(flushed),
+    0,
+    request.progress.as_ref(),
   )
   .await?;
-  let task = request
-    .repository
-    .update_transfer_progress(
-      &request.task.id,
-      crate::domain::TaskStatus::Downloading,
-      offset,
-      offset,
-      0,
-    )
-    .await?;
-  reporter.report(task, true);
-  file.sync_all()?;
-  Ok(DownloadReport {
-    total_bytes: offset,
-    elapsed: started.elapsed(),
-  })
+  Ok(flushed)
 }
 
-async fn probe_with_headers(
+async fn send(request: RequestBuilder, cancellation: &CancellationToken) -> Result<Response> {
+  tokio::select! {
+    () = cancellation.cancelled() => Err(Error::Cancelled),
+    response = request.send() => Ok(response?),
+  }
+}
+
+async fn probe(
   client: &Client,
   url: &str,
-  expected_size: Option<u64>,
   headers: &HeaderMap,
-) -> Result<ProbeResult> {
-  let response = client
+  expected_size: Option<u64>,
+  cancellation: &CancellationToken,
+) -> Result<Probe> {
+  let request = client
     .get(url)
     .headers(headers.clone())
-    .header(RANGE, "bytes=0-0")
-    .send()
-    .await?;
+    .header(RANGE, "bytes=0-0");
+  let response = send(request, cancellation).await?;
   if let Some(error) = retryable_response_error(&response) {
     return Err(error);
   }
-  match response.status() {
-    StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => Err(Error::SourceExpired),
+  let etag = header_text(&response, ETAG);
+  let last_modified = header_text(&response, LAST_MODIFIED);
+  let (total_bytes, supports_ranges, full_response) = match response.status() {
+    StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => return Err(Error::SourceExpired),
     StatusCode::PARTIAL_CONTENT => {
       let content_range = header_text(&response, CONTENT_RANGE)
         .and_then(|value| parse_content_range(&value))
         .ok_or(Error::RangeRejected)?;
-      Ok(ProbeResult {
-        total_bytes: Some(content_range.total),
-        supports_ranges: true,
-        etag: header_text(&response, ETAG),
-        last_modified: header_text(&response, LAST_MODIFIED),
-      })
+      (Some(content_range.total), true, None)
     }
-    StatusCode::OK => {
-      let total = response
-        .headers()
-        .get(CONTENT_LENGTH)
-        .and_then(|value| value.to_str().ok())
-        .and_then(|value| value.parse().ok())
-        .or(expected_size);
-      Ok(ProbeResult {
-        total_bytes: total,
-        supports_ranges: false,
-        etag: header_text(&response, ETAG),
-        last_modified: header_text(&response, LAST_MODIFIED),
-      })
+    StatusCode::OK => (
+      response.content_length().or(expected_size),
+      false,
+      Some(response),
+    ),
+    StatusCode::RANGE_NOT_SATISFIABLE if expected_size == Some(0) => (Some(0), true, None),
+    StatusCode::RANGE_NOT_SATISFIABLE => return Err(Error::RemoteChanged),
+    status => {
+      return Err(Error::InvalidInput(format!(
+        "download probe returned {status}"
+      )));
     }
-    StatusCode::RANGE_NOT_SATISFIABLE => {
-      if expected_size == Some(0) {
-        Ok(ProbeResult {
-          total_bytes: Some(0),
-          supports_ranges: true,
-          etag: header_text(&response, ETAG),
-          last_modified: header_text(&response, LAST_MODIFIED),
-        })
-      } else {
-        Err(Error::RemoteChanged)
-      }
-    }
-    status => Err(Error::InvalidInput(format!(
-      "download probe returned {status}"
-    ))),
-  }
+  };
+  Ok(Probe {
+    total_bytes,
+    supports_ranges,
+    etag,
+    last_modified,
+    full_response,
+  })
 }
 
 fn build_headers(
@@ -1176,14 +1071,17 @@ fn response_validator_changed(response: &Response, expected: &str) -> bool {
   header_text(response, header).is_some_and(|actual| actual != expected)
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn can_reuse_completed(
   client: &Client,
   url: &str,
   headers: &HeaderMap,
   file: &File,
+  completed: &[CompletedRange],
   repository: &Repository,
   task: &DownloadTask,
-  probe: &ProbeResult,
+  probe: &Probe,
+  cancellation: &CancellationToken,
 ) -> Result<bool> {
   let Some(total) = probe.total_bytes else {
     return Ok(false);
@@ -1191,14 +1089,8 @@ async fn can_reuse_completed(
   // Remote validators identify the source object, not the local partial
   // file. A recreated file must not inherit persisted ranges merely because
   // the source still has the same ETag.
-  let required_local_length = repository
-    .completed_ranges(&task.id)
-    .await?
-    .into_iter()
-    .map(|range| range.end)
-    .max()
-    .unwrap_or(0);
-  if file.metadata()?.len() < required_local_length {
+  let required_local_length = completed.iter().map(|range| range.end).max().unwrap_or(0);
+  if task.total_bytes != Some(total) || file.metadata()?.len() < required_local_length {
     return Ok(false);
   }
   let samples = repository.integrity_samples(&task.id).await?;
@@ -1209,15 +1101,12 @@ async fn can_reuse_completed(
     strong_etag(task.etag.as_deref()),
     strong_etag(probe.etag.as_deref()),
   ) {
-    return Ok(previous == current && task.total_bytes == Some(total));
+    return Ok(previous == current);
   }
   if let (Some(previous), Some(current)) = (&task.last_modified, &probe.last_modified) {
-    return Ok(previous == current && task.total_bytes == Some(total));
+    return Ok(previous == current);
   }
-  if task.total_bytes != Some(total) {
-    return Ok(false);
-  }
-  verify_remote_integrity_samples(client, url, headers, &samples, total).await
+  verify_remote_integrity_samples(client, url, headers, &samples, total, cancellation).await
 }
 
 fn verify_local_integrity_samples(
@@ -1225,26 +1114,15 @@ fn verify_local_integrity_samples(
   samples: &[IntegritySample],
   total: u64,
 ) -> Result<bool> {
-  use sha2::{Digest, Sha256};
-
   if samples.is_empty() {
     return Ok(false);
   }
   for sample in samples {
-    let Some(end) = sample.start.checked_add(sample.length) else {
-      return Ok(false);
-    };
-    if sample.length == 0 || end > total {
+    if sample.start + sample.length > total {
       return Ok(false);
     }
-    let mut local = vec![
-      0_u8;
-      usize::try_from(sample.length).map_err(|_| {
-        Error::InvalidInput("integrity sample length exceeds address space".into())
-      })?
-    ];
-    if read_exact_at(file, &mut local, sample.start).is_err()
-      || hex::encode(Sha256::digest(&local)) != sample.sha256
+    let mut local = vec![0_u8; sample.length as usize];
+    if read_exact_at(file, &mut local, sample.start).is_err() || sha256_hex(&local) != sample.sha256
     {
       return Ok(false);
     }
@@ -1258,70 +1136,53 @@ async fn verify_remote_integrity_samples(
   headers: &HeaderMap,
   samples: &[IntegritySample],
   total: u64,
+  cancellation: &CancellationToken,
 ) -> Result<bool> {
-  use sha2::{Digest, Sha256};
-
   for sample in samples {
-    let Some(end) = sample.start.checked_add(sample.length) else {
-      return Ok(false);
-    };
-    let response = client
+    let end = sample.start + sample.length;
+    let request = client
       .get(url)
       .headers(headers.clone())
-      .header(RANGE, format!("bytes={}-{}", sample.start, end - 1))
-      .send()
-      .await?;
-    if matches!(
-      response.status(),
-      StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN
-    ) {
-      return Err(Error::SourceExpired);
+      .header(RANGE, format!("bytes={}-{}", sample.start, end - 1));
+    let response = send(request, cancellation).await?;
+    match response.status() {
+      StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => return Err(Error::SourceExpired),
+      StatusCode::PARTIAL_CONTENT => {}
+      _ => return Ok(false),
     }
-    if response.status() != StatusCode::PARTIAL_CONTENT {
-      return Ok(false);
-    }
-    let Some(content_range) =
-      header_text(&response, CONTENT_RANGE).and_then(|value| parse_content_range(&value))
-    else {
-      return Ok(false);
-    };
-    if content_range.start != sample.start
-      || content_range.end != end
-      || content_range.total != total
+    if header_text(&response, CONTENT_RANGE).and_then(|value| parse_content_range(&value))
+      != Some(ParsedContentRange {
+        start: sample.start,
+        end,
+        total,
+      })
     {
       return Ok(false);
     }
     let remote = collect_limited_body(response, sample.length).await?;
-    if remote.len() as u64 != sample.length || hex::encode(Sha256::digest(&remote)) != sample.sha256
-    {
+    if sha256_hex(&remote) != sample.sha256 {
       return Ok(false);
     }
   }
   Ok(true)
 }
 
-async fn persist_integrity_samples(
-  repository: &Repository,
-  task_id: &str,
-  file: &File,
-  completed: &[CompletedRange],
-) -> Result<()> {
+fn sha256_hex(bytes: &[u8]) -> String {
   use sha2::{Digest, Sha256};
 
+  hex::encode(Sha256::digest(bytes))
+}
+
+fn integrity_samples(file: &File, completed: &[CompletedRange]) -> Result<Vec<IntegritySample>> {
   let mut positions = Vec::new();
-  for range in merge_ranges(completed.to_vec()) {
+  for range in completed {
     let length = (range.end - range.start).min(INTEGRITY_SAMPLE_BYTES);
-    if length == 0 {
-      continue;
-    }
     positions.push((range.start, length));
     let tail_start = range.end - length;
     if tail_start != range.start {
       positions.push((tail_start, length));
     }
   }
-  positions.sort_unstable();
-  positions.dedup();
   if positions.len() > MAX_INTEGRITY_SAMPLES {
     let last = positions.len() - 1;
     positions = (0..MAX_INTEGRITY_SAMPLES)
@@ -1329,34 +1190,72 @@ async fn persist_integrity_samples(
       .collect();
   }
 
-  let mut samples = Vec::with_capacity(positions.len());
-  for (start, length) in positions {
-    let mut bytes = vec![
-      0_u8;
-      usize::try_from(length).map_err(|_| {
-        Error::InvalidInput("integrity sample length exceeds address space".into())
-      })?
-    ];
-    read_exact_at(file, &mut bytes, start)?;
-    samples.push(IntegritySample {
-      start,
-      length,
-      sha256: hex::encode(Sha256::digest(&bytes)),
-    });
-  }
-  repository
-    .replace_integrity_samples(task_id, &samples)
+  let mut bytes = Vec::new();
+  positions
+    .into_iter()
+    .map(|(start, length)| {
+      bytes.resize(length as usize, 0);
+      read_exact_at(file, &mut bytes, start)?;
+      Ok(IntegritySample {
+        start,
+        length,
+        sha256: sha256_hex(&bytes),
+      })
+    })
+    .collect()
+}
+
+/// Flushes file data, then atomically persists the completed ranges and their integrity samples
+/// before publishing progress.
+async fn save_checkpoint(
+  repository: &Repository,
+  task_id: &str,
+  file: &Arc<File>,
+  completed: Vec<CompletedRange>,
+  total: Option<u64>,
+  speed: u64,
+  progress: Option<&ProgressSink>,
+) -> Result<()> {
+  let completed = merge_ranges(completed);
+  let (completed, samples) = {
+    let file = file.clone();
+    tokio::task::spawn_blocking(move || {
+      file.sync_data()?;
+      let samples = integrity_samples(&file, &completed)?;
+      Ok::<_, Error>((completed, samples))
+    })
     .await
+    .map_err(std::io::Error::from)??
+  };
+  repository
+    .save_checkpoint(task_id, &completed, &samples)
+    .await?;
+  let downloaded = range_bytes(&completed);
+  let task = match total {
+    Some(total) => {
+      repository
+        .update_transfer_progress(task_id, TaskStatus::Downloading, total, downloaded, speed)
+        .await?
+    }
+    None => {
+      repository
+        .update_progress(task_id, downloaded, speed)
+        .await?
+    }
+  };
+  if let Some(progress) = progress {
+    progress(task);
+  }
+  Ok(())
 }
 
 async fn collect_limited_body(response: Response, expected: u64) -> Result<Vec<u8>> {
-  let capacity = usize::try_from(expected)
-    .map_err(|_| Error::InvalidInput("response length exceeds address space".into()))?;
+  let capacity = expected as usize;
   let mut body = Vec::with_capacity(capacity);
   let mut stream = response.bytes_stream();
   while let Some(chunk) = stream.next().await {
     let chunk = chunk?;
-    if body.len().saturating_add(chunk.len()) > capacity {
+    if body.len() + chunk.len() > capacity {
       return Err(Error::InvalidInput(
         "response body exceeded Content-Range".into(),
       ));
@@ -1373,13 +1272,21 @@ fn write_claims(
   claims: &[CompletedRange],
 ) -> Result<()> {
   for claim in claims {
-    let start = usize::try_from(claim.start - chunk_start)
-      .map_err(|_| Error::InvalidInput("chunk offset exceeds address space".into()))?;
-    let end = usize::try_from(claim.end - chunk_start)
-      .map_err(|_| Error::InvalidInput("chunk offset exceeds address space".into()))?;
+    let start = (claim.start - chunk_start) as usize;
+    let end = (claim.end - chunk_start) as usize;
     write_all_at(file, &bytes[start..end], claim.start)?;
   }
   Ok(())
+}
+
+async fn write_at(file: &Arc<File>, buffer: Vec<u8>, offset: u64) -> Result<Vec<u8>> {
+  let file = file.clone();
+  tokio::task::spawn_blocking(move || {
+    write_all_at(&file, &buffer, offset)?;
+    Ok(buffer)
+  })
+  .await
+  .map_err(std::io::Error::from)?
 }
 
 fn open_partial_file(root: &Path, path: &Path) -> Result<File> {
@@ -1456,18 +1363,8 @@ fn configure_no_follow(options: &mut OpenOptions) {
 fn configure_no_follow(_options: &mut OpenOptions) {}
 
 #[cfg(unix)]
-fn read_exact_at(file: &File, mut bytes: &mut [u8], mut offset: u64) -> std::io::Result<()> {
-  use std::os::unix::fs::FileExt;
-  while !bytes.is_empty() {
-    let read = file.read_at(bytes, offset)?;
-    if read == 0 {
-      return Err(std::io::Error::from(std::io::ErrorKind::UnexpectedEof));
-    }
-    let (_, remaining) = bytes.split_at_mut(read);
-    bytes = remaining;
-    offset += read as u64;
-  }
-  Ok(())
+fn read_exact_at(file: &File, bytes: &mut [u8], offset: u64) -> std::io::Result<()> {
+  std::os::unix::fs::FileExt::read_exact_at(file, bytes, offset)
 }
 
 #[cfg(windows)]
@@ -1486,17 +1383,10 @@ fn read_exact_at(file: &File, mut bytes: &mut [u8], mut offset: u64) -> std::io:
 }
 
 #[cfg(unix)]
-fn write_all_at(file: &File, mut bytes: &[u8], mut offset: u64) -> Result<()> {
-  use std::os::unix::fs::FileExt;
-  while !bytes.is_empty() {
-    let written = file.write_at(bytes, offset)?;
-    if written == 0 {
-      return Err(std::io::Error::from(std::io::ErrorKind::WriteZero).into());
-    }
-    bytes = &bytes[written..];
-    offset += written as u64;
-  }
-  Ok(())
+fn write_all_at(file: &File, bytes: &[u8], offset: u64) -> Result<()> {
+  Ok(std::os::unix::fs::FileExt::write_all_at(
+    file, bytes, offset,
+  )?)
 }
 
 #[cfg(windows)]

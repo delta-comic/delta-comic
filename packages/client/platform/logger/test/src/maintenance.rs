@@ -29,15 +29,3 @@ async fn archives_month_old_and_deletes_quarter_old_logs() {
     .unwrap();
   assert_eq!(decoded, "archivable log");
 }
-
-#[tokio::test]
-async fn ignores_unmanaged_files() {
-  let directory = tempdir().unwrap();
-  let unrelated = directory.path().join("notes.txt");
-  fs::write(&unrelated, b"keep").await.unwrap();
-  LogMaintenance::new(directory.path().to_path_buf())
-    .run_once(NaiveDate::from_ymd_opt(2026, 7, 22).unwrap())
-    .await
-    .unwrap();
-  assert!(unrelated.exists());
-}

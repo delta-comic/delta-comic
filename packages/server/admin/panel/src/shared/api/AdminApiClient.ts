@@ -6,12 +6,11 @@ const apiLogger = logger.scoped('admin:api')
 
 export interface AdminApiClientOptions {
   baseUrl: string
-  fetcher?: typeof fetch
   getToken?: () => string
   timeout?: number
 }
 
-export interface AdminRequestOptions {
+interface AdminRequestOptions {
   body?: unknown
   method?: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT'
   signal?: AbortSignal
@@ -43,11 +42,9 @@ const isApiResponse = <T>(value: unknown): value is ApiResponse<T> => {
 }
 
 export class AdminApiClient {
-  private readonly fetcher: typeof fetch
   private readonly timeout: number
 
   constructor(private readonly options: AdminApiClientOptions) {
-    this.fetcher = (options.fetcher ?? globalThis.fetch).bind(globalThis)
     this.timeout = options.timeout ?? 12_000
   }
 
@@ -90,7 +87,7 @@ export class AdminApiClient {
       if (token) headers.set('authorization', `Bearer ${token}`)
       if (options.body !== undefined) headers.set('content-type', 'application/json')
 
-      const response = await this.fetcher(this.resolve(path), {
+      const response = await fetch(this.resolve(path), {
         body: options.body === undefined ? undefined : JSON.stringify(options.body),
         headers,
         method,
@@ -183,8 +180,4 @@ export class AdminApiClient {
 }
 
 export const readableApiError = (error: unknown): string =>
-  error instanceof AdminApiError
-    ? error.message
-    : error instanceof Error
-      ? error.message
-      : String(error)
+  error instanceof Error ? error.message : String(error)

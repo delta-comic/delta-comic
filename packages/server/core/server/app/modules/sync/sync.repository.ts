@@ -16,7 +16,6 @@ import {
 
 import type {
   NormalizedSyncOperation,
-  SyncAction,
   SyncChangeRow,
   SyncCollection,
   SyncEntityRow,
@@ -351,6 +350,3 @@ export const toReplayedResult = (row: SyncOpRow) => ({
   result: row.result === 'applied' ? 'replayed' : row.result,
   ...(row.server_seq === null ? {} : { serverSeq: row.server_seq }),
 })
-
-export const actionFromDeletedAt = (deletedAt: number | null): SyncAction =>
-  deletedAt === null ? 'upsert' : 'delete'

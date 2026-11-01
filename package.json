@@ -25,7 +25,7 @@
     "@delta-comic/release-cli": "workspace:*",
     "@semantic-release/changelog": "catalog:",
     "@semantic-release/release-notes-generator": "catalog:",
-    "@vue/test-utils": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "commitlint-plugin-cspell": "catalog:",
     "cspell": "catalog:",
     "happy-dom": "catalog:",

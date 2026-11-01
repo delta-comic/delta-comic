@@ -1,4 +1,4 @@
-use std::{path::PathBuf, sync::Arc};
+use std::path::PathBuf;
 
 use tauri::{
   AppHandle, Manager, Runtime,
@@ -32,7 +32,6 @@ pub use error::{Error, Result};
 pub struct Builder {
   database_path: Option<PathBuf>,
   download_dir: Option<PathBuf>,
-  secret_resolver: Option<Arc<dyn SecretResolver>>,
 }
 
 pub trait SecretResolver: Send + Sync + 'static {
@@ -44,7 +43,6 @@ impl Builder {
     Self {
       database_path: None,
       download_dir: None,
-      secret_resolver: None,
     }
   }
 
@@ -55,11 +53,6 @@ impl Builder {
 
   pub fn download_dir(mut self, path: impl Into<PathBuf>) -> Self {
     self.download_dir = Some(path.into());
-    self
-  }
-
-  pub fn secret_resolver(mut self, resolver: impl SecretResolver) -> Self {
-    self.secret_resolver = Some(Arc::new(resolver));
     self
   }
 
@@ -117,7 +110,7 @@ impl Builder {
           mobile.initialize_credential_context()?;
           let credentials =
             credentials::CredentialVault::system().map_err(|error| error.to_string())?;
-          let secret_resolver = credentials::resolver(credentials.clone(), self.secret_resolver);
+          let secret_resolver = credentials::resolver(credentials.clone());
           mobile::register_event_sink(event_sink);
           let engine = tauri::async_runtime::block_on(mobile::open_or_reuse_engine(
             config.clone(),
@@ -134,7 +127,7 @@ impl Builder {
         {
           let credentials =
             credentials::CredentialVault::system().map_err(|error| error.to_string())?;
-          let secret_resolver = credentials::resolver(credentials.clone(), self.secret_resolver);
+          let secret_resolver = credentials::resolver(credentials.clone());
           let engine = tauri::async_runtime::block_on(engine::Engine::open(
             &database_path,
             &default_download_dir,

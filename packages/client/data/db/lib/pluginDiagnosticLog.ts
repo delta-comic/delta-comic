@@ -18,7 +18,6 @@ export interface PluginDiagnosticInput {
   readonly message: string
   readonly details?: Record<string, unknown>
   readonly fiberId?: string
-  readonly eventId?: string
 }
 
 const serializeDetails = (details: Record<string, unknown> | undefined) =>
@@ -36,7 +35,6 @@ export const append = async (db: Kysely<DB>, input: PluginDiagnosticInput): Prom
       message: input.message,
       details: serializeDetails(input.details),
       fiberId: input.fiberId ?? null,
-      eventId: input.eventId ?? null,
     })
     .execute()
   await db
@@ -55,17 +53,3 @@ export const append = async (db: Kysely<DB>, input: PluginDiagnosticInput): Prom
     )
     .execute()
 }
-
-export const listRecent = async (
-  db: Kysely<DB>,
-  pluginId: string,
-  limit = 100,
-): Promise<readonly PluginDiagnosticLog[]> =>
-  await db
-    .selectFrom('pluginDiagnosticLog')
-    .selectAll()
-    .where('pluginId', '=', pluginId)
-    .orderBy('timestamp', 'desc')
-    .orderBy('id', 'desc')
-    .limit(Math.max(1, Math.min(Math.trunc(limit) || 100, 100)))
-    .execute()

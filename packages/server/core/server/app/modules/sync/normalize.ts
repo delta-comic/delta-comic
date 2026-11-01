@@ -1,6 +1,6 @@
-import { hashJson, sha256Hex } from '@/shared/crypto'
 import { AppError } from '@/shared/errors'
-import { stableStringify } from '@/shared/json'
+
+import { hashJson, sha256Hex, stableStringify } from '../../../lib/sync/hash'
 
 import { assertSyncCollection, syncCollections } from './collections'
 import type { NormalizedSyncOperation, SyncPushOperation } from './sync.types'

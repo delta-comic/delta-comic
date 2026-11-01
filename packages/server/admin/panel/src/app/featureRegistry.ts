@@ -28,7 +28,3 @@ export const featureNavigation = adminFeatures
   .sort((left, right) => left.order - right.order)
 
 export const featureRoutes = adminFeatures.flatMap(feature => feature.routes)
-
-export function defineAdminFeature<const Feature extends AdminFeature>(feature: Feature): Feature {
-  return feature
-}

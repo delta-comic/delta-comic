@@ -2,7 +2,6 @@ use std::{fs::File, path::Path};
 
 use md5::Md5;
 use sha2::{Digest, Sha256};
-use tokio::io::AsyncReadExt;
 
 use crate::{
   domain::{Checksum, ChecksumAlgorithm},
@@ -10,8 +9,7 @@ use crate::{
 };
 
 pub async fn verify(path: &Path, checksum: &Checksum) -> Result<()> {
-  let actual = digest(path, checksum.algorithm).await?;
-  verify_digest(actual, checksum)
+  verify_file(&File::open(path)?, checksum).await
 }
 
 pub async fn verify_file(file: &File, checksum: &Checksum) -> Result<()> {
@@ -19,11 +17,7 @@ pub async fn verify_file(file: &File, checksum: &Checksum) -> Result<()> {
   let algorithm = checksum.algorithm;
   let actual = tokio::task::spawn_blocking(move || digest_file(&file, algorithm))
     .await
-    .map_err(|error| Error::InvalidInput(format!("checksum worker failed: {error}")))??;
-  verify_digest(actual, checksum)
-}
-
-fn verify_digest(actual: String, checksum: &Checksum) -> Result<()> {
+    .map_err(std::io::Error::from)??;
   let expected = checksum.value.trim().to_ascii_lowercase();
   if actual == expected {
     Ok(())
@@ -32,36 +26,48 @@ fn verify_digest(actual: String, checksum: &Checksum) -> Result<()> {
   }
 }
 
+enum Hasher {
+  Sha256(Sha256),
+  Md5(Md5),
+}
+
+impl Hasher {
+  fn new(algorithm: ChecksumAlgorithm) -> Self {
+    match algorithm {
+      ChecksumAlgorithm::Sha256 => Self::Sha256(Sha256::new()),
+      ChecksumAlgorithm::Md5 => Self::Md5(Md5::new()),
+    }
+  }
+
+  fn update(&mut self, bytes: &[u8]) {
+    match self {
+      Self::Sha256(digest) => digest.update(bytes),
+      Self::Md5(digest) => digest.update(bytes),
+    }
+  }
+
+  fn finish(self) -> String {
+    match self {
+      Self::Sha256(digest) => hex::encode(digest.finalize()),
+      Self::Md5(digest) => hex::encode(digest.finalize()),
+    }
+  }
+}
+
 fn digest_file(file: &File, algorithm: ChecksumAlgorithm) -> Result<String> {
   let length = file.metadata()?.len();
   let mut buffer = vec![0_u8; 256 * 1024];
   let mut offset = 0_u64;
-  match algorithm {
-    ChecksumAlgorithm::Sha256 => {
-      let mut digest = Sha256::new();
-      while offset < length {
-        let read = read_at(file, &mut buffer, offset)?;
-        if read == 0 {
-          return Err(std::io::Error::from(std::io::ErrorKind::UnexpectedEof).into());
-        }
-        digest.update(&buffer[..read]);
-        offset += read as u64;
-      }
-      Ok(hex::encode(digest.finalize()))
+  let mut hasher = Hasher::new(algorithm);
+  while offset < length {
+    let read = read_at(file, &mut buffer, offset)?;
+    if read == 0 {
+      return Err(std::io::Error::from(std::io::ErrorKind::UnexpectedEof).into());
     }
-    ChecksumAlgorithm::Md5 => {
-      let mut digest = Md5::new();
-      while offset < length {
-        let read = read_at(file, &mut buffer, offset)?;
-        if read == 0 {
-          return Err(std::io::Error::from(std::io::ErrorKind::UnexpectedEof).into());
-        }
-        digest.update(&buffer[..read]);
-        offset += read as u64;
-      }
-      Ok(hex::encode(digest.finalize()))
-    }
+    hasher.update(&buffer[..read]);
+    offset += read as u64;
   }
+  Ok(hasher.finish())
 }
 
 #[cfg(unix)]
@@ -82,35 +88,6 @@ fn read_at(file: &File, buffer: &mut [u8], offset: u64) -> std::io::Result<usize
   let mut file = file.try_clone()?;
   file.seek(SeekFrom::Start(offset))?;
   file.read(buffer)
-}
-
-pub async fn digest(path: &Path, algorithm: ChecksumAlgorithm) -> Result<String> {
-  let mut file = tokio::fs::File::open(path).await?;
-  let mut buffer = vec![0_u8; 256 * 1024];
-  match algorithm {
-    ChecksumAlgorithm::Sha256 => {
-      let mut digest = Sha256::new();
-      loop {
-        let read = file.read(&mut buffer).await?;
-        if read == 0 {
-          break;
-        }
-        digest.update(&buffer[..read]);
-      }
-      Ok(hex::encode(digest.finalize()))
-    }
-    ChecksumAlgorithm::Md5 => {
-      let mut digest = Md5::new();
-      loop {
-        let read = file.read(&mut buffer).await?;
-        if read == 0 {
-          break;
-        }
-        digest.update(&buffer[..read]);
-      }
-      Ok(hex::encode(digest.finalize()))
-    }
-  }
 }
 
 #[cfg(test)]

@@ -125,9 +125,7 @@ onMounted(() => {
       <header class="border-border flex items-center justify-between border-b px-5 py-4.5">
         <div>
           <h2 class="m-0 text-[15px]">Worker 诊断快照</h2>
-          <p class="text-muted-foreground mt-1 mb-0 text-[11px]">
-            生命周期、请求和调度事件按容量保留，可用于故障回放。
-          </p>
+          <p class="text-muted-foreground mt-1 mb-0 text-[11px]">请求事件按容量保留。</p>
         </div>
         <NButton
           size="small"
@@ -139,14 +137,10 @@ onMounted(() => {
         </NButton>
       </header>
       <div v-if="diagnosticError" class="admin-error m-5">{{ diagnosticError }}</div>
-      <div v-else-if="diagnostic" class="grid gap-4 p-5 md:grid-cols-3">
+      <div v-else-if="diagnostic" class="grid gap-4 p-5 md:grid-cols-2">
         <div>
           <div class="text-muted-foreground text-[11px]">运行时</div>
           <code class="text-xs">{{ diagnostic.runtime }}</code>
-        </div>
-        <div>
-          <div class="text-muted-foreground text-[11px]">插件</div>
-          <strong>{{ diagnostic.plugins.length }}</strong>
         </div>
         <div>
           <div class="text-muted-foreground text-[11px]">记录</div>

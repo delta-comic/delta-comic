@@ -97,10 +97,7 @@ configurePluginHost({
           source: record.source,
           message: record.message,
           details: record.details,
-          fiberId:
-            record.fiberId ??
-            (typeof record.details?.fiberId === 'string' ? record.details.fiberId : undefined),
-          eventId: record.eventId,
+          fiberId: typeof record.details?.fiberId === 'string' ? record.details.fiberId : undefined,
         }),
       )
       .catch(error => {

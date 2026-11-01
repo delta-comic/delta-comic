@@ -3,6 +3,7 @@ import { useMessage } from 'naive-ui'
 import { shallowRef } from 'vue'
 
 import { flowText } from '@/i18n/flows'
+import { readableApiError } from '@/shared/api/AdminApiClient'
 import PageHeader from '@/shared/components/PageHeader.vue'
 import StatusMark from '@/shared/components/StatusMark.vue'
 import { useConnectionStore } from '@/stores/connection'
@@ -25,7 +26,7 @@ const save = async () => {
     if (connected) message.success('连接验证成功')
     else formError.value = connection.error
   } catch (error) {
-    formError.value = error instanceof Error ? error.message : String(error)
+    formError.value = readableApiError(error)
   } finally {
     saving.value = false
   }

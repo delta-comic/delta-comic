@@ -46,25 +46,6 @@ fn serves_nested_plugin_modules_with_cors_headers() {
 }
 
 #[test]
-fn supports_head_and_wasm_content_types() {
-  let root = fixture_root();
-  fs::write(root.join("layout/module.wasm"), [0, 97, 115, 109]).unwrap();
-  let response = response_from_root(
-    &root,
-    request(http::Method::HEAD, "plugin://localhost/layout/module.wasm"),
-  );
-
-  assert_eq!(response.status(), http::StatusCode::OK);
-  assert!(response.body().is_empty());
-  assert_eq!(
-    response.headers()[http::header::CONTENT_TYPE],
-    "application/wasm"
-  );
-  assert_eq!(response.headers()[http::header::CONTENT_LENGTH], "4");
-  fs::remove_dir_all(root).unwrap();
-}
-
-#[test]
 fn rejects_paths_outside_the_plugin_directory() {
   let root = fixture_root();
   for uri in [

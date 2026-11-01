@@ -72,17 +72,3 @@ fn native_store_value_round_trips_and_removes_values() {
     None,
   );
 }
-
-#[test]
-fn native_store_set_value_creates_encoded_namespace_directory() {
-  let dir = TestDir::new();
-
-  native_store_set_value(dir.path(), "plugin/a.b", "comic:key", "value")
-    .expect("value should write");
-
-  assert_eq!(
-    fs::read_to_string(dir.path().join("plugin%2Fa%2Eb").join("comic%3Akey.json"))
-      .expect("encoded value path should exist"),
-    "value",
-  );
-}

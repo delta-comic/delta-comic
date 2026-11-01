@@ -89,12 +89,5 @@ export default defineConfig({
       },
     },
   },
-  test: {
-    alias: {
-      'cloudflare:workers': fileURLToPath(new URL('./test/cloudflareWorkers.ts', import.meta.url)),
-    },
-    environment: 'node',
-    include: ['test/**/*.test.ts'],
-    root,
-  },
+  test: { environment: 'node', include: ['test/**/*.test.ts'], root },
 })

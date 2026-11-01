@@ -1,6 +1,6 @@
-import { defineAdminFeature } from '@/app/featureRegistry'
+import type { AdminFeature } from '@/app/featureRegistry'
 
-export default defineAdminFeature({
+export default {
   key: 'observability',
   navigation: { icon: 'metrics', label: '运行指标', order: 20, path: '/observability' },
   routes: [
@@ -11,4 +11,4 @@ export default defineAdminFeature({
       meta: { title: '运行指标' },
     },
   ],
-})
+} satisfies AdminFeature

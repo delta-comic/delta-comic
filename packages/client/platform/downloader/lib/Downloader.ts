@@ -4,8 +4,11 @@ import type {
   Checksum as RpcChecksum,
   ContentRefreshContext as RpcContentRefreshContext,
   DownloadAsset as RpcDownloadAsset,
+  DownloadCollection as RpcDownloadCollection,
+  DownloaderSettings as RpcDownloaderSettings,
   DownloadSource as RpcDownloadSource,
   DownloadTask as RpcDownloadTask,
+  DownloadTaskDetail as RpcDownloadTaskDetail,
   HttpMirror as RpcHttpMirror,
   SeedPolicy as RpcSeedPolicy,
   TaskRemovedEvent as RpcTaskRemovedEvent,
@@ -200,26 +203,58 @@ const toClientTask = (task: RpcDownloadTask): DownloadTask => ({
   revision: task.revision,
 })
 
+const toClientRefreshContext = (context: RpcContentRefreshContext): ContentRefreshContext => ({
+  plugin: context.plugin,
+  contentType: context.contentType,
+  contentId: context.contentId,
+  episodeId: context.episodeId,
+  contentPageFingerprint: context.contentPageFingerprint ?? undefined,
+  providerFingerprint: context.providerFingerprint,
+  pluginVersion: context.pluginVersion ?? undefined,
+  pluginIntegrity: context.pluginIntegrity ?? undefined,
+})
+
+const toClientCollection = (collection: RpcDownloadCollection): DownloadCollection => ({
+  ...collection,
+  refreshContext: collection.refreshContext
+    ? toClientRefreshContext(collection.refreshContext)
+    : undefined,
+  totalBytes: collection.totalBytes ?? undefined,
+})
+
+const toClientTaskDetail = (detail: RpcDownloadTaskDetail): DownloadTaskDetail => ({
+  task: toClientTask(detail.task),
+  completedRanges: detail.completedRanges,
+  torrent: detail.torrent
+    ? {
+        infoHash: detail.torrent.infoHash ?? undefined,
+        uploadedBytes: detail.torrent.uploadedBytes,
+        peerCount: detail.torrent.peerCount,
+        seedStartedAt: detail.torrent.seedStartedAt ?? undefined,
+      }
+    : undefined,
+})
+
+const toClientSettings = (settings: RpcDownloaderSettings): DownloaderSettings => ({
+  ...settings,
+  seedRatio: settings.seedRatio ?? undefined,
+  seedSeconds: settings.seedSeconds ?? undefined,
+})
+
 export interface CreateDownloaderOptions {
   key?: string
-  rpc?: DownloaderRpc
 }
 
 export class Downloader {
   static readonly #defaultKey = 'default'
   static readonly #instances = new Map<string, Downloader>()
-  static #createRpc(): DownloaderRpc {
-    return createTauRPCProxy().downloader
-  }
-
   readonly #key: string
   readonly #subscriptions = new Set<DownloaderUnlisten>()
   #rpc: DownloaderRpc | undefined
   #disposed = false
 
-  private constructor(key: string, rpc?: DownloaderRpc) {
+  private constructor(key: string) {
     this.#key = key
-    this.#rpc = rpc
   }
 
   /** Creates and registers a downloader instance under a stable runtime key. */
@@ -228,7 +263,7 @@ export class Downloader {
     if (this.#instances.has(key)) {
       throw new Error(`downloader instance already exists: ${key}`)
     }
-    const downloader = new Downloader(key, options.rpc)
+    const downloader = new Downloader(key)
     this.#instances.set(key, downloader)
     return downloader
   }
@@ -246,14 +281,15 @@ export class Downloader {
   }
 
   #getRpc(): DownloaderRpc {
-    return (this.#rpc ??= Downloader.#createRpc())
+    this.#assertActive()
+    return (this.#rpc ??= createTauRPCProxy().downloader)
   }
 
   get key(): string {
     return this.#key
   }
 
-  /** Removes native event listeners and unregisters this instance. Safe to call repeatedly. */
+  /** Removes native event listeners and unregisters this instance. */
   dispose(): void {
     if (this.#disposed) return
     this.#disposed = true
@@ -261,17 +297,7 @@ export class Downloader {
     this.#subscriptions.clear()
     if (Downloader.#instances.get(this.#key) === this) Downloader.#instances.delete(this.#key)
 
-    const errors: unknown[] = []
-    for (const unlisten of subscriptions) {
-      try {
-        unlisten()
-      } catch (error) {
-        errors.push(error)
-      }
-    }
-    if (errors.length) {
-      throw new AggregateError(errors, `failed to dispose downloader instance: ${this.#key}`)
-    }
+    for (const unlisten of subscriptions) unlisten()
   }
 
   /**
@@ -282,71 +308,65 @@ export class Downloader {
     url: string,
     options: DownloadEphemeralOptions = {},
   ): Promise<Uint8Array<ArrayBuffer>> {
-    const bytes = await this.#request(() =>
-      this.#getRpc().download_ephemeral(
-        url,
-        options.headers ?? null,
-        options.secretRef ?? null,
-        options.maxBytes ?? null,
-      ),
+    const bytes = await this.#getRpc().download_ephemeral(
+      url,
+      options.headers ?? null,
+      options.secretRef ?? null,
+      options.maxBytes ?? null,
     )
-    return Downloader.#normalizeRawBytes(bytes)
+    return Uint8Array.from(bytes)
   }
 
   /** Stores a header, cookie, or token in the operating system credential vault. */
   async storeSecret(value: string): Promise<string> {
-    return await this.#request(() => this.#getRpc().store_secret(value))
+    return await this.#getRpc().store_secret(value)
   }
 
   /** Deletes a native credential reference. Deletion is idempotent. */
   async deleteSecret(secretRef: string): Promise<void> {
-    await this.#request(() => this.#getRpc().delete_secret(secretRef))
+    await this.#getRpc().delete_secret(secretRef)
   }
 
   async listTasks(): Promise<DownloadTask[]> {
-    return (await this.#request(() => this.#getRpc().list_tasks())) as DownloadTask[]
-  }
-
-  async getTask(id: string): Promise<DownloadTask | null> {
-    return (await this.#request(() => this.#getRpc().get_task(id))) as DownloadTask | null
+    return (await this.#getRpc().list_tasks()).map(toClientTask)
   }
 
   async getTaskDetail(id: string): Promise<DownloadTaskDetail> {
-    return (await this.#request(() => this.#getRpc().get_task_detail(id))) as DownloadTaskDetail
+    return toClientTaskDetail(await this.#getRpc().get_task_detail(id))
   }
 
   async getCollections(): Promise<DownloadCollection[]> {
-    return (await this.#request(() => this.#getRpc().get_collections())) as DownloadCollection[]
+    return (await this.#getRpc().get_collections()).map(toClientCollection)
   }
 
   async listDestinations(): Promise<Destination[]> {
-    return (await this.#request(() => this.#getRpc().list_destinations())) as Destination[]
+    return await this.#getRpc().list_destinations()
   }
 
   async getSettings(): Promise<DownloaderSettings> {
-    return (await this.#request(() => this.#getRpc().get_settings())) as DownloaderSettings
+    return toClientSettings(await this.#getRpc().get_settings())
   }
 
   async getCapabilities(): Promise<DownloaderCapabilities> {
-    return (await this.#request(() => this.#getRpc().get_capabilities())) as DownloaderCapabilities
+    return await this.#getRpc().get_capabilities()
   }
 
   async updateSettings(
     patch: Partial<Omit<DownloaderSettings, 'revision'>>,
   ): Promise<DownloaderSettings> {
     const settings = { ...(await this.getSettings()), ...patch }
-    return (await this.#request(() =>
-      this.#getRpc().update_settings({
+    return toClientSettings(
+      await this.#getRpc().update_settings({
         ...settings,
         seedRatio: settings.seedRatio ?? null,
         seedSeconds: settings.seedSeconds ?? null,
       }),
-    )) as DownloaderSettings
+    )
   }
 
   async enqueueUrl(input: EnqueueUrlInput): Promise<DownloadTask> {
-    return (await this.#request(() =>
-      this.#getRpc().enqueue_url({
+    return toClientTask(
+      await this.#getRpc().enqueue_url({
         url: input.url,
         mirrors: input.mirrors?.map(toRpcMirror),
         title: input.title ?? null,
@@ -355,12 +375,12 @@ export class Downloader {
         priority: input.priority ?? null,
         checksum: toRpcChecksum(input.checksum),
       }),
-    )) as DownloadTask
+    )
   }
 
   async enqueueTorrent(input: EnqueueTorrentInput): Promise<DownloadTask> {
-    return (await this.#request(() =>
-      this.#getRpc().enqueue_torrent({
+    return toClientTask(
+      await this.#getRpc().enqueue_torrent({
         source: {
           input: input.source.input,
           onlyFiles: input.source.onlyFiles,
@@ -371,65 +391,60 @@ export class Downloader {
         destinationId: input.destinationId ?? null,
         priority: input.priority ?? null,
       }),
-    )) as DownloadTask
+    )
   }
 
   async enqueuePlan(input: EnqueuePlanInput): Promise<DownloadTask[]> {
-    return (await this.#request(() =>
-      this.#getRpc().enqueue_plan({
-        key: input.key,
-        title: input.title,
-        assets: input.assets.map(toRpcAsset),
-        destinationId: input.destinationId ?? null,
-        priority: input.priority ?? null,
-        refreshContext: toRpcRefreshContext(input.refreshContext),
-      }),
-    )) as DownloadTask[]
+    const tasks = await this.#getRpc().enqueue_plan({
+      key: input.key,
+      title: input.title,
+      assets: input.assets.map(toRpcAsset),
+      destinationId: input.destinationId ?? null,
+      priority: input.priority ?? null,
+      refreshContext: toRpcRefreshContext(input.refreshContext),
+    })
+    return tasks.map(toClientTask)
   }
 
   async pauseTask(id: string): Promise<DownloadTask> {
-    return (await this.#request(() => this.#getRpc().pause_task(id))) as DownloadTask
+    return toClientTask(await this.#getRpc().pause_task(id))
   }
 
   async resumeTask(id: string): Promise<DownloadTask> {
-    return (await this.#request(() => this.#getRpc().resume_task(id))) as DownloadTask
+    return toClientTask(await this.#getRpc().resume_task(id))
   }
 
   async retryTask(id: string): Promise<DownloadTask> {
-    return (await this.#request(() => this.#getRpc().retry_task(id))) as DownloadTask
+    return toClientTask(await this.#getRpc().retry_task(id))
   }
 
   async cancelTask(id: string): Promise<DownloadTask> {
-    return (await this.#request(() => this.#getRpc().cancel_task(id))) as DownloadTask
+    return toClientTask(await this.#getRpc().cancel_task(id))
   }
 
   async forgetTask(id: string): Promise<void> {
-    await this.#request(() => this.#getRpc().forget_task(id))
+    await this.#getRpc().forget_task(id)
   }
 
   async deleteTaskFiles(id: string): Promise<void> {
-    await this.#request(() => this.#getRpc().delete_task_files(id))
+    await this.#getRpc().delete_task_files(id)
   }
 
   async setPriority(id: string, priority: number): Promise<DownloadTask> {
-    return (await this.#request(() => this.#getRpc().set_priority(id, priority))) as DownloadTask
+    return toClientTask(await this.#getRpc().set_priority(id, priority))
   }
 
   async moveQueue(id: string, beforeTaskId?: string | null): Promise<DownloadTask> {
-    return (await this.#request(() =>
-      this.#getRpc().move_queue(id, beforeTaskId ?? null),
-    )) as DownloadTask
+    return toClientTask(await this.#getRpc().move_queue(id, beforeTaskId ?? null))
   }
 
   /** Opens the platform-owned directory picker and registers the granted destination. */
   async pickDestination(): Promise<Destination | null> {
-    return (await this.#request(() => this.#getRpc().pick_destination())) as Destination | null
+    return await this.#getRpc().pick_destination()
   }
 
   async updateSource(id: string, source: DownloadSource): Promise<DownloadTask> {
-    return (await this.#request(() =>
-      this.#getRpc().update_source(id, toRpcSource(source)),
-    )) as DownloadTask
+    return toClientTask(await this.#getRpc().update_source(id, toRpcSource(source)))
   }
 
   async onTaskUpsert(handler: (event: TaskUpsertEvent) => void): Promise<DownloaderUnlisten> {
@@ -471,11 +486,6 @@ export class Downloader {
     }
   }
 
-  async #request<T>(request: () => Promise<T>): Promise<T> {
-    this.#assertActive()
-    return await request()
-  }
-
   async #subscribe<T>(
     subscribe: (handler: (event: T) => void) => Promise<DownloaderUnlisten>,
     handler: (event: T) => void,
@@ -499,14 +509,5 @@ export class Downloader {
 
   #assertActive(): void {
     if (this.#disposed) throw new Error(`downloader instance is disposed: ${this.#key}`)
-  }
-
-  static #normalizeRawBytes(
-    value: ArrayBuffer | Uint8Array | readonly number[],
-  ): Uint8Array<ArrayBuffer> {
-    if (value instanceof ArrayBuffer) return new Uint8Array(value)
-    if (value instanceof Uint8Array) return Uint8Array.from(value)
-    if (Array.isArray(value)) return Uint8Array.from(value)
-    throw new TypeError('downloader returned an invalid ephemeral response')
   }
 }
