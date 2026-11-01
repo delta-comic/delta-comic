@@ -165,6 +165,7 @@ impl Engine {
   #[cfg(not(target_os = "android"))]
   pub fn start(&self) {
     let engine = self.clone();
+    self.wake.notify_one();
     tauri::async_runtime::spawn(async move { engine.dispatch_loop().await });
   }
 
@@ -651,24 +652,18 @@ impl Engine {
 
   #[cfg(not(target_os = "android"))]
   async fn dispatch_loop(self) {
-    #[cfg(not(target_os = "android"))]
     let mut next_network_reprobe = tokio::time::Instant::now() + NETWORK_REPROBE_INTERVAL;
     loop {
       tokio::select! {
         () = self.shutdown.cancelled() => break,
         () = self.wake.notified() => {},
-        () = tokio::time::sleep(Duration::from_millis(500)) => {},
+        () = tokio::time::sleep_until(next_network_reprobe) => {},
       }
-      if self.shutdown.is_cancelled() {
-        break;
-      }
-      #[cfg(not(target_os = "android"))]
       if tokio::time::Instant::now() >= next_network_reprobe {
-        let interval_millis =
-          i64::try_from(NETWORK_REPROBE_INTERVAL.as_millis()).unwrap_or(i64::MAX);
+        let interval_millis = NETWORK_REPROBE_INTERVAL.as_millis() as i64;
         match self
           .repository
-          .requeue_due_network_tasks(now_millis().saturating_sub(interval_millis), 20)
+          .requeue_due_network_tasks(now_millis() - interval_millis, 20)
           .await
         {
           Ok(tasks) => {
@@ -687,11 +682,6 @@ impl Engine {
           continue;
         }
       };
-      if let Ok(tasks) = self.repository.list_tasks().await {
-        for task in tasks.into_iter().filter(|task| task.status.is_active()) {
-          self.emit_task(task);
-        }
-      }
       let active = self.controls.lock().await.len();
       let effective_task_limit = Self::effective_task_limit(&settings);
       let available = effective_task_limit.saturating_sub(active);
@@ -1047,10 +1037,6 @@ impl Engine {
         "direct SAF targets support HTTP tasks only".into(),
       ));
     }
-    self
-      .repository
-      .set_paths(&task.id, &final_path, &temp_path)
-      .await?;
     if !is_direct_saf && let Some(parent) = final_path.parent() {
       tokio::fs::create_dir_all(parent).await?;
     }

@@ -1200,16 +1200,6 @@ impl Repository {
     self.require_task(id).await
   }
 
-  pub async fn set_paths(&self, id: &str, final_path: &Path, temp_path: &Path) -> Result<()> {
-    sqlx::query("UPDATE tasks SET final_path = ?, temp_path = ? WHERE id = ?")
-      .bind(final_path.to_string_lossy().as_ref())
-      .bind(temp_path.to_string_lossy().as_ref())
-      .bind(id)
-      .execute(&self.writer)
-      .await?;
-    Ok(())
-  }
-
   pub async fn completed_ranges(&self, task_id: &str) -> Result<Vec<CompletedRange>> {
     let rows = sqlx::query(
       "SELECT start_offset, committed_end FROM segments \

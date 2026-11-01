@@ -2,7 +2,6 @@ use std::{fs::File, path::Path};
 
 use md5::Md5;
 use sha2::{Digest, Sha256};
-use tokio::io::AsyncReadExt;
 
 use crate::{
   domain::{Checksum, ChecksumAlgorithm},
@@ -10,8 +9,7 @@ use crate::{
 };
 
 pub async fn verify(path: &Path, checksum: &Checksum) -> Result<()> {
-  let actual = digest(path, checksum.algorithm).await?;
-  verify_digest(actual, checksum)
+  verify_file(&File::open(path)?, checksum).await
 }
 
 pub async fn verify_file(file: &File, checksum: &Checksum) -> Result<()> {
@@ -19,11 +17,7 @@ pub async fn verify_file(file: &File, checksum: &Checksum) -> Result<()> {
   let algorithm = checksum.algorithm;
   let actual = tokio::task::spawn_blocking(move || digest_file(&file, algorithm))
     .await
-    .map_err(|error| Error::InvalidInput(format!("checksum worker failed: {error}")))??;
-  verify_digest(actual, checksum)
-}
-
-fn verify_digest(actual: String, checksum: &Checksum) -> Result<()> {
+    .map_err(std::io::Error::from)??;
   let expected = checksum.value.trim().to_ascii_lowercase();
   if actual == expected {
     Ok(())
@@ -94,19 +88,6 @@ fn read_at(file: &File, buffer: &mut [u8], offset: u64) -> std::io::Result<usize
   let mut file = file.try_clone()?;
   file.seek(SeekFrom::Start(offset))?;
   file.read(buffer)
-}
-
-async fn digest(path: &Path, algorithm: ChecksumAlgorithm) -> Result<String> {
-  let mut file = tokio::fs::File::open(path).await?;
-  let mut buffer = vec![0_u8; 256 * 1024];
-  let mut hasher = Hasher::new(algorithm);
-  loop {
-    let read = file.read(&mut buffer).await?;
-    if read == 0 {
-      return Ok(hasher.finish());
-    }
-    hasher.update(&buffer[..read]);
-  }
 }
 
 #[cfg(test)]
