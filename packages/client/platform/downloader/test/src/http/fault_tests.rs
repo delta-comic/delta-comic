@@ -19,7 +19,7 @@ use tempfile::TempDir;
 use tokio::{net::TcpListener, task::JoinHandle};
 use tokio_util::sync::CancellationToken;
 
-use super::{DownloadRequest, download, persist_integrity_samples};
+use super::{DownloadRequest, download, integrity_samples};
 use crate::{
   domain::{
     Destination, DestinationKind, DownloadSource, DownloadTask, DownloaderSettings, HttpMirror,
@@ -306,16 +306,6 @@ async fn assert_stale_resume_restarts(
     )
     .await
     .unwrap();
-  repository
-    .replace_completed_ranges(
-      &task.id,
-      &[CompletedRange {
-        start: 0,
-        end: completed,
-      }],
-    )
-    .await
-    .unwrap();
   let partial = root.path().join("fixture.bin.part");
   tokio::fs::write(&partial, &bytes[..completed as usize])
     .await
@@ -325,17 +315,18 @@ async fn assert_stale_resume_restarts(
     .write(true)
     .open(&partial)
     .unwrap();
-  persist_integrity_samples(
-    &repository,
-    &task.id,
-    &partial_file,
-    &[CompletedRange {
-      start: 0,
-      end: completed,
-    }],
-  )
-  .await
-  .unwrap();
+  let ranges = [CompletedRange {
+    start: 0,
+    end: completed,
+  }];
+  repository
+    .save_checkpoint(
+      &task.id,
+      &ranges,
+      &integrity_samples(&partial_file, &ranges).unwrap(),
+    )
+    .await
+    .unwrap();
 
   download(
     &reqwest::Client::new(),
@@ -489,16 +480,6 @@ async fn resume_requests_only_missing_ranges() {
     )
     .await
     .unwrap();
-  repository
-    .replace_completed_ranges(
-      &task.id,
-      &[CompletedRange {
-        start: 0,
-        end: completed,
-      }],
-    )
-    .await
-    .unwrap();
   let partial = root.path().join("fixture.bin.part");
   tokio::fs::write(&partial, &bytes[..completed as usize])
     .await
@@ -508,17 +489,18 @@ async fn resume_requests_only_missing_ranges() {
     .write(true)
     .open(&partial)
     .unwrap();
-  persist_integrity_samples(
-    &repository,
-    &task.id,
-    &partial_file,
-    &[CompletedRange {
-      start: 0,
-      end: completed,
-    }],
-  )
-  .await
-  .unwrap();
+  let ranges = [CompletedRange {
+    start: 0,
+    end: completed,
+  }];
+  repository
+    .save_checkpoint(
+      &task.id,
+      &ranges,
+      &integrity_samples(&partial_file, &ranges).unwrap(),
+    )
+    .await
+    .unwrap();
 
   download(
     &reqwest::Client::new(),

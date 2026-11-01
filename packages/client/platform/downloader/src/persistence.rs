@@ -1228,34 +1228,6 @@ impl Repository {
     Ok(merge_ranges(ranges))
   }
 
-  pub async fn replace_completed_ranges(
-    &self,
-    task_id: &str,
-    ranges: &[CompletedRange],
-  ) -> Result<()> {
-    let ranges = merge_ranges(ranges.to_vec());
-    let mut transaction = self.writer.begin().await?;
-    sqlx::query("DELETE FROM segments WHERE task_id = ?")
-      .bind(task_id)
-      .execute(&mut *transaction)
-      .await?;
-    for range in ranges {
-      sqlx::query(
-        "INSERT INTO segments(task_id, start_offset, end_offset, committed_end, state, updated_at) \
-         VALUES (?, ?, ?, ?, 'completed', ?)",
-      )
-      .bind(task_id)
-      .bind(to_i64(range.start)?)
-      .bind(to_i64(range.end)?)
-      .bind(to_i64(range.end)?)
-      .bind(now_millis())
-      .execute(&mut *transaction)
-      .await?;
-    }
-    transaction.commit().await?;
-    Ok(())
-  }
-
   pub async fn integrity_samples(&self, task_id: &str) -> Result<Vec<IntegritySample>> {
     let rows = sqlx::query(
       "SELECT start_offset, length, sha256 FROM integrity_samples \
@@ -1276,20 +1248,21 @@ impl Repository {
       .collect()
   }
 
-  pub async fn replace_integrity_samples(
+  /// Replaces completed ranges and their integrity samples in one transaction, so a crash can
+  /// never pair new ranges with stale samples.
+  pub async fn save_checkpoint(
     &self,
     task_id: &str,
+    ranges: &[CompletedRange],
     samples: &[IntegritySample],
   ) -> Result<()> {
     let mut transaction = self.writer.begin().await?;
+    replace_completed_ranges(&mut transaction, task_id, ranges).await?;
     sqlx::query("DELETE FROM integrity_samples WHERE task_id = ?")
       .bind(task_id)
       .execute(&mut *transaction)
       .await?;
     for sample in samples {
-      if sample.length == 0 {
-        continue;
-      }
       sqlx::query(
         "INSERT INTO integrity_samples(task_id, start_offset, length, sha256) \
          VALUES (?, ?, ?, ?)",
@@ -1737,6 +1710,32 @@ fn task_from_row(row: &sqlx::sqlite::SqliteRow) -> Result<DownloadTask> {
     updated_at: row.try_get("updated_at")?,
     revision: row.try_get("revision")?,
   })
+}
+
+async fn replace_completed_ranges(
+  transaction: &mut Transaction<'_, Sqlite>,
+  task_id: &str,
+  ranges: &[CompletedRange],
+) -> Result<()> {
+  sqlx::query("DELETE FROM segments WHERE task_id = ?")
+    .bind(task_id)
+    .execute(&mut **transaction)
+    .await?;
+  let updated_at = now_millis();
+  for range in merge_ranges(ranges.to_vec()) {
+    sqlx::query(
+      "INSERT INTO segments(task_id, start_offset, end_offset, committed_end, state, updated_at) \
+       VALUES (?, ?, ?, ?, 'completed', ?)",
+    )
+    .bind(task_id)
+    .bind(to_i64(range.start)?)
+    .bind(to_i64(range.end)?)
+    .bind(to_i64(range.end)?)
+    .bind(updated_at)
+    .execute(&mut **transaction)
+    .await?;
+  }
+  Ok(())
 }
 
 async fn next_revision(transaction: &mut Transaction<'_, Sqlite>) -> Result<i64> {

@@ -129,7 +129,7 @@ async fn shutdown_waits_for_worker_checkpoint_and_requeues_only_interrupted_task
 
   engine
     .repository
-    .replace_completed_ranges(&interrupted.id, &[CompletedRange { start: 0, end: 8 }])
+    .save_checkpoint(&interrupted.id, &[CompletedRange { start: 0, end: 8 }], &[])
     .await
     .unwrap();
   engine.controls.lock().await.remove(&interrupted.id);
@@ -558,12 +558,13 @@ async fn reopens_interrupted_tasks_with_ranges_and_refresh_context() {
     .unwrap();
   first_engine
     .repository
-    .replace_completed_ranges(
+    .save_checkpoint(
       &task_id,
       &[
         CompletedRange { start: 0, end: 8 },
         CompletedRange { start: 16, end: 24 },
       ],
+      &[],
     )
     .await
     .unwrap();

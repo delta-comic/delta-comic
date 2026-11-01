@@ -352,7 +352,7 @@ async fn direct_saf_state_resumes_only_the_same_temporary_document() {
     .await
     .unwrap();
   repository
-    .replace_completed_ranges(&task.id, &[CompletedRange { start: 0, end: 4 }])
+    .save_checkpoint(&task.id, &[CompletedRange { start: 0, end: 4 }], &[])
     .await
     .unwrap();
   repository
