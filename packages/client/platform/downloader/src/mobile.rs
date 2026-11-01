@@ -198,7 +198,6 @@ impl<R: Runtime> MobileDownloader<R> {
       .map_err(|error| format!("failed to persist Android downloader configuration: {error}"))
   }
 
-  #[allow(dead_code)]
   pub(crate) fn schedule(
     &self,
     task_id: String,
