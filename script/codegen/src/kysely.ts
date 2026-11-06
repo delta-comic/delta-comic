@@ -1,7 +1,7 @@
 import { IsOptional, IsUnion } from 'typebox'
 import type { TSchema } from 'typebox'
 
-import { isAutoIncrementColumn, isJsonColumn, type TableSchema } from './schema.mts'
+import { isAutoIncrementColumn, isJsonColumn, type TableSchema } from './schema'
 
 const pascalCase = (name: string): string =>
   name

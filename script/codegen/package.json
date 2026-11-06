@@ -1,0 +1,30 @@
+{
+  "name": "@delta-comic/codegen-cli",
+  "version": "0.1.0",
+  "description": "Delta Comic 数据库代码生成 CLI",
+  "license": "AGPL-3.0-only",
+  "bin": {
+    "dcg": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./cli": "./dist/cli.mjs"
+  },
+  "dependencies": {
+    "commander": "catalog:",
+    "kysely": "catalog:",
+    "typebox": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

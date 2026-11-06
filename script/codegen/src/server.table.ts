@@ -1,6 +1,6 @@
 import { Type } from 'typebox'
 
-import { autoIncrement, defineTable, type TableSchema } from './schema.mts'
+import { autoIncrement, defineTable, type TableSchema } from './schema'
 
 const syncCollection = Type.Union([
   Type.Literal('itemStore'),

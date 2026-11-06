@@ -29,11 +29,9 @@
     "commitlint-plugin-cspell": "catalog:",
     "cspell": "catalog:",
     "happy-dom": "catalog:",
-    "kysely": "catalog:",
     "semantic-release": "catalog:",
     "tailwindcss": "catalog:",
     "twlinter": "catalog:",
-    "typebox": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
@@ -60,6 +58,6 @@
       "url": "https://wakatime.com/badge/user/018cf362-35ff-48f2-af6b-61f09a441de4/project/9f2c18ca-6eec-4e82-8041-5d23c1aba440.svg"
     }
   ],
-  "packageManager": "pnpm@12.16.1",
+  "packageManager": "pnpm@12.18.0",
   "readme": "./README.md"
 }

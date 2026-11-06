@@ -29,6 +29,10 @@ export default defineConfig({
         command: 'vp run --filter @delta-comic/release-cli build',
         cache: { output: ['script/manager/dist/**'] },
       },
+      'codegen-cli': {
+        command: 'vp run --filter @delta-comic/codegen-cli build',
+        cache: { output: ['script/codegen/dist/**'] },
+      },
       'branch:develop': {
         command: 'vp exec dr branch prepare develop',
         dependsOn: ['release-cli'],
@@ -71,16 +75,16 @@ export default defineConfig({
         dependsOn: ['build:packages'],
         cache: { output: [] },
       },
-      'codegen:check': { command: 'node ./script/codegen/check.mts', cache: false },
+      'codegen:check': { command: 'vp exec dcg check', dependsOn: ['codegen-cli'], cache: false },
       // codegen
       'codegen': {
-        command:
-          'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/core/server/app/infrastructure/d1/generated',
+        command: 'vp exec dcg generate server',
+        dependsOn: ['codegen-cli'],
         cache: false,
       },
       'codegen:all': {
-        command:
-          'node ./script/codegen/run.mts script/codegen/server.table.mts packages/server/core/server/app/infrastructure/d1/generated && node ./script/codegen/run.mts script/codegen/client.table.mts packages/client/data/db/lib/generated',
+        command: 'vp exec dcg generate all',
+        dependsOn: ['codegen-cli'],
         cache: false,
       },
     },

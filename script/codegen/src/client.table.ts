@@ -1,6 +1,6 @@
 import { Type } from 'typebox'
 
-import { defineTable, jsonColumn, type TableSchema } from './schema.mts'
+import { defineTable, jsonColumn, type TableSchema } from './schema'
 
 const model = '@delta-comic/client-core-model'
 

@@ -1,11 +1,11 @@
-import { generateTableInterface } from './kysely.mts'
+import { generateTableInterface } from './kysely'
 import {
   camelCase,
   generateCamelCaseRuntimeTableSchema,
   generateRuntimeTableSchema,
   type TableSchema,
-} from './schema.mts'
-import { generateTableSqlFull } from './sql.mts'
+} from './schema'
+import { generateTableSqlFull } from './sql'
 
 export interface GeneratedArtifacts {
   sql: string

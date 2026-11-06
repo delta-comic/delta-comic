@@ -4,10 +4,10 @@ import type { Static, TProperties, TSchema } from 'typebox'
 const JSON_COLUMN = Symbol('delta.comic.json-column')
 
 export interface JsonColumn {
-  readonly [JSON_COLUMN]: true
-  readonly type: 'object'
-  readonly typeName: string
-  readonly typeImport?: string
+  [JSON_COLUMN]: true
+  type: 'object'
+  typeName: string
+  typeImport?: string
 }
 
 export const isJsonColumn = (schema: TSchema): schema is JsonColumn =>
@@ -23,8 +23,8 @@ export const jsonColumn = (typeName = 'object', typeImport?: string): JsonColumn
 const AUTOINCREMENT = Symbol('delta.comic.autoincrement')
 
 export interface AutoIncrementColumn extends TSchema {
-  readonly [AUTOINCREMENT]: true
-  readonly type: 'integer'
+  [AUTOINCREMENT]: true
+  type: 'integer'
 }
 
 export const isAutoIncrementColumn = (schema: TSchema): schema is AutoIncrementColumn =>
@@ -39,23 +39,23 @@ export interface IndexColumn<TCols extends TProperties = TProperties> {
 
 export interface TableIndex<TCols extends TProperties = TProperties> {
   name: string
-  columns: readonly ((keyof TCols & string) | IndexColumn<TCols>)[]
+  columns: ((keyof TCols & string) | IndexColumn<TCols>)[]
   unique?: boolean
 }
 
 export interface TableForeignKey {
-  columns: readonly string[]
+  columns: string[]
   refTable: string
-  refColumns: readonly string[]
+  refColumns: string[]
   onDelete?: 'cascade' | 'set null' | 'restrict' | 'no action' | 'set default'
 }
 
 export interface TableMeta<TCols extends TProperties> {
   description?: string
-  primaryKey: readonly (keyof TCols & string)[]
-  unique?: readonly (readonly (keyof TCols & string)[])[]
-  indexes?: readonly TableIndex<TCols>[]
-  foreignKeys?: readonly (TableForeignKey & { columns: readonly (keyof TCols & string)[] })[]
+  primaryKey: (keyof TCols & string)[]
+  unique?: (keyof TCols & string)[][]
+  indexes?: TableIndex<TCols>[]
+  foreignKeys?: (TableForeignKey & { columns: (keyof TCols & string)[] })[]
 }
 
 export interface TableSchema<
@@ -88,7 +88,7 @@ export const validateTableSchema = (table: TableSchema): void => {
   const columns = Object.keys(table.columns)
   if (columns.length === 0) throw schemaError(table, 'at least one column is required')
 
-  const assertColumns = (names: readonly string[], context: string): void => {
+  const assertColumns = (names: string[], context: string): void => {
     for (const name of names) {
       if (!columns.includes(name))
         throw schemaError(table, `${context} references unknown column "${name}"`)

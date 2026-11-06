@@ -11,48 +11,47 @@ allowBuilds:
 
 catalog:
   commander: ^15.0.0
-  '@semantic-release/changelog': ^6.0.3
+  '@semantic-release/changelog': ^7.0.0
   '@semantic-release/release-notes-generator': ^14.1.1
-  semantic-release: ^25.0.7
-  acorn: ^8.18.0
+  semantic-release: ^25.0.9
+  acorn: ^8.19.0
   es-module-lexer: ^3.0.4
-  magic-string: ^1.1.0
-  cordis: ^4.0.0-rc.10
-  '@swc/core': ^1.16.0
-  # https://github.com/vuejs/language-tools/issues/6237
-  vue-tsc: 3.3.11
-  rolldown-plugin-dts: ^0.28.6
-  '@commitlint/cli': ^21.2.3
-  '@commitlint/config-conventional': ^21.2.3
-  '@cloudflare/vite-plugin': 1.62.5
+  magic-string: ^1.4.5
+  cordis: ^4.0.0-rc.12
+  '@swc/core': ^1.16.22
+  vue-tsc: 3.3.14
+  rolldown-plugin-dts: ^0.30.0
+  '@commitlint/cli': ^21.2.4
+  '@commitlint/config-conventional': ^21.2.4
+  '@cloudflare/vite-plugin': 1.67.0
   '@elysiajs/bearer': ^1.4.4
-  '@elysiajs/cors': ^1.4.2
-  '@elysiajs/openapi': ^1.4.16
+  '@elysiajs/cors': ^1.4.3
+  '@elysiajs/openapi': ^1.4.17
   '@sinclair/typebox': ^0.34.52
-  typebox: ^1.3.34
+  typebox: ^1.4.5
   '@octokit/rest': ^22.0.1
-  '@pinia/colada': ^1.4.7
-  '@tailwindcss/vite': ^4.3.3
-  '@tauri-apps/api': ^2.12.1
-  '@tauri-apps/cli': ^2.12.1
-  '@tauri-apps/plugin-clipboard-manager': ~2.4.1
-  '@tauri-apps/plugin-fs': ^2.6.0
-  '@tauri-apps/plugin-shell': ^2.4.0
-  '@tauri-apps/plugin-sql': ^2.5.0
+  '@pinia/colada': ^1.4.9
+  '@tailwindcss/vite': ^4.3.4
+  '@tauri-apps/api': ^2.12.4
+  '@tauri-apps/cli': ^2.12.4
+  '@tauri-apps/plugin-clipboard-manager': ^2.5.0
+  '@tauri-apps/plugin-fs': ^2.7.1
+  '@tauri-apps/plugin-shell': ^2.6.0
+  '@tauri-apps/plugin-sql': ^2.6.0
   '@types/node': 26.6.6
   '@types/semver': ^7.8.0
-  '@vitejs/plugin-legacy': ^8.2.3
-  '@vitejs/plugin-vue': ^6.0.9
+  '@vitejs/plugin-legacy': ^8.2.4
+  '@vitejs/plugin-vue': ^6.0.10
   '@vitejs/plugin-vue-jsx': ^5.1.6
   '@vueuse/core': ^15.0.0
-  '@vitest/coverage-v8': 5.0.5
-  browserslist: ^4.29.3
+  '@vitest/coverage-v8': 5.1.0
+  browserslist: ^4.29.5
   color: ^5.0.3
   commitlint-plugin-cspell: ^0.9.5
-  cspell: ^10.4.0-alpha.1
-  dayjs: ^1.11.21
-  elysia: ^1.4.29
-  es-toolkit: ^1.52.0
+  cspell: ^10.4.0
+  dayjs: ^1.11.23
+  elysia: ^1.4.31
+  es-toolkit: ^1.53.2
   jszip: ^3.10.2
   ky: ^2.2.0
   kysely: ^0.30.0-beta.2
@@ -62,63 +61,45 @@ catalog:
   lightningcss: ^1.33.0
   linkify-it: ^6.1.0
   lz-string: ^1.5.0
-  markdown-it: ^15.0.2
+  markdown-it: ^15.0.3
   mitt: ^3.0.1
-  motion-v: 2.9.0
+  motion-v: 2.11.1
   naive-ui: ^2.45.3
   pinia: ^4.1.0
-  semver: ^7.8.5
-  swiper: ^14.3.0
+  semver: ^7.8.6
+  swiper: ^14.4.0
   tailwind-merge: ^3.7.0
-  tailwindcss: ^4.3.3
+  tailwindcss: ^4.3.4
   tailwindcss-safe-area-capacitor: ^0.5.1
   twlinter: ^0.8.0
   tauri-plugin-m3: ^0.3.2
   taurpc: 2.0.0
   tlds: ^1.261.0
-  typescript: npm:typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2
+  typescript: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
   unplugin-vue-components: 32.1.0
-  vite: npm:@voidzero-dev/vite-plus-core@1.0.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.5.0
   vite-plugin-vue-devtools: ^9.0.0-beta.1
   vite-plugin-wasm: ^3.6.0
-  vite-plus: 1.4.0
+  vite-plus: 1.5.0
   vue: 3.6.0-rc.10
   vue-i18n: ^12.0.0-alpha.4
-  vue-component-type-helpers: ^3.3.12
+  vue-component-type-helpers: ^3.3.14
   vue-router: ^5.4.0
-  wrangler: 4.156.0
+  wrangler: 4.158.0
   kysely-wasqlite-worker: ^2.0.1
   happy-dom: ^21.0.4
   json-logic-js: ^2.0.5
   '@types/json-logic-js': ^2.0.8
   miniflare: 5.20261023.3-beta
-  vitest: 5.0.1
+  vitest: 5.1.0
 
 minimumReleaseAgeExclude:
-  - '@cloudflare/vite-plugin@1.62.5'
-  - '@pinia/colada@1.4.7'
-  - '@vue/language-core@3.3.11 || 3.3.12'
-  - miniflare@5.20261001.0-alpha || 5.20261023.3-beta
-  - vue-component-type-helpers@3.3.12
-  - vue-tsc@3.3.11 || 3.3.12
-  - wrangler@4.147.0 || 4.156.0
-  - eslint@10.12.0
-  - '@vue/compiler-core@3.6.0-rc.14'
-  - '@vue/compiler-dom@3.6.0-rc.14'
-  - '@vue/compiler-sfc@3.6.0-rc.14'
-  - '@vue/compiler-ssr@3.6.0-rc.14'
-  - '@vue/compiler-vapor@3.6.0-rc.14'
-  - '@vue/reactivity@3.6.0-rc.14'
-  - '@vue/runtime-core@3.6.0-rc.14'
-  - '@vue/runtime-dom@3.6.0-rc.14'
-  - '@vue/runtime-vapor@3.6.0-rc.14'
-  - '@vue/server-renderer@3.6.0-rc.14'
-  - '@vue/shared@3.6.0-rc.14'
-  - vue@3.6.0-rc.14
+  - es-toolkit@1.53.2
+  - rolldown-plugin-dts@0.30.0
+  - typebox@1.4.5
 
 overrides:
-  typescript: npm:typescript-native-bridge@6.0.3-bridge.18.tsgo.7.0.2
-  '@c4312/blake3-internal': ^3.0.0
+  typescript: 'catalog:'
   vite@*: 'catalog:'
   vitest@*: 'catalog:'
 

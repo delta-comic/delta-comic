@@ -9,7 +9,7 @@ import {
 import { IsOptional, IsUnion } from 'typebox'
 import type { TSchema } from 'typebox'
 
-import { isAutoIncrementColumn, type TableSchema, validateTableSchema } from './schema.mts'
+import { isAutoIncrementColumn, type TableSchema, validateTableSchema } from './schema'
 
 const sqlLiteral = (value: string): string => `'${value.replaceAll("'", "''")}'`
 
