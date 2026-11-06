@@ -1,7 +1,7 @@
+import { createReleaseNameTemplate } from '@delta-comic/release-cli'
 import type { GlobalConfig } from 'semantic-release'
 
 import pkg from './package.json' with { type: 'json' }
-import { createReleaseNameTemplate } from './script/manager/src/release-notes.mts'
 export const releaseBranches = ['main', { name: 'next', channel: 'next', prerelease: 'next' }]
 
 export default {

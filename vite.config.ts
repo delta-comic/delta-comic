@@ -67,7 +67,7 @@ export default defineConfig({
       },
       // linter
       'typecheck': {
-        command: 'vp run -r typecheck',
+        command: 'vp exec tsc --project ./tsconfig.json && vp run -r typecheck',
         dependsOn: ['build:packages'],
         cache: { output: [] },
       },

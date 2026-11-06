@@ -1,6 +1,6 @@
 packages:
   - packages/*/*/*
-  - script/manager
+  - script/*
 
 allowBuilds:
   '@swc/core': true
