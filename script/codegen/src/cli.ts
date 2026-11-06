@@ -25,13 +25,15 @@ const createProgram = () => {
   program
     .command('generate <target>')
     .description('生成数据库 SQL、Kysely 类型和运行时 schema')
-    .choices(['server', 'client', 'all'])
     .action(async (target: string) => {
       if (!isTarget(target)) throw new Error(`不支持的生成目标: ${target}`)
       const root = resolve(program.opts<{ cwd: string }>().cwd)
-      const definitions = target === 'all' ? codegenDefinitions : codegenDefinitions.filter(([file]) =>
-        target === 'client' ? file.includes('client.table') : file.includes('server.table'),
-      )
+      const definitions =
+        target === 'all'
+          ? codegenDefinitions
+          : codegenDefinitions.filter(([file]) =>
+              target === 'client' ? file.includes('client.table') : file.includes('server.table'),
+            )
       for (const [tableFile, outputDir] of definitions)
         await generateCodegen(root, tableFile, outputDir)
     })

@@ -3,6 +3,8 @@ import type { TSchema } from 'typebox'
 
 import { isAutoIncrementColumn, isJsonColumn, type TableSchema } from './schema'
 
+type SchemaShape = TSchema & { type?: string; description?: string }
+
 const pascalCase = (name: string): string =>
   name
     .split('_')
@@ -17,16 +19,16 @@ const singularize = (name: string): string => {
   return name.endsWith('s') ? name.slice(0, -1) : name
 }
 
-const isPrimitive = (schema: TSchema, type: 'string' | 'integer' | 'number' | 'boolean') =>
+const isPrimitive = (schema: SchemaShape, type: 'string' | 'integer' | 'number' | 'boolean') =>
   schema.type === type
 
-const tsType = (schema: TSchema, kyselyBoolean: boolean): string => {
+const tsType = (schema: SchemaShape, kyselyBoolean: boolean): string => {
   const base = tsBaseType(schema)
   const type = kyselyBoolean && schema.type === 'boolean' ? 'boolean' : base
   return IsOptional(schema) ? `${type} | null` : type
 }
 
-const tsBaseType = (schema: TSchema): string => {
+const tsBaseType = (schema: SchemaShape): string => {
   if (isAutoIncrementColumn(schema)) return 'Generated<number>'
   if (isJsonColumn(schema)) return `JSONColumnType<${schema.typeName}>`
   if (isPrimitive(schema, 'string')) return 'string'
@@ -52,14 +54,17 @@ export const generateTableInterface = (table: TableSchema): string => {
   const rowTypeName = singularize(pascalCase(table.name))
   const lines = Object.entries(table.columns).map(
     ([name, schema]) =>
-      `  ${table.kyselyCamelCase ? camelCase(name) : name}: ${tsType(schema as TSchema, table.kyselyBoolean === true)}`,
+      `  ${table.kyselyCamelCase ? camelCase(name) : name}: ${tsType(schema, table.kyselyBoolean === true)}`,
   )
   return [
     ...description,
     `export interface ${interfaceName} {`,
     ...lines.map((line, index) => {
-      const schema = Object.values(table.columns)[index] as TSchema
-      const description = typeof schema.description === 'string' ? ` // ${schema.description}` : ''
+      const schema = Object.values(table.columns)[index]
+      const description =
+        'description' in schema && typeof schema.description === 'string'
+          ? ` // ${schema.description}`
+          : ''
       return `${line}${description}`
     }),
     '}',

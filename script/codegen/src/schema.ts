@@ -1,5 +1,10 @@
 import { IsOptional, IsUnion, Type } from 'typebox'
-import type { Static, TProperties, TSchema } from 'typebox'
+import type { Static, TSchema } from 'typebox'
+
+type TableProperties = Record<string, TSchema>
+
+const schemaType = (schema: TSchema): string | undefined =>
+  'type' in schema && typeof schema.type === 'string' ? schema.type : undefined
 
 const JSON_COLUMN = Symbol('delta.comic.json-column')
 
@@ -32,12 +37,12 @@ export const isAutoIncrementColumn = (schema: TSchema): schema is AutoIncrementC
 
 export const autoIncrement = (): AutoIncrementColumn => ({ [AUTOINCREMENT]: true, type: 'integer' })
 
-export interface IndexColumn<TCols extends TProperties = TProperties> {
+export interface IndexColumn<TCols extends TableProperties = TableProperties> {
   column: keyof TCols & string
   order?: 'ASC' | 'DESC'
 }
 
-export interface TableIndex<TCols extends TProperties = TProperties> {
+export interface TableIndex<TCols extends TableProperties = TableProperties> {
   name: string
   columns: ((keyof TCols & string) | IndexColumn<TCols>)[]
   unique?: boolean
@@ -50,7 +55,7 @@ export interface TableForeignKey {
   onDelete?: 'cascade' | 'set null' | 'restrict' | 'no action' | 'set default'
 }
 
-export interface TableMeta<TCols extends TProperties> {
+export interface TableMeta<TCols extends TableProperties> {
   description?: string
   primaryKey: (keyof TCols & string)[]
   unique?: (keyof TCols & string)[][]
@@ -60,7 +65,7 @@ export interface TableMeta<TCols extends TProperties> {
 
 export interface TableSchema<
   TName extends string = string,
-  TCols extends TProperties = TProperties,
+  TCols extends TableProperties = TableProperties,
 > {
   name: TName
   columns: TCols
@@ -69,7 +74,7 @@ export interface TableSchema<
   kyselyBoolean?: boolean
 }
 
-export const defineTable = <TName extends string, TCols extends TProperties>(
+export const defineTable = <TName extends string, TCols extends TableProperties>(
   name: TName,
   columns: TCols,
   meta: TableMeta<TCols>,
@@ -135,7 +140,7 @@ export const validateTableSchema = (table: TableSchema): void => {
 }
 
 const databaseColumnSchema = (schema: TSchema): TSchema => {
-  const base = schema.type === 'boolean' ? Type.Integer() : schema
+  const base = schemaType(schema) === 'boolean' ? Type.Integer() : schema
   return IsOptional(schema) ? Type.Union([base, Type.Null()]) : base
 }
 
@@ -148,7 +153,7 @@ const camelRuntimeValueSchema = (
 ): Record<string, unknown> => {
   if (isJsonColumn(schema)) return { anyOf: [{ type: 'object' }, { type: 'string' }] }
   if (isAutoIncrementColumn(schema)) return { type: 'integer' }
-  if (schema.type === 'boolean')
+  if (schemaType(schema) === 'boolean')
     return kyselyBoolean
       ? { anyOf: [{ type: 'boolean' }, { const: 0 }, { const: 1 }] }
       : { type: 'integer' }
@@ -184,7 +189,7 @@ export const generateCamelCaseRuntimeTableSchema = (
 const runtimeSchema = (schema: TSchema): Record<string, unknown> => {
   if (isJsonColumn(schema)) return { type: 'string' }
   if (isAutoIncrementColumn(schema)) return { type: 'integer' }
-  if (schema.type === 'boolean') return { type: 'integer' }
+  if (schemaType(schema) === 'boolean') return { type: 'integer' }
   if (IsUnion(schema)) {
     return { anyOf: (schema.anyOf ?? []).map(node => runtimeSchema(node)) }
   }

@@ -61,5 +61,5 @@ export async function generateCodegen(
     console.log(`generated ${filePath}`)
   }
 
-  await execFileAsync('vp', ['fmt', '--write', ...generatedTypeFiles], { cwd: root, stdio: 'inherit' })
+  await execFileAsync('vp', ['fmt', '--write', ...generatedTypeFiles], { cwd: root })
 }

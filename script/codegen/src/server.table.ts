@@ -1,6 +1,6 @@
 import { Type } from 'typebox'
 
-import { autoIncrement, defineTable, type TableSchema } from './schema'
+import { autoIncrement, defineTable } from './schema'
 
 const syncCollection = Type.Union([
   Type.Literal('itemStore'),
@@ -286,7 +286,7 @@ const pluginStoreTable = defineTable(
   },
 )
 
-export const serverTables: readonly TableSchema[] = [
+export const serverTables = [
   authUsersTable,
   authTerminalsTable,
   authSessionsTable,
@@ -298,4 +298,4 @@ export const serverTables: readonly TableSchema[] = [
   pluginSchedulesTable,
   pluginRunsTable,
   pluginStoreTable,
-]
+] as const
