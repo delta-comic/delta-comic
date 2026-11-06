@@ -63,7 +63,7 @@ const app = useAppStore()
     class="app-navigation grid h-full w-22 grid-cols-1 grid-rows-[64px_repeat(2,64px)_72px_repeat(2,64px)_1fr] items-center gap-1 border-r border-dc-border bg-dc-surface px-2.5 py-3"
     :aria-label="t('navigation.aria.main')"
   >
-    <div class="ml-1 size-10.25!">
+    <div class="mx-auto ml-1 flex size-10.25 justify-center">
       <DcImage :src="app.activatedUser?.avatar ?? userIcon" :fallback="userIcon" round class="" />
     </div>
     <AppNavigationItem

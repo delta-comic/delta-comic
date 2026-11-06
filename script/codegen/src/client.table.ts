@@ -1,6 +1,6 @@
 import { Type } from 'typebox'
 
-import { defineTable, jsonColumn, type TableSchema } from './schema.mts'
+import { defineTable, jsonColumn } from './schema'
 
 const model = '@delta-comic/client-core-model'
 
@@ -160,7 +160,7 @@ const pluginDiagnosticLogTable = defineTable(
   { kyselyCamelCase: true },
 )
 
-export const clientTables: readonly TableSchema[] = [
+export const clientTables = [
   itemStoreTable,
   favouriteCardTable,
   favouriteItemTable,
@@ -171,4 +171,4 @@ export const clientTables: readonly TableSchema[] = [
   nativeStoreTable,
   configTable,
   pluginDiagnosticLogTable,
-]
+] as const

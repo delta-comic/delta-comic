@@ -43,3 +43,5 @@ packages/client/app/*/public/runtime/
 *.tsbuildinfo
 packages/*/android/.tauri
 packages/*/android/.gradle
+
+.test-plugin

@@ -9,7 +9,14 @@ import {
 import { IsOptional, IsUnion } from 'typebox'
 import type { TSchema } from 'typebox'
 
-import { isAutoIncrementColumn, type TableSchema, validateTableSchema } from './schema.mts'
+import { isAutoIncrementColumn, type TableSchema, validateTableSchema } from './schema'
+
+type SchemaShape = TSchema & {
+  type?: string
+  default?: unknown
+  minimum?: number
+  maximum?: number
+}
 
 const sqlLiteral = (value: string): string => `'${value.replaceAll("'", "''")}'`
 
@@ -21,10 +28,10 @@ const unionValues = (schema: TSchema): readonly (string | number)[] | undefined 
   return undefined
 }
 
-const isPrimitive = (schema: TSchema, type: 'string' | 'integer' | 'number' | 'boolean') =>
+const isPrimitive = (schema: SchemaShape, type: 'string' | 'integer' | 'number' | 'boolean') =>
   schema.type === type
 
-const sqliteType = (schema: TSchema): string => {
+const sqliteType = (schema: SchemaShape): 'text' | 'integer' | 'real' => {
   if (isPrimitive(schema, 'string')) return 'text'
   if (isPrimitive(schema, 'integer')) return 'integer'
   if (isPrimitive(schema, 'number')) return 'real'
@@ -38,14 +45,14 @@ const sqliteType = (schema: TSchema): string => {
 
 const isNullable = (schema: TSchema): boolean => IsOptional(schema)
 
-const defaultLiteral = (schema: TSchema): unknown => {
-  const value = (schema as { default?: unknown }).default
+const defaultLiteral = (schema: SchemaShape): unknown => {
+  const value = schema.default
   if (typeof value === 'boolean') return value ? 1 : 0
   if (typeof value === 'string' || typeof value === 'number') return value
   return undefined
 }
 
-const checkExpression = (name: string, schema: TSchema): string | undefined => {
+const checkExpression = (name: string, schema: SchemaShape): string | undefined => {
   if (isPrimitive(schema, 'boolean')) return `${name} in (0, 1)`
   const values = unionValues(schema)
   if (values !== undefined) {
@@ -92,7 +99,16 @@ const foreignKeyCallback =
   }
 
 // 仅供生成 SQL 使用，compile 阶段不会触碰 database
-const db = new Kysely({ dialect: new SqliteDialect({ database: {} }) })
+const db = new Kysely({
+  dialect: new SqliteDialect({
+    database: {
+      close() {},
+      prepare() {
+        throw new Error('SQLite database access is unavailable during SQL generation')
+      },
+    },
+  }),
+})
 
 export const generateTableSql = (table: TableSchema): string => {
   validateTableSchema(table)
@@ -104,7 +120,7 @@ export const generateTableSql = (table: TableSchema): string => {
 
   let builder: CreateTableBuilder<any, any> = db.schema.createTable(table.name).ifNotExists()
   for (const name of Object.keys(columns)) {
-    const schema = columns[name] as TSchema
+    const schema = columns[name]
     builder = builder.addColumn(
       name,
       sqliteType(schema),

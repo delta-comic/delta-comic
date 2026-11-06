@@ -206,7 +206,7 @@ Web 入口为 `src/main.tsx`，Tauri 入口为 `src-tauri/src/main.rs`，窗口�
 
 ## 数据、目录与诊断
 
-数据定义源为 `script/codegen/client.table.mts` 和 `script/codegen/server.table.mts`。
+数据定义源为 `script/codegen/client.table.ts` 和 `script/codegen/server.table.ts`。
 生成文件由 codegen 更新。服务端 `0005_plugin_flows.sql` 建立流程表，
 `0006_remove_legacy_plugin_tables.sql` 完成表清理；既有历史迁移按序保留。
 
