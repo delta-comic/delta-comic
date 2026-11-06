@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useMessage } from 'naive-ui'
+import { storeToRefs } from 'pinia'
 import { shallowRef } from 'vue'
 
 import { flowText } from '@/i18n/flows'
@@ -9,12 +10,16 @@ import StatusMark from '@/shared/components/StatusMark.vue'
 import { useConnectionStore } from '@/stores/connection'
 
 const connection = useConnectionStore()
+const { adminToken, apiBaseUrl, capabilities, error, isConnected, status, userToken } =
+  storeToRefs(connection)
+const { clearToken } = connection
 const message = useMessage()
-const endpointDraft = shallowRef(connection.apiBaseUrl)
-const tokenDraft = shallowRef(connection.adminToken)
-const userTokenDraft = shallowRef(connection.userToken)
+const endpointDraft = shallowRef(apiBaseUrl.value)
+const tokenDraft = shallowRef(adminToken.value)
+const userTokenDraft = shallowRef(userToken.value)
 const saving = shallowRef(false)
 const formError = shallowRef('')
+const userTokenLabel = flowText.token
 
 const save = async () => {
   saving.value = true
@@ -24,7 +29,7 @@ const save = async () => {
     connection.saveUserToken(userTokenDraft.value)
     const connected = await connection.connect()
     if (connected) message.success('连接验证成功')
-    else formError.value = connection.error
+    else formError.value = error.value
   } catch (error) {
     formError.value = readableApiError(error)
   } finally {
@@ -57,7 +62,7 @@ const save = async () => {
               autocomplete="current-password"
             />
           </NFormItem>
-          <NFormItem :label="flowText.token">
+          <NFormItem :label="userTokenLabel">
             <NInput
               v-model:value="userTokenDraft"
               type="password"
@@ -73,9 +78,7 @@ const save = async () => {
             {{ formError }}
           </div>
           <NSpace justify="end">
-            <NButton v-if="connection.adminToken" @click="connection.clearToken">
-              清除会话令牌
-            </NButton>
+            <NButton v-if="adminToken" @click="clearToken">清除会话令牌</NButton>
             <NButton attr-type="submit" type="primary" :loading="saving">保存并验证</NButton>
           </NSpace>
         </NForm>
@@ -84,29 +87,21 @@ const save = async () => {
       <NCard title="运行时能力" :bordered="true">
         <div class="settings-page__status mb-4.5">
           <StatusMark
-            :label="connection.isConnected ? '已认证' : '未认证'"
-            :tone="
-              connection.isConnected
-                ? 'success'
-                : connection.status === 'error'
-                  ? 'danger'
-                  : 'muted'
-            "
+            :label="isConnected ? '已认证' : '未认证'"
+            :tone="isConnected ? 'success' : status === 'error' ? 'danger' : 'muted'"
           />
         </div>
-        <template v-if="connection.capabilities">
+        <template v-if="capabilities">
           <NDescriptions label-placement="left" :column="1" bordered size="small">
-            <NDescriptionsItem label="服务">{{
-              connection.capabilities.server.service
-            }}</NDescriptionsItem>
+            <NDescriptionsItem label="服务">{{ capabilities.server.service }}</NDescriptionsItem>
             <NDescriptionsItem label="管理路径">{{
-              connection.capabilities.server.adminPath
+              capabilities.server.adminPath
             }}</NDescriptionsItem>
             <NDescriptionsItem label="运行模块">{{
-              connection.capabilities.modules.length
+              capabilities.modules.length
             }}</NDescriptionsItem>
             <NDescriptionsItem label="版本元数据">
-              {{ connection.capabilities.features.versionMetadata ? '可用' : '未绑定' }}
+              {{ capabilities.features.versionMetadata ? '可用' : '未绑定' }}
             </NDescriptionsItem>
           </NDescriptions>
         </template>
