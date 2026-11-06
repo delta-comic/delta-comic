@@ -40,5 +40,4 @@ class CredentialBootstrapTest {
         assertFalse(initialized)
         assertEquals(0, bootstrapCalls)
     }
-
 }

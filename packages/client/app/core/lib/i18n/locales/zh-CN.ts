@@ -324,8 +324,7 @@ const zhCN = {
       searchPlaceholder: '搜索插件、作者或描述',
       security: {
         insecure: '警告：该来源未使用 HTTPS。',
-        notice:
-          '第三方插件会在应用内执行代码。请核对来源并仅安装你信任的插件',
+        notice: '第三方插件会在应用内执行代码。请核对来源并仅安装你信任的插件',
         title: '安装安全提示',
       },
       stale: '正在显示缓存数据，内容可能已过期',

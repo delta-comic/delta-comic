@@ -2,14 +2,9 @@
   "extends": "../../tsconfig.node.json",
   "compilerOptions": {
     "composite": true,
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "moduleResolution": "bundler",
     "module": "esnext"
   },
-  "include": [
-    "./vite.config.mts",
-    "./src/**/*"
-  ]
+  "include": ["./vite.config.mts", "./src/**/*"]
 }
