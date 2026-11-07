@@ -87,7 +87,9 @@ jobs:
           version-file: package.json
 
       - name: Synchronize build version
-        run: vp exec dr version sync "${{ needs.plan.outputs.version }}"
+        run: |
+          vpr release-cli
+          vp exec dr version sync "${{ needs.plan.outputs.version }}"
 
       - name: Build release workspace libraries
         run: vp run build:packages
@@ -234,7 +236,9 @@ jobs:
           version-file: package.json
 
       - name: Synchronize build version
-        run: vp exec dr version sync "${{ needs.plan.outputs.version }}"
+        run: |
+          vpr release-cli
+          vp exec dr version sync "${{ needs.plan.outputs.version }}"
 
       - name: Configure Windows MSI version
         if: matrix.platform == 'windows-latest'
@@ -288,8 +292,7 @@ jobs:
           run-install: true
           version-file: package.json
 
-      - name: Build release CLI
-        run: vp run --filter @delta-comic/release-cli build
+      - run: vpr release-cli
 
       - name: Download release artifacts
         uses: actions/download-artifact@v7
@@ -298,17 +301,13 @@ jobs:
           path: dist/release
           merge-multiple: true
 
-      - name: Verify release artifacts
-        run: test -n "$(find dist/release -type f -print -quit)"
-
-      - name: Configure git author
+      - name: Configure auth
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name 'delta-comic-bot'
           git config user.email 'delta-comic-bot@proton.me'
-      - name: Configure GitHub Packages authentication
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: vp pm config set '//npm.pkg.github.com/:_authToken' "$GITHUB_TOKEN"
+          vp pm config set '//npm.pkg.github.com/:_authToken' "$GITHUB_TOKEN"
 
       - name: Publish semantic release
         env:
