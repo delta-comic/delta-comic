@@ -3,10 +3,32 @@ name: 单元测试
 on:
   push:
     paths:
-      - '!*.md'
+      - 'packages/**'
+      - '.github/workflows/lint.yaml'
+      - '.editorconfig'
+      - '.node-version'
+      - 'Cargo.lock'
+      - 'Cargo.toml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'words.txt'
+      - '*.config.ts'
+      - 'tsconfig*.json'
   pull_request:
     paths:
-      - '!*.md'
+      - 'packages/**'
+      - '.github/workflows/lint.yaml'
+      - '.editorconfig'
+      - '.node-version'
+      - 'Cargo.lock'
+      - 'Cargo.toml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'words.txt'
+      - '*.config.ts'
+      - 'tsconfig*.json'
 
 permissions:
   contents: read
