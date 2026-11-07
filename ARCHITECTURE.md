@@ -25,11 +25,11 @@
 | `packages/client/http` | HTTP 平台适配 |
 | `packages/client/logger` | 日志传输 |
 | `packages/client/ui` | 通用 Vue UI、内容布局和播放器 |
-| `packages/shared/both` | Cordis 导出、诊断协议与双端核心 |
-| `packages/shared/logger` | 双端日志核心 |
-| `packages/shared/manifest` | 客户端 manifest v2 schema 与完整性检查 |
+| `packages/client/both` | Cordis 导出、诊断协议与双端核心 |
+| `packages/client/logger` | 双端日志核心 |
+| `packages/client/manifest` | 客户端 manifest v2 schema 与完整性检查 |
 
-共享模块由客户端各端实际消费。`@delta-comic/client-runtime` 为外部插件提供宿主桥接。
+客户端公共模块由各端实际消费。`@delta-comic/client-runtime` 为外部插件提供宿主桥接。
 
 ## Manifest 与产物
 

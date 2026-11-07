@@ -45,7 +45,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@delta-comic/logger": "workspace:",
+    "@delta-comic/client-logger": "workspace:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-shell": "catalog:",
     "@vueuse/core": "catalog:",

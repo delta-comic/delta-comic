@@ -1,11 +1,11 @@
 export const LOG_LEVELS = ['trace', 'debug', 'info', 'warn', 'error'] as const
 
-export type LogLevel = (typeof LOG_LEVELS)[number]
+export type LoggerLevel = (typeof LOG_LEVELS)[number]
 
 export interface LogEntry {
   timestamp: string
   scope: string
-  level: LogLevel
+  level: LoggerLevel
   content: string
 }
 
@@ -16,7 +16,7 @@ export interface LoggerTransport {
 }
 
 export interface LoggerOptions {
-  minLevel?: LogLevel
+  minLevel?: LoggerLevel
   transport?: LoggerTransport
   captureErrors?: boolean
   flushOnLifecycle?: boolean

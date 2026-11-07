@@ -1,7 +1,7 @@
 import { useNativeStore } from '@delta-comic/client-db'
+import { logger } from '@delta-comic/client-logger'
 import { type Content, usePluginStore } from '@delta-comic/client-plugin'
 import { SharedFunction } from '@delta-comic/client-utils'
-import { logger } from '@delta-comic/logger'
 import { computedAsync } from '@vueuse/core'
 import { uniq } from 'es-toolkit'
 import { computed, readonly, shallowRef } from 'vue'

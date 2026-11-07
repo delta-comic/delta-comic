@@ -16,6 +16,7 @@
     }
   },
   "dependencies": {
+    "dayjs": "catalog:",
     "taurpc": "catalog:"
   },
   "devDependencies": {

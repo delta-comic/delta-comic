@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/client-logger'
 import type { TSchema } from 'typebox'
 import { Compile } from 'typebox/compile'
 import { Value } from 'typebox/value'

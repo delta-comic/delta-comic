@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useDownloadLifecycle } from '@delta-comic/client-app-core/features/downloads/useDownloadLifecycle'
 import { pluginName } from '@delta-comic/client-app-core/symbol'
+import { logger } from '@delta-comic/client-logger'
 import { usePluginStore } from '@delta-comic/client-plugin'
 import { SharedFunction } from '@delta-comic/client-utils'
-import { logger } from '@delta-comic/logger'
 import { useIntervalFn } from '@vueuse/core'
 import { Mutex } from 'es-toolkit'
 import { onMounted } from 'vue'

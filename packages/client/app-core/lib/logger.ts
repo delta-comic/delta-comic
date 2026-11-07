@@ -1,3 +1,3 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/client-logger'
 
 export const appLogger = logger.scoped('app')

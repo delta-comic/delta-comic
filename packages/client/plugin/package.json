@@ -39,9 +39,9 @@
   },
   "dependencies": {
     "@delta-comic/client": "workspace:",
+    "@delta-comic/client-logger": "workspace:",
     "@delta-comic/client-plugin-install": "workspace:",
     "@delta-comic/client-plugin-vite": "workspace:",
-    "@delta-comic/logger": "workspace:",
     "@delta-comic/manifest": "workspace:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-fs": "catalog:",

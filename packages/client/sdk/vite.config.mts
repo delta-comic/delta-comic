@@ -28,13 +28,11 @@ export default defineConfig({
       '@delta-comic/client-downloader': fileURLToPath(
         new URL('../downloader/lib/index.ts', import.meta.url),
       ),
-      '@delta-comic/logger': fileURLToPath(
-        new URL('../../shared/logger/lib/index.ts', import.meta.url),
+      '@delta-comic/client-logger': fileURLToPath(
+        new URL('../logger/lib/index.ts', import.meta.url),
       ),
       '@delta-comic/client-model': fileURLToPath(new URL('../model/lib/index.ts', import.meta.url)),
-      '@delta-comic/manifest': fileURLToPath(
-        new URL('../../shared/manifest/lib/index.ts', import.meta.url),
-      ),
+      '@delta-comic/manifest': fileURLToPath(new URL('../manifest/lib/index.ts', import.meta.url)),
       '@delta-comic/client-ui': fileURLToPath(new URL('../ui/lib/index.ts', import.meta.url)),
       '@delta-comic/client-utils': fileURLToPath(new URL('../utils/lib/index.ts', import.meta.url)),
     },

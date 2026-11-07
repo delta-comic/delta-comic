@@ -6,7 +6,7 @@
     TComponent extends GlobalEnvironments[TKey] = GlobalEnvironments[TKey]
   "
 >
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/client-logger'
 import { computed } from 'vue'
 import type { ComponentProps } from 'vue-component-type-helpers'
 

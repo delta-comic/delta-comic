@@ -4,7 +4,7 @@ import { serializeLogArguments } from './serializer'
 import {
   LOG_LEVELS,
   type LogEntry,
-  type LogLevel,
+  type LoggerLevel,
   type LoggerTransport,
   type LoggerOptions,
 } from './types'
@@ -12,7 +12,7 @@ import {
 type ConsoleMethod = 'debug' | 'error' | 'info' | 'log' | 'trace' | 'warn'
 type ConsoleWriter = (...values: unknown[]) => void
 
-const CONSOLE_LEVEL: Record<ConsoleMethod, LogLevel> = {
+const CONSOLE_LEVEL: Record<ConsoleMethod, LoggerLevel> = {
   debug: 'debug',
   error: 'error',
   info: 'info',
@@ -21,7 +21,7 @@ const CONSOLE_LEVEL: Record<ConsoleMethod, LogLevel> = {
   warn: 'warn',
 }
 
-const LEVEL_CONSOLE: Record<LogLevel, ConsoleMethod> = {
+const LEVEL_CONSOLE: Record<LoggerLevel, ConsoleMethod> = {
   trace: 'trace',
   debug: 'debug',
   info: 'info',
@@ -29,9 +29,9 @@ const LEVEL_CONSOLE: Record<LogLevel, ConsoleMethod> = {
   error: 'error',
 }
 
-const levelValue = (level: LogLevel) => LOG_LEVELS.indexOf(level)
+const levelValue = (level: LoggerLevel) => LOG_LEVELS.indexOf(level)
 
-const resolveMinLevel = (requested?: LogLevel): LogLevel => requested ?? 'info'
+const resolveMinLevel = (requested?: LoggerLevel): LoggerLevel => requested ?? 'info'
 
 const normalizeScope = (scope: string) => scope.trim() || 'app'
 
@@ -48,7 +48,7 @@ export const formatLogEntry = (entry: LogEntry): string => {
 
 interface LoggerRuntime {
   transport: LoggerTransport
-  minLevel: LogLevel
+  minLevel: LoggerLevel
   consoleWriters: Record<ConsoleMethod, ConsoleWriter>
   cleanup: Set<() => void>
   consoleRestore?: () => void
@@ -96,11 +96,11 @@ export class Logger {
     this.runtime.transport = transport
   }
 
-  public get minLevel(): LogLevel {
+  public get minLevel(): LoggerLevel {
     return this.runtime.minLevel
   }
 
-  public set minLevel(level: LogLevel) {
+  public set minLevel(level: LoggerLevel) {
     this.runtime.minLevel = resolveMinLevel(level)
   }
 
@@ -212,7 +212,7 @@ export class Logger {
     await this.runtime.transport.dispose()
   }
 
-  private emit(level: LogLevel, values: readonly unknown[], mirrorConsole = true): void {
+  private emit(level: LoggerLevel, values: readonly unknown[], mirrorConsole = true): void {
     if (levelValue(level) < levelValue(this.runtime.minLevel)) return
     const entry: LogEntry = {
       content: serializeLogArguments(values),

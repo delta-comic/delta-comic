@@ -9,8 +9,18 @@ export default defineConfig({
       resolveDepSubpath: true,
     },
     entry: './lib/index.ts',
-    dts: true,
+    dts: { tsconfig: './tsconfig.app.json' },
     sourcemap: true,
   },
-  run: { tasks: { build: { command: 'vp pack', cache: { output: ['dist/**'] } } } },
+  run: {
+    tasks: {
+      build: { command: 'vp pack', cache: { output: ['dist/**'] } },
+      test: { command: 'vp test run test/lib', cache: { output: [] } },
+      typecheck: {
+        command: ['tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
+        cache: { output: [] },
+      },
+    },
+  },
+  test: { environment: 'node', include: ['test/**/*.test.ts'] },
 })

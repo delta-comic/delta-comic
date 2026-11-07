@@ -115,10 +115,10 @@ The goal is to make the requested change correctly, with minimal unnecessary com
   客户端。Tauri 必须使用端口 `5173`，端口不可用时会直接失败，而不会选择其他端口。
 - 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/client-runtime`，它是供外部插件使用的
   UMD 宿主库桥接层。请保持此依赖顺序。
-- `packages/client/db`、`packages/client/downloader`、`packages/client/logger`、`packages/client/ui`、
-  `packages/shared/logger` 与 `packages/client/{model,utils,plugin}` 是可发布的工作区；其中一些还通过
+- `packages/client/db`、`packages/client/downloader`、`packages/client/logger`、`packages/client/ui` 与
+  `packages/client/{model,utils,plugin}` 是可发布的工作区；其中一些还通过
   根 Cargo 工作区映射到 Rust Tauri 插件 crate。`packages/client/runtime` 与 `app-core` 是私有包。
-- `packages/shared` 只容纳客户端各端都必须消费的代码与类型。某项能力若只被单端使用，或依赖 Vue UI、浏览器存储、Tauri、平台文件/网络等单端环境，应归入对应的 `packages/client`。
+- `packages/client` 包含客户端各端代码与类型。能力若只被单端使用，或依赖 Vue UI、浏览器存储、Tauri、平台文件/网络等单端环境，归入对应的 `packages/client` 子包。
 
 ## 架构约束
 

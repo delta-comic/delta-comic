@@ -3,6 +3,7 @@ import PluginIcon from '@delta-comic/client-app-core/components/plugin/PluginIco
 import { usePluginInstall } from '@delta-comic/client-app-core/features/pluginInstall/usePluginInstall'
 import { translateText } from '@delta-comic/client-app-core/i18n/index'
 import { Icons } from '@delta-comic/client-app-core/icons'
+import { logger } from '@delta-comic/client-logger'
 import {
   setPluginConfig,
   pluginFiberStates,
@@ -12,7 +13,6 @@ import {
   type PluginInstallation,
   usePluginStore,
 } from '@delta-comic/client-plugin'
-import { logger } from '@delta-comic/logger'
 import type { DropdownOption } from 'naive-ui'
 import semver from 'semver'
 import { computed, shallowReactive, shallowRef } from 'vue'

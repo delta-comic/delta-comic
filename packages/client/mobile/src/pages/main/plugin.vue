@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icons } from '@delta-comic/client-app-core/icons'
+import { logger } from '@delta-comic/client-logger'
 import { loadEnabledPlugins, pluginSafeMode } from '@delta-comic/client-plugin'
-import { logger } from '@delta-comic/logger'
 import { type MenuOption, NIcon } from 'naive-ui'
 import type { Component } from 'vue'
 import { computed, h, shallowRef } from 'vue'

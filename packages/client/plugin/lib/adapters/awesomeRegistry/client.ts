@@ -1,3 +1,4 @@
+import { logger } from '@delta-comic/client-logger'
 import type { PluginManifest } from '@delta-comic/client-model'
 import type {
   PluginCatalog,
@@ -7,7 +8,6 @@ import type {
   PluginCatalogResult,
 } from '@delta-comic/client-plugin-install'
 import { parsePluginManifest } from '@delta-comic/client-plugin-install'
-import { logger } from '@delta-comic/logger'
 import ky from 'ky'
 
 import { AwesomeRegistryCache } from './cache'

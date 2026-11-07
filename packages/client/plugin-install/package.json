@@ -20,9 +20,9 @@
     "test": "vp test run"
   },
   "dependencies": {
+    "@delta-comic/client-logger": "workspace:",
     "@delta-comic/client-model": "workspace:",
     "@delta-comic/client-plugin-artifact": "workspace:",
-    "@delta-comic/logger": "workspace:",
     "@delta-comic/manifest": "workspace:",
     "@octokit/rest": "catalog:",
     "cordis": "catalog:",
