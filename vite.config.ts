@@ -10,7 +10,7 @@ const lintConfig = lint as OxlintConfig
 export default defineConfig({
   resolve: { conditions: ['delta-comic-workspace', ...defaultClientConditions] },
   staged: {
-    '*': 'vp run codegen:all && vp check --fix && vp run codegen:check',
+    '*': () => ['vp run codegen:all', 'vp check --fix', 'vp run codegen:check'],
     '*.{ts,tsx,mts,js,jsx,mjs,vue,html,md,json,yaml,toml}': 'vp exec cspell --no-must-find-files',
   },
   fmt: fmt as OxfmtConfig,

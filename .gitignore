@@ -41,3 +41,4 @@ packages/*/android/.tauri
 packages/*/android/.gradle
 
 .test-plugin
+.planning
