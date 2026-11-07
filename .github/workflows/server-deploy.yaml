@@ -24,24 +24,25 @@ jobs:
       HUSKY: 0
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@v1.21.1
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
           node-version-file: .node-version
           cache: true
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
+          node-manager: pnpm
+          run-install: true
+          version-file: package.json
+
       - name: Build workspace libraries
         run: vp run build:packages
+
       - name: Check formatting and lint
-        run: vp check
-      - name: Check TypeScript
-        run: vp run -r typecheck
-      - name: Run tests
-        run: vp test run
-      - name: Check generated files
-        run: vp run codegen:check
+        run: |
+          vp check
+          vp run -r typecheck
+          vp test run
+          vp run codegen:check
       - name: Check diff
         run: git diff --check
 
@@ -55,14 +56,17 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+
       - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@v1.21.1
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
           node-version-file: .node-version
           cache: true
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
+          node-manager: pnpm
+          run-install: true
+          version-file: package.json
+
       - name: Build workspace libraries
         run: vp run build:packages
       - name: Apply remote migrations
@@ -81,14 +85,16 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@v1.21.1
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
           node-version-file: .node-version
           cache: true
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
+          node-manager: pnpm
+          run-install: true
+          version-file: package.json
+
       - name: Build workspace libraries
         run: vp run build:packages
       - name: Build admin

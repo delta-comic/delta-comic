@@ -10,7 +10,7 @@ export default {
   tagFormat: '${version}',
   plugins: [
     ['@semantic-release/commit-analyzer', { preset: 'angular' }],
-    '@delta-comic/release-cli/semantic-release',
+    '@delta-comic/release-ci',
     ['@semantic-release/release-notes-generator', { preset: 'angular' }],
     ['@semantic-release/changelog', { changelogFile: 'CHANGELOG.md' }],
     [

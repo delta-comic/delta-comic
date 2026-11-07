@@ -12,10 +12,7 @@ import {
 } from './schema'
 
 export const codegenDefinitions = [
-  [
-    'script/codegen/server.table.ts',
-    'packages/server/core/server/app/infrastructure/d1/generated',
-  ],
+  ['script/codegen/server.table.ts', 'packages/server/core/server/app/infrastructure/d1/generated'],
   ['script/codegen/client.table.ts', 'packages/client/data/db/lib/generated'],
 ] as const
 
@@ -57,7 +54,9 @@ export async function checkCodegen(root: string): Promise<void> {
             throw new Error(`generated file is stale: ${outputDir}/${file} (${table.name})`)
           if (table.kyselyCamelCase !== true) continue
           const camelMapName = `${schemaExportName.replace(/RowSchemas$/, '')}CamelRowSchemas`
-          const actualCamelMap = generatedModule[camelMapName] as Record<string, unknown> | undefined
+          const actualCamelMap = generatedModule[camelMapName] as
+            | Record<string, unknown>
+            | undefined
           if (!actualCamelMap) throw new Error(`generated file is stale: ${outputDir}/${file}`)
           const expectedCamelSchema = generateCamelCaseRuntimeTableSchema(table)
           if (

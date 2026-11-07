@@ -3,30 +3,10 @@ name: 单元测试
 on:
   push:
     paths:
-      - 'packages/**'
-      - 'script/**'
-      - '.github/workflows/test.yaml'
-      - '.node-version'
-      - 'Cargo.lock'
-      - 'Cargo.toml'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - '*.config.ts'
-      - 'tsconfig*.json'
+      - '!*.md'
   pull_request:
     paths:
-      - 'packages/**'
-      - 'script/**'
-      - '.github/workflows/test.yaml'
-      - '.node-version'
-      - 'Cargo.lock'
-      - 'Cargo.toml'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - '*.config.ts'
-      - 'tsconfig*.json'
+      - '!*.md'
 
 permissions:
   contents: read
@@ -39,18 +19,18 @@ jobs:
       HUSKY: 0
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
       - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@v1.21.1
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
           node-version-file: .node-version
           cache: true
-
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
+          node-manager: pnpm
+          run-install: true
+          version-file: package.json
 
       - name: Test
         run: |
@@ -62,7 +42,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
@@ -87,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Rust metadata toolchain
         uses: dtolnay/rust-toolchain@master

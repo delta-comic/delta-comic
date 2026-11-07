@@ -24,7 +24,6 @@ export default defineConfig({
       'dev:web': { command: 'vp run @delta-comic/client-app-mobile#dev:web', cache: false },
       // build
       'build:packages': { command: 'vp run -r build', cache: { output: [] } },
-      // release
       'release-cli': {
         command: 'vp run --filter @delta-comic/release-cli build',
         cache: { output: ['script/manager/dist/**'] },
@@ -33,39 +32,20 @@ export default defineConfig({
         command: 'vp run --filter @delta-comic/codegen-cli build',
         cache: { output: ['script/codegen/dist/**'] },
       },
+      // release
       'branch:develop': {
         command: 'vp exec dr branch prepare develop',
         dependsOn: ['release-cli'],
         cache: false,
       },
-      'branch:develop:dry-run': {
-        command: 'vp exec dr branch prepare develop --dry-run',
-        dependsOn: ['release-cli'],
-        cache: false,
-      },
       'release': { command: 'vp exec dr release run', dependsOn: ['release-cli'], cache: false },
-      'release:dry-run': {
-        command: 'vp exec dr release plan',
-        dependsOn: ['release-cli'],
-        cache: false,
-      },
       'release:preview': {
         command: 'vp exec dr branch promote preview',
         dependsOn: ['release-cli'],
         cache: false,
       },
-      'release:preview:dry-run': {
-        command: 'vp exec dr branch promote preview --dry-run',
-        dependsOn: ['release-cli'],
-        cache: false,
-      },
       'release:stable': {
         command: 'vp exec dr branch promote stable',
-        dependsOn: ['release-cli'],
-        cache: false,
-      },
-      'release:stable:dry-run': {
-        command: 'vp exec dr branch promote stable --dry-run',
         dependsOn: ['release-cli'],
         cache: false,
       },
@@ -101,23 +81,6 @@ export default defineConfig({
       thresholds: { lines: 20, functions: 20, branches: 20, statements: 20 },
     },
     exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
-    projects: [
-      {
-        test: { name: 'root', environment: 'node', include: ['script/manager/test/**/*.test.ts'] },
-      },
-      'packages/shared/core/both',
-      'packages/client/core/plugin-artifact',
-      'packages/client/core/plugin-install',
-      'packages/client/core/plugin-vite',
-      'packages/shared/plugin/manifest',
-      'packages/client/app/core',
-      'packages/client/data/db',
-      'packages/client/platform/http',
-      'packages/shared/core/logger',
-      'packages/client/core/model',
-      'packages/client/core/plugin',
-      'packages/server/core/server',
-      'packages/client/core/utils',
-    ],
+    projects: ['script/*', 'packages/*/*/*'],
   },
 })
