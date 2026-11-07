@@ -38,18 +38,18 @@ jobs:
       HUSKY: 0
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@v1.21.1
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
           node-version-file: .node-version
           cache: true
-
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
+          node-manager: pnpm
+          run-install: true
+          version-file: package.json
 
       - name: Build release CLI
         run: vp run --filter @delta-comic/release-cli build
@@ -64,43 +64,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DELTA_RELEASE_RECOVERY: ${{ inputs.recover_withdrawn_2x && 'withdrawn-2x' || '' }}
         run: vp exec dr release plan
-
-      - name: Synchronize release build version
-        if: steps.release-plan.outputs.has-release == 'true'
-        run: vp exec dr version sync "${{ steps.release-plan.outputs.version }}"
-
-      - name: Build release workspace libraries
-        if: steps.release-plan.outputs.has-release == 'true'
-        run: vp run build:packages
-
-      - name: Upload workspace libraries
-        if: steps.release-plan.outputs.has-release == 'true'
-        uses: actions/upload-artifact@v7
-        with:
-          name: workspace-libraries
-          path: |
-            packages/client/app/mobile/public/runtime
-            packages/client/app/desktop/public/runtime
-            packages/client/core/runtime/dist
-            packages/shared/core/both/dist
-            packages/client/core/sdk/dist
-            packages/server/core/server/dist
-            packages/client/data/db/dist
-            packages/client/platform/downloader/dist
-            packages/client/platform/http/dist
-            packages/client/platform/logger/dist
-            packages/shared/core/logger/dist
-            packages/shared/plugin/manifest/dist
-            packages/client/core/model/dist
-            packages/client/core/plugin-artifact/dist
-            packages/client/core/plugin-install/dist
-            packages/client/core/plugin-vite/dist
-            packages/client/core/plugin/dist
-            packages/client/ui/ui/dist
-            packages/client/ui/ui/dist-vite
-            packages/client/core/utils/dist
-          if-no-files-found: error
-          retention-days: 1
 
       - name: No release required
         if:
@@ -122,31 +85,22 @@ jobs:
       DELTA_SKIP_LIB_BUILD: 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@v1.21.1
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
           node-version-file: .node-version
           cache: true
-
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
-
-      - name: Setup pnpm for Android Tauri lifecycle
-        uses: pnpm/action-setup@v4
-
-      - name: Build release CLI
-        run: vp run --filter @delta-comic/release-cli build
+          node-manager: pnpm
+          run-install: true
+          version-file: package.json
 
       - name: Synchronize build version
         run: vp exec dr version sync "${{ needs.plan.outputs.version }}"
 
-      - name: Download workspace libraries
-        uses: actions/download-artifact@v7
-        with:
-          name: workspace-libraries
-          path: packages
+      - name: Build release workspace libraries
+        run: vp run build:packages
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
@@ -277,19 +231,16 @@ jobs:
       DELTA_SKIP_LIB_BUILD: 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@v1.21.1
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
           node-version-file: .node-version
           cache: true
-
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
-
-      - name: Build release CLI
-        run: vp run --filter @delta-comic/release-cli build
+          node-manager: pnpm
+          run-install: true
+          version-file: package.json
 
       - name: Synchronize build version
         run: vp exec dr version sync "${{ needs.plan.outputs.version }}"
@@ -298,11 +249,8 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: vp exec dr version msi "${{ needs.plan.outputs.version }}"
 
-      - name: Download workspace libraries
-        uses: actions/download-artifact@v7
-        with:
-          name: workspace-libraries
-          path: packages
+      - name: Build release workspace libraries
+        run: vp run build:packages
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
@@ -335,18 +283,18 @@ jobs:
       HUSKY: 0
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup Vite+
-        uses: voidzero-dev/setup-vp@v1.21.1
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
           node-version-file: .node-version
           cache: true
-
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
+          node-manager: pnpm
+          run-install: true
+          version-file: package.json
 
       - name: Build release CLI
         run: vp run --filter @delta-comic/release-cli build
