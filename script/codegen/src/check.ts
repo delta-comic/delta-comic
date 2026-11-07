@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 import { generateArtifacts } from './artifacts'
+import * as clientTable from './client.table'
 import {
   camelCase,
   generateCamelCaseRuntimeTableSchema,
@@ -12,8 +13,7 @@ import {
 } from './schema'
 
 export const codegenDefinitions = [
-  ['script/codegen/server.table.ts', 'packages/server/core/server/app/infrastructure/d1/generated'],
-  ['script/codegen/client.table.ts', 'packages/client/data/db/lib/generated'],
+  ['script/codegen/src/client.table.ts', 'packages/platform/db/lib/generated'],
 ] as const
 
 const isTableSchema = (value: unknown): value is TableSchema =>
@@ -25,7 +25,9 @@ const isTableSchema = (value: unknown): value is TableSchema =>
 
 export async function checkCodegen(root: string): Promise<void> {
   for (const [definitionPath, outputDir] of codegenDefinitions) {
-    const module = await import(pathToFileURL(resolve(root, definitionPath)).href)
+    const module = definitionPath.includes('client.table')
+      ? clientTable
+      : await import(pathToFileURL(resolve(root, definitionPath)).href)
     const tables = Object.values(module).flatMap(value =>
       Array.isArray(value) ? value.filter(isTableSchema) : isTableSchema(value) ? [value] : [],
     )
@@ -36,9 +38,7 @@ export async function checkCodegen(root: string): Promise<void> {
         throw new Error(`duplicate table name "${table.name}" in ${definitionPath}`)
       seen.add(table.name)
     }
-    const schemaExportName = definitionPath.includes('client.table')
-      ? 'clientRowSchemas'
-      : 'serverRowSchemas'
+    const schemaExportName = 'clientRowSchemas'
     const expectedArtifacts = generateArtifacts(tables, schemaExportName)
     for (const [file, expectedContent] of expectedArtifacts) {
       const actualPath = resolve(root, outputDir, file)

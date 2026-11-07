@@ -125,7 +125,6 @@ webp
 wenxig
 workerd
 worktree
-wrangler
 xgbuugti
 Yahei
 yxxx

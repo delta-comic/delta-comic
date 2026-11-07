@@ -1,6 +1,5 @@
-- Monorepo root: `packages/*`; publishable/shared packages include `db`, `downloader`, `logger`, `model`, `plugin`, `ui`, `utils`; private apps/services include `app`, `runtime`, `server`, `server-admin`.
-- Client app entry: `packages/client/app/app/src/main.tsx`; Tauri entry: `packages/client/app/app/src-tauri/src/main.rs`; server Worker entry: `packages/server/core/server/app/index.ts`; shared server API: `packages/server/core/server/lib/index.ts`.
-- `packages/server/admin/server-admin` auto-discovers features from `src/features/*/feature.ts`; add feature modules instead of editing a central route list.
-- Plugin architecture is documented in `packages/shared/plugin/plugin/ARCHITECTURE.md`; composition is the only layer that assembles capabilities/adapters, and package code must not self-import the package root.
-- Generated declarations must not be edited manually: `components.d.ts`, `typed-router.d.ts`, `packages/server/core/server/worker-configuration.d.ts`.
+- Monorepo root: `packages/*`; publishable packages include `data/db`, `platform/downloader`, `platform/http`, `core/logger`, `core/model`, `core/utils`, `plugin`, and `ui`; private apps include `app` and `core/runtime`.
+- Client app entries: `packages/app/mobile` and `packages/app/desktop`; shared Tauri entry: `packages/app/core/src/lib.rs`.
+- Plugin architecture is documented in `packages/plugin/core/ARCHITECTURE.md`; composition is the only layer that assembles capabilities/adapters, and package code must not self-import the package root.
+- Generated declarations must not be edited manually: `components.d.ts`, `typed-router.d.ts`, and Rust bindings.
 - Read `mem:tech_stack` for tooling, `mem:suggested_commands` for commands, `mem:conventions` for implementation rules, and `mem:task_completion` for verification gates.

@@ -12,14 +12,13 @@
   },
   "files": [],
   "references": [
-    { "path": "./packages/client/app/mobile/tsconfig.node.json" },
-    { "path": "./packages/client/app/desktop/tsconfig.node.json" },
+    { "path": "./packages/app/mobile/tsconfig.node.json" },
+    { "path": "./packages/app/desktop/tsconfig.node.json" },
 
-    { "path": "./packages/client/data/db/tsconfig.node.json" },
-    { "path": "./packages/client/core/model/tsconfig.node.json" },
-    { "path": "./packages/client/core/plugin/tsconfig.node.json" },
-    { "path": "./packages/server/core/server/tsconfig.node.json" },
-    { "path": "./packages/client/ui/ui/tsconfig.node.json" },
-    { "path": "./packages/client/core/utils/tsconfig.node.json" }
+    { "path": "./packages/platform/db/tsconfig.node.json" },
+    { "path": "./packages/core/model/tsconfig.node.json" },
+    { "path": "./packages/plugin/core/tsconfig.node.json" },
+    { "path": "./packages/ui/ui/tsconfig.node.json" },
+    { "path": "./packages/core/utils/tsconfig.node.json" }
   ]
 }

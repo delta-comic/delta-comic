@@ -89,13 +89,11 @@ function createProgram() {
   release
     .command('plan')
     .description('计算发布计划并写出 CI 输出')
-    .option('--recover-withdrawn-2x', '恢复已撤回的 2.x 发布序列')
     .option('--dry-run', '只计算发布计划')
-    .action(async (options: { recoverWithdrawn2x?: boolean; dryRun?: boolean }) => {
+    .action(async () => {
       const cwd = projectRoot(program)
       await projectConfig(program, cwd)
       const env = { ...process.env }
-      if (options.recoverWithdrawn2x) env.DELTA_RELEASE_RECOVERY = 'withdrawn-2x'
       await executeRelease(
         ['--dry-run'],
         env,
@@ -106,13 +104,11 @@ function createProgram() {
   release
     .command('run')
     .description('执行实际发布')
-    .option('--recover-withdrawn-2x', '恢复已撤回的 2.x 发布序列')
     .option('--dry-run', '只计算发布计划')
-    .action(async (options: { recoverWithdrawn2x?: boolean; dryRun?: boolean }) => {
+    .action(async (options: { dryRun?: boolean }) => {
       const cwd = projectRoot(program)
       await projectConfig(program, cwd)
       const env = { ...process.env }
-      if (options.recoverWithdrawn2x) env.DELTA_RELEASE_RECOVERY = 'withdrawn-2x'
       await executeRelease(
         dryRun(program, options.dryRun) ? ['--dry-run'] : [],
         env,

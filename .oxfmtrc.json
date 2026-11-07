@@ -5,9 +5,8 @@
     "typed-router.d.ts",
     "bindings.ts",
     "**/permissions/**",
-    "**/worker-configuration.d.ts",
     "*.md",
-    "packages/client/app/*/public/runtime/**"
+    "packages/app/*/public/runtime/**"
   ],
   "endOfLine": "lf",
   "semi": false,
@@ -23,7 +22,7 @@
   "sortTailwindcss": {
     "preserveDuplicates": true,
     "preserveWhitespace": true,
-    "stylesheet": "./packages/client/app/mobile/src/index.css",
+    "stylesheet": "./packages/app/mobile/src/index.css",
     "attributes": ["overlayClass", ":class", "Class"],
     "functions": ["twMerge", "cn"]
   },

@@ -1,0 +1,65 @@
+{
+  "name": "@delta-comic/client",
+  "version": "3.0.0-next.24",
+  "description": "Delta Comic client plugin SDK",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    "./vite": {
+      "types": "./dist/vite.d.mts",
+      "import": "./dist/vite.mjs"
+    },
+    ".": {
+      "delta-comic-workspace": "./lib/index.ts",
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./manifest": {
+      "types": "./dist/manifest.d.mts",
+      "import": "./dist/manifest.mjs"
+    },
+    "./ui": {
+      "types": "./dist/ui.d.mts",
+      "import": "./dist/ui.mjs"
+    },
+    "./network": {
+      "types": "./dist/network.d.mts",
+      "import": "./dist/network.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@delta-comic/both": "workspace:",
+    "cordis": "catalog:",
+    "kysely": "catalog:"
+  },
+  "devDependencies": {
+    "@delta-comic/client-db": "workspace:",
+    "@delta-comic/client-downloader": "workspace:",
+    "@delta-comic/client-model": "workspace:",
+    "@delta-comic/client-plugin-vite": "workspace:",
+    "@delta-comic/client-ui": "workspace:",
+    "@delta-comic/client-utils": "workspace:",
+    "@delta-comic/manifest": "workspace:",
+    "@swc/core": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:",
+    "vue": "catalog:"
+  },
+  "peerDependencies": {
+    "vite-plus": "catalog:",
+    "vue": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "vite-plus": {
+      "optional": true
+    }
+  }
+}

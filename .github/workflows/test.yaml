@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: test/${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Web 单元测试
@@ -28,7 +32,7 @@ jobs:
         with:
           node-version-file: .node-version
           cache: true
-          node-manager: pnpm
+          node-manager: true
           run-install: true
           version-file: package.json
 
@@ -39,7 +43,7 @@ jobs:
 
   rust:
     name: Rust 单元测试
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -79,11 +83,11 @@ jobs:
         with:
           cache-targets: false
 
-      - name: Setup JDK 21
+      - name: Setup JDK 26
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '26'
           cache: 'gradle'
 
       - name: Setup Android SDK
@@ -107,9 +111,9 @@ jobs:
 
       - name: Test Android downloader module
         run: |
-          chmod +x ./packages/client/app/mobile/src-tauri/gen/android/gradlew
-          ./packages/client/app/mobile/src-tauri/gen/android/gradlew \
-            -p packages/client/platform/downloader/android \
+          chmod +x ./packages/app/mobile/src-tauri/gen/android/gradlew
+          ./packages/app/mobile/src-tauri/gen/android/gradlew \
+            -p packages/platform/downloader/android \
             testDebugUnitTest \
             --no-daemon \
-            --max-workers=2
+            --max-workers=2f

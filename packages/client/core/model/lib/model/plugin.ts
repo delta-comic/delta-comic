@@ -1,1 +1,0 @@
-export type { PluginManifest } from '@delta-comic/shared-plugin-manifest'

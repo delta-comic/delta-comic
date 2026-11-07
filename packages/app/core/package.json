@@ -1,0 +1,43 @@
+{
+  "name": "@delta-comic/client-app-core",
+  "version": "3.0.0-next.24",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./lib/index.ts",
+    "./components": "./components.d.ts",
+    "./tailwind.css": "./tailwind.css",
+    "./*": "./lib/*.ts",
+    "./icons": "./lib/icons.tsx",
+    "./components/*": "./lib/components/*"
+  },
+  "dependencies": {
+    "@delta-comic/client": "workspace:",
+    "@delta-comic/client-db": "workspace:",
+    "@delta-comic/client-downloader": "workspace:",
+    "@delta-comic/client-logger": "workspace:",
+    "@delta-comic/client-model": "workspace:",
+    "@delta-comic/client-plugin": "workspace:",
+    "@delta-comic/client-ui": "workspace:",
+    "@delta-comic/client-utils": "workspace:",
+    "@pinia/colada": "catalog:",
+    "@vueuse/core": "catalog:",
+    "dayjs": "catalog:",
+    "es-toolkit": "catalog:",
+    "motion-v": "catalog:",
+    "naive-ui": "catalog:",
+    "pinia": "catalog:",
+    "semver": "catalog:",
+    "taurpc": "catalog:",
+    "vue": "catalog:",
+    "vue-i18n": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "devDependencies": {
+    "@delta-comic/client-runtime": "workspace:",
+    "@types/semver": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

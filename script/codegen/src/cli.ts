@@ -10,10 +10,9 @@ import { checkCodegen } from './check'
 import { codegenDefinitions } from './check'
 import { generateCodegen } from './run'
 
-type Target = 'server' | 'client' | 'all'
+type Target = 'client' | 'all'
 
-const isTarget = (value: string): value is Target =>
-  value === 'server' || value === 'client' || value === 'all'
+const isTarget = (value: string): value is Target => value === 'client' || value === 'all'
 
 const createProgram = () => {
   const program = new Command()
@@ -31,9 +30,7 @@ const createProgram = () => {
       const definitions =
         target === 'all'
           ? codegenDefinitions
-          : codegenDefinitions.filter(([file]) =>
-              target === 'client' ? file.includes('client.table') : file.includes('server.table'),
-            )
+          : codegenDefinitions.filter(([file]) => file.includes('client.table'))
       for (const [tableFile, outputDir] of definitions)
         await generateCodegen(root, tableFile, outputDir)
     })

@@ -12,7 +12,7 @@
 
 release note 与 changelog 使用 semantic-release 内置的 Angular preset 和默认英文分类。预览版开头会显示加粗的谨慎更新提示，GitHub Release 标题也会明确标记“预览版”或“正式版”。
 
-发布 npm workspace 时，脚本会从 `packages/*/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。当前公开发布面固定为 `@delta-comic/both`、`@delta-comic/client` 和 `@delta-comic/server`；其他 workspace 包均为内部实现，由对应 SDK 在构建产物和入口中统一提供需要对外使用的能力。
+发布 npm workspace 时，脚本会从 `packages/*/*/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。当前公开发布面固定为 `@delta-comic/both` 和 `@delta-comic/client`；其他 workspace 包均为内部实现，由对应 SDK 在构建产物和入口中统一提供需要对外使用的能力。
 
 workspace 包发布到 GitHub Packages。发布脚本会显式覆盖 `.npmrc` 中的 scope registry；递归发布会跳过目标 registry 中已经存在的版本，因此发布短暂失败后可以安全重跑。CI 使用当前工作流的短期 `GITHUB_TOKEN` 和 `packages: write` 权限发布 GitHub Packages，不保存长期发布 token。
 
@@ -68,11 +68,3 @@ dr branch prepare develop
 ## 手动重跑与保护规则
 
 GitHub Actions 的“构建和发布”工作流可以手动运行，但必须在分支选择器中选择 `main` 或 `next`；选择 `develop` 时发布任务会跳过。重复运行不会强制产生版本，没有新的可发布提交时会安全结束。
-
-### 2.x 撤回后的 3.x 恢复
-
-已撤回的 `2.x` tag 不会重新推送，也不能复用这些版本号。仓库保留的 `semantic-release-2.0.0` git note 指向原始发布提交；在首个 `3.x` 预览版和正式版发布时，维护者需要手动运行“构建和发布”，勾选 `recover_withdrawn_2x`。恢复过程只在 runner 本地临时创建 `2.0.0` 版本下限，并在 semantic-release 推送前删除它，因此远端只会收到真实的 `3.x` tag。
-
-未勾选恢复选项时，工作流会安全结束并提示需要恢复，不会错误地复用 `2.x`。首个 `3.x` tag 建立后，后续发布恢复为普通自动流程。发布前会拒绝任何本地存在但远端不存在的非恢复 tag，避免再次发生全量 tag 推送污染。
-
-建议在 GitHub 中保护三个长期分支：禁止 force push 和删除；`main` 只接受来自 `next` 的晋级，`next` 只接受来自 `develop` 的晋级；必须通过现有检查后才能合并。仓库保护属于 GitHub 管理配置，不由本地脚本修改。

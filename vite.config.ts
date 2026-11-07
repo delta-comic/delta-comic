@@ -10,7 +10,7 @@ const lintConfig = lint as OxlintConfig
 export default defineConfig({
   resolve: { conditions: ['delta-comic-workspace', ...defaultClientConditions] },
   staged: {
-    '*': 'vp run codegen:all && vp check --fix && vp run codegen:check',
+    '*': () => ['vp run codegen:all', 'vp check --fix', 'vp run codegen:check'],
     '*.{ts,tsx,mts,js,jsx,mjs,vue,html,md,json,yaml,toml}': 'vp exec cspell --no-must-find-files',
   },
   fmt: fmt as OxfmtConfig,
@@ -19,9 +19,9 @@ export default defineConfig({
     cache: { tasks: true, scripts: false },
     tasks: {
       // dev
-      'dev': { command: 'vp run @delta-comic/client-app-desktop#dev', cache: false },
-      'dev:android': { command: 'vp run @delta-comic/client-app-mobile#dev', cache: false },
-      'dev:web': { command: 'vp run @delta-comic/client-app-mobile#dev:web', cache: false },
+      'dev': { command: 'vp run @delta-comic/client-desktop#dev', cache: false },
+      'dev:android': { command: 'vp run @delta-comic/client-mobile#dev', cache: false },
+      'dev:web': { command: 'vp run @delta-comic/client-mobile#dev:web', cache: false },
       // build
       'build:packages': { command: 'vp run -r build', cache: { output: [] } },
       'release-cli': {
@@ -55,15 +55,19 @@ export default defineConfig({
         dependsOn: ['build:packages'],
         cache: { output: [] },
       },
-      'codegen:check': { command: 'vp exec dcg check', dependsOn: ['codegen-cli'], cache: false },
+      'codegen:check': {
+        command: 'node script/codegen/dist/cli.mjs check',
+        dependsOn: ['codegen-cli'],
+        cache: false,
+      },
       // codegen
       'codegen': {
-        command: 'vp exec dcg generate server',
+        command: 'node script/codegen/dist/cli.mjs generate client',
         dependsOn: ['codegen-cli'],
         cache: false,
       },
       'codegen:all': {
-        command: 'vp exec dcg generate all',
+        command: 'node script/codegen/dist/cli.mjs generate all',
         dependsOn: ['codegen-cli'],
         cache: false,
       },
@@ -76,11 +80,11 @@ export default defineConfig({
     unstubGlobals: true,
     coverage: {
       provider: 'v8',
-      include: ['packages/*/*/*/{app,lib,src,src-web,vite}/**/*.ts', 'script/**/*.{ts,mts}'],
+      include: ['packages/*/*/{app,lib,src,src-web,vite}/**/*.ts', 'script/**/*.{ts,mts}'],
       exclude: ['**/*.d.ts', '**/{test,dist,generated}/**', '**/*.test.ts', '**/src/router.ts'],
       thresholds: { lines: 20, functions: 20, branches: 20, statements: 20 },
     },
     exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
-    projects: ['script/*', 'packages/*/*/*'],
+    projects: ['script/*', 'packages/*/*'],
   },
 })
