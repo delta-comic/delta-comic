@@ -1,0 +1,64 @@
+{
+  "name": "@delta-comic/client-plugin",
+  "version": "3.0.0-next.24",
+  "private": true,
+  "description": "空阙虱楼",
+  "homepage": "https://github.com/delta-comic/delta-comic",
+  "license": "AGPL-3.0-only",
+  "author": {
+    "name": "wenxig",
+    "email": "wenxinguo12@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/delta-comic/delta-comic.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.mts",
+      "import": "./dist/adapters/index.mjs"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.mts",
+      "import": "./dist/vite.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@delta-comic/client": "workspace:",
+    "@delta-comic/client-plugin-install": "workspace:",
+    "@delta-comic/client-plugin-vite": "workspace:",
+    "@delta-comic/logger": "workspace:",
+    "@delta-comic/manifest": "workspace:",
+    "@tauri-apps/api": "catalog:",
+    "@tauri-apps/plugin-fs": "catalog:",
+    "cordis": "catalog:",
+    "es-toolkit": "catalog:",
+    "ky": "catalog:",
+    "lz-string": "catalog:",
+    "taurpc": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "@delta-comic/client-db": "workspace:",
+    "@delta-comic/client-model": "workspace:",
+    "@delta-comic/client-ui": "workspace:",
+    "@delta-comic/client-utils": "workspace:",
+    "vue": "catalog:"
+  }
+}

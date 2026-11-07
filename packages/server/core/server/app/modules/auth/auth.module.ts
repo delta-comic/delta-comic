@@ -1,1 +1,0 @@
-export { authRoutes as authModule } from './auth.routes'

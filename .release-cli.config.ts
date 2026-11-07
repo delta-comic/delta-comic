@@ -2,31 +2,30 @@ import { defineReleaseCliConfig } from '@delta-comic/release-cli'
 
 export const jsonVersionPaths = [
   'package.json',
-  'packages/client/app/mobile/package.json',
-  'packages/client/app/desktop/package.json',
-  'packages/client/app/core/package.json',
-  'packages/client/core/sdk/package.json',
-  'packages/client/app/mobile/src-tauri/tauri.conf.json',
-  'packages/client/app/desktop/src-tauri/tauri.conf.json',
-  'packages/client/data/db/package.json',
-  'packages/client/platform/downloader/package.json',
-  'packages/client/platform/http/package.json',
-  'packages/shared/core/logger/package.json',
-  'packages/client/core/model/package.json',
-  'packages/shared/plugin/manifest/package.json',
-  'packages/client/core/plugin-artifact/package.json',
-  'packages/client/core/plugin-install/package.json',
-  'packages/client/core/plugin-vite/package.json',
-  'packages/client/core/plugin/package.json',
-  'packages/server/core/server/package.json',
-  'packages/shared/core/both/package.json',
-  'packages/client/ui/ui/package.json',
-  'packages/client/core/utils/package.json',
+  'packages/client/mobile/package.json',
+  'packages/client/desktop/package.json',
+  'packages/client/app-core/package.json',
+  'packages/client/sdk/package.json',
+  'packages/client/mobile/src-tauri/tauri.conf.json',
+  'packages/client/desktop/src-tauri/tauri.conf.json',
+  'packages/client/db/package.json',
+  'packages/client/downloader/package.json',
+  'packages/client/http/package.json',
+  'packages/shared/logger/package.json',
+  'packages/client/model/package.json',
+  'packages/shared/manifest/package.json',
+  'packages/client/plugin-artifact/package.json',
+  'packages/client/plugin-install/package.json',
+  'packages/client/plugin-vite/package.json',
+  'packages/client/plugin/package.json',
+  'packages/shared/both/package.json',
+  'packages/client/ui/package.json',
+  'packages/client/utils/package.json',
 ] as const
 
 export const cargoTomlVersionPaths = [
-  ['packages/client/app/mobile/src-tauri/Cargo.toml', 'package'],
-  ['packages/client/app/desktop/src-tauri/Cargo.toml', 'package'],
+  ['packages/client/mobile/src-tauri/Cargo.toml', 'package'],
+  ['packages/client/desktop/src-tauri/Cargo.toml', 'package'],
   ['Cargo.toml', 'workspace.package'],
 ] as const
 
@@ -44,13 +43,13 @@ export const cargoLockPackageNames = [
 
 export const versionAssetPaths = [
   ...jsonVersionPaths,
-  'packages/*/*/*/package.json',
+  'packages/*/*/package.json',
   ...cargoTomlVersionPaths.map(([path]) => path),
   'Cargo.lock',
 ] as const
 
 export default defineReleaseCliConfig({
-  msiConfigPath: 'packages/client/app/desktop/src-tauri/tauri.windows.conf.json',
+  msiConfigPath: 'packages/client/desktop/src-tauri/tauri.windows.conf.json',
   jsonVersionPaths,
   cargoTomlVersionPaths,
   cargoLockPackageNames,

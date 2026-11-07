@@ -1,6 +1,6 @@
 # TypeBox 数据库 Schema 规范
 
-数据库表定义以 `script/codegen/server.table.ts` 和 `script/codegen/client.table.ts` 为唯一来源。SQL、Kysely 类型和服务端运行时行 schema 都是生成产物，不要直接编辑 `generated/` 目录。
+数据库表定义以 `script/codegen/src/client.table.ts` 为唯一来源。SQL、Kysely 类型和运行时行 schema 都是生成产物，不要直接编辑 `generated/` 目录。
 
 ## 定义规范
 
@@ -16,7 +16,7 @@
 
 1. 在对应的 `.table.ts` 中新增 `defineTable(...)`，同时补充主键、唯一约束、索引和外键。
 2. 执行 `vp run codegen`，并检查生成的 SQL、Kysely 类型和运行时 schema。
-3. 为表结构和边缘情况添加 `script/test/codegen/` 测试；如是服务端表，还要对照现有 migration 做语义测试。
+3. 为表结构和边缘情况添加 `script/test/codegen/` 测试。
 4. 将生成文件和定义文件一起提交，执行 `vp run codegen:check` 确认没有漂移。
 5. Repository 读写边界使用生成的 schema 验证，不要重新声明同一份 row 类型。
 

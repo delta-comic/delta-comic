@@ -12,7 +12,7 @@
 
 release note 与 changelog 使用 semantic-release 内置的 Angular preset 和默认英文分类。预览版开头会显示加粗的谨慎更新提示，GitHub Release 标题也会明确标记“预览版”或“正式版”。
 
-发布 npm workspace 时，脚本会从 `packages/*/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。当前公开发布面固定为 `@delta-comic/both`、`@delta-comic/client` 和 `@delta-comic/server`；其他 workspace 包均为内部实现，由对应 SDK 在构建产物和入口中统一提供需要对外使用的能力。
+发布 npm workspace 时，脚本会从 `packages/*/*/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。当前公开发布面固定为 `@delta-comic/both` 和 `@delta-comic/client`；其他 workspace 包均为内部实现，由对应 SDK 在构建产物和入口中统一提供需要对外使用的能力。
 
 workspace 包发布到 GitHub Packages。发布脚本会显式覆盖 `.npmrc` 中的 scope registry；递归发布会跳过目标 registry 中已经存在的版本，因此发布短暂失败后可以安全重跑。CI 使用当前工作流的短期 `GITHUB_TOKEN` 和 `packages: write` 权限发布 GitHub Packages，不保存长期发布 token。
 

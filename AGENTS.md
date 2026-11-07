@@ -98,44 +98,32 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 - 完整的 Web 验证流程：依次运行 `vp run build:packages`、`vp check`、
   `vp run -r typecheck`，然后运行 `vp test run`。由于根目录 lint 的类型检查已禁用，
   `vp check` 不能替代显式的工作区类型检查。
-- 使用 `vp test run packages/client/app/core/test/lib/path/file.test.ts` 运行单个测试文件；添加
+- 使用 `vp test run packages/client/app-core/test/lib/path/file.test.ts` 运行单个测试文件；添加
   `-t 'test name'` 可聚焦单个测试用例。测试监听模式为 `vp test watch <path>`。
 - 覆盖率检查命令为 `vp test run --coverage`；根目录阈值为行、函数、语句和分支 20%。
 - Rust 验证需单独执行：`cargo fmt --all --check`、
   `cargo clippy --workspace --all-targets --locked -- -D warnings` 和
   `cargo test --workspace --locked -- --test-threads=2`。
-- 修改 `packages/client/platform/downloader/android` 下的内容时，还必须运行 Gradle 的 `ktlintCheck`、
+- 修改 `packages/client/downloader/android` 下的内容时，还必须运行 Gradle 的 `ktlintCheck`、
   `lintDebug` 和 `testDebugUnitTest` 任务。CI 使用的具体 JDK 21/Android 36 配置位于
   `.github/workflows/{lint,test}.yaml`。
 
 ## 运行时入口
 
-- `packages/client/app/app`：Vue/Tauri 客户端。Web 入口为 `src/main.tsx`；原生入口为
+- `packages/client/app-core`：Vue/Tauri 客户端共享核心。Web 入口为各端的 `src/main.tsx`；原生入口为
   `src-tauri/src/main.rs`。`vp run --filter app dev` 启动 Tauri；`dev:web` 仅启动 Web
   客户端。Tauri 必须使用端口 `5173`，端口不可用时会直接失败，而不会选择其他端口。
-- 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/client-core-runtime`，它是供外部插件使用的
+- 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/client-runtime`，它是供外部插件使用的
   UMD 宿主库桥接层。请保持此依赖顺序。
-- `packages/server/core/server/app/index.ts`：Elysia Cloudflare Worker 入口。
-  `packages/server/core/server/lib/index.ts` 是客户端/共享公共 API，并非 Worker 入口。本地启动前必须先运行
-  `vp run --filter @delta-comic/server migrate:local`，然后再运行 `... dev`。
-- `packages/server/admin/panel` 是独立的 Vue 管理应用。功能通过
-  `src/features/*/feature.ts` 自动发现；应添加功能模块，而不是编辑集中式路由列表。
-- `packages/client/data/db`、`packages/client/platform/{downloader,logger}`、`packages/client/ui/ui`、
-  `packages/shared/core/logger` 与 `packages/client/core/{model,utils,plugin}` 是可发布的工作区；其中一些还通过
-  根 Cargo 工作区映射到 Rust Tauri 插件 crate。`packages/client/core/runtime`、`app`、`server` 和
-  `admin` 是私有包。
-- `packages/shared` 只容纳客户端和服务端都必须消费的代码与类型。某项能力若只被单端使用，或依赖 Vue UI、浏览器存储、Tauri、Worker binding、平台文件/网络等单端环境，应归入对应的 `packages/client` 或 `packages/server`。
+- `packages/client/db`、`packages/client/downloader`、`packages/client/logger`、`packages/client/ui`、
+  `packages/shared/logger` 与 `packages/client/{model,utils,plugin}` 是可发布的工作区；其中一些还通过
+  根 Cargo 工作区映射到 Rust Tauri 插件 crate。`packages/client/runtime` 与 `app-core` 是私有包。
+- `packages/shared` 只容纳客户端各端都必须消费的代码与类型。某项能力若只被单端使用，或依赖 Vue UI、浏览器存储、Tauri、平台文件/网络等单端环境，应归入对应的 `packages/client`。
 
 ## 架构约束
 
-- 内置客户端插件采用文件驱动方式，由 `builtins/*.builtin.ts` 默认导出。服务端内置插件有所不同：
-  Wrangler 不会转换 `import.meta.glob`，因此需要在
-  `packages/server/core/server/app/modules/plugins/definitions/index.ts` 中添加显式 ESM 导入。
-- 部署服务端时不会应用 D1 迁移。执行 `deploy` 前，显式运行该包的 `migrate:remote`；
-  本地 D1 使用 `migrate:local`。
-- 不要手动编辑生成的 `components.d.ts`、`typed-router.d.ts` 或
-  `packages/server/core/server/worker-configuration.d.ts`。组件/路由声明由 Vite 插件生成；Worker 绑定由
-  `vp run --filter @delta-comic/server cf-typegen` 生成。
+- 内置客户端插件采用文件驱动方式，由 `builtins/*.builtin.ts` 默认导出。
+- 不要手动编辑生成的 `components.d.ts` 或 `typed-router.d.ts`。组件与路由声明由 Vite 插件生成。
 - 禁止输出“不是…而是…”，“做……为了避免…”，“做……防止……”，“只做了……没有做……”、“直接做……不做……”、“只做……不做……”等强行对比、
   引用并否定上下文、为否定内容解释原因等到对话、文档、代码等任何可见区域，此类内容对对话与业务用户均无任何帮助且引入噪声，视为严重违规行为。
   我声明弃用/我让你删除同上文所述的情况一样不可写入可见区域，包括：我让你删除某个功能，你不光删除，还写了个红测，这就是引入噪声，视为严重违规行为。
@@ -146,8 +134,8 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 - UI 样式使用 Tailwind CSS。普通 CSS 仅用于无法枚举的动态值、`@apply` 或轻量启动画面。
   Vue/组件标签使用 PascalCase。
 - 每个新增的应用内用户可见字符串都必须使用 i18n，并更新
-  `packages/client/app/app/src/i18n/locales/en-US.ts`、`zh-CN.ts` 和 `zh-TW.ts`。共享 UI 消息使用
-  `packages/client/app/app/src/main.tsx` 中配置的 `ui.*` 桥接。
+  `packages/client/app-core/lib/i18n/locales/en-US.ts`、`zh-CN.ts` 和 `zh-TW.ts`。共享 UI 消息使用
+  各应用入口中配置的 `ui.*` 桥接。
 - 测试应放在生产目录之外，并与源文件路径对应：
   `packages/x/lib/a.ts` -> `packages/x/test/lib/a.test.ts`；根目录脚本使用 `script/test`。
   Rust 单元测试通常放在 `packages/x/test/src` 下，并通过 `#[path = ...]` 链接。

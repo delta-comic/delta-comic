@@ -11,8 +11,8 @@
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
   "i18n-ally.localesPaths": [
-    "packages/client/app/app/src/i18n",
-    "packages/client/app/app/src/i18n/locales"
+    "packages/client/app-core/lib/i18n",
+    "packages/client/app-core/lib/i18n/locales"
   ],
   "js/ts.experimental.useTsgo": false
 }

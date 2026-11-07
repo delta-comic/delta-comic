@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
 
 import { generateArtifacts } from './artifacts'
+import * as clientTable from './client.table'
 import type { TableSchema } from './schema'
 import { validateTableSchema } from './schema'
 
@@ -22,13 +23,13 @@ export async function generateCodegen(
   tableFile: string,
   outputDir: string,
 ): Promise<void> {
-  const schemaExportName = tableFile.includes('client.table')
-    ? 'clientRowSchemas'
-    : 'serverRowSchemas'
+  const schemaExportName = 'clientRowSchemas'
 
   let module: Record<string, unknown>
   try {
-    module = await import(pathToFileURL(resolve(root, tableFile)).href)
+    module = tableFile.includes('client.table')
+      ? clientTable
+      : await import(pathToFileURL(resolve(root, tableFile)).href)
   } catch (error) {
     throw new Error(`failed to load table definitions from ${tableFile}: ${String(error)}`, {
       cause: error,

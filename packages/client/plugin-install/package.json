@@ -1,0 +1,37 @@
+{
+  "name": "@delta-comic/client-plugin-install",
+  "version": "3.0.0-next.24",
+  "private": true,
+  "description": "Plugin installation contracts and source adapters",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "@delta-comic/client-model": "workspace:",
+    "@delta-comic/client-plugin-artifact": "workspace:",
+    "@delta-comic/logger": "workspace:",
+    "@delta-comic/manifest": "workspace:",
+    "@octokit/rest": "catalog:",
+    "cordis": "catalog:",
+    "es-module-lexer": "catalog:",
+    "jszip": "catalog:",
+    "semver": "catalog:"
+  },
+  "devDependencies": {
+    "@delta-comic/client-db": "workspace:",
+    "vite-plus": "catalog:"
+  }
+}

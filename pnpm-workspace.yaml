@@ -1,5 +1,5 @@
 packages:
-  - packages/*/*/*
+  - packages/*/*
   - script/*
 
 allowBuilds:
@@ -7,7 +7,6 @@ allowBuilds:
   core-js: true
   esbuild: true
   sharp: true
-  workerd: true
 
 catalog:
   commander: ^15.0.0
@@ -23,11 +22,6 @@ catalog:
   rolldown-plugin-dts: ^0.30.0
   '@commitlint/cli': ^21.2.4
   '@commitlint/config-conventional': ^21.2.4
-  '@cloudflare/vite-plugin': 1.67.0
-  '@elysiajs/bearer': ^1.4.4
-  '@elysiajs/cors': ^1.4.3
-  '@elysiajs/openapi': ^1.4.17
-  '@sinclair/typebox': ^0.34.52
   typebox: ^1.4.5
   '@octokit/rest': ^22.0.1
   '@pinia/colada': ^1.4.9
@@ -50,12 +44,10 @@ catalog:
   commitlint-plugin-cspell: ^0.9.5
   cspell: ^10.4.0
   dayjs: ^1.11.23
-  elysia: ^1.4.31
   es-toolkit: ^1.53.2
   jszip: ^3.10.2
   ky: ^2.2.0
   kysely: ^0.30.0-beta.2
-  kysely-d1: ^0.4.0
   kysely-dialect-tauri: ^2.0.1
   kysely-plugin-serialize: ^0.8.2
   lightningcss: ^1.33.0
@@ -85,12 +77,10 @@ catalog:
   vue-i18n: ^12.0.0-alpha.4
   vue-component-type-helpers: ^3.3.14
   vue-router: ^5.4.0
-  wrangler: 4.158.0
   kysely-wasqlite-worker: ^2.0.1
   happy-dom: ^21.0.4
   json-logic-js: ^2.0.5
   '@types/json-logic-js': ^2.0.8
-  miniflare: 5.20261023.3-beta
   vitest: 5.1.0
 
 minimumReleaseAgeExclude:

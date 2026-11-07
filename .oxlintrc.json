@@ -13,9 +13,9 @@
     ".vscode",
     "*.md",
     "**/worker-configuration.d.ts",
-    "packages/client/ui/ui/lib/components/DcPullRefresh.vue",
+    "packages/client/ui/lib/components/DcPullRefresh.vue",
     "**/_lib/**",
-    "packages/client/app/*/public/runtime/**"
+    "packages/client/*/public/runtime/**"
   ],
   "options": { "typeAware": false, "typeCheck": false }
 }

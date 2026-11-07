@@ -7,7 +7,7 @@
     "**/permissions/**",
     "**/worker-configuration.d.ts",
     "*.md",
-    "packages/client/app/*/public/runtime/**"
+    "packages/client/*/public/runtime/**"
   ],
   "endOfLine": "lf",
   "semi": false,
@@ -23,7 +23,7 @@
   "sortTailwindcss": {
     "preserveDuplicates": true,
     "preserveWhitespace": true,
-    "stylesheet": "./packages/client/app/mobile/src/index.css",
+    "stylesheet": "./packages/client/mobile/src/index.css",
     "attributes": ["overlayClass", ":class", "Class"],
     "functions": ["twMerge", "cn"]
   },

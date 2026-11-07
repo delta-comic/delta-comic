@@ -107,9 +107,9 @@ jobs:
 
       - name: Test Android downloader module
         run: |
-          chmod +x ./packages/client/app/mobile/src-tauri/gen/android/gradlew
-          ./packages/client/app/mobile/src-tauri/gen/android/gradlew \
-            -p packages/client/platform/downloader/android \
+          chmod +x ./packages/client/mobile/src-tauri/gen/android/gradlew
+          ./packages/client/mobile/src-tauri/gen/android/gradlew \
+            -p packages/client/downloader/android \
             testDebugUnitTest \
             --no-daemon \
             --max-workers=2
