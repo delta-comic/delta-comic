@@ -1,12 +1,10 @@
 import { execFile } from 'node:child_process'
-import { appendFile } from 'node:fs/promises'
 import { promisify } from 'node:util'
 
 import { rootDir } from './set-version'
 
 const execFileAsync = promisify(execFile)
 
-export const releaseRecoveryMode = 'withdrawn-2x'
 export const withdrawnRelease = { noteRef: 'semantic-release-2.0.0', version: '2.0.0' } as const
 
 export interface GitResult {
@@ -76,17 +74,14 @@ interface ReleaseEnvironmentOptions {
 export class ReleaseEnvironment {
   private readonly env: NodeJS.ProcessEnv
   private readonly git: GitRunner
-  private readonly writeOutput: (path: string, contents: string) => Promise<void>
 
   constructor({
     env = process.env,
     cwd = rootDir,
     git = createGitRunner(cwd),
-    writeOutput = async (path, contents) => appendFile(path, contents, { encoding: 'utf-8' }),
   }: ReleaseEnvironmentOptions = {}) {
     this.env = env
     this.git = git
-    this.writeOutput = writeOutput
   }
 
   async currentBranch() {
@@ -100,22 +95,6 @@ export class ReleaseEnvironment {
     if (unpublished.length > 0) {
       throw new Error(`Refusing to publish local-only tags: ${unpublished.join(', ')}`)
     }
-  }
-
-  private async blockForExplicitRecovery() {
-    const message =
-      'The withdrawn 2.x history requires an explicit recovery run before automatic releases.'
-    if (this.env.GITHUB_OUTPUT) {
-      await this.writeOutput(this.env.GITHUB_OUTPUT, 'has-release=false\nrecovery-required=true\n')
-    }
-    if (this.env.GITHUB_STEP_SUMMARY) {
-      await this.writeOutput(
-        this.env.GITHUB_STEP_SUMMARY,
-        `## Release recovery required\n\n${message}\n`,
-      )
-    }
-    console.log(message)
-    return { shouldRun: false } satisfies ReleasePreparation
   }
 
   private async createEphemeralBaseline() {
@@ -151,9 +130,8 @@ export class ReleaseEnvironment {
 
   async prepare(): Promise<ReleasePreparation> {
     const branch = await this.currentBranch()
-    if (branch !== 'main' && branch !== 'next') {
+    if (branch !== 'main' && branch !== 'next')
       throw new Error(`Releases can only run from main or next, received ${branch || '(detached)'}`)
-    }
 
     const localTags = (await this.git(['tag', '--merged', 'HEAD', '--list'])).stdout
       .split('\n')
@@ -161,10 +139,6 @@ export class ReleaseEnvironment {
       .filter(Boolean)
     await this.assertNoUnpublishedTags(localTags)
     if (hasRecoveredRelease(branch, localTags)) return { shouldRun: true }
-
-    if (this.env.DELTA_RELEASE_RECOVERY !== releaseRecoveryMode) {
-      return this.blockForExplicitRecovery()
-    }
 
     const ephemeralTag = await this.createEphemeralBaseline()
     return { ephemeralTag, shouldRun: true }

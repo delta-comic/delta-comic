@@ -6,12 +6,6 @@ on:
       - 'main'
       - 'next'
   workflow_dispatch:
-    inputs:
-      recover_withdrawn_2x:
-        description: '使用已撤回 2.0.0 的 semantic-release note 恢复 3.x 发布序列'
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   actions: read
@@ -22,7 +16,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: release/${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -47,22 +41,18 @@ jobs:
         with:
           node-version-file: .node-version
           cache: true
-          node-manager: pnpm
+          node-manager: true
           run-install: true
           version-file: package.json
 
-      - name: Build release CLI
-        run: vp run --filter @delta-comic/release-cli build
-
-      - name: Build workspace libraries
-        run: vp run build:packages
+      - run: vp run --filter @delta-comic/release-cli build
+      - run: vp run build:packages
 
       - name: Resolve semantic release plan
         id: release-plan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DELTA_RELEASE_RECOVERY: ${{ inputs.recover_withdrawn_2x && 'withdrawn-2x' || '' }}
         run: vp exec dr release plan
 
       - name: No release required
@@ -92,7 +82,7 @@ jobs:
         with:
           node-version-file: .node-version
           cache: true
-          node-manager: pnpm
+          node-manager: true
           run-install: true
           version-file: package.json
 
@@ -108,11 +98,11 @@ jobs:
           toolchain: nightly-2026-08-12
           targets: aarch64-linux-android, armv7-linux-androideabi
 
-      - name: Setup JDK 23
-        uses: actions/setup-java@v4
+      - name: Setup JDK 26
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '23'
+          java-version: '26'
           cache: 'gradle'
 
       - name: Setup Android SDK
@@ -154,7 +144,7 @@ jobs:
         run: |
           cd packages/app/mobile
           vp run --filter @delta-comic/client-mobile --fail-if-no-match tauri android build --ci --target aarch64 armv7
-      - name: Restore Android keystore
+      - name: Prepare signer
         env:
           KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
@@ -171,8 +161,8 @@ jobs:
           keyPassword=$KEYSTORE_PASS
           keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
           EOF
-      - name: Install APK signer
-        run: sudo apt-get update && sudo apt-get install -y apksigner
+
+          sudo apt-get update && sudo apt-get install -y apksigner
 
       - name: Sign APK
         env:
@@ -198,6 +188,7 @@ jobs:
             --out "./dist/release/delta-comic-$RELEASE_VERSION-android.apk" \
             "$APK_SRC"
           apksigner verify "./dist/release/delta-comic-$RELEASE_VERSION-android.apk"
+
       - name: Upload Android artifact
         uses: actions/upload-artifact@v7
         with:
@@ -218,7 +209,7 @@ jobs:
           - platform: macos-latest
             args: '--target x86_64-apple-darwin'
             rust-targets: 'aarch64-apple-darwin,x86_64-apple-darwin'
-          - platform: ubuntu-22.04
+          - platform: ubuntu-latest
             args: ''
             rust-targets: ''
           - platform: windows-latest
@@ -238,7 +229,7 @@ jobs:
         with:
           node-version-file: .node-version
           cache: true
-          node-manager: pnpm
+          node-manager: true
           run-install: true
           version-file: package.json
 
@@ -259,10 +250,11 @@ jobs:
           targets: ${{ matrix.rust-targets }}
 
       - name: Install Linux dependencies
-        if: matrix.platform == 'ubuntu-22.04'
+        if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
       - name: Build desktop app
         uses: tauri-apps/tauri-action@v1
         env:
@@ -292,7 +284,7 @@ jobs:
         with:
           node-version-file: .node-version
           cache: true
-          node-manager: pnpm
+          node-manager: true
           run-install: true
           version-file: package.json
 
@@ -323,5 +315,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-          DELTA_RELEASE_RECOVERY: ${{ inputs.recover_withdrawn_2x && 'withdrawn-2x' || '' }}
         run: vp exec dr release run
