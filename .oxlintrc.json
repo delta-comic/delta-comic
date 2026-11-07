@@ -12,10 +12,9 @@
     ".agents",
     ".vscode",
     "*.md",
-    "**/worker-configuration.d.ts",
-    "packages/client/ui/lib/components/DcPullRefresh.vue",
+    "packages/ui/ui/lib/components/DcPullRefresh.vue",
     "**/_lib/**",
-    "packages/client/*/public/runtime/**"
+    "packages/app/*/public/runtime/**"
   ],
   "options": { "typeAware": false, "typeCheck": false }
 }

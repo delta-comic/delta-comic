@@ -427,32 +427,32 @@ importers:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@26.6.6)(@vitest/browser-preview@5.1.0)(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(happy-dom@21.0.4)
 
-  packages/client/app-core:
+  packages/app/core:
     dependencies:
       '@delta-comic/client':
         specifier: 'workspace:'
-        version: link:../sdk
+        version: link:../../core/sdk
       '@delta-comic/client-db':
         specifier: 'workspace:'
-        version: link:../db
+        version: link:../../data/db
       '@delta-comic/client-downloader':
         specifier: 'workspace:'
-        version: link:../downloader
+        version: link:../../platform/downloader
       '@delta-comic/client-logger':
         specifier: 'workspace:'
-        version: link:../logger
+        version: link:../../core/logger
       '@delta-comic/client-model':
         specifier: 'workspace:'
-        version: link:../model
+        version: link:../../core/model
       '@delta-comic/client-plugin':
         specifier: 'workspace:'
-        version: link:../plugin
+        version: link:../../plugin/core
       '@delta-comic/client-ui':
         specifier: 'workspace:'
-        version: link:../ui
+        version: link:../../ui/ui
       '@delta-comic/client-utils':
         specifier: 'workspace:'
-        version: link:../utils
+        version: link:../../core/utils
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
@@ -492,7 +492,7 @@ importers:
     devDependencies:
       '@delta-comic/client-runtime':
         specifier: 'workspace:'
-        version: link:../runtime
+        version: link:../../core/runtime
       '@types/semver':
         specifier: 'catalog:'
         version: 7.8.0
@@ -506,7 +506,279 @@ importers:
         specifier: 'catalog:'
         version: 3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
 
-  packages/client/both:
+  packages/app/desktop:
+    dependencies:
+      '@delta-comic/client':
+        specifier: 'workspace:'
+        version: link:../../core/sdk
+      '@delta-comic/client-app-core':
+        specifier: 'workspace:'
+        version: link:../core
+      '@delta-comic/client-db':
+        specifier: 'workspace:'
+        version: link:../../data/db
+      '@delta-comic/client-http':
+        specifier: 'workspace:'
+        version: link:../../platform/http
+      '@delta-comic/client-logger':
+        specifier: 'workspace:'
+        version: link:../../core/logger
+      '@delta-comic/client-model':
+        specifier: 'workspace:'
+        version: link:../../core/model
+      '@delta-comic/client-plugin':
+        specifier: 'workspace:'
+        version: link:../../plugin/core
+      '@delta-comic/client-ui':
+        specifier: 'workspace:'
+        version: link:../../ui/ui
+      '@delta-comic/client-utils':
+        specifier: 'workspace:'
+        version: link:../../core/utils
+      '@octokit/rest':
+        specifier: 'catalog:'
+        version: 22.0.1
+      '@pinia/colada':
+        specifier: 'catalog:'
+        version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      '@tauri-apps/api':
+        specifier: 'catalog:'
+        version: 2.12.4
+      '@tauri-apps/plugin-clipboard-manager':
+        specifier: 'catalog:'
+        version: 2.5.0
+      '@tauri-apps/plugin-shell':
+        specifier: 'catalog:'
+        version: 2.6.0
+      '@vueuse/core':
+        specifier: 'catalog:'
+        version: 15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      color:
+        specifier: 'catalog:'
+        version: 5.0.3
+      es-toolkit:
+        specifier: 'catalog:'
+        version: 1.53.2
+      motion-v:
+        specifier: 'catalog:'
+        version: 2.11.1(@vueuse/core@15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      naive-ui:
+        specifier: 'catalog:'
+        version: 2.45.3(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      pinia:
+        specifier: 'catalog:'
+        version: 4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      semver:
+        specifier: 'catalog:'
+        version: 7.8.6
+      tauri-plugin-m3:
+        specifier: 'catalog:'
+        version: 0.3.2
+      taurpc:
+        specifier: 'catalog:'
+        version: 2.0.0(@tauri-apps/api@2.12.4)
+      vue:
+        specifier: 'catalog:'
+        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
+      vue-i18n:
+        specifier: 'catalog:'
+        version: 12.0.0-alpha.9(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      vue-router:
+        specifier: 'catalog:'
+        version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+    devDependencies:
+      '@delta-comic/client-runtime':
+        specifier: 'workspace:'
+        version: link:../../core/runtime
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.16.22
+      '@tailwindcss/vite':
+        specifier: 'catalog:'
+        version: 4.3.4(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))
+      '@tauri-apps/cli':
+        specifier: 'catalog:'
+        version: 2.12.4
+      '@types/semver':
+        specifier: 'catalog:'
+        version: 7.8.0
+      '@vitejs/plugin-legacy':
+        specifier: 'catalog:'
+        version: 8.2.4(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(supports-color@7.2.0)(terser@5.51.2)
+      '@vitejs/plugin-vue':
+        specifier: 'catalog:'
+        version: 6.0.10(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      '@vitejs/plugin-vue-jsx':
+        specifier: 'catalog:'
+        version: 5.1.6(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(supports-color@7.2.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      browserslist:
+        specifier: 'catalog:'
+        version: 4.29.5
+      lightningcss:
+        specifier: 'catalog:'
+        version: 1.33.0
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.4
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+      unplugin-vue-components:
+        specifier: 'catalog:'
+        version: 32.1.0(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(esbuild@0.28.2)(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      vite-plugin-vue-devtools:
+        specifier: 'catalog:'
+        version: 9.0.0-rc.2(@devframes/agentic@1.3.2)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(cac@7.1.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8)
+      vite-plugin-wasm:
+        specifier: 'catalog:'
+        version: 3.6.0(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
+      vue-component-type-helpers:
+        specifier: 'catalog:'
+        version: 3.3.14
+      vue-tsc:
+        specifier: 'catalog:'
+        version: 3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
+
+  packages/app/mobile:
+    dependencies:
+      '@delta-comic/client':
+        specifier: 'workspace:'
+        version: link:../../core/sdk
+      '@delta-comic/client-app-core':
+        specifier: 'workspace:'
+        version: link:../core
+      '@delta-comic/client-db':
+        specifier: 'workspace:'
+        version: link:../../data/db
+      '@delta-comic/client-http':
+        specifier: 'workspace:'
+        version: link:../../platform/http
+      '@delta-comic/client-logger':
+        specifier: 'workspace:'
+        version: link:../../core/logger
+      '@delta-comic/client-model':
+        specifier: 'workspace:'
+        version: link:../../core/model
+      '@delta-comic/client-plugin':
+        specifier: 'workspace:'
+        version: link:../../plugin/core
+      '@delta-comic/client-ui':
+        specifier: 'workspace:'
+        version: link:../../ui/ui
+      '@delta-comic/client-utils':
+        specifier: 'workspace:'
+        version: link:../../core/utils
+      '@octokit/rest':
+        specifier: 'catalog:'
+        version: 22.0.1
+      '@pinia/colada':
+        specifier: 'catalog:'
+        version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      '@tauri-apps/api':
+        specifier: 'catalog:'
+        version: 2.12.4
+      '@tauri-apps/plugin-clipboard-manager':
+        specifier: 'catalog:'
+        version: 2.5.0
+      '@tauri-apps/plugin-shell':
+        specifier: 'catalog:'
+        version: 2.6.0
+      '@vueuse/core':
+        specifier: 'catalog:'
+        version: 15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      color:
+        specifier: 'catalog:'
+        version: 5.0.3
+      es-toolkit:
+        specifier: 'catalog:'
+        version: 1.53.2
+      motion-v:
+        specifier: 'catalog:'
+        version: 2.11.1(@vueuse/core@15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      naive-ui:
+        specifier: 'catalog:'
+        version: 2.45.3(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      pinia:
+        specifier: 'catalog:'
+        version: 4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      semver:
+        specifier: 'catalog:'
+        version: 7.8.6
+      tauri-plugin-m3:
+        specifier: 'catalog:'
+        version: 0.3.2
+      taurpc:
+        specifier: 'catalog:'
+        version: 2.0.0(@tauri-apps/api@2.12.4)
+      vue:
+        specifier: 'catalog:'
+        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
+      vue-i18n:
+        specifier: 'catalog:'
+        version: 12.0.0-alpha.9(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      vue-router:
+        specifier: 'catalog:'
+        version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+    devDependencies:
+      '@delta-comic/client-runtime':
+        specifier: 'workspace:'
+        version: link:../../core/runtime
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.16.22
+      '@tailwindcss/vite':
+        specifier: 'catalog:'
+        version: 4.3.4(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))
+      '@tauri-apps/cli':
+        specifier: 'catalog:'
+        version: 2.12.4
+      '@types/semver':
+        specifier: 'catalog:'
+        version: 7.8.0
+      '@vitejs/plugin-legacy':
+        specifier: 'catalog:'
+        version: 8.2.4(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(supports-color@7.2.0)(terser@5.51.2)
+      '@vitejs/plugin-vue':
+        specifier: 'catalog:'
+        version: 6.0.10(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      '@vitejs/plugin-vue-jsx':
+        specifier: 'catalog:'
+        version: 5.1.6(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(supports-color@7.2.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      browserslist:
+        specifier: 'catalog:'
+        version: 4.29.5
+      lightningcss:
+        specifier: 'catalog:'
+        version: 1.33.0
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.4
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+      unplugin-vue-components:
+        specifier: 'catalog:'
+        version: 32.1.0(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(esbuild@0.28.2)(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      vite-plugin-vue-devtools:
+        specifier: 'catalog:'
+        version: 9.0.0-rc.2(@devframes/agentic@1.3.2)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(cac@7.1.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8)
+      vite-plugin-wasm:
+        specifier: 'catalog:'
+        version: 3.6.0(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
+      vue-component-type-helpers:
+        specifier: 'catalog:'
+        version: 3.3.14
+      vue-tsc:
+        specifier: 'catalog:'
+        version: 3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
+
+  packages/core/both:
     dependencies:
       cordis:
         specifier: 'catalog:'
@@ -516,17 +788,172 @@ importers:
         specifier: 'catalog:'
         version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
-  packages/client/db:
+  packages/core/logger:
+    dependencies:
+      dayjs:
+        specifier: 'catalog:'
+        version: 1.11.23
+      taurpc:
+        specifier: 'catalog:'
+        version: 2.0.0(@tauri-apps/api@2.12.4)
+    devDependencies:
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
+
+  packages/core/model:
     dependencies:
       '@delta-comic/client-logger':
         specifier: 'workspace:'
         version: link:../logger
+      '@delta-comic/manifest':
+        specifier: 'workspace:'
+        version: link:../../plugin/manifest
+      es-toolkit:
+        specifier: 'catalog:'
+        version: 1.53.2
+      vue:
+        specifier: 'catalog:'
+        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
+    devDependencies:
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.16.22
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
+
+  packages/core/runtime:
+    dependencies:
+      '@pinia/colada':
+        specifier: 'catalog:'
+        version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      cordis:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.12
+      naive-ui:
+        specifier: 'catalog:'
+        version: 2.45.3(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      pinia:
+        specifier: 'catalog:'
+        version: 4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      vue:
+        specifier: 'catalog:'
+        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
+      vue-router:
+        specifier: 'catalog:'
+        version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+    devDependencies:
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
+
+  packages/core/sdk:
+    dependencies:
+      '@delta-comic/both':
+        specifier: 'workspace:'
+        version: link:../both
+      cordis:
+        specifier: 'catalog:'
+        version: 4.0.0-rc.12
+      kysely:
+        specifier: 'catalog:'
+        version: 0.30.0-beta.2
+    devDependencies:
+      '@delta-comic/client-db':
+        specifier: 'workspace:'
+        version: link:../../data/db
+      '@delta-comic/client-downloader':
+        specifier: 'workspace:'
+        version: link:../../platform/downloader
       '@delta-comic/client-model':
         specifier: 'workspace:'
         version: link:../model
+      '@delta-comic/client-plugin-vite':
+        specifier: 'workspace:'
+        version: link:../../plugin/vite
+      '@delta-comic/client-ui':
+        specifier: 'workspace:'
+        version: link:../../ui/ui
+      '@delta-comic/client-utils':
+        specifier: 'workspace:'
+        version: link:../utils
       '@delta-comic/manifest':
         specifier: 'workspace:'
-        version: link:../manifest
+        version: link:../../plugin/manifest
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.16.22
+      typescript:
+        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
+      vue:
+        specifier: 'catalog:'
+        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
+
+  packages/core/utils:
+    dependencies:
+      '@delta-comic/client-logger':
+        specifier: 'workspace:'
+        version: link:../logger
+      '@tauri-apps/api':
+        specifier: 'catalog:'
+        version: 2.12.4
+      acorn:
+        specifier: 'catalog:'
+        version: 8.19.0
+      es-module-lexer:
+        specifier: 'catalog:'
+        version: 3.0.4
+      es-toolkit:
+        specifier: 'catalog:'
+        version: 1.53.2
+      magic-string:
+        specifier: 'catalog:'
+        version: 1.4.5
+      mitt:
+        specifier: 'catalog:'
+        version: 3.0.1
+      naive-ui:
+        specifier: 'catalog:'
+        version: 2.45.3(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      taurpc:
+        specifier: 'catalog:'
+        version: 2.0.0(@tauri-apps/api@2.12.4)
+      vue:
+        specifier: 'catalog:'
+        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
+      vue-router:
+        specifier: 'catalog:'
+        version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+    devDependencies:
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
+
+  packages/data/db:
+    dependencies:
+      '@delta-comic/client-logger':
+        specifier: 'workspace:'
+        version: link:../../core/logger
+      '@delta-comic/client-model':
+        specifier: 'workspace:'
+        version: link:../../core/model
+      '@delta-comic/manifest':
+        specifier: 'workspace:'
+        version: link:../../plugin/manifest
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
@@ -571,143 +998,7 @@ importers:
         specifier: 'catalog:'
         version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
-  packages/client/desktop:
-    dependencies:
-      '@delta-comic/client':
-        specifier: 'workspace:'
-        version: link:../sdk
-      '@delta-comic/client-app-core':
-        specifier: 'workspace:'
-        version: link:../app-core
-      '@delta-comic/client-db':
-        specifier: 'workspace:'
-        version: link:../db
-      '@delta-comic/client-http':
-        specifier: 'workspace:'
-        version: link:../http
-      '@delta-comic/client-logger':
-        specifier: 'workspace:'
-        version: link:../logger
-      '@delta-comic/client-model':
-        specifier: 'workspace:'
-        version: link:../model
-      '@delta-comic/client-plugin':
-        specifier: 'workspace:'
-        version: link:../plugin
-      '@delta-comic/client-ui':
-        specifier: 'workspace:'
-        version: link:../ui
-      '@delta-comic/client-utils':
-        specifier: 'workspace:'
-        version: link:../utils
-      '@octokit/rest':
-        specifier: 'catalog:'
-        version: 22.0.1
-      '@pinia/colada':
-        specifier: 'catalog:'
-        version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      '@tauri-apps/api':
-        specifier: 'catalog:'
-        version: 2.12.4
-      '@tauri-apps/plugin-clipboard-manager':
-        specifier: 'catalog:'
-        version: 2.5.0
-      '@tauri-apps/plugin-shell':
-        specifier: 'catalog:'
-        version: 2.6.0
-      '@vueuse/core':
-        specifier: 'catalog:'
-        version: 15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      color:
-        specifier: 'catalog:'
-        version: 5.0.3
-      es-toolkit:
-        specifier: 'catalog:'
-        version: 1.53.2
-      motion-v:
-        specifier: 'catalog:'
-        version: 2.11.1(@vueuse/core@15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      naive-ui:
-        specifier: 'catalog:'
-        version: 2.45.3(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      pinia:
-        specifier: 'catalog:'
-        version: 4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      semver:
-        specifier: 'catalog:'
-        version: 7.8.6
-      tauri-plugin-m3:
-        specifier: 'catalog:'
-        version: 0.3.2
-      taurpc:
-        specifier: 'catalog:'
-        version: 2.0.0(@tauri-apps/api@2.12.4)
-      vue:
-        specifier: 'catalog:'
-        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-      vue-i18n:
-        specifier: 'catalog:'
-        version: 12.0.0-alpha.9(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      vue-router:
-        specifier: 'catalog:'
-        version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-    devDependencies:
-      '@delta-comic/client-runtime':
-        specifier: 'workspace:'
-        version: link:../runtime
-      '@swc/core':
-        specifier: 'catalog:'
-        version: 1.16.22
-      '@tailwindcss/vite':
-        specifier: 'catalog:'
-        version: 4.3.4(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))
-      '@tauri-apps/cli':
-        specifier: 'catalog:'
-        version: 2.12.4
-      '@types/semver':
-        specifier: 'catalog:'
-        version: 7.8.0
-      '@vitejs/plugin-legacy':
-        specifier: 'catalog:'
-        version: 8.2.4(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(supports-color@7.2.0)(terser@5.51.2)
-      '@vitejs/plugin-vue':
-        specifier: 'catalog:'
-        version: 6.0.10(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      '@vitejs/plugin-vue-jsx':
-        specifier: 'catalog:'
-        version: 5.1.6(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(supports-color@7.2.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      browserslist:
-        specifier: 'catalog:'
-        version: 4.29.5
-      lightningcss:
-        specifier: 'catalog:'
-        version: 1.33.0
-      tailwindcss:
-        specifier: 'catalog:'
-        version: 4.3.4
-      typescript:
-        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-      unplugin-vue-components:
-        specifier: 'catalog:'
-        version: 32.1.0(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(esbuild@0.28.2)(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      vite-plugin-vue-devtools:
-        specifier: 'catalog:'
-        version: 9.0.0-rc.2(@devframes/agentic@1.3.2)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(cac@7.1.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8)
-      vite-plugin-wasm:
-        specifier: 'catalog:'
-        version: 3.6.0(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
-      vue-component-type-helpers:
-        specifier: 'catalog:'
-        version: 3.3.14
-      vue-tsc:
-        specifier: 'catalog:'
-        version: 3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-
-  packages/client/downloader:
+  packages/platform/downloader:
     dependencies:
       taurpc:
         specifier: 'catalog:'
@@ -720,7 +1011,7 @@ importers:
         specifier: 'catalog:'
         version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
-  packages/client/http:
+  packages/platform/http:
     dependencies:
       '@tauri-apps/api':
         specifier: 'catalog:'
@@ -739,225 +1030,42 @@ importers:
         specifier: 'catalog:'
         version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
-  packages/client/logger:
+  packages/plugin/artifact:
     dependencies:
-      dayjs:
-        specifier: 'catalog:'
-        version: 1.11.23
-      taurpc:
-        specifier: 'catalog:'
-        version: 2.0.0(@tauri-apps/api@2.12.4)
-    devDependencies:
-      typescript:
-        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
-
-  packages/client/manifest:
-    dependencies:
-      semver:
-        specifier: 'catalog:'
-        version: 7.8.6
-      typebox:
-        specifier: 'catalog:'
-        version: 1.4.5
-    devDependencies:
-      '@types/semver':
-        specifier: 'catalog:'
-        version: 7.8.0
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
-
-  packages/client/mobile:
-    dependencies:
-      '@delta-comic/client':
-        specifier: 'workspace:'
-        version: link:../sdk
-      '@delta-comic/client-app-core':
-        specifier: 'workspace:'
-        version: link:../app-core
-      '@delta-comic/client-db':
-        specifier: 'workspace:'
-        version: link:../db
-      '@delta-comic/client-http':
-        specifier: 'workspace:'
-        version: link:../http
-      '@delta-comic/client-logger':
-        specifier: 'workspace:'
-        version: link:../logger
-      '@delta-comic/client-model':
-        specifier: 'workspace:'
-        version: link:../model
-      '@delta-comic/client-plugin':
-        specifier: 'workspace:'
-        version: link:../plugin
-      '@delta-comic/client-ui':
-        specifier: 'workspace:'
-        version: link:../ui
-      '@delta-comic/client-utils':
-        specifier: 'workspace:'
-        version: link:../utils
-      '@octokit/rest':
-        specifier: 'catalog:'
-        version: 22.0.1
-      '@pinia/colada':
-        specifier: 'catalog:'
-        version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      '@tauri-apps/api':
-        specifier: 'catalog:'
-        version: 2.12.4
-      '@tauri-apps/plugin-clipboard-manager':
-        specifier: 'catalog:'
-        version: 2.5.0
-      '@tauri-apps/plugin-shell':
-        specifier: 'catalog:'
-        version: 2.6.0
-      '@vueuse/core':
-        specifier: 'catalog:'
-        version: 15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      color:
-        specifier: 'catalog:'
-        version: 5.0.3
-      es-toolkit:
-        specifier: 'catalog:'
-        version: 1.53.2
-      motion-v:
-        specifier: 'catalog:'
-        version: 2.11.1(@vueuse/core@15.0.0(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      naive-ui:
-        specifier: 'catalog:'
-        version: 2.45.3(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      pinia:
-        specifier: 'catalog:'
-        version: 4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      semver:
-        specifier: 'catalog:'
-        version: 7.8.6
-      tauri-plugin-m3:
-        specifier: 'catalog:'
-        version: 0.3.2
-      taurpc:
-        specifier: 'catalog:'
-        version: 2.0.0(@tauri-apps/api@2.12.4)
-      vue:
-        specifier: 'catalog:'
-        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-      vue-i18n:
-        specifier: 'catalog:'
-        version: 12.0.0-alpha.9(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      vue-router:
-        specifier: 'catalog:'
-        version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-    devDependencies:
-      '@delta-comic/client-runtime':
-        specifier: 'workspace:'
-        version: link:../runtime
-      '@swc/core':
-        specifier: 'catalog:'
-        version: 1.16.22
-      '@tailwindcss/vite':
-        specifier: 'catalog:'
-        version: 4.3.4(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))
-      '@tauri-apps/cli':
-        specifier: 'catalog:'
-        version: 2.12.4
-      '@types/semver':
-        specifier: 'catalog:'
-        version: 7.8.0
-      '@vitejs/plugin-legacy':
-        specifier: 'catalog:'
-        version: 8.2.4(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(supports-color@7.2.0)(terser@5.51.2)
-      '@vitejs/plugin-vue':
-        specifier: 'catalog:'
-        version: 6.0.10(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      '@vitejs/plugin-vue-jsx':
-        specifier: 'catalog:'
-        version: 5.1.6(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(supports-color@7.2.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      browserslist:
-        specifier: 'catalog:'
-        version: 4.29.5
-      lightningcss:
-        specifier: 'catalog:'
-        version: 1.33.0
-      tailwindcss:
-        specifier: 'catalog:'
-        version: 4.3.4
-      typescript:
-        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-      unplugin-vue-components:
-        specifier: 'catalog:'
-        version: 32.1.0(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(esbuild@0.28.2)(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      vite-plugin-vue-devtools:
-        specifier: 'catalog:'
-        version: 9.0.0-rc.2(@devframes/agentic@1.3.2)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(cac@7.1.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8)
-      vite-plugin-wasm:
-        specifier: 'catalog:'
-        version: 3.6.0(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
-      vue-component-type-helpers:
-        specifier: 'catalog:'
-        version: 3.3.14
-      vue-tsc:
-        specifier: 'catalog:'
-        version: 3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-
-  packages/client/model:
-    dependencies:
-      '@delta-comic/client-logger':
-        specifier: 'workspace:'
-        version: link:../logger
       '@delta-comic/manifest':
         specifier: 'workspace:'
         version: link:../manifest
-      es-toolkit:
-        specifier: 'catalog:'
-        version: 1.53.2
-      vue:
-        specifier: 'catalog:'
-        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
     devDependencies:
-      '@swc/core':
-        specifier: 'catalog:'
-        version: 1.16.22
-      typescript:
-        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
       vite-plus:
         specifier: 'catalog:'
         version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
-  packages/client/plugin:
+  packages/plugin/core:
     dependencies:
       '@delta-comic/client':
         specifier: 'workspace:'
-        version: link:../sdk
+        version: link:../../core/sdk
       '@delta-comic/client-db':
         specifier: 'workspace:'
-        version: link:../db
+        version: link:../../data/db
       '@delta-comic/client-logger':
         specifier: 'workspace:'
-        version: link:../logger
+        version: link:../../core/logger
       '@delta-comic/client-model':
         specifier: 'workspace:'
-        version: link:../model
+        version: link:../../core/model
       '@delta-comic/client-plugin-install':
         specifier: 'workspace:'
-        version: link:../plugin-install
+        version: link:../install
       '@delta-comic/client-plugin-vite':
         specifier: 'workspace:'
-        version: link:../plugin-vite
+        version: link:../vite
       '@delta-comic/client-ui':
         specifier: 'workspace:'
-        version: link:../ui
+        version: link:../../ui/ui
       '@delta-comic/client-utils':
         specifier: 'workspace:'
-        version: link:../utils
+        version: link:../../core/utils
       '@delta-comic/manifest':
         specifier: 'workspace:'
         version: link:../manifest
@@ -990,27 +1098,17 @@ importers:
         specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
         version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
 
-  packages/client/plugin-artifact:
-    dependencies:
-      '@delta-comic/manifest':
-        specifier: 'workspace:'
-        version: link:../manifest
-    devDependencies:
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
-
-  packages/client/plugin-install:
+  packages/plugin/install:
     dependencies:
       '@delta-comic/client-logger':
         specifier: 'workspace:'
-        version: link:../logger
+        version: link:../../core/logger
       '@delta-comic/client-model':
         specifier: 'workspace:'
-        version: link:../model
+        version: link:../../core/model
       '@delta-comic/client-plugin-artifact':
         specifier: 'workspace:'
-        version: link:../plugin-artifact
+        version: link:../artifact
       '@delta-comic/manifest':
         specifier: 'workspace:'
         version: link:../manifest
@@ -1032,22 +1130,38 @@ importers:
     devDependencies:
       '@delta-comic/client-db':
         specifier: 'workspace:'
-        version: link:../db
+        version: link:../../data/db
       vite-plus:
         specifier: 'catalog:'
         version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
-  packages/client/plugin-vite:
+  packages/plugin/manifest:
+    dependencies:
+      semver:
+        specifier: 'catalog:'
+        version: 7.8.6
+      typebox:
+        specifier: 'catalog:'
+        version: 1.4.5
+    devDependencies:
+      '@types/semver':
+        specifier: 'catalog:'
+        version: 7.8.0
+      vite-plus:
+        specifier: 'catalog:'
+        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
+
+  packages/plugin/vite:
     dependencies:
       '@delta-comic/client-model':
         specifier: 'workspace:'
-        version: link:../model
+        version: link:../../core/model
       '@delta-comic/client-plugin-install':
         specifier: 'workspace:'
-        version: link:../plugin-install
+        version: link:../install
       '@delta-comic/client-utils':
         specifier: 'workspace:'
-        version: link:../utils
+        version: link:../../core/utils
       jszip:
         specifier: 'catalog:'
         version: 3.10.2
@@ -1057,96 +1171,22 @@ importers:
     devDependencies:
       '@delta-comic/client-db':
         specifier: 'workspace:'
-        version: link:../db
+        version: link:../../data/db
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.10(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
 
-  packages/client/runtime:
-    dependencies:
-      '@pinia/colada':
-        specifier: 'catalog:'
-        version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      cordis:
-        specifier: 'catalog:'
-        version: 4.0.0-rc.12
-      naive-ui:
-        specifier: 'catalog:'
-        version: 2.45.3(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      pinia:
-        specifier: 'catalog:'
-        version: 4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      vue:
-        specifier: 'catalog:'
-        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-      vue-router:
-        specifier: 'catalog:'
-        version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-    devDependencies:
-      typescript:
-        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
-
-  packages/client/sdk:
-    dependencies:
-      '@delta-comic/both':
-        specifier: 'workspace:'
-        version: link:../both
-      cordis:
-        specifier: 'catalog:'
-        version: 4.0.0-rc.12
-      kysely:
-        specifier: 'catalog:'
-        version: 0.30.0-beta.2
-    devDependencies:
-      '@delta-comic/client-db':
-        specifier: 'workspace:'
-        version: link:../db
-      '@delta-comic/client-downloader':
-        specifier: 'workspace:'
-        version: link:../downloader
-      '@delta-comic/client-model':
-        specifier: 'workspace:'
-        version: link:../model
-      '@delta-comic/client-plugin-vite':
-        specifier: 'workspace:'
-        version: link:../plugin-vite
-      '@delta-comic/client-ui':
-        specifier: 'workspace:'
-        version: link:../ui
-      '@delta-comic/client-utils':
-        specifier: 'workspace:'
-        version: link:../utils
-      '@delta-comic/manifest':
-        specifier: 'workspace:'
-        version: link:../manifest
-      '@swc/core':
-        specifier: 'catalog:'
-        version: 1.16.22
-      typescript:
-        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
-      vue:
-        specifier: 'catalog:'
-        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-
-  packages/client/ui:
+  packages/ui/ui:
     dependencies:
       '@delta-comic/client-logger':
         specifier: 'workspace:'
-        version: link:../logger
+        version: link:../../core/logger
       '@delta-comic/client-model':
         specifier: 'workspace:'
-        version: link:../model
+        version: link:../../core/model
       '@delta-comic/client-utils':
         specifier: 'workspace:'
-        version: link:../utils
+        version: link:../../core/utils
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
@@ -1232,46 +1272,6 @@ importers:
       vue-tsc:
         specifier: 'catalog:'
         version: 3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-
-  packages/client/utils:
-    dependencies:
-      '@delta-comic/client-logger':
-        specifier: 'workspace:'
-        version: link:../logger
-      '@tauri-apps/api':
-        specifier: 'catalog:'
-        version: 2.12.4
-      acorn:
-        specifier: 'catalog:'
-        version: 8.19.0
-      es-module-lexer:
-        specifier: 'catalog:'
-        version: 3.0.4
-      es-toolkit:
-        specifier: 'catalog:'
-        version: 1.53.2
-      magic-string:
-        specifier: 'catalog:'
-        version: 1.4.5
-      mitt:
-        specifier: 'catalog:'
-        version: 3.0.1
-      naive-ui:
-        specifier: 'catalog:'
-        version: 2.45.3(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      taurpc:
-        specifier: 'catalog:'
-        version: 2.0.0(@tauri-apps/api@2.12.4)
-      vue:
-        specifier: 'catalog:'
-        version: 3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-      vue-router:
-        specifier: 'catalog:'
-        version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-    devDependencies:
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
   script/codegen:
     dependencies:

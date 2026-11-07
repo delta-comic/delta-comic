@@ -9,25 +9,25 @@
 
 | 路径 | 职责 |
 | --- | --- |
-| `packages/client/mobile` | 移动端 Vue/Tauri 应用、路由与三语 i18n |
-| `packages/client/desktop` | 桌面端 Vue/Tauri 应用、路由与窗口行为 |
-| `packages/client/app-core` | 双端共享业务状态、组件、插件初始化与生命周期协议 |
-| `packages/client/sdk` | `@delta-comic/client` 类型、Context 扩展与平台客户端工具 |
-| `packages/client/plugin` | 宿主服务、内置插件、安装组合与 Fiber 管理 |
-| `packages/client/plugin-install` | 来源、安装记录、ZIP、模块读取与开发服务器 |
-| `packages/client/plugin-artifact` | 客户端资源与模块图完整性校验 |
-| `packages/client/plugin-vite` | 插件构建、ZIP 输出、CSS 与 HMR 协议 |
-| `packages/client/runtime` | `@delta-comic/client-runtime` UMD 宿主模块桥接 |
-| `packages/client/model` | 内容模型 |
-| `packages/client/utils` | 客户端工具 |
-| `packages/client/db` | 客户端 SQLite/Web 数据库和生成表类型 |
-| `packages/client/downloader` | 原生下载 |
-| `packages/client/http` | HTTP 平台适配 |
-| `packages/client/logger` | 日志传输 |
-| `packages/client/ui` | 通用 Vue UI、内容布局和播放器 |
-| `packages/client/both` | Cordis 导出、诊断协议与双端核心 |
-| `packages/client/logger` | 双端日志核心 |
-| `packages/client/manifest` | 客户端 manifest v2 schema 与完整性检查 |
+| `packages/app/mobile` | 移动端 Vue/Tauri 应用、路由与三语 i18n |
+| `packages/app/desktop` | 桌面端 Vue/Tauri 应用、路由与窗口行为 |
+| `packages/app/core` | 双端共享业务状态、组件、插件初始化与生命周期协议 |
+| `packages/core/sdk` | `@delta-comic/client` 类型、Context 扩展与平台客户端工具 |
+| `packages/plugin/core` | 宿主服务、内置插件、安装组合与 Fiber 管理 |
+| `packages/plugin/install` | 来源、安装记录、ZIP、模块读取与开发服务器 |
+| `packages/plugin/artifact` | 客户端资源与模块图完整性校验 |
+| `packages/plugin/vite` | 插件构建、ZIP 输出、CSS 与 HMR 协议 |
+| `packages/core/runtime` | `@delta-comic/client-runtime` UMD 宿主模块桥接 |
+| `packages/core/model` | 内容模型 |
+| `packages/core/utils` | 客户端工具 |
+| `packages/data/db` | 客户端 SQLite/Web 数据库和生成表类型 |
+| `packages/platform/downloader` | 原生下载 |
+| `packages/platform/http` | HTTP 平台适配 |
+| `packages/core/logger` | 日志传输 |
+| `packages/ui/ui` | 通用 Vue UI、内容布局和播放器 |
+| `packages/core/both` | Cordis 导出、诊断协议与双端核心 |
+| `packages/core/logger` | 双端日志核心 |
+| `packages/plugin/manifest` | 客户端 manifest v2 schema 与完整性检查 |
 
 客户端公共模块由各端实际消费。`@delta-comic/client-runtime` 为外部插件提供宿主桥接。
 

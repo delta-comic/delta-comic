@@ -33,13 +33,9 @@ release
 .codex
 .codex/config.toml
 
-.wrangler
-.dev.vars
-.dev.vars.*
-
 target
 dist-vite
-packages/client/*/public/runtime/
+packages/app/*/public/runtime/
 *.tsbuildinfo
 packages/*/android/.tauri
 packages/*/android/.gradle

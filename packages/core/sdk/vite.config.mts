@@ -24,16 +24,20 @@ export default defineConfig({
   plugins: [decoratorPlugin],
   resolve: {
     alias: {
-      '@delta-comic/client-db': fileURLToPath(new URL('../db/lib/index.ts', import.meta.url)),
+      '@delta-comic/client-db': fileURLToPath(
+        new URL('../../data/db/lib/index.ts', import.meta.url),
+      ),
       '@delta-comic/client-downloader': fileURLToPath(
-        new URL('../downloader/lib/index.ts', import.meta.url),
+        new URL('../../platform/downloader/lib/index.ts', import.meta.url),
       ),
       '@delta-comic/client-logger': fileURLToPath(
         new URL('../logger/lib/index.ts', import.meta.url),
       ),
       '@delta-comic/client-model': fileURLToPath(new URL('../model/lib/index.ts', import.meta.url)),
-      '@delta-comic/manifest': fileURLToPath(new URL('../manifest/lib/index.ts', import.meta.url)),
-      '@delta-comic/client-ui': fileURLToPath(new URL('../ui/lib/index.ts', import.meta.url)),
+      '@delta-comic/manifest': fileURLToPath(
+        new URL('../../plugin/manifest/lib/index.ts', import.meta.url),
+      ),
+      '@delta-comic/client-ui': fileURLToPath(new URL('../../ui/ui/lib/index.ts', import.meta.url)),
       '@delta-comic/client-utils': fileURLToPath(new URL('../utils/lib/index.ts', import.meta.url)),
     },
   },

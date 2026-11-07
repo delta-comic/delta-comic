@@ -98,27 +98,27 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 - 完整的 Web 验证流程：依次运行 `vp run build:packages`、`vp check`、
   `vp run -r typecheck`，然后运行 `vp test run`。由于根目录 lint 的类型检查已禁用，
   `vp check` 不能替代显式的工作区类型检查。
-- 使用 `vp test run packages/client/app-core/test/lib/path/file.test.ts` 运行单个测试文件；添加
+- 使用 `vp test run packages/app/core/test/lib/path/file.test.ts` 运行单个测试文件；添加
   `-t 'test name'` 可聚焦单个测试用例。测试监听模式为 `vp test watch <path>`。
 - 覆盖率检查命令为 `vp test run --coverage`；根目录阈值为行、函数、语句和分支 20%。
 - Rust 验证需单独执行：`cargo fmt --all --check`、
   `cargo clippy --workspace --all-targets --locked -- -D warnings` 和
   `cargo test --workspace --locked -- --test-threads=2`。
-- 修改 `packages/client/downloader/android` 下的内容时，还必须运行 Gradle 的 `ktlintCheck`、
+- 修改 `packages/platform/downloader/android` 下的内容时，还必须运行 Gradle 的 `ktlintCheck`、
   `lintDebug` 和 `testDebugUnitTest` 任务。CI 使用的具体 JDK 21/Android 36 配置位于
   `.github/workflows/{lint,test}.yaml`。
 
 ## 运行时入口
 
-- `packages/client/app-core`：Vue/Tauri 客户端共享核心。Web 入口为各端的 `src/main.tsx`；原生入口为
+- `packages/app/core`：Vue/Tauri 客户端共享核心。Web 入口为各端的 `src/main.tsx`；原生入口为
   `src-tauri/src/main.rs`。`vp run --filter app dev` 启动 Tauri；`dev:web` 仅启动 Web
   客户端。Tauri 必须使用端口 `5173`，端口不可用时会直接失败，而不会选择其他端口。
 - 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/client-runtime`，它是供外部插件使用的
   UMD 宿主库桥接层。请保持此依赖顺序。
-- `packages/client/db`、`packages/client/downloader`、`packages/client/logger`、`packages/client/ui` 与
-  `packages/client/{model,utils,plugin}` 是可发布的工作区；其中一些还通过
-  根 Cargo 工作区映射到 Rust Tauri 插件 crate。`packages/client/runtime` 与 `app-core` 是私有包。
-- `packages/client` 包含客户端各端代码与类型。能力若只被单端使用，或依赖 Vue UI、浏览器存储、Tauri、平台文件/网络等单端环境，归入对应的 `packages/client` 子包。
+- `packages/data/db`、`packages/platform/downloader`、`packages/core/logger`、`packages/ui/ui`、
+  `packages/core/{model,utils}` 与 `packages/plugin/{core,artifact,install,vite}` 是可发布的工作区；其中一些还通过
+  根 Cargo 工作区映射到 Rust Tauri 插件 crate。`packages/core/runtime` 与 `packages/app/core` 是私有包。
+- 客户端代码按 app、core、data、platform、plugin 与 ui 分类。能力若只被单端使用，或依赖 Vue UI、浏览器存储、Tauri、平台文件/网络等单端环境，归入对应分类下的子包。
 
 ## 架构约束
 
@@ -134,7 +134,7 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 - UI 样式使用 Tailwind CSS。普通 CSS 仅用于无法枚举的动态值、`@apply` 或轻量启动画面。
   Vue/组件标签使用 PascalCase。
 - 每个新增的应用内用户可见字符串都必须使用 i18n，并更新
-  `packages/client/app-core/lib/i18n/locales/en-US.ts`、`zh-CN.ts` 和 `zh-TW.ts`。共享 UI 消息使用
+  `packages/app/core/lib/i18n/locales/en-US.ts`、`zh-CN.ts` 和 `zh-TW.ts`。共享 UI 消息使用
   各应用入口中配置的 `ui.*` 桥接。
 - 测试应放在生产目录之外，并与源文件路径对应：
   `packages/x/lib/a.ts` -> `packages/x/test/lib/a.test.ts`；根目录脚本使用 `script/test`。

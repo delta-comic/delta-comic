@@ -20,7 +20,7 @@ logger.setTransport(new TauriLoggerClient())
 installGlobalLogger()
 ```
 
-Tauri 原生日志 crate 位于 `packages/client/logger`。Rust 宿主需要在其他插件之前注册插件，之后可直接使用 `tracing`：
+Tauri 原生日志 crate 位于 `packages/core/logger`。Rust 宿主需要在其他插件之前注册插件，之后可直接使用 `tracing`：
 
 ```rust
 tauri::Builder::default()

@@ -1,16 +1,16 @@
 [workspace]
 resolver = "3"
 members = [
-  "packages/client/mobile/src-tauri",
-  "packages/client/desktop/src-tauri",
-  "packages/client/app-core",
-  "packages/client/db",
-  "packages/client/downloader",
-  "packages/client/http",
-  "packages/client/downloader/tools/performance-baseline",
-  "packages/client/logger",
-  "packages/client/plugin",
-  "packages/client/utils",
+  "packages/app/mobile/src-tauri",
+  "packages/app/desktop/src-tauri",
+  "packages/app/core",
+  "packages/data/db",
+  "packages/platform/downloader",
+  "packages/platform/http",
+  "packages/platform/downloader/tools/performance-baseline",
+  "packages/core/logger",
+  "packages/plugin/core",
+  "packages/core/utils",
 ]
 
 [workspace.package]
@@ -22,7 +22,7 @@ rust-version = "1.95.0"
 version = "3.0.0-next.24"
 
 [workspace.dependencies]
-delta-comic-native = { path = "packages/client/app-core" }
+delta-comic-native = { path = "packages/app/core" }
 android-native-keyring-store = "1.0.0"
 apple-native-keyring-store = { version = "1.0.2", features = ["keychain"] }
 async-trait = "0.1.89"
@@ -62,22 +62,22 @@ tauri = "2.12.1"
 tauri-build = "2.7.1"
 tauri-plugin = "2.7.1"
 tauri-plugin-aptabase = { git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls", branch = "main" }
-tauri-plugin-http = { path = "packages/client/http", features = ["multipart", "blocking"] }
+tauri-plugin-http = { path = "packages/platform/http", features = ["multipart", "blocking"] }
 tauri-plugin-clipboard-manager = "2.4.1"
-tauri-plugin-db = { path = "packages/client/db" }
-tauri-plugin-downloader = { path = "packages/client/downloader" }
-tauri-plugin-logger = { path = "packages/client/logger" }
+tauri-plugin-db = { path = "packages/data/db" }
+tauri-plugin-downloader = { path = "packages/platform/downloader" }
+tauri-plugin-logger = { path = "packages/core/logger" }
 tauri-plugin-fs = "2.6.0"
 tauri-plugin-m3 = "0.3.2"
 tauri-plugin-persisted-scope = "2.4.0"
-tauri-plugin-plugin = { path = "packages/client/plugin" }
+tauri-plugin-plugin = { path = "packages/plugin/core" }
 tauri-plugin-shell = "2.4.0"
 tauri-plugin-webview-upgrade = { git = "https://github.com/readest/tauri-plugin-webview-upgrade" }
 
 tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2", features = [
   "sqlite",
 ] }
-tauri-plugin-utils = { path = "packages/client/utils" }
+tauri-plugin-utils = { path = "packages/core/utils" }
 tauri-runtime-wry = "2.12.1"
 taurpc = "0.8.2"
 tempfile = "3.27.0"
