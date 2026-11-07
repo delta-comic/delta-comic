@@ -33,7 +33,7 @@
     { "path": "./packages/plugin/core/tsconfig.json" },
     { "path": "./packages/core/runtime/tsconfig.json" },
     { "path": "./packages/core/sdk/tsconfig.json" },
-    { "path": "./packages/data/db/tsconfig.json" },
+    { "path": "./packages/platform/db/tsconfig.json" },
     { "path": "./packages/platform/http/tsconfig.json" },
     { "path": "./tsconfig.node.json" }
   ]

@@ -25,7 +25,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@delta-comic/client-db': fileURLToPath(
-        new URL('../../data/db/lib/index.ts', import.meta.url),
+        new URL('../../platform/db/lib/index.ts', import.meta.url),
       ),
       '@delta-comic/client-downloader': fileURLToPath(
         new URL('../../platform/downloader/lib/index.ts', import.meta.url),

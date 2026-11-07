@@ -8,7 +8,7 @@ export const jsonVersionPaths = [
   'packages/core/sdk/package.json',
   'packages/app/mobile/src-tauri/tauri.conf.json',
   'packages/app/desktop/src-tauri/tauri.conf.json',
-  'packages/data/db/package.json',
+  'packages/platform/db/package.json',
   'packages/platform/downloader/package.json',
   'packages/platform/http/package.json',
   'packages/core/logger/package.json',

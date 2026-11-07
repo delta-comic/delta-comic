@@ -20,7 +20,7 @@
 | `packages/core/runtime` | `@delta-comic/client-runtime` UMD 宿主模块桥接 |
 | `packages/core/model` | 内容模型 |
 | `packages/core/utils` | 客户端工具 |
-| `packages/data/db` | 客户端 SQLite/Web 数据库和生成表类型 |
+| `packages/platform/db` | 客户端 SQLite/Web 数据库和生成表类型 |
 | `packages/platform/downloader` | 原生下载 |
 | `packages/platform/http` | HTTP 平台适配 |
 | `packages/core/logger` | 日志传输 |

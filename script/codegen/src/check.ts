@@ -13,7 +13,7 @@ import {
 } from './schema'
 
 export const codegenDefinitions = [
-  ['script/codegen/src/client.table.ts', 'packages/data/db/lib/generated'],
+  ['script/codegen/src/client.table.ts', 'packages/platform/db/lib/generated'],
 ] as const
 
 const isTableSchema = (value: unknown): value is TableSchema =>

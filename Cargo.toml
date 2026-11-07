@@ -4,7 +4,7 @@ members = [
   "packages/app/mobile/src-tauri",
   "packages/app/desktop/src-tauri",
   "packages/app/core",
-  "packages/data/db",
+  "packages/platform/db",
   "packages/platform/downloader",
   "packages/platform/http",
   "packages/platform/downloader/tools/performance-baseline",
@@ -64,7 +64,7 @@ tauri-plugin = "2.7.1"
 tauri-plugin-aptabase = { git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls", branch = "main" }
 tauri-plugin-http = { path = "packages/platform/http", features = ["multipart", "blocking"] }
 tauri-plugin-clipboard-manager = "2.4.1"
-tauri-plugin-db = { path = "packages/data/db" }
+tauri-plugin-db = { path = "packages/platform/db" }
 tauri-plugin-downloader = { path = "packages/platform/downloader" }
 tauri-plugin-logger = { path = "packages/core/logger" }
 tauri-plugin-fs = "2.6.0"
