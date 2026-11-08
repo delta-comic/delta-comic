@@ -18,6 +18,12 @@ const extendsDepends = await (async () => {
 const externalDepends = [...Object.keys(extendsDepends), 'highlight.js']
 const isExternal = (id: string) =>
   externalDepends.some(dep => id === dep || id.startsWith(`${dep}/`))
+const disabledPlugins = new Set(
+  (process.env.DELTA_UI_DISABLE_PLUGINS ?? '')
+    .split(',')
+    .map(plugin => plugin.trim())
+    .filter(Boolean),
+)
 
 export default defineConfig(({ command }) => ({
   plugins: lazyPlugins((async () => {
@@ -36,14 +42,18 @@ export default defineConfig(({ command }) => ({
     ])
 
     return [
-      VueRouter({
-        root: import.meta.dirname,
-        dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
-      }),
+      ...(disabledPlugins.has('router')
+        ? []
+        : [
+            VueRouter({
+              root: import.meta.dirname,
+              dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
+            }),
+          ]),
       vue(),
-      vueJsx(),
-      tailwindcss(),
-      ...(command === 'build'
+      ...(disabledPlugins.has('jsx') ? [] : [vueJsx()]),
+      ...(disabledPlugins.has('tailwind') ? [] : [tailwindcss()]),
+      ...(command === 'build' && !disabledPlugins.has('dts')
         ? [
             dts({
               vue: true,
