@@ -46,8 +46,8 @@ export default defineConfig(({ command }) => ({
       ...(command === 'build'
         ? [
             dts({
+              generator: 'oxc',
               tsconfig: resolve(import.meta.dirname, './tsconfig.build.json'),
-              tsc: { parallel: true, vue: true },
               sourcemap: true,
             }),
           ]

@@ -1,12 +1,15 @@
 import type { FormConfigure, FormResult, FormSingleResult } from '@delta-comic/client-model'
 import { NButton } from 'naive-ui'
 import { ref } from 'vue'
+import type { JSX } from 'vue/jsx-runtime'
 
 import { translateUi } from '../../i18n'
 
 import DcForm from './components/DcForm.vue'
 
-export const createForm = <T extends FormConfigure>(configs: T) => {
+export const createForm = <T extends FormConfigure>(
+  configs: T,
+): { comp: JSX.Element; data: Promise<FormResult<T>> } => {
   const data = ref<Record<string, FormSingleResult<any>>>({})
   const c = Promise.withResolvers<FormResult<T>>()
   for (const name in configs) {
