@@ -47,7 +47,7 @@ export default defineConfig(({ command }) => ({
         ? [
             dts({
               vue: true,
-              tsconfig: resolve(import.meta.dirname, './tsconfig.app.json'),
+              tsconfig: resolve(import.meta.dirname, './tsconfig.build.json'),
               sourcemap: true,
             }),
           ]
