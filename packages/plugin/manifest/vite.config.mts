@@ -5,7 +5,10 @@ export default defineConfig({
   run: {
     tasks: {
       build: { command: 'vp pack', cache: { output: ['dist/**'] } },
-      typecheck: { command: 'tsc -p tsconfig.json --noEmit', cache: { output: [] } },
+      typecheck: {
+        command: 'tsrs --fast --runExternalCode -p tsconfig.json --noEmit',
+        cache: { output: [] },
+      },
     },
   },
   test: { environment: 'node', include: ['test/**/*.test.ts'] },

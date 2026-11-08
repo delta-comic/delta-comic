@@ -23,8 +23,7 @@
     "@delta-comic/client-model": "workspace:",
     "@delta-comic/client-plugin-install": "workspace:",
     "@delta-comic/client-utils": "workspace:",
-    "jszip": "catalog:",
-    "vite-plus": "catalog:"
+    "jszip": "catalog:"
   },
   "devDependencies": {
     "@delta-comic/client-db": "workspace:"

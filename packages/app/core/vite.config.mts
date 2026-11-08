@@ -4,12 +4,12 @@ export default defineConfig({
   run: {
     tasks: {
       build: {
-        command: 'tsrs --runExternalCode --noEmit -p tsconfig.json',
+        command: 'tsrs --fast --runExternalCode --noEmit -p tsconfig.json',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         cache: { output: [] },
       },
       typecheck: {
-        command: 'tsrs --runExternalCode --noEmit -p tsconfig.json',
+        command: 'tsrs --fast --runExternalCode --noEmit -p tsconfig.json',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         cache: { output: [] },
       },

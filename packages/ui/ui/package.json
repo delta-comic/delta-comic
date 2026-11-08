@@ -65,11 +65,7 @@
     "browserslist": "catalog:",
     "lightningcss": "catalog:",
     "rolldown-plugin-dts": "catalog:",
-    "tailwindcss": "catalog:",
-    "tsrs": "catalog:",
     "unplugin-vue-components": "catalog:",
-    "vite-plus": "catalog:",
-    "vize": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
   "peerDependencies": {

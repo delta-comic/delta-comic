@@ -43,9 +43,6 @@
     "mitt": "catalog:",
     "taurpc": "catalog:"
   },
-  "devDependencies": {
-    "vite-plus": "catalog:"
-  },
   "peerDependencies": {
     "naive-ui": "catalog:",
     "vue": "catalog:",

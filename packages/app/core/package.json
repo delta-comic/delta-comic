@@ -35,10 +35,6 @@
   },
   "devDependencies": {
     "@delta-comic/client-runtime": "workspace:",
-    "@types/semver": "catalog:",
-    "tsrs": "catalog:",
-    "typescript": "catalog:",
-    "vite-plus": "catalog:",
-    "vize": "catalog:"
+    "@types/semver": "catalog:"
   }
 }

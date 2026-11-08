@@ -31,9 +31,5 @@
   },
   "dependencies": {
     "taurpc": "catalog:"
-  },
-  "devDependencies": {
-    "typescript": "catalog:",
-    "vite-plus": "catalog:"
   }
 }

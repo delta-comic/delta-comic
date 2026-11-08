@@ -38,7 +38,7 @@ const slots = defineSlots<{
         :config
         v-if="slots.row && (isArray(overrideRow) ? overrideRow.includes(path) : overrideRow)"
       />
-      <DcFormItem v-model="formModel[path]" :path="path as string" :config v-else />
+      <DcFormItem v-model="formModel[path]" :path :config v-else />
     </template>
     <slot name="bottom" :config="configs" />
   </NForm>

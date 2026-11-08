@@ -10,7 +10,7 @@ export default defineConfig({
         cache: { output: ['dist/**'] },
       },
       typecheck: {
-        command: 'tsc -p tsconfig.json --noEmit',
+        command: 'tsrs --fast --runExternalCode -p tsconfig.json --noEmit',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         cache: { output: [] },
       },

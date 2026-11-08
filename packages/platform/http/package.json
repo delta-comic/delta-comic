@@ -25,9 +25,5 @@
     "@tauri-apps/api": "catalog:",
     "es-toolkit": "catalog:",
     "taurpc": "catalog:"
-  },
-  "devDependencies": {
-    "typescript": "catalog:",
-    "vite-plus": "catalog:"
   }
 }

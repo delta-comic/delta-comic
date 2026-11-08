@@ -49,8 +49,6 @@
     "@delta-comic/client-utils": "workspace:",
     "@delta-comic/manifest": "workspace:",
     "@swc/core": "catalog:",
-    "typescript": "catalog:",
-    "vite-plus": "catalog:",
     "vue": "catalog:"
   },
   "peerDependencies": {

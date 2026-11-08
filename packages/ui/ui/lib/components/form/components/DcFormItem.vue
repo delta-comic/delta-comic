@@ -23,7 +23,7 @@ const write = (value: FormDefaultValue[keyof FormDefaultValue]): void => {
 </script>
 
 <template>
-  <NFormItem :label="config.info" :path="path as string" :required="config.required ?? true">
+  <NFormItem :label="config.info" :path="path.toString()" :required="config.required ?? true">
     <DcFormSwitch
       :config
       :model-value="store as FormDefaultValue['switch']"

@@ -51,9 +51,6 @@
     "lz-string": "catalog:",
     "taurpc": "catalog:"
   },
-  "devDependencies": {
-    "typescript": "catalog:"
-  },
   "peerDependencies": {
     "@delta-comic/client-db": "workspace:",
     "@delta-comic/client-model": "workspace:",

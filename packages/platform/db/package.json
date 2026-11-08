@@ -43,10 +43,6 @@
     "taurpc": "catalog:",
     "typebox": "catalog:"
   },
-  "devDependencies": {
-    "typescript": "catalog:",
-    "vite-plus": "catalog:"
-  },
   "peerDependencies": {
     "@delta-comic/client-model": "workspace:",
     "@pinia/colada": "catalog:",

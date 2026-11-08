@@ -20,8 +20,5 @@
   },
   "dependencies": {
     "@delta-comic/manifest": "workspace:"
-  },
-  "devDependencies": {
-    "vite-plus": "catalog:"
   }
 }

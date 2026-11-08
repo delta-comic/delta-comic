@@ -193,8 +193,8 @@ export default defineConfig(
           'tauri': { command: 'vp exec tauri', cache: false },
           'typecheck': {
             command: [
-              'tsrs --runExternalCode --noEmit -p tsconfig.app.json',
-              'tsc -p tsconfig.node.json --noEmit',
+              'tsrs --fast --runExternalCode --noEmit -p tsconfig.app.json',
+              'tsrs --fast --runExternalCode -p tsconfig.node.json --noEmit',
             ],
             dependsOn: [{ task: 'build', from: 'dependencies' }],
             cache: { output: [] },

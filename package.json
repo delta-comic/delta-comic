@@ -31,10 +31,12 @@
     "happy-dom": "catalog:",
     "semantic-release": "catalog:",
     "tailwindcss": "catalog:",
+    "tsrs": "catalog:",
     "twlinter": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "vize": "catalog:"
   },
   "badges": [
     {

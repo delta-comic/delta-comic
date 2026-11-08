@@ -5,7 +5,10 @@ export default defineConfig({
   run: {
     tasks: {
       build: { command: 'vp pack', cache: { output: ['dist/**'] } },
-      typecheck: { command: 'tsc -p tsconfig.json', cache: { output: [] } },
+      typecheck: {
+        command: 'tsrs --fast --runExternalCode -p tsconfig.json',
+        cache: { output: [] },
+      },
     },
   },
 })

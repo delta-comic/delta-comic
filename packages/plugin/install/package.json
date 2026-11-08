@@ -31,7 +31,6 @@
     "semver": "catalog:"
   },
   "devDependencies": {
-    "@delta-comic/client-db": "workspace:",
-    "vite-plus": "catalog:"
+    "@delta-comic/client-db": "workspace:"
   }
 }

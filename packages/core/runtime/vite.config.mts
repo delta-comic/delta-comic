@@ -14,7 +14,10 @@ export default defineConfig(({ mode }) => {
       tasks: {
         'build': { command: 'vp build', cache: { output: ['dist/**'] } },
         'build:dev': { command: 'vp build --mode development', cache: { output: ['dist/**'] } },
-        'typecheck': { command: 'tsc -p tsconfig.json --noEmit', cache: { output: [] } },
+        'typecheck': {
+          command: 'tsrs --fast --runExternalCode -p tsconfig.json --noEmit',
+          cache: { output: [] },
+        },
       },
     },
     plugins: [

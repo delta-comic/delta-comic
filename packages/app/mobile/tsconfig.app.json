@@ -15,9 +15,5 @@
       "@delta-comic/client-utils"
     ]
   },
-  "vueCompilerOptions": {
-    "plugins": ["vue-router/volar/sfc-typed-router", "vue-router/volar/sfc-route-blocks"]
-  },
-  "contentMappers": [{ "package": "vize", "extensions": [".vue"] }],
   "include": ["./src/**/*"]
 }

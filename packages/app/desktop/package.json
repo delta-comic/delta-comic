@@ -41,14 +41,9 @@
     "@vizejs/vite-plugin": "catalog:",
     "browserslist": "catalog:",
     "lightningcss": "catalog:",
-    "tailwindcss": "catalog:",
-    "tsrs": "catalog:",
-    "typescript": "catalog:",
     "unplugin-vue-components": "catalog:",
     "vite-plugin-vue-devtools": "catalog:",
     "vite-plugin-wasm": "catalog:",
-    "vite-plus": "catalog:",
-    "vize": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
   "readme": "../../README.md"
