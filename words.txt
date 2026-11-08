@@ -143,3 +143,7 @@ Redirections
 CORSXML
 Nlcjpw
 taurpc
+tsrs
+vdom
+vize
+vizejs

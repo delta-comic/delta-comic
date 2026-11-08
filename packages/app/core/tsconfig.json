@@ -4,5 +4,6 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "types": ["vite-plus/client", "@delta-comic/client-utils", "./components.d.ts"]
   },
+  "contentMappers": [{ "package": "vize", "extensions": [".vue"] }],
   "include": ["lib", "test"]
 }

@@ -22,27 +22,20 @@ const isExternal = (id: string) =>
 
 export default defineConfig(({ command }) => ({
   plugins: lazyPlugins((async () => {
-    const [
-      { default: tailwindcss },
-      { default: vue },
-      { default: vueJsx },
-      { dts },
-      { default: VueRouter },
-    ] = await Promise.all([
-      import('@tailwindcss/vite'),
-      import('@vitejs/plugin-vue'),
-      import('@vitejs/plugin-vue-jsx'),
-      import('rolldown-plugin-dts'),
-      import('vue-router/vite'),
-    ])
+    const [{ default: tailwindcss }, { default: vize }, { dts }, { default: VueRouter }] =
+      await Promise.all([
+        import('@tailwindcss/vite'),
+        import('@vizejs/vite-plugin'),
+        import('rolldown-plugin-dts'),
+        import('vue-router/vite'),
+      ])
 
     return [
       VueRouter({
         root: import.meta.dirname,
         dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
       }),
-      vue(),
-      vueJsx(),
+      vize({ jsxMode: 'vdom' }),
       tailwindcss(),
       ...(command === 'build'
         ? [
@@ -101,7 +94,10 @@ export default defineConfig(({ command }) => ({
       },
       dev: { command: 'vp dev', cache: false },
       typecheck: {
-        command: ['vue-tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
+        command: [
+          'tsrs --runExternalCode --noEmit -p tsconfig.app.json',
+          'tsc -p tsconfig.node.json --noEmit',
+        ],
         dependsOn: [{ task: 'build', from: ['dependencies', 'peerDependencies'] }],
         cache: { output: [] },
       },

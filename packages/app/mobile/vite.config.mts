@@ -78,8 +78,7 @@ export default defineConfig(
             { exposeHostLibraries },
             { default: tailwindcss },
             { default: legacy },
-            { default: vue },
-            { default: vueJsx },
+            { default: vize },
             { default: MotionResolver },
             { NaiveUiResolver },
             { default: Components },
@@ -91,8 +90,7 @@ export default defineConfig(
             import('@delta-comic/client-utils/vite'),
             import('@tailwindcss/vite'),
             import('@vitejs/plugin-legacy'),
-            import('@vitejs/plugin-vue'),
-            import('@vitejs/plugin-vue-jsx'),
+            import('@vizejs/vite-plugin'),
             import('motion-v/resolver'),
             import('unplugin-vue-components/resolvers'),
             import('unplugin-vue-components/vite'),
@@ -111,11 +109,7 @@ export default defineConfig(
               dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
             }),
             vueDevTools(),
-            vue({
-              features: { vapor: false },
-              template: { compilerOptions: { isCustomElement: tag => tag.startsWith('media-') } },
-            }),
-            vueJsx(),
+            vize({ vapor: false, jsxMode: 'vdom', customElements: ['media-*'] }),
             Components({
               dirs: ['src/components', coreComponentsDir],
               dts: resolve(import.meta.dirname, 'components.d.ts'),
@@ -199,7 +193,7 @@ export default defineConfig(
           'tauri': { command: 'vp exec tauri', cache: false },
           'typecheck': {
             command: [
-              'vue-tsc -p tsconfig.app.json --noEmit',
+              'tsrs --runExternalCode --noEmit -p tsconfig.app.json',
               'tsc -p tsconfig.node.json --noEmit',
             ],
             dependsOn: [{ task: 'build', from: 'dependencies' }],

@@ -27,7 +27,6 @@
     "vite-plus": "catalog:"
   },
   "devDependencies": {
-    "@delta-comic/client-db": "workspace:",
-    "@vitejs/plugin-vue": "catalog:"
+    "@delta-comic/client-db": "workspace:"
   }
 }

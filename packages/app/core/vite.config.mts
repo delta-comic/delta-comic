@@ -4,12 +4,12 @@ export default defineConfig({
   run: {
     tasks: {
       build: {
-        command: 'vue-tsc -p tsconfig.json --noEmit',
+        command: 'tsrs --runExternalCode --noEmit -p tsconfig.json',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         cache: { output: [] },
       },
       typecheck: {
-        command: 'vue-tsc -p tsconfig.json --noEmit',
+        command: 'tsrs --runExternalCode --noEmit -p tsconfig.json',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         cache: { output: [] },
       },

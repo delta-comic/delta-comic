@@ -11,11 +11,13 @@
       "vue-component-type-helpers",
       "./typed-router.d.ts",
       "vite-plus/client",
+      "@vizejs/vite-plugin",
       "@delta-comic/client-utils"
     ]
   },
   "vueCompilerOptions": {
     "plugins": ["vue-router/volar/sfc-typed-router", "vue-router/volar/sfc-route-blocks"]
   },
+  "contentMappers": [{ "package": "vize", "extensions": [".vue"] }],
   "include": ["./src/**/*"]
 }
