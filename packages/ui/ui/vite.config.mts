@@ -48,7 +48,7 @@ export default defineConfig(({ command }) => ({
         ? [
             dts({
               tsconfig: resolve(import.meta.dirname, './tsconfig.build.json'),
-              tsc: { newContext: true, vue: true },
+              ...(process.platform === 'win32' ? { generator: 'oxc' } : { tsc: { vue: true } }),
               sourcemap: true,
             }),
           ]
