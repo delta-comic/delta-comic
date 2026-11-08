@@ -48,7 +48,7 @@ export default defineConfig(({ command }) => ({
         ? [
             dts({
               tsconfig: resolve(import.meta.dirname, './tsconfig.build.json'),
-              tsc: { newContext: true, vue: true },
+              tsc: { newContext: true, parallel: true, vue: true },
               sourcemap: true,
             }),
           ]
