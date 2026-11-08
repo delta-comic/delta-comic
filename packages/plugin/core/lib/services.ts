@@ -13,13 +13,7 @@ import type {
   User,
   PluginLocaleMessages,
 } from '@delta-comic/client'
-import {
-  UniComment,
-  UniContentPage,
-  UniItem,
-  UniResource,
-  UniUser,
-} from '@delta-comic/model'
+import { UniComment, UniContentPage, UniItem, UniResource, UniUser } from '@delta-comic/model'
 import { environmentRegistry } from '@delta-comic/ui/environment'
 import { Service, type Context } from 'cordis'
 import { shallowReactive } from 'vue'

@@ -43,11 +43,11 @@
   "devDependencies": {
     "@delta-comic/db": "workspace:",
     "@delta-comic/downloader": "workspace:",
+    "@delta-comic/manifest": "workspace:",
     "@delta-comic/model": "workspace:",
     "@delta-comic/plugin-vite": "workspace:",
     "@delta-comic/ui": "workspace:",
     "@delta-comic/utils": "workspace:",
-    "@delta-comic/manifest": "workspace:",
     "@swc/core": "catalog:",
     "vue": "catalog:"
   },

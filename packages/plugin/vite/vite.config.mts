@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite-plus'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 
 export default defineConfig({
   pack: { entry: './lib/index.ts', dts: true, sourcemap: true },
@@ -11,9 +11,5 @@ export default defineConfig({
       },
     },
   },
-  test: {
-    name: '@delta-comic/plugin-vite',
-    environment: 'node',
-    include: ['test/**/*.test.ts'],
-  },
-})
+  test: { name: '@delta-comic/plugin-vite', environment: 'node', include: ['test/**/*.test.ts'] },
+}).withVue({})

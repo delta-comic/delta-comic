@@ -1,7 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import { transform } from '@swc/core'
-import { defineConfig } from 'vite-plus'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 import type { Plugin } from 'vite-plus'
 
 const lowerDecorators = async (code: string, id: string) => {
@@ -24,15 +24,11 @@ export default defineConfig({
   plugins: [decoratorPlugin],
   resolve: {
     alias: {
-      '@delta-comic/db': fileURLToPath(
-        new URL('../../platform/db/lib/index.ts', import.meta.url),
-      ),
+      '@delta-comic/db': fileURLToPath(new URL('../../platform/db/lib/index.ts', import.meta.url)),
       '@delta-comic/downloader': fileURLToPath(
         new URL('../../platform/downloader/lib/index.ts', import.meta.url),
       ),
-      '@delta-comic/logger': fileURLToPath(
-        new URL('../logger/lib/index.ts', import.meta.url),
-      ),
+      '@delta-comic/logger': fileURLToPath(new URL('../logger/lib/index.ts', import.meta.url)),
       '@delta-comic/model': fileURLToPath(new URL('../model/lib/index.ts', import.meta.url)),
       '@delta-comic/manifest': fileURLToPath(
         new URL('../../plugin/manifest/lib/index.ts', import.meta.url),
@@ -77,4 +73,4 @@ export default defineConfig({
       },
     },
   },
-})
+}).withVue({})

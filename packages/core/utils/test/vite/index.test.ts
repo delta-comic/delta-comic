@@ -74,10 +74,9 @@ describe('host external libraries', () => {
 
   it('externalizes all ABI modules for third-party plugin bundles', async () => {
     const plugin = externalizeSharedRuntime()
-    const source = [
-      `import { ref } from 'vue'`,
-      `const database = import('@delta-comic/db')`,
-    ].join('\n')
+    const source = [`import { ref } from 'vue'`, `const database = import('@delta-comic/db')`].join(
+      '\n',
+    )
     const result = await plugin.transform.call(context, source, '\0virtual:plugin-entry')
 
     expect(result?.code).toContain('const ref = window.$$lib$$.Vue.ref')

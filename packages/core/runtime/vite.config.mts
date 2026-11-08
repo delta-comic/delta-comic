@@ -1,6 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig } from 'vite-plus'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 
 const root = fileURLToPath(new URL('.', import.meta.url))
 const output = fileURLToPath(new URL('./dist', import.meta.url))
@@ -84,4 +84,4 @@ export default defineConfig(({ mode }) => {
       target: process.env.TAURI_ENV_PLATFORM === 'windows' ? 'chrome105' : 'safari15',
     },
   }
-})
+}).withVue({})

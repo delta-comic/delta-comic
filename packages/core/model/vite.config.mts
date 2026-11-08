@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url'
 
 import { transform } from '@swc/core'
-import { defineConfig } from 'vite-plus'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 import type { Plugin } from 'vite-plus'
 
 const root = fileURLToPath(new URL('.', import.meta.url))
@@ -70,4 +70,4 @@ export default defineConfig({
     },
   },
   test: { environment: 'node', include: ['test/**/*.test.ts'] },
-})
+}).withVue({})

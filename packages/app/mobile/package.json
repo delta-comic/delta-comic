@@ -4,8 +4,8 @@
   "private": true,
   "description": "阿赖耶识",
   "dependencies": {
-    "@delta-comic/client": "workspace:",
     "@delta-comic/app-core": "workspace:",
+    "@delta-comic/client": "workspace:",
     "@delta-comic/db": "workspace:",
     "@delta-comic/http": "workspace:",
     "@delta-comic/logger": "workspace:",
@@ -43,7 +43,6 @@
     "lightningcss": "catalog:",
     "unplugin-vue-components": "catalog:",
     "vite-plugin-vue-devtools": "catalog:",
-    "vite-plugin-wasm": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
   "readme": "../../README.md"

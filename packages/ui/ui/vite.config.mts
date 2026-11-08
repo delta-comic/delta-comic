@@ -1,10 +1,10 @@
 import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
-import type { UserConfig } from 'vite-plus'
-import { defineConfig, lazyPlugins } from 'vite-plus'
+import { lazyPlugins } from 'vite-plus'
 
 const extendsDepends = await (async () => {
   try {
@@ -21,33 +21,33 @@ const isExternal = (id: string) =>
   externalDepends.some(dep => id === dep || id.startsWith(`${dep}/`))
 
 export default defineConfig(({ command }) => ({
-  plugins: lazyPlugins((async () => {
-    const [{ default: tailwindcss }, { default: vize }, { dts }, { default: VueRouter }] =
-      await Promise.all([
-        import('@tailwindcss/vite'),
-        import('@vizejs/vite-plugin'),
-        import('rolldown-plugin-dts'),
-        import('vue-router/vite'),
-      ])
+  plugins: lazyPlugins(async () => {
+    const [{ default: tailwindcss }, { dts }, { default: VueRouter }] = await Promise.all([
+      import('@tailwindcss/vite'),
+      import('rolldown-plugin-dts'),
+      import('vue-router/vite'),
+    ])
 
     return [
       VueRouter({
         root: import.meta.dirname,
         dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
       }),
-      vize({}),
+
       tailwindcss(),
       ...(command === 'build'
         ? [
             dts({
               tsconfig: resolve(import.meta.dirname, './tsconfig.build.json'),
-              ...(process.platform === 'win32' ? { generator: 'oxc' } : { tsc: { vue: true } }),
+              ...(process.platform === 'win32'
+                ? { generator: 'oxc' }
+                : { tsrs: { runExternalCode: true } }),
               sourcemap: true,
             }),
           ]
         : []),
     ]
-  }) as any),
+  }),
   resolve: {
     alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) },
     extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],
@@ -60,7 +60,6 @@ export default defineConfig(({ command }) => ({
   },
   base: '/',
   oxc: { exclude: [/\.js$/, /\.d\.[cm]?ts$/] },
-  server: {},
   // builds
   build: {
     lib: {
@@ -102,4 +101,4 @@ export default defineConfig(({ command }) => ({
       },
     },
   },
-})) as UserConfig
+})).withVue({})

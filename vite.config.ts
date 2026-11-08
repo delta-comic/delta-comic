@@ -1,4 +1,5 @@
-import { defaultClientConditions, defineConfig } from 'vite-plus'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
+import { defaultClientConditions } from 'vite-plus'
 import type { OxfmtConfig } from 'vite-plus/fmt'
 import type { OxlintConfig } from 'vite-plus/lint'
 
@@ -22,6 +23,7 @@ export default defineConfig({
       'dev:web': { command: 'vp run @delta-comic/mobile#dev:web', cache: false },
       // build
       'build:packages': { command: 'vp run -r build', cache: { output: [] } },
+      'build': { command: 'echo "no need"' },
       'release-cli': {
         command: 'vp run --filter @delta-comic/release-cli build',
         cache: { output: ['script/manager/dist/**'] },
@@ -85,4 +87,4 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
     projects: ['script/*', 'packages/*/*'],
   },
-})
+}).withVue({})

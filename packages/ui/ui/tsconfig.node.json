@@ -1,10 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "composite": true,
-    "noEmit": true,
-    "emitDeclarationOnly": false,
-    "isolatedDeclarations": true
-  },
+  "compilerOptions": { "composite": true, "noEmit": true, "emitDeclarationOnly": false },
   "include": ["./vite.config.mts", "./vite/**/*", "./tailwind/**/*", "./package.json"]
 }

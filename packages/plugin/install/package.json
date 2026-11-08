@@ -16,14 +16,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "scripts": {
-    "test": "vp test run"
-  },
   "dependencies": {
     "@delta-comic/logger": "workspace:",
+    "@delta-comic/manifest": "workspace:",
     "@delta-comic/model": "workspace:",
     "@delta-comic/plugin-artifact": "workspace:",
-    "@delta-comic/manifest": "workspace:",
     "@octokit/rest": "catalog:",
     "cordis": "catalog:",
     "es-module-lexer": "catalog:",

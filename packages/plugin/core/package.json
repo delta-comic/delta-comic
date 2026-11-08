@@ -40,9 +40,9 @@
   "dependencies": {
     "@delta-comic/client": "workspace:",
     "@delta-comic/logger": "workspace:",
+    "@delta-comic/manifest": "workspace:",
     "@delta-comic/plugin-install": "workspace:",
     "@delta-comic/plugin-vite": "workspace:",
-    "@delta-comic/manifest": "workspace:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-fs": "catalog:",
     "cordis": "catalog:",

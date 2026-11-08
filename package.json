@@ -19,6 +19,9 @@
     "url": "https://github.com/delta-comic/delta-comic.git"
   },
   "type": "module",
+  "dependencies": {
+    "@vizejs/vite-plugin": "catalog:"
+  },
   "devDependencies": {
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
@@ -36,7 +39,8 @@
     "typescript": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",
-    "vize": "catalog:"
+    "vize": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "badges": [
     {

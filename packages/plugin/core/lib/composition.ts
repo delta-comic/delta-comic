@@ -8,6 +8,7 @@ import {
   type DiagnosticRecord,
 } from '@delta-comic/client'
 import type { DB, PluginArchiveDB } from '@delta-comic/db'
+import { isPluginManifest, type PluginManifest } from '@delta-comic/manifest'
 import {
   DevServerPluginModuleReader,
   DevServerSourceResolver,
@@ -27,7 +28,6 @@ import {
   type PluginCatalog,
   type PluginInstallReporter,
 } from '@delta-comic/plugin-install'
-import { isPluginManifest, type PluginManifest } from '@delta-comic/manifest'
 import {
   Context,
   DisposableList,
