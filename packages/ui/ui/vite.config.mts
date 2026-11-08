@@ -15,12 +15,9 @@ const extendsDepends = await (async () => {
     return {}
   }
 })()
-const externalDepends = [
-  ...Object.keys(extendsDepends),
-  '@delta-comic/client-logger',
-  'highlight.js',
-]
+const externalDepends = [...Object.keys(extendsDepends), 'highlight.js']
 const isExternal = (id: string) =>
+  id.startsWith('@delta-comic/') ||
   externalDepends.some(dep => id === dep || id.startsWith(`${dep}/`))
 
 export default defineConfig(({ command }) => ({
@@ -51,7 +48,7 @@ export default defineConfig(({ command }) => ({
         ? [
             dts({
               tsconfig: resolve(import.meta.dirname, './tsconfig.build.json'),
-              tsc: { vue: true },
+              tsc: { newContext: true, vue: true },
               sourcemap: true,
             }),
           ]
