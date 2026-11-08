@@ -15,7 +15,11 @@ const extendsDepends = await (async () => {
     return {}
   }
 })()
-const externalDepends = [...Object.keys(extendsDepends), 'highlight.js']
+const externalDepends = [
+  ...Object.keys(extendsDepends),
+  '@delta-comic/client-logger',
+  'highlight.js',
+]
 const isExternal = (id: string) =>
   externalDepends.some(dep => id === dep || id.startsWith(`${dep}/`))
 
@@ -46,8 +50,8 @@ export default defineConfig(({ command }) => ({
       ...(command === 'build'
         ? [
             dts({
-              generator: 'oxc',
               tsconfig: resolve(import.meta.dirname, './tsconfig.build.json'),
+              tsc: { vue: true },
               sourcemap: true,
             }),
           ]
