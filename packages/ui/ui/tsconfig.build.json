@@ -1,1 +1,5 @@
-{ "extends": "./tsconfig.app.json", "include": ["env.d.ts", "lib/**/*", "./package.json"] }
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": { "composite": false, "incremental": false },
+  "include": ["env.d.ts", "lib/**/*", "./package.json"]
+}
