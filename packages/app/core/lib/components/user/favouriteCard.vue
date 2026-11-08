@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { FavouriteDB } from '@delta-comic/client-db'
-import { UniImage } from '@delta-comic/client-model'
-import { DcState } from '@delta-comic/client-ui'
+import { Icons } from '@delta-comic/app-core/icons'
+import { FavouriteDB } from '@delta-comic/db'
+import { UniImage } from '@delta-comic/model'
+import { DcState } from '@delta-comic/ui'
 import { isEmpty } from 'es-toolkit/compat'
 import { useI18n } from 'vue-i18n'
 
@@ -13,7 +13,7 @@ const emit = defineEmits<{ open: []; play: [] }>()
 const { t } = useI18n()
 
 const { state: favouriteItems } = FavouriteDB.useQueryItem<
-  Array<FavouriteDB.Item & { item: import('@delta-comic/client-model').UniItemRaw; key: string }>
+  Array<FavouriteDB.Item & { item: import('@delta-comic/model').UniItemRaw; key: string }>
 >(
   db =>
     db

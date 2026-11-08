@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { relative, resolve } from 'node:path'
 
-import type { PluginManifest } from '@delta-comic/client-model'
-import { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH } from '@delta-comic/client-plugin-install'
+import type { PluginManifest } from '@delta-comic/model'
+import { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH } from '@delta-comic/plugin-install'
 import type { Connect, ModuleNode, Plugin, ViteDevServer } from 'vite-plus'
 import { isCSSRequest, normalizePath } from 'vite-plus'
 

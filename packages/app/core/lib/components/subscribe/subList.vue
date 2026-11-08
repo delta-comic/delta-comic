@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { SubscribeDB } from '@delta-comic/client-db'
-import { usePluginStore } from '@delta-comic/client-plugin'
+import { SubscribeDB } from '@delta-comic/db'
+import { usePluginStore } from '@delta-comic/plugin'
 import { useInfiniteQuery } from '@pinia/colada'
 import { computed } from 'vue'
 

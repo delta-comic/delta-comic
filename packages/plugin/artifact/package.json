@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/client-plugin-artifact",
+  "name": "@delta-comic/plugin-artifact",
   "version": "3.0.0-next.24",
   "private": true,
   "description": "Cordis plugin artifact validation",

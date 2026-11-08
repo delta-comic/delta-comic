@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormConfigure, FormResult } from '@delta-comic/client-model'
+import type { FormConfigure, FormResult } from '@delta-comic/model'
 import { NAlert, NButton, NInput } from 'naive-ui'
 import { ref } from 'vue'
 

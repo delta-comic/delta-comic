@@ -1,6 +1,6 @@
 import type { DiagnosticRecorder } from '@delta-comic/both'
-import type { DB } from '@delta-comic/client-db'
-import type { Downloader } from '@delta-comic/client-downloader'
+import type { DB } from '@delta-comic/db'
+import type { Downloader } from '@delta-comic/downloader'
 
 import type { ClientDatabase, ClientUi } from './host.js'
 import type { ContentModel } from './model/content.js'

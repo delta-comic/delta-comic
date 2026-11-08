@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/client-utils",
+  "name": "@delta-comic/utils",
   "version": "3.0.0-next.24",
   "private": true,
   "description": "空阙虱楼",
@@ -34,7 +34,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@delta-comic/client-logger": "workspace:",
+    "@delta-comic/logger": "workspace:",
     "@tauri-apps/api": "catalog:",
     "acorn": "catalog:",
     "es-module-lexer": "catalog:",

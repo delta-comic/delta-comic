@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormDate } from '@delta-comic/client-model'
+import type { FormDate } from '@delta-comic/model'
 import { shallowRef } from 'vue'
 
 import { DcFormDate } from '@/index'

@@ -3,7 +3,7 @@ import type {
   FormDefaultValue,
   FormSingleConfigure,
   FormSingleResult,
-} from '@delta-comic/client-model'
+} from '@delta-comic/model'
 import { NFormItem } from 'naive-ui'
 
 import DcFormCheckbox from './DcFormCheckbox.vue'

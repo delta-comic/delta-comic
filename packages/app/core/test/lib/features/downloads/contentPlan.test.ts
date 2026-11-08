@@ -1,11 +1,11 @@
-import type { PluginArchiveDB } from '@delta-comic/client-db'
+import type { PluginArchiveDB } from '@delta-comic/db'
 import {
   type UniContentDownloadProvider,
   UniContentPage,
   type UniContentPageLike,
   type UniContentType,
   type UniDownloadPlan,
-} from '@delta-comic/client-model'
+} from '@delta-comic/model'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const database = vi.hoisted(() => {
@@ -32,8 +32,8 @@ const model = vi.hoisted(() => {
   return { contentPages: registry(), downloadProviders: registry() }
 })
 
-vi.mock('@delta-comic/client-db', () => ({ db: { selectFrom: database.selectFrom } }))
-vi.mock('@delta-comic/client-model', () => ({
+vi.mock('@delta-comic/db', () => ({ db: { selectFrom: database.selectFrom } }))
+vi.mock('@delta-comic/model', () => ({
   UniContentPage: { contentPages: model.contentPages, downloadProviders: model.downloadProviders },
 }))
 

@@ -1,5 +1,5 @@
-import type { ContentRefreshContext } from '@delta-comic/client-downloader'
-import type { UniContentDownloadProvider, UniContentPageLike } from '@delta-comic/client-model'
+import type { ContentRefreshContext } from '@delta-comic/downloader'
+import type { UniContentDownloadProvider, UniContentPageLike } from '@delta-comic/model'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({

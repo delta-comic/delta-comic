@@ -6,8 +6,8 @@
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5174",
-    "beforeDevCommand": "vp run --filter @delta-comic/client-desktop dev:web",
-    "beforeBuildCommand": "vp run --filter @delta-comic/client-desktop build:web"
+    "beforeDevCommand": "vp run --filter @delta-comic/desktop dev:web",
+    "beforeBuildCommand": "vp run --filter @delta-comic/desktop build:web"
   },
   "app": {
     "windows": [
@@ -25,13 +25,24 @@
     ],
     "security": {
       "csp": null,
-      "assetProtocol": { "enable": true, "scope": ["$APPLOCALDATA/plugin/**"] }
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "$APPLOCALDATA/plugin/**"
+        ]
+      }
     },
     "withGlobalTauri": false
   },
   "plugins": {
-    "shell": { "open": "^(https?://|file://|/|[A-Za-z]:[\\\\/]).*" },
-    "sql": { "preload": ["sqlite:app.db"] }
+    "shell": {
+      "open": "^(https?://|file://|/|[A-Za-z]:[\\\\/]).*"
+    },
+    "sql": {
+      "preload": [
+        "sqlite:app.db"
+      ]
+    }
   },
   "bundle": {
     "active": true,

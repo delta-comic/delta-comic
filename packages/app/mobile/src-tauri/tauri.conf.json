@@ -6,8 +6,8 @@
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
-    "beforeDevCommand": "vp run --filter @delta-comic/client-mobile dev:web",
-    "beforeBuildCommand": "vp run --filter @delta-comic/client-mobile build:web"
+    "beforeDevCommand": "vp run --filter @delta-comic/mobile dev:web",
+    "beforeBuildCommand": "vp run --filter @delta-comic/mobile build:web"
   },
   "app": {
     "windows": [
@@ -25,13 +25,24 @@
     ],
     "security": {
       "csp": null,
-      "assetProtocol": { "enable": true, "scope": ["$APPLOCALDATA/plugin/**"] }
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "$APPLOCALDATA/plugin/**"
+        ]
+      }
     },
     "withGlobalTauri": false
   },
   "plugins": {
-    "shell": { "open": "^(https?://|file://|/|[A-Za-z]:[\\\\/]).*" },
-    "sql": { "preload": ["sqlite:app.db"] }
+    "shell": {
+      "open": "^(https?://|file://|/|[A-Za-z]:[\\\\/]).*"
+    },
+    "sql": {
+      "preload": [
+        "sqlite:app.db"
+      ]
+    }
   },
   "bundle": {
     "active": true,
@@ -47,6 +58,9 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "android": { "autoIncrementVersionCode": false, "minSdkVersion": 26 }
+    "android": {
+      "autoIncrementVersionCode": false,
+      "minSdkVersion": 26
+    }
   }
 }

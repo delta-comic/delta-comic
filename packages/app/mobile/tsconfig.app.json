@@ -1,19 +1,31 @@
 {
-  "extends": ["./tsconfig.json", "../../../tsconfig.base.json"],
+  "extends": [
+    "./tsconfig.json",
+    "../../../tsconfig.base.json"
+  ],
   "compilerOptions": {
     "composite": true,
-    "lib": ["ESNext", "DOM"],
-    "paths": { "@/*": ["./src/*"] },
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
     "rootDir": "../../../../",
     "types": [
       "./components.d.ts",
-      "@delta-comic/client-app-core/components",
+      "@delta-comic/app-core/components",
       "vue-component-type-helpers",
       "./typed-router.d.ts",
       "vite-plus/client",
       "@vizejs/vite-plugin",
-      "@delta-comic/client-utils"
+      "@delta-comic/utils"
     ]
   },
-  "include": ["./src/**/*"]
+  "include": [
+    "./src/**/*"
+  ]
 }

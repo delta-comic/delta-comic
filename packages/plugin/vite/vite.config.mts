@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   test: {
-    name: '@delta-comic/client-plugin-vite',
+    name: '@delta-comic/plugin-vite',
     environment: 'node',
     include: ['test/**/*.test.ts'],
   },

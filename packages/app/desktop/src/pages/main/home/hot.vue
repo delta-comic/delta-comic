@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { pluginContext, usePluginStore } from '@delta-comic/client-plugin'
+import { Icons } from '@delta-comic/app-core/icons'
+import { pluginContext, usePluginStore } from '@delta-comic/plugin'
 import { isEmpty } from 'es-toolkit/compat'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

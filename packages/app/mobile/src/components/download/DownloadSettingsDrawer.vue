@@ -3,7 +3,7 @@ import type {
   Destination,
   DownloaderCapabilities,
   DownloaderSettings,
-} from '@delta-comic/client-app-core/features/downloads/downloaderClient'
+} from '@delta-comic/app-core/features/downloads/downloaderClient'
 import {
   NButton,
   NDrawer,

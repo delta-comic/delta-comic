@@ -1,1 +1,1 @@
-export { deltaComic, createDevPlugin } from '@delta-comic/client-plugin-vite'
+export { deltaComic, createDevPlugin } from '@delta-comic/plugin-vite'

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import PluginIcon from '@delta-comic/client-app-core/components/plugin/PluginIcon.vue'
-import { usePluginInstall } from '@delta-comic/client-app-core/features/pluginInstall/usePluginInstall'
-import { translateText } from '@delta-comic/client-app-core/i18n/index'
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { logger } from '@delta-comic/client-logger'
+import PluginIcon from '@delta-comic/app-core/components/plugin/PluginIcon.vue'
+import { usePluginInstall } from '@delta-comic/app-core/features/pluginInstall/usePluginInstall'
+import { translateText } from '@delta-comic/app-core/i18n/index'
+import { Icons } from '@delta-comic/app-core/icons'
+import { logger } from '@delta-comic/logger'
 import {
   setPluginConfig,
   pluginFiberStates,
@@ -12,7 +12,7 @@ import {
   updatePluginByName,
   type PluginInstallation,
   usePluginStore,
-} from '@delta-comic/client-plugin'
+} from '@delta-comic/plugin'
 import type { DropdownOption } from 'naive-ui'
 import semver from 'semver'
 import { computed, shallowReactive, shallowRef } from 'vue'

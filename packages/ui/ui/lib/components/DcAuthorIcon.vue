@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UniImage, type UniImageRaw, UniItem, type UniResourceRaw } from '@delta-comic/client-model'
+import { UniImage, type UniImageRaw, UniItem, type UniResourceRaw } from '@delta-comic/model'
 import { isString } from 'es-toolkit'
 import { computed } from 'vue'
 

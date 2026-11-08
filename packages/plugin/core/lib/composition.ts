@@ -7,7 +7,7 @@ import {
   type ClientUiRegistrars,
   type DiagnosticRecord,
 } from '@delta-comic/client'
-import type { DB, PluginArchiveDB } from '@delta-comic/client-db'
+import type { DB, PluginArchiveDB } from '@delta-comic/db'
 import {
   DevServerPluginModuleReader,
   DevServerSourceResolver,
@@ -26,7 +26,7 @@ import {
   type LoadedPluginModule,
   type PluginCatalog,
   type PluginInstallReporter,
-} from '@delta-comic/client-plugin-install'
+} from '@delta-comic/plugin-install'
 import { isPluginManifest, type PluginManifest } from '@delta-comic/manifest'
 import {
   Context,

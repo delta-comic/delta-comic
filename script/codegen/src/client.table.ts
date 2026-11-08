@@ -2,7 +2,7 @@ import { Type } from 'typebox'
 
 import { defineTable, jsonColumn } from './schema'
 
-const model = '@delta-comic/client-model'
+const model = '@delta-comic/model'
 
 const itemStoreTable = defineTable(
   'item_store',

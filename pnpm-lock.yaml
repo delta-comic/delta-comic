@@ -438,25 +438,25 @@ importers:
       '@delta-comic/client':
         specifier: 'workspace:'
         version: link:../../core/sdk
-      '@delta-comic/client-db':
+      '@delta-comic/db':
         specifier: 'workspace:'
         version: link:../../platform/db
-      '@delta-comic/client-downloader':
+      '@delta-comic/downloader':
         specifier: 'workspace:'
         version: link:../../platform/downloader
-      '@delta-comic/client-logger':
+      '@delta-comic/logger':
         specifier: 'workspace:'
         version: link:../../core/logger
-      '@delta-comic/client-model':
+      '@delta-comic/model':
         specifier: 'workspace:'
         version: link:../../core/model
-      '@delta-comic/client-plugin':
+      '@delta-comic/plugin':
         specifier: 'workspace:'
         version: link:../../plugin/core
-      '@delta-comic/client-ui':
+      '@delta-comic/ui':
         specifier: 'workspace:'
         version: link:../../ui/ui
-      '@delta-comic/client-utils':
+      '@delta-comic/utils':
         specifier: 'workspace:'
         version: link:../../core/utils
       '@pinia/colada':
@@ -496,7 +496,7 @@ importers:
         specifier: 'catalog:'
         version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
     devDependencies:
-      '@delta-comic/client-runtime':
+      '@delta-comic/runtime':
         specifier: 'workspace:'
         version: link:../../core/runtime
       '@types/semver':
@@ -508,28 +508,28 @@ importers:
       '@delta-comic/client':
         specifier: 'workspace:'
         version: link:../../core/sdk
-      '@delta-comic/client-app-core':
+      '@delta-comic/app-core':
         specifier: 'workspace:'
         version: link:../core
-      '@delta-comic/client-db':
+      '@delta-comic/db':
         specifier: 'workspace:'
         version: link:../../platform/db
-      '@delta-comic/client-http':
+      '@delta-comic/http':
         specifier: 'workspace:'
         version: link:../../platform/http
-      '@delta-comic/client-logger':
+      '@delta-comic/logger':
         specifier: 'workspace:'
         version: link:../../core/logger
-      '@delta-comic/client-model':
+      '@delta-comic/model':
         specifier: 'workspace:'
         version: link:../../core/model
-      '@delta-comic/client-plugin':
+      '@delta-comic/plugin':
         specifier: 'workspace:'
         version: link:../../plugin/core
-      '@delta-comic/client-ui':
+      '@delta-comic/ui':
         specifier: 'workspace:'
         version: link:../../ui/ui
-      '@delta-comic/client-utils':
+      '@delta-comic/utils':
         specifier: 'workspace:'
         version: link:../../core/utils
       '@octokit/rest':
@@ -584,7 +584,7 @@ importers:
         specifier: 'catalog:'
         version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
     devDependencies:
-      '@delta-comic/client-runtime':
+      '@delta-comic/runtime':
         specifier: 'workspace:'
         version: link:../../core/runtime
       '@swc/core':
@@ -629,28 +629,28 @@ importers:
       '@delta-comic/client':
         specifier: 'workspace:'
         version: link:../../core/sdk
-      '@delta-comic/client-app-core':
+      '@delta-comic/app-core':
         specifier: 'workspace:'
         version: link:../core
-      '@delta-comic/client-db':
+      '@delta-comic/db':
         specifier: 'workspace:'
         version: link:../../platform/db
-      '@delta-comic/client-http':
+      '@delta-comic/http':
         specifier: 'workspace:'
         version: link:../../platform/http
-      '@delta-comic/client-logger':
+      '@delta-comic/logger':
         specifier: 'workspace:'
         version: link:../../core/logger
-      '@delta-comic/client-model':
+      '@delta-comic/model':
         specifier: 'workspace:'
         version: link:../../core/model
-      '@delta-comic/client-plugin':
+      '@delta-comic/plugin':
         specifier: 'workspace:'
         version: link:../../plugin/core
-      '@delta-comic/client-ui':
+      '@delta-comic/ui':
         specifier: 'workspace:'
         version: link:../../ui/ui
-      '@delta-comic/client-utils':
+      '@delta-comic/utils':
         specifier: 'workspace:'
         version: link:../../core/utils
       '@octokit/rest':
@@ -705,7 +705,7 @@ importers:
         specifier: 'catalog:'
         version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
     devDependencies:
-      '@delta-comic/client-runtime':
+      '@delta-comic/runtime':
         specifier: 'workspace:'
         version: link:../../core/runtime
       '@swc/core':
@@ -750,10 +750,6 @@ importers:
       cordis:
         specifier: 'catalog:'
         version: 4.0.0-rc.12
-    devDependencies:
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
   packages/core/logger:
     dependencies:
@@ -763,17 +759,10 @@ importers:
       taurpc:
         specifier: 'catalog:'
         version: 2.0.0(@tauri-apps/api@2.12.4)
-    devDependencies:
-      typescript:
-        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
   packages/core/model:
     dependencies:
-      '@delta-comic/client-logger':
+      '@delta-comic/logger':
         specifier: 'workspace:'
         version: link:../logger
       '@delta-comic/manifest':
@@ -789,12 +778,6 @@ importers:
       '@swc/core':
         specifier: 'catalog:'
         version: 1.16.22
-      typescript:
-        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
   packages/core/runtime:
     dependencies:
@@ -816,13 +799,6 @@ importers:
       vue-router:
         specifier: 'catalog:'
         version: 5.4.0(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(esbuild@0.28.2)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.10(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-    devDependencies:
-      typescript:
-        specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-        version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
 
   packages/core/sdk:
     dependencies:
@@ -839,22 +815,22 @@ importers:
         specifier: 'catalog:'
         version: 1.5.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.5.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(esbuild@0.28.2)(happy-dom@21.0.4)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1)
     devDependencies:
-      '@delta-comic/client-db':
+      '@delta-comic/db':
         specifier: 'workspace:'
         version: link:../../platform/db
-      '@delta-comic/client-downloader':
+      '@delta-comic/downloader':
         specifier: 'workspace:'
         version: link:../../platform/downloader
-      '@delta-comic/client-model':
+      '@delta-comic/model':
         specifier: 'workspace:'
         version: link:../model
-      '@delta-comic/client-plugin-vite':
+      '@delta-comic/plugin-vite':
         specifier: 'workspace:'
         version: link:../../plugin/vite
-      '@delta-comic/client-ui':
+      '@delta-comic/ui':
         specifier: 'workspace:'
         version: link:../../ui/ui
-      '@delta-comic/client-utils':
+      '@delta-comic/utils':
         specifier: 'workspace:'
         version: link:../utils
       '@delta-comic/manifest':
@@ -869,7 +845,7 @@ importers:
 
   packages/core/utils:
     dependencies:
-      '@delta-comic/client-logger':
+      '@delta-comic/logger':
         specifier: 'workspace:'
         version: link:../logger
       '@tauri-apps/api':
@@ -905,10 +881,10 @@ importers:
 
   packages/platform/db:
     dependencies:
-      '@delta-comic/client-logger':
+      '@delta-comic/logger':
         specifier: 'workspace:'
         version: link:../../core/logger
-      '@delta-comic/client-model':
+      '@delta-comic/model':
         specifier: 'workspace:'
         version: link:../../core/model
       '@delta-comic/manifest':
@@ -980,25 +956,25 @@ importers:
       '@delta-comic/client':
         specifier: 'workspace:'
         version: link:../../core/sdk
-      '@delta-comic/client-db':
+      '@delta-comic/db':
         specifier: 'workspace:'
         version: link:../../platform/db
-      '@delta-comic/client-logger':
+      '@delta-comic/logger':
         specifier: 'workspace:'
         version: link:../../core/logger
-      '@delta-comic/client-model':
+      '@delta-comic/model':
         specifier: 'workspace:'
         version: link:../../core/model
-      '@delta-comic/client-plugin-install':
+      '@delta-comic/plugin-install':
         specifier: 'workspace:'
         version: link:../install
-      '@delta-comic/client-plugin-vite':
+      '@delta-comic/plugin-vite':
         specifier: 'workspace:'
         version: link:../vite
-      '@delta-comic/client-ui':
+      '@delta-comic/ui':
         specifier: 'workspace:'
         version: link:../../ui/ui
-      '@delta-comic/client-utils':
+      '@delta-comic/utils':
         specifier: 'workspace:'
         version: link:../../core/utils
       '@delta-comic/manifest':
@@ -1031,13 +1007,13 @@ importers:
 
   packages/plugin/install:
     dependencies:
-      '@delta-comic/client-logger':
+      '@delta-comic/logger':
         specifier: 'workspace:'
         version: link:../../core/logger
-      '@delta-comic/client-model':
+      '@delta-comic/model':
         specifier: 'workspace:'
         version: link:../../core/model
-      '@delta-comic/client-plugin-artifact':
+      '@delta-comic/plugin-artifact':
         specifier: 'workspace:'
         version: link:../artifact
       '@delta-comic/manifest':
@@ -1059,7 +1035,7 @@ importers:
         specifier: 'catalog:'
         version: 7.8.6
     devDependencies:
-      '@delta-comic/client-db':
+      '@delta-comic/db':
         specifier: 'workspace:'
         version: link:../../platform/db
 
@@ -1078,32 +1054,32 @@ importers:
 
   packages/plugin/vite:
     dependencies:
-      '@delta-comic/client-model':
+      '@delta-comic/model':
         specifier: 'workspace:'
         version: link:../../core/model
-      '@delta-comic/client-plugin-install':
+      '@delta-comic/plugin-install':
         specifier: 'workspace:'
         version: link:../install
-      '@delta-comic/client-utils':
+      '@delta-comic/utils':
         specifier: 'workspace:'
         version: link:../../core/utils
       jszip:
         specifier: 'catalog:'
         version: 3.10.2
     devDependencies:
-      '@delta-comic/client-db':
+      '@delta-comic/db':
         specifier: 'workspace:'
         version: link:../../platform/db
 
   packages/ui/ui:
     dependencies:
-      '@delta-comic/client-logger':
+      '@delta-comic/logger':
         specifier: 'workspace:'
         version: link:../../core/logger
-      '@delta-comic/client-model':
+      '@delta-comic/model':
         specifier: 'workspace:'
         version: link:../../core/model
-      '@delta-comic/client-utils':
+      '@delta-comic/utils':
         specifier: 'workspace:'
         version: link:../../core/utils
       '@pinia/colada':

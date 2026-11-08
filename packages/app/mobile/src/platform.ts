@@ -2,8 +2,8 @@ import {
   createAppHostProfile,
   detectWebHostPlatform,
   type AppHostProfile,
-} from '@delta-comic/client-app-core/host/profile'
-import { getTauriPluginRoot } from '@delta-comic/client-plugin'
+} from '@delta-comic/app-core/host/profile'
+import { getTauriPluginRoot } from '@delta-comic/plugin'
 import { isTauri } from '@tauri-apps/api/core'
 
 import { createTauRPCProxy } from './bindings'
@@ -41,7 +41,7 @@ export const initializePlatform = async (): Promise<SafeAreaInsets | false> => {
     return false
   }
   const [{ CORSFetch }, { M3 }] = await Promise.all([
-    import('@delta-comic/client-http'),
+    import('@delta-comic/http'),
     import('tauri-plugin-m3'),
   ])
   await CORSFetch.init({

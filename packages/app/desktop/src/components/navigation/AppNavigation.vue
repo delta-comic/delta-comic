@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { appNavigation } from '@delta-comic/client-app-core/clientHost'
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { useAppStore } from '@delta-comic/client-app-core/stores/app'
+import { appNavigation } from '@delta-comic/app-core/clientHost'
+import { Icons } from '@delta-comic/app-core/icons'
+import { useAppStore } from '@delta-comic/app-core/stores/app'
 import { computed, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 

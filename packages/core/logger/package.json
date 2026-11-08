@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/client-logger",
+  "name": "@delta-comic/logger",
   "version": "3.0.0-next.19",
   "private": true,
   "files": [
@@ -18,9 +18,5 @@
   "dependencies": {
     "dayjs": "catalog:",
     "taurpc": "catalog:"
-  },
-  "devDependencies": {
-    "typescript": "catalog:",
-    "vite-plus": "catalog:"
   }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormNumber, FormString, FormSwitch } from '@delta-comic/client-model'
+import type { FormNumber, FormString, FormSwitch } from '@delta-comic/model'
 import { NForm } from 'naive-ui'
 import { reactive } from 'vue'
 

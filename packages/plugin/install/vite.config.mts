@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   test: {
-    name: '@delta-comic/client-plugin-install',
+    name: '@delta-comic/plugin-install',
     environment: 'node',
     include: ['test/**/*.test.ts'],
   },

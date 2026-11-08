@@ -5,8 +5,6 @@ import type { OxlintConfig } from 'vite-plus/lint'
 import fmt from './.oxfmtrc.json' with { type: 'json' }
 import lint from './.oxlintrc.json' with { type: 'json' }
 
-const lintConfig = lint as OxlintConfig
-
 export default defineConfig({
   resolve: { conditions: ['delta-comic-workspace', ...defaultClientConditions] },
   staged: {
@@ -14,14 +12,14 @@ export default defineConfig({
     '*.{ts,tsx,mts,js,jsx,mjs,vue,html,md,json,yaml,toml}': 'vp exec cspell --no-must-find-files',
   },
   fmt: fmt as OxfmtConfig,
-  lint: lintConfig,
+  lint: lint as OxlintConfig,
   run: {
     cache: { tasks: true, scripts: false },
     tasks: {
       // dev
-      'dev': { command: 'vp run @delta-comic/client-desktop#dev', cache: false },
-      'dev:android': { command: 'vp run @delta-comic/client-mobile#dev', cache: false },
-      'dev:web': { command: 'vp run @delta-comic/client-mobile#dev:web', cache: false },
+      'dev': { command: 'vp run @delta-comic/desktop#dev', cache: false },
+      'dev:android': { command: 'vp run @delta-comic/mobile#dev', cache: false },
+      'dev:web': { command: 'vp run @delta-comic/mobile#dev:web', cache: false },
       // build
       'build:packages': { command: 'vp run -r build', cache: { output: [] } },
       'release-cli': {

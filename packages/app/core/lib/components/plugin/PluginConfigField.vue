@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormSingleConfigure } from '@delta-comic/client-model'
+import type { FormSingleConfigure } from '@delta-comic/model'
 import { computed } from 'vue'
 
 const props = defineProps<{ config: FormSingleConfigure; modelValue: any }>()

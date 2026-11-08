@@ -22,8 +22,5 @@
   },
   "dependencies": {
     "cordis": "catalog:"
-  },
-  "devDependencies": {
-    "vite-plus": "catalog:"
   }
 }

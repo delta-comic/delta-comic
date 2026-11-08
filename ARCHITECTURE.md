@@ -17,7 +17,7 @@
 | `packages/plugin/install` | 来源、安装记录、ZIP、模块读取与开发服务器 |
 | `packages/plugin/artifact` | 客户端资源与模块图完整性校验 |
 | `packages/plugin/vite` | 插件构建、ZIP 输出、CSS 与 HMR 协议 |
-| `packages/core/runtime` | `@delta-comic/client-runtime` UMD 宿主模块桥接 |
+| `packages/core/runtime` | `@delta-comic/runtime` UMD 宿主模块桥接 |
 | `packages/core/model` | 内容模型 |
 | `packages/core/utils` | 客户端工具 |
 | `packages/platform/db` | 客户端 SQLite/Web 数据库和生成表类型 |
@@ -29,7 +29,7 @@
 | `packages/core/logger` | 双端日志核心 |
 | `packages/plugin/manifest` | 客户端 manifest v2 schema 与完整性检查 |
 
-客户端公共模块由各端实际消费。`@delta-comic/client-runtime` 为外部插件提供宿主桥接。
+客户端公共模块由各端实际消费。`@delta-comic/runtime` 为外部插件提供宿主桥接。
 
 ## Manifest 与产物
 

@@ -2,8 +2,8 @@ import {
   createAppHostProfile,
   detectWebHostPlatform,
   type AppHostProfile,
-} from '@delta-comic/client-app-core/host/profile'
-import { getTauriPluginRoot } from '@delta-comic/client-plugin'
+} from '@delta-comic/app-core/host/profile'
+import { getTauriPluginRoot } from '@delta-comic/plugin'
 import { isTauri } from '@tauri-apps/api/core'
 
 import { createTauRPCProxy } from './bindings'
@@ -37,7 +37,7 @@ export const initializePlatform = async (): Promise<SafeAreaInsets | false> => {
     window.$api.M3 = { getInsets: async () => false, setBarColor: async () => true }
     return false
   }
-  const { CORSFetch } = await import('@delta-comic/client-http')
+  const { CORSFetch } = await import('@delta-comic/http')
   await CORSFetch.init({
     request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } },
   })

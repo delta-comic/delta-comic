@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/client-downloader",
+  "name": "@delta-comic/downloader",
   "version": "3.0.0-next.24",
   "private": true,
   "description": "Delta Comic high-performance native download manager",

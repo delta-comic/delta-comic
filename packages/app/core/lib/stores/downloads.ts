@@ -1,6 +1,6 @@
-import { logger } from '@delta-comic/client-logger'
-import { UniContentPage } from '@delta-comic/client-model'
-import { usePluginStore } from '@delta-comic/client-plugin'
+import { logger } from '@delta-comic/logger'
+import { UniContentPage } from '@delta-comic/model'
+import { usePluginStore } from '@delta-comic/plugin'
 import { defineStore } from 'pinia'
 import { computed, shallowRef, watch } from 'vue'
 

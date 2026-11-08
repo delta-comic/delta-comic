@@ -1,4 +1,4 @@
-import { Struct } from '@delta-comic/client-model'
+import { Struct } from '@delta-comic/model'
 import {
   defineMutation,
   useMutation,

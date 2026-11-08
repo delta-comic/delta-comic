@@ -19,8 +19,8 @@ import {
   UniItem,
   UniResource,
   UniUser,
-} from '@delta-comic/client-model'
-import { environmentRegistry } from '@delta-comic/client-ui/environment'
+} from '@delta-comic/model'
+import { environmentRegistry } from '@delta-comic/ui/environment'
 import { Service, type Context } from 'cordis'
 import { shallowReactive } from 'vue'
 

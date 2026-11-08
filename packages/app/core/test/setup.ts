@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 
 // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
-await import('@delta-comic/client-runtime/host-libraries.umd.js')
+await import('@delta-comic/runtime/host-libraries.umd.js')
 
 vi.mock('vue', () => window.$$lib$$.Vue)
 vi.mock('naive-ui', () => window.$$lib$$.Naive)

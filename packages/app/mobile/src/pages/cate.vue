@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { usePluginStore } from '@delta-comic/client-plugin'
-import { SharedFunction } from '@delta-comic/client-utils'
+import { usePluginStore } from '@delta-comic/plugin'
+import { SharedFunction } from '@delta-comic/utils'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

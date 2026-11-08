@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormNumber } from '@delta-comic/client-model'
+import type { FormNumber } from '@delta-comic/model'
 import { shallowRef } from 'vue'
 
 import { DcFormNumber } from '@/index'

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { ResolvedHotSearchSection } from '@delta-comic/client-app-core/features/search/useSearchLanding'
-import type { Content } from '@delta-comic/client-plugin'
+import type { ResolvedHotSearchSection } from '@delta-comic/app-core/features/search/useSearchLanding'
+import type { Content } from '@delta-comic/plugin'
 import { useI18n } from 'vue-i18n'
 
 defineProps<{ loading: boolean; sections: readonly ResolvedHotSearchSection[] }>()

@@ -1,4 +1,4 @@
-import type { FormSingleConfigure } from '@delta-comic/client-model'
+import type { FormSingleConfigure } from '@delta-comic/model'
 
 export type ConfigDescription = Record<
   string,

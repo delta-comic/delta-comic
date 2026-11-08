@@ -1,1 +1,1 @@
-export * from '@delta-comic/client-plugin-vite'
+export * from '@delta-comic/plugin-vite'

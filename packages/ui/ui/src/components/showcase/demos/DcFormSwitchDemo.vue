@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormSwitch } from '@delta-comic/client-model'
+import type { FormSwitch } from '@delta-comic/model'
 import { shallowRef } from 'vue'
 
 import { DcFormSwitch } from '@/index'
