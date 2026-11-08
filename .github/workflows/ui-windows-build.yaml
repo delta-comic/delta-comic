@@ -1,0 +1,65 @@
+name: UI Windows 构建
+
+on:
+  push:
+    paths:
+      - 'packages/ui/ui/**'
+      - 'packages/core/logger/**'
+      - 'packages/core/model/**'
+      - 'packages/core/utils/**'
+      - 'packages/plugin/manifest/**'
+      - '.github/workflows/ui-windows-build.yaml'
+      - '.node-version'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tsconfig*.json'
+  pull_request:
+    paths:
+      - 'packages/ui/ui/**'
+      - 'packages/core/logger/**'
+      - 'packages/core/model/**'
+      - 'packages/core/utils/**'
+      - 'packages/plugin/manifest/**'
+      - '.github/workflows/ui-windows-build.yaml'
+      - '.node-version'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'tsconfig*.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-windows/${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: UI Windows 构建
+    runs-on: windows-latest
+    env:
+      HUSKY: 0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1.22.0
+        with:
+          node-version-file: .node-version
+          cache: true
+          node-manager: true
+          run-install: true
+          version-file: package.json
+
+      - name: Build UI package
+        run: vp run --no-cache --filter @delta-comic/client-ui build
+
+      - name: Show Vite+ task details
+        if: always()
+        run: vp run --last-details
