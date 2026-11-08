@@ -38,15 +38,10 @@ concurrency:
 
 jobs:
   build:
-    name: UI Windows 构建 (${{ matrix.disable || 'full' }})
+    name: UI Windows 构建
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        disable: ['', tailwind, router, jsx, dts]
     env:
       HUSKY: 0
-      DELTA_UI_DISABLE_PLUGINS: ${{ matrix.disable }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
