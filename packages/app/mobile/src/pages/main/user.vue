@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ActionCard } from '@delta-comic/app-core/components/user/actionCard.vue'
+import ActionCard from '@delta-comic/app-core/components/user/actionCard.vue'
 import { Icons } from '@delta-comic/app-core/icons'
 import { useAppStore } from '@delta-comic/app-core/stores/app'
 import { DBUtils, FavouriteDB, RecentDB, SubscribeDB } from '@delta-comic/db'
