@@ -2,10 +2,8 @@ import { i18n } from '@delta-comic/app-core/i18n/index'
 import { usePluginStore } from '@delta-comic/plugin'
 import { DcCell } from '@delta-comic/ui'
 import { SharedFunction } from '@delta-comic/utils'
-import type { Component } from 'vue'
-
+import { h, type Component } from 'vue'
 export type ThinkList = ({ text: string; value: string } | Component)[]
-
 export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise<ThinkList> => {
   const store = usePluginStore()
   const matched = [...store.content].flatMap(([plugin, content]) => {
@@ -19,10 +17,10 @@ export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise
     )
   })
   return Promise.resolve(
-    matched.map(({ aim, barcode, plugin }) => (
-      <DcCell
-        title={barcode.getTipText(aim)}
-        onClick={() => {
+    matched.map(({ aim, barcode, plugin }) =>
+      h(DcCell, {
+        title: barcode.getTipText(aim),
+        onClick: () => {
           if (!signal.aborted)
             void SharedFunction.call(
               'routeToSearch',
@@ -30,11 +28,11 @@ export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise
               [plugin, aim.search.method],
               aim.search.sort,
             )
-        }}
-        label={i18n.global.t('search.sourceLabel', { source: store.displayName(plugin) })}
-        value={searchText}
-        class='w-full dc-interactive'
-      />
-    )),
+        },
+        label: i18n.global.t('search.sourceLabel', { source: store.displayName(plugin) }),
+        value: searchText,
+        class: 'w-full dc-interactive',
+      }),
+    ),
   )
 }

@@ -33,7 +33,7 @@ describe('host external libraries', () => {
   })
 
   it('exposes only host-owned ESM modules from the bridge', () => {
-    const plugin = exposeHostLibraries({ entry: '/repo/src/main.tsx' })
+    const plugin = exposeHostLibraries({ entry: '/repo/src/main.ts' })
     const resolvedId = plugin.resolveId!(virtualModuleId)
     const hostModule = plugin.load!(resolvedId!)
 
@@ -48,13 +48,13 @@ describe('host external libraries', () => {
   })
 
   it('rewrites static and dynamic imports to the prebuilt UMD namespace', async () => {
-    const plugin = exposeHostLibraries({ entry: '/repo/src/main.tsx' })
+    const plugin = exposeHostLibraries({ entry: '/repo/src/main.ts' })
     const source = [
       `import { createApp as boot } from 'vue'`,
       `import * as Router from 'vue-router'`,
       `const experimental = import('vue-router/experimental')`,
     ].join('\n')
-    const result = await plugin.transform.call(context, source, '/repo/src/main.tsx?direct')
+    const result = await plugin.transform.call(context, source, '/repo/src/main.ts?direct')
 
     expect(result?.code).toContain(`import ${JSON.stringify(virtualModuleId)}`)
     expect(result?.code).toContain('const boot = window.$$lib$$.Vue.createApp')
@@ -64,7 +64,7 @@ describe('host external libraries', () => {
   })
 
   it('does not externalize host ESM modules in the application', async () => {
-    const plugin = exposeHostLibraries({ entry: '/repo/src/main.tsx' })
+    const plugin = exposeHostLibraries({ entry: '/repo/src/main.ts' })
     const source = `const database = import('@delta-comic/db')`
     const result = await plugin.transform.call(context, source, '/repo/src/feature.ts')
 
@@ -159,8 +159,8 @@ describe('host external libraries', () => {
   })
 
   it('normalizes Windows entry paths', async () => {
-    const plugin = exposeHostLibraries({ entry: String.raw`C:\repo\src\main.tsx` })
-    const result = await plugin.transform.call(context, '', 'C:/repo/src/main.tsx')
+    const plugin = exposeHostLibraries({ entry: String.raw`C:\repo\src\main.ts` })
+    const result = await plugin.transform.call(context, '', 'C:/repo/src/main.ts')
 
     expect(result?.code).toBe(`import ${JSON.stringify(virtualModuleId)}\n`)
   })
