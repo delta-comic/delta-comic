@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { HotMainListBlock } from '@delta-comic/app-core/components/home/HotMainListBlock.vue'
+import HotMainListBlock from '@delta-comic/app-core/components/home/HotMainListBlock.vue'
 import { Icons } from '@delta-comic/app-core/icons'
 import { pluginContext, usePluginStore } from '@delta-comic/plugin'
 import { isEmpty } from 'es-toolkit/compat'

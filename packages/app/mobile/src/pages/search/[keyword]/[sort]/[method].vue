@@ -12,7 +12,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import noneSearchTextIcon from '@/assets/images/none-search-text-icon.webp'
-import { SearchBar } from '@/components/search/searchBar.vue'
+import SearchBar from '@/components/search/searchBar.vue'
 import { searchSourceKey } from '@/components/search/source'
 
 const route = useRoute<'/search/[keyword]/[sort]/[method]'>()
