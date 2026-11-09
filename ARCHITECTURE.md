@@ -108,7 +108,7 @@ export default [example] satisfies readonly Plugin.Function[]
 
 ### 启动与安全模式
 
-Web 入口为 `src/main.tsx`，Tauri 入口为 `src-tauri/src/main.rs`，窗口加载同一前端。应用内
+Web 入口为 `src/main.ts`，Tauri 入口为 `src-tauri/src/main.rs`，窗口加载同一前端。应用内
 插件页面展示持久启用状态、当前 Fiber 状态与错误来源，并提供安装、启停、配置、更新和卸载。
 
 模块加载失败或可管理插件 Fiber 进入 `FAILED` 时，本轮加载停止，并单次卸载全部可管理插件。

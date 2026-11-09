@@ -29,21 +29,18 @@ import {
 
 import '@/index.css'
 import { createPinia, setActivePinia } from 'pinia'
-import { createApp, defineComponent, vaporInteropPlugin, watch } from 'vue'
+import { createApp, defineComponent, h, vaporInteropPlugin, watch } from 'vue'
 import { DataLoaderPlugin } from 'vue-router/experimental'
 
 import AppSetup from './AppSetup.vue'
 import { appLogger } from './logger'
 import { initializePlatform, openExternal, resolveAppHostProfile } from './platform'
 import { router } from './router'
-
 configureUiI18n((key: UiMessageKey, params?: UiMessageParams) =>
   i18n.global.t(`ui.${key}`, params as Record<string, number | string>),
 )
-
 document.addEventListener('contextmenu', e => e.preventDefault())
 document.documentElement.lang = 'zh-CN'
-
 configureCoreHost({
   navigation: router,
   platform: {
@@ -53,10 +50,8 @@ configureCoreHost({
   },
   ui: { warning: message => window.$message.warning(message), createDownloadMessage },
 })
-
 const appHostProfile = await resolveAppHostProfile()
 appLogger.scoped('platform').info('app host profile resolved', appHostProfile)
-
 await initializePlatform().then(v => {
   appLogger.scoped('platform').info('platform initialized', { nativeInsets: v || undefined })
   for (const direction of ['Top', 'Bottom', 'Left', 'Right'] as const)
@@ -65,18 +60,15 @@ await initializePlatform().then(v => {
       `${(v || {})[`adjustedInset${direction}`] ?? 0}px`,
     )
 })
-
 const pinia = createPinia()
 setActivePinia(pinia)
 await prepareAppPluginHost()
-
 const app = createApp(
   defineComponent(() => {
     const themeColor = Color('#fb7299').hex()
     const themeColorDark = Color(themeColor).darken(0.2).hex()
     const config = useConfig()
     const naiveLocale = { dateLocale: dateZhCN, locale: naiveZhCN }
-
     const themeOverrides = reactiveComputed<GlobalThemeOverrides>(() => ({
       common: {
         primaryColor: themeColor,
@@ -95,48 +87,44 @@ const app = createApp(
       },
       { immediate: true },
     )
-    return () => (
-      <NConfigProvider
-        locale={naiveLocale.locale}
-        dateLocale={naiveLocale.dateLocale}
-        abstract
-        theme={config.isDark ? darkTheme : lightTheme}
-        themeOverrides={themeOverrides}
-      >
-        <DcConfigProvider locale='zh-CN' theme={config.isDark ? 'dark' : 'light'}>
-          <NGlobalStyle />
-          <NLoadingBarProvider>
-            <NDialogProvider>
-              <div class='h-full overflow-hidden'>
-                <NMessageProvider max={5}>
-                  <AppSetup />
-                </NMessageProvider>
-              </div>
-            </NDialogProvider>
-          </NLoadingBarProvider>
-        </DcConfigProvider>
-      </NConfigProvider>
-    )
+    return () =>
+      h(
+        NConfigProvider,
+        {
+          locale: naiveLocale.locale,
+          dateLocale: naiveLocale.dateLocale,
+          abstract: true,
+          theme: config.isDark ? darkTheme : lightTheme,
+          themeOverrides: themeOverrides,
+        },
+        h(DcConfigProvider, { locale: 'zh-CN', theme: config.isDark ? 'dark' : 'light' }, [
+          h(NGlobalStyle, undefined),
+          h(
+            NLoadingBarProvider,
+            undefined,
+            h(
+              NDialogProvider,
+              undefined,
+              h(
+                'div',
+                { class: 'h-full overflow-hidden' },
+                h(NMessageProvider, { max: 5 }, h(AppSetup, undefined)),
+              ),
+            ),
+          ),
+        ]),
+      )
   }),
 )
-
 app.use(vaporInteropPlugin)
-
 app.use(DataLoaderPlugin, { router })
-
 app.use(pinia)
-
 app.use(PiniaColada)
-
 app.use(i18n)
-
 app.use(router)
-
 const meta = document.createElement('meta')
 meta.name = 'naive-ui-style'
 document.head.appendChild(meta)
-
 app.mount('#app')
 appLogger.info('frontend application mounted')
-
 window.addEventListener('beforeunload', () => void disposeAppPluginHost())

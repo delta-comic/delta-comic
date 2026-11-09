@@ -69,7 +69,7 @@ export default defineConfig(() => ({
         }),
         vueDevTools(),
         tailwindcss(),
-        exposeHostLibraries({ entry: fileURLToPath(new URL('./src/main.tsx', import.meta.url)) }),
+        exposeHostLibraries({ entry: fileURLToPath(new URL('./src/main.ts', import.meta.url)) }),
       ]
     }),
   ],

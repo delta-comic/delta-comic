@@ -7,7 +7,7 @@
     ".": "./lib/index.ts",
     "./tailwind.css": "./tailwind.css",
     "./*": "./lib/*.ts",
-    "./icons": "./lib/icons.tsx",
+    "./icons": "./lib/icons.ts",
     "./components/*": "./lib/components/*"
   },
   "dependencies": {
