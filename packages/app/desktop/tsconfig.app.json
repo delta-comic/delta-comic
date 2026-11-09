@@ -6,8 +6,6 @@
     "paths": { "@/*": ["./src/*"] },
     "rootDir": "../../../../",
     "types": [
-      "./components.d.ts",
-      "@delta-comic/app-core/components",
       "vue-component-type-helpers",
       "./typed-router.d.ts",
       "vite-plus/client",

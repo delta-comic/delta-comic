@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Icons } from '@delta-comic/app-core/icons'
 import { SubscribeDB } from '@delta-comic/db'
-import { usePreventBack, DcState } from '@delta-comic/ui'
-import { motion } from 'motion-v'
+import { usePreventBack, DcState, DcAuthorIcon } from '@delta-comic/ui'
+import { motion, AnimatePresence } from 'motion-v'
 import { NButton, NIcon, NTabPane, NTabs } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

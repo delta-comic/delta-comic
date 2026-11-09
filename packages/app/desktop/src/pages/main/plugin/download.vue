@@ -3,7 +3,7 @@ import { usePluginInstall } from '@delta-comic/app-core/features/pluginInstall/u
 import { logger } from '@delta-comic/logger'
 import { installPlugin } from '@delta-comic/plugin'
 import { toReactive, useFileDialog } from '@vueuse/core'
-import { useDialog, useMessage } from 'naive-ui'
+import { useDialog, useMessage, NScrollbar, NInput, NButton } from 'naive-ui'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

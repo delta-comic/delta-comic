@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { DcImage } from '@delta-comic/ui'
+import { NIcon } from 'naive-ui'
+
 import { appNavigation } from '@delta-comic/app-core/clientHost'
 import { Icons } from '@delta-comic/app-core/icons'
 import { useAppStore } from '@delta-comic/app-core/stores/app'

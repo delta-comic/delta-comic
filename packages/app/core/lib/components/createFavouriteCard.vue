@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { DcCellGroup } from '@delta-comic/ui'
+
 import { FavouriteDB } from '@delta-comic/db'
 import {
   NButton,

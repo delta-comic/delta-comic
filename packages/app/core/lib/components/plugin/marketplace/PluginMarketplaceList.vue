@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import PluginMarketplaceCard from './PluginMarketplaceCard.vue'
+
 import type { PluginMarketplaceItem } from '@delta-comic/app-core/features/pluginMarketplace/model'
 import { NAlert, NButton, NEmpty, NSpin } from 'naive-ui'
 import { useI18n } from 'vue-i18n'

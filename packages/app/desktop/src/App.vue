@@ -8,7 +8,7 @@ import { useIntervalFn } from '@vueuse/core'
 import { Mutex } from 'es-toolkit'
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, RouterView } from 'vue-router'
 
 import { readClipboardText, writeClipboardText } from './platform'
 

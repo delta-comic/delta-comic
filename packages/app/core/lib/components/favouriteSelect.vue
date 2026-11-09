@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import CreateFavouriteCard from './createFavouriteCard.vue'
+
 import { Icons } from '@delta-comic/app-core/icons'
 import { db, DBUtils, FavouriteDB } from '@delta-comic/db'
 import { logger } from '@delta-comic/logger'
 import type { UniItem } from '@delta-comic/model'
-import { DcToggleIcon, DcState } from '@delta-comic/ui'
-import { useMessage } from 'naive-ui'
+import { DcToggleIcon, DcState, DcCellGroup, DcVar, DcCell } from '@delta-comic/ui'
+import { useMessage, NDrawer, NIcon, NCheckbox, NButton } from 'naive-ui'
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 

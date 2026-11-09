@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { NIcon } from 'naive-ui'
+import { DcContent } from '@delta-comic/ui'
+
 import { type UniContentType_, UniItem } from '@delta-comic/model'
 import type { Content } from '@delta-comic/plugin'
 import { useQuery } from '@pinia/colada'

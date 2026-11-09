@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import CreateFavouriteCard from '../createFavouriteCard.vue'
+
 import { Icons } from '@delta-comic/app-core/icons'
 import { DBUtils, FavouriteDB } from '@delta-comic/db'
-import { DcState } from '@delta-comic/ui'
-import { useMessage } from 'naive-ui'
+import { DcState, DcCellGroup, DcCell } from '@delta-comic/ui'
+import { useMessage, NDrawer, NIcon, NCheckbox, NButton } from 'naive-ui'
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 

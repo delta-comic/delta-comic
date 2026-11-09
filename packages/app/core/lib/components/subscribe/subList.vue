@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { DcWaterfall } from '@delta-comic/ui'
+
 import { SubscribeDB } from '@delta-comic/db'
 import { usePluginStore } from '@delta-comic/plugin'
 import { useInfiniteQuery } from '@pinia/colada'

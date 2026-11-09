@@ -1,6 +1,5 @@
-import { readFileSync } from 'node:fs'
 import { copyFile, mkdir } from 'node:fs/promises'
-import { relative, resolve } from 'node:path'
+import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 import { transform } from '@swc/core'
@@ -10,26 +9,6 @@ import { browserslistToTargets } from 'lightningcss'
 import { defaultClientConditions, lazyPlugins } from 'vite-plus'
 
 const host = process.env.TAURI_DEV_HOST
-const corePackageLib = fileURLToPath(new URL('.', import.meta.resolve('@delta-comic/app-core')))
-const coreComponentsDir = resolve(corePackageLib, 'components')
-const coreComponentsDeclaration = fileURLToPath(
-  import.meta.resolve('@delta-comic/app-core/components'),
-)
-const coreComponentImports = new Map(
-  [
-    ...readFileSync(coreComponentsDeclaration, 'utf8').matchAll(
-      /^\s+(\w+): typeof import\('\.\/lib\/components\/(.+)'\)\['default'\]/gm,
-    ),
-  ].map(match => [match[1], `@delta-comic/app-core/components/${match[2]}`]),
-)
-const coreComponentResolver = {
-  type: 'component' as const,
-  resolve: (name: string) => coreComponentImports.get(name),
-}
-const coreComponentImportPathTransform = (path: string) =>
-  path.startsWith(`${coreComponentsDir}/`)
-    ? `@delta-comic/app-core/components/${relative(coreComponentsDir, path)}`
-    : path
 const runtimeFile = fileURLToPath(import.meta.resolve('@delta-comic/runtime/host-libraries.umd.js'))
 const appRuntimeFile = resolve(import.meta.dirname, 'public/runtime/host-libraries.umd.js')
 // Release CI builds the workspace libraries and the shared runtime once in the `plan` job and
@@ -72,22 +51,14 @@ export default defineConfig(() => ({
         { exposeHostLibraries },
         { default: tailwindcss },
         { default: legacy },
-        { default: MotionResolver },
-        { NaiveUiResolver },
-        { default: Components },
         { default: vueDevTools },
         { default: VueRouter },
-        { DeltaComicUiResolver },
       ] = await Promise.all([
         import('@delta-comic/utils/vite'),
         import('@tailwindcss/vite'),
         import('@vitejs/plugin-legacy'),
-        import('motion-v/resolver'),
-        import('unplugin-vue-components/resolvers'),
-        import('unplugin-vue-components/vite'),
         import('vite-plugin-vue-devtools'),
         import('vue-router/vite'),
-        import('@delta-comic/ui/vite'),
       ])
 
       return [
@@ -97,18 +68,6 @@ export default defineConfig(() => ({
           dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
         }),
         vueDevTools(),
-        Components({
-          dirs: ['src/components', coreComponentsDir],
-          dts: resolve(import.meta.dirname, 'components.d.ts'),
-          importPathTransform: coreComponentImportPathTransform,
-          resolvers: [
-            coreComponentResolver,
-            MotionResolver(),
-            NaiveUiResolver(),
-            DeltaComicUiResolver(),
-          ],
-          dtsTsx: false,
-        }),
         tailwindcss(),
         exposeHostLibraries({ entry: fileURLToPath(new URL('./src/main.tsx', import.meta.url)) }),
       ]
@@ -164,7 +123,7 @@ export default defineConfig(() => ({
         dependsOn: skipLibBuild
           ? []
           : [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build'],
-        cache: { output: ['dist/**', 'components.d.ts', 'typed-router.d.ts'] },
+        cache: { output: ['dist/**', 'typed-router.d.ts'] },
       },
       'dev': { command: 'tauri android dev', cache: false },
       'dev:web': {

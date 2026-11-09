@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { NScrollbar, NIcon } from 'naive-ui'
+import { HotMainListBlock } from '@delta-comic/app-core/components/home/HotMainListBlock.vue'
+
 import { Icons } from '@delta-comic/app-core/icons'
 import { pluginContext, usePluginStore } from '@delta-comic/plugin'
 import { isEmpty } from 'es-toolkit/compat'

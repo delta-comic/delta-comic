@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NButton } from 'naive-ui'
+
 import { useI18n } from 'vue-i18n'
 
 defineProps<{ items: readonly string[] }>()

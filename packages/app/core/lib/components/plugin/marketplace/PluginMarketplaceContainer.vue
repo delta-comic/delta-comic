@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import PluginMarketplaceFilters from './PluginMarketplaceFilters.vue'
+import PluginMarketplaceList from './PluginMarketplaceList.vue'
+import PluginMarketplaceDetails from './PluginMarketplaceDetails.vue'
+
 import { usePluginInstall } from '@delta-comic/app-core/features/pluginInstall/usePluginInstall'
 import {
   pluginMarketplaceInstallInput,
@@ -7,7 +11,7 @@ import {
 } from '@delta-comic/app-core/features/pluginMarketplace/model'
 import { usePluginMarketplace } from '@delta-comic/app-core/features/pluginMarketplace/usePluginMarketplace'
 import { installPlugin, updatePluginByName } from '@delta-comic/plugin'
-import { useDialog, useMessage } from 'naive-ui'
+import { useDialog, useMessage, NScrollbar } from 'naive-ui'
 import { computed, onMounted, shallowReactive, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 

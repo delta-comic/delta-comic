@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { DcCell, DcFormSwitch, DcFormString, DcFormNumber, DcVar, DcFormDate, DcFormDateRange, DcFormPairs } from '@delta-comic/ui'
+import { NPopselect, NModal } from 'naive-ui'
+
 import type { FormSingleConfigure } from '@delta-comic/model'
 import { computed } from 'vue'
 

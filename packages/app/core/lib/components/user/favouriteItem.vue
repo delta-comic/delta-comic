@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NIcon } from 'naive-ui'
+
 import { Icons } from '@delta-comic/app-core/icons'
 import { type UniEp, UniItem, type UniItemRaw } from '@delta-comic/model'
 import { computed } from 'vue'

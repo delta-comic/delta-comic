@@ -77,19 +77,12 @@ export default defineConfig(({ command }) => ({
       },
     },
   },
-  pack: {
-    entry: './vite/index.ts',
-    outDir: 'dist-vite',
-    dts: { generator: 'oxc', oxc: {}, tsconfig: './tsconfig.node.json' },
-    sourcemap: true,
-    deps: { neverBundle: ['unplugin-vue-components'] },
-  },
   run: {
     tasks: {
       build: {
-        command: ['vp build', 'vp pack'],
+        command: ['vp build'],
         dependsOn: [{ task: 'build', from: ['dependencies', 'peerDependencies'] }],
-        cache: { output: ['dist/**', 'dist-vite/**'] },
+        cache: { output: ['dist/**'] },
       },
       dev: { command: 'vp dev', cache: false },
       typecheck: {

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { DcVar, DcCell } from '@delta-comic/ui'
+import { ActionCard } from '@delta-comic/app-core/components/user/actionCard.vue'
+
 import { Icons } from '@delta-comic/app-core/icons'
 import { useAppStore } from '@delta-comic/app-core/stores/app'
 import { DBUtils, FavouriteDB, RecentDB, SubscribeDB } from '@delta-comic/db'
@@ -6,8 +9,8 @@ import { UniUser } from '@delta-comic/model'
 import { useConfig, usePluginStore } from '@delta-comic/plugin'
 import { createReusableTemplate } from '@vueuse/core'
 import { isEmpty } from 'es-toolkit/compat'
-import { motion } from 'motion-v'
-import { NCollapseTransition } from 'naive-ui'
+import { motion, AnimatePresence, Motion } from 'motion-v'
+import { NCollapseTransition, NButton, NIcon, NDivider } from 'naive-ui'
 import { computed, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

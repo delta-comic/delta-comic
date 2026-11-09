@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { RouterView } from 'vue-router'
+
 import FavouriteOverview from '@/components/user/favourite/FavouriteOverview.vue'
 </script>
 

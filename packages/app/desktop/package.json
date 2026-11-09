@@ -41,7 +41,6 @@
     "@vizejs/vite-plugin": "catalog:",
     "browserslist": "catalog:",
     "lightningcss": "catalog:",
-    "unplugin-vue-components": "catalog:",
     "vite-plugin-vue-devtools": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },

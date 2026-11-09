@@ -34,7 +34,6 @@ release
 .codex/config.toml
 
 target
-dist-vite
 packages/app/*/public/runtime/
 *.tsbuildinfo
 packages/*/android/.tauri

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NIcon } from 'naive-ui'
+
 import { appNavigation } from '@delta-comic/app-core/clientHost'
 import { Icons } from '@delta-comic/app-core/icons'
 import { computed, type Component } from 'vue'

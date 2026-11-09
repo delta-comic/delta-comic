@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { usePluginStore, type User } from '@delta-comic/plugin'
-import { NGi, NGrid } from 'naive-ui'
+import { NGi, NGrid, NIcon, NStatistic } from 'naive-ui'
 import { toRef } from 'vue'
 import { useRouter } from 'vue-router'
 

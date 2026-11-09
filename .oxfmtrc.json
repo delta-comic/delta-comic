@@ -1,7 +1,6 @@
 {
   "ignorePatterns": [
     ".agents/**",
-    "components.d.ts",
     "typed-router.d.ts",
     "bindings.ts",
     "**/permissions/**",

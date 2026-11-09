@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { DcWaterfall } from '@delta-comic/ui'
+import { NIcon } from 'naive-ui'
+
 import { Icons } from '@delta-comic/app-core/icons'
 import { isShowMainHomeNavBar } from '@delta-comic/app-core/symbol'
 import { UniItem } from '@delta-comic/model'

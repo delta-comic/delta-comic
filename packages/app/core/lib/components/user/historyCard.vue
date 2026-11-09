@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { DcVar } from '@delta-comic/ui'
+import { NIcon } from 'naive-ui'
+
 import { Icons } from '@delta-comic/app-core/icons'
 import { createDateString } from '@delta-comic/app-core/utils/date'
 import type { HistoryDB, ItemStoreDB } from '@delta-comic/db'

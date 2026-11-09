@@ -14,6 +14,7 @@ import {
   usePluginStore,
 } from '@delta-comic/plugin'
 import type { DropdownOption } from 'naive-ui'
+import { NScrollbar, NAlert, NEmpty, NButton, NCard, NDropdown, NIcon, NModal, NInput } from 'naive-ui'
 import semver from 'semver'
 import { computed, shallowReactive, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'

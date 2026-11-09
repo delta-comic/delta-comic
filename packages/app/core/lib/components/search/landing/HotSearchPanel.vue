@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NSkeleton, NEmpty } from 'naive-ui'
+
 import type { ResolvedHotSearchSection } from '@delta-comic/app-core/features/search/useSearchLanding'
 import type { Content } from '@delta-comic/plugin'
 import { useI18n } from 'vue-i18n'

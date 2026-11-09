@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NPageHeader } from 'naive-ui'
+
 import { usePluginStore } from '@delta-comic/plugin'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

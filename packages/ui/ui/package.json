@@ -15,7 +15,6 @@
   },
   "files": [
     "dist",
-    "dist-vite",
     "tailwind"
   ],
   "type": "module",
@@ -26,10 +25,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./vite": {
-      "types": "./dist-vite/index.d.mts",
-      "import": "./dist-vite/index.mjs"
     },
     "./tailwind": {
       "types": "./tailwind/index.ts",
@@ -65,7 +60,6 @@
     "browserslist": "catalog:",
     "lightningcss": "catalog:",
     "rolldown-plugin-dts": "catalog:",
-    "unplugin-vue-components": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
   "peerDependencies": {

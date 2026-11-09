@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { DcAuthorIcon, DcImage } from '@delta-comic/ui'
+
 import { Icons } from '@delta-comic/app-core/icons'
 import { createDateString } from '@delta-comic/app-core/utils/date'
 import type { UniItem } from '@delta-comic/model'

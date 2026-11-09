@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NPageHeader, NScrollbar } from 'naive-ui'
+
 import { UniUser } from '@delta-comic/model'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

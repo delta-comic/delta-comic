@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { SearchBar } from '@/components/search/searchBar.vue'
+import { NPopselect, NButton, NIcon, NSwitch, NResult } from 'naive-ui'
+import { DcImage, DcList } from '@delta-comic/ui'
+
 import { Icons } from '@delta-comic/app-core/icons'
 import { UniItem } from '@delta-comic/model'
 import { Core, useConfig, usePluginStore, type Content } from '@delta-comic/plugin'

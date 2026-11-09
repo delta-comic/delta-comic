@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { NPageHeader, NPopselect, NButton } from 'naive-ui'
+import { DcVar, DcList } from '@delta-comic/ui'
+
 import { SourcedValue, UniItem } from '@delta-comic/model'
 import { usePluginStore } from '@delta-comic/plugin'
 import { useQuery } from '@pinia/colada'
