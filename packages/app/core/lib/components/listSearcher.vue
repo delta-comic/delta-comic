@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { usePreventBack } from '@delta-comic/client-ui'
+import { Icons } from '@delta-comic/app-core/icons'
+import { usePreventBack, DcCell } from '@delta-comic/ui'
 import { isEmpty, uniq } from 'es-toolkit/compat'
-import { motion } from 'motion-v'
+import { motion, AnimatePresence, Motion } from 'motion-v'
 import { NIcon } from 'naive-ui'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'

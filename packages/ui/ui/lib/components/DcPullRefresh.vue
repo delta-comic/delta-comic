@@ -9,7 +9,7 @@ import DcLoading from './DcLoading.vue'
 const $props = withDefaults(
   defineProps<
     {
-      disabled: boolean
+      disabled?: boolean
       refresher: () => Promise<any>
       pullDistance?: number
       contentClass?: any

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UniImage, UniResource } from '@delta-comic/client-model'
+import { UniImage, UniResource } from '@delta-comic/model'
 import { NIcon } from 'naive-ui'
 import type { Component } from 'vue'
 

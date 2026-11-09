@@ -1,12 +1,12 @@
-import { db } from '@delta-comic/client-db'
-import type { ContentRefreshContext, EnqueuePlanInput } from '@delta-comic/client-downloader'
+import { db } from '@delta-comic/db'
+import type { ContentRefreshContext, EnqueuePlanInput } from '@delta-comic/downloader'
 import {
   type UniContentDownloadProvider,
   UniContentPage,
   type UniContentPageLike,
   type UniContentType,
   type UniDownloadPlan,
-} from '@delta-comic/client-model'
+} from '@delta-comic/model'
 
 const textEncoder = new TextEncoder()
 

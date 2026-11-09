@@ -1,4 +1,4 @@
-import type { LogEntry, LoggerTransport } from '@delta-comic/client-logger'
+import type { LogEntry, LoggerTransport } from '@delta-comic/logger'
 
 import { createTauRPCProxy } from './bindings'
 

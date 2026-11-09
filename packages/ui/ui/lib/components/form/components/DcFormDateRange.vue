@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormDateRange, FormSingleResult } from '@delta-comic/client-model'
+import type { FormDateRange, FormSingleResult } from '@delta-comic/model'
 import { NDatePicker } from 'naive-ui'
 
 defineProps<{ config: FormDateRange }>()

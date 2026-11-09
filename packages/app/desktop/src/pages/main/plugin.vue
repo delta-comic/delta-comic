@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { logger } from '@delta-comic/client-logger'
-import { loadEnabledPlugins, pluginSafeMode } from '@delta-comic/client-plugin'
-import { type MenuOption, NIcon } from 'naive-ui'
+import { Icons } from '@delta-comic/app-core/icons'
+import { logger } from '@delta-comic/logger'
+import { loadEnabledPlugins, pluginSafeMode } from '@delta-comic/plugin'
+import { type MenuOption, NIcon, NMenu, NButton } from 'naive-ui'
 import type { Component } from 'vue'
 import { computed, h, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRouter, RouterView } from 'vue-router'
 
 const pluginPageLogger = logger.scoped('app:plugin-page')
 definePage({ redirect: { name: '/main/plugin/list' } })

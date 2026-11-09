@@ -1,4 +1,4 @@
-import type { PluginAuthGateway, User } from '@delta-comic/client-plugin'
+import type { PluginAuthGateway, User } from '@delta-comic/plugin'
 
 export const raceAbort = <T>(operation: Promise<T>, signal: AbortSignal) => {
   if (signal.aborted) return Promise.reject<T>(signal.reason)

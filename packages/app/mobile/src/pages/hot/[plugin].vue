@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { SourcedValue, UniItem } from '@delta-comic/client-model'
-import { usePluginStore } from '@delta-comic/client-plugin'
+import { SourcedValue, UniItem } from '@delta-comic/model'
+import { usePluginStore } from '@delta-comic/plugin'
+import { DcVar, DcList } from '@delta-comic/ui'
 import { useQuery } from '@pinia/colada'
+import { NPageHeader, NPopselect, NButton } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'

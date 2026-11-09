@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 
-import { defineConfig } from 'vite-plus'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 
 const root = fileURLToPath(new URL('.', import.meta.url))
 
@@ -10,16 +10,18 @@ export default defineConfig({
   run: {
     tasks: {
       build: {
-        command: 'vp pack',
+        command: ['vp pack'],
         dependsOn: [{ task: 'build', from: ['dependencies', 'peerDependencies'] }],
         cache: { output: ['dist/**'] },
       },
       typecheck: {
-        command: ['tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
-        dependsOn: [{ task: 'build', from: ['dependencies', 'peerDependencies'] }],
+        command: [
+          'tsrs --fast --runExternalCode -p tsconfig.app.json --noEmit',
+          'tsrs --fast --runExternalCode -p tsconfig.node.json --noEmit',
+        ],
         cache: { output: [] },
       },
     },
   },
   test: { environment: 'node', include: ['test/**/*.test.ts'] },
-})
+}).withVue({})

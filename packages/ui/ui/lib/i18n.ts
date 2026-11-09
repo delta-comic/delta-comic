@@ -30,9 +30,9 @@ const fallbackMessages: Record<UiMessageKey, string> = {
 
 let resolver: UiMessageResolver | undefined
 
-export const configureUiI18n = (nextResolver?: UiMessageResolver) => {
+export const configureUiI18n = (nextResolver?: UiMessageResolver): void => {
   resolver = nextResolver
 }
 
-export const translateUi = (key: UiMessageKey, params?: UiMessageParams) =>
+export const translateUi = (key: UiMessageKey, params?: UiMessageParams): string =>
   resolver?.(key, params) || fallbackMessages[key]

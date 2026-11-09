@@ -1,4 +1,4 @@
-import { sha256Integrity } from '@delta-comic/client-plugin-artifact'
+import { sha256Integrity } from '@delta-comic/plugin-artifact'
 import JSZip from 'jszip'
 import { describe, expect, it } from 'vitest'
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormNumber, FormSingleResult } from '@delta-comic/client-model'
+import type { FormNumber, FormSingleResult } from '@delta-comic/model'
 import { NInputNumber } from 'naive-ui'
 
 defineProps<{ config: FormNumber }>()

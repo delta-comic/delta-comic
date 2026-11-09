@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/client-plugin",
+  "name": "@delta-comic/plugin",
   "version": "3.0.0-next.24",
   "private": true,
   "description": "空阙虱楼",
@@ -39,10 +39,10 @@
   },
   "dependencies": {
     "@delta-comic/client": "workspace:",
-    "@delta-comic/client-logger": "workspace:",
-    "@delta-comic/client-plugin-install": "workspace:",
-    "@delta-comic/client-plugin-vite": "workspace:",
+    "@delta-comic/logger": "workspace:",
     "@delta-comic/manifest": "workspace:",
+    "@delta-comic/plugin-install": "workspace:",
+    "@delta-comic/plugin-vite": "workspace:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-fs": "catalog:",
     "cordis": "catalog:",
@@ -51,14 +51,11 @@
     "lz-string": "catalog:",
     "taurpc": "catalog:"
   },
-  "devDependencies": {
-    "typescript": "catalog:"
-  },
   "peerDependencies": {
-    "@delta-comic/client-db": "workspace:",
-    "@delta-comic/client-model": "workspace:",
-    "@delta-comic/client-ui": "workspace:",
-    "@delta-comic/client-utils": "workspace:",
+    "@delta-comic/db": "workspace:",
+    "@delta-comic/model": "workspace:",
+    "@delta-comic/ui": "workspace:",
+    "@delta-comic/utils": "workspace:",
     "vue": "catalog:"
   }
 }

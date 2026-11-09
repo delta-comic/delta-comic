@@ -31,8 +31,8 @@ export class EnvironmentRegistry {
     key: TKey,
     component: Raw<TComponent>,
     condition: EnvironmentRegistration<TKey, TComponent>['condition'] = () => true,
-    owner = this.owners.at(-1),
-  ) {
+    owner: string | undefined = this.owners.at(-1),
+  ): () => void {
     const entry: OwnedEnvironmentRegistration = {
       owner,
       registration: { component, condition, id: Symbol(`environment:${key}`), key },
@@ -44,7 +44,7 @@ export class EnvironmentRegistry {
     }
   }
 
-  public forKey<TKey extends EnvironmentKey>(key: TKey) {
+  public forKey<TKey extends EnvironmentKey>(key: TKey): EnvironmentRegistration<TKey>[] {
     return this.entries
       .map(entry => entry.registration)
       .filter(
@@ -52,7 +52,7 @@ export class EnvironmentRegistry {
       )
   }
 
-  public removeOwner(owner: string) {
+  public removeOwner(owner: string): void {
     for (let index = this.entries.length - 1; index >= 0; index--) {
       if (this.entries[index].owner === owner) this.entries.splice(index, 1)
     }
@@ -68,7 +68,7 @@ export class EnvironmentRegistry {
   }
 }
 
-export const environmentRegistry = new EnvironmentRegistry()
+export const environmentRegistry: EnvironmentRegistry = new EnvironmentRegistry()
 
 export const addEnvironment = <
   TKey extends EnvironmentKey,
@@ -78,4 +78,4 @@ export const addEnvironment = <
   component: Raw<TComponent>,
   condition?: EnvironmentRegistration<TKey, TComponent>['condition'],
   owner?: string,
-) => environmentRegistry.register(key, component, condition, owner)
+): (() => void) => environmentRegistry.register(key, component, condition, owner)

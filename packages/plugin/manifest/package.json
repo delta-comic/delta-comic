@@ -23,7 +23,6 @@
     "typebox": "catalog:"
   },
   "devDependencies": {
-    "@types/semver": "catalog:",
-    "vite-plus": "catalog:"
+    "@types/semver": "catalog:"
   }
 }

@@ -1,16 +1,19 @@
-import { defineConfig } from 'vite-plus'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 
 export default defineConfig({
   pack: { entry: './lib/index.ts', dts: true, sourcemap: true },
   run: {
     tasks: {
       build: { command: 'vp pack', cache: { output: ['dist/**'] } },
-      typecheck: { command: 'tsc -p tsconfig.json --noEmit', cache: { output: [] } },
+      typecheck: {
+        command: 'tsrs --fast --runExternalCode -p tsconfig.json --noEmit',
+        cache: { output: [] },
+      },
     },
   },
   test: {
-    name: '@delta-comic/client-plugin-install',
+    name: '@delta-comic/plugin-install',
     environment: 'node',
     include: ['test/**/*.test.ts'],
   },
-})
+}).withVue({})

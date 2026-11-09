@@ -1,11 +1,10 @@
 {
-  "name": "@delta-comic/client-app-core",
+  "name": "@delta-comic/app-core",
   "version": "3.0.0-next.24",
   "private": true,
   "type": "module",
   "exports": {
     ".": "./lib/index.ts",
-    "./components": "./components.d.ts",
     "./tailwind.css": "./tailwind.css",
     "./*": "./lib/*.ts",
     "./icons": "./lib/icons.tsx",
@@ -13,13 +12,13 @@
   },
   "dependencies": {
     "@delta-comic/client": "workspace:",
-    "@delta-comic/client-db": "workspace:",
-    "@delta-comic/client-downloader": "workspace:",
-    "@delta-comic/client-logger": "workspace:",
-    "@delta-comic/client-model": "workspace:",
-    "@delta-comic/client-plugin": "workspace:",
-    "@delta-comic/client-ui": "workspace:",
-    "@delta-comic/client-utils": "workspace:",
+    "@delta-comic/db": "workspace:",
+    "@delta-comic/downloader": "workspace:",
+    "@delta-comic/logger": "workspace:",
+    "@delta-comic/model": "workspace:",
+    "@delta-comic/plugin": "workspace:",
+    "@delta-comic/ui": "workspace:",
+    "@delta-comic/utils": "workspace:",
     "@pinia/colada": "catalog:",
     "@vueuse/core": "catalog:",
     "dayjs": "catalog:",
@@ -34,10 +33,7 @@
     "vue-router": "catalog:"
   },
   "devDependencies": {
-    "@delta-comic/client-runtime": "workspace:",
-    "@types/semver": "catalog:",
-    "typescript": "catalog:",
-    "vite-plus": "catalog:",
-    "vue-tsc": "catalog:"
+    "@delta-comic/runtime": "workspace:",
+    "@types/semver": "catalog:"
   }
 }

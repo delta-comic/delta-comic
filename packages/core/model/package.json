@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/client-model",
+  "name": "@delta-comic/model",
   "version": "3.0.0-next.24",
   "private": true,
   "description": "空阙虱楼",
@@ -30,14 +30,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@delta-comic/client-logger": "workspace:",
+    "@delta-comic/logger": "workspace:",
     "@delta-comic/manifest": "workspace:",
     "es-toolkit": "catalog:"
   },
   "devDependencies": {
-    "@swc/core": "catalog:",
-    "typescript": "catalog:",
-    "vite-plus": "catalog:"
+    "@swc/core": "catalog:"
   },
   "peerDependencies": {
     "vue": "catalog:"

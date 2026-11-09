@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { type UniEp, UniItem, type UniItemRaw } from '@delta-comic/client-model'
+import { Icons } from '@delta-comic/app-core/icons'
+import { type UniEp, UniItem, type UniItemRaw } from '@delta-comic/model'
+import { NIcon } from 'naive-ui'
 import { computed } from 'vue'
 const $props = defineProps<{ item: UniItemRaw; ep: UniEp['id'] }>()
 

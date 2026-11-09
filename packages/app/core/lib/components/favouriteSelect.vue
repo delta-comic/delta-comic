@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { db, DBUtils, FavouriteDB } from '@delta-comic/client-db'
-import { logger } from '@delta-comic/client-logger'
-import type { UniItem } from '@delta-comic/client-model'
-import { DcToggleIcon, DcState } from '@delta-comic/client-ui'
-import { useMessage } from 'naive-ui'
+import { Icons } from '@delta-comic/app-core/icons'
+import { db, DBUtils, FavouriteDB } from '@delta-comic/db'
+import { logger } from '@delta-comic/logger'
+import type { UniItem } from '@delta-comic/model'
+import { DcToggleIcon, DcState, DcCellGroup, DcVar, DcCell } from '@delta-comic/ui'
+import { useMessage, NDrawer, NIcon, NCheckbox, NButton } from 'naive-ui'
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import CreateFavouriteCard from './createFavouriteCard.vue'
 
 const favouriteLogger = logger.scoped('app:favourite-select')
 
@@ -85,7 +87,7 @@ const { data: thisFavouriteCount } = FavouriteDB.useQueryItem(db =>
   >
     {{ plain ? '' : t('favourite.actions.favourite') }}
   </DcToggleIcon>
-  <NDrawer v-model:show="isShow" placement="bottom" @closed="promise.reject()">
+  <NDrawer v-model:show="isShow" placement="bottom" @after-leave="promise.reject()">
     <div class="relative m-(--dc-content-padding) mt-2 mb-2! w-full font-semibold">
       {{ t('favourite.select.title') }}
       <div

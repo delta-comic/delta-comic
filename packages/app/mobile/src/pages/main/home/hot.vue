@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { pluginContext, usePluginStore } from '@delta-comic/client-plugin'
+import { HotMainListBlock } from '@delta-comic/app-core/components/home/HotMainListBlock.vue'
+import { Icons } from '@delta-comic/app-core/icons'
+import { pluginContext, usePluginStore } from '@delta-comic/plugin'
 import { isEmpty } from 'es-toolkit/compat'
+import { NScrollbar, NIcon } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

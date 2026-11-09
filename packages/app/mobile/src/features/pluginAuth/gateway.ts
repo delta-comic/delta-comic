@@ -1,13 +1,13 @@
 import {
   createPluginAuthGateway as createCorePluginAuthGateway,
   raceAbort,
-} from '@delta-comic/client-app-core/features/pluginAuth/gateway'
-import { translateText } from '@delta-comic/client-app-core/i18n/index'
-import { localizeForm } from '@delta-comic/client-app-core/i18n/pluginText'
-import type { PluginAuthGateway, User } from '@delta-comic/client-plugin'
-import { pluginStore } from '@delta-comic/client-plugin'
-import { createForm } from '@delta-comic/client-ui'
-import { PageWebviewAuth } from '@delta-comic/client-utils'
+} from '@delta-comic/app-core/features/pluginAuth/gateway'
+import { translateText } from '@delta-comic/app-core/i18n/index'
+import { localizeForm } from '@delta-comic/app-core/i18n/pluginText'
+import type { PluginAuthGateway, User } from '@delta-comic/plugin'
+import { pluginStore } from '@delta-comic/plugin'
+import { createForm } from '@delta-comic/ui'
+import { PageWebviewAuth } from '@delta-comic/utils'
 import { NSelect } from 'naive-ui'
 import { h, ref } from 'vue'
 

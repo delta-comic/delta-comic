@@ -1,12 +1,14 @@
-import type { FormConfigure, FormResult, FormSingleResult } from '@delta-comic/client-model'
+import type { FormConfigure, FormResult, FormSingleResult } from '@delta-comic/model'
 import { NButton } from 'naive-ui'
-import { ref } from 'vue'
+import { h, ref, type VNode } from 'vue'
 
 import { translateUi } from '../../i18n'
 
 import DcForm from './components/DcForm.vue'
 
-export const createForm = <T extends FormConfigure>(configs: T) => {
+export const createForm = <T extends FormConfigure>(
+  configs: T,
+): { comp: VNode; data: Promise<FormResult<T>> } => {
   const data = ref<Record<string, FormSingleResult<any>>>({})
   const c = Promise.withResolvers<FormResult<T>>()
   for (const name in configs) {
@@ -35,29 +37,30 @@ export const createForm = <T extends FormConfigure>(configs: T) => {
   }
 
   return {
-    comp: (
-      <DcForm
-        configs={configs}
-        modelValue={data.value as FormResult<T>}
-        onUpdate:modelValue={(v: any) => (data.value = v)}
-      >
-        {{
-          bottom: () => (
-            <NButton
-              type='primary'
-              onClick={async () => {
+    comp: h(
+      DcForm,
+      {
+        configs,
+        'modelValue': data.value as FormResult<T>,
+        'onUpdate:modelValue': (v: any) => (data.value = v),
+      },
+      {
+        bottom: () =>
+          h(
+            NButton,
+            {
+              type: 'primary',
+              onClick: async () => {
                 try {
                   c.resolve(data.value as FormResult<T>)
                 } catch (error) {
                   window.$message.error(String(error))
                 }
-              }}
-            >
-              {translateUi('actions.submit')}
-            </NButton>
+              },
+            },
+            { default: () => translateUi('actions.submit') },
           ),
-        }}
-      </DcForm>
+      },
     ),
     data: c.promise,
   }

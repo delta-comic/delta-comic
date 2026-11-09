@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FormSingleResult, FormSwitch } from '@delta-comic/client-model'
+import type { FormSingleResult, FormSwitch } from '@delta-comic/model'
 import { NSwitch } from 'naive-ui'
 
 defineProps<{ config: FormSwitch }>()

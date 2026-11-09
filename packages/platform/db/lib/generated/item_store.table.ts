@@ -1,4 +1,4 @@
-import type { UniItemRaw } from '@delta-comic/client-model'
+import type { UniItemRaw } from '@delta-comic/model'
 import type { Insertable, Selectable, Updateable, JSONColumnType } from 'kysely'
 
 export interface ItemStoreTable {

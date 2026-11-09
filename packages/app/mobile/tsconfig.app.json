@@ -6,16 +6,12 @@
     "paths": { "@/*": ["./src/*"] },
     "rootDir": "../../../../",
     "types": [
-      "./components.d.ts",
-      "@delta-comic/client-app-core/components",
       "vue-component-type-helpers",
       "./typed-router.d.ts",
       "vite-plus/client",
-      "@delta-comic/client-utils"
+      "@vizejs/vite-plugin",
+      "@delta-comic/utils"
     ]
-  },
-  "vueCompilerOptions": {
-    "plugins": ["vue-router/volar/sfc-typed-router", "vue-router/volar/sfc-route-blocks"]
   },
   "include": ["./src/**/*"]
 }

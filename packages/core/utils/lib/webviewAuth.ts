@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/client-logger'
+import { logger } from '@delta-comic/logger'
 import { isTauri } from '@tauri-apps/api/core'
 
 import { createTauRPCProxy } from './bindings'

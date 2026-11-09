@@ -1,5 +1,5 @@
 /// <reference types="vite-plus/client" />
-/// <reference types="@delta-comic/client-utils" />
+/// <reference types="@delta-comic/utils" />
 
 declare module '*.css' {}
 

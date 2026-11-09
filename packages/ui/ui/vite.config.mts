@@ -1,36 +1,29 @@
 import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
-import type { UserConfig } from 'vite-plus'
-import { defineConfig, lazyPlugins } from 'vite-plus'
+import { lazyPlugins } from 'vite-plus'
 
 const extendsDepends = await (async () => {
   try {
-    const { extendsDepends } = await import('@delta-comic/client-utils/vite')
+    const { extendsDepends } = await import('@delta-comic/utils/vite')
     return extendsDepends
   } catch (error) {
-    console.warn(error, 'Fail to import `@delta-comic/client-utils/vite`')
+    console.warn(error, 'Fail to import `@delta-comic/utils/vite`')
     return {}
   }
 })()
 const externalDepends = [...Object.keys(extendsDepends), 'highlight.js']
 const isExternal = (id: string) =>
+  id.startsWith('@delta-comic/') ||
   externalDepends.some(dep => id === dep || id.startsWith(`${dep}/`))
 
 export default defineConfig(({ command }) => ({
-  plugins: lazyPlugins((async () => {
-    const [
-      { default: tailwindcss },
-      { default: vue },
-      { default: vueJsx },
-      { dts },
-      { default: VueRouter },
-    ] = await Promise.all([
+  plugins: lazyPlugins(async () => {
+    const [{ default: tailwindcss }, { dts }, { default: VueRouter }] = await Promise.all([
       import('@tailwindcss/vite'),
-      import('@vitejs/plugin-vue'),
-      import('@vitejs/plugin-vue-jsx'),
       import('rolldown-plugin-dts'),
       import('vue-router/vite'),
     ])
@@ -40,20 +33,21 @@ export default defineConfig(({ command }) => ({
         root: import.meta.dirname,
         dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
       }),
-      vue(),
-      vueJsx(),
+
       tailwindcss(),
       ...(command === 'build'
         ? [
             dts({
-              vue: true,
-              tsconfig: resolve(import.meta.dirname, './tsconfig.build.json'),
+              tsconfig: resolve(import.meta.dirname, './tsconfig.app.json'),
+              ...(process.platform === 'win32'
+                ? { generator: 'oxc' }
+                : { tsrs: { runExternalCode: true } }),
               sourcemap: true,
             }),
           ]
         : []),
     ]
-  }) as any),
+  }),
   resolve: {
     alias: { '@': fileURLToPath(new URL('./lib', import.meta.url)) },
     extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],
@@ -66,7 +60,6 @@ export default defineConfig(({ command }) => ({
   },
   base: '/',
   oxc: { exclude: [/\.js$/, /\.d\.[cm]?ts$/] },
-  server: {},
   // builds
   build: {
     lib: {
@@ -84,26 +77,21 @@ export default defineConfig(({ command }) => ({
       },
     },
   },
-  pack: {
-    entry: './vite/index.ts',
-    outDir: 'dist-vite',
-    dts: { generator: 'oxc', oxc: {}, tsconfig: './tsconfig.node.json' },
-    sourcemap: true,
-    deps: { neverBundle: ['unplugin-vue-components'] },
-  },
   run: {
     tasks: {
       build: {
-        command: ['vp build', 'vp pack'],
+        command: ['vp build'],
         dependsOn: [{ task: 'build', from: ['dependencies', 'peerDependencies'] }],
-        cache: { output: ['dist/**', 'dist-vite/**'] },
+        cache: { output: ['dist/**'] },
       },
       dev: { command: 'vp dev', cache: false },
       typecheck: {
-        command: ['vue-tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
-        dependsOn: [{ task: 'build', from: ['dependencies', 'peerDependencies'] }],
+        command: [
+          'tsrs --fast --runExternalCode --noEmit -p tsconfig.app.json',
+          'tsrs --fast --runExternalCode -p tsconfig.node.json --noEmit',
+        ],
         cache: { output: [] },
       },
     },
   },
-})) as UserConfig
+})).withVue({})

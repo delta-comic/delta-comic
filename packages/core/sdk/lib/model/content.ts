@@ -7,7 +7,7 @@ import type {
   UniItem,
   UniItemCardComponent,
   UniItemTranslator,
-} from '@delta-comic/client-model'
+} from '@delta-comic/model'
 import type { Component } from 'vue'
 
 export interface ContentModel {

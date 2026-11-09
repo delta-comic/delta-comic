@@ -1,4 +1,4 @@
-import type { PluginArchiveDB } from '@delta-comic/client-db'
+import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/manifest'
 import type { Context, Plugin } from 'cordis'
 

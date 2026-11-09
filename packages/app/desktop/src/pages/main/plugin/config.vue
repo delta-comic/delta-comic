@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { translateText } from '@delta-comic/client-app-core/i18n/index'
-import { Core, useConfig } from '@delta-comic/client-plugin'
-import { NDynamicInput } from 'naive-ui'
+import { translateText } from '@delta-comic/app-core/i18n/index'
+import { Core, useConfig } from '@delta-comic/plugin'
+import { DcFormSwitch } from '@delta-comic/ui'
+import { NDynamicInput, NScrollbar, NInput, NDivider } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 const cfg = useConfig().load(Core.cfg)

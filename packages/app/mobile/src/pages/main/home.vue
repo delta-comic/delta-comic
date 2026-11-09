@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import MainPageSearchBar from '@delta-comic/client-app-core/components/home/mainPageSearchBar.vue'
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { useAppStore } from '@delta-comic/client-app-core/stores/app'
-import { isShowMainHomeNavBar } from '@delta-comic/client-app-core/symbol'
-import { usePluginStore } from '@delta-comic/client-plugin'
+import MainPageSearchBar from '@delta-comic/app-core/components/home/mainPageSearchBar.vue'
+import { Icons } from '@delta-comic/app-core/icons'
+import { useAppStore } from '@delta-comic/app-core/stores/app'
+import { isShowMainHomeNavBar } from '@delta-comic/app-core/symbol'
+import { usePluginStore } from '@delta-comic/plugin'
+import { DcImage, DcTab } from '@delta-comic/ui'
+import { NIcon } from 'naive-ui'
 import { computed, provide, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRouter, RouterView } from 'vue-router'
 
 import userIcon from '@/assets/images/userIcon.webp'
 const $router = useRouter()

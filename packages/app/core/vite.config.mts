@@ -1,15 +1,15 @@
-import { defineConfig } from 'vite-plus'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 
 export default defineConfig({
   run: {
     tasks: {
       build: {
-        command: 'vue-tsc -p tsconfig.json --noEmit',
+        command: 'tsrs --fast --runExternalCode --noEmit -p tsconfig.json',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         cache: { output: [] },
       },
       typecheck: {
-        command: 'vue-tsc -p tsconfig.json --noEmit',
+        command: 'tsrs --fast --runExternalCode --noEmit -p tsconfig.json',
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         cache: { output: [] },
       },
@@ -20,4 +20,4 @@ export default defineConfig({
     include: ['test/**/*.test.ts'],
     setupFiles: ['./test/setup.ts'],
   },
-})
+}).withVue({})

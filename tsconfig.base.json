@@ -22,6 +22,11 @@
     "jsxImportSource": "vue",
     "verbatimModuleSyntax": true
   },
+  "vueCompilerOptions": {
+    "plugins": ["vue-router/volar/sfc-typed-router", "vue-router/volar/sfc-route-blocks"],
+    "strictTemplates": true
+  },
+  "contentMappers": [{ "package": "vize", "extensions": [".vue"] }],
   "files": [],
   "references": [
     { "path": "./packages/app/mobile/tsconfig.json" },

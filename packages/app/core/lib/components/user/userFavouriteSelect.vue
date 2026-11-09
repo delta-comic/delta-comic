@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { Icons } from '@delta-comic/client-app-core/icons'
-import { DBUtils, FavouriteDB } from '@delta-comic/client-db'
-import { DcState } from '@delta-comic/client-ui'
-import { useMessage } from 'naive-ui'
+import { Icons } from '@delta-comic/app-core/icons'
+import { DBUtils, FavouriteDB } from '@delta-comic/db'
+import { DcState, DcCellGroup, DcCell } from '@delta-comic/ui'
+import { useMessage, NDrawer, NIcon, NCheckbox, NButton } from 'naive-ui'
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import CreateFavouriteCard from '../createFavouriteCard.vue'
 
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())

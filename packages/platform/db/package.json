@@ -1,5 +1,5 @@
 {
-  "name": "@delta-comic/client-db",
+  "name": "@delta-comic/db",
   "version": "3.0.0-next.24",
   "private": true,
   "description": "空阙虱楼",
@@ -30,7 +30,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@delta-comic/client-logger": "workspace:",
+    "@delta-comic/logger": "workspace:",
     "@delta-comic/manifest": "workspace:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-sql": "catalog:",
@@ -43,12 +43,8 @@
     "taurpc": "catalog:",
     "typebox": "catalog:"
   },
-  "devDependencies": {
-    "typescript": "catalog:",
-    "vite-plus": "catalog:"
-  },
   "peerDependencies": {
-    "@delta-comic/client-model": "workspace:",
+    "@delta-comic/model": "workspace:",
     "@pinia/colada": "catalog:",
     "vue": "catalog:"
   }

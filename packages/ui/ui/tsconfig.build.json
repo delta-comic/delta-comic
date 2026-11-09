@@ -1,1 +1,0 @@
-{ "extends": "./tsconfig.app.json", "include": ["env.d.ts", "lib/**/*", "./package.json"] }

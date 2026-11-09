@@ -1,5 +1,16 @@
 <script setup lang="ts">
-import type { FormSingleConfigure } from '@delta-comic/client-model'
+import type { FormSingleConfigure } from '@delta-comic/model'
+import {
+  DcCell,
+  DcFormSwitch,
+  DcFormString,
+  DcFormNumber,
+  DcVar,
+  DcFormDate,
+  DcFormDateRange,
+  DcFormPairs,
+} from '@delta-comic/ui'
+import { NPopselect, NModal } from 'naive-ui'
 import { computed } from 'vue'
 
 const props = defineProps<{ config: FormSingleConfigure; modelValue: any }>()

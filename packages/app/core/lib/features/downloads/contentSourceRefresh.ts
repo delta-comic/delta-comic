@@ -1,11 +1,11 @@
-import type { PluginArchiveDB } from '@delta-comic/client-db'
-import type { ContentRefreshContext } from '@delta-comic/client-downloader'
+import type { PluginArchiveDB } from '@delta-comic/db'
+import type { ContentRefreshContext } from '@delta-comic/downloader'
 import type {
   UniContentDownloadProvider,
   UniContentPage,
   UniContentPageLike,
   UniContentType,
-} from '@delta-comic/client-model'
+} from '@delta-comic/model'
 
 import { fingerprintContentDownloadProvider, fingerprintContentPage } from './contentPlan'
 

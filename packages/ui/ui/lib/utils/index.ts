@@ -1,7 +1,7 @@
 export * from './layout'
 export * from './type'
 
-import type { StreamQuery } from '@delta-comic/client-model'
+import type { StreamQuery } from '@delta-comic/model'
 import type { UseInfiniteQueryReturn, UseQueryReturn } from '@pinia/colada'
 import { noop } from 'es-toolkit'
 

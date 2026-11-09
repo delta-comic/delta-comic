@@ -1,40 +1,15 @@
-import { readFileSync } from 'node:fs'
 import { copyFile, mkdir } from 'node:fs/promises'
-import { relative, resolve } from 'node:path'
+import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 import { transform } from '@swc/core'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
-import type { UserConfig } from 'vite-plus'
-import { defaultClientConditions, defineConfig, lazyPlugins } from 'vite-plus'
+import { defaultClientConditions, lazyPlugins } from 'vite-plus'
 
 const host = process.env.TAURI_DEV_HOST
-const corePackageLib = fileURLToPath(
-  new URL('.', import.meta.resolve('@delta-comic/client-app-core')),
-)
-const coreComponentsDir = resolve(corePackageLib, 'components')
-const coreComponentsDeclaration = fileURLToPath(
-  import.meta.resolve('@delta-comic/client-app-core/components'),
-)
-const coreComponentImports = new Map(
-  [
-    ...readFileSync(coreComponentsDeclaration, 'utf8').matchAll(
-      /^\s+(\w+): typeof import\('\.\/lib\/components\/(.+)'\)\['default'\]/gm,
-    ),
-  ].map(match => [match[1], `@delta-comic/client-app-core/components/${match[2]}`]),
-)
-const coreComponentResolver = {
-  type: 'component' as const,
-  resolve: (name: string) => coreComponentImports.get(name),
-}
-const coreComponentImportPathTransform = (path: string) =>
-  path.startsWith(`${coreComponentsDir}/`)
-    ? `@delta-comic/client-app-core/components/${relative(coreComponentsDir, path)}`
-    : path
-const runtimeFile = fileURLToPath(
-  import.meta.resolve('@delta-comic/client-runtime/host-libraries.umd.js'),
-)
+const runtimeFile = fileURLToPath(import.meta.resolve('@delta-comic/runtime/host-libraries.umd.js'))
 const appRuntimeFile = resolve(import.meta.dirname, 'public/runtime/host-libraries.umd.js')
 // Release CI builds the workspace libraries and the shared runtime once in the `plan` job and
 // downloads the artifacts into place; skip rebuilding them on each platform runner.
@@ -60,154 +35,113 @@ const decoratorPlugin = {
   },
 }
 
-export default defineConfig(
-  () =>
-    ({
-      devtools: { apply: 'serve' },
-      plugins: [
-        decoratorPlugin as any,
-        {
-          name: 'delta-comic:copy-runtime',
-          async buildStart() {
-            await mkdir(resolve(import.meta.dirname, 'public/runtime'), { recursive: true })
-            await copyFile(runtimeFile, appRuntimeFile)
-          },
-        },
-        lazyPlugins(async () => {
-          const [
-            { exposeHostLibraries },
-            { default: tailwindcss },
-            { default: legacy },
-            { default: vue },
-            { default: vueJsx },
-            { default: MotionResolver },
-            { NaiveUiResolver },
-            { default: Components },
-            { default: vueDevTools },
-            { default: wasm },
-            { default: VueRouter },
-            { DeltaComicUiResolver },
-          ] = await Promise.all([
-            import('@delta-comic/client-utils/vite'),
-            import('@tailwindcss/vite'),
-            import('@vitejs/plugin-legacy'),
-            import('@vitejs/plugin-vue'),
-            import('@vitejs/plugin-vue-jsx'),
-            import('motion-v/resolver'),
-            import('unplugin-vue-components/resolvers'),
-            import('unplugin-vue-components/vite'),
-            import('vite-plugin-vue-devtools'),
-            import('vite-plugin-wasm'),
-            import('vue-router/vite'),
-            import('@delta-comic/client-ui/vite'),
-          ])
+export default defineConfig(() => ({
+  devtools: { apply: 'serve' },
+  plugins: [
+    decoratorPlugin as any,
+    {
+      name: 'delta-comic:copy-runtime',
+      async buildStart() {
+        await mkdir(resolve(import.meta.dirname, 'public/runtime'), { recursive: true })
+        await copyFile(runtimeFile, appRuntimeFile)
+      },
+    },
+    lazyPlugins(async () => {
+      const [
+        { exposeHostLibraries },
+        { default: tailwindcss },
+        { default: legacy },
+        { default: vueDevTools },
+        { default: VueRouter },
+      ] = await Promise.all([
+        import('@delta-comic/utils/vite'),
+        import('@tailwindcss/vite'),
+        import('@vitejs/plugin-legacy'),
+        import('vite-plugin-vue-devtools'),
+        import('vue-router/vite'),
+      ])
 
-          return [
-            // @ts-ignore
-            wasm(),
-            legacy({ targets: ['ie >= 11'], renderModernChunks: false }),
-            VueRouter({
-              root: import.meta.dirname,
-              dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
-            }),
-            vueDevTools(),
-            vue({
-              features: { vapor: false },
-              template: { compilerOptions: { isCustomElement: tag => tag.startsWith('media-') } },
-            }),
-            vueJsx(),
-            Components({
-              dirs: ['src/components', coreComponentsDir],
-              dts: resolve(import.meta.dirname, 'components.d.ts'),
-              importPathTransform: coreComponentImportPathTransform,
-              resolvers: [
-                coreComponentResolver,
-                MotionResolver(),
-                NaiveUiResolver(),
-                DeltaComicUiResolver(),
-              ],
-              dtsTsx: false,
-            }),
-            tailwindcss(),
-            exposeHostLibraries({
-              entry: fileURLToPath(new URL('./src/main.tsx', import.meta.url)),
-            }),
-          ]
+      return [
+        legacy({ targets: ['ie >= 11'], renderModernChunks: false }),
+        VueRouter({
+          root: import.meta.dirname,
+          dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
         }),
-      ],
-      resolve: {
-        conditions: ['delta-comic-workspace', ...defaultClientConditions],
-        alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
-        extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],
-      },
-      css: {
-        transformer: 'lightningcss',
-        lightningcss: { targets: browserslistToTargets(browserslist('> 5%')) },
-      },
-      build: {
-        // Tauri uses Chromium on Windows and WebKit on macOS and Linux
-        target: process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari15',
-        // don't minify for debug builds
-        minify: !process.env.TAURI_ENV_DEBUG ? 'oxc' : false,
-        // produce sourcemaps for debug builds
-        sourcemap: !!process.env.TAURI_ENV_DEBUG,
-        rolldownOptions: { input: { main: resolve(import.meta.dirname, 'index.html') } },
-      },
-      worker: { format: 'es' },
-      base: '/',
-      server: {
-        port: 5173,
-        // Tauri expects a fixed port, fail if that port is not available
-        strictPort: true,
-        // if the host Tauri is expecting is set, use it
-        host: host || false,
-        hmr: host ? { protocol: 'ws', host, port: 1421 } : undefined,
+        vueDevTools(),
+        tailwindcss(),
+        exposeHostLibraries({ entry: fileURLToPath(new URL('./src/main.tsx', import.meta.url)) }),
+      ]
+    }),
+  ],
+  resolve: {
+    conditions: ['delta-comic-workspace', ...defaultClientConditions],
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    extensions: ['.ts', '.tsx', '.json', '.mjs', '.js', '.jsx', '.mts'],
+  },
+  css: {
+    transformer: 'lightningcss',
+    lightningcss: { targets: browserslistToTargets(browserslist('> 5%')) },
+  },
+  build: {
+    // Tauri uses Chromium on Windows and WebKit on macOS and Linux
+    target: process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari15',
+    // don't minify for debug builds
+    minify: !process.env.TAURI_ENV_DEBUG ? 'oxc' : false,
+    // produce sourcemaps for debug builds
+    sourcemap: !!process.env.TAURI_ENV_DEBUG,
+    rolldownOptions: { input: { main: resolve(import.meta.dirname, 'index.html') } },
+  },
+  worker: { format: 'es' },
+  base: '/',
+  server: {
+    port: 5173,
+    // Tauri expects a fixed port, fail if that port is not available
+    strictPort: true,
+    // if the host Tauri is expecting is set, use it
+    host: host || false,
+    hmr: host ? { protocol: 'ws', host, port: 1421 } : undefined,
 
-        watch: {
-          // tell vite to ignore watching `src-tauri`
-          ignored: ['**/src-tauri/**', 'src-tauri'],
-        },
+    watch: {
+      // tell vite to ignore watching `src-tauri`
+      ignored: ['**/src-tauri/**', 'src-tauri'],
+    },
+  },
+  run: {
+    tasks: {
+      'build': {
+        command: 'node -e ""',
+        dependsOn: skipLibBuild
+          ? []
+          : [{ task: 'build', from: ['dependencies', 'devDependencies'] }],
+        cache: { output: [] },
       },
-      run: {
-        tasks: {
-          'build': {
-            command: 'node -e ""',
-            dependsOn: skipLibBuild
-              ? []
-              : [{ task: 'build', from: ['dependencies', 'devDependencies'] }],
-            cache: { output: [] },
-          },
-          'build:app': { command: 'TRUE_BUILD_MAIN_APP=true tauri android build', cache: false },
-          'build:debug': { command: 'tauri android build --debug', cache: false },
-          'build:local': { command: 'tauri build --debug', cache: false },
-          'build:web': {
-            command: 'vp build',
-            dependsOn: skipLibBuild
-              ? []
-              : [{ task: 'build', from: 'dependencies' }, '@delta-comic/client-runtime#build'],
-            cache: { output: ['dist/**', 'components.d.ts', 'typed-router.d.ts'] },
-          },
-          'dev': { command: 'tauri android dev', cache: false },
-          'dev:web': {
-            command: 'vp dev',
-            cache: false,
-            dependsOn: [
-              { task: 'build', from: 'dependencies' },
-              '@delta-comic/client-runtime#build:dev',
-            ],
-          },
-          'tauri': { command: 'vp exec tauri', cache: false },
-          'typecheck': {
-            command: [
-              'vue-tsc -p tsconfig.app.json --noEmit',
-              'tsc -p tsconfig.node.json --noEmit',
-            ],
-            dependsOn: [{ task: 'build', from: 'dependencies' }],
-            cache: { output: [] },
-          },
-        },
+      'build:app': { command: 'TRUE_BUILD_MAIN_APP=true tauri android build', cache: false },
+      'build:debug': { command: 'tauri android build --debug', cache: false },
+      'build:local': { command: 'tauri build --debug', cache: false },
+      'build:web': {
+        command: 'vp build',
+        dependsOn: skipLibBuild
+          ? []
+          : [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build'],
+        cache: { output: ['dist/**', 'typed-router.d.ts'] },
       },
-      clearScreen: false,
-      envPrefix: ['VITE_', 'TAURI_ENV_*'],
-    }) as UserConfig,
-)
+      'dev': { command: 'tauri android dev', cache: false },
+      'dev:web': {
+        command: 'vp dev',
+        cache: false,
+        dependsOn: [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build:dev'],
+      },
+      'tauri': { command: 'vp exec tauri', cache: false },
+      'typecheck': {
+        command: [
+          'tsrs --fast --runExternalCode --noEmit -p tsconfig.app.json',
+          'tsrs --fast --runExternalCode -p tsconfig.node.json --noEmit',
+        ],
+        dependsOn: [{ task: 'build', from: 'dependencies' }],
+        cache: { output: [] },
+      },
+    },
+  },
+  clearScreen: false,
+  envPrefix: ['VITE_', 'TAURI_ENV_*'],
+})).withVue({ compiler: { customElements: ['media-*'] } })

@@ -5,7 +5,7 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "composite": true,
     "paths": { "@/*": ["./lib/*"] },
-    "types": ["./env.d.ts", "./typed-router.d.ts"]
+    "types": ["./env.d.ts", "./typed-router.d.ts", "@vizejs/vite-plugin"]
   },
-  "include": ["env.d.ts", "lib/**/*", "src/**/*", "./package.json"]
+  "include": ["env.d.ts", "lib/**/*", "./package.json"]
 }

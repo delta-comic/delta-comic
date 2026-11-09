@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite-plus'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 
 export default defineConfig({
   pack: {
@@ -17,10 +17,13 @@ export default defineConfig({
       build: { command: 'vp pack', cache: { output: ['dist/**'] } },
       test: { command: 'vp test run test/lib', cache: { output: [] } },
       typecheck: {
-        command: ['tsc -p tsconfig.app.json --noEmit', 'tsc -p tsconfig.node.json --noEmit'],
+        command: [
+          'tsrs --fast --runExternalCode -p tsconfig.app.json --noEmit',
+          'tsrs --fast --runExternalCode -p tsconfig.node.json --noEmit',
+        ],
         cache: { output: [] },
       },
     },
   },
   test: { environment: 'node', include: ['test/**/*.test.ts'] },
-})
+}).withVue({})

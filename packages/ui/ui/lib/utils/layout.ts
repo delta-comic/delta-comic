@@ -10,7 +10,7 @@ const preventIndexMap = new Array<Ref<boolean>>()
  * isShow为真时会阻止替换路由返回。
  * 同时还会自动处理force路由
  */
-export const usePreventBack = (isShow: Ref<boolean>) => {
+export const usePreventBack = (isShow: Ref<boolean>): (() => void) => {
   const $router = window.$router ?? useRouter()
 
   const isLast = () => preventIndexMap.at(-1) === isShow

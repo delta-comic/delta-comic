@@ -138,4 +138,4 @@ jobs:
             -p packages/platform/downloader/android \
             testDebugUnitTest \
             --no-daemon \
-            --max-workers=2f
+            --max-workers=2

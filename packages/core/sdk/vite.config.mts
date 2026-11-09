@@ -1,7 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import { transform } from '@swc/core'
-import { defineConfig } from 'vite-plus'
+import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 import type { Plugin } from 'vite-plus'
 
 const lowerDecorators = async (code: string, id: string) => {
@@ -24,21 +24,17 @@ export default defineConfig({
   plugins: [decoratorPlugin],
   resolve: {
     alias: {
-      '@delta-comic/client-db': fileURLToPath(
-        new URL('../../platform/db/lib/index.ts', import.meta.url),
-      ),
-      '@delta-comic/client-downloader': fileURLToPath(
+      '@delta-comic/db': fileURLToPath(new URL('../../platform/db/lib/index.ts', import.meta.url)),
+      '@delta-comic/downloader': fileURLToPath(
         new URL('../../platform/downloader/lib/index.ts', import.meta.url),
       ),
-      '@delta-comic/client-logger': fileURLToPath(
-        new URL('../logger/lib/index.ts', import.meta.url),
-      ),
-      '@delta-comic/client-model': fileURLToPath(new URL('../model/lib/index.ts', import.meta.url)),
+      '@delta-comic/logger': fileURLToPath(new URL('../logger/lib/index.ts', import.meta.url)),
+      '@delta-comic/model': fileURLToPath(new URL('../model/lib/index.ts', import.meta.url)),
       '@delta-comic/manifest': fileURLToPath(
         new URL('../../plugin/manifest/lib/index.ts', import.meta.url),
       ),
-      '@delta-comic/client-ui': fileURLToPath(new URL('../../ui/ui/lib/index.ts', import.meta.url)),
-      '@delta-comic/client-utils': fileURLToPath(new URL('../utils/lib/index.ts', import.meta.url)),
+      '@delta-comic/ui': fileURLToPath(new URL('../../ui/ui/lib/index.ts', import.meta.url)),
+      '@delta-comic/utils': fileURLToPath(new URL('../utils/lib/index.ts', import.meta.url)),
     },
   },
   pack: [
@@ -71,10 +67,10 @@ export default defineConfig({
         cache: { output: ['dist/**'] },
       },
       typecheck: {
-        command: ['tsc -p tsconfig.json --noEmit'],
+        command: ['tsrs --fast --runExternalCode -p tsconfig.json --noEmit'],
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         cache: { output: [] },
       },
     },
   },
-})
+}).withVue({})

@@ -1,5 +1,5 @@
-import { validateArtifact } from '@delta-comic/client-plugin-artifact'
 import { assertPluginManifestCompatible } from '@delta-comic/manifest'
+import { validateArtifact } from '@delta-comic/plugin-artifact'
 import JSZip from 'jszip'
 
 import type { DecodedPluginPackage, PluginPackageCodec } from './contracts'

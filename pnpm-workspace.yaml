@@ -18,7 +18,6 @@ catalog:
   magic-string: ^1.4.5
   cordis: ^4.0.0-rc.12
   '@swc/core': ^1.16.22
-  vue-tsc: 3.3.14
   rolldown-plugin-dts: ^0.30.0
   '@commitlint/cli': ^21.2.4
   '@commitlint/config-conventional': ^21.2.4
@@ -35,8 +34,7 @@ catalog:
   '@types/node': 26.6.6
   '@types/semver': ^7.8.0
   '@vitejs/plugin-legacy': ^8.2.4
-  '@vitejs/plugin-vue': ^6.0.10
-  '@vitejs/plugin-vue-jsx': ^5.1.6
+  '@vizejs/vite-plugin': ^0.715.0
   '@vueuse/core': ^15.0.0
   '@vitest/coverage-v8': 5.1.0
   browserslist: ^4.29.5
@@ -67,12 +65,13 @@ catalog:
   tauri-plugin-m3: ^0.3.2
   taurpc: 2.0.0
   tlds: ^1.261.0
+  tsrs: 0.23.0-ts7.1.0-beta
   typescript: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-  unplugin-vue-components: 32.1.0
   vite: npm:@voidzero-dev/vite-plus-core@1.5.0
   vite-plugin-vue-devtools: ^9.0.0-beta.1
-  vite-plugin-wasm: ^3.6.0
   vite-plus: 1.5.0
+  vue-tsc: ^3.3.14
+  vize: ^0.715.0
   vue: 3.6.0-rc.10
   vue-i18n: ^12.0.0-alpha.4
   vue-component-type-helpers: ^3.3.14
@@ -87,6 +86,18 @@ minimumReleaseAgeExclude:
   - es-toolkit@1.53.2
   - rolldown-plugin-dts@0.30.0
   - typebox@1.4.5
+  - '@vizejs/native-darwin-arm64@0.715.0'
+  - '@vizejs/native-darwin-x64@0.715.0'
+  - '@vizejs/native-linux-arm64-gnu@0.715.0'
+  - '@vizejs/native-linux-arm64-musl@0.715.0'
+  - '@vizejs/native-linux-x64-gnu@0.715.0'
+  - '@vizejs/native-linux-x64-musl@0.715.0'
+  - '@vizejs/native-win32-arm64-msvc@0.715.0'
+  - '@vizejs/native-win32-x64-msvc@0.715.0'
+  - '@vizejs/native@0.715.0'
+  - '@vizejs/unplugin@0.715.0'
+  - '@vizejs/vite-plugin@0.715.0'
+  - vize@0.715.0
 
 overrides:
   typescript: 'catalog:'

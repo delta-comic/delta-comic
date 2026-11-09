@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { SourceRefreshWarning } from '@delta-comic/client-app-core/features/downloads/sourceRefresh'
-import { Icons } from '@delta-comic/client-app-core/icons'
+import type { SourceRefreshWarning } from '@delta-comic/app-core/features/downloads/sourceRefresh'
+import { Icons } from '@delta-comic/app-core/icons'
 import { NAlert, NButton, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
