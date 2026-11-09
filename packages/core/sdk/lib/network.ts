@@ -1,4 +1,4 @@
-import { withDiagnostic, type DiagnosticRecorder } from '@delta-comic/both'
+import { withDiagnostic, type DiagnosticRecorder } from './diagnostic.js'
 
 export interface ClientNetworkRequest {
   readonly url: RequestInfo | URL

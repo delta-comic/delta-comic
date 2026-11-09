@@ -18,7 +18,6 @@ export const jsonVersionPaths = [
   'packages/plugin/install/package.json',
   'packages/plugin/vite/package.json',
   'packages/plugin/core/package.json',
-  'packages/core/both/package.json',
   'packages/ui/ui/package.json',
   'packages/core/utils/package.json',
 ] as const

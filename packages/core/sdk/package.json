@@ -36,7 +36,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@delta-comic/both": "workspace:",
     "cordis": "catalog:",
     "kysely": "catalog:"
   },

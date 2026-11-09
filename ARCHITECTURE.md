@@ -25,7 +25,7 @@
 | `packages/platform/http` | HTTP 平台适配 |
 | `packages/core/logger` | 日志传输 |
 | `packages/ui/ui` | 通用 Vue UI、内容布局和播放器 |
-| `packages/core/both` | Cordis 导出、诊断协议与双端核心 |
+| `packages/core/sdk` | 插件 SDK、Cordis 导出与诊断协议 |
 | `packages/core/logger` | 双端日志核心 |
 | `packages/plugin/manifest` | 客户端 manifest v2 schema 与完整性检查 |
 
