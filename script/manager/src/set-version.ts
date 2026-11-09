@@ -1,7 +1,7 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import type { ReleaseCliConfig } from './config'
+import type { CIConfig } from './config'
 
 export const rootDir = process.cwd()
 
@@ -20,9 +20,9 @@ export function assertVersion(version: string) {
 
 export class VersionSynchronizer {
   private readonly cwd: string
-  private readonly config: ReleaseCliConfig
+  private readonly config: CIConfig
 
-  constructor(cwd = rootDir, config: ReleaseCliConfig = {}) {
+  constructor(cwd = rootDir, config: CIConfig = {}) {
     this.cwd = cwd
     this.config = config
   }

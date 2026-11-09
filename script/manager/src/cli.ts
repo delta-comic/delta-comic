@@ -7,7 +7,7 @@ import { Command, InvalidArgumentError } from 'commander'
 
 import packageJson from '../package.json' with { type: 'json' }
 
-import { findProjectRoot, loadReleaseCliConfig } from './config'
+import { findProjectRoot, loadCIConfig } from './config'
 import { executeRelease, runSemanticRelease } from './release'
 import { describeReleaseBranchAction, ReleaseBranchManager } from './release-branches'
 import { ReleaseEnvironment } from './release-environment'
@@ -25,7 +25,7 @@ function dryRun(program: Command, local = false) {
 
 async function projectConfig(program: Command, root = projectRoot(program)) {
   const configPath = program.opts<{ config?: string }>().config
-  return loadReleaseCliConfig(root, configPath)
+  return loadCIConfig(root, configPath)
 }
 
 function parseVersion(value: string) {
@@ -54,7 +54,7 @@ function createProgram() {
     .description('Delta Comic semantic-release 控制 CLI')
     .version(packageJson.version)
     .option('--cwd <path>', '项目目录', process.cwd())
-    .option('--config <path>', '项目配置文件路径')
+    .option('--config <path>', 'semantic-release 配置文件路径')
     .option('--dry-run', '只输出计划，不写入或发布')
 
   const branch = program.command('branch').description('管理发布分支')

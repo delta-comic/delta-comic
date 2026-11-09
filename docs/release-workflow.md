@@ -28,7 +28,7 @@ npm install --global @delta-comic/release-cli
 dr --help
 ```
 
-在仓库内执行时，`dr` 会从当前目录向上寻找项目根目录，也可以用 `--cwd` 指定目标仓库，用 `--config` 指定配置文件。项目配置默认位于 `.release-cli.config.ts`，负责版本文件、workspace 根目录、MSI 文件和发布 registry；CLI 包自身的版本使用 `dr package version set <version>` 管理。
+在仓库内执行时，`dr` 会从当前目录向上寻找项目根目录，也可以用 `--cwd` 指定目标仓库，用 `--config` 指定 semantic-release 配置文件。项目配置统一位于 `release.config.ts`：使用 `defineConfig` 定义 semantic-release 配置，再通过 `.withCI({...})` 配置版本文件、workspace 根目录、MSI 文件和发布 registry；CLI 包自身的版本使用 `dr package version set <version>` 管理。
 
 ## 首次建立分支
 

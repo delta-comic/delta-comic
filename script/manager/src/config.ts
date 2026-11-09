@@ -2,7 +2,9 @@ import { existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-export interface ReleaseCliConfig {
+import type { GlobalConfig, PluginSpec } from 'semantic-release'
+
+export interface CIConfig {
   jsonVersionPaths?: readonly string[]
   cargoTomlVersionPaths?: readonly (readonly [string, 'package' | 'workspace.package'])[]
   cargoLockPackageNames?: readonly string[]
@@ -13,19 +15,43 @@ export interface ReleaseCliConfig {
   registry?: string
 }
 
-export function defineReleaseCliConfig(config: ReleaseCliConfig) {
-  return config
+export const releasePluginName = '@delta-comic/release-cli'
+
+type ReleaseConfig = GlobalConfig & { withCI(config: CIConfig): GlobalConfig }
+
+function pluginName(plugin: PluginSpec) {
+  return Array.isArray(plugin) ? plugin[0] : plugin
 }
 
-export async function loadReleaseCliConfig(cwd: string, configPath?: string) {
-  const path = configPath ? resolve(cwd, configPath) : join(cwd, '.release-cli.config.ts')
+export function defineConfig(config: GlobalConfig): ReleaseConfig {
+  const plugins = config.plugins.filter(plugin => pluginName(plugin) !== releasePluginName)
+  const createConfig = (ci?: CIConfig): GlobalConfig => {
+    const releasePlugin = ci === undefined ? releasePluginName : [releasePluginName, ci]
+    return {
+      ...config,
+      plugins: [plugins[0], releasePlugin, ...plugins.slice(1)].filter(
+        (plugin): plugin is PluginSpec => plugin !== undefined,
+      ),
+    }
+  }
+
+  return { ...createConfig(), withCI: createConfig }
+}
+
+export async function loadCIConfig(cwd: string, configPath?: string) {
+  const path = configPath ? resolve(cwd, configPath) : join(cwd, 'release.config.ts')
   if (!existsSync(path)) return {}
   const module = await import(pathToFileURL(path).href)
   const config = module.default
   if (!config || typeof config !== 'object') {
-    throw new Error(`Release CLI config must default-export an object: ${path}`)
+    throw new Error(`semantic-release config must default-export an object: ${path}`)
   }
-  return config as ReleaseCliConfig
+
+  const plugin = (config as GlobalConfig).plugins.find(
+    plugin => pluginName(plugin) === releasePluginName,
+  )
+  if (!plugin) throw new Error(`semantic-release config must include ${releasePluginName}: ${path}`)
+  return Array.isArray(plugin) ? plugin[1] : {}
 }
 
 export function findProjectRoot(input: string) {

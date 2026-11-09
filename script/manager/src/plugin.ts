@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process'
 import { appendFile, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
+import type { CIConfig } from './config'
 import { removeEphemeralReleaseTag } from './release-environment'
 import { prereleaseWarning } from './release-notes'
 import {
@@ -9,7 +10,7 @@ import {
   type PublishableWorkspacePackage,
   ReleaseWorkspace,
 } from './release-workspace'
-import { assertVersion, rootDir, setVersion } from './set-version'
+import { assertVersion, rootDir, VersionSynchronizer } from './set-version'
 
 interface ReleaseContext {
   branch?: { name: string }
@@ -73,10 +74,10 @@ async function commitRelease(version: string, notes: string | undefined, branch:
 interface ReleasePluginDependencies {
   cleanPendingRelease?: (version: string) => Promise<void>
   commitPreparedRelease?: ReleaseCommitter
-  resolvePublishablePackages?: () => Promise<PublishableWorkspacePackage[]>
+  resolvePublishablePackages?: (config: CIConfig) => Promise<PublishableWorkspacePackage[]>
   removeEphemeralTag?: (env: NodeJS.ProcessEnv) => Promise<void>
   publishCommand?: CommandRunner
-  synchronizeVersion?: (version: string) => Promise<void>
+  synchronizeVersion?: (version: string, config: CIConfig) => Promise<void>
   writeOutput?: (path: string, contents: string) => Promise<void>
 }
 
@@ -91,24 +92,26 @@ export function resolveDistTag(channel?: string | null) {
 export function createReleasePlugin({
   cleanPendingRelease = removePendingChangelogRelease,
   commitPreparedRelease = commitRelease,
-  resolvePublishablePackages = () => new ReleaseWorkspace().publishablePackages(),
+  resolvePublishablePackages = (config: CIConfig) =>
+    new ReleaseWorkspace(rootDir, config.workspace).publishablePackages(),
   removeEphemeralTag = removeEphemeralReleaseTag,
   publishCommand = runCommand,
-  synchronizeVersion = setVersion,
+  synchronizeVersion = (version, config) =>
+    new VersionSynchronizer(rootDir, config).setVersion(version),
   writeOutput = async (path, contents) => appendFile(path, contents, { encoding: 'utf-8' }),
 }: ReleasePluginDependencies = {}) {
   return {
-    async verifyConditions(_pluginConfig: unknown, { env }: ReleaseContext) {
+    async verifyConditions(pluginConfig: CIConfig = {}, { env }: ReleaseContext) {
       if (!env.GITHUB_TOKEN) {
         throw new Error('GITHUB_TOKEN is required to publish workspace packages')
       }
-      const packages = await resolvePublishablePackages()
+      const packages = await resolvePublishablePackages(pluginConfig)
       for (const pkg of packages) {
         await publishCommand('vp', ['run', '--filter', pkg.name, '--fail-if-no-match', 'build'])
       }
     },
 
-    async verifyRelease(_pluginConfig: unknown, { env, nextRelease }: ReleaseContext) {
+    async verifyRelease(_pluginConfig: CIConfig = {}, { env, nextRelease }: ReleaseContext) {
       assertVersion(nextRelease.version)
       const channel = resolveDistTag(nextRelease.channel)
       if (env.GITHUB_OUTPUT) {
@@ -119,19 +122,19 @@ export function createReleasePlugin({
       }
     },
 
-    async prepare(_pluginConfig: unknown, { env, nextRelease }: ReleaseContext) {
+    async prepare(pluginConfig: CIConfig = {}, { env, nextRelease }: ReleaseContext) {
       await removeEphemeralTag(env)
       await cleanPendingRelease(nextRelease.version)
-      await synchronizeVersion(nextRelease.version)
+      await synchronizeVersion(nextRelease.version, pluginConfig)
     },
 
-    async generateNotes(_pluginConfig: unknown, { nextRelease }: ReleaseContext) {
+    async generateNotes(_pluginConfig: CIConfig = {}, { nextRelease }: ReleaseContext) {
       return nextRelease.channel ? prereleaseWarning : ''
     },
 
-    async publish(_pluginConfig: unknown, { nextRelease }: ReleaseContext) {
+    async publish(pluginConfig: CIConfig = {}, { nextRelease }: ReleaseContext) {
       const distTag = resolveDistTag(nextRelease.channel)
-      const packages = await resolvePublishablePackages()
+      const packages = await resolvePublishablePackages(pluginConfig)
       assertWorkspaceVersion(packages, nextRelease.version)
       for (const pkg of packages) {
         await publishCommand('vp', ['run', '--filter', pkg.name, '--fail-if-no-match', 'build'])
@@ -144,12 +147,12 @@ export function createReleasePlugin({
         '--tag',
         distTag,
         '--',
-        '--registry=https://npm.pkg.github.com/',
-        '--config.@delta-comic:registry=https://npm.pkg.github.com/',
+        `--registry=${pluginConfig.registry ?? 'https://npm.pkg.github.com/'}`,
+        `--config.@delta-comic:registry=${pluginConfig.registry ?? 'https://npm.pkg.github.com/'}`,
       ])
     },
 
-    async success(_pluginConfig: unknown, { branch, nextRelease }: ReleaseContext) {
+    async success(_pluginConfig: CIConfig = {}, { branch, nextRelease }: ReleaseContext) {
       if (!branch) throw new Error('semantic-release did not provide the release branch')
       await commitPreparedRelease(nextRelease.version, nextRelease.notes, branch.name)
     },
