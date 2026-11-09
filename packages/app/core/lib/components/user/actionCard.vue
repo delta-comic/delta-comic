@@ -20,20 +20,23 @@ const router = useRouter()
     <NGrid class="w-full" :cols="4" :y-gap="10">
       <template v-for="item of card.items">
         <NGi
-          class="flex dc-interactive flex-col items-center justify-center"
           v-if="item.type == 'button'"
-          @click="
-            router.force.push({
-              name: '/user/action/[plugin]/[key]',
-              params: { plugin: pluginName, key: item.key },
-            })
-          "
           span="1"
         >
-          <NIcon size="2rem" :color="color || 'var(--bili-blue)'">
-            <component :is="item.icon" />
-          </NIcon>
-          <span class="mt-1 text-(--dc-text)">{{ item.name }}</span>
+          <button
+            class="flex dc-interactive flex-col items-center justify-center"
+            @click="
+              router.force.push({
+                name: '/user/action/[plugin]/[key]',
+                params: { plugin: pluginName, key: item.key },
+              })
+            "
+          >
+            <NIcon size="2rem" :color="color || 'var(--bili-blue)'">
+              <component :is="item.icon" />
+            </NIcon>
+            <span class="mt-1 text-(--dc-text)">{{ item.name }}</span>
+          </button>
         </NGi>
         <NGi
           class="flex dc-interactive flex-col items-center justify-center"

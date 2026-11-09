@@ -87,7 +87,7 @@ const { data: thisFavouriteCount } = FavouriteDB.useQueryItem(db =>
   >
     {{ plain ? '' : t('favourite.actions.favourite') }}
   </DcToggleIcon>
-  <NDrawer v-model:show="isShow" placement="bottom" @closed="promise.reject()">
+  <NDrawer v-model:show="isShow" placement="bottom" @after-leave="promise.reject()">
     <div class="relative m-(--dc-content-padding) mt-2 mb-2! w-full font-semibold">
       {{ t('favourite.select.title') }}
       <div
