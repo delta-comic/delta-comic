@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { Context, DiagnosticRecorder, Service, withDiagnostic } from '../lib/index.js'
-
-declare module 'cordis' {
-  interface Context {
-    answer: number
-  }
-}
+import { Context, DiagnosticRecorder, Service, withDiagnostic } from '../../lib/index.js'
 
 declare module 'cordis' {
   interface Context {
@@ -24,8 +18,8 @@ class DummyService extends Service {
   }
 }
 
-describe('@delta-comic/both cordis integration', () => {
-  it('mounts service properly', async () => {
+describe('client diagnostics', () => {
+  it('re-exports Cordis services', async () => {
     const ctx = new Context()
     await ctx.plugin(DummyService)
     expect(ctx.dummy).toBeDefined()

@@ -1,4 +1,22 @@
-export * from '@delta-comic/both'
+export {
+  Context,
+  CordisError,
+  DisposableList,
+  EventsService,
+  Fiber,
+  type FiberState,
+  Inject,
+  Logger,
+  type LoggerLevel,
+  LoggerService,
+  RegistryService,
+  Service,
+  ValidationError,
+  type Disposable,
+  type Plugin,
+  type Events,
+} from 'cordis'
+export * from './diagnostic.js'
 export * from '@delta-comic/model'
 export * from '@delta-comic/manifest'
 export * from '@delta-comic/downloader'

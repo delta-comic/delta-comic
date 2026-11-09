@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import type { ReleaseCliConfig } from './config'
+import type { CIConfig } from './config'
 import { assertVersion, rootDir } from './set-version'
 
 const stableBuild = 65_535
@@ -44,10 +44,10 @@ export function toWindowsMsiVersion(version: string) {
 export async function writeWindowsMsiConfig(
   version: string,
   cwd = rootDir,
-  configuredPath?: ReleaseCliConfig['msiConfigPath'],
+  configuredPath?: CIConfig['msiConfigPath'],
 ) {
   if (!configuredPath) {
-    throw new Error('msiConfigPath is required in .release-cli.config.ts')
+    throw new Error('msiConfigPath is required in semantic-release CI config')
   }
   const target = join(cwd, configuredPath)
   await mkdir(join(target, '..'), { recursive: true })

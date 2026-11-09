@@ -1,7 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 
-import type { ReleaseCliConfig } from './config'
+import type { CIConfig } from './config'
 import { rootDir } from './set-version'
 
 type DependencyBlock = Record<string, string>
@@ -84,7 +84,7 @@ export class ReleaseWorkspace {
   private readonly cwd: string
   private readonly roots: readonly string[]
 
-  constructor(cwd = rootDir, config: ReleaseCliConfig['workspace'] = {}) {
+  constructor(cwd = rootDir, config: CIConfig['workspace'] = {}) {
     this.cwd = cwd
     this.roots = config?.roots?.length ? config.roots : ['packages']
   }

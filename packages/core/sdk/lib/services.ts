@@ -1,7 +1,7 @@
-import type { DiagnosticRecorder } from '@delta-comic/both'
 import type { DB } from '@delta-comic/db'
 import type { Downloader } from '@delta-comic/downloader'
 
+import type { DiagnosticRecorder } from './diagnostic.js'
 import type { ClientDatabase, ClientUi } from './host.js'
 import type { ContentModel } from './model/content.js'
 import type { RemoteModel } from './model/remote.js'

@@ -737,12 +737,6 @@ importers:
         specifier: 'catalog:'
         version: 3.3.14
 
-  packages/core/both:
-    dependencies:
-      cordis:
-        specifier: 'catalog:'
-        version: 4.0.0-rc.12
-
   packages/core/logger:
     dependencies:
       dayjs:
@@ -794,9 +788,6 @@ importers:
 
   packages/core/sdk:
     dependencies:
-      '@delta-comic/both':
-        specifier: 'workspace:'
-        version: link:../both
       cordis:
         specifier: 'catalog:'
         version: 4.0.0-rc.12
