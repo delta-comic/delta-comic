@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { DcVar } from '@delta-comic/ui'
-import { NIcon } from 'naive-ui'
-
 import { Icons } from '@delta-comic/app-core/icons'
 import { createDateString } from '@delta-comic/app-core/utils/date'
 import type { HistoryDB, ItemStoreDB } from '@delta-comic/db'
 import { UniItem } from '@delta-comic/model'
+import { DcVar } from '@delta-comic/ui'
 import dayjs from 'dayjs'
+import { NIcon } from 'naive-ui'
 import { computed } from 'vue'
 const $props = defineProps<{ item: ItemStoreDB.StoredItem & HistoryDB.Item }>()
 

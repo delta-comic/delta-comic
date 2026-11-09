@@ -38,7 +38,7 @@ export default defineConfig(({ command }) => ({
       ...(command === 'build'
         ? [
             dts({
-              tsconfig: resolve(import.meta.dirname, './tsconfig.build.json'),
+              tsconfig: resolve(import.meta.dirname, './tsconfig.app.json'),
               ...(process.platform === 'win32'
                 ? { generator: 'oxc' }
                 : { tsrs: { runExternalCode: true } }),

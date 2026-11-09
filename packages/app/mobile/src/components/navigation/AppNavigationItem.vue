@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
 import { NIcon } from 'naive-ui'
-
 import type { Component } from 'vue'
+import { RouterLink } from 'vue-router'
 
 defineProps<{ active: boolean; icon?: Component; label: string; to: string }>()
 </script>

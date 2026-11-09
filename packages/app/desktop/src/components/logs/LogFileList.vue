@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import {
-  formatLogFileSize,
-  type LogFileInfo,
-} from '@delta-comic/app-core/features/logs/model'
+import { formatLogFileSize, type LogFileInfo } from '@delta-comic/app-core/features/logs/model'
 import { formatDate } from '@delta-comic/app-core/i18n/index'
 import { NEmpty, NSpin } from 'naive-ui'
 import { useI18n } from 'vue-i18n'

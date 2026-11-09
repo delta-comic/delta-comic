@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { NPageHeader, NScrollbar, NModal } from 'naive-ui'
-
 import PluginConfigField from '@delta-comic/app-core/components/plugin/PluginConfigField.vue'
 import { translateText } from '@delta-comic/app-core/i18n/index'
 import { localizeFormConfig } from '@delta-comic/app-core/i18n/pluginText'
 import { useConfig } from '@delta-comic/plugin'
 import { DcCell, DcCellGroup } from '@delta-comic/ui'
+import { NPageHeader, NScrollbar, NModal } from 'naive-ui'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

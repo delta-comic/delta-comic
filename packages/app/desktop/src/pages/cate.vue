@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { NPageHeader, NScrollbar, NH1, NText, NButton } from 'naive-ui'
-
 import { usePluginStore } from '@delta-comic/plugin'
 import { SharedFunction } from '@delta-comic/utils'
+import { NPageHeader, NScrollbar, NH1, NText, NButton } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

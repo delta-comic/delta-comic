@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { NEmpty, NButton, NIcon } from 'naive-ui'
-
 import { Icons } from '@delta-comic/app-core/icons'
 import type { FavouriteDB } from '@delta-comic/db'
+import { NEmpty, NButton, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 import FavouriteCard from '../favouriteCard.vue'

@@ -19,10 +19,7 @@ const router = useRouter()
     </div>
     <NGrid class="w-full" :cols="4" :y-gap="10">
       <template v-for="item of card.items">
-        <NGi
-          v-if="item.type == 'button'"
-          span="1"
-        >
+        <NGi v-if="item.type == 'button'" span="1">
           <button
             class="flex dc-interactive flex-col items-center justify-center"
             @click="

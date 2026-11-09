@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { DcAuthorIcon, DcImage } from '@delta-comic/ui'
-
 import { Icons } from '@delta-comic/app-core/icons'
 import { createDateString } from '@delta-comic/app-core/utils/date'
 import type { UniItem } from '@delta-comic/model'
+import { DcAuthorIcon, DcImage } from '@delta-comic/ui'
 import { SharedFunction } from '@delta-comic/utils'
 import { NButton, NDropdown, NIcon, type DropdownOption } from 'naive-ui'
 import { computed, h } from 'vue'

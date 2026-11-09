@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { NIcon, NEmpty, NButton } from 'naive-ui'
-
 import { Icons } from '@delta-comic/app-core/icons'
 import { FavouriteDB } from '@delta-comic/db'
 import { UniImage } from '@delta-comic/model'
 import { DcState, DcImage } from '@delta-comic/ui'
 import { isEmpty } from 'es-toolkit/compat'
+import { NIcon, NEmpty, NButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 const props = withDefaults(defineProps<{ isCardMode?: boolean; card: FavouriteDB.Card }>(), {

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ForkSelect } from '@delta-comic/app-core/components/forkSelect.vue'
-
 import { computed, shallowRef } from 'vue'
 import { useRoute, RouterView } from 'vue-router'
 

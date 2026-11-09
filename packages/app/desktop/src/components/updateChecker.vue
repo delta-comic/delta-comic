@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { NModal, NButton } from 'naive-ui'
 import { DcMarkdown } from '@delta-comic/ui'
-
 import { Octokit } from '@octokit/rest'
 import { computedAsync } from '@vueuse/core'
+import { NModal, NButton } from 'naive-ui'
 import { watch, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 

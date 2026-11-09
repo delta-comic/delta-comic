@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import PluginMarketplaceFilters from './PluginMarketplaceFilters.vue'
-import PluginMarketplaceList from './PluginMarketplaceList.vue'
-import PluginMarketplaceDetails from './PluginMarketplaceDetails.vue'
-
 import { usePluginInstall } from '@delta-comic/app-core/features/pluginInstall/usePluginInstall'
 import {
   pluginMarketplaceInstallInput,
@@ -16,6 +12,10 @@ import { computed, onMounted, shallowReactive, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { getCoreHost } from '../../../ports'
+
+import PluginMarketplaceDetails from './PluginMarketplaceDetails.vue'
+import PluginMarketplaceFilters from './PluginMarketplaceFilters.vue'
+import PluginMarketplaceList from './PluginMarketplaceList.vue'
 
 const openExternal = (url: string) => getCoreHost().platform.openExternal(url)
 

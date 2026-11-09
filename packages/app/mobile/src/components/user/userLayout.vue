@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { NSpin, NIcon } from 'naive-ui'
-
 import { Icons } from '@delta-comic/app-core/icons'
 import { useResizeObserver } from '@vueuse/core'
+import { NSpin, NIcon } from 'naive-ui'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
