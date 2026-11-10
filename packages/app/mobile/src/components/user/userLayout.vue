@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { Icons } from '@delta-comic/app-core/icons'
 import { useResizeObserver } from '@vueuse/core'
-import { NSpin, NIcon } from 'naive-ui'
+import { NSpin, NIcon, NButton } from 'naive-ui'
 import { ref, useTemplateRef } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 withDefaults(defineProps<{ title: string; isLoading?: boolean }>(), { isLoading: false })
@@ -14,7 +13,6 @@ useResizeObserver(topBarEl, () => {
   height.value = topBarEl.value?.getBoundingClientRect().height ?? 0
 })
 const $router = useRouter()
-const { t } = useI18n()
 </script>
 
 <template>
@@ -26,15 +24,17 @@ const { t } = useI18n()
     <div class="w-full bg-(--dc-surface) pt-safe"></div>
     <div class="flex w-full flex-col bg-(--dc-surface)" ref="topBarEl">
       <div class="relative flex h-13 w-full items-center justify-center text-lg! font-bold">
-        <NIcon
-          size="calc(var(--spacing) * 6)"
-          class="absolute! left-3 rotate-180 dc-interactive"
-          @click="$router.back()"
-          color="var(--dc-text-secondary)"
-          :aria-label="t('common.actions.back')"
-        >
-          <Icons.material.ArrowForwardIosRound />
-        </NIcon>
+        <NButton quaternary circle @click="$router.back()">
+          <template #icon>
+            <NIcon
+              size="calc(var(--spacing) * 6)"
+              class="absolute! left-3 rotate-180 dc-interactive"
+              color="var(--dc-text-secondary)"
+            >
+              <Icons.material.ArrowForwardIosRound />
+            </NIcon>
+          </template>
+        </NButton>
         <span>{{ title }}</span>
         <div class="absolute right-0 flex h-full items-center justify-end gap-4 pr-2">
           <slot name="rightNav" />

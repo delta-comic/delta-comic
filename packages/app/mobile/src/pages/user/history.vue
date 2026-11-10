@@ -150,7 +150,7 @@ const { t } = useI18n()
       </Layout>
     </Action>
   </DcState>
-  <NDrawer v-model:show="showConfig" position="bottom" round class="bg-(--dc-background)!">
+  <NDrawer v-model:show="showConfig" placement="bottom" class="bg-(--dc-background)!">
     <div class="m-(--dc-content-padding) mt-4 mb-2! w-full font-semibold">
       {{ t('history.settings.title') }}
     </div>

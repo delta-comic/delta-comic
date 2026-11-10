@@ -85,13 +85,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: UniUser; plugin: strin
   <div class="w-full bg-(--dc-surface) pt-safe"></div>
   <div class="flex h-10 w-full items-center justify-end bg-(--dc-surface)">
     <NIcon color="var(--dc-text-secondary)" class="mx-2" size="28">
-      <svg
-        v-if="config.isDark"
-        xmlns="http://www.w3.org/2000/svg"
-        class="w-7"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-        viewBox="0 0 24 24"
-      >
+      <svg v-if="config.isDark" xmlns="http://www.w3.org/2000/svg" class="w-7" viewBox="0 0 24 24">
         <path
           d="M12 3h.393a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992z"
           fill="none"
@@ -101,13 +95,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: UniUser; plugin: strin
           stroke-linejoin="round"
         ></path>
       </svg>
-      <svg
-        v-else
-        xmlns="http://www.w3.org/2000/svg"
-        class="w-7"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-        viewBox="0 0 24 24"
-      >
+      <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-7" viewBox="0 0 24 24">
         <g
           fill="none"
           stroke="currentColor"
@@ -207,11 +195,7 @@ const [DefineUser, User] = createReusableTemplate<{ user: UniUser; plugin: strin
         class="flex h-20 dc-interactive flex-col items-center justify-center"
       >
         <NIcon size="1.9rem" color="var(--bili-blue)">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            viewBox="0 0 32 32"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
             <path d="M20.59 22L15 16.41V7h2v8.58l5 5.01L20.59 22z" fill="currentColor"></path>
             <path
               d="M16 2A13.94 13.94 0 0 0 6 6.23V2H4v8h8V8H7.08A12 12 0 1 1 4 16H2A14 14 0 1 0 16 2z"

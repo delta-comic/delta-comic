@@ -132,13 +132,13 @@ const showPlayUnavailable = () => {
 <template>
   <Layout :title="t('favourite.title')" :is-loading="isSyncing">
     <template #rightNav>
-      <NIcon
-        size="calc(var(--spacing) * 6.5)"
-        color="var(--dc-text-secondary)"
-        @click="syncFromCloud"
-      >
-        <Icons.antd.CloudSyncOutlined />
-      </NIcon>
+      <NButton @click="syncFromCloud" quaternary circle>
+        <template #icon>
+          <NIcon size="calc(var(--spacing) * 6.5)" color="var(--dc-text-secondary)">
+            <Icons.antd.CloudSyncOutlined />
+          </NIcon>
+        </template>
+      </NButton>
     </template>
     <template #topNav>
       <Searcher ref="searcher" v-model:filters-history="mainFilters" />
@@ -163,22 +163,33 @@ const showPlayUnavailable = () => {
             {{ item.name }}
           </NButton>
         </div>
-        <NIcon
-          color="var(--dc-text-secondary)"
-          size="1.5rem"
-          class="dc-interactive"
+        <NButton
+          class="size-6 dc-interactive"
+          :disabled="!searcher"
           @click="searcher && (searcher.isSearching = true)"
-        >
-          <Icons.material.SearchFilled />
-        </NIcon>
-        <NIcon
           color="var(--dc-text-secondary)"
-          size="1.5rem"
-          class="dc-interactive"
-          @click="createFavouriteCard?.create()"
+          quaternary
+          circle
         >
-          <Icons.material.PlusFilled />
-        </NIcon>
+          <template #icon>
+            <NIcon>
+              <Icons.material.SearchFilled />
+            </NIcon>
+          </template>
+        </NButton>
+        <NButton
+          class="size-6 dc-interactive"
+          @click="createFavouriteCard?.create()"
+          color="var(--dc-text-secondary)"
+          quaternary
+          circle
+        >
+          <template #icon>
+            <NIcon>
+              <Icons.material.PlusFilled />
+            </NIcon>
+          </template>
+        </NButton>
         <button
           type="button"
           class="flex size-7 dc-interactive items-center justify-center text-(--dc-text-secondary)"
