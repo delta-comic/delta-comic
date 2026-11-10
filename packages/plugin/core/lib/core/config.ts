@@ -5,7 +5,11 @@ import { pluginName } from './env'
 export const cfg = new ConfigPointer(
   pluginName,
   {
-    recordHistory: { type: 'switch', defaultValue: true, info: 'plugin.core.config.recordHistory' },
+    recordHistory: {
+      type: 'switch',
+      defaultValue: Boolean(true),
+      info: 'plugin.core.config.recordHistory',
+    },
     showAIProject: { type: 'switch', defaultValue: true, info: 'plugin.core.config.showAiWorks' },
     darkMode: {
       type: 'radio',

@@ -7,7 +7,7 @@ import { Icons } from '@delta-comic/app-core/icons'
 import { pluginName } from '@delta-comic/app-core/symbol'
 import { db, DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/db'
 import { createLoadingMessage, DcState, DcWaterfall, DcCellGroup, DcCell } from '@delta-comic/ui'
-import { useDialog, NIcon, NDrawer, NPopconfirm } from 'naive-ui'
+import { useDialog, NIcon, NButton, NDrawer, NPopconfirm } from 'naive-ui'
 import { computed, shallowRef } from 'vue'
 import { useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -129,41 +129,53 @@ const $dialog = useDialog()
       >
         <Layout title="">
           <template #rightNav>
-            <NIcon
-              size="calc(var(--spacing) * 6.5)"
-              class="dc-interactive"
+            <NButton
+              class="size-6 dc-interactive"
+              :disabled="!searcher"
+              @click="searcher!.isSearching = true"
               color="var(--dc-text-secondary)"
-              @click="searcher && (searcher!.isSearching = true)"
+              quaternary
+              circle
             >
-              <Icons.material.SearchFilled />
-            </NIcon>
-            <NIcon
-              size="1.5rem"
-              class="dc-interactive"
+              <template #icon>
+                <NIcon>
+                  <Icons.material.SearchFilled />
+                </NIcon>
+              </template>
+            </NButton>
+            <NButton
+              class="size-6 dc-interactive"
               @click="actionController!.showSelect = true"
               color="var(--dc-text-secondary)"
+              quaternary
+              circle
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                viewBox="0 0 24 24"
-              >
-                <g fill="none">
-                  <path
-                    d="M6.78 4.78a.75.75 0 0 0-1.06-1.06L3.75 5.69l-.47-.47a.75.75 0 0 0-1.06 1.06l1 1a.75.75 0 0 0 1.06 0l2.5-2.5zm14.47 13.227H9.75l-.102.007a.75.75 0 0 0 .102 1.493h11.5l.102-.007a.75.75 0 0 0-.102-1.493zm0-6.507H9.75l-.102.007A.75.75 0 0 0 9.75 13h11.5l.102-.007a.75.75 0 0 0-.102-1.493zm0-6.5H9.75l-.102.007A.75.75 0 0 0 9.75 6.5h11.5l.102-.007A.75.75 0 0 0 21.25 5zM6.78 17.78a.75.75 0 1 0-1.06-1.06l-1.97 1.97l-.47-.47a.75.75 0 0 0-1.06 1.06l1 1a.75.75 0 0 0 1.06 0l2.5-2.5zm0-7.56a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 0 1-1.06 0l-1-1a.75.75 0 1 1 1.06-1.06l.47.47l1.97-1.97a.75.75 0 0 1 1.06 0z"
-                    fill="currentColor"
-                  ></path>
-                </g>
-              </svg>
-            </NIcon>
-            <NIcon
-              size="calc(var(--spacing) * 6.5)"
-              class="rotate-90 dc-interactive"
+              <template #icon>
+                <NIcon>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <g fill="none">
+                      <path
+                        d="M6.78 4.78a.75.75 0 0 0-1.06-1.06L3.75 5.69l-.47-.47a.75.75 0 0 0-1.06 1.06l1 1a.75.75 0 0 0 1.06 0l2.5-2.5zm14.47 13.227H9.75l-.102.007a.75.75 0 0 0 .102 1.493h11.5l.102-.007a.75.75 0 0 0-.102-1.493zm0-6.507H9.75l-.102.007A.75.75 0 0 0 9.75 13h11.5l.102-.007a.75.75 0 0 0-.102-1.493zm0-6.5H9.75l-.102.007A.75.75 0 0 0 9.75 6.5h11.5l.102-.007A.75.75 0 0 0 21.25 5zM6.78 17.78a.75.75 0 1 0-1.06-1.06l-1.97 1.97l-.47-.47a.75.75 0 0 0-1.06 1.06l1 1a.75.75 0 0 0 1.06 0l2.5-2.5zm0-7.56a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 0 1-1.06 0l-1-1a.75.75 0 1 1 1.06-1.06l.47.47l1.97-1.97a.75.75 0 0 1 1.06 0z"
+                        fill="currentColor"
+                      ></path>
+                    </g>
+                  </svg>
+                </NIcon>
+              </template>
+            </NButton>
+            <NButton
+              class="size-6 rotate-90 dc-interactive"
               color="var(--dc-text-secondary)"
               @click="isShowMore = true"
+              quaternary
+              circle
             >
-              <Icons.material.MoreHorizRound />
-            </NIcon>
+              <template #icon>
+                <NIcon>
+                  <Icons.material.MoreHorizRound />
+                </NIcon>
+              </template>
+            </NButton>
           </template>
           <template #bottomNav>
             <div class="mt-3 mb-4 flex w-full flex-col pl-5" v-if="card">
@@ -213,11 +225,7 @@ const $dialog = useDialog()
           <DcCell center :title="t('favourite.actions.deleteFolder')">
             <template #icon>
               <NIcon size="1.4rem">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  viewBox="0 0 16 16"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
                   <g fill="none">
                     <path
                       d="M6.5 7v4a.5.5 0 0 0 1 0V7a.5.5 0 0 0-1 0zM9 6.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5zM10 4h3a.5.5 0 0 1 0 1h-.553l-.752 6.776A2.5 2.5 0 0 1 9.21 14H6.79a2.5 2.5 0 0 1-2.485-2.224L3.552 5H3a.5.5 0 0 1 0-1h3a2 2 0 1 1 4 0zM8 3a1 1 0 0 0-1 1h2a1 1 0 0 0-1-1zM4.559 5l.74 6.666A1.5 1.5 0 0 0 6.79 13h2.42a1.5 1.5 0 0 0 1.49-1.334L11.442 5H4.56z"

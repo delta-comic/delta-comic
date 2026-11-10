@@ -127,10 +127,14 @@ const [DefineUser, User] = createReusableTemplate<{ user: UniUser; plugin: strin
       v-if="UniUser.userBase.size > 1"
     >
       <NDivider class="my-0! bg-(--dc-surface)">
-        <NIcon @click="showActivatedUserSelect = !showActivatedUserSelect" size="20px">
-          <Icons.material.KeyboardArrowUpRound v-if="showActivatedUserSelect" />
-          <Icons.material.KeyboardArrowDownRound v-else />
-        </NIcon>
+        <NButton quaternary circle @click="showActivatedUserSelect = !showActivatedUserSelect">
+          <template #icon>
+            <NIcon size="20px">
+              <Icons.material.KeyboardArrowUpRound v-if="showActivatedUserSelect" />
+              <Icons.material.KeyboardArrowDownRound v-else />
+            </NIcon>
+          </template>
+        </NButton>
       </NDivider>
     </Motion>
   </AnimatePresence>

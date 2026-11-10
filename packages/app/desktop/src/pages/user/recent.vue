@@ -64,14 +64,20 @@ const { t } = useI18n()
     >
       <Layout :title="t('recent.title')">
         <template #rightNav>
-          <NIcon
-            size="calc(var(--spacing) * 6.5)"
-            class="dc-interactive"
-            @click="searcher && (searcher!.isSearching = true)"
+          <NButton
+            class="size-6 dc-interactive"
+            :disabled="!searcher"
+            @click="searcher!.isSearching = true"
             color="var(--dc-text-secondary)"
+            quaternary
+            circle
           >
-            <Icons.material.SearchFilled />
-          </NIcon>
+            <template #icon>
+              <NIcon>
+                <Icons.material.SearchFilled />
+              </NIcon>
+            </template>
+          </NButton>
         </template>
         <template #topNav>
           <component :is="ActionBar" />
@@ -79,24 +85,25 @@ const { t } = useI18n()
         </template>
         <template #bottomNav>
           <div class="flex h-12 w-full items-center justify-end bg-(--dc-surface) pt-4 pr-3 pb-2">
-            <NIcon
-              size="1.5rem"
-              class="dc-interactive"
+            <NButton
+              class="size-6 dc-interactive"
               @click="actionController!.showSelect = true"
+              quaternary
+              circle
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-                viewBox="0 0 24 24"
-              >
-                <g fill="none">
-                  <path
-                    d="M6.78 4.78a.75.75 0 0 0-1.06-1.06L3.75 5.69l-.47-.47a.75.75 0 0 0-1.06 1.06l1 1a.75.75 0 0 0 1.06 0l2.5-2.5zm14.47 13.227H9.75l-.102.007a.75.75 0 0 0 .102 1.493h11.5l.102-.007a.75.75 0 0 0-.102-1.493zm0-6.507H9.75l-.102.007A.75.75 0 0 0 9.75 13h11.5l.102-.007a.75.75 0 0 0-.102-1.493zm0-6.5H9.75l-.102.007A.75.75 0 0 0 9.75 6.5h11.5l.102-.007A.75.75 0 0 0 21.25 5zM6.78 17.78a.75.75 0 1 0-1.06-1.06l-1.97 1.97l-.47-.47a.75.75 0 0 0-1.06 1.06l1 1a.75.75 0 0 0 1.06 0l2.5-2.5zm0-7.56a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 0 1-1.06 0l-1-1a.75.75 0 1 1 1.06-1.06l.47.47l1.97-1.97a.75.75 0 0 1 1.06 0z"
-                    fill="currentColor"
-                  ></path>
-                </g>
-              </svg>
-            </NIcon>
+              <template #icon>
+                <NIcon>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <g fill="none">
+                      <path
+                        d="M6.78 4.78a.75.75 0 0 0-1.06-1.06L3.75 5.69l-.47-.47a.75.75 0 0 0-1.06 1.06l1 1a.75.75 0 0 0 1.06 0l2.5-2.5zm14.47 13.227H9.75l-.102.007a.75.75 0 0 0 .102 1.493h11.5l.102-.007a.75.75 0 0 0-.102-1.493zm0-6.507H9.75l-.102.007A.75.75 0 0 0 9.75 13h11.5l.102-.007a.75.75 0 0 0-.102-1.493zm0-6.5H9.75l-.102.007A.75.75 0 0 0 9.75 6.5h11.5l.102-.007A.75.75 0 0 0 21.25 5zM6.78 17.78a.75.75 0 1 0-1.06-1.06l-1.97 1.97l-.47-.47a.75.75 0 0 0-1.06 1.06l1 1a.75.75 0 0 0 1.06 0l2.5-2.5zm0-7.56a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 0 1-1.06 0l-1-1a.75.75 0 1 1 1.06-1.06l.47.47l1.97-1.97a.75.75 0 0 1 1.06 0z"
+                        fill="currentColor"
+                      ></path>
+                    </g>
+                  </svg>
+                </NIcon>
+              </template>
+            </NButton>
           </div>
         </template>
         <DcWaterfall
