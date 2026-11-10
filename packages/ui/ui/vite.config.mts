@@ -41,7 +41,7 @@ export default defineConfig(({ command }) => ({
               tsconfig: resolve(import.meta.dirname, './tsconfig.app.json'),
               ...(process.platform === 'win32'
                 ? { generator: 'oxc' }
-                : { tsrs: { runExternalCode: true } }),
+                : { tsc: { vue: true }, tsrs: { runExternalCode: true } }),
               sourcemap: true,
             }),
           ]

@@ -8,11 +8,11 @@ import { Command, InvalidArgumentError } from 'commander'
 import packageJson from '../package.json' with { type: 'json' }
 
 import { findProjectRoot, loadCIConfig } from './config'
+import { toLinuxRmpVersion, toWindowsMsiVersion } from './platform-version'
 import { executeRelease, runSemanticRelease } from './release'
 import { describeReleaseBranchAction, ReleaseBranchManager } from './release-branches'
 import { ReleaseEnvironment } from './release-environment'
 import { assertVersion, VersionSynchronizer } from './set-version'
-import { toWindowsMsiVersion, writeWindowsMsiConfig } from './windows-msi-version'
 
 function projectRoot(program: Command) {
   const cwd = program.opts<{ cwd: string }>().cwd
@@ -117,33 +117,32 @@ function createProgram() {
       )
     })
 
-  const version = program.command('version').description('同步项目版本')
-  version
-    .command('sync <version>')
-    .description('同步 JSON、Cargo 和 Cargo.lock 版本')
+  program
+    .command('version <version>')
+    .description('同步设置 JSON、Cargo 和 Cargo.lock 版本')
     .option('--dry-run', '只显示目标版本')
-    .action(async (value: string, options: { dryRun?: boolean }) => {
+    .option('-p, --platform <PLATFORM>', '适用于特定系统的格式')
+    .action(async (value: string, options: { dryRun?: boolean; platform?: string }) => {
       const root = projectRoot(program)
       const next = parseVersion(value)
       const config = await projectConfig(program, root)
       const synchronizer = new VersionSynchronizer(root, config)
+
       const changes = await synchronizer.plan(next)
+
+      let version = next
+      if (options.platform?.includes('windows')) {
+        // msi
+        version = toWindowsMsiVersion(version)
+      } else if (options.platform?.includes('ubuntu')) {
+        // rpm
+        version = toLinuxRmpVersion(version)
+      }
+
       if (dryRun(program, options.dryRun)) {
-        console.log(`Version synchronization plan: ${next}`)
-        console.log(changes.map(path => `  ${path} -> ${next}`).join('\n'))
-      } else await synchronizer.setVersion(next)
-    })
-  version
-    .command('msi <version>')
-    .description('生成 Windows MSI 版本配置')
-    .option('--dry-run', '只显示 MSI 版本')
-    .action(async (value: string, options: { dryRun?: boolean }) => {
-      const next = parseVersion(value)
-      const root = projectRoot(program)
-      const config = await projectConfig(program, root)
-      if (dryRun(program, options.dryRun))
-        console.log(`Windows MSI version: ${toWindowsMsiVersion(next)}`)
-      else console.log(`Updated ${await writeWindowsMsiConfig(next, root, config.msiConfigPath)}`)
+        console.log(`Version synchronization plan: ${version}`)
+        console.log(changes.map(path => `  ${path} -> ${version}`).join('\n'))
+      } else await synchronizer.setVersion(version)
     })
 
   const packageCommand = program.command('package').description('管理 CLI 包自身版本')

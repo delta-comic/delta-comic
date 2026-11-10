@@ -129,12 +129,12 @@ defineExpose({ isLoaded, imageEl: computed(() => img.value?.imageRef), imageIns:
       ...imgProp,
       class: cn(imgProp?.class, 'w-full'),
       fetchpriority: $props.fetchpriority,
+      onClick: handleClickImage,
     }"
     :class="cn(round && 'rounded-full!', inline ? 'inline-flex' : 'flex', $props.class)"
     :style
     v-if="show"
     @load="handleImageLoad"
-    @click="handleClickImage"
     :src
     :fallbackSrc
   >

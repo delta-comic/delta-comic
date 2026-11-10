@@ -8,7 +8,6 @@ export interface CIConfig {
   jsonVersionPaths?: readonly string[]
   cargoTomlVersionPaths?: readonly (readonly [string, 'package' | 'workspace.package'])[]
   cargoLockPackageNames?: readonly string[]
-  msiConfigPath?: string
   workspace?: { roots?: readonly string[] }
   buildCommand?: { command: string; args?: readonly string[] }
   publishCommand?: { command: string; args?: readonly string[] }
@@ -38,7 +37,7 @@ export function defineConfig(config: GlobalConfig): ReleaseConfig {
   return { ...createConfig(), withCI: createConfig }
 }
 
-export async function loadCIConfig(cwd: string, configPath?: string) {
+export async function loadCIConfig(cwd: string, configPath?: string): Promise<CIConfig> {
   const path = configPath ? resolve(cwd, configPath) : join(cwd, 'release.config.ts')
   if (!existsSync(path)) return {}
   const module = await import(pathToFileURL(path).href)

@@ -28,22 +28,15 @@ const showLogReader = shallowRef(false)
   <NScrollbar class="h-[calc(100%-var(--dc-page-header-height)-var(--safe-area-inset-top))] w-full">
     <div class="mx-auto w-full max-w-5xl py-2">
       <DcCellGroup
-        v-for="[
-          formKey,
-          {
-            form,
-            data: { value: store },
-            name: title,
-          },
-        ] of config.form.entries()"
+        v-for="[formKey, val] of config.form.entries()"
         :key="formKey"
-        :title="translateText(title)"
+        :title="translateText(val.name)"
       >
-        <template v-for="[name, config] of Object.entries(form)" :key="name">
+        <template v-for="[name, config] of Object.entries(val.form)" :key="name">
           <PluginConfigField
             :config="localizeFormConfig(config)"
-            :model-value="store[name]"
-            @update:model-value="store[name] = $event"
+            :model-value="val.data.value[name]"
+            @update:model-value="val.data.value[name] = $event"
           />
         </template>
       </DcCellGroup>

@@ -89,7 +89,7 @@ jobs:
       - name: Synchronize build version
         run: |
           vpr release-cli
-          vp exec dr version sync "${{ needs.plan.outputs.version }}"
+          vp exec dr version "${{ needs.plan.outputs.version }}"
 
       - name: Build release workspace libraries
         run: vp run build:packages
@@ -134,8 +134,8 @@ jobs:
           cd packages/app/mobile
           vp run --filter @delta-comic/mobile --fail-if-no-match tauri android init --ci --skip-targets-install
           git restore src-tauri/gen/android/buildSrc/src/main/java/org/wenxig/delta_comic/kotlin/BuildTask.kt
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./packages/app/mobile/src-tauri/gen/android/gradlew
+
+          chmod +x ./packages/app/mobile/src-tauri/gen/android/gradlew
 
       - name: Build Android App
         id: build
@@ -146,56 +146,48 @@ jobs:
         run: |
           cd packages/app/mobile
           vp run --filter @delta-comic/mobile --fail-if-no-match tauri android build --ci --target aarch64 armv7
-      - name: Prepare signer
-        env:
-          KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          set -euo pipefail
-          printf '%s' '${{ secrets.ANDROID_KEY_BASE64 }}' | base64 --decode > "$RUNNER_TEMP/keystore.p12"
-          FILESIZE=$(stat --format='%s' "$RUNNER_TEMP/keystore.p12" || echo 0)
-          if [ "$FILESIZE" -lt 1000 ]; then
-            echo "Android keystore is unexpectedly small ($FILESIZE bytes)." >&2
-            exit 1
-          fi
-          cat > ./packages/app/mobile/src-tauri/gen/android/keystore.properties <<EOF
-          storeFile=$RUNNER_TEMP/keystore.p12
-          storePassword=$KEYSTORE_PASS
-          keyPassword=$KEYSTORE_PASS
-          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
-          EOF
 
-          sudo apt-get update && sudo apt-get install -y apksigner
-
-      - name: Sign APK
+      - name: Sign Android APK
         env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEY_BASE64 }}
           KEYSTORE_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
           set -euo pipefail
-          APK_SRC='./packages/app/mobile/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk'
-          if [ ! -f "$APK_SRC" ]; then
-            echo "APK not found at $APK_SRC" >&2
-            exit 1
-          fi
+
+          KEYSTORE="$RUNNER_TEMP/keystore.p12"
+          APK="./packages/app/mobile/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
+          OUTPUT="./dist/release/delta-comic-$RELEASE_VERSION-android.apk"
+
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+
+          sudo apt-get update
+          sudo apt-get install -y apksigner
+
           mkdir -p dist/release
+
           apksigner sign \
-            --ks "$RUNNER_TEMP/keystore.p12" \
+            --ks "$KEYSTORE" \
             --ks-type PKCS12 \
             --ks-key-alias "$KEY_ALIAS" \
-            --ks-pass "pass:$KEYSTORE_PASS" \
-            --key-pass "pass:$KEYSTORE_PASS" \
+            --ks-pass "env:KEYSTORE_PASS" \
+            --key-pass "env:KEYSTORE_PASS" \
             --v1-signing-enabled true \
             --v2-signing-enabled true \
             --v3-signing-enabled true \
-            --out "./dist/release/delta-comic-$RELEASE_VERSION-android.apk" \
-            "$APK_SRC"
-          apksigner verify "./dist/release/delta-comic-$RELEASE_VERSION-android.apk"
+            --v4-signing-enabled true \
+            --out "$OUTPUT" \
+            "$APK"
+
+          apksigner verify "$OUTPUT"
 
       - name: Upload Android artifact
         uses: actions/upload-artifact@v7
         with:
           name: release-android
-          path: dist/release/*.apk
+          path: |
+            dist/release/*.apk
+            dist/release/*.apk.idsig
           if-no-files-found: error
 
   desktop:
@@ -238,11 +230,7 @@ jobs:
       - name: Synchronize build version
         run: |
           vpr release-cli
-          vp exec dr version sync "${{ needs.plan.outputs.version }}"
-
-      - name: Configure Windows MSI version
-        if: matrix.platform == 'windows-latest'
-        run: vp exec dr version msi "${{ needs.plan.outputs.version }}"
+          vp exec dr version "${{ needs.plan.outputs.version }}" -p "${{matrix.platform}}"
 
       - name: Build release workspace libraries
         run: vp run build:packages
@@ -259,15 +247,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Configure Linux package version
-        if: matrix.platform == 'ubuntu-latest'
-        env:
-          RELEASE_VERSION: ${{ needs.plan.outputs.version }}
-        run: |
-          rpm_version="${RELEASE_VERSION/-/+}"
-          rpm_version="${rpm_version//-/.}"
-          printf '{"version":"%s"}\n' "$rpm_version" > packages/app/desktop/src-tauri/tauri.linux.conf.json
-
       - name: Build desktop app
         uses: tauri-apps/tauri-action@v1
         env:
@@ -277,8 +256,16 @@ jobs:
           args: ${{ matrix.args }}
           projectPath: packages/app/desktop
           retryAttempts: 0
-          uploadWorkflowArtifacts: true
-          workflowArtifactNamePattern: release-desktop-[platform]-[arch]-[bundle]
+          uploadWorkflowArtifacts: false
+
+      - name: Upload desktop artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-desktop-${{ matrix.platform }}-${{ strategy.job-index }}
+          path: |
+            packages/app/desktop/src-tauri/target/**/release/bundle/**
+            !packages/app/desktop/src-tauri/target/**/release/bundle/**/*.app/**
+          if-no-files-found: error
 
   release:
     needs: [plan, android, desktop]
