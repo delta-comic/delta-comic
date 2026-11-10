@@ -89,7 +89,7 @@ jobs:
       - name: Synchronize build version
         run: |
           vpr release-cli
-          vp exec dr version sync "${{ needs.plan.outputs.version }}"
+          vp exec dr version "${{ needs.plan.outputs.version }}"
 
       - name: Build release workspace libraries
         run: vp run build:packages
@@ -238,11 +238,7 @@ jobs:
       - name: Synchronize build version
         run: |
           vpr release-cli
-          vp exec dr version sync "${{ needs.plan.outputs.version }}"
-
-      - name: Configure Windows MSI version
-        if: matrix.platform == 'windows-latest'
-        run: vp exec dr version msi "${{ needs.plan.outputs.version }}"
+          vp exec dr version "${{ needs.plan.outputs.version }}" -p "${{matrix.platform}}"
 
       - name: Build release workspace libraries
         run: vp run build:packages
@@ -258,15 +254,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-
-      - name: Configure Linux package version
-        if: matrix.platform == 'ubuntu-latest'
-        env:
-          RELEASE_VERSION: ${{ needs.plan.outputs.version }}
-        run: |
-          rpm_version="${RELEASE_VERSION/-/+}"
-          rpm_version="${rpm_version//-/.}"
-          printf '{"version":"%s"}\n' "$rpm_version" > packages/app/desktop/src-tauri/tauri.linux.conf.json
 
       - name: Build desktop app
         uses: tauri-apps/tauri-action@v1

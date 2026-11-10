@@ -24,6 +24,8 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "@types/semver": "catalog:",
+    "semver": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   },

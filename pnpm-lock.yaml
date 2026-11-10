@@ -1173,6 +1173,12 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
+      '@types/semver':
+        specifier: 'catalog:'
+        version: 7.8.0
+      semver:
+        specifier: 'catalog:'
+        version: 7.8.6
       typescript:
         specifier: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
         version: typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2

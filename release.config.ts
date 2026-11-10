@@ -17,7 +17,6 @@ export default defineConfig({
     ],
   ],
 }).withCI({
-  msiConfigPath: 'packages/app/desktop/src-tauri/tauri.windows.conf.json',
   jsonVersionPaths: [
     'package.json',
     'packages/app/mobile/package.json',

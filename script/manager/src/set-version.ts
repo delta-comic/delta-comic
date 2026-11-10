@@ -1,12 +1,11 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
+import { valid } from 'semver'
+
 import type { CIConfig } from './config'
 
 export const rootDir = process.cwd()
-
-const semverPattern =
-  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/
 
 function replaceVersion(raw: string, pattern: RegExp, version: string, label: string) {
   if (!pattern.test(raw)) throw new Error(`Unable to find version field in ${label}`)
@@ -15,7 +14,7 @@ function replaceVersion(raw: string, pattern: RegExp, version: string, label: st
 }
 
 export function assertVersion(version: string) {
-  if (!semverPattern.test(version)) throw new Error(`Invalid semantic version: ${version}`)
+  if (!valid(version, { loose: true })) throw new Error(`Invalid semantic version: ${version}`)
 }
 
 export class VersionSynchronizer {
