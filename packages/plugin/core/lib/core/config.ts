@@ -24,23 +24,23 @@ export const cfg = new ConfigPointer(
     },
     easilyTitle: {
       type: 'switch',
-      defaultValue: false,
+      defaultValue: Boolean(false),
       info: 'plugin.core.config.simplifiedTitle',
     },
     githubToken: {
       type: 'string',
-      defaultValue: '',
+      defaultValue: String(''),
       info: 'plugin.core.config.githubToken.title',
       placeholder: 'plugin.core.config.githubToken.placeholder',
     },
     receivePerReleaseUpdate: {
       type: 'switch',
-      defaultValue: false,
+      defaultValue: Boolean(false),
       info: 'plugin.core.config.prereleaseUpdates',
     },
     installOverride: {
       type: 'pairs',
-      defaultValue: [],
+      defaultValue: new Array(),
       info: 'plugin.core.config.installOverride',
       required: true,
     },
