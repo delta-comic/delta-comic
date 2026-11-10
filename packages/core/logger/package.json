@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/logger",
-  "version": "3.0.0-next.19",
+  "version": "3.0.0-next.25",
   "private": true,
   "files": [
     "dist"
