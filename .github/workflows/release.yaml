@@ -135,7 +135,7 @@ jobs:
           vp run --filter @delta-comic/mobile --fail-if-no-match tauri android init --ci --skip-targets-install
           git restore src-tauri/gen/android/buildSrc/src/main/java/org/wenxig/delta_comic/kotlin/BuildTask.kt
 
-          chmod +x ./packages/app/mobile/src-tauri/gen/android/gradlew
+          chmod +x ./src-tauri/gen/android/gradlew
 
       - name: Build Android App
         id: build
@@ -263,8 +263,8 @@ jobs:
         with:
           name: release-desktop-${{ matrix.platform }}-${{ strategy.job-index }}
           path: |
-            packages/app/desktop/src-tauri/target/**/release/bundle/**
-            !packages/app/desktop/src-tauri/target/**/release/bundle/**/*.app/**
+            target/**/release/bundle/**
+            !target/**/release/bundle/**/*.app/**
           if-no-files-found: error
 
   release:
