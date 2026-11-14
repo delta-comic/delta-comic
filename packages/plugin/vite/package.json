@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/plugin-vite",
-  "version": "3.0.0-next.27",
+  "version": "3.0.0-next.28",
   "private": true,
   "description": "Vite build and development adapter for Delta Comic plugins",
   "files": [

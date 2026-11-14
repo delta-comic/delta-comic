@@ -1,5 +1,25 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.28](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.27...3.0.0-next.28) (2026-11-14)
+
+
+### Bug Fixes
+
+* **build:** 保持工作区包边界并修正构建入口 ([a487f02](https://github.com/delta-comic/delta-comic/commit/a487f02953f4be43d964e3ddf11ee24ee33fbda3))
+* **build:** 通过 peer 依赖排除 Vite+ 打包 ([a39e330](https://github.com/delta-comic/delta-comic/commit/a39e3309499717ad9533c037420bec8dafef9c20))
+* **ci:** 修复 Android 构建与发布流程告警 ([8025ed2](https://github.com/delta-comic/delta-comic/commit/8025ed26b1376847de263c5f9308bd3db28abf08))
+* **ci:** 修复最近构建与发布失败 ([7237bb3](https://github.com/delta-comic/delta-comic/commit/7237bb36006c4ec9d1d5c04a300f646b10bf7241))
+* **ci:** 修复安卓初始化和桌面产物上传路径 ([845b41a](https://github.com/delta-comic/delta-comic/commit/845b41a014c96de2ad4b72c0724a423cdf7f68e1))
+* **release:** 修复发布文件太多问题 ([ed3fa53](https://github.com/delta-comic/delta-comic/commit/ed3fa53aada0542e7a9dfcf90095e5d4966fe6a6))
+* **sdk:** 修复私有依赖打包与构建顺序 ([94aa58e](https://github.com/delta-comic/delta-comic/commit/94aa58ecac2ed03a249522ecf6ebdaccad8577b7))
+
+
+### Performance Improvements
+
+* **build:** 打包现代化js块来提高性能 ([98769a8](https://github.com/delta-comic/delta-comic/commit/98769a829925ee37f8f57d44dcac7a8fa256ebe1))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.27](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.26...3.0.0-next.27) (2026-11-14)
 
 
