@@ -6,15 +6,7 @@ import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
 import { lazyPlugins } from 'vite-plus'
 
-const extendsDepends = await (async () => {
-  try {
-    const { extendsDepends } = await import('@delta-comic/utils/vite')
-    return extendsDepends
-  } catch (error) {
-    console.warn(error, 'Fail to import `@delta-comic/utils/vite`')
-    return {}
-  }
-})()
+import { extendsDepends } from '../../core/utils/vite/index'
 const externalDepends = [...Object.keys(extendsDepends), 'highlight.js']
 const isExternal = (id: string) =>
   id.startsWith('@delta-comic/') ||
