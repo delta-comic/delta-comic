@@ -69,7 +69,18 @@ export default defineConfig(() => ({
         VueRouter({
           root: import.meta.dirname,
           dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
-          exclude: ['**/*.impl.vue', '**/*.desktop.vue', '**/*.mobile.vue'],
+          exclude: ['**/components/**', '**/*.impl.vue', '**/*.desktop.vue', '**/*.mobile.vue'],
+          // `index.vue` directories keep the existing route names used by the app.
+          getRouteName: node => {
+            const segments: string[] = []
+            let current = node
+            while (current.parent) {
+              const segment = current.value.rawSegment
+              if (segment !== 'index' && !/^\(.+\)$/.test(segment)) segments.unshift(segment)
+              current = current.parent
+            }
+            return segments.length ? `/${segments.join('/')}` : '/'
+          },
         }),
         vueDevTools(),
         tailwindcss(),

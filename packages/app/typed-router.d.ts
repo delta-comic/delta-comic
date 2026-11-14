@@ -64,27 +64,14 @@ declare module 'vue-router/auto-routes' {
       '/main',
       Record<never, never>,
       Record<never, never>,
-      | '/main/home'
-      | '/main/home/[id]'
-      | '/main/home/hot'
-      | '/main/home/random'
-      | '/main/plugin'
-      | '/main/plugin/config'
-      | '/main/plugin/download'
-      | '/main/plugin/list'
-      | '/main/plugin/shop'
-      | '/main/search'
-      | '/main/subscribe'
-      | '/main/user'
+      | never
     >,
     '/main/home': RouteRecordInfo<
       '/main/home',
       '/main/home',
       Record<never, never>,
       Record<never, never>,
-      | '/main/home/[id]'
-      | '/main/home/hot'
-      | '/main/home/random'
+      | never
     >,
     '/main/home/[id]': RouteRecordInfo<
       '/main/home/[id]',
@@ -112,10 +99,7 @@ declare module 'vue-router/auto-routes' {
       '/main/plugin',
       Record<never, never>,
       Record<never, never>,
-      | '/main/plugin/config'
-      | '/main/plugin/download'
-      | '/main/plugin/list'
-      | '/main/plugin/shop'
+      | never
     >,
     '/main/plugin/config': RouteRecordInfo<
       '/main/plugin/config',
@@ -206,7 +190,7 @@ declare module 'vue-router/auto-routes' {
       '/user/favourite',
       Record<never, never>,
       Record<never, never>,
-      | '/user/favourite/[id]'
+      | never
     >,
     '/user/favourite/[id]': RouteRecordInfo<
       '/user/favourite/[id]',
@@ -242,7 +226,7 @@ declare module 'vue-router/auto-routes' {
    * @internal
    */
   export interface _RouteFileInfoMap {
-    'src/pages/index.vue': {
+    'src/pages/(root)/index.vue': {
       routes:
         | '/'
       views:
@@ -250,7 +234,7 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/cate.vue': {
+    'src/pages/cate/index.vue': {
       routes:
         | '/cate'
       views:
@@ -258,62 +242,47 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/content/[contentType]/[id]/[ep].vue': {
+    'src/pages/content/[contentType]/[id]/[ep]/index.vue': {
       routes:
         | '/content/[contentType]/[id]/[ep]'
       views:
         | never
       pathParamNames:
-        | 'ep'
+        | never
     }
-    'src/pages/hot/[plugin].vue': {
+    'src/pages/hot/[plugin]/index.vue': {
       routes:
         | '/hot/[plugin]'
       views:
         | never
       pathParamNames:
-        | 'plugin'
+        | never
     }
-    'src/pages/main.vue': {
+    'src/pages/main/index.vue': {
       routes:
         | '/main'
-        | '/main/home'
-        | '/main/home/[id]'
-        | '/main/home/hot'
-        | '/main/home/random'
-        | '/main/plugin'
-        | '/main/plugin/config'
-        | '/main/plugin/download'
-        | '/main/plugin/list'
-        | '/main/plugin/shop'
-        | '/main/search'
-        | '/main/subscribe'
-        | '/main/user'
       views:
-        | 'default'
+        | never
       pathParamNames:
         | never
     }
-    'src/pages/main/home.vue': {
+    'src/pages/main/home/index.vue': {
       routes:
         | '/main/home'
-        | '/main/home/[id]'
-        | '/main/home/hot'
-        | '/main/home/random'
       views:
-        | 'default'
+        | never
       pathParamNames:
         | never
     }
-    'src/pages/main/home/[id].vue': {
+    'src/pages/main/home/[id]/index.vue': {
       routes:
         | '/main/home/[id]'
       views:
         | never
       pathParamNames:
-        | 'id'
+        | never
     }
-    'src/pages/main/home/hot.vue': {
+    'src/pages/main/home/hot/index.vue': {
       routes:
         | '/main/home/hot'
       views:
@@ -321,7 +290,7 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/main/home/random.vue': {
+    'src/pages/main/home/random/index.vue': {
       routes:
         | '/main/home/random'
       views:
@@ -329,19 +298,15 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/main/plugin.vue': {
+    'src/pages/main/plugin/index.vue': {
       routes:
         | '/main/plugin'
-        | '/main/plugin/config'
-        | '/main/plugin/download'
-        | '/main/plugin/list'
-        | '/main/plugin/shop'
       views:
-        | 'default'
+        | never
       pathParamNames:
         | never
     }
-    'src/pages/main/plugin/config.vue': {
+    'src/pages/main/plugin/config/index.vue': {
       routes:
         | '/main/plugin/config'
       views:
@@ -349,7 +314,7 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/main/plugin/download.vue': {
+    'src/pages/main/plugin/download/index.vue': {
       routes:
         | '/main/plugin/download'
       views:
@@ -357,7 +322,7 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/main/plugin/list.vue': {
+    'src/pages/main/plugin/list/index.vue': {
       routes:
         | '/main/plugin/list'
       views:
@@ -365,7 +330,7 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/main/plugin/shop.vue': {
+    'src/pages/main/plugin/shop/index.vue': {
       routes:
         | '/main/plugin/shop'
       views:
@@ -373,7 +338,7 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/main/search.vue': {
+    'src/pages/main/search/index.vue': {
       routes:
         | '/main/search'
       views:
@@ -381,7 +346,7 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/main/subscribe.vue': {
+    'src/pages/main/subscribe/index.vue': {
       routes:
         | '/main/subscribe'
       views:
@@ -389,7 +354,7 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/main/user.vue': {
+    'src/pages/main/user/index.vue': {
       routes:
         | '/main/user'
       views:
@@ -397,15 +362,15 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/search/[keyword]/[sort]/[method].vue': {
+    'src/pages/search/[keyword]/[sort]/[method]/index.vue': {
       routes:
         | '/search/[keyword]/[sort]/[method]'
       views:
         | never
       pathParamNames:
-        | 'method'
+        | never
     }
-    'src/pages/setting.vue': {
+    'src/pages/setting/index.vue': {
       routes:
         | '/setting'
       views:
@@ -413,15 +378,15 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/user/action/[plugin]/[key].vue': {
+    'src/pages/user/action/[plugin]/[key]/index.vue': {
       routes:
         | '/user/action/[plugin]/[key]'
       views:
         | never
       pathParamNames:
-        | 'key'
+        | never
     }
-    'src/pages/user/download.vue': {
+    'src/pages/user/download/index.vue': {
       routes:
         | '/user/download'
       views:
@@ -429,32 +394,31 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/user/edit/[plugin].vue': {
+    'src/pages/user/edit/[plugin]/index.vue': {
       routes:
         | '/user/edit/[plugin]'
       views:
         | never
       pathParamNames:
-        | 'plugin'
+        | never
     }
-    'src/pages/user/favourite.vue': {
+    'src/pages/user/favourite/index.vue': {
       routes:
         | '/user/favourite'
-        | '/user/favourite/[id]'
       views:
-        | 'default'
+        | never
       pathParamNames:
         | never
     }
-    'src/pages/user/favourite/[id].vue': {
+    'src/pages/user/favourite/[id]/index.vue': {
       routes:
         | '/user/favourite/[id]'
       views:
         | never
       pathParamNames:
-        | 'id'
+        | never
     }
-    'src/pages/user/history.vue': {
+    'src/pages/user/history/index.vue': {
       routes:
         | '/user/history'
       views:
@@ -462,7 +426,7 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/user/recent.vue': {
+    'src/pages/user/recent/index.vue': {
       routes:
         | '/user/recent'
       views:

@@ -1,1 +1,0 @@
-export { default } from './cate.impl.vue'
