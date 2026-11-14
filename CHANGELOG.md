@@ -1,5 +1,14 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.27](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.26...3.0.0-next.27) (2026-11-14)
+
+
+### Bug Fixes
+
+* **release:** 修复发布文件太多问题 ([8acaf9d](https://github.com/delta-comic/delta-comic/commit/8acaf9da508821476d7b9a7f13addf42f53e86bb))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.24](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.23...3.0.0-next.24) (2026-10-31)
 
 
