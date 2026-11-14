@@ -1,5 +1,5 @@
 - Monorepo root: `packages/*`; publishable packages include `data/db`, `platform/downloader`, `platform/http`, `core/logger`, `core/model`, `core/utils`, `plugin`, and `ui`; private apps include `app` and `core/runtime`.
-- Client app entries: `packages/app/mobile` and `packages/app/desktop`; shared Tauri entry: `packages/app/core/src/lib.rs`.
+- Client app entry: `packages/app/src`; shared Tauri entry: `packages/app/core/src/lib.rs`.
 - Plugin architecture is documented in `packages/plugin/core/ARCHITECTURE.md`; composition is the only layer that assembles capabilities/adapters, and package code must not self-import the package root.
 - Generated declarations must not be edited manually: `components.d.ts`, `typed-router.d.ts`, and Rust bindings.
 - Read `mem:tech_stack` for tooling, `mem:suggested_commands` for commands, `mem:conventions` for implementation rules, and `mem:task_completion` for verification gates.

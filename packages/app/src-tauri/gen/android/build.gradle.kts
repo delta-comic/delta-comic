@@ -20,4 +20,4 @@ tasks.register("clean").configure {
     delete("build")
 }
 
-apply(from = "../../../../../../script/android/warnings.gradle")
+apply(from = "../../../../../script/android/warnings.gradle")
