@@ -57,6 +57,7 @@ fn setup_download_tray(app: &mut tauri::App) -> tauri::Result<()> {
 }
 
 #[allow(clippy::large_unopt_stack_frames)]
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   #[cfg(target_os = "macos")]
   disable_automatic_capitalization();
