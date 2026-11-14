@@ -66,10 +66,10 @@
 ## 客户端 Context 与插件
 
 每个应用会话使用一个原生 `Context`。宿主先初始化平台服务、配置、i18n、用户集合和应用 UI，
-再加载启用插件。安装包默认导出 `readonly Plugin.Function<Config>[]`。
+再加载启用插件。安装包默认导出 `readonly Component.Function<Config>[]`。
 
 ```ts
-import type { Context, Plugin } from 'cordis'
+import type { Component, Context } from 'cordis'
 import type {} from '@delta-comic/client'
 
 function example(ctx: Context, config: Record<string, unknown>) {
@@ -79,7 +79,7 @@ function example(ctx: Context, config: Record<string, unknown>) {
 }
 
 Object.assign(example, { inject: ['ui', 'diagnostics'] })
-export default [example] satisfies readonly Plugin.Function[]
+export default [example] satisfies readonly Component.Function[]
 ```
 
 函数使用原生 `name`、`inject`、`provide` 和 `Config` 元数据。Cordis 原生 `resolveConfig`

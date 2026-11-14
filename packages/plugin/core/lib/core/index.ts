@@ -1,4 +1,4 @@
-import type { Context, Plugin } from 'cordis'
+import type { Component, Context } from 'cordis'
 
 export { cfg } from './config'
 
@@ -11,4 +11,4 @@ function core(ctx: Context) {
 }
 
 core.inject = ['i18n', 'share']
-export default [core] satisfies readonly Plugin.Function[]
+export default [core] satisfies readonly Component.Function[]

@@ -1,6 +1,6 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import { validateArtifact } from '@delta-comic/plugin-artifact'
-import type { Context, Plugin } from 'cordis'
+import type { Component, Context } from 'cordis'
 
 import type { LoadedPluginModule, PluginFileStore, PluginModuleReader } from './contracts'
 import { DEV_CSS_PATH, devServerUrl, parseDevServerPort } from './dev'
@@ -10,8 +10,8 @@ import { createArtifactModuleGraph } from './moduleGraph'
 export const parseClientPluginEntry = (
   value: unknown,
   plugin: string,
-): readonly Plugin.Function[] => {
-  const isFunctionArray = (value: unknown): value is readonly Plugin.Function[] =>
+): readonly Component.Function[] => {
+  const isFunctionArray = (value: unknown): value is readonly Component.Function[] =>
     Array.isArray(value) && value.every(item => typeof item === 'function')
   if (!isFunctionArray(value))
     throw new TypeError(`client entry must export a function array: ${plugin}`)

@@ -1,6 +1,6 @@
 import type { PluginArchiveDB } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/manifest'
-import type { Context, Plugin } from 'cordis'
+import type { Component, Context } from 'cordis'
 
 export type PluginInstallInput = File | string
 
@@ -56,7 +56,7 @@ export interface PluginArchiveRepository {
 }
 
 export interface LoadedPluginModule {
-  readonly functions: readonly Plugin.Function[]
+  readonly functions: readonly Component.Function[]
   readonly activate?: (ctx: Context) => void
   readonly dispose?: () => void | Promise<void>
 }
