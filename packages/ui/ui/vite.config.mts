@@ -1,12 +1,12 @@
 import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
+import { extendsDepends } from '@delta-comic/utils/vite'
 import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
 import { lazyPlugins } from 'vite-plus'
 
-import { extendsDepends } from '../../core/utils/vite/index'
 const externalDepends = [...Object.keys(extendsDepends), 'highlight.js']
 const isExternal = (id: string) =>
   id.startsWith('@delta-comic/') ||

@@ -8,8 +8,6 @@ import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
 import { defaultClientConditions, lazyPlugins } from 'vite-plus'
 
-import { exposeHostLibraries } from '../../core/utils/vite/index'
-
 const host = process.env.TAURI_DEV_HOST
 const runtimeFile = fileURLToPath(import.meta.resolve('@delta-comic/runtime/host-libraries.umd.js'))
 const appRuntimeFile = resolve(import.meta.dirname, 'public/runtime/host-libraries.umd.js')
@@ -50,11 +48,13 @@ export default defineConfig(() => ({
     },
     lazyPlugins(async () => {
       const [
+        { exposeHostLibraries },
         { default: tailwindcss },
         { default: legacy },
         { default: vueDevTools },
         { default: VueRouter },
       ] = await Promise.all([
+        import('@delta-comic/utils/vite'),
         import('@tailwindcss/vite'),
         import('@vitejs/plugin-legacy'),
         import('vite-plugin-vue-devtools'),

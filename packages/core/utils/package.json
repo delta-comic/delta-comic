@@ -22,12 +22,14 @@
   "types": "./dist/lib/index.d.mts",
   "exports": {
     ".": {
+      "delta-comic-workspace": "./lib/index.ts",
       "types": "./dist/lib/index.d.mts",
       "import": "./dist/lib/index.mjs"
     },
     "./vite": {
+      "delta-comic-workspace": "./vite/index.ts",
       "types": "./dist/vite/index.d.mts",
-      "import": "./dist/vite/index.mjs"
+      "import": "./vite/index.ts"
     }
   },
   "publishConfig": {
