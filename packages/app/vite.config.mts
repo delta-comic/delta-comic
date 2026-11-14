@@ -108,6 +108,11 @@ export default defineConfig(() => ({
   },
   worker: { format: 'es' },
   base: '/',
+  test: {
+    environment: 'happy-dom',
+    setupFiles: ['./test/setup.ts'],
+    include: ['test/**/*.test.ts'],
+  },
   server: {
     port: isDesktop ? 5174 : 5173,
     // Tauri expects a fixed port, fail if that port is not available

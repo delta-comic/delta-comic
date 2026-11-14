@@ -40,8 +40,6 @@ export default defineConfig({
     ['Cargo.toml', 'workspace.package'],
   ],
   cargoLockPackageNames: [
-    'delta-comic-mobile',
-    'delta-comic-desktop',
     'delta-comic-native',
     'tauri-plugin-db',
     'tauri-plugin-downloader',
