@@ -143,8 +143,8 @@ jobs:
 
       - name: Check Android lint and Kotlin formatting
         run: |
-          chmod +x ./packages/app/mobile/src-tauri/gen/android/gradlew
-          ./packages/app/mobile/src-tauri/gen/android/gradlew \
+          chmod +x ./packages/app/src-tauri/gen/android/gradlew
+          ./packages/app/src-tauri/gen/android/gradlew \
             -p packages/platform/downloader/android \
             ktlintCheck \
             lintDebug \

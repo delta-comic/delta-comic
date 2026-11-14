@@ -437,38 +437,56 @@ importers:
         specifier: 'catalog:'
         version: 3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
 
-  packages/app/core:
+  packages/app:
     dependencies:
       '@delta-comic/client':
         specifier: 'workspace:'
-        version: link:../../core/sdk
+        version: link:../core/sdk
       '@delta-comic/db':
         specifier: 'workspace:'
-        version: link:../../platform/db
+        version: link:../platform/db
       '@delta-comic/downloader':
         specifier: 'workspace:'
-        version: link:../../platform/downloader
+        version: link:../platform/downloader
+      '@delta-comic/http':
+        specifier: 'workspace:'
+        version: link:../platform/http
       '@delta-comic/logger':
         specifier: 'workspace:'
-        version: link:../../core/logger
+        version: link:../core/logger
       '@delta-comic/model':
         specifier: 'workspace:'
-        version: link:../../core/model
+        version: link:../core/model
       '@delta-comic/plugin':
         specifier: 'workspace:'
-        version: link:../../plugin/core
+        version: link:../plugin/core
       '@delta-comic/ui':
         specifier: 'workspace:'
-        version: link:../../ui/ui
+        version: link:../ui/ui
       '@delta-comic/utils':
         specifier: 'workspace:'
-        version: link:../../core/utils
+        version: link:../core/utils
+      '@octokit/rest':
+        specifier: 'catalog:'
+        version: 22.0.1
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      '@tauri-apps/api':
+        specifier: 'catalog:'
+        version: 2.12.4
+      '@tauri-apps/plugin-clipboard-manager':
+        specifier: 'catalog:'
+        version: 2.5.0
+      '@tauri-apps/plugin-shell':
+        specifier: 'catalog:'
+        version: 2.6.0
       '@vueuse/core':
         specifier: 'catalog:'
         version: 15.0.0(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      color:
+        specifier: 'catalog:'
+        version: 5.0.3
       dayjs:
         specifier: 'catalog:'
         version: 1.11.23
@@ -487,91 +505,6 @@ importers:
       semver:
         specifier: 'catalog:'
         version: 7.8.6
-      taurpc:
-        specifier: 'catalog:'
-        version: 2.0.0(@tauri-apps/api@2.12.4)
-      vue:
-        specifier: 'catalog:'
-        version: 3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-      vue-i18n:
-        specifier: 'catalog:'
-        version: 12.0.0-alpha.10(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      vue-router:
-        specifier: 'catalog:'
-        version: 5.5.1(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-    devDependencies:
-      '@delta-comic/runtime':
-        specifier: 'workspace:'
-        version: link:../../core/runtime
-      '@types/semver':
-        specifier: 'catalog:'
-        version: 7.8.0
-
-  packages/app/desktop:
-    dependencies:
-      '@delta-comic/app-core':
-        specifier: 'workspace:'
-        version: link:../core
-      '@delta-comic/client':
-        specifier: 'workspace:'
-        version: link:../../core/sdk
-      '@delta-comic/db':
-        specifier: 'workspace:'
-        version: link:../../platform/db
-      '@delta-comic/http':
-        specifier: 'workspace:'
-        version: link:../../platform/http
-      '@delta-comic/logger':
-        specifier: 'workspace:'
-        version: link:../../core/logger
-      '@delta-comic/model':
-        specifier: 'workspace:'
-        version: link:../../core/model
-      '@delta-comic/plugin':
-        specifier: 'workspace:'
-        version: link:../../plugin/core
-      '@delta-comic/ui':
-        specifier: 'workspace:'
-        version: link:../../ui/ui
-      '@delta-comic/utils':
-        specifier: 'workspace:'
-        version: link:../../core/utils
-      '@octokit/rest':
-        specifier: 'catalog:'
-        version: 22.0.1
-      '@pinia/colada':
-        specifier: 'catalog:'
-        version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      '@tauri-apps/api':
-        specifier: 'catalog:'
-        version: 2.12.4
-      '@tauri-apps/plugin-clipboard-manager':
-        specifier: 'catalog:'
-        version: 2.5.0
-      '@tauri-apps/plugin-shell':
-        specifier: 'catalog:'
-        version: 2.6.0
-      '@vueuse/core':
-        specifier: 'catalog:'
-        version: 15.0.0(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      color:
-        specifier: 'catalog:'
-        version: 5.0.3
-      es-toolkit:
-        specifier: 'catalog:'
-        version: 1.53.2
-      motion-v:
-        specifier: 'catalog:'
-        version: 2.11.1(@vueuse/core@15.0.0(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      naive-ui:
-        specifier: 'catalog:'
-        version: 2.45.3(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      pinia:
-        specifier: 'catalog:'
-        version: 4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      semver:
-        specifier: 'catalog:'
-        version: 7.8.6
       tauri-plugin-m3:
         specifier: 'catalog:'
         version: 0.3.2
@@ -590,122 +523,7 @@ importers:
     devDependencies:
       '@delta-comic/runtime':
         specifier: 'workspace:'
-        version: link:../../core/runtime
-      '@swc/core':
-        specifier: 'catalog:'
-        version: 1.16.22
-      '@tailwindcss/vite':
-        specifier: 'catalog:'
-        version: 4.3.5(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))
-      '@tauri-apps/cli':
-        specifier: 'catalog:'
-        version: 2.12.4
-      '@types/semver':
-        specifier: 'catalog:'
-        version: 7.8.0
-      '@vitejs/plugin-legacy':
-        specifier: 'catalog:'
-        version: 8.2.4(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(supports-color@7.2.0)(terser@5.51.2)
-      '@vizejs/vite-plugin':
-        specifier: 'catalog:'
-        version: 0.751.0(842bf7f759dbeb5a3a91e53eb67c2791)
-      browserslist:
-        specifier: 'catalog:'
-        version: 4.29.5
-      lightningcss:
-        specifier: 'catalog:'
-        version: 1.33.0
-      vite-plugin-vue-devtools:
-        specifier: 'catalog:'
-        version: 9.0.0-rc.3(@devframes/agentic@1.3.2)(@vitejs/devtools@0.7.6(@devframes/json-render@1.3.2(@devframes/hub@1.3.2(@devframes/agentic@1.3.2)(crossws@0.4.17(srvx@1.0.8))(devframe@1.3.2))(devframe@1.3.2))(@voidzero-dev/vite-plus-core@1.6.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8))(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(cac@7.1.0)(crossws@0.4.17(srvx@1.0.8))(srvx@1.0.8)
-      vue-component-type-helpers:
-        specifier: 'catalog:'
-        version: 4.0.0-alpha.3
-
-  packages/app/mobile:
-    dependencies:
-      '@delta-comic/app-core':
-        specifier: 'workspace:'
-        version: link:../core
-      '@delta-comic/client':
-        specifier: 'workspace:'
-        version: link:../../core/sdk
-      '@delta-comic/db':
-        specifier: 'workspace:'
-        version: link:../../platform/db
-      '@delta-comic/http':
-        specifier: 'workspace:'
-        version: link:../../platform/http
-      '@delta-comic/logger':
-        specifier: 'workspace:'
-        version: link:../../core/logger
-      '@delta-comic/model':
-        specifier: 'workspace:'
-        version: link:../../core/model
-      '@delta-comic/plugin':
-        specifier: 'workspace:'
-        version: link:../../plugin/core
-      '@delta-comic/ui':
-        specifier: 'workspace:'
-        version: link:../../ui/ui
-      '@delta-comic/utils':
-        specifier: 'workspace:'
-        version: link:../../core/utils
-      '@octokit/rest':
-        specifier: 'catalog:'
-        version: 22.0.1
-      '@pinia/colada':
-        specifier: 'catalog:'
-        version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      '@tauri-apps/api':
-        specifier: 'catalog:'
-        version: 2.12.4
-      '@tauri-apps/plugin-clipboard-manager':
-        specifier: 'catalog:'
-        version: 2.5.0
-      '@tauri-apps/plugin-shell':
-        specifier: 'catalog:'
-        version: 2.6.0
-      '@vueuse/core':
-        specifier: 'catalog:'
-        version: 15.0.0(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      color:
-        specifier: 'catalog:'
-        version: 5.0.3
-      es-toolkit:
-        specifier: 'catalog:'
-        version: 1.53.2
-      motion-v:
-        specifier: 'catalog:'
-        version: 2.11.1(@vueuse/core@15.0.0(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      naive-ui:
-        specifier: 'catalog:'
-        version: 2.45.3(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      pinia:
-        specifier: 'catalog:'
-        version: 4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      semver:
-        specifier: 'catalog:'
-        version: 7.8.6
-      tauri-plugin-m3:
-        specifier: 'catalog:'
-        version: 0.3.2
-      taurpc:
-        specifier: 'catalog:'
-        version: 2.0.0(@tauri-apps/api@2.12.4)
-      vue:
-        specifier: 'catalog:'
-        version: 3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-      vue-i18n:
-        specifier: 'catalog:'
-        version: 12.0.0-alpha.10(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      vue-router:
-        specifier: 'catalog:'
-        version: 5.5.1(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@1.6.0(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(jiti@2.7.0)(terser@5.51.2)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.45)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.0)(vue@3.6.0-rc.15(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-    devDependencies:
-      '@delta-comic/runtime':
-        specifier: 'workspace:'
-        version: link:../../core/runtime
+        version: link:../core/runtime
       '@swc/core':
         specifier: 'catalog:'
         version: 1.16.22

@@ -1100,34 +1100,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "delta-comic-desktop"
+name = "delta-comic"
 version = "3.0.0-next.28"
 dependencies = [
  "delta-comic-native",
  "objc2-foundation",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-aptabase",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-db",
- "tauri-plugin-downloader",
- "tauri-plugin-fs",
- "tauri-plugin-http",
- "tauri-plugin-logger",
- "tauri-plugin-persisted-scope",
- "tauri-plugin-plugin",
- "tauri-plugin-shell",
- "tauri-plugin-sql",
- "tauri-plugin-utils",
- "tracing",
-]
-
-[[package]]
-name = "delta-comic-mobile"
-version = "3.0.0-next.28"
-dependencies = [
- "delta-comic-native",
  "serde_json",
  "tauri",
  "tauri-build",

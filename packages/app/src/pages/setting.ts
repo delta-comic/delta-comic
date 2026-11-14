@@ -1,0 +1,1 @@
+export { default } from './setting.impl.vue'

@@ -9,9 +9,9 @@
 
 | 路径 | 职责 |
 | --- | --- |
-| `packages/app/mobile` | 移动端 Vue/Tauri 应用、路由与三语 i18n |
-| `packages/app/desktop` | 桌面端 Vue/Tauri 应用、路由与窗口行为 |
-| `packages/app/core` | 双端共享业务状态、组件、插件初始化与生命周期协议 |
+| `packages/app` | 统一 Vue 前端、路由、三语 i18n、共享业务状态与平台组件壳 |
+| `packages/app/src-tauri` | 统一 Tauri 工程；按目标构建桌面端、Android 与 iOS |
+| `packages/app/core` | 共享 Tauri Rust 原生能力与 RPC 路由 |
 | `packages/core/sdk` | `@delta-comic/client` 类型、Context 扩展与平台客户端工具 |
 | `packages/plugin/core` | 宿主服务、内置插件、安装组合与 Fiber 管理 |
 | `packages/plugin/install` | 来源、安装记录、ZIP、模块读取与开发服务器 |

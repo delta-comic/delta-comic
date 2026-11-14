@@ -92,9 +92,9 @@ The goal is to make the requested change correctly, with minimal unnecessary com
 
 ## 运行时入口
 
-- `packages/app/core`：Vue/Tauri 客户端共享核心。Web 入口为各端的 `src/main.tsx`；原生入口为
-  `src-tauri/src/main.rs`。`vp run --filter app dev` 启动 Tauri；`dev:web` 仅启动 Web
-  客户端。Tauri 必须使用端口 `5173`，端口不可用时会直接失败，而不会选择其他端口。
+- `packages/app`：统一 Vue 客户端与 Tauri 工程。Web 入口为 `src/main.ts`；原生入口为
+  `src-tauri/src/main.rs`。`dev:desktop`、`dev:mobile` 分别启动对应目标；Web 入口使用
+  `dev:web:desktop` 或 `dev:web:mobile`。Tauri 必须使用固定端口，端口不可用时会直接失败。
 - 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/runtime`，它是供外部插件使用的
   UMD 宿主库桥接层。请保持此依赖顺序。
 - 客户端代码按 app、core、data、platform、plugin 与 ui 分类。能力若只被单端使用，或依赖 Vue UI、浏览器存储、Tauri、平台文件/网络等单端环境，归入对应分类下的子包。

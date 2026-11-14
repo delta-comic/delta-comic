@@ -29,9 +29,7 @@
   "contentMappers": [{ "package": "vize", "extensions": [".vue"] }],
   "files": [],
   "references": [
-    { "path": "./packages/app/mobile/tsconfig.json" },
-    { "path": "./packages/app/desktop/tsconfig.json" },
-    { "path": "./packages/app/core/tsconfig.json" },
+    { "path": "./packages/app/tsconfig.json" },
     { "path": "./packages/core/utils/tsconfig.json" },
     { "path": "./packages/ui/ui/tsconfig.json" },
     { "path": "./packages/core/model/tsconfig.json" },

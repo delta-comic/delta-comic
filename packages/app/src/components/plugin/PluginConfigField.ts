@@ -1,0 +1,1 @@
+export { default } from './PluginConfigField.vue'

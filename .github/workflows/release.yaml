@@ -134,8 +134,8 @@ jobs:
           echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> "$GITHUB_PATH"
           echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
-          cd packages/app/mobile
-          vp run --filter @delta-comic/mobile --fail-if-no-match tauri android init --ci --skip-targets-install
+          cd packages/app
+          vp run --filter @delta-comic/app --fail-if-no-match tauri android init --config src-tauri/tauri.conf.json --ci --skip-targets-install
           git restore src-tauri/gen/android/buildSrc/src/main/java/org/wenxig/delta_comic/kotlin/BuildTask.kt src-tauri/gen/android/build.gradle.kts src-tauri/gen/android/app/build.gradle.kts src-tauri/gen/android/settings.gradle
 
           chmod +x ./src-tauri/gen/android/gradlew
@@ -147,8 +147,8 @@ jobs:
           NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
-          cd packages/app/mobile
-          vp run --filter @delta-comic/mobile --fail-if-no-match tauri android build --ci --target aarch64 armv7
+          cd packages/app
+          vp run --filter @delta-comic/app --fail-if-no-match tauri android build --config src-tauri/tauri.conf.json --ci --target aarch64 armv7
 
       - name: Sign Android APK
         env:
@@ -159,7 +159,7 @@ jobs:
           set -euo pipefail
 
           KEYSTORE="$RUNNER_TEMP/keystore.p12"
-          APK="./packages/app/mobile/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
+          APK="./packages/app/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
           OUTPUT="./dist/release/delta-comic-$RELEASE_VERSION-android.apk"
 
           printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
@@ -256,8 +256,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         with:
-          args: ${{ matrix.args }}
-          projectPath: packages/app/desktop
+          projectPath: packages/app
+          args: --config src-tauri/tauri.conf.json ${{ matrix.args }}
           retryAttempts: 0
           uploadWorkflowArtifacts: false
 

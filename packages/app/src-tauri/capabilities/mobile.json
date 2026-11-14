@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "mobile",
+  "description": "enables mobile platform permissions",
+  "windows": ["main"],
+  "platforms": ["android", "iOS"],
+  "permissions": ["m3:default"]
+}
