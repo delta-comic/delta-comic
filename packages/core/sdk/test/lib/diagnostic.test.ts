@@ -21,7 +21,7 @@ class DummyService extends Service {
 describe('client diagnostics', () => {
   it('re-exports Cordis services', async () => {
     const ctx = new Context()
-    await ctx.plugin(DummyService)
+    await ctx.use(DummyService)
     expect(ctx.dummy).toBeDefined()
     expect(ctx.dummy.ping()).toBe('pong')
   })

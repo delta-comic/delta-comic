@@ -275,12 +275,12 @@ const mount = async (id: string, override?: readonly Component.Function[]) => {
   pluginStatuses.set(id, { state: pluginFiberStates.LOADING })
   const group: Fiber[] = []
   children.set(id, group)
-  const fiber = pluginContext.plugin({
+  const fiber = pluginContext.use({
     name: id,
     apply(ctx) {
       owners.set(ctx.fiber, id)
       module.activate?.(ctx)
-      for (const fn of module.functions) group.push(ctx.plugin(fn, installation.config))
+      for (const fn of module.functions) group.push(ctx.use(fn, installation.config))
     },
   })
   pluginFibers.set(id, fiber)
@@ -316,7 +316,7 @@ export interface PreparePluginHostOptions {
 export const preparePluginHost = async (options: PreparePluginHostOptions) => {
   initialization ??= (async () => {
     await pluginConfigStore.register(cfg).ready
-    await pluginContext.plugin(ctx => {
+    await pluginContext.use(ctx => {
       new ConfigService(ctx, {
         get: id => pluginInstallations.get(id)?.config ?? {},
         set: setPluginConfig,
