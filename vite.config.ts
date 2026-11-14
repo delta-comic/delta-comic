@@ -86,7 +86,11 @@ export default defineConfig(
         thresholds: { lines: 20, functions: 20, branches: 20, statements: 20 },
       },
       exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
-      projects: ['script/*', 'packages/*/*'],
+      projects: [
+        'script/*/vite.config.*',
+        'packages/*/vite.config.*',
+        'packages/*/*/vite.config.*',
+      ],
     },
   },
   { lint: false, fmt: false },

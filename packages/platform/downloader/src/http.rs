@@ -1329,19 +1329,16 @@ fn reject_symlinks_below(root: &Path, path: &Path) -> Result<()> {
 }
 
 fn metadata_is_link_like(metadata: &std::fs::Metadata) -> bool {
-  if metadata.file_type().is_symlink() {
-    return true;
-  }
+  let is_symlink = metadata.file_type().is_symlink();
   #[cfg(windows)]
   {
     use std::os::windows::fs::MetadataExt;
 
     const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x400;
-    if metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0 {
-      return true;
-    }
+    return is_symlink || metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0;
   }
-  false
+  #[cfg(not(windows))]
+  is_symlink
 }
 
 #[cfg(unix)]

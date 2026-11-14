@@ -42,7 +42,7 @@ import {
   fingerprintContentPage,
   fingerprintContentDownloadProvider,
   sha256Hex,
-} from '../../../../lib/features/downloads/contentPlan'
+} from '../../../../src/features/downloads/contentPlan'
 
 const contentType: UniContentType = ['reader', 'comic']
 

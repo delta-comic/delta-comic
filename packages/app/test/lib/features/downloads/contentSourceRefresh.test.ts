@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
   fingerprintProvider: vi.fn(async () => 'provider-v1'),
 }))
 
-vi.mock('../../../../lib/features/downloads/contentPlan', () => ({
+vi.mock('../../../../src/features/downloads/contentPlan', () => ({
   fingerprintContentDownloadProvider: mocks.fingerprintProvider,
   fingerprintContentPage: mocks.fingerprintContentPage,
 }))
@@ -18,7 +18,7 @@ import {
   prepareContentSourceRefresh,
   type ContentRefreshPluginIdentity,
   type ContentSourceRefreshRuntime,
-} from '../../../../lib/features/downloads/contentSourceRefresh'
+} from '../../../../src/features/downloads/contentSourceRefresh'
 
 const context = {
   plugin: 'reader',

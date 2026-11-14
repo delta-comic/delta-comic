@@ -77,15 +77,15 @@ const { client, handlers, sourceRefresh } = vi.hoisted(() => {
   }
 })
 
-vi.mock('../../../lib/features/downloads/downloaderClient', () => ({ downloaderClient: client }))
+vi.mock('../../../src/features/downloads/downloaderClient', () => ({ downloaderClient: client }))
 vi.mock('@delta-comic/model', () => ({
   UniContentPage: { contentPages: { get: vi.fn() }, downloadProviders: { get: vi.fn() } },
 }))
 vi.mock('@delta-comic/plugin', () => ({ usePluginStore: () => sourceRefresh.pluginStore }))
-vi.mock('../../../lib/features/downloads/contentPlan', () => ({
+vi.mock('../../../src/features/downloads/contentPlan', () => ({
   getPluginDownloadIdentity: sourceRefresh.getPluginDownloadIdentity,
 }))
-vi.mock('../../../lib/features/downloads/contentSourceRefresh', () => ({
+vi.mock('../../../src/features/downloads/contentSourceRefresh', () => ({
   isContentSourceRefreshCandidateCurrent: sourceRefresh.isCandidateCurrent,
   prepareContentSourceRefresh: sourceRefresh.prepare,
 }))
