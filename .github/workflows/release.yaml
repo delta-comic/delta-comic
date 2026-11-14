@@ -256,16 +256,8 @@ jobs:
           args: ${{ matrix.args }}
           projectPath: packages/app/desktop
           retryAttempts: 0
-          uploadWorkflowArtifacts: false
-
-      - name: Upload desktop artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: release-desktop-${{ matrix.platform }}-${{ strategy.job-index }}
-          path: |
-            target/**/release/bundle/**
-            !target/**/release/bundle/**/*.app/**
-          if-no-files-found: error
+          uploadWorkflowArtifacts: true
+          workflowArtifactNamePattern: release-desktop-[platform]-[arch]-[bundle]
 
   release:
     needs: [plan, android, desktop]
