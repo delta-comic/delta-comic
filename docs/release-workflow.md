@@ -12,7 +12,7 @@
 
 release note 与 changelog 使用 semantic-release 内置的 Angular preset 和默认英文分类。预览版开头会显示加粗的谨慎更新提示，GitHub Release 标题也会明确标记“预览版”或“正式版”。
 
-发布 npm workspace 时，脚本会从 `packages/*/*/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。当前公开发布面为 `@delta-comic/client`；其他 workspace 包均为内部实现，由 SDK 在构建产物和入口中统一提供需要对外使用的能力。
+发布 npm workspace 时，脚本会从 `packages/*/*/package.json` 和 `script/manager/package.json` 自动发现所有非 `private` 包，校验它们具有统一版本、`build` 脚本及公开发布配置，并按内部依赖顺序逐个构建后递归发布。当前公开发布面为 `@delta-comic/client` 和 `@delta-comic/release-cli`；其他 workspace 包均为内部实现，由 SDK 或 CLI 在构建产物和入口中统一提供需要对外使用的能力。
 
 workspace 包发布到 GitHub Packages。发布脚本会显式覆盖 `.npmrc` 中的 scope registry；递归发布会跳过目标 registry 中已经存在的版本，因此发布短暂失败后可以安全重跑。CI 使用当前工作流的短期 `GITHUB_TOKEN` 和 `packages: write` 权限发布 GitHub Packages，不保存长期发布 token。
 
@@ -28,7 +28,7 @@ npm install --global @delta-comic/release-cli
 dr --help
 ```
 
-在仓库内执行时，`dr` 会从当前目录向上寻找项目根目录，也可以用 `--cwd` 指定目标仓库，用 `--config` 指定 semantic-release 配置文件。项目配置统一位于 `release.config.ts`：使用 `defineConfig` 定义 semantic-release 配置，再通过 `.withCI({...})` 配置版本文件、workspace 根目录、MSI 文件和发布 registry；CLI 包自身的版本使用 `dr package version set <version>` 管理。
+在仓库内执行时，`dr` 会从当前目录向上寻找项目根目录，也可以用 `--cwd` 指定目标仓库，用 `--config` 指定 semantic-release 配置文件。项目配置统一位于 `release.config.ts`：使用 `defineConfig` 定义 semantic-release 配置，再通过 `.withCI({...})` 配置版本文件、workspace 根目录、MSI 文件和发布 registry。CLI 与主应用共用 semantic-release 版本，在同一次发布中使用相同版本号和 npm dist-tag 发布。
 
 ## 首次建立分支
 
