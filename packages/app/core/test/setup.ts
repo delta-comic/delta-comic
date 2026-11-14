@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { vi } from 'vite-plus/test'
 
 // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
 await import('@delta-comic/runtime/host-libraries.umd.js')
