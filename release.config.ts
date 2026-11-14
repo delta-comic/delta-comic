@@ -19,6 +19,7 @@ export default defineConfig({
 }).withCI({
   jsonVersionPaths: [
     'package.json',
+    'script/manager/package.json',
     'packages/app/package.json',
     'packages/core/sdk/package.json',
     'packages/app/src-tauri/tauri.conf.json',
@@ -48,6 +49,6 @@ export default defineConfig({
     'tauri-plugin-plugin',
     'tauri-plugin-utils',
   ],
-  workspace: { roots: ['packages'] },
+  workspace: { roots: ['packages', 'script/manager'] },
   registry: 'https://npm.pkg.github.com/',
 })
