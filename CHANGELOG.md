@@ -1,5 +1,26 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.29](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.28...3.0.0-next.29) (2026-11-14)
+
+
+### Bug Fixes
+
+* **android:** 修正 Gradle 警告脚本路径 ([0a29a92](https://github.com/delta-comic/delta-comic/commit/0a29a923b06f56d20ebbb82808dc5cbcb9e4d324))
+* **android:** 修正 M3 Gradle 脚本路径 ([df7e7ac](https://github.com/delta-comic/delta-comic/commit/df7e7ac7f15c4e2c3abfd490a768f23e0f6432ac))
+* **android:** 恢复移动端运行时入口 ([fa298a2](https://github.com/delta-comic/delta-comic/commit/fa298a2fc738041cf6960bbc5ccba2801f5c750c))
+* **ci:** 修复全量检查失败 ([9143fa4](https://github.com/delta-comic/delta-comic/commit/9143fa40c25eb402592267887145ad5c3203ce5f))
+* **paths:** 清理应用迁移后的旧路径 ([5f029f5](https://github.com/delta-comic/delta-comic/commit/5f029f5c093be8c4682aca78811d6ebf8925a83d))
+* **plugin:** 使用 Cordis use API ([331287f](https://github.com/delta-comic/delta-comic/commit/331287f69d73bd7ff05623556c9cb4bfbe1f9a10))
+* **plugin:** 适配 Cordis Component 类型 ([0a965dd](https://github.com/delta-comic/delta-comic/commit/0a965dd3dbdc81ee994526e957974b1b60269138))
+* **release:** 合流发布独立 CLI 版本 ([e732eea](https://github.com/delta-comic/delta-comic/commit/e732eea01881df67d418eb30a45a201a9bd02ead))
+
+
+### Features
+
+* **app:** 统一应用平台构建与原生工程 ([f3170a5](https://github.com/delta-comic/delta-comic/commit/f3170a5d0a81624f9c3c0ad58377ac63a162050b))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.28](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.27...3.0.0-next.28) (2026-11-14)
 
 
