@@ -54,7 +54,6 @@ export default defineConfig({
       },
       deps: {
         alwaysBundle: [/^@delta-comic\//],
-        neverBundle: ['vite-plus'],
         dts: { alwaysBundle: id => id.startsWith('@delta-comic/') || id.includes('/packages/') },
       },
     },

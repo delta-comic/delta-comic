@@ -1,12 +1,7 @@
 import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 
 export default defineConfig({
-  pack: {
-    entry: './lib/index.ts',
-    dts: true,
-    sourcemap: true,
-    deps: { neverBundle: ['vite-plus'] },
-  },
+  pack: { entry: './lib/index.ts', dts: true, sourcemap: true },
   run: {
     tasks: {
       build: {
