@@ -1,0 +1,15 @@
+// M3's published Android build script still uses Kotlin's deprecated kotlinOptions DSL.
+def m3 = findProject(':tauri-plugin-m3')
+if (m3 != null) {
+    def original = new File(m3.projectDir, 'build.gradle.kts')
+    def patched = new File(settingsDir, 'build/android-patches/m3.gradle.kts')
+    def source = original.getText('UTF-8').replace('''    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+''', '')
+    patched.parentFile.mkdirs()
+    if (!patched.exists() || patched.getText('UTF-8') != source) {
+        patched.setText(source, 'UTF-8')
+    }
+    m3.buildFileName = m3.projectDir.toPath().relativize(patched.toPath()).toString()
+}

@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'packages/**'
+      - 'script/android/**'
       - '.github/workflows/lint.yaml'
       - '.editorconfig'
       - '.node-version'
@@ -18,6 +19,7 @@ on:
   pull_request:
     paths:
       - 'packages/**'
+      - 'script/android/**'
       - '.github/workflows/lint.yaml'
       - '.editorconfig'
       - '.node-version'
@@ -117,9 +119,14 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
+        with:
+          accept-android-sdk-licenses: false
+          packages: ''
 
       - name: Install Android SDK components
-        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+        run:
+          android --sdk="$ANDROID_HOME" sdk install platform-tools platforms/android-36
+          build-tools/36.0.0
 
       - name: Resolve Tauri Android library
         shell: bash

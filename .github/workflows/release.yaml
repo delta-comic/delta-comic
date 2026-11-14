@@ -110,18 +110,21 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
-          log-accepted-android-sdk-licenses: false
+          accept-android-sdk-licenses: false
+          packages: ''
 
       - name: Install Android SDK packages
-        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+        run:
+          android --sdk="$ANDROID_HOME" sdk install platform-tools platforms/android-36
+          build-tools/36.0.0
 
       - name: Setup Android NDK
         id: setup-ndk
-        uses: nttld/setup-ndk@v1.5.0
+        uses: nttld/setup-ndk@v1.6.0
         with:
           ndk-version: r29
           link-to-sdk: true
-          local-cache: true
+          local-cache: false
           add-to-path: true
 
       - name: Initialize Android project
@@ -133,7 +136,7 @@ jobs:
           echo "NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
           cd packages/app/mobile
           vp run --filter @delta-comic/mobile --fail-if-no-match tauri android init --ci --skip-targets-install
-          git restore src-tauri/gen/android/buildSrc/src/main/java/org/wenxig/delta_comic/kotlin/BuildTask.kt
+          git restore src-tauri/gen/android/buildSrc/src/main/java/org/wenxig/delta_comic/kotlin/BuildTask.kt src-tauri/gen/android/build.gradle.kts src-tauri/gen/android/app/build.gradle.kts src-tauri/gen/android/settings.gradle
 
           chmod +x ./src-tauri/gen/android/gradlew
 
@@ -283,11 +286,13 @@ jobs:
       - run: vpr release-cli
 
       - name: Download release artifacts
-        uses: actions/download-artifact@v7
-        with:
-          pattern: release-*
-          path: dist/release
-          merge-multiple: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'release-*' --dir "$RUNNER_TEMP/release-artifacts"
+          mkdir -p dist/release
+          find "$RUNNER_TEMP/release-artifacts" -type f -exec cp -t dist/release {} +
 
       - name: Configure auth
         env:
