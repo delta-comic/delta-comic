@@ -259,8 +259,27 @@ jobs:
           args: ${{ matrix.args }}
           projectPath: packages/app/desktop
           retryAttempts: 0
-          uploadWorkflowArtifacts: true
-          workflowArtifactNamePattern: release-desktop-[platform]-[arch]-[bundle]
+          uploadWorkflowArtifacts: false
+
+      - name: Collect desktop artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/release
+          find target -type f -path '*/release/bundle/*' \
+            \( -name '*.AppImage' -o -name '*.AppImage.sig' -o -name '*.deb' -o -name '*.deb.sig' \
+            -o -name '*.rpm' -o -name '*.rpm.sig' -o -name '*.dmg' -o -name '*.dmg.sig' \
+            -o -name '*.app.tar.gz' -o -name '*.app.tar.gz.sig' -o -name '*.msi' \
+            -o -name '*.msi.sig' -o -name '*.zip' -o -name '*.zip.sig' \
+            -o -name '*.exe' -o -name '*.exe.sig' \) \
+            -exec cp {} dist/release/ \;
+
+      - name: Upload desktop artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-desktop-${{ matrix.platform }}-${{ strategy.job-index }}
+          path: dist/release/*
+          if-no-files-found: error
 
   release:
     needs: [plan, android, desktop]
@@ -292,7 +311,7 @@ jobs:
           gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" \
             --pattern 'release-*' --dir "$RUNNER_TEMP/release-artifacts"
           mkdir -p dist/release
-          find "$RUNNER_TEMP/release-artifacts" -type f -exec cp -t dist/release {} +
+          find "$RUNNER_TEMP/release-artifacts" -type f -exec cp -n -t dist/release {} +
 
       - name: Configure auth
         env:
