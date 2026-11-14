@@ -34,6 +34,7 @@ release
 .codex/config.toml
 
 target
+packages/app/public/runtime/
 packages/app/*/public/runtime/
 *.tsbuildinfo
 packages/*/android/.tauri

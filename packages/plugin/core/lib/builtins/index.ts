@@ -1,12 +1,12 @@
 import type { PluginManifest } from '@delta-comic/manifest'
-import type { Plugin } from 'cordis'
+import type { Component } from 'cordis'
 
 export { manifest as coreManifest } from './core.builtin'
 
-const modules = import.meta.glob<{ default: readonly Plugin.Function[]; manifest: PluginManifest }>(
-  './*.builtin.ts',
-  { eager: true },
-)
+const modules = import.meta.glob<{
+  default: readonly Component.Function[]
+  manifest: PluginManifest
+}>('./*.builtin.ts', { eager: true })
 
 export const builtinPlugins = Object.entries(modules)
   .sort(([left], [right]) => left.localeCompare(right))

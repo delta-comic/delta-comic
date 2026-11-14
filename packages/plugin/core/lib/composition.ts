@@ -30,11 +30,11 @@ import {
 } from '@delta-comic/plugin-install'
 import {
   Context,
+  type Component,
   DisposableList,
   resolveConfig,
   type FiberState,
   type Fiber,
-  type Plugin,
 } from 'cordis'
 import { computed, shallowReactive, shallowRef } from 'vue'
 
@@ -254,7 +254,7 @@ const refreshInstallations = async () => {
   }
 }
 
-const mount = async (id: string, override?: readonly Plugin.Function[]) => {
+const mount = async (id: string, override?: readonly Component.Function[]) => {
   const installation = pluginInstallations.get(id)
   if (!installation) throw new Error(`installed plugin not found: ${id}`)
   if (!installation.manifest) throw new TypeError(`invalid plugin manifest: ${id}`)
@@ -275,12 +275,12 @@ const mount = async (id: string, override?: readonly Plugin.Function[]) => {
   pluginStatuses.set(id, { state: pluginFiberStates.LOADING })
   const group: Fiber[] = []
   children.set(id, group)
-  const fiber = pluginContext.plugin({
+  const fiber = pluginContext.use({
     name: id,
     apply(ctx) {
       owners.set(ctx.fiber, id)
       module.activate?.(ctx)
-      for (const fn of module.functions) group.push(ctx.plugin(fn, installation.config))
+      for (const fn of module.functions) group.push(ctx.use(fn, installation.config))
     },
   })
   pluginFibers.set(id, fiber)
@@ -316,7 +316,7 @@ export interface PreparePluginHostOptions {
 export const preparePluginHost = async (options: PreparePluginHostOptions) => {
   initialization ??= (async () => {
     await pluginConfigStore.register(cfg).ready
-    await pluginContext.plugin(ctx => {
+    await pluginContext.use(ctx => {
       new ConfigService(ctx, {
         get: id => pluginInstallations.get(id)?.config ?? {},
         set: setPluginConfig,
@@ -382,7 +382,7 @@ export const loadEnabledPlugins = () =>
     }
   })
 
-const reload = async (id: string, override?: readonly Plugin.Function[]) => {
+const reload = async (id: string, override?: readonly Component.Function[]) => {
   await unload(id)
   await refreshInstallations()
   try {
@@ -455,7 +455,7 @@ export const uninstallPlugin = (id: string) =>
     await refreshInstallations()
   })
 
-export const reloadPlugin = (id: string, functions?: readonly Plugin.Function[]) =>
+export const reloadPlugin = (id: string, functions?: readonly Component.Function[]) =>
   managed(() => reload(id, functions))
 
 export const disposePluginHost = async () => {

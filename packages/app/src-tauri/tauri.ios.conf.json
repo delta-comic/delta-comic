@@ -1,0 +1,12 @@
+{
+  "build": {
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "vp run --filter @delta-comic/app dev:web:mobile",
+    "beforeBuildCommand": "vp run --filter @delta-comic/app build:web:mobile"
+  },
+  "app": {
+    "windows": [
+      { "label": "main", "url": "index.html", "title": "Delta Comic", "fullscreen": false }
+    ]
+  }
+}

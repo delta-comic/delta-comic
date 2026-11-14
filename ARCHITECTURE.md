@@ -9,9 +9,9 @@
 
 | 路径 | 职责 |
 | --- | --- |
-| `packages/app/mobile` | 移动端 Vue/Tauri 应用、路由与三语 i18n |
-| `packages/app/desktop` | 桌面端 Vue/Tauri 应用、路由与窗口行为 |
-| `packages/app/core` | 双端共享业务状态、组件、插件初始化与生命周期协议 |
+| `packages/app` | 统一 Vue 前端、路由、三语 i18n、共享业务状态与平台组件壳 |
+| `packages/app/src-tauri` | 统一 Tauri 工程；按目标构建桌面端、Android 与 iOS |
+| `packages/app/core` | 共享 Tauri Rust 原生能力与 RPC 路由 |
 | `packages/core/sdk` | `@delta-comic/client` 类型、Context 扩展与平台客户端工具 |
 | `packages/plugin/core` | 宿主服务、内置插件、安装组合与 Fiber 管理 |
 | `packages/plugin/install` | 来源、安装记录、ZIP、模块读取与开发服务器 |
@@ -66,10 +66,10 @@
 ## 客户端 Context 与插件
 
 每个应用会话使用一个原生 `Context`。宿主先初始化平台服务、配置、i18n、用户集合和应用 UI，
-再加载启用插件。安装包默认导出 `readonly Plugin.Function<Config>[]`。
+再加载启用插件。安装包默认导出 `readonly Component.Function<Config>[]`。
 
 ```ts
-import type { Context, Plugin } from 'cordis'
+import type { Component, Context } from 'cordis'
 import type {} from '@delta-comic/client'
 
 function example(ctx: Context, config: Record<string, unknown>) {
@@ -79,7 +79,7 @@ function example(ctx: Context, config: Record<string, unknown>) {
 }
 
 Object.assign(example, { inject: ['ui', 'diagnostics'] })
-export default [example] satisfies readonly Plugin.Function[]
+export default [example] satisfies readonly Component.Function[]
 ```
 
 函数使用原生 `name`、`inject`、`provide` 和 `Config` 元数据。Cordis 原生 `resolveConfig`
@@ -127,7 +127,7 @@ Web 入口为 `src/main.ts`，Tauri 入口为 `src-tauri/src/main.rs`，窗口�
 
 ## 构建、验收与发布
 
-工作区采用 Node 26.10.0、pnpm 12.0.0-rc.3、Vite+；Rust 使用 `nightly-2026-08-12`。公共包
+工作区采用 Node 26.10.0、pnpm 12.0.0-rc.3、Vite+；Rust 使用 `1.100.0` stable 与最新 nightly。公共包
 版本通过 `vp run set-ver -- <version>` 统一更新，发布拓扑与 dry run 见 `docs/release-workflow.md`。
 
 串行验收顺序：

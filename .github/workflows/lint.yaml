@@ -75,7 +75,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly-2026-08-12
+          toolchain: nightly
           components: clippy, rustfmt
 
       - name: Cache Rust build
@@ -103,7 +103,7 @@ jobs:
       - name: Setup Rust metadata toolchain
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly-2026-08-12
+          toolchain: nightly
 
       - name: Cache Rust registry
         uses: Swatinem/rust-cache@v2
@@ -143,8 +143,8 @@ jobs:
 
       - name: Check Android lint and Kotlin formatting
         run: |
-          chmod +x ./packages/app/mobile/src-tauri/gen/android/gradlew
-          ./packages/app/mobile/src-tauri/gen/android/gradlew \
+          chmod +x ./packages/app/src-tauri/gen/android/gradlew
+          ./packages/app/src-tauri/gen/android/gradlew \
             -p packages/platform/downloader/android \
             ktlintCheck \
             lintDebug \

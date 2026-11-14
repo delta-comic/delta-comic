@@ -19,12 +19,9 @@ export default defineConfig({
 }).withCI({
   jsonVersionPaths: [
     'package.json',
-    'packages/app/mobile/package.json',
-    'packages/app/desktop/package.json',
-    'packages/app/core/package.json',
+    'packages/app/package.json',
     'packages/core/sdk/package.json',
-    'packages/app/mobile/src-tauri/tauri.conf.json',
-    'packages/app/desktop/src-tauri/tauri.conf.json',
+    'packages/app/src-tauri/tauri.conf.json',
     'packages/platform/db/package.json',
     'packages/platform/downloader/package.json',
     'packages/platform/http/package.json',
@@ -39,8 +36,7 @@ export default defineConfig({
     'packages/core/utils/package.json',
   ],
   cargoTomlVersionPaths: [
-    ['packages/app/mobile/src-tauri/Cargo.toml', 'package'],
-    ['packages/app/desktop/src-tauri/Cargo.toml', 'package'],
+    ['packages/app/src-tauri/Cargo.toml', 'package'],
     ['Cargo.toml', 'workspace.package'],
   ],
   cargoLockPackageNames: [

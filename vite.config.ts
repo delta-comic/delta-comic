@@ -19,9 +19,9 @@ export default defineConfig(
       cache: { tasks: true, scripts: false },
       tasks: {
         // dev
-        'dev': { command: 'vp run @delta-comic/desktop#dev', cache: false },
-        'dev:android': { command: 'vp run @delta-comic/mobile#dev', cache: false },
-        'dev:web': { command: 'vp run @delta-comic/mobile#dev:web', cache: false },
+        'dev': { command: 'vp run @delta-comic/app#dev:desktop', cache: false },
+        'dev:android': { command: 'vp run @delta-comic/app#dev:mobile', cache: false },
+        'dev:web': { command: 'vp run @delta-comic/app#dev:web:mobile', cache: false },
         // build
         'build:packages': { command: 'vp run -r build', cache: { output: [] } },
         'build': { command: 'echo "no need"' },

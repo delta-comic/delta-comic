@@ -1,6 +1,6 @@
 import { db } from '@delta-comic/db'
 import type { PluginManifest } from '@delta-comic/manifest'
-import type { Context, Plugin } from 'cordis'
+import type { Component, Context } from 'cordis'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 declare module 'cordis' {
@@ -14,9 +14,9 @@ const state = vi.hoisted(() => ({
     string,
     { pluginName: string; meta: unknown; enable: boolean; config: Record<string, unknown> }
   >(),
-  modules: new Map<string, readonly Plugin.Function[]>(),
+  modules: new Map<string, readonly Component.Function[]>(),
   released: vi.fn(),
-  builtins: new Array<{ manifest: PluginManifest; functions: readonly Plugin.Function[] }>(),
+  builtins: new Array<{ manifest: PluginManifest; functions: readonly Component.Function[] }>(),
 }))
 
 vi.mock('@delta-comic/db', () => ({ db: {} }))
@@ -79,7 +79,7 @@ afterEach(async () => {
   await host.disposePluginHost()
 })
 
-const install = (id: string, functions: readonly Plugin.Function[]) => {
+const install = (id: string, functions: readonly Component.Function[]) => {
   state.archives.set(id, {
     pluginName: id,
     enable: true,
@@ -152,7 +152,7 @@ describe('native package lifecycle', () => {
           },
         },
       },
-    } satisfies Partial<Plugin.Function>)
+    } satisfies Partial<Component.Function>)
     install('configured', [configured])
     await prepare()
     await host.loadEnabledPlugins().catch(() => {})
