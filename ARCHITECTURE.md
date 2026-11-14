@@ -127,7 +127,7 @@ Web 入口为 `src/main.ts`，Tauri 入口为 `src-tauri/src/main.rs`，窗口�
 
 ## 构建、验收与发布
 
-工作区采用 Node 26.10.0、pnpm 12.0.0-rc.3、Vite+；Rust 使用 `nightly-2026-08-12`。公共包
+工作区采用 Node 26.10.0、pnpm 12.0.0-rc.3、Vite+；Rust 使用 `1.100.0` stable 与最新 nightly。公共包
 版本通过 `vp run set-ver -- <version>` 统一更新，发布拓扑与 dry run 见 `docs/release-workflow.md`。
 
 串行验收顺序：

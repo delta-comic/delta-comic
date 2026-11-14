@@ -97,7 +97,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly-2026-08-12
+          toolchain: nightly
           targets: aarch64-linux-android, armv7-linux-androideabi
 
       - name: Setup JDK 21
@@ -241,7 +241,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: nightly-2026-08-12
+          toolchain: nightly
           targets: ${{ matrix.rust-targets }}
 
       - name: Install Linux dependencies
