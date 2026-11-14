@@ -62,7 +62,7 @@ export default defineConfig(() => ({
       ])
 
       return [
-        legacy({ targets: ['ie >= 11'], renderModernChunks: false }),
+        legacy({ targets: ['ie >= 11'], renderModernChunks: true }),
         VueRouter({
           root: import.meta.dirname,
           dts: resolve(import.meta.dirname, 'typed-router.d.ts'),

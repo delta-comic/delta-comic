@@ -6,7 +6,7 @@ import {
   type UniContentType,
   type UniDownloadPlan,
 } from '@delta-comic/model'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const database = vi.hoisted(() => {
   const executeTakeFirst = vi.fn()

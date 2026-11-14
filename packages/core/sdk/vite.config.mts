@@ -54,7 +54,6 @@ export default defineConfig({
       },
       deps: {
         alwaysBundle: [/^@delta-comic\//],
-        neverBundle: ['vite-plus'],
         dts: { alwaysBundle: id => id.startsWith('@delta-comic/') || id.includes('/packages/') },
       },
     },
@@ -63,12 +62,12 @@ export default defineConfig({
     tasks: {
       build: {
         command: 'vp pack',
-        dependsOn: [{ task: 'build', from: 'dependencies' }],
+        dependsOn: [{ task: 'build', from: ['dependencies', 'devDependencies'] }],
         cache: { output: ['dist/**'] },
       },
       typecheck: {
         command: ['tsrs --fast --runExternalCode -p tsconfig.json --noEmit'],
-        dependsOn: [{ task: 'build', from: 'dependencies' }],
+        dependsOn: [{ task: 'build', from: ['dependencies', 'devDependencies'] }],
         cache: { output: [] },
       },
     },

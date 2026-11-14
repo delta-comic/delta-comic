@@ -4,7 +4,11 @@ export default defineConfig({
   pack: { entry: './lib/index.ts', dts: true, sourcemap: true },
   run: {
     tasks: {
-      build: { command: 'vp pack', cache: { output: ['dist/**'] } },
+      build: {
+        command: 'vp pack',
+        dependsOn: [{ task: 'build', from: 'dependencies' }],
+        cache: { output: ['dist/**'] },
+      },
       typecheck: {
         command: 'tsrs --fast --runExternalCode -p tsconfig.json --noEmit',
         cache: { output: [] },

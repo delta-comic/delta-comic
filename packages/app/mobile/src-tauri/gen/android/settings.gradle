@@ -1,3 +1,5 @@
 include ':app'
 
 apply from: 'tauri.settings.gradle'
+
+apply from: "../../../../../../script/android/m3.settings.gradle"

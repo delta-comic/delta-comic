@@ -1,6 +1,6 @@
 import type { ContentRefreshContext } from '@delta-comic/downloader'
 import type { UniContentDownloadProvider, UniContentPageLike } from '@delta-comic/model'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 const mocks = vi.hoisted(() => ({
   fingerprintContentPage: vi.fn(async () => 'content-page-v1'),

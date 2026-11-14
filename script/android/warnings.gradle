@@ -1,0 +1,69 @@
+def repositoryDir = rootProject.file(rootProject.name == 'tauri-plugin-downloader-android'
+    ? '../../../..' : '../../../../../..')
+
+// Compile framework sources from build-local copies so Cargo's registry stays reusable.
+def patchKotlin = { String source ->
+    source = source.replace(
+        'this@AppPlugin.activity.onBackPressed()',
+        '(this@AppPlugin.activity as androidx.appcompat.app.AppCompatActivity).onBackPressedDispatcher.onBackPressed()'
+    ).replace(
+        'this@WryActivity.onBackPressed()',
+        'this@WryActivity.onBackPressedDispatcher.onBackPressed()'
+    ).replace('        settings.databaseEnabled = true\n', '')
+    // Legacy callbacks remain part of Tauri's plugin compatibility contract.
+    source = source.replace('pluginCursor = pluginCursor.superclass', 'pluginCursor = pluginCursor.superclass ?: break')
+    source = source.replace('  internal fun triggerOn', '  @Suppress("DEPRECATION")\n  internal fun triggerOn')
+    source = source.replace('methodDecorator: Command', '@Suppress("UNUSED_PARAMETER") methodDecorator: Command')
+    source = source.replace('''      else -> {
+        throw Exception("unimplemented ReadClipData")
+      }
+''', '').replace('''      } else -> {
+        invoke.reject("unimplemented WriteOptions")
+        return
+      }''', '      }')
+    return source
+}
+
+allprojects { target ->
+    ['com.android.application', 'com.android.library'].each { pluginId ->
+        target.plugins.withId(pluginId) {
+            target.extensions.getByName('androidComponents').finalizeDsl { android ->
+                android.compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+                android.compileOptions.targetCompatibility = JavaVersion.VERSION_17
+
+                if (target.name == 'tauri-plugin-m3') {
+                    def rules = new File(repositoryDir, 'script/android/m3-consumer-rules.pro')
+                    android.defaultConfig.consumerProguardFiles.removeAll { it.name == 'consumer-rules.pro' }
+                    android.defaultConfig.consumerProguardFiles(rules)
+                }
+
+                if (target.name in ['app', 'tauri-android', 'tauri-plugin-clipboard-manager']) {
+                    def main = android.sourceSets.getByName('main')
+                    def sourceDirs = main.java.srcDirs + target.file('src/main/kotlin')
+                    def patchedDir = target.layout.buildDirectory.dir('generated/patched-kotlin')
+                    def patchTask = target.tasks.register('prepareAndroidKotlinSources', Sync) {
+                        from(sourceDirs)
+                        into(patchedDir)
+                        inputs.file(new File(repositoryDir, 'script/android/warnings.gradle'))
+                        // Source edits below are part of this task's output.
+                        doLast {
+                            target.fileTree(patchedDir).matching { include '**/*.kt' }.each { file ->
+                                file.setText(patchKotlin(file.getText('UTF-8')), 'UTF-8')
+                            }
+                        }
+                    }
+                    main.java.setSrcDirs([patchedDir])
+                    target.extensions.getByName('kotlin').sourceSets.getByName('main').kotlin.setSrcDirs([patchedDir])
+                    target.tasks.configureEach { task ->
+                        if (task.name ==~ /compile.*(Kotlin|JavaWithJavac)/) {
+                            task.dependsOn(patchTask)
+                        }
+                    }
+                }
+            }
+            target.tasks.matching { it.name ==~ /compile.*Kotlin/ }.configureEach {
+                compilerOptions.jvmTarget.set(compilerOptions.jvmTarget.get().values().find { it.target == '17' })
+            }
+        }
+    }
+}
