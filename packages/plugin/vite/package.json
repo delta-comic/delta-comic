@@ -24,5 +24,8 @@
   },
   "devDependencies": {
     "@delta-comic/db": "workspace:"
+  },
+  "peerDependencies": {
+    "vite-plus": "catalog:"
   }
 }

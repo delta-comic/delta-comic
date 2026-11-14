@@ -37,7 +37,8 @@
   },
   "dependencies": {
     "cordis": "catalog:",
-    "kysely": "catalog:"
+    "kysely": "catalog:",
+    "typebox": "catalog:"
   },
   "devDependencies": {
     "@delta-comic/db": "workspace:",
