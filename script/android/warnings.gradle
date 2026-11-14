@@ -1,5 +1,5 @@
 def repositoryDir = rootProject.file(rootProject.name == 'tauri-plugin-downloader-android'
-    ? '../../../..' : '../../../../../..')
+    ? '../../../..' : '../../../../../')
 
 // Compile framework sources from build-local copies so Cargo's registry stays reusable.
 def patchKotlin = { String source ->

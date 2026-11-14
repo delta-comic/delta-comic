@@ -1,5 +1,5 @@
 - Format TypeScript/Vue with 2 spaces, no semicolons, single quotes, max 100 columns; use Tailwind for UI styling and PascalCase component tags.
-- Every new user-visible app string must use i18n and update `packages/app/core/lib/i18n/locales/en-US.ts`, `zh-CN.ts`, and `zh-TW.ts`; shared UI messages use the `ui.*` bridge configured in the app entry.
+- Every new user-visible app string must use i18n and update `packages/app/src/i18n/locales/en-US.ts`, `zh-CN.ts`, and `zh-TW.ts`; shared UI messages use the `ui.*` bridge configured in the app entry.
 - Tests live outside production directories and mirror source paths; root scripts use `script/test` where applicable. Rust unit tests generally live under `packages/x/test/src` and link via `#[path = ...]`.
 - Prefer type-safe signatures and existing libraries; avoid unnecessary `any` and unsafe `as` assertions, especially `as unknown as`. Do not hand-edit generated declaration files.
 - Plugin changes must follow `packages/plugin/core/ARCHITECTURE.md`: only `composition.ts` assembles concrete capabilities/adapters; `index.ts` is exports only; package internals must not import `@delta-comic/plugin` or `@/index`.
