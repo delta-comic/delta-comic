@@ -1,5 +1,14 @@
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
+# [3.0.0-next.30](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.29...3.0.0-next.30) (2026-11-15)
+
+
+### Bug Fixes
+
+* **manager:** 移除历史恢复逻辑 ([692cbd4](https://github.com/delta-comic/delta-comic/commit/692cbd42394aecebbf314defa5b7456467b9fb05))
+
+**谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
+
 # [3.0.0-next.29](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.28...3.0.0-next.29) (2026-11-14)
 
 
