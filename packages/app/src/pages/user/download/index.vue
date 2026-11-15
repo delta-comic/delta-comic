@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Page from './index'
+import DownloadManagerPage from '@/components/download/DownloadManagerPage.vue'
 </script>
 
 <template>
-  <Page />
+  <DownloadManagerPage />
 </template>

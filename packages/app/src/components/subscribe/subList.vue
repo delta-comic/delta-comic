@@ -5,7 +5,7 @@ import { DcWaterfall } from '@delta-comic/ui'
 import { useInfiniteQuery } from '@pinia/colada'
 import { computed } from 'vue'
 
-import Card from './subCard'
+import Card from './subCard.vue'
 
 const $props = defineProps<{ source: SubscribeDB.Item }>()
 const $emit = defineEmits<{ unsubscribe: [] }>()

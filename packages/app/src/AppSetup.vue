@@ -4,8 +4,8 @@ import { useDialog, useLoadingBar, useMessage } from 'naive-ui'
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import App from './App'
-import UpdateChecker from './components/updateChecker'
+import App from './App.vue'
+import UpdateChecker from './components/updateChecker.vue'
 import { createPluginAuthGateway } from './features/pluginAuth/gateway'
 import { appLogger } from './logger'
 

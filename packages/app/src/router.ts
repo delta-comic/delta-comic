@@ -75,6 +75,15 @@ const $routerForceDo = async (mode: keyof typeof router.force, to: RouteAim) => 
 }
 
 router.beforeEach(async to => {
+  switch (to.name) {
+    case '/':
+    case '/main':
+    case '/main/home':
+      return { name: '/main/home/random' }
+    case '/main/plugin':
+      return { name: '/main/plugin/list' }
+  }
+
   const isDark = useConfig().isDark
   if (to.meta.statusBar) {
     const sb = toValue(to.meta.statusBar)

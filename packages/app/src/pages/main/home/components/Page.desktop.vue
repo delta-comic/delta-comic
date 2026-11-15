@@ -4,9 +4,9 @@ import { DcTab } from '@delta-comic/ui'
 import { NIcon } from 'naive-ui'
 import { computed, provide, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter, RouterView } from 'vue-router'
+import { useRouter } from 'vue-router'
 
-import MainPageSearchBar from '@/components/home/mainPageSearchBar'
+import MainPageSearchBar from '@/components/home/mainPageSearchBar.vue'
 import { Icons } from '@/icons'
 import { isShowMainHomeNavBar } from '@/symbol'
 
@@ -14,8 +14,6 @@ const $router = useRouter()
 const { t } = useI18n()
 const isShowNavBar = shallowRef(true)
 provide(isShowMainHomeNavBar, isShowNavBar)
-
-definePage({ redirect: { name: '/main/home/random' } })
 
 const openSearch = () => $router.force.push({ name: '/main/search' })
 
@@ -117,6 +115,6 @@ const tabs = computed(() => [
         : 'h-[calc(100%-var(--safe-area-inset-top)-var(--dc-tabs-height))]! -translate-y-[calc(var(--dc-tabs-height)+var(--dc-tabs-padding-bottom))]',
     ]"
   >
-    <RouterView />
+    <slot />
   </div>
 </template>

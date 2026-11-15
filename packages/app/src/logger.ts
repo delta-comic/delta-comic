@@ -2,7 +2,7 @@ import { installGlobalLogger, logger } from '@delta-comic/logger'
 
 import { TauriLoggerClient } from '@/logger/TauriLoggerClient'
 
-logger.setTransport(new TauriLoggerClient({ forwardToNative: true }))
+logger.setTransport(new TauriLoggerClient())
 logger.minLevel = import.meta.env.DEV ? 'trace' : 'info'
 installGlobalLogger()
 

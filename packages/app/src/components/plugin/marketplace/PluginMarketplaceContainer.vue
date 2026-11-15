@@ -14,9 +14,9 @@ import { usePluginMarketplace } from '@/features/pluginMarketplace/usePluginMark
 
 import { getCoreHost } from '../../../ports'
 
-import PluginMarketplaceDetails from './PluginMarketplaceDetails'
-import PluginMarketplaceFilters from './PluginMarketplaceFilters'
-import PluginMarketplaceList from './PluginMarketplaceList'
+import PluginMarketplaceDetails from './PluginMarketplaceDetails.vue'
+import PluginMarketplaceFilters from './PluginMarketplaceFilters.vue'
+import PluginMarketplaceList from './PluginMarketplaceList.vue'
 
 const openExternal = (url: string) => getCoreHost().platform.openExternal(url)
 

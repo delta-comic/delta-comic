@@ -4,8 +4,8 @@ import { NEmpty, NProgress, NTag } from 'naive-ui'
 import { computed, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import DownloadTaskActions from '@/components/download/DownloadTaskActions'
-import DownloadTaskInfo from '@/components/download/DownloadTaskInfo'
+import DownloadTaskActions from '@/components/download/DownloadTaskActions.vue'
+import DownloadTaskInfo from '@/components/download/DownloadTaskInfo.vue'
 import type { DownloadTask } from '@/features/downloads/downloaderClient'
 import {
   formatBytes,

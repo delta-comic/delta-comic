@@ -20,7 +20,7 @@ const { t } = useI18n()
 const pluginStore = usePluginStore()
 useDownloadLifecycle()
 
-await $router.push($route.fullPath)
+await $router.isReady()
 
 const scanned = new Set<string>()
 SharedFunction.define(

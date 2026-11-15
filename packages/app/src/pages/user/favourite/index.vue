@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import Page from './index'
+import { RouterView } from 'vue-router'
+
+import FavouriteOverview from '@/components/user/favourite/FavouriteOverview.vue'
 </script>
 
 <template>
-  <Page />
+  <RouterView v-slot="{ Component }">
+    <component :is="Component" v-if="Component" />
+    <FavouriteOverview v-else />
+  </RouterView>
 </template>

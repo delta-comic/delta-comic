@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
 
-import CreateFavouriteCard from './createFavouriteCard'
+import CreateFavouriteCard from './createFavouriteCard.vue'
 
 const favouriteLogger = logger.scoped('app:favourite-select')
 

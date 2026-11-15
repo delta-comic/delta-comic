@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/icons'
 
-import FavouriteCard from '../favouriteCard'
+import FavouriteCard from '../favouriteCard.vue'
 
 defineProps<{ cards: FavouriteDB.Card[]; isCardMode: boolean }>()
 const emit = defineEmits<{

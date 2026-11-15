@@ -6,7 +6,7 @@ import { useI18n } from 'vue-i18n'
 
 import type { DownloadTask } from '@/features/downloads/downloaderClient'
 
-import DownloadTaskCard from './DownloadTaskCard'
+import DownloadTaskCard from './DownloadTaskCard.vue'
 
 const props = defineProps<{ disabled?: boolean; tasks: DownloadTask[] }>()
 const emit = defineEmits<{

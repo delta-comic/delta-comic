@@ -3,7 +3,7 @@ import { NAlert, NButton, NModal, NTag } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import PluginIcon from '@/components/plugin/PluginIcon'
+import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import {
   pluginMarketplaceInstallInput,
   pluginMarketplaceSourceUrl,

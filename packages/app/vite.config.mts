@@ -1,5 +1,5 @@
 import { copyFile, mkdir } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { relative, resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 import { transform } from '@swc/core'
@@ -68,6 +68,13 @@ export default defineConfig(() => ({
         legacy({ targets: ['ie >= 11'], renderModernChunks: true }),
         VueRouter({
           root: import.meta.dirname,
+          routesFolder: {
+            src: 'src/pages',
+            path: file =>
+              relative(resolve(import.meta.dirname, 'src/pages'), file)
+                .replaceAll('\\', '/')
+                .replace(/\/index\.vue$/, '.vue'),
+          },
           dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
           exclude: ['**/components/**', '**/*.impl.vue', '**/*.desktop.vue', '**/*.mobile.vue'],
           // `index.vue` directories keep the existing route names used by the app.
