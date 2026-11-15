@@ -95,22 +95,15 @@ const app = createApp(
           theme: config.isDark ? darkTheme : lightTheme,
           themeOverrides: themeOverrides,
         },
-        h(DcConfigProvider, { locale: 'zh-CN', theme: config.isDark ? 'dark' : 'light' }, [
-          h(NGlobalStyle, undefined),
-          h(
-            NLoadingBarProvider,
-            undefined,
-            h(
-              NDialogProvider,
-              undefined,
-              h(
-                'div',
-                { class: 'h-full overflow-hidden' },
-                h(NMessageProvider, { max: 5 }, h(AppSetup, undefined)),
+        () =>
+          h(DcConfigProvider, { locale: 'zh-CN', theme: config.isDark ? 'dark' : 'light' }, () => [
+            h(NGlobalStyle, undefined),
+            h(NLoadingBarProvider, undefined, () =>
+              h(NDialogProvider, undefined, () =>
+                h(NMessageProvider, { max: 5 }, () => h(AppSetup)),
               ),
             ),
-          ),
-        ]),
+          ]),
       )
   }),
 )
@@ -122,7 +115,7 @@ app.use(i18n)
 app.use(router)
 const meta = document.createElement('meta')
 meta.name = 'naive-ui-style'
-document.head.appendChild(meta)
 app.mount('#app')
+document.head.appendChild(meta)
 appLogger.info('frontend application mounted')
 window.addEventListener('beforeunload', () => void disposeAppPluginHost())
