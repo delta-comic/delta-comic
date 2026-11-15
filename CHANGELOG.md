@@ -1,3 +1,12 @@
+**请谨慎更新，当前版本为预发布版本，可能包含未完成的功能或兼容性问题**
+
+# [3.0.0-next.31](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.30...3.0.0-next.31) (2026-11-15)
+
+
+### Features
+
+* **release-cli:** 调整表达语言 ([54563f1](https://github.com/delta-comic/delta-comic/commit/54563f182d8496ee4acb0738f9d1215fd4a33e66))
+
 **谨慎更新：当前版本为预发布版本，可能包含未完成的功能或兼容性问题，请酌情更新。**
 
 # [3.0.0-next.30](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.29...3.0.0-next.30) (2026-11-15)
