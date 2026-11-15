@@ -27,7 +27,6 @@ jobs:
       has-release: ${{ steps.release-plan.outputs.has-release }}
       version: ${{ steps.release-plan.outputs.version }}
       channel: ${{ steps.release-plan.outputs.channel }}
-      recovery-required: ${{ steps.release-plan.outputs.recovery-required }}
     env:
       HUSKY: 0
     steps:
@@ -56,14 +55,8 @@ jobs:
         run: vp exec dr release plan
 
       - name: No release required
-        if:
-          steps.release-plan.outputs.has-release != 'true' &&
-          steps.release-plan.outputs.recovery-required != 'true'
+        if: steps.release-plan.outputs.has-release != 'true'
         run: echo 'No releasable Conventional Commit was found.'
-
-      - name: Recovery required
-        if: steps.release-plan.outputs.recovery-required == 'true'
-        run: echo 'Run this workflow manually with recover_withdrawn_2x enabled.'
 
   android:
     needs: plan

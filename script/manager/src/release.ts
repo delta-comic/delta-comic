@@ -1,13 +1,12 @@
 import { spawn } from 'node:child_process'
 
-import { ReleaseEnvironment, type ReleasePreparation } from './release-environment'
+import { ReleaseEnvironment } from './release-environment'
 import { rootDir } from './set-version'
 
 export type SemanticReleaseRunner = (args: string[], env: NodeJS.ProcessEnv) => Promise<void>
 
 interface PreparedReleaseEnvironment {
-  cleanup(ephemeralTag?: string): Promise<void>
-  prepare(): Promise<ReleasePreparation>
+  prepare(): Promise<void>
 }
 
 export async function runSemanticRelease(args: string[], env: NodeJS.ProcessEnv, cwd = rootDir) {
@@ -27,19 +26,7 @@ export async function executeRelease(
   environment: PreparedReleaseEnvironment = new ReleaseEnvironment({ env }),
   semanticRelease: SemanticReleaseRunner = runSemanticRelease,
 ) {
-  const preparation = await environment.prepare()
-
-  if (!preparation.shouldRun) return false
-
-  try {
-    await semanticRelease(args, {
-      ...env,
-      ...(preparation.ephemeralTag
-        ? { DELTA_RELEASE_EPHEMERAL_TAG: preparation.ephemeralTag }
-        : {}),
-    })
-  } finally {
-    await environment.cleanup(preparation.ephemeralTag)
-  }
+  await environment.prepare()
+  await semanticRelease(args, env)
   return true
 }

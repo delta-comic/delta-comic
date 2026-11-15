@@ -5,8 +5,6 @@ import { rootDir } from './set-version'
 
 const execFileAsync = promisify(execFile)
 
-export const withdrawnRelease = { noteRef: 'semantic-release-2.0.0', version: '2.0.0' } as const
-
 export interface GitResult {
   status: number
   stderr: string
@@ -34,12 +32,6 @@ export function createGitRunner(cwd = rootDir): GitRunner {
   }
 }
 
-function parseVersionTag(tag: string) {
-  const match = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?$/.exec(tag)
-  if (!match) return undefined
-  return { major: Number(match[1]), prerelease: match[4] }
-}
-
 function remoteTagNames(output: string) {
   return new Set(
     output
@@ -48,20 +40,6 @@ function remoteTagNames(output: string) {
       .filter((ref): ref is string => Boolean(ref?.startsWith('refs/tags/')))
       .map(ref => ref.replace(/^refs\/tags\//, '').replace(/\^\{\}$/, '')),
   )
-}
-
-export function hasRecoveredRelease(branch: string, tags: string[]) {
-  return tags.some(tag => {
-    const version = parseVersionTag(tag)
-    if (!version || version.major < 3) return false
-    if (branch === 'main') return version.prerelease === undefined
-    return version.prerelease === undefined || version.prerelease.startsWith('next.')
-  })
-}
-
-export interface ReleasePreparation {
-  ephemeralTag?: string
-  shouldRun: boolean
 }
 
 interface ReleaseEnvironmentOptions {
@@ -97,38 +75,7 @@ export class ReleaseEnvironment {
     }
   }
 
-  private async createEphemeralBaseline() {
-    await this.git([
-      'fetch',
-      '--no-tags',
-      'origin',
-      `+refs/notes/${withdrawnRelease.noteRef}:refs/notes/${withdrawnRelease.noteRef}`,
-    ])
-    const notes = (await this.git(['notes', '--ref', withdrawnRelease.noteRef, 'list'])).stdout
-      .trim()
-      .split('\n')
-      .filter(Boolean)
-    if (notes.length !== 1) {
-      throw new Error(
-        `Expected one ${withdrawnRelease.noteRef} note, found ${notes.length.toString()}`,
-      )
-    }
-
-    const [, releaseHead] = notes[0].trim().split(/\s+/)
-    if (!releaseHead) throw new Error(`Unable to resolve ${withdrawnRelease.noteRef} target`)
-
-    const ancestor = await this.git(['merge-base', '--is-ancestor', releaseHead, 'HEAD'], {
-      allowFailure: true,
-    })
-    if (ancestor.status !== 0) {
-      throw new Error(`Withdrawn release commit ${releaseHead} is not an ancestor of HEAD`)
-    }
-
-    await this.git(['tag', '--no-sign', withdrawnRelease.version, releaseHead])
-    return withdrawnRelease.version
-  }
-
-  async prepare(): Promise<ReleasePreparation> {
+  async prepare() {
     const branch = await this.currentBranch()
     if (branch !== 'main' && branch !== 'next')
       throw new Error(`Releases can only run from main or next, received ${branch || '(detached)'}`)
@@ -138,29 +85,5 @@ export class ReleaseEnvironment {
       .map(tag => tag.trim())
       .filter(Boolean)
     await this.assertNoUnpublishedTags(localTags)
-    if (hasRecoveredRelease(branch, localTags)) return { shouldRun: true }
-
-    const ephemeralTag = await this.createEphemeralBaseline()
-    return { ephemeralTag, shouldRun: true }
-  }
-
-  async cleanup(ephemeralTag?: string) {
-    if (!ephemeralTag) return
-    await this.git(['tag', '--delete', ephemeralTag], { allowFailure: true })
-  }
-}
-
-export async function removeEphemeralReleaseTag(
-  env: NodeJS.ProcessEnv,
-  git: GitRunner = createGitRunner(),
-) {
-  const tag = env.DELTA_RELEASE_EPHEMERAL_TAG
-  if (!tag) return
-  if (tag !== withdrawnRelease.version) {
-    throw new Error(`Refusing to delete unexpected ephemeral tag ${tag}`)
-  }
-  const result = await git(['tag', '--delete', tag], { allowFailure: true })
-  if (result.status !== 0 && !result.stderr.includes('not found')) {
-    throw new Error(`Unable to remove ephemeral tag ${tag}: ${result.stderr.trim()}`)
   }
 }
