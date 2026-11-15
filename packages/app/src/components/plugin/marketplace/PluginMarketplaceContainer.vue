@@ -11,8 +11,7 @@ import {
   type PluginMarketplaceItem,
 } from '@/features/pluginMarketplace/model'
 import { usePluginMarketplace } from '@/features/pluginMarketplace/usePluginMarketplace'
-
-import { getCoreHost } from '../../../ports'
+import { getCoreHost } from '@/native/ports'
 
 import PluginMarketplaceDetails from './PluginMarketplaceDetails.vue'
 import PluginMarketplaceFilters from './PluginMarketplaceFilters.vue'

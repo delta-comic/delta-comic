@@ -4,8 +4,8 @@ const isDesktop = __DC_APP_TARGET__ === 'desktop'
 import { NAlert, NButton, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
+import { Icons } from '@/components/icons'
 import type { SourceRefreshWarning } from '@/features/downloads/sourceRefresh'
-import { Icons } from '@/icons'
 
 defineProps<{ disabled?: boolean; warnings: readonly SourceRefreshWarning[] }>()
 const emit = defineEmits<{ confirm: [taskId: string]; retry: [taskId: string] }>()

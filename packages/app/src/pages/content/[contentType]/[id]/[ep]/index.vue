@@ -10,9 +10,9 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import ContentDownloadDialog from '@/components/download/ContentDownloadDialog.vue'
+import { Icons } from '@/components/icons'
 import { contentPlanToEnqueueInput } from '@/features/downloads/contentPlan'
 import type { ContentDownloadRequest } from '@/features/downloads/destination'
-import { Icons } from '@/icons'
 import { useContentStore } from '@/stores/content'
 import { useDownloadsStore } from '@/stores/downloads'
 

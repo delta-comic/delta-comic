@@ -10,7 +10,7 @@ import LogReaderPanel from '@/components/logs/LogReaderPanel.vue'
 import PluginConfigField from '@/components/plugin/PluginConfigField.vue'
 import { translateText } from '@/i18n/index'
 import { localizeFormConfig } from '@/i18n/pluginText'
-import { isTauriRuntime } from '@/platform'
+import { isTauriRuntime } from '@/native/platform'
 
 const $router = useRouter()
 const config = useConfig()

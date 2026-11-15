@@ -5,9 +5,9 @@ import { useMessage, NDrawer, NIcon, NCheckbox, NButton } from 'naive-ui'
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 
-import CreateFavouriteCard from '../createFavouriteCard.vue'
+import CreateFavouriteCard from './favourite/CreateFavouriteCard.vue'
 
 const createFavouriteCard = useTemplateRef('createFavouriteCard')
 const selectList = shallowReactive(new Set<FavouriteDB.Card['createAt']>())

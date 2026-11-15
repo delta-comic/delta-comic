@@ -5,8 +5,8 @@ import { NButton, NIcon, NEmpty, NDrawer } from 'naive-ui'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { Icons } from '@/components/icons'
 import AuthorList from '@/components/subscribe/subAuthorList.vue'
-import { Icons } from '@/icons'
 const isOnAllPage = shallowRef(true)
 const { t } = useI18n()
 const subscribeQuery = SubscribeDB.useQuery(db =>

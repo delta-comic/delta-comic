@@ -7,7 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import HotMainListBlock from '@/components/home/HotMainListBlock.vue'
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 
 const $router = useRouter()
 const { t } = useI18n()

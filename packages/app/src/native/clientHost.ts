@@ -5,7 +5,8 @@ import { shallowReactive } from 'vue'
 import type { Component } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 
-import { appLogger } from './logger'
+import { appLogger } from '@/logger'
+
 import { getCoreHost } from './ports'
 
 export interface AppNavigationRegistration {

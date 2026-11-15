@@ -4,10 +4,11 @@ import { useDialog, useLoadingBar, useMessage } from 'naive-ui'
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { createPluginAuthGateway } from '@/features/pluginAuth/gateway'
+import { appLogger } from '@/logger'
+
 import App from './App.vue'
-import UpdateChecker from './components/updateChecker.vue'
-import { createPluginAuthGateway } from './features/pluginAuth/gateway'
-import { appLogger } from './logger'
+import UpdateChecker from './UpdateChecker.vue'
 
 const { t } = useI18n()
 window.$message = useMessage()

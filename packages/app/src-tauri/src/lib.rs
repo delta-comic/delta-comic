@@ -63,11 +63,11 @@ pub fn run() {
   disable_automatic_capitalization();
 
   #[cfg(any(target_os = "android", target_os = "ios"))]
-  let builder = delta_comic_native::builder().plugin(tauri_plugin_m3::init());
+  let builder = builder().plugin(tauri_plugin_m3::init());
   #[cfg(target_os = "android")]
   let builder = builder.plugin(tauri_plugin_webview_upgrade::init());
   #[cfg(not(any(target_os = "android", target_os = "ios")))]
-  let builder = delta_comic_native::builder();
+  let builder = builder();
 
   #[cfg(not(any(target_os = "android", target_os = "ios")))]
   let builder = builder.on_window_event(|window, event| {
@@ -87,12 +87,15 @@ pub fn run() {
 
   builder
     .setup(|app| {
-      delta_comic_native::setup(app)?;
+      setup(app)?;
       #[cfg(not(any(target_os = "android", target_os = "ios")))]
       setup_download_tray(app)?;
       Ok(())
     })
     .build(tauri::generate_context!())
     .expect("failed to build Delta Comic runtime")
-    .run(delta_comic_native::on_event);
+    .run(on_event);
 }
+mod native;
+
+pub use native::{builder, on_event, rpc_handler, rpc_router, setup};

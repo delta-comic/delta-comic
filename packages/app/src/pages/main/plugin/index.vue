@@ -7,7 +7,7 @@ import { computed, h, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter, RouterView } from 'vue-router'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 
 const pluginPageLogger = logger.scoped('app:plugin-page')
 const router = useRouter()

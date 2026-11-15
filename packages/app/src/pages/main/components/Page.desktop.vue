@@ -2,8 +2,9 @@
 import { computed, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
-import ForkSelect from '@/components/forkSelect.vue'
 import AppNavigation from '@/components/navigation/AppNavigation'
+
+import ForkSelect from './ForkSelect.vue'
 const route = useRoute()
 const isStandalonePage = computed(() => route.name === '/main/search')
 const activeNavigation = computed(() => {

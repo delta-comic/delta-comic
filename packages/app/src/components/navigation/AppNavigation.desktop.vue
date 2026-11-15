@@ -4,8 +4,8 @@ import { NIcon } from 'naive-ui'
 import { computed, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { appNavigation } from '@/clientHost'
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
+import { appNavigation } from '@/native/clientHost'
 import { useAppStore } from '@/stores/app'
 
 import AppNavigationItem from './AppNavigationItem'

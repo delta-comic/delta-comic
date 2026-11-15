@@ -11,9 +11,9 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
 import noneSearchTextIcon from '@/assets/images/none-search-text-icon.webp'
+import { Icons } from '@/components/icons'
 import SearchBar from '@/components/search/searchBar.vue'
 import { searchSourceKey } from '@/components/search/source'
-import { Icons } from '@/icons'
 
 const route = useRoute<'/search/[keyword]/[sort]/[method]'>()
 const pluginStore = usePluginStore()

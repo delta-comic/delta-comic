@@ -10,7 +10,7 @@ import { NIcon } from 'naive-ui'
 import { computed, inject, onMounted, shallowRef, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 import { isShowMainHomeNavBar } from '@/symbol'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()

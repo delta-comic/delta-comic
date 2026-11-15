@@ -6,7 +6,7 @@ import { isEmpty } from 'es-toolkit/compat'
 import { NIcon, NEmpty, NButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 
 const props = withDefaults(defineProps<{ isCardMode?: boolean; card: FavouriteDB.Card }>(), {
   isCardMode: true,

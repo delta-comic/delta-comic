@@ -28,14 +28,19 @@ import { createApp, defineComponent, h, vaporInteropPlugin, watch } from 'vue'
 import { DataLoaderPlugin } from 'vue-router/experimental'
 
 import '@/index.css'
-import { prepareAppPluginHost, disposeAppPluginHost } from '@/clientHost'
-import { i18n } from '@/i18n/index'
-import { configureCoreHost } from '@/index'
+import { i18n } from '@/i18n'
+import { appLogger } from '@/logger'
+import {
+  prepareAppPluginHost,
+  disposeAppPluginHost,
+  configureCoreHost,
+  initializePlatform,
+  openExternal,
+} from '@/native'
+import { router } from '@/router'
 
 import AppSetup from './AppSetup.vue'
-import { appLogger } from './logger'
-import { initializePlatform, openExternal } from './platform'
-import { router } from './router'
+
 configureUiI18n((key: UiMessageKey, params?: UiMessageParams) =>
   i18n.global.t(`ui.${key}`, params as Record<string, number | string>),
 )

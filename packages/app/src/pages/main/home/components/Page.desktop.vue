@@ -7,7 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import MainPageSearchBar from '@/components/home/mainPageSearchBar.vue'
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 import { isShowMainHomeNavBar } from '@/symbol'
 
 const $router = useRouter()

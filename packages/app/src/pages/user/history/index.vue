@@ -8,11 +8,11 @@ import { useDialog, NIcon, NPopconfirm, NButton, NDrawer, NSwitch } from 'naive-
 import { shallowRef, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { Icons } from '@/components/icons'
 import Action from '@/components/listAction.vue'
 import Searcher from '@/components/listSearcher.vue'
 import HistoryCard from '@/components/user/historyCard.vue'
 import Layout from '@/components/user/userLayout.vue'
-import { Icons } from '@/icons'
 import { pluginName } from '@/symbol'
 
 const { state: historiesState } = HistoryDB.useQuery(

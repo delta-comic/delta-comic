@@ -6,8 +6,9 @@ import { NModal, NButton } from 'naive-ui'
 import { watch, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { openExternal } from '@/native/platform'
+
 import pkg from '../../package.json'
-import { openExternal } from '../platform'
 
 const oct = new Octokit()
 const { t } = useI18n()

@@ -26,11 +26,11 @@ import { computed, shallowReactive, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+import { Icons } from '@/components/icons'
 import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import { usePluginInstall } from '@/features/pluginInstall/usePluginInstall'
 import { translateText } from '@/i18n/index'
-import { Icons } from '@/icons'
-import { isTauriRuntime, openPluginDirectory } from '@/platform'
+import { isTauriRuntime, openPluginDirectory } from '@/native/platform'
 
 const pluginListLogger = logger.scoped('app:plugin-list')
 

@@ -3,7 +3,7 @@ import type { FavouriteDB } from '@delta-comic/db'
 import { NEmpty, NButton, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 
 import FavouriteCard from '../favouriteCard.vue'
 

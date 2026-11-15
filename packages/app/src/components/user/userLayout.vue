@@ -4,7 +4,7 @@ import { NSpin, NIcon, NButton } from 'naive-ui'
 import { ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 
 withDefaults(defineProps<{ title: string; isLoading?: boolean }>(), { isLoading: false })
 defineSlots<{ rightNav(): void; topNav(): void; bottomNav(): void; default(): void }>()

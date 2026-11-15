@@ -11,8 +11,8 @@ import { computed, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+import { Icons } from '@/components/icons'
 import ActionCard from '@/components/user/actionCard.vue'
-import { Icons } from '@/icons'
 import { useAppStore } from '@/stores/app'
 const $router = useRouter()
 const config = useConfig()

@@ -3,7 +3,7 @@ import { NButton, NIcon, NInput } from 'naive-ui'
 import { onMounted, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 
 const query = defineModel<string>({ required: true })
 const emit = defineEmits<{ back: []; submit: [] }>()

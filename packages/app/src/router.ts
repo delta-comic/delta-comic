@@ -14,7 +14,7 @@ import {
 import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 
 import { searchSourceKey } from '@/components/search/source'
-import { setStatusBar } from '@/platform'
+import { setStatusBar } from '@/native/platform'
 import { useContentStore } from '@/stores/content'
 import { pluginName } from '@/symbol'
 

@@ -3,7 +3,7 @@ import { type UniEp, UniItem, type UniItemRaw } from '@delta-comic/model'
 import { NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 const $props = defineProps<{ item: UniItemRaw; ep: UniEp['id'] }>()
 
 const item = computed(() => UniItem.create($props.item))

@@ -9,9 +9,8 @@ import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute, RouterView } from 'vue-router'
 
 import { useDownloadLifecycle } from '@/features/downloads/useDownloadLifecycle'
+import { readClipboardText, writeClipboardText } from '@/native/platform'
 import { pluginName } from '@/symbol'
-
-import { readClipboardText, writeClipboardText } from './platform'
 
 const appShellLogger = logger.scoped('app:shell')
 const $router = useRouter()

@@ -6,7 +6,7 @@ import { NButton, NIcon, NTabPane, NTabs } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 
 import SubList from './subList.vue'
 

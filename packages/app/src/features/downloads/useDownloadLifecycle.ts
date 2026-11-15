@@ -2,7 +2,8 @@ import { logger } from '@delta-comic/logger'
 import { onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { getCoreHost } from '../../ports'
+import { getCoreHost } from '@/native/ports'
+
 import { useDownloadsStore } from '../../stores/downloads'
 
 import { createDownloadAttentionReporter } from './attention'

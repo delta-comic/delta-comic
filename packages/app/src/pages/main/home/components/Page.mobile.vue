@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router'
 
 import userIcon from '@/assets/images/userIcon.webp'
 import MainPageSearchBar from '@/components/home/mainPageSearchBar.vue'
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 import { useAppStore } from '@/stores/app'
 import { isShowMainHomeNavBar } from '@/symbol'
 const $router = useRouter()

@@ -1,10 +1,10 @@
 use std::fs;
 
-use crate::{AppApi, AppApiImpl};
+use super::{AppApi, AppApiImpl};
 
 #[test]
 fn export_bindings() -> std::result::Result<(), Box<dyn std::error::Error>> {
-  let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("src/bindings.ts");
+  let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../src/native/bindings.ts");
   let temp_path = std::env::temp_dir().join(format!(
     "delta-comic-app-bindings-{}.ts",
     std::process::id()

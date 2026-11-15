@@ -7,11 +7,11 @@ import { useDialog, NIcon, NPopconfirm, NButton } from 'naive-ui'
 import { useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { Icons } from '@/components/icons'
 import Action from '@/components/listAction.vue'
 import Searcher from '@/components/listSearcher.vue'
 import RecentCard from '@/components/user/recentCard.vue'
 import Layout from '@/components/user/userLayout.vue'
-import { Icons } from '@/icons'
 import { pluginName } from '@/symbol'
 
 const { state: recentState } = RecentDB.useQuery(

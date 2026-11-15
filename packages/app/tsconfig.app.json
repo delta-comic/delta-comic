@@ -13,5 +13,5 @@
       "@delta-comic/utils"
     ]
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*", "./env.d.ts"]
 }
