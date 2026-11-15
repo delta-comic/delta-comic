@@ -3,7 +3,6 @@ import { appendFile, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import type { CIConfig } from './config'
-import { removeEphemeralReleaseTag } from './release-environment'
 import { prereleaseWarning } from './release-notes'
 import {
   assertWorkspaceVersion,
@@ -75,7 +74,6 @@ interface ReleasePluginDependencies {
   cleanPendingRelease?: (version: string) => Promise<void>
   commitPreparedRelease?: ReleaseCommitter
   resolvePublishablePackages?: (config: CIConfig) => Promise<PublishableWorkspacePackage[]>
-  removeEphemeralTag?: (env: NodeJS.ProcessEnv) => Promise<void>
   publishCommand?: CommandRunner
   synchronizeVersion?: (version: string, config: CIConfig) => Promise<void>
   writeOutput?: (path: string, contents: string) => Promise<void>
@@ -94,7 +92,6 @@ export function createReleasePlugin({
   commitPreparedRelease = commitRelease,
   resolvePublishablePackages = (config: CIConfig) =>
     new ReleaseWorkspace(rootDir, config.workspace).publishablePackages(),
-  removeEphemeralTag = removeEphemeralReleaseTag,
   publishCommand = runCommand,
   synchronizeVersion = (version, config) =>
     new VersionSynchronizer(rootDir, config).setVersion(version),
@@ -122,8 +119,7 @@ export function createReleasePlugin({
       }
     },
 
-    async prepare(pluginConfig: CIConfig = {}, { env, nextRelease }: ReleaseContext) {
-      await removeEphemeralTag(env)
+    async prepare(pluginConfig: CIConfig = {}, { nextRelease }: ReleaseContext) {
       await cleanPendingRelease(nextRelease.version)
       await synchronizeVersion(nextRelease.version, pluginConfig)
     },
