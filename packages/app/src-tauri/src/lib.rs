@@ -85,6 +85,20 @@ pub fn run() {
     }
   });
 
+  let context = tauri::generate_context!();
+  #[cfg(all(desktop, dev))]
+  let context = {
+    let mut context = context;
+    let workspace = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+      .ancestors()
+      .nth(3)
+      .expect("failed to resolve the Delta Comic workspace");
+    context.config_mut().app.app_directories_override = Some(
+      tauri::utils::config::AppDirectoriesOverride::Root(workspace.join(".temp")),
+    );
+    context
+  };
+
   builder
     .setup(|app| {
       setup(app)?;
@@ -92,7 +106,7 @@ pub fn run() {
       setup_download_tray(app)?;
       Ok(())
     })
-    .build(tauri::generate_context!())
+    .build(context)
     .expect("failed to build Delta Comic runtime")
     .run(on_event);
 }

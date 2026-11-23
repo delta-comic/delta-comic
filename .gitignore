@@ -42,5 +42,6 @@ packages/*/android/.gradle
 
 .test-plugin
 .planning
+/.temp/
 
 .playwright-mcp
