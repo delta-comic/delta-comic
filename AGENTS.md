@@ -1,84 +1,3 @@
-# Pragmatic Engineering Rules
-
-Solve the requested task with the smallest simple change that is correct, maintainable, and consistent with the existing codebase.
-
-## Scope
-
-* Do exactly what the task requires.
-* Do not expand the scope unless it is necessary for correctness.
-* Do not redesign, rewrite, or refactor unrelated code.
-* Prefer modifying existing code over introducing new abstractions.
-* Preserve the existing architecture, conventions, and dependencies whenever practical.
-
-## YAGNI / KISS
-
-* Do not implement hypothetical future requirements.
-* Do not add abstractions "for future flexibility".
-* Do not add interfaces, factories, registries, plugins, managers, strategies, generic frameworks, configuration systems, or extension points unless the current task actually requires them.
-* Do not add a helper or abstraction merely because code could theoretically be reused later.
-* Prefer straightforward code when it is sufficient.
-* A small amount of duplication is preferable to unnecessary abstraction.
-
-## Change Budget
-
-Before making changes, identify the minimum set of files and code paths required.
-
-Prefer:
-
-1. Existing function over new helper.
-2. Existing module over new module.
-3. Existing dependency over new dependency.
-4. Local change over architectural change.
-5. Explicit code over additional indirection.
-
-Every additional abstraction or dependency must have a concrete current justification.
-
-## Refactoring
-
-Refactor only when:
-
-* the existing code directly prevents the requested change,
-* the refactor is necessary to preserve correctness, or
-* the task explicitly requests refactoring.
-
-Do not refactor merely for elegance, consistency, or personal preference.
-
-## Decision Rule
-
-When multiple solutions work, prefer the one with:
-
-* fewer changed lines,
-* fewer files,
-* fewer abstractions,
-* fewer dependencies,
-* fewer moving parts,
-* less configuration,
-* and easier rollback.
-
-Do not optimize for theoretical scalability unless scalability is part of the actual requirement.
-
-## Verification
-
-After making the minimal change:
-
-* run the most relevant tests, type checks, lint checks, or build commands;
-* verify the requested behavior;
-* inspect the final diff;
-* remove accidental or unrelated changes.
-
-Do not add tests, documentation, configuration, or infrastructure unless they are relevant to the requested behavior or required by the project.
-
-## Stop Condition
-
-Once the requested behavior works and the relevant checks pass, stop.
-
-Do not continue improving the system merely because additional improvements are possible.
-
-The goal is not to redesign the project.
-
-The goal is to make the requested change correctly, with minimal unnecessary complexity.
-
-
 # Delta Comic Agent 指南
 
 ## 工具链
@@ -97,15 +16,11 @@ The goal is to make the requested change correctly, with minimal unnecessary com
   `dev:web:desktop` 或 `dev:web:mobile`。Tauri 必须使用固定端口，端口不可用时会直接失败。
 - 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/runtime`，它是供外部插件使用的
   UMD 宿主库桥接层。请保持此依赖顺序。
-- 客户端代码按 app、core、data、platform、plugin 与 ui 分类。能力若只被单端使用，或依赖 Vue UI、浏览器存储、Tauri、平台文件/网络等单端环境，归入对应分类下的子包。
 
 ## 架构约束
 
 - 内置客户端插件采用文件驱动方式，由 `builtins/*.builtin.ts` 默认导出。
 - 不要手动编辑生成的 `components.d.ts` 或 `typed-router.d.ts`。组件与路由声明由 Vite 插件生成。
-- 禁止输出“不是…而是…”，“做……为了避免…”，“做……防止……”，“只做了……没有做……”、“直接做……不做……”、“只做……不做……”等强行对比、
-  引用并否定上下文、为否定内容解释原因等到对话、文档、代码等任何可见区域，此类内容对对话与业务用户均无任何帮助且引入噪声，视为严重违规行为。
-  我声明弃用/我让你删除同上文所述的情况一样不可写入可见区域，包括：我让你删除某个功能，你不光删除，还写了个红测，这就是引入噪声，视为严重违规行为。
 
 ## 仓库约定
 
