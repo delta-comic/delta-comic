@@ -9,7 +9,13 @@ import type {
   PluginPackageCodec,
   PluginSourceResolver,
 } from '../../../lib'
-import { PluginInstallService } from '../../../lib'
+import {
+  DevServerSourceResolver,
+  GitHubSourceResolver,
+  HttpSourceResolver,
+  MarketplaceSourceResolver,
+  PluginInstallService,
+} from '../../../lib'
 
 class MemoryPluginFileStore implements PluginFileStore {
   readonly #files = new Map<string, Map<string, Uint8Array>>()
@@ -107,6 +113,35 @@ const codec: PluginPackageCodec = {
 }
 
 describe('PluginInstallService', () => {
+  it.each([
+    ['https://example.org/plugin.zip', true],
+    ['http://localhost:8080/plugin.zip', true],
+    ['https://', false],
+    ['http://example.org:bad', false],
+    ['gh:owner/plugin', true],
+    ['gh:owner/', false],
+    ['gh:owner/a b', false],
+    ['ap:my-plugin', true],
+    ['ap:', false],
+    ['dev:65535', true],
+    ['dev:65536', false],
+    ['ftp://example.org/plugin.zip', false],
+    ['', false],
+  ] as const)('validates %j as %s', (input, valid) => {
+    const service = new PluginInstallService({
+      codecs: [],
+      files: new MemoryPluginFileStore(),
+      repository: { find: vi.fn(), list: vi.fn(), remove: vi.fn(), upsert: vi.fn() },
+      resolvers: [
+        new DevServerSourceResolver(),
+        new GitHubSourceResolver({ coreVersion: '1.0.0' }),
+        new HttpSourceResolver(),
+        new MarketplaceSourceResolver({ resolveInstallInput: vi.fn() }, []),
+      ],
+    })
+    expect(service.isValidInput(input)).toBe(valid)
+  })
+
   it('persists development metadata while clearing stored files', async () => {
     const files = new MemoryPluginFileStore()
     await (

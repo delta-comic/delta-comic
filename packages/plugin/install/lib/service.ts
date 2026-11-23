@@ -32,6 +32,14 @@ export class PluginInstallService {
     return [...new Set(this.options.resolvers.flatMap(resolver => resolver.inputPrefixes ?? []))]
   }
 
+  private findResolver(input: PluginInstallInput) {
+    return this.options.resolvers.find(source => source.matches(input))
+  }
+
+  public isValidInput(input: PluginInstallInput): boolean {
+    return this.findResolver(input) !== undefined
+  }
+
   public async install(
     input: PluginInstallInput,
     signal = new AbortController().signal,
@@ -39,7 +47,7 @@ export class PluginInstallService {
     hooks: PluginInstallHooks = {},
   ) {
     report({ phase: 'resolve', progress: 0 })
-    const resolver = this.options.resolvers.find(source => source.matches(input))
+    const resolver = this.findResolver(input)
     if (!resolver) throw new Error('no plugin source resolver accepts this input')
     const source = await resolver.resolve(input, signal, report)
     signal.throwIfAborted()

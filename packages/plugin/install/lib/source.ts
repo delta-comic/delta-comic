@@ -73,7 +73,7 @@ export class HttpSourceResolver implements PluginSourceResolver {
   public readonly inputPrefixes = ['http://', 'https://']
 
   public matches(input: PluginInstallInput): input is string {
-    return typeof input === 'string' && /^https?:\/\//i.test(input)
+    return typeof input === 'string' && /^https?:\/\//i.test(input) && URL.canParse(input)
   }
 
   public async resolve(
@@ -149,7 +149,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
   public constructor(private readonly options: GitHubSourceResolverOptions) {}
 
   public matches(input: PluginInstallInput): input is string {
-    return typeof input === 'string' && /^gh:[^/]+\/[^/]+$/.test(input)
+    return typeof input === 'string' && /^gh:[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(input)
   }
 
   public async resolve(

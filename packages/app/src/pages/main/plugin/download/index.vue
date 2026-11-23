@@ -14,6 +14,7 @@ const { runPluginInstall } = usePluginInstall()
 
 const inputUrl = ref('')
 const isAdding = ref(false)
+const isValidInput = computed(() => pluginInstaller.isValidInput(inputUrl.value))
 const protocolOptions = computed(() => {
   const input = inputUrl.value.toLowerCase()
   return pluginInstaller.inputPrefixes.filter(
@@ -117,6 +118,7 @@ const useUploadPlugin = () => {
       :placeholder="t('plugin.install.placeholder')"
       :disabled="isAdding"
       :loading="isAdding"
+      :status="inputUrl && !isValidInput ? 'error' : undefined"
       @update:value="inputUrl = $event ?? ''"
     />
     <div class="flex w-full items-center justify-center gap-4 p-10">
@@ -125,7 +127,7 @@ const useUploadPlugin = () => {
         size="large"
         class="w-1/2!"
         :loading="isAdding"
-        :disabled="isAdding"
+        :disabled="isAdding || !isValidInput"
         @click="confirmAdd(inputUrl)"
         >{{ t('common.actions.confirm') }}
       </NButton>
