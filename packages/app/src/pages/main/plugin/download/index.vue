@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { logger } from '@delta-comic/logger'
-import { installPlugin } from '@delta-comic/plugin'
+import { installPlugin, pluginInstaller } from '@delta-comic/plugin'
 import { toReactive, useFileDialog } from '@vueuse/core'
-import { useDialog, useMessage, NScrollbar, NInput, NButton } from 'naive-ui'
-import { ref } from 'vue'
+import { useDialog, useMessage, NScrollbar, NAutoComplete, NButton } from 'naive-ui'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { usePluginInstall } from '@/features/pluginInstall/usePluginInstall'
@@ -14,6 +14,12 @@ const { runPluginInstall } = usePluginInstall()
 
 const inputUrl = ref('')
 const isAdding = ref(false)
+const protocolOptions = computed(() => {
+  const input = inputUrl.value.toLowerCase()
+  return pluginInstaller.inputPrefixes.filter(
+    prefix => prefix.length > input.length && prefix.startsWith(input),
+  )
+})
 
 const $message = useMessage()
 const $dialog = useDialog()
@@ -102,13 +108,16 @@ const useUploadPlugin = () => {
 <template>
   <NScrollbar class="size-full">
     <div class="mb-2 pt-3 pl-5 text-2xl">{{ t('plugin.install.title') }}</div>
-    <NInput
-      v-model:value="inputUrl"
+    <NAutoComplete
+      :value="inputUrl"
       class="m-1.25 w-[calc(100%-10px)]!"
       clearable
+      :options="protocolOptions"
+      :get-show="() => !isAdding"
       :placeholder="t('plugin.install.placeholder')"
       :disabled="isAdding"
       :loading="isAdding"
+      @update:value="inputUrl = $event ?? ''"
     />
     <div class="flex w-full items-center justify-center gap-4 p-10">
       <NButton

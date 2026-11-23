@@ -28,6 +28,10 @@ export interface PluginInstallHooks {
 export class PluginInstallService {
   public constructor(private readonly options: PluginInstallServiceOptions) {}
 
+  public get inputPrefixes(): readonly string[] {
+    return [...new Set(this.options.resolvers.flatMap(resolver => resolver.inputPrefixes ?? []))]
+  }
+
   public async install(
     input: PluginInstallInput,
     signal = new AbortController().signal,

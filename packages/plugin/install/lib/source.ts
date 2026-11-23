@@ -13,6 +13,7 @@ import {
   DEV_ENTRY_PATH,
   DEV_MANIFEST_PATH,
   DEV_SERVER_LOADER_ID,
+  DEV_SERVER_SOURCE_PREFIX,
   devServerUrl,
   parseDevServerPort,
 } from './dev'
@@ -69,6 +70,7 @@ export class LocalFileSourceResolver implements PluginSourceResolver {
 
 export class HttpSourceResolver implements PluginSourceResolver {
   public readonly id = 'http'
+  public readonly inputPrefixes = ['http://', 'https://']
 
   public matches(input: PluginInstallInput): input is string {
     return typeof input === 'string' && /^https?:\/\//i.test(input)
@@ -106,6 +108,7 @@ const fetchDevText = async (
 
 export class DevServerSourceResolver implements PluginSourceResolver {
   public readonly id = DEV_SERVER_LOADER_ID
+  public readonly inputPrefixes = [DEV_SERVER_SOURCE_PREFIX]
 
   public matches(input: PluginInstallInput): input is string {
     return typeof input === 'string' && parseDevServerPort(input) !== undefined
@@ -141,6 +144,7 @@ export interface GitHubSourceResolverOptions {
 
 export class GitHubSourceResolver implements PluginSourceResolver {
   public readonly id = 'github'
+  public readonly inputPrefixes = ['gh:']
 
   public constructor(private readonly options: GitHubSourceResolverOptions) {}
 
@@ -191,6 +195,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
 
 export class MarketplaceSourceResolver implements PluginSourceResolver {
   public readonly id = 'marketplace'
+  public readonly inputPrefixes = ['ap:']
 
   public constructor(
     private readonly catalog: PluginInstallCatalog,

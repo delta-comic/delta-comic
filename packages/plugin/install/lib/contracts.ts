@@ -14,6 +14,7 @@ export interface ResolvedPluginSource {
 
 export interface PluginSourceResolver {
   readonly id: string
+  readonly inputPrefixes?: readonly string[]
   matches(input: PluginInstallInput): boolean
   resolve(
     input: PluginInstallInput,
