@@ -229,6 +229,8 @@ class TauriPluginFileBackend implements PluginFileBackend {
     const backupRoot = await join(appData, 'plugin-backup')
     const staging = await join(stagingRoot, `${plugin}-${token}`)
     const backup = await join(backupRoot, `${plugin}-${token}`)
+    if (!files.size && !(await fs.exists(live))) return
+    await fs.mkdir(base, { recursive: true })
     await fs.mkdir(staging, { recursive: true })
     try {
       for (const [path, bytes] of files) {
@@ -244,7 +246,8 @@ class TauriPluginFileBackend implements PluginFileBackend {
         await fs.rename(live, backup)
       }
       try {
-        await fs.rename(staging, live)
+        if (files.size) await fs.rename(staging, live)
+        else await fs.remove(staging, { recursive: true })
       } catch (error) {
         if (existed && (await fs.exists(backup))) await fs.rename(backup, live)
         throw error
