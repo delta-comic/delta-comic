@@ -70,3 +70,7 @@
   `<T extends Struct<object>>(arg: T): number`。
 - `as`断言不止`as any`，比如`(keys: readonly unknown[])=> [...static, ...keys] as EntryKey`，此时这种类型转换也不能保证正确，
   应当改为`(keys: EntryKey[])=> [...foo, ...keys]`
+
+## 参考资源
+
+- naive ui 文档: https://www.naiveui.com/zh-CN/llms.txt
