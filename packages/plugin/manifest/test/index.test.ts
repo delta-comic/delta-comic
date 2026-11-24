@@ -6,7 +6,13 @@ import {
   parsePluginManifest,
 } from '../lib/index.js'
 
-const manifest = { id: 'demo', name: 'Demo', version: '1.0.0', entry: 'index.js', resources: [] }
+const manifest = {
+  id: 'demo',
+  name: 'Demo',
+  version: '1.0.0',
+  entryModulePath: 'index.js',
+  resources: [],
+}
 
 describe('@delta-comic/manifest', () => {
   it('validates and parses a manifest', () => {
@@ -16,7 +22,7 @@ describe('@delta-comic/manifest', () => {
 
   it('rejects malformed manifests', () => {
     expect(isPluginManifest({ ...manifest, id: 'bad id' })).toBe(false)
-    expect(() => parsePluginManifest({ ...manifest, entry: undefined })).toThrow(
+    expect(() => parsePluginManifest({ ...manifest, entryModulePath: undefined })).toThrow(
       'invalid plugin manifest',
     )
     expect(isPluginManifest({ ...manifest, protocolVersion: 2 })).toBe(false)

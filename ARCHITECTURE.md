@@ -42,7 +42,7 @@
   "version": "1.0.0",
   "author": "Example Author",
   "description": "Example package",
-  "entry": "index.js",
+  "entryModulePath": "index.js",
   "resources": [
     {
       "path": "index.js",
@@ -55,7 +55,9 @@
 ```
 
 插件作者向 `deltaComic()` 传入 `PluginMetadata`，填写 ID、名称、插件版本及可选的作者、
-描述、图标和核心版本范围 `supportCoreVersion`。构建工具自动生成必填的 `entry` 和 `resources`。
+描述、图标和核心版本范围 `supportCoreVersion`。构建工具自动生成必填的 `entryModulePath` 和 `resources`。
+`entryModulePath` 是入口 ESM 模块相对包根目录的路径，开发模式下相对于开发服务器根路径。
+宿主从该模块加载依赖图，并读取其默认导出的 Cordis 插件函数数组。
 `resources` 描述资源路径、MIME、SHA-256 和导入图。
 
 启用状态、用户配置、来源和定时设置保存在客户端安装记录。安装器校验结构、路径、资源完整性

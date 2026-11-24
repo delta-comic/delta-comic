@@ -84,7 +84,7 @@ const install = (id: string, functions: readonly Component.Function[]) => {
     pluginName: id,
     enable: true,
     config: {},
-    meta: { id, name: id, version: '1.0.0', entry: 'index.js', resources: [] },
+    meta: { id, name: id, version: '1.0.0', entryModulePath: 'index.js', resources: [] },
   })
   state.modules.set(id, functions)
 }
@@ -99,7 +99,7 @@ describe('native package lifecycle', () => {
       id: 'core',
       name: 'Core',
       version: '1.0.0',
-      entry: 'core',
+      entryModulePath: 'core',
       resources: [],
     }
     state.builtins.push({ manifest, functions: [function core() {}] })

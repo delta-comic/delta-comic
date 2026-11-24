@@ -124,7 +124,7 @@ describe('deltaComic vite plugin', () => {
           integrity: expect.stringMatching(/^sha256-/),
         }),
       )
-      expect(manifest.entry).toBe('index.js')
+      expect(manifest.entryModulePath).toBe('index.js')
       expect(plugin.config?.({}).build.lib.entry).toBe('./src/main.ts')
     } finally {
       await rm(root, { recursive: true })
@@ -217,7 +217,7 @@ describe('deltaComic vite plugin', () => {
     if (typeof manifestFile?.source !== 'string') throw new Error('manifest not emitted')
     const manifest = manifestFile.source
     expect(JSON.parse(manifest)).toMatchObject({
-      entry: 'index.js',
+      entryModulePath: 'index.js',
       resources: [
         { path: 'index.js', integrity: expect.stringMatching(/^sha256-/) },
         { path: 'index.css', mimeType: 'text/css' },

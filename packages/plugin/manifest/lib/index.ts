@@ -18,7 +18,7 @@ export const PluginManifestSchema = Type.Object(
     author: Type.Optional(Type.String()),
     description: Type.Optional(Type.String()),
     icon: Type.Optional(Type.String({ minLength: 1 })),
-    entry: Type.String({ minLength: 1 }),
+    entryModulePath: Type.String({ minLength: 1 }),
     resources: Type.Array(PluginResourceSchema),
   },
   { additionalProperties: false },
@@ -26,7 +26,7 @@ export const PluginManifestSchema = Type.Object(
 
 export type PluginResource = Static<typeof PluginResourceSchema>
 export type PluginManifest = Static<typeof PluginManifestSchema>
-export type PluginMetadata = Omit<PluginManifest, 'entry' | 'resources'>
+export type PluginMetadata = Omit<PluginManifest, 'entryModulePath' | 'resources'>
 export type PluginUserConfig = Record<string, unknown>
 
 export const assertPluginManifestCompatible = (manifest: PluginManifest, coreVersion: string) => {

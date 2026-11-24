@@ -17,7 +17,7 @@ export interface PluginArtifact {
 export interface ArtifactValidationResult {
   manifest: PluginManifest
   files: readonly ArtifactFile[]
-  entry: ArtifactFile
+  entryModule: ArtifactFile
 }
 
 export class ArtifactValidationError extends Error {
@@ -78,8 +78,10 @@ const resourceByPath = (resources: readonly PluginResource[]) =>
 
 const validateResourceGraph = (manifest: PluginManifest) => {
   const resources = resourceByPath(manifest.resources)
-  if (!resources.has(normalizePath(manifest.entry))) {
-    throw new ArtifactValidationError(`entry is not declared as a resource: ${manifest.entry}`)
+  if (!resources.has(normalizePath(manifest.entryModulePath))) {
+    throw new ArtifactValidationError(
+      `entry module is not declared as a resource: ${manifest.entryModulePath}`,
+    )
   }
   for (const resource of resources.values()) {
     for (const imported of resource.imports) {
@@ -111,9 +113,10 @@ export const validateArtifact = async (
       throw new ArtifactValidationError(`integrity mismatch: ${path}`)
     }
   }
-  const entry = files.get(normalizePath(manifest.entry))
-  if (!entry) throw new ArtifactValidationError(`entry is missing: ${manifest.entry}`)
-  return { manifest, files: [...files.values()], entry }
+  const entryModule = files.get(normalizePath(manifest.entryModulePath))
+  if (!entryModule)
+    throw new ArtifactValidationError(`entry module is missing: ${manifest.entryModulePath}`)
+  return { manifest, files: [...files.values()], entryModule }
 }
 
 export const sha256Integrity = digest

@@ -6,7 +6,7 @@ import core from '../core'
 export const manifest: PluginManifest = {
   id: 'core',
   name: 'core',
-  entry: 'core',
+  entryModulePath: 'core',
   resources: [],
   author: 'Delta Comic',
   description: 'Delta Comic host services',

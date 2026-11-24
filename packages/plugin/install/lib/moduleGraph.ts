@@ -55,7 +55,7 @@ export const createArtifactModuleGraph = async (
     return url
   }
   try {
-    return { url: build(safePluginPath(manifest.entry, 'client entry')), dispose }
+    return { url: build(safePluginPath(manifest.entryModulePath, 'entry module path')), dispose }
   } catch (error) {
     dispose()
     throw error

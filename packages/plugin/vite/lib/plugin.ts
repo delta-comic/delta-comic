@@ -100,10 +100,10 @@ export const deltaComic = (meta: PluginMetadata): PluginOption[] => {
           imports: [],
         })
       }
-      const entry = Object.values(bundle).find(item => item.type === 'chunk' && item.isEntry)
-      if (!entry) throw new Error('plugin build did not produce an entry')
+      const entryModule = Object.values(bundle).find(item => item.type === 'chunk' && item.isEntry)
+      if (!entryModule) throw new Error('plugin build did not produce an entry module')
       const manifest = JSON.stringify(
-        { ...meta, resources, entry: entry.fileName } satisfies PluginManifest,
+        { ...meta, resources, entryModulePath: entryModule.fileName } satisfies PluginManifest,
         null,
         2,
       )

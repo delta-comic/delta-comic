@@ -10,7 +10,7 @@ describe('@delta-comic/plugin-artifact', () => {
         id: 'demo',
         name: 'Demo',
         version: '1.0.0',
-        entry: 'index.js',
+        entryModulePath: 'index.js',
         resources: [
           {
             path: 'index.js',
@@ -22,7 +22,9 @@ describe('@delta-comic/plugin-artifact', () => {
       },
       files: [{ path: 'index.js', bytes }],
     }
-    await expect(validateArtifact(artifact)).resolves.toMatchObject({ entry: { path: 'index.js' } })
+    await expect(validateArtifact(artifact)).resolves.toMatchObject({
+      entryModule: { path: 'index.js' },
+    })
   })
 
   it('rejects unsafe paths and integrity mismatches', async () => {
@@ -32,7 +34,7 @@ describe('@delta-comic/plugin-artifact', () => {
         id: 'demo',
         name: 'Demo',
         version: '1.0.0',
-        entry: 'index.js',
+        entryModulePath: 'index.js',
         resources: [
           {
             path: 'index.js',
@@ -47,12 +49,18 @@ describe('@delta-comic/plugin-artifact', () => {
     await expect(validateArtifact(artifact)).rejects.toThrow('unsafe relative path')
   })
 
-  it('requires the entry to be a declared resource', async () => {
+  it('requires the entry module to be a declared resource', async () => {
     await expect(
       validateArtifact({
-        manifest: { id: 'demo', name: 'Demo', version: '1.0.0', entry: 'index.js', resources: [] },
+        manifest: {
+          id: 'demo',
+          name: 'Demo',
+          version: '1.0.0',
+          entryModulePath: 'index.js',
+          resources: [],
+        },
         files: [],
       }),
-    ).rejects.toThrow('entry is not declared as a resource')
+    ).rejects.toThrow('entry module is not declared as a resource')
   })
 })

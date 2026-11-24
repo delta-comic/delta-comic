@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { relative, resolve } from 'node:path'
 
-import type { PluginMetadata } from '@delta-comic/manifest'
+import type { PluginManifest, PluginMetadata } from '@delta-comic/manifest'
 import {
   DEV_CSS_PATH,
   DEV_ENTRY_PATH,
@@ -26,9 +26,9 @@ const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*' } as const
 const VUE_STYLE_QUERY = /(?:^|[?&])vue&type=style(?:&|$)/
 const CSS_RUNTIME_BYPASS_QUERY = /(?:^|[?&])(?:direct|inline|raw|url)(?:&|$)/
 
-export const createWireManifest = (meta: PluginMetadata) => ({
+export const createWireManifest = (meta: PluginMetadata): PluginManifest => ({
   ...meta,
-  entry: DEV_ENTRY_PATH.slice(1),
+  entryModulePath: DEV_ENTRY_PATH.slice(1),
   resources: [],
 })
 

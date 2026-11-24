@@ -66,8 +66,9 @@ export async function getPluginDownloadIdentity(plugin: string): Promise<PluginD
     .executeTakeFirst()
   return {
     pluginVersion: archive?.meta.version,
-    pluginIntegrity: archive?.meta.resources.find(resource => resource.path === archive.meta.entry)
-      ?.integrity,
+    pluginIntegrity: archive?.meta.resources.find(
+      resource => resource.path === archive.meta.entryModulePath,
+    )?.integrity,
   }
 }
 

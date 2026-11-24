@@ -87,9 +87,9 @@ export class DevServerPluginModuleReader implements PluginModuleReader {
     const port = parseDevServerPort(archive.installInput)
     if (port === undefined)
       throw new Error(`invalid development install source: ${archive.installInput}`)
-    const entry = archive.meta.entry
+    const entryModulePath = archive.meta.entryModulePath
     const session = crypto.randomUUID()
-    const url = new URL(devServerUrl(port, safePluginPath(entry, 'client entry')))
+    const url = new URL(devServerUrl(port, safePluginPath(entryModulePath, 'entry module path')))
     url.searchParams.set(DEV_SESSION_QUERY, session)
     url.searchParams.set('t', Date.now().toString())
     const module: unknown = await import(/* @vite-ignore */ url.href)

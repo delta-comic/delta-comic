@@ -69,7 +69,7 @@ class MemoryPluginFileStore implements PluginFileStore {
 }
 
 const manifest = (version: string): PluginManifest => ({
-  entry: 'index.js',
+  entryModulePath: 'index.js',
   resources: [],
   author: 'test',
   description: 'test',

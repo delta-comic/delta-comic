@@ -13,7 +13,7 @@ const archive = async (entry = 'export default () => ({})') => {
       id: 'artifact-reader',
       name: 'Artifact Reader',
       version: '1.0.0',
-      entry: 'index.js',
+      entryModulePath: 'index.js',
       resources: [
         {
           path: 'index.js',
