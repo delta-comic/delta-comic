@@ -388,6 +388,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: 'catalog:'
         version: 21.2.4
+      '@delta-comic/codegen-cli':
+        specifier: workspace:*
+        version: link:script/codegen
       '@delta-comic/release-cli':
         specifier: workspace:*
         version: link:script/manager

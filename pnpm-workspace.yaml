@@ -35,7 +35,7 @@ catalog:
   '@types/node': 26.6.6
   '@types/semver': ^7.8.0
   '@vitejs/plugin-legacy': ^8.2.4
-  '@vizejs/vite-plugin': ^0.791.0
+  '@vizejs/vite-plugin': ^0.792.0
   '@vueuse/core': ^15.0.0
   '@vitest/coverage-v8': 5.1.0
   browserslist: ^4.29.5
@@ -59,7 +59,7 @@ catalog:
   pinia: ^4.1.0
   semver: ^7.8.6
   swiper: ^14.4.0
-  tailwind-merge: ^3.7.0
+  tailwind-merge: ^3.7.1
   tailwindcss: ^4.3.5
   tailwindcss-safe-area-capacitor: ^0.5.1
   twlinter: ^0.8.0
@@ -68,13 +68,13 @@ catalog:
   tlds: ^1.261.0
   tsrs: 7.1.0-beta.tsrs5
   typescript: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-  vite: npm:@voidzero-dev/vite-plus-core@1.6.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.8.0
   vite-plugin-vue-devtools: ^9.0.0-rc.3
-  vite-plus: 1.6.0
+  vite-plus: 1.8.0
   vue-tsc: ^3.3.14
-  vize: ^0.791.0
-  vue: 3.6.0-rc.15
-  vue-i18n: ^12.0.0-alpha.10
+  vize: ^0.792.0
+  vue: 3.6.0-rc.16
+  vue-i18n: ^12.0.0-alpha.13
   vue-component-type-helpers: ^4.0.0-alpha.3
   vue-router: ^5.5.1
   kysely-wasqlite-worker: ^2.0.1
@@ -82,30 +82,6 @@ catalog:
   json-logic-js: ^2.0.5
   '@types/json-logic-js': ^2.0.8
   vitest: 5.1.0
-
-minimumReleaseAgeExclude:
-  - vue-router@5.5.1
-  - '@tsrs/darwin-arm64@7.1.0-beta.tsrs5'
-  - '@tsrs/darwin-x64@7.1.0-beta.tsrs5'
-  - '@tsrs/linux-arm64-gnu@7.1.0-beta.tsrs5'
-  - '@tsrs/linux-arm64-musl@7.1.0-beta.tsrs5'
-  - '@tsrs/linux-x64-gnu@7.1.0-beta.tsrs5'
-  - '@tsrs/linux-x64-musl@7.1.0-beta.tsrs5'
-  - '@tsrs/win32-arm64@7.1.0-beta.tsrs5'
-  - '@tsrs/win32-x64@7.1.0-beta.tsrs5'
-  - '@vizejs/native-darwin-arm64@0.791.0'
-  - '@vizejs/native-darwin-x64@0.791.0'
-  - '@vizejs/native-linux-arm64-gnu@0.791.0'
-  - '@vizejs/native-linux-arm64-musl@0.791.0'
-  - '@vizejs/native-linux-x64-gnu@0.791.0'
-  - '@vizejs/native-linux-x64-musl@0.791.0'
-  - '@vizejs/native-win32-arm64-msvc@0.791.0'
-  - '@vizejs/native-win32-x64-msvc@0.791.0'
-  - '@vizejs/native@0.791.0'
-  - '@vizejs/unplugin@0.791.0'
-  - '@vizejs/vite-plugin@0.791.0'
-  - tsrs@7.1.0-beta.tsrs5
-  - vize@0.791.0
 
 overrides:
   typescript: 'catalog:'
