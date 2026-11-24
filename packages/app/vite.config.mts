@@ -197,7 +197,7 @@ export default defineConfig(() => ({
         dependsOn: [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build:dev'],
       },
       'tauri': { command: 'vp exec tauri', cache: false },
-      'typecheck:desktop': {
+      'typecheck': {
         command: [
           'tsrs --fast --runExternalCode --noEmit -p tsconfig.app.json',
           'tsrs --fast --runExternalCode -p tsconfig.node.json --noEmit',
@@ -205,14 +205,8 @@ export default defineConfig(() => ({
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         cache: { output: [] },
       },
-      'typecheck:mobile': {
-        command: [
-          'tsrs --fast --runExternalCode --noEmit -p tsconfig.app.json',
-          'tsrs --fast --runExternalCode -p tsconfig.node.json --noEmit',
-        ],
-        dependsOn: [{ task: 'build', from: 'dependencies' }],
-        cache: { output: [] },
-      },
+      'typecheck:desktop': { command: 'vp run typecheck' },
+      'typecheck:mobile': { command: 'vp run typecheck' },
     },
   },
   clearScreen: false,

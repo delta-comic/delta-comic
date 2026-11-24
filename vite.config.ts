@@ -52,7 +52,11 @@ export default defineConfig(
         },
         // linter
         'typecheck': {
-          command: 'vp exec tsc --project ./tsconfig.json && vp run -r typecheck',
+          command: [
+            'vp exec tsc --project ./tsconfig.json',
+            // build:packages has already produced the declarations used by these checks.
+            'vp run -r --ignore-depends-on typecheck',
+          ],
           dependsOn: ['build:packages'],
           cache: { output: [] },
         },
