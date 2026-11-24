@@ -37,7 +37,7 @@ catalog:
   '@vitejs/plugin-legacy': ^8.2.4
   '@vizejs/vite-plugin': ^0.792.0
   '@vueuse/core': ^15.0.0
-  '@vitest/coverage-v8': 5.1.0
+  '@vitest/coverage-v8': 5.1.1
   browserslist: ^4.29.5
   color: ^5.0.3
   commitlint-plugin-cspell: ^0.9.5
@@ -68,7 +68,7 @@ catalog:
   tlds: ^1.261.0
   tsrs: 7.1.0-beta.tsrs5
   typescript: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-  vite: npm:@voidzero-dev/vite-plus-core@1.8.0
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8001
   vite-plugin-vue-devtools: ^9.0.0-rc.3
   vite-plus: 1.8.0
   vue-tsc: ^3.3.14
@@ -81,7 +81,40 @@ catalog:
   happy-dom: ^21.0.4
   json-logic-js: ^2.0.5
   '@types/json-logic-js': ^2.0.8
-  vitest: 5.1.0
+  vitest: 5.1.1
+
+minimumReleaseAgeExclude:
+  - '@tsrs/darwin-arm64@7.1.0-beta.tsrs5'
+  - '@tsrs/darwin-x64@7.1.0-beta.tsrs5'
+  - '@tsrs/linux-arm64-gnu@7.1.0-beta.tsrs5'
+  - '@tsrs/linux-arm64-musl@7.1.0-beta.tsrs5'
+  - '@tsrs/linux-x64-gnu@7.1.0-beta.tsrs5'
+  - '@tsrs/linux-x64-musl@7.1.0-beta.tsrs5'
+  - '@tsrs/win32-arm64@7.1.0-beta.tsrs5'
+  - '@tsrs/win32-x64@7.1.0-beta.tsrs5'
+  - '@vizejs/native-darwin-arm64@0.792.0'
+  - '@vizejs/native-darwin-x64@0.792.0'
+  - '@vizejs/native-linux-arm64-gnu@0.792.0'
+  - '@vizejs/native-linux-arm64-musl@0.792.0'
+  - '@vizejs/native-linux-x64-gnu@0.792.0'
+  - '@vizejs/native-linux-x64-musl@0.792.0'
+  - '@vizejs/native-win32-arm64-msvc@0.792.0'
+  - '@vizejs/native-win32-x64-msvc@0.792.0'
+  - '@vizejs/native@0.792.0'
+  - '@vizejs/unplugin@0.792.0'
+  - '@vizejs/vite-plugin@0.792.0'
+  - '@voidzero-dev/vite-plus-core@8.3.8001'
+  - '@voidzero-dev/vite-plus-darwin-arm64@1.8.0'
+  - '@voidzero-dev/vite-plus-darwin-x64@1.8.0'
+  - '@voidzero-dev/vite-plus-linux-arm64-gnu@1.8.0'
+  - '@voidzero-dev/vite-plus-linux-arm64-musl@1.8.0'
+  - '@voidzero-dev/vite-plus-linux-x64-gnu@1.8.0'
+  - '@voidzero-dev/vite-plus-linux-x64-musl@1.8.0'
+  - '@voidzero-dev/vite-plus-win32-arm64-msvc@1.8.0'
+  - '@voidzero-dev/vite-plus-win32-x64-msvc@1.8.0'
+  - tsrs@7.1.0-beta.tsrs5
+  - vite-plus@1.8.0
+  - vize@0.792.0
 
 overrides:
   typescript: 'catalog:'
@@ -90,8 +123,6 @@ overrides:
 
 peerDependencyRules:
   allowAny:
-    - vite
     - vitest
   allowedVersions:
-    vite: '*'
     vitest: '*'
