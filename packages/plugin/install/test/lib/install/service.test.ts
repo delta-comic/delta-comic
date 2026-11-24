@@ -100,6 +100,7 @@ const resolver: PluginSourceResolver = {
   id: 'local',
   matches: () => true,
   resolve: async () => ({
+    kind: 'archive',
     file: new File(['package'], 'plugin.zip'),
     installInput: '',
     resolverId: 'local',
@@ -142,7 +143,7 @@ describe('PluginInstallService', () => {
     expect(service.isValidInput(input)).toBe(valid)
   })
 
-  it('persists development metadata while clearing stored files', async () => {
+  it('persists development metadata without touching stored files', async () => {
     const files = new MemoryPluginFileStore()
     await (
       await files.replace('example', new Map([['index.js', new TextEncoder().encode('old')]]))
@@ -162,10 +163,10 @@ describe('PluginInstallService', () => {
       id: 'dev-server',
       matches: input => input === 'dev:6173',
       resolve: async () => ({
+        kind: 'dev-server',
+        manifest: manifest('2.0.0'),
         installInput: 'dev:6173',
-        package: { codecId: 'dev-server', files: new Map(), manifest: manifest('2.0.0') },
         resolverId: 'dev-server',
-        storage: 'remote',
       }),
     }
     const service = new PluginInstallService({
@@ -178,7 +179,7 @@ describe('PluginInstallService', () => {
     const installed = await service.install('dev:6173')
 
     expect(installed).toMatchObject({ installInput: 'dev:6173', loaderName: 'dev-server' })
-    await expect(files.read('example', 'index.js')).rejects.toThrow('not found')
+    expect(new TextDecoder().decode(await files.read('example', 'index.js'))).toBe('old')
     expect(current.get('example')?.loaderName).toBe('dev-server')
   })
 

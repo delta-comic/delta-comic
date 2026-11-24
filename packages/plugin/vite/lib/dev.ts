@@ -2,7 +2,13 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { relative, resolve } from 'node:path'
 
 import type { PluginManifest } from '@delta-comic/model'
-import { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH } from '@delta-comic/plugin-install'
+import {
+  DEV_CSS_PATH,
+  DEV_ENTRY_PATH,
+  DEV_MANIFEST_PATH,
+  DEV_SESSION_QUERY,
+  DEV_UPDATE_EVENT,
+} from '@delta-comic/plugin-install'
 import type { Connect, ModuleNode, Plugin, ViteDevServer } from 'vite-plus'
 import { isCSSRequest, normalizePath } from 'vite-plus'
 
@@ -29,27 +35,17 @@ export const createWireManifest = (meta: PluginManifest) => ({
 export const createDevEntryCode = (meta: PluginManifest, entryUrl: string) =>
   [
     `import '/@vite/client'`,
-    `const __deltaComicCssPath = ${JSON.stringify(DEV_CSS_PATH)}`,
-    `const __deltaComicUpdateStyle = async () => {`,
-    `  const __deltaComicDocument = globalThis.document`,
-    `  if (!__deltaComicDocument) return`,
-    `  try {`,
-    `    const __deltaComicResponse = await fetch(new URL(__deltaComicCssPath, import.meta.url), { cache: 'no-store' })`,
-    `    if (!__deltaComicResponse.ok) return`,
-    `    const __deltaComicCss = await __deltaComicResponse.text()`,
-    `    for (const __deltaComicStyle of __deltaComicDocument.head.querySelectorAll('style')) {`,
-    `      if (__deltaComicStyle.dataset.plugin === ${JSON.stringify(meta.id)}) __deltaComicStyle.textContent = __deltaComicCss`,
-    `    }`,
-    `  } catch {}`,
-    `}`,
-    `const __deltaComicHot = import.meta.hot`,
-    `if (__deltaComicHot) {`,
-    `  __deltaComicHot.accept(${JSON.stringify(entryUrl)}, module => {`,
-    `    if (module) globalThis.dispatchEvent(new CustomEvent('delta-comic:plugin-update', { detail: { id: ${JSON.stringify(meta.id)}, functions: module.default } }))`,
-    `  })`,
-    `  const __deltaComicAfterUpdate = () => { void __deltaComicUpdateStyle() }`,
-    `  __deltaComicHot.on('vite:afterUpdate', __deltaComicAfterUpdate)`,
-    `  __deltaComicHot.dispose(() => __deltaComicHot.off('vite:afterUpdate', __deltaComicAfterUpdate))`,
+    `const session = new URL(import.meta.url).searchParams.get(${JSON.stringify(DEV_SESSION_QUERY)})`,
+    `const hot = import.meta.hot`,
+    `if (hot && session) {`,
+    `  let nextModule`,
+    `  hot.accept(${JSON.stringify(entryUrl)}, module => { nextModule = module })`,
+    `  const afterUpdate = () => {`,
+    `    globalThis.dispatchEvent(new CustomEvent(${JSON.stringify(DEV_UPDATE_EVENT)}, { detail: { id: ${JSON.stringify(meta.id)}, session, module: nextModule } }))`,
+    `    nextModule = undefined`,
+    `  }`,
+    `  hot.on('vite:afterUpdate', afterUpdate)`,
+    `  hot.dispose(() => hot.off('vite:afterUpdate', afterUpdate))`,
     `}`,
     `export { default } from ${JSON.stringify(entryUrl)}`,
   ].join('\n')

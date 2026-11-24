@@ -3,6 +3,7 @@ import { logger } from '@delta-comic/logger'
 import {
   setPluginConfig,
   pluginFiberStates,
+  reconnectDevPlugin,
   setPluginEnabled,
   uninstallPlugin,
   updatePluginByName,
@@ -85,6 +86,8 @@ const plugins = computed<ManagedPlugin[]>(() =>
 )
 const isBuiltIn = (plugin: ManagedPlugin) => plugin.origin === 'builtin'
 const canOpenLocally = (plugin: ManagedPlugin) => isTauriRuntime() && !isBuiltIn(plugin)
+const isDevServerPlugin = (plugin: ManagedPlugin) =>
+  pluginStore.installations.get(plugin.pluginName)?.loaderName === 'dev-server'
 const editing = shallowRef<ManagedPlugin>()
 const configText = shallowRef('')
 const saveConfig = async () => {
@@ -121,6 +124,17 @@ const actionsFor = (plugin: ManagedPlugin): DropdownOption[] => {
     { key: 'config', label: t('plugin.menu.config') },
     { key: 'remove', label: t('common.actions.delete') },
   ]
+  if (
+    isDevServerPlugin(plugin) &&
+    pluginStore.statuses.get(plugin.pluginName)?.state === pluginFiberStates.FAILED
+  ) {
+    installedActions.unshift({
+      key: 'reconnect',
+      label: t('plugin.list.actions.reconnectDevServer', {
+        source: pluginStore.installations.get(plugin.pluginName)?.installInput,
+      }),
+    })
+  }
   {
     installedActions.splice(installedActions.length - 1, 0, {
       key: 'update',
@@ -167,6 +181,9 @@ const handleAction = async (plugin: ManagedPlugin, key: string) => {
       }
       case 'update':
         await updatePlugin(plugin)
+        break
+      case 'reconnect':
+        await reconnectDevPlugin(plugin.pluginName)
         break
       case 'remove':
         await uninstallPlugin(plugin.pluginName)

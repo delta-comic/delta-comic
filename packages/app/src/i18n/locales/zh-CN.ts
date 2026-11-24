@@ -260,6 +260,7 @@ const zhCN = {
         enable: '启用',
         menu: '插件操作',
         openLocal: '在本地打开',
+        reconnectDevServer: '重连开发服务器（{source}）',
         updateFromSource: '从下载源更新',
       },
       empty: { action: '前往市场', description: '暂未安装插件' },

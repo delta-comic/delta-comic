@@ -28,6 +28,7 @@ import {
   type PluginCatalog,
   type PluginInstallReporter,
 } from '@delta-comic/plugin-install'
+import { DEV_UPDATE_EVENT } from '@delta-comic/plugin-install'
 import {
   Context,
   type Component,
@@ -68,6 +69,8 @@ export const pluginFiberStates = {
 } satisfies Record<string, FiberState>
 
 export interface PluginInstallation {
+  readonly installInput?: string
+  readonly loaderName?: string
   readonly manifest: PluginManifest | null
   readonly enabled: boolean
   readonly config: Record<string, unknown>
@@ -246,6 +249,8 @@ const refreshInstallations = async () => {
   for (const archive of archives) {
     if (internalIds.has(archive.pluginName)) continue
     pluginInstallations.set(archive.pluginName, {
+      installInput: archive.installInput,
+      loaderName: archive.loaderName,
       manifest: isPluginManifest(archive.meta) ? archive.meta : null,
       enabled: archive.enable,
       config: archive.config ?? {},
@@ -362,6 +367,17 @@ export const loadEnabledPlugins = () =>
       try {
         await mount(id)
       } catch (error) {
+        if (
+          pluginInstallations.get(id)?.manifest &&
+          (await repository.find(id))?.loaderName === DEV_SERVER_LOADER_ID
+        ) {
+          pluginStatuses.set(id, {
+            state: pluginFiberStates.FAILED,
+            source: 'dev-server',
+            error: describe(error),
+          })
+          continue
+        }
         await enterSafeMode(id, id, error)
         throw error
       }
@@ -383,13 +399,41 @@ export const loadEnabledPlugins = () =>
   })
 
 const reload = async (id: string, override?: readonly Component.Function[]) => {
+  const current = loadedModules.get(id)
   await unload(id)
   await refreshInstallations()
   try {
-    if (pluginInstallations.get(id)?.enabled) await mount(id, override)
+    if (pluginInstallations.get(id)?.enabled) {
+      if (override && current?.dev) {
+        loadedModules.set(id, { ...current, functions: override })
+        pluginStatuses.set(id, { state: pluginFiberStates.LOADING })
+        const group: Fiber[] = []
+        children.set(id, group)
+        const installation = pluginInstallations.get(id)!
+        const fiber = pluginContext.use({
+          name: id,
+          apply(ctx) {
+            owners.set(ctx.fiber, id)
+            current.activate?.(ctx)
+            for (const fn of override) group.push(ctx.use(fn, installation.config))
+          },
+        })
+        pluginFibers.set(id, fiber)
+      } else {
+        await mount(id, override)
+      }
+    }
     await stabilize()
   } catch (error) {
-    await enterSafeMode(id, id, error)
+    if ((await repository.find(id))?.loaderName === DEV_SERVER_LOADER_ID) {
+      pluginStatuses.set(id, {
+        state: pluginFiberStates.FAILED,
+        source: 'dev-server',
+        error: describe(error),
+      })
+    } else {
+      await enterSafeMode(id, id, error)
+    }
     throw error
   }
 }
@@ -402,7 +446,7 @@ export interface PluginInstallOptions {
 export const installPlugin = (input: File | string, options: PluginInstallOptions = {}) =>
   managed(async () =>
     pluginInstaller.install(input, options.signal, options.report, {
-      afterStage: archive => reload(archive.pluginName),
+      afterStage: (archive, previous) => reloadForInstall(archive, previous),
     }),
   )
 
@@ -411,7 +455,8 @@ export const updatePluginByName = (id: string, options: PluginInstallOptions = {
     const archive = await repository.find(id)
     if (!archive?.installInput) throw new Error(`plugin has no update source: ${id}`)
     return await pluginInstaller.install(archive.installInput, options.signal, options.report, {
-      afterStage: staged => reload(staged.pluginName),
+      expectedId: id,
+      afterStage: (staged, previous) => reloadForInstall(staged, previous),
     })
   })
 
@@ -456,7 +501,66 @@ export const uninstallPlugin = (id: string) =>
   })
 
 export const reloadPlugin = (id: string, functions?: readonly Component.Function[]) =>
-  managed(() => reload(id, functions))
+  managed(async () => {
+    try {
+      await reload(id, functions)
+    } catch (error) {
+      if ((await repository.find(id))?.loaderName !== DEV_SERVER_LOADER_ID) throw error
+    }
+  })
+
+export const reconnectDevPlugin = (id: string) =>
+  managed(async () => {
+    const archive = await repository.find(id)
+    if (archive?.loaderName !== DEV_SERVER_LOADER_ID)
+      throw new Error(`plugin is not connected to a development server: ${id}`)
+    await reload(id)
+  })
+
+const reloadForInstall = async (
+  archive: PluginArchiveDB.Archive,
+  previous: PluginArchiveDB.Archive | undefined,
+) => {
+  const previousModule = loadedModules.get(archive.pluginName)
+  try {
+    await reload(archive.pluginName)
+  } catch (error) {
+    if (archive.loaderName !== DEV_SERVER_LOADER_ID) throw error
+    if (previous) {
+      await repository.upsert(previous)
+      if (previous.enable && previousModule) {
+        loadedModules.set(archive.pluginName, previousModule)
+        pluginInstallations.set(archive.pluginName, {
+          installInput: previous.installInput,
+          loaderName: previous.loaderName,
+          manifest: previous.meta,
+          enabled: previous.enable,
+          config: previous.config ?? {},
+          origin: 'installed',
+        })
+        await mount(archive.pluginName, previousModule.functions)
+        await stabilize()
+      }
+    }
+    pluginStatuses.set(archive.pluginName, {
+      state: pluginFiberStates.FAILED,
+      source: 'dev-server',
+      error: describe(error),
+    })
+    throw error
+  }
+  return {
+    commit: async () => previousModule?.dispose?.(),
+    rollback: async () => {
+      if (!previous || !previousModule) return
+      await unload(archive.pluginName)
+      await repository.upsert(previous)
+      loadedModules.set(archive.pluginName, previousModule)
+      await mount(archive.pluginName, previousModule.functions)
+      await stabilize()
+    },
+  }
+}
 
 export const disposePluginHost = async () => {
   await management
@@ -509,7 +613,7 @@ export const pluginStore = {
 export const usePluginStore = () => pluginStore
 
 if (typeof window !== 'undefined') {
-  window.addEventListener('delta-comic:plugin-update', event => {
+  window.addEventListener(DEV_UPDATE_EVENT, event => {
     if (!(event instanceof CustomEvent)) return
     const detail: unknown = event.detail
     if (
@@ -517,21 +621,42 @@ if (typeof window !== 'undefined') {
       detail === null ||
       !('id' in detail) ||
       typeof detail.id !== 'string' ||
-      !('functions' in detail)
+      !('session' in detail) ||
+      typeof detail.session !== 'string'
     )
       return
     const id = detail.id
     if (!pluginFibers.has(id)) return
+    const current = loadedModules.get(id)?.dev
+    if (!current || current.session !== detail.session) return
     try {
-      const functions = parseClientPluginEntry(detail.functions, id)
-      void reloadPlugin(id, functions).catch(error =>
-        pluginDiagnostics.record('error', 'plugin hot update failed', {
-          pluginId: id,
-          error: describe(error),
-        }),
-      )
+      const nextModule = 'module' in detail ? detail.module : undefined
+      if (nextModule) {
+        const functions = parseClientPluginEntry(
+          typeof nextModule === 'object' && nextModule !== null && 'default' in nextModule
+            ? nextModule.default
+            : undefined,
+          id,
+        )
+        void reloadPlugin(id, functions)
+      } else {
+        void current
+          .refreshStyle()
+          .catch(error =>
+            pluginStatuses.set(id, {
+              state: pluginFiberStates.FAILED,
+              source: 'dev-server',
+              error: describe(error),
+            }),
+          )
+      }
+      pluginDiagnostics.record('info', 'development plugin updated', { pluginId: id })
     } catch (error) {
-      void enterSafeMode(id, 'hot update', error)
+      pluginStatuses.set(id, {
+        state: pluginFiberStates.FAILED,
+        source: 'dev-server',
+        error: describe(error),
+      })
     }
   })
 }

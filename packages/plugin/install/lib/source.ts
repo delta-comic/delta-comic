@@ -9,12 +9,9 @@ import type {
   ResolvedPluginSource,
 } from './contracts'
 import {
-  DEV_CSS_PATH,
-  DEV_ENTRY_PATH,
-  DEV_MANIFEST_PATH,
   DEV_SERVER_LOADER_ID,
   DEV_SERVER_SOURCE_PREFIX,
-  devServerUrl,
+  readDevManifest,
   parseDevServerPort,
 } from './dev'
 import { isPluginManifestCompatible, parsePluginManifest } from './manifest'
@@ -64,7 +61,7 @@ export class LocalFileSourceResolver implements PluginSourceResolver {
 
   public async resolve(input: PluginInstallInput): Promise<ResolvedPluginSource> {
     if (typeof input === 'string') throw new TypeError('local file resolver requires a File')
-    return { file: input, installInput: '', resolverId: this.id }
+    return { kind: 'archive', file: input, installInput: '', resolverId: this.id }
   }
 }
 
@@ -86,24 +83,12 @@ export class HttpSourceResolver implements PluginSourceResolver {
     if (!response.ok) throw new Error(`plugin download failed: ${response.status}`)
     const name = new URL(input).pathname.split('/').at(-1) || 'plugin.zip'
     return {
+      kind: 'archive' as const,
       file: await responseFile(response, name, report),
       installInput: input,
       resolverId: this.id,
     }
   }
-}
-
-const fetchDevText = async (
-  url: string,
-  signal: AbortSignal,
-  optional = false,
-): Promise<string | undefined> => {
-  const response = await fetch(url, { cache: 'no-store', signal })
-  if (!response.ok) {
-    if (optional && response.status === 404) return undefined
-    throw new Error(`development plugin request failed: ${response.status}`)
-  }
-  return await response.text()
 }
 
 export class DevServerSourceResolver implements PluginSourceResolver {
@@ -122,16 +107,11 @@ export class DevServerSourceResolver implements PluginSourceResolver {
     const port = parseDevServerPort(input)
     if (port === undefined) throw new TypeError('development resolver requires dev:<port>')
 
-    const manifestText = await fetchDevText(devServerUrl(port, DEV_MANIFEST_PATH), signal)
-    const manifest = parsePluginManifest(JSON.parse(manifestText ?? ''))
-    await fetchDevText(devServerUrl(port, DEV_ENTRY_PATH), signal)
-    await fetchDevText(devServerUrl(port, DEV_CSS_PATH), signal, true)
-
     return {
+      kind: 'dev-server',
+      manifest: await readDevManifest(port, signal),
       installInput: input,
-      package: { codecId: this.id, files: new Map(), manifest },
       resolverId: this.id,
-      storage: 'remote',
     }
   }
 }
@@ -183,6 +163,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
         if (!packageResponse.ok)
           throw new Error(`plugin download failed: ${packageResponse.status}`)
         return {
+          kind: 'archive' as const,
           file: await responseFile(packageResponse, packageAsset.name, report),
           installInput: input,
           resolverId: this.id,
