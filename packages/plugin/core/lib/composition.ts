@@ -21,14 +21,13 @@ import {
   StoredPluginModuleReader,
   ZipPackageCodec,
   devServerUrl,
-  parseClientPluginEntry,
   parseDevServerPort,
   safePluginPath,
   type LoadedPluginModule,
   type PluginCatalog,
   type PluginInstallReporter,
 } from '@delta-comic/plugin-install'
-import { DEV_UPDATE_EVENT } from '@delta-comic/plugin-install'
+import { DEV_INVALIDATE_EVENT } from '@delta-comic/plugin-install'
 import {
   Context,
   type Component,
@@ -613,7 +612,7 @@ export const pluginStore = {
 export const usePluginStore = () => pluginStore
 
 if (typeof window !== 'undefined') {
-  window.addEventListener(DEV_UPDATE_EVENT, event => {
+  window.addEventListener(DEV_INVALIDATE_EVENT, event => {
     if (!(event instanceof CustomEvent)) return
     const detail: unknown = event.detail
     if (
@@ -629,35 +628,8 @@ if (typeof window !== 'undefined') {
     if (!pluginFibers.has(id)) return
     const current = loadedModules.get(id)?.dev
     if (!current || current.session !== detail.session) return
-    try {
-      const nextModule = 'module' in detail ? detail.module : undefined
-      if (nextModule) {
-        const functions = parseClientPluginEntry(
-          typeof nextModule === 'object' && nextModule !== null && 'default' in nextModule
-            ? nextModule.default
-            : undefined,
-          id,
-        )
-        void reloadPlugin(id, functions)
-      } else {
-        void current
-          .refreshStyle()
-          .catch(error =>
-            pluginStatuses.set(id, {
-              state: pluginFiberStates.FAILED,
-              source: 'dev-server',
-              error: describe(error),
-            }),
-          )
-      }
-      pluginDiagnostics.record('info', 'development plugin updated', { pluginId: id })
-    } catch (error) {
-      pluginStatuses.set(id, {
-        state: pluginFiberStates.FAILED,
-        source: 'dev-server',
-        error: describe(error),
-      })
-    }
+    void reloadPlugin(id)
+    pluginDiagnostics.record('info', 'development plugin invalidated', { pluginId: id })
   })
 }
 

@@ -92,38 +92,29 @@ export class DevServerPluginModuleReader implements PluginModuleReader {
     const session = crypto.randomUUID()
     const url = new URL(devServerUrl(port, safePluginPath(entry, 'client entry')))
     url.searchParams.set(DEV_SESSION_QUERY, session)
+    url.searchParams.set('t', Date.now().toString())
     const module: unknown = await import(/* @vite-ignore */ url.href)
     signal.throwIfAborted()
     const functions = moduleEntry(module, archive.pluginName)
-    let style: HTMLStyleElement | undefined
-    let text = ''
-    const refreshStyle = async () => {
-      const response = await fetch(devServerUrl(port, DEV_CSS_PATH), {
-        cache: 'no-store',
-        signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
-      })
-      if (!response.ok && response.status !== 404)
-        throw new Error(`development CSS request failed: ${response.status}`)
-      text = response.status === 404 ? '' : await response.text()
-      signal.throwIfAborted()
-      if (style && style.textContent !== text) style.textContent = text
-    }
-    await refreshStyle()
+    const response = await fetch(devServerUrl(port, DEV_CSS_PATH), {
+      cache: 'no-store',
+      signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
+    })
+    if (!response.ok && response.status !== 404)
+      throw new Error(`development CSS request failed: ${response.status}`)
+    const styleText = response.status === 404 ? '' : await response.text()
+    signal.throwIfAborted()
     return {
       functions,
-      dev: { session, refreshStyle },
+      dev: { session },
       activate(ctx) {
-        if (typeof document === 'undefined') return
+        if (typeof document === 'undefined' || !styleText) return
         ctx.effect(() => {
-          const element = document.createElement('style')
-          element.dataset.plugin = archive.pluginName
-          element.textContent = text
-          document.head.append(element)
-          style = element
-          return () => {
-            element.remove()
-            if (style === element) style = undefined
-          }
+          const style = document.createElement('style')
+          style.dataset.plugin = archive.pluginName
+          style.textContent = styleText
+          document.head.append(style)
+          return () => style.remove()
         }, 'plugin CSS')
       },
     }

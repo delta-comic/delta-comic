@@ -58,7 +58,7 @@ export interface PluginArchiveRepository {
 
 export interface LoadedPluginModule {
   readonly functions: readonly Component.Function[]
-  readonly dev?: { readonly session: string; refreshStyle(): Promise<void> }
+  readonly dev?: { readonly session: string }
   readonly activate?: (ctx: Context) => void
   readonly dispose?: () => void | Promise<void>
 }

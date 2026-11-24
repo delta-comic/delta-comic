@@ -7,7 +7,7 @@ import {
   DEV_ENTRY_PATH,
   DEV_MANIFEST_PATH,
   DEV_SESSION_QUERY,
-  DEV_UPDATE_EVENT,
+  DEV_INVALIDATE_EVENT,
 } from '@delta-comic/plugin-install'
 import type { Connect, ModuleNode, Plugin, ViteDevServer } from 'vite-plus'
 import { isCSSRequest, normalizePath } from 'vite-plus'
@@ -38,11 +38,9 @@ export const createDevEntryCode = (meta: PluginManifest, entryUrl: string) =>
     `const session = new URL(import.meta.url).searchParams.get(${JSON.stringify(DEV_SESSION_QUERY)})`,
     `const hot = import.meta.hot`,
     `if (hot && session) {`,
-    `  let nextModule`,
-    `  hot.accept(${JSON.stringify(entryUrl)}, module => { nextModule = module })`,
+    `  hot.accept(${JSON.stringify(entryUrl)}, () => {})`,
     `  const afterUpdate = () => {`,
-    `    globalThis.dispatchEvent(new CustomEvent(${JSON.stringify(DEV_UPDATE_EVENT)}, { detail: { id: ${JSON.stringify(meta.id)}, session, module: nextModule } }))`,
-    `    nextModule = undefined`,
+    `    globalThis.dispatchEvent(new CustomEvent(${JSON.stringify(DEV_INVALIDATE_EVENT)}, { detail: { id: ${JSON.stringify(meta.id)}, session } }))`,
     `  }`,
     `  hot.on('vite:afterUpdate', afterUpdate)`,
     `  hot.dispose(() => hot.off('vite:afterUpdate', afterUpdate))`,
