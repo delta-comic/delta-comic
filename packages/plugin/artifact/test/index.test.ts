@@ -7,12 +7,10 @@ describe('@delta-comic/plugin-artifact', () => {
     const bytes = new TextEncoder().encode('export default () => undefined')
     const artifact = {
       manifest: {
-        protocolVersion: 2 as const,
         id: 'demo',
         name: 'Demo',
         version: '1.0.0',
-        client: { entry: 'index.js' },
-
+        entry: 'index.js',
         resources: [
           {
             path: 'index.js',
@@ -24,21 +22,17 @@ describe('@delta-comic/plugin-artifact', () => {
       },
       files: [{ path: 'index.js', bytes }],
     }
-    await expect(validateArtifact(artifact)).resolves.toMatchObject({
-      client: { path: 'index.js' },
-    })
+    await expect(validateArtifact(artifact)).resolves.toMatchObject({ entry: { path: 'index.js' } })
   })
 
   it('rejects unsafe paths and integrity mismatches', async () => {
     const bytes = new TextEncoder().encode('content')
     const artifact = {
       manifest: {
-        protocolVersion: 2 as const,
         id: 'demo',
         name: 'Demo',
         version: '1.0.0',
-        client: { entry: 'index.js' },
-
+        entry: 'index.js',
         resources: [
           {
             path: 'index.js',
@@ -53,39 +47,12 @@ describe('@delta-comic/plugin-artifact', () => {
     await expect(validateArtifact(artifact)).rejects.toThrow('unsafe relative path')
   })
 
-  it('validates only resources selected for the target platform', async () => {
-    const bytes = new TextEncoder().encode('export default 1')
-    const integrity = await sha256Integrity(bytes)
-    const manifest = {
-      protocolVersion: 2 as const,
-      id: 'platform-plugin',
-      name: 'Platform Plugin',
-      version: '1.0.0',
-      client: { entry: 'index.js' },
-
-      resources: [
-        {
-          path: 'index.js',
-          mimeType: 'text/javascript',
-          integrity,
-          imports: [],
-          platform: ['desktop'],
-        },
-        {
-          path: 'android.js',
-          mimeType: 'text/javascript',
-          integrity: 'sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
-          imports: [],
-          platform: ['android'],
-        },
-      ],
-    }
-
+  it('requires the entry to be a declared resource', async () => {
     await expect(
-      validateArtifact({ manifest, files: [{ path: 'index.js', bytes }] }, { platform: 'desktop' }),
-    ).resolves.toMatchObject({ client: { path: 'index.js' } })
-    await expect(
-      validateArtifact({ manifest, files: [{ path: 'index.js', bytes }] }, { platform: 'android' }),
+      validateArtifact({
+        manifest: { id: 'demo', name: 'Demo', version: '1.0.0', entry: 'index.js', resources: [] },
+        files: [],
+      }),
     ).rejects.toThrow('entry is not declared as a resource')
   })
 })

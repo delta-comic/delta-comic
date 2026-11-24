@@ -45,7 +45,7 @@ export class StoredPluginModuleReader implements PluginModuleReader {
     signal: AbortSignal,
   ): Promise<LoadedPluginModule> {
     const manifest = archive.meta
-    if (!manifest.client) throw new Error(`plugin has no client entry: ${archive.pluginName}`)
+
     const resources = new Map<string, Uint8Array>()
     for (const resource of manifest.resources) {
       resources.set(resource.path, await this.files.read(archive.pluginName, resource.path))
@@ -87,8 +87,7 @@ export class DevServerPluginModuleReader implements PluginModuleReader {
     const port = parseDevServerPort(archive.installInput)
     if (port === undefined)
       throw new Error(`invalid development install source: ${archive.installInput}`)
-    const entry = archive.meta.client?.entry
-    if (!entry) throw new Error(`plugin has no client entry: ${archive.pluginName}`)
+    const entry = archive.meta.entry
     const session = crypto.randomUUID()
     const url = new URL(devServerUrl(port, safePluginPath(entry, 'client entry')))
     url.searchParams.set(DEV_SESSION_QUERY, session)

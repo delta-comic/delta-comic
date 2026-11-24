@@ -858,9 +858,9 @@ importers:
 
   packages/plugin/vite:
     dependencies:
-      '@delta-comic/model':
+      '@delta-comic/manifest':
         specifier: 'workspace:'
-        version: link:../../core/model
+        version: link:../manifest
       '@delta-comic/plugin-install':
         specifier: 'workspace:'
         version: link:../install

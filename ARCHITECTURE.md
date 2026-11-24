@@ -27,23 +27,22 @@
 | `packages/ui/ui` | 通用 Vue UI、内容布局和播放器 |
 | `packages/core/sdk` | 插件 SDK、Cordis 导出与诊断协议 |
 | `packages/core/logger` | 双端日志核心 |
-| `packages/plugin/manifest` | 客户端 manifest v2 schema 与完整性检查 |
+| `packages/plugin/manifest` | 客户端 manifest schema 与完整性检查 |
 
 客户端公共模块由各端实际消费。`@delta-comic/runtime` 为外部插件提供宿主桥接。
 
 ## Manifest 与产物
 
-`@delta-comic/manifest` 提供 TypeBox schema，协议版本为 `2`。插件包提供客户端入口：
+`@delta-comic/manifest` 提供 TypeBox schema。插件包提供客户端入口：
 
 ```json
 {
-  "protocolVersion": 2,
   "id": "example",
   "name": "Example",
   "version": "1.0.0",
   "author": "Example Author",
   "description": "Example package",
-  "client": { "entry": "index.js" },
+  "entry": "index.js",
   "resources": [
     {
       "path": "index.js",
@@ -55,11 +54,11 @@
 }
 ```
 
-核心字段包括 ID、名称、版本、作者、描述、图标和资源清单。可选 `apiVersion` 与
-`cordisVersion` 表达宿主版本范围。`resources` 描述资源路径、MIME、SHA-256、导入图及
-可选平台条件。
+插件作者向 `deltaComic()` 传入 `PluginMetadata`，填写 ID、名称、插件版本及可选的作者、
+描述、图标和核心版本范围 `supportCoreVersion`。构建工具自动生成必填的 `entry` 和 `resources`。
+`resources` 描述资源路径、MIME、SHA-256 和导入图。
 
-启用状态、用户配置、来源和定时设置保存在客户端安装记录。安装器校验协议、路径、资源完整性
+启用状态、用户配置、来源和定时设置保存在客户端安装记录。安装器校验结构、路径、资源完整性
 与客户端入口。客户端安装支持本地 ZIP、HTTP、GitHub release、市场与 `dev:<port>`；模块读取器
 处理 ESM 图、Blob/资源 URL、CSS 和释放。构建桥接使 Cordis、Vue、SDK 和 UI 使用宿主实例。
 

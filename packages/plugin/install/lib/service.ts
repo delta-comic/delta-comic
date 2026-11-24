@@ -64,7 +64,7 @@ export class PluginInstallService {
         : { manifest: source.manifest, codecId: DEV_SERVER_LOADER_ID, files: undefined }
     const { manifest, files, codecId } = resolved
     const plugin = manifest.id
-    if (!manifest.client) throw new Error(`plugin has no client entry: ${plugin}`)
+
     if (this.options.reservedIds?.has(plugin)) throw new Error(`plugin id is reserved: ${plugin}`)
     if (hooks.expectedId !== undefined && hooks.expectedId !== plugin)
       throw new Error(`expected plugin ${hooks.expectedId}, received ${plugin}`)

@@ -17,7 +17,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@delta-comic/model": "workspace:",
+    "@delta-comic/manifest": "workspace:",
     "@delta-comic/plugin-install": "workspace:",
     "@delta-comic/utils": "workspace:",
     "jszip": "catalog:"

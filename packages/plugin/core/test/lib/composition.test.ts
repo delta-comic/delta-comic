@@ -84,14 +84,7 @@ const install = (id: string, functions: readonly Component.Function[]) => {
     pluginName: id,
     enable: true,
     config: {},
-    meta: {
-      protocolVersion: 2,
-      id,
-      name: id,
-      version: '1.0.0',
-      client: { entry: 'index.js' },
-      resources: [],
-    },
+    meta: { id, name: id, version: '1.0.0', entry: 'index.js', resources: [] },
   })
   state.modules.set(id, functions)
 }
@@ -103,11 +96,10 @@ describe('native package lifecycle', () => {
     await host.disposePluginHost()
     vi.resetModules()
     const manifest: PluginManifest = {
-      protocolVersion: 2,
       id: 'core',
       name: 'Core',
       version: '1.0.0',
-      client: { entry: 'core' },
+      entry: 'core',
       resources: [],
     }
     state.builtins.push({ manifest, functions: [function core() {}] })

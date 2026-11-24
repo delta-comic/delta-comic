@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { relative, resolve } from 'node:path'
 
-import type { PluginManifest } from '@delta-comic/model'
+import type { PluginMetadata } from '@delta-comic/manifest'
 import {
   DEV_CSS_PATH,
   DEV_ENTRY_PATH,
@@ -26,13 +26,13 @@ const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*' } as const
 const VUE_STYLE_QUERY = /(?:^|[?&])vue&type=style(?:&|$)/
 const CSS_RUNTIME_BYPASS_QUERY = /(?:^|[?&])(?:direct|inline|raw|url)(?:&|$)/
 
-export const createWireManifest = (meta: PluginManifest) => ({
+export const createWireManifest = (meta: PluginMetadata) => ({
   ...meta,
-  client: { entry: DEV_ENTRY_PATH.slice(1) },
+  entry: DEV_ENTRY_PATH.slice(1),
   resources: [],
 })
 
-export const createDevEntryCode = (meta: PluginManifest, entryUrl: string) =>
+export const createDevEntryCode = (meta: PluginMetadata, entryUrl: string) =>
   [
     `import '/@vite/client'`,
     `const session = new URL(import.meta.url).searchParams.get(${JSON.stringify(DEV_SESSION_QUERY)})`,
@@ -143,7 +143,7 @@ const requestOrigin = (req: IncomingMessage) => {
   return `${secure ? 'https' : 'http'}://${req.headers.host}`
 }
 
-export const createDevPlugin = (meta: PluginManifest): Plugin => {
+export const createDevPlugin = (meta: PluginMetadata): Plugin => {
   let server: ViteDevServer | undefined
   let entryUrl = '/src/main.ts'
 

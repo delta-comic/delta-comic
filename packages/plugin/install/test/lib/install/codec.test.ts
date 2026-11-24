@@ -10,12 +10,10 @@ const archive = async (entry = 'export default () => ({})') => {
   zip.file(
     'manifest.json',
     JSON.stringify({
-      protocolVersion: 2,
       id: 'artifact-reader',
       name: 'Artifact Reader',
       version: '1.0.0',
-      client: { entry: 'index.js' },
-
+      entry: 'index.js',
       resources: [
         {
           path: 'index.js',

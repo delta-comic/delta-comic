@@ -78,7 +78,7 @@ const canInstall = computed(
         </div>
         <div v-if="item.manifest">
           <dt>{{ t('plugin.market.details.supportCore') }}</dt>
-          <dd>{{ item.manifest.apiVersion ?? '*' }}</dd>
+          <dd>{{ item.manifest.supportCoreVersion ?? '*' }}</dd>
         </div>
         <div>
           <dt>{{ t('plugin.market.details.manifest') }}</dt>

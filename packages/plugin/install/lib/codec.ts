@@ -1,4 +1,3 @@
-import { assertPluginManifestCompatible } from '@delta-comic/manifest'
 import { validateArtifact } from '@delta-comic/plugin-artifact'
 import JSZip from 'jszip'
 
@@ -19,7 +18,6 @@ export class ZipPackageCodec implements PluginPackageCodec {
     const manifestFile = archive.file('manifest.json')
     if (!manifestFile) throw new Error('plugin archive does not contain manifest.json')
     const manifest = parsePluginManifest(JSON.parse(await manifestFile.async('text')))
-    assertPluginManifestCompatible(manifest, {})
     const files = new Map<string, Uint8Array>()
     for (const entry of Object.values(archive.files)) {
       signal.throwIfAborted()

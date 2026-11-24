@@ -13,7 +13,7 @@ export const createArtifactModuleGraph = async (
   files: ReadonlyMap<string, Uint8Array>,
 ): Promise<ModuleGraphUrl> => {
   await init
-  if (!manifest.client) throw new Error(`plugin has no client entry: ${manifest.id}`)
+
   const urls = new Map<string, string>()
   const visiting = new Set<string>()
   const resources = new Map(manifest.resources.map(resource => [resource.path, resource]))
@@ -55,7 +55,7 @@ export const createArtifactModuleGraph = async (
     return url
   }
   try {
-    return { url: build(safePluginPath(manifest.client.entry, 'client entry')), dispose }
+    return { url: build(safePluginPath(manifest.entry, 'client entry')), dispose }
   } catch (error) {
     dispose()
     throw error

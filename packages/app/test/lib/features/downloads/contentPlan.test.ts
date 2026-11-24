@@ -90,8 +90,7 @@ const registerProvider = (provider: UniContentDownloadProvider = { resolve }) =>
 
 const archiveMeta = (integrity?: string): Pick<PluginArchiveDB.Archive, 'meta'> => ({
   meta: {
-    protocolVersion: 2,
-    client: { entry: 'index.js' },
+    entry: 'index.js',
     resources: integrity
       ? [{ path: 'index.js', mimeType: 'text/javascript', integrity, imports: [] }]
       : [],

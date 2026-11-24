@@ -2,14 +2,14 @@ import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { isAbsolute, relative, resolve } from 'node:path'
 
-import type { PluginManifest } from '@delta-comic/model'
+import type { PluginMetadata, PluginManifest } from '@delta-comic/manifest'
 import { exposeHostLibraries, extendsDepends } from '@delta-comic/utils/vite'
 import JSZip from 'jszip'
 import type { Plugin, PluginOption } from 'vite-plus'
 
 import { createDevPlugin } from './dev'
 
-export const deltaComic = (meta: PluginManifest): PluginOption[] => {
+export const deltaComic = (meta: PluginMetadata): PluginOption[] => {
   const externalGlobals = extendsDepends as Record<string, string>
   let mode: string | undefined
   let root = process.cwd()
@@ -101,8 +101,9 @@ export const deltaComic = (meta: PluginManifest): PluginOption[] => {
         })
       }
       const entry = Object.values(bundle).find(item => item.type === 'chunk' && item.isEntry)
+      if (!entry) throw new Error('plugin build did not produce an entry')
       const manifest = JSON.stringify(
-        { ...meta, resources, ...(entry ? { client: { entry: entry.fileName } } : {}) },
+        { ...meta, resources, entry: entry.fileName } satisfies PluginManifest,
         null,
         2,
       )

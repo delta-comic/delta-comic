@@ -7,7 +7,7 @@ mounts. The Web entry and visible Tauri main window both use `index.html`.
 
 ## Package Entry
 
-Manifest protocol 2 has a `client.entry` field. A client module exports
+The manifest has a required `entry` field generated with its resources by the build tool. A client module exports
 a default `readonly Component.Function<Config>[]`. Functions use Cordis `name`, `inject`, `provide`,
 and Standard Schema `Config` metadata. Plugin authors import types and Context extensions from
 `@delta-comic/client`. The build bridge shares Cordis and UI library instances with the host.
