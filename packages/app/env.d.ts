@@ -25,13 +25,11 @@ declare module '@delta-comic/utils' {
     Vue: typeof import('vue')
     Naive: typeof import('naive-ui')
     VR: typeof import('vue-router')
+    VRExperimental: typeof import('vue-router/experimental')
     Pinia: typeof import('pinia')
     Pc: typeof import('@pinia/colada')
-    DcUi: typeof import('@delta-comic/ui')
-    DcModel: typeof import('@delta-comic/model')
-    DcPlugin: typeof import('@delta-comic/plugin')
-    DcUtils: typeof import('@delta-comic/utils')
-    DcDb: typeof import('@delta-comic/db')
+    Cordis: typeof import('cordis')
+    DcClient: typeof import('@delta-comic/client')
   }
 }
 
