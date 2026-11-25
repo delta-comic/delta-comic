@@ -2,7 +2,6 @@ import {
   assertPluginManifestCompatible,
   parsePluginManifest as parseManifest,
   type PluginManifest,
-  type PluginManifestCompatibility,
 } from '@delta-comic/manifest'
 
 export class PluginManifestError extends Error {
@@ -34,7 +33,7 @@ export const safePluginPath = (value: unknown, path: string) => {
 
 export const parsePluginManifest = (value: unknown): PluginManifest => {
   const manifest = parseManifest(value)
-  if (manifest.client) safePluginPath(manifest.client.entry, 'manifest entry')
+  safePluginPath(manifest.entryModulePath, 'entry module path')
   for (const resource of manifest.resources) {
     safePluginPath(resource.path, 'resource path')
     for (const imported of resource.imports) safePluginPath(imported, 'resource import')
@@ -52,14 +51,9 @@ export const parsePluginManifest = (value: unknown): PluginManifest => {
 
 export const isPluginManifestCompatible = (manifest: PluginManifest, coreVersion: string) => {
   try {
-    assertPluginManifestCompatible(manifest, { apiVersion: coreVersion })
+    assertPluginManifestCompatible(manifest, coreVersion)
     return true
   } catch {
     return false
   }
 }
-
-export const assertArtifactManifestCompatible = (
-  manifest: PluginManifest,
-  compatibility: PluginManifestCompatibility,
-) => assertPluginManifestCompatible(manifest, compatibility)

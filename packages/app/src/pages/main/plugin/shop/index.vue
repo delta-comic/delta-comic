@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Page from './index'
+import PluginMarketplaceContainer from '@/components/plugin/marketplace/PluginMarketplaceContainer.vue'
 </script>
 
 <template>
-  <Page />
+  <PluginMarketplaceContainer />
 </template>

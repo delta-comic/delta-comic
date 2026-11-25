@@ -1101,11 +1101,12 @@ dependencies = [
 
 [[package]]
 name = "delta-comic"
-version = "3.0.0-next.28"
+version = "3.0.0-next.30"
 dependencies = [
- "delta-comic-native",
  "objc2-foundation",
+ "serde",
  "serde_json",
+ "specta",
  "tauri",
  "tauri-build",
  "tauri-plugin-aptabase",
@@ -1146,6 +1147,7 @@ dependencies = [
  "tauri-plugin-sql",
  "tauri-plugin-utils",
  "taurpc",
+ "tempfile",
  "tokio",
  "tracing",
 ]

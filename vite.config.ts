@@ -52,23 +52,21 @@ export default defineConfig(
         },
         // linter
         'typecheck': {
-          command: 'vp exec tsc --project ./tsconfig.json && vp run -r typecheck',
+          command: [
+            'vp exec tsrs --fast -p ./tsconfig.json',
+            'vp run -r --ignore-depends-on typecheck',
+          ],
           dependsOn: ['build:packages'],
-          cache: { output: [] },
         },
-        'codegen:check': {
-          command: 'node script/codegen/dist/cli.mjs check',
-          dependsOn: ['codegen-cli'],
-          cache: false,
-        },
+        'codegen:check': { command: 'vp exec dcg check', dependsOn: ['codegen-cli'], cache: false },
         // codegen
         'codegen': {
-          command: 'node script/codegen/dist/cli.mjs generate client',
+          command: 'vp exec dcg generate client',
           dependsOn: ['codegen-cli'],
           cache: false,
         },
         'codegen:all': {
-          command: 'node script/codegen/dist/cli.mjs generate all',
+          command: 'vp exec dcg generate all',
           dependsOn: ['codegen-cli'],
           cache: false,
         },

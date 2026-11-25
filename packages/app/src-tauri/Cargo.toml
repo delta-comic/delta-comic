@@ -13,10 +13,13 @@ name = "delta_comic"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [dependencies]
+serde.workspace = true
 serde_json.workspace = true
-delta-comic-native.workspace = true
+specta.workspace = true
 tauri = { workspace = true, features = ["tray-icon", "protocol-asset"] }
 tracing.workspace = true
+taurpc.workspace = true
+tokio.workspace = true
 tauri-plugin-downloader.workspace = true
 
 [target.'cfg(target_os = "macos")'.dependencies]
@@ -64,6 +67,9 @@ workspace = true
 
 [build-dependencies]
 tauri-build.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [features]
 default = []

@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 import { NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 import { createDateString } from '@/utils/date'
 const $props = defineProps<{ item: ItemStoreDB.StoredItem & RecentDB.Item }>()
 

@@ -88,7 +88,7 @@ export function pluginArchiveToContentRefreshIdentity(
   return {
     pluginVersion: archive.meta.version,
     pluginIntegrity: archive.meta.resources.find(
-      resource => resource.path === archive.meta.client?.entry,
+      resource => resource.path === archive.meta.entryModulePath,
     )?.integrity,
   }
 }

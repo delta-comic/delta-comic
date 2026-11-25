@@ -35,9 +35,9 @@ catalog:
   '@types/node': 26.6.6
   '@types/semver': ^7.8.0
   '@vitejs/plugin-legacy': ^8.2.4
-  '@vizejs/vite-plugin': ^0.751.0
+  '@vizejs/vite-plugin': ^0.793.0
   '@vueuse/core': ^15.0.0
-  '@vitest/coverage-v8': 5.1.0
+  '@vitest/coverage-v8': 5.1.1
   browserslist: ^4.29.5
   color: ^5.0.3
   commitlint-plugin-cspell: ^0.9.5
@@ -59,32 +59,53 @@ catalog:
   pinia: ^4.1.0
   semver: ^7.8.6
   swiper: ^14.4.0
-  tailwind-merge: ^3.7.0
+  tailwind-merge: ^3.7.1
   tailwindcss: ^4.3.5
   tailwindcss-safe-area-capacitor: ^0.5.1
   twlinter: ^0.8.0
   tauri-plugin-m3: ^0.3.2
   taurpc: 2.0.0
   tlds: ^1.261.0
-  tsrs: 0.25.0-ts7.1.0-beta
+  tsrs: 7.1.0-beta.tsrs5
   typescript: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
-  vite: npm:@voidzero-dev/vite-plus-core@1.6.0
+  vite: npm:@voidzero-dev/vite-plus-core@8.3.8001
   vite-plugin-vue-devtools: ^9.0.0-rc.3
-  vite-plus: 1.6.0
+  vite-plus: 1.8.0
   vue-tsc: ^3.3.14
-  vize: ^0.751.0
-  vue: 3.6.0-rc.15
-  vue-i18n: ^12.0.0-alpha.10
+  vize: ^0.793.0
+  vue: 3.6.0-rc.16
+  vue-i18n: ^12.0.0-alpha.13
   vue-component-type-helpers: ^4.0.0-alpha.3
   vue-router: ^5.5.1
   kysely-wasqlite-worker: ^2.0.1
   happy-dom: ^21.0.4
   json-logic-js: ^2.0.5
   '@types/json-logic-js': ^2.0.8
-  vitest: 5.1.0
+  vitest: 5.1.1
 
 minimumReleaseAgeExclude:
-  - vue-router@5.5.1
+  - '@vizejs/native-darwin-arm64@0.793.0'
+  - '@vizejs/native-darwin-x64@0.793.0'
+  - '@vizejs/native-linux-arm64-gnu@0.793.0'
+  - '@vizejs/native-linux-arm64-musl@0.793.0'
+  - '@vizejs/native-linux-x64-gnu@0.793.0'
+  - '@vizejs/native-linux-x64-musl@0.793.0'
+  - '@vizejs/native-win32-arm64-msvc@0.793.0'
+  - '@vizejs/native-win32-x64-msvc@0.793.0'
+  - '@vizejs/native@0.793.0'
+  - '@vizejs/unplugin@0.793.0'
+  - '@vizejs/vite-plugin@0.793.0'
+  - '@voidzero-dev/vite-plus-core@8.3.8001'
+  - '@voidzero-dev/vite-plus-darwin-arm64@1.8.0'
+  - '@voidzero-dev/vite-plus-darwin-x64@1.8.0'
+  - '@voidzero-dev/vite-plus-linux-arm64-gnu@1.8.0'
+  - '@voidzero-dev/vite-plus-linux-arm64-musl@1.8.0'
+  - '@voidzero-dev/vite-plus-linux-x64-gnu@1.8.0'
+  - '@voidzero-dev/vite-plus-linux-x64-musl@1.8.0'
+  - '@voidzero-dev/vite-plus-win32-arm64-msvc@1.8.0'
+  - '@voidzero-dev/vite-plus-win32-x64-msvc@1.8.0'
+  - vite-plus@1.8.0
+  - vize@0.793.0
 
 overrides:
   typescript: 'catalog:'
@@ -93,8 +114,6 @@ overrides:
 
 peerDependencyRules:
   allowAny:
-    - vite
     - vitest
   allowedVersions:
-    vite: '*'
     vitest: '*'

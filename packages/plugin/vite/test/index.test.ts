@@ -2,16 +2,13 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import type { PluginArchiveDB } from '@delta-comic/db'
+import type { PluginMetadata } from '@delta-comic/manifest'
 import JSZip from 'jszip'
 import { describe, expect, it } from 'vite-plus/test'
 
 import { deltaComic } from '../lib/plugin'
 
-const meta: PluginArchiveDB.Meta = {
-  protocolVersion: 2,
-  client: { entry: 'index.js' },
-  resources: [],
+const meta: PluginMetadata = {
   name: 'Test Plugin',
   id: 'test-plugin',
   version: '1.0.0',
@@ -127,7 +124,7 @@ describe('deltaComic vite plugin', () => {
           integrity: expect.stringMatching(/^sha256-/),
         }),
       )
-      expect(manifest.client).toEqual({ entry: 'index.js' })
+      expect(manifest.entryModulePath).toBe('index.js')
       expect(plugin.config?.({}).build.lib.entry).toBe('./src/main.ts')
     } finally {
       await rm(root, { recursive: true })
@@ -220,8 +217,7 @@ describe('deltaComic vite plugin', () => {
     if (typeof manifestFile?.source !== 'string') throw new Error('manifest not emitted')
     const manifest = manifestFile.source
     expect(JSON.parse(manifest)).toMatchObject({
-      protocolVersion: 2,
-      client: { entry: 'index.js' },
+      entryModulePath: 'index.js',
       resources: [
         { path: 'index.js', integrity: expect.stringMatching(/^sha256-/) },
         { path: 'index.css', mimeType: 'text/css' },

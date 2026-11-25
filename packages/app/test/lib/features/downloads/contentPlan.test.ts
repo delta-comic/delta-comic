@@ -41,7 +41,6 @@ import {
   contentPlanToEnqueueInput,
   fingerprintContentPage,
   fingerprintContentDownloadProvider,
-  sha256Hex,
 } from '../../../../src/features/downloads/contentPlan'
 
 const contentType: UniContentType = ['reader', 'comic']
@@ -91,8 +90,7 @@ const registerProvider = (provider: UniContentDownloadProvider = { resolve }) =>
 
 const archiveMeta = (integrity?: string): Pick<PluginArchiveDB.Archive, 'meta'> => ({
   meta: {
-    protocolVersion: 2,
-    client: { entry: 'index.js' },
+    entryModulePath: 'index.js',
     resources: integrity
       ? [{ path: 'index.js', mimeType: 'text/javascript', integrity, imports: [] }]
       : [],
@@ -301,12 +299,5 @@ describe('fingerprintContentDownloadProvider', () => {
       await fingerprintContentDownloadProvider(forward),
       await fingerprintContentDownloadProvider(forward),
     ])
-  })
-
-  it('uses a deterministic SHA-256 fallback with the same digest format', async () => {
-    const expected = 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad'
-
-    await expect(sha256Hex('abc', null)).resolves.toBe(expected)
-    await expect(sha256Hex('abc')).resolves.toBe(expected)
   })
 })

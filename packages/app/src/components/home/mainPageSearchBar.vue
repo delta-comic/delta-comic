@@ -2,7 +2,7 @@
 import { NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 
 const emit = defineEmits<{ activate: [] }>()
 const { t } = useI18n()

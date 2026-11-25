@@ -17,11 +17,7 @@ export interface PluginArtifact {
 export interface ArtifactValidationResult {
   manifest: PluginManifest
   files: readonly ArtifactFile[]
-  client?: ArtifactFile
-}
-
-export interface ArtifactValidationOptions {
-  readonly platform?: string
+  entryModule: ArtifactFile
 }
 
 export class ArtifactValidationError extends Error {
@@ -80,16 +76,11 @@ const digest = async (bytes: Uint8Array) => {
 const resourceByPath = (resources: readonly PluginResource[]) =>
   new Map(resources.map(resource => [normalizePath(resource.path), resource]))
 
-const validateResourceGraph = (manifest: PluginManifest, platform?: string) => {
-  const resources = resourceByPath(
-    manifest.resources.filter(
-      resource =>
-        platform === undefined || !resource.platform || resource.platform.includes(platform),
-    ),
-  )
-  if (manifest.client && !resources.has(normalizePath(manifest.client.entry))) {
+const validateResourceGraph = (manifest: PluginManifest) => {
+  const resources = resourceByPath(manifest.resources)
+  if (!resources.has(normalizePath(manifest.entryModulePath))) {
     throw new ArtifactValidationError(
-      `entry is not declared as a resource: ${manifest.client.entry}`,
+      `entry module is not declared as a resource: ${manifest.entryModulePath}`,
     )
   }
   for (const resource of resources.values()) {
@@ -106,10 +97,9 @@ const validateResourceGraph = (manifest: PluginManifest, platform?: string) => {
 
 export const validateArtifact = async (
   artifact: PluginArtifact,
-  options: ArtifactValidationOptions = {},
 ): Promise<ArtifactValidationResult> => {
   const manifest = parsePluginManifest(artifact.manifest)
-  const resources = validateResourceGraph(manifest, options.platform)
+  const resources = validateResourceGraph(manifest)
   const files = new Map<string, ArtifactFile>()
   for (const file of artifact.files) {
     const path = normalizePath(file.path)
@@ -123,8 +113,10 @@ export const validateArtifact = async (
       throw new ArtifactValidationError(`integrity mismatch: ${path}`)
     }
   }
-  const client = manifest.client ? files.get(normalizePath(manifest.client.entry)) : undefined
-  return { manifest, files: [...files.values()], client }
+  const entryModule = files.get(normalizePath(manifest.entryModulePath))
+  if (!entryModule)
+    throw new ArtifactValidationError(`entry module is missing: ${manifest.entryModulePath}`)
+  return { manifest, files: [...files.values()], entryModule }
 }
 
 export const sha256Integrity = digest

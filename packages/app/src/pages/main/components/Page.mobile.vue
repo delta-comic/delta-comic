@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, shallowRef } from 'vue'
-import { useRoute, RouterView } from 'vue-router'
+import { useRoute } from 'vue-router'
 
-import ForkSelect from '@/components/forkSelect'
 import AppNavigation from '@/components/navigation/AppNavigation'
+
+import ForkSelect from './ForkSelect.vue'
 const route = useRoute()
 const isStandalonePage = computed(() => route.name === '/main/search')
 const activeNavigation = computed(() => {
@@ -46,7 +47,7 @@ const showForkSelect = shallowRef(false)
           : 'h-[calc(100%-var(--dc-navigation-height)-var(--safe-area-inset-bottom))]'
       "
     >
-      <RouterView />
+      <slot />
     </main>
   </div>
   <ForkSelect v-model:show="showForkSelect" />

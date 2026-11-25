@@ -76,8 +76,7 @@ describe('content source refresh preparation', () => {
     expect(
       pluginArchiveToContentRefreshIdentity({
         meta: {
-          protocolVersion: 2,
-          client: { entry: 'index.js' },
+          entryModulePath: 'index.js',
           resources: [
             {
               path: 'index.js',
@@ -99,8 +98,7 @@ describe('content source refresh preparation', () => {
     expect(
       pluginArchiveToContentRefreshIdentity({
         meta: {
-          protocolVersion: 2,
-          client: { entry: 'index.js' },
+          entryModulePath: 'index.js',
           resources: [],
           author: 'author',
           description: 'description',

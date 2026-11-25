@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import type { PluginMarketplaceItem } from '@/features/pluginMarketplace/model'
 
-import PluginMarketplaceCard from './PluginMarketplaceCard'
+import PluginMarketplaceCard from './PluginMarketplaceCard.vue'
 
 defineProps<{
   confirmingIds: ReadonlySet<string>

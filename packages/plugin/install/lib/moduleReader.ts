@@ -3,7 +3,7 @@ import { validateArtifact } from '@delta-comic/plugin-artifact'
 import type { Component, Context } from 'cordis'
 
 import type { LoadedPluginModule, PluginFileStore, PluginModuleReader } from './contracts'
-import { DEV_CSS_PATH, devServerUrl, parseDevServerPort } from './dev'
+import { DEV_CSS_PATH, DEV_SESSION_QUERY, devServerUrl, parseDevServerPort } from './dev'
 import { safePluginPath } from './manifest'
 import { createArtifactModuleGraph } from './moduleGraph'
 
@@ -45,7 +45,7 @@ export class StoredPluginModuleReader implements PluginModuleReader {
     signal: AbortSignal,
   ): Promise<LoadedPluginModule> {
     const manifest = archive.meta
-    if (!manifest.client) throw new Error(`plugin has no client entry: ${archive.pluginName}`)
+
     const resources = new Map<string, Uint8Array>()
     for (const resource of manifest.resources) {
       resources.set(resource.path, await this.files.read(archive.pluginName, resource.path))
@@ -80,8 +80,6 @@ export class StoredPluginModuleReader implements PluginModuleReader {
 }
 
 export class DevServerPluginModuleReader implements PluginModuleReader {
-  readonly #versions = new Map<string, number>()
-
   public async read(
     archive: PluginArchiveDB.Archive,
     signal: AbortSignal,
@@ -89,24 +87,35 @@ export class DevServerPluginModuleReader implements PluginModuleReader {
     const port = parseDevServerPort(archive.installInput)
     if (port === undefined)
       throw new Error(`invalid development install source: ${archive.installInput}`)
-    const entry = archive.meta.client?.entry
-    if (!entry) throw new Error(`plugin has no client entry: ${archive.pluginName}`)
-    const previous = this.#versions.get(archive.pluginName)
-    const version = (previous ?? 0) + 1
-    this.#versions.set(archive.pluginName, version)
-    const url = devServerUrl(port, safePluginPath(entry, 'client entry'))
-    const module: unknown = await import(
-      /* @vite-ignore */ `${url}${previous === undefined ? '' : `?v=${version}`}`
-    )
+    const entryModulePath = archive.meta.entryModulePath
+    const session = crypto.randomUUID()
+    const url = new URL(devServerUrl(port, safePluginPath(entryModulePath, 'entry module path')))
+    url.searchParams.set(DEV_SESSION_QUERY, session)
+    url.searchParams.set('t', Date.now().toString())
+    const module: unknown = await import(/* @vite-ignore */ url.href)
     signal.throwIfAborted()
-    const response = await fetch(devServerUrl(port, DEV_CSS_PATH), { cache: 'no-store', signal })
+    const functions = moduleEntry(module, archive.pluginName)
+    const response = await fetch(devServerUrl(port, DEV_CSS_PATH), {
+      cache: 'no-store',
+      signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
+    })
     if (!response.ok && response.status !== 404)
       throw new Error(`development CSS request failed: ${response.status}`)
-    const text = response.status === 404 ? '' : await response.text()
+    const styleText = response.status === 404 ? '' : await response.text()
     signal.throwIfAborted()
     return {
-      functions: moduleEntry(module, archive.pluginName),
-      activate: styleActivator(archive.pluginName, text),
+      functions,
+      dev: { session },
+      activate(ctx) {
+        if (typeof document === 'undefined' || !styleText) return
+        ctx.effect(() => {
+          const style = document.createElement('style')
+          style.dataset.plugin = archive.pluginName
+          style.textContent = styleText
+          document.head.append(style)
+          return () => style.remove()
+        }, 'plugin CSS')
+      },
     }
   }
 }

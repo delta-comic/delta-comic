@@ -4,16 +4,17 @@ import type { Component, Context } from 'cordis'
 
 export type PluginInstallInput = File | string
 
-export interface ResolvedPluginSource {
-  readonly file?: File
+export type ResolvedPluginSource = {
   readonly installInput: string
-  readonly package?: DecodedPluginPackage
   readonly resolverId: string
-  readonly storage?: 'archive' | 'remote'
-}
+} & (
+  | { readonly kind: 'archive'; readonly file: File }
+  | { readonly kind: 'dev-server'; readonly manifest: PluginManifest }
+)
 
 export interface PluginSourceResolver {
   readonly id: string
+  readonly inputPrefixes?: readonly string[]
   matches(input: PluginInstallInput): boolean
   resolve(
     input: PluginInstallInput,
@@ -57,6 +58,7 @@ export interface PluginArchiveRepository {
 
 export interface LoadedPluginModule {
   readonly functions: readonly Component.Function[]
+  readonly dev?: { readonly session: string }
   readonly activate?: (ctx: Context) => void
   readonly dispose?: () => void | Promise<void>
 }

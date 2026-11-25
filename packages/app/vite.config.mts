@@ -1,5 +1,5 @@
 import { copyFile, mkdir } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { relative, resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 import { transform } from '@swc/core'
@@ -68,6 +68,13 @@ export default defineConfig(() => ({
         legacy({ targets: ['ie >= 11'], renderModernChunks: true }),
         VueRouter({
           root: import.meta.dirname,
+          routesFolder: {
+            src: 'src/pages',
+            path: file =>
+              relative(resolve(import.meta.dirname, 'src/pages'), file)
+                .replaceAll('\\', '/')
+                .replace(/\/index\.vue$/, '.vue'),
+          },
           dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
           exclude: ['**/components/**', '**/*.impl.vue', '**/*.desktop.vue', '**/*.mobile.vue'],
           // `index.vue` directories keep the existing route names used by the app.
@@ -190,7 +197,7 @@ export default defineConfig(() => ({
         dependsOn: [{ task: 'build', from: 'dependencies' }, '@delta-comic/runtime#build:dev'],
       },
       'tauri': { command: 'vp exec tauri', cache: false },
-      'typecheck:desktop': {
+      'typecheck': {
         command: [
           'tsrs --fast --runExternalCode --noEmit -p tsconfig.app.json',
           'tsrs --fast --runExternalCode -p tsconfig.node.json --noEmit',
@@ -198,14 +205,8 @@ export default defineConfig(() => ({
         dependsOn: [{ task: 'build', from: 'dependencies' }],
         cache: { output: [] },
       },
-      'typecheck:mobile': {
-        command: [
-          'tsrs --fast --runExternalCode --noEmit -p tsconfig.app.json',
-          'tsrs --fast --runExternalCode -p tsconfig.node.json --noEmit',
-        ],
-        dependsOn: [{ task: 'build', from: 'dependencies' }],
-        cache: { output: [] },
-      },
+      'typecheck:desktop': { command: 'vp run typecheck' },
+      'typecheck:mobile': { command: 'vp run typecheck' },
     },
   },
   clearScreen: false,

@@ -9,11 +9,9 @@ import type {
   ResolvedPluginSource,
 } from './contracts'
 import {
-  DEV_CSS_PATH,
-  DEV_ENTRY_PATH,
-  DEV_MANIFEST_PATH,
   DEV_SERVER_LOADER_ID,
-  devServerUrl,
+  DEV_SERVER_SOURCE_PREFIX,
+  readDevManifest,
   parseDevServerPort,
 } from './dev'
 import { isPluginManifestCompatible, parsePluginManifest } from './manifest'
@@ -63,15 +61,16 @@ export class LocalFileSourceResolver implements PluginSourceResolver {
 
   public async resolve(input: PluginInstallInput): Promise<ResolvedPluginSource> {
     if (typeof input === 'string') throw new TypeError('local file resolver requires a File')
-    return { file: input, installInput: '', resolverId: this.id }
+    return { kind: 'archive', file: input, installInput: '', resolverId: this.id }
   }
 }
 
 export class HttpSourceResolver implements PluginSourceResolver {
   public readonly id = 'http'
+  public readonly inputPrefixes = ['http://', 'https://']
 
   public matches(input: PluginInstallInput): input is string {
-    return typeof input === 'string' && /^https?:\/\//i.test(input)
+    return typeof input === 'string' && /^https?:\/\//i.test(input) && URL.canParse(input)
   }
 
   public async resolve(
@@ -84,6 +83,7 @@ export class HttpSourceResolver implements PluginSourceResolver {
     if (!response.ok) throw new Error(`plugin download failed: ${response.status}`)
     const name = new URL(input).pathname.split('/').at(-1) || 'plugin.zip'
     return {
+      kind: 'archive' as const,
       file: await responseFile(response, name, report),
       installInput: input,
       resolverId: this.id,
@@ -91,21 +91,9 @@ export class HttpSourceResolver implements PluginSourceResolver {
   }
 }
 
-const fetchDevText = async (
-  url: string,
-  signal: AbortSignal,
-  optional = false,
-): Promise<string | undefined> => {
-  const response = await fetch(url, { cache: 'no-store', signal })
-  if (!response.ok) {
-    if (optional && response.status === 404) return undefined
-    throw new Error(`development plugin request failed: ${response.status}`)
-  }
-  return await response.text()
-}
-
 export class DevServerSourceResolver implements PluginSourceResolver {
   public readonly id = DEV_SERVER_LOADER_ID
+  public readonly inputPrefixes = [DEV_SERVER_SOURCE_PREFIX]
 
   public matches(input: PluginInstallInput): input is string {
     return typeof input === 'string' && parseDevServerPort(input) !== undefined
@@ -119,16 +107,11 @@ export class DevServerSourceResolver implements PluginSourceResolver {
     const port = parseDevServerPort(input)
     if (port === undefined) throw new TypeError('development resolver requires dev:<port>')
 
-    const manifestText = await fetchDevText(devServerUrl(port, DEV_MANIFEST_PATH), signal)
-    const manifest = parsePluginManifest(JSON.parse(manifestText ?? ''))
-    await fetchDevText(devServerUrl(port, DEV_ENTRY_PATH), signal)
-    await fetchDevText(devServerUrl(port, DEV_CSS_PATH), signal, true)
-
     return {
+      kind: 'dev-server',
+      manifest: await readDevManifest(port, signal),
       installInput: input,
-      package: { codecId: this.id, files: new Map(), manifest },
       resolverId: this.id,
-      storage: 'remote',
     }
   }
 }
@@ -141,11 +124,12 @@ export interface GitHubSourceResolverOptions {
 
 export class GitHubSourceResolver implements PluginSourceResolver {
   public readonly id = 'github'
+  public readonly inputPrefixes = ['gh:']
 
   public constructor(private readonly options: GitHubSourceResolverOptions) {}
 
   public matches(input: PluginInstallInput): input is string {
-    return typeof input === 'string' && /^gh:[^/]+\/[^/]+$/.test(input)
+    return typeof input === 'string' && /^gh:[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(input)
   }
 
   public async resolve(
@@ -179,6 +163,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
         if (!packageResponse.ok)
           throw new Error(`plugin download failed: ${packageResponse.status}`)
         return {
+          kind: 'archive' as const,
           file: await responseFile(packageResponse, packageAsset.name, report),
           installInput: input,
           resolverId: this.id,
@@ -191,6 +176,7 @@ export class GitHubSourceResolver implements PluginSourceResolver {
 
 export class MarketplaceSourceResolver implements PluginSourceResolver {
   public readonly id = 'marketplace'
+  public readonly inputPrefixes = ['ap:']
 
   public constructor(
     private readonly catalog: PluginInstallCatalog,

@@ -1,21 +1,17 @@
 import { logger } from '@delta-comic/logger'
 import { computed, onMounted, readonly, shallowRef } from 'vue'
 
-import { loggerClient, type LogReaderClient } from './loggerClient'
+import { TauriLoggerClient } from '@/logger/TauriLoggerClient'
+
 import { filterLogContent, type LogFileInfo, type LogLevelFilter } from './model'
 
 const logReaderLogger = logger.scoped('app:settings:logs')
 
-export interface UseLogReaderOptions {
-  client?: LogReaderClient
-  immediate?: boolean
-}
-
 const errorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : String(error)
 
-export const useLogReader = (options: UseLogReaderOptions = {}) => {
-  const client = options.client ?? loggerClient
+export const useLogReader = () => {
+  const client = new TauriLoggerClient()
   const files = shallowRef<LogFileInfo[]>([])
   const selectedPath = shallowRef<string>()
   const selectedLog = shallowRef<string>('')
@@ -70,9 +66,9 @@ export const useLogReader = (options: UseLogReaderOptions = {}) => {
     exportPath.value = undefined
 
     try {
-      files.value = [...(await client.listLogFiles())].sort(
-        (left, right) => right.modifiedAt - left.modifiedAt,
-      )
+      files.value = (await client.listLogFiles())
+        .map(file => ({ ...file, modifiedAt: new Date(file.modifiedAt).getTime() }))
+        .sort((left, right) => right.modifiedAt - left.modifiedAt)
       logReaderLogger.debug('log file list refreshed', { fileCount: files.value.length })
       const nextPath = files.value.some(file => file.path === selectedPath.value)
         ? selectedPath.value
@@ -102,7 +98,7 @@ export const useLogReader = (options: UseLogReaderOptions = {}) => {
     error.value = undefined
     exportPath.value = undefined
     try {
-      exportPath.value = await client.exportLogs(files.value.map(file => file.path))
+      exportPath.value = await client.exportLogs({ paths: files.value.map(file => file.path) })
       logReaderLogger.info('logs exported', {
         fileCount: files.value.length,
         path: exportPath.value,
@@ -127,7 +123,7 @@ export const useLogReader = (options: UseLogReaderOptions = {}) => {
     error.value = undefined
   }
 
-  if (options.immediate !== false) onMounted(() => void refresh())
+  onMounted(() => void refresh())
 
   return {
     clearError,

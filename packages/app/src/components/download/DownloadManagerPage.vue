@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import Layout from '@/components/user/userLayout'
+import Layout from '@/components/user/userLayout.vue'
 import type {
   AddDownloadRequest,
   DownloadTask,
@@ -12,12 +12,12 @@ import type {
 } from '@/features/downloads/downloaderClient'
 import { useDownloadManager } from '@/features/downloads/useDownloadManager'
 
-import AddDownloadDialog from './AddDownloadDialog'
-import DownloadDetailDrawer from './DownloadDetailDrawer'
+import AddDownloadDialog from './AddDownloadDialog.vue'
+import DownloadDetailDrawer from './DownloadDetailDrawer.vue'
 import DownloadList from './DownloadList'
-import DownloadSettingsDrawer from './DownloadSettingsDrawer'
-import DownloadSourceRefreshWarnings from './DownloadSourceRefreshWarnings'
-import DownloadToolbar from './DownloadToolbar'
+import DownloadSettingsDrawer from './DownloadSettingsDrawer.vue'
+import DownloadSourceRefreshWarnings from './DownloadSourceRefreshWarnings.vue'
+import DownloadToolbar from './DownloadToolbar.vue'
 
 const { filter, filteredTasks, query, store } = useDownloadManager()
 const {

@@ -10,11 +10,11 @@ import { computed, shallowRef, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import CreateFavouriteCard from '@/components/createFavouriteCard'
-import Searcher from '@/components/listSearcher'
-import FavouriteFolderList from '@/components/user/favourite/FavouriteFolderList'
-import Layout from '@/components/user/userLayout'
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
+import Searcher from '@/components/listSearcher.vue'
+import CreateFavouriteCard from '@/components/user/favourite/CreateFavouriteCard.vue'
+import FavouriteFolderList from '@/components/user/favourite/FavouriteFolderList.vue'
+import Layout from '@/components/user/userLayout.vue'
 import { pluginName } from '@/symbol'
 
 const isCardMode = shallowRef(true)

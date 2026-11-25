@@ -2,30 +2,23 @@ import semver from 'semver'
 import { Type, type Static } from 'typebox'
 import { Value } from 'typebox/value'
 
-export const PLUGIN_PROTOCOL_VERSION = 2 as const
-
 export const PluginResourceSchema = Type.Object({
   path: Type.String({ minLength: 1 }),
   mimeType: Type.String({ minLength: 1 }),
   integrity: Type.String({ pattern: '^sha256-[A-Za-z0-9+/]+={0,2}$' }),
   imports: Type.Array(Type.String()),
-  platform: Type.Optional(Type.Array(Type.String({ minLength: 1 }))),
 })
 
 export const PluginManifestSchema = Type.Object(
   {
-    protocolVersion: Type.Literal(PLUGIN_PROTOCOL_VERSION),
     id: Type.String({ minLength: 1, maxLength: 64, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' }),
     name: Type.String({ minLength: 1 }),
     version: Type.String({ minLength: 1 }),
-    apiVersion: Type.Optional(Type.String({ minLength: 1 })),
-    cordisVersion: Type.Optional(Type.String({ minLength: 1 })),
+    supportCoreVersion: Type.Optional(Type.String({ minLength: 1 })),
     author: Type.Optional(Type.String()),
     description: Type.Optional(Type.String()),
     icon: Type.Optional(Type.String({ minLength: 1 })),
-    client: Type.Optional(
-      Type.Object({ entry: Type.String({ minLength: 1 }) }, { additionalProperties: false }),
-    ),
+    entryModulePath: Type.String({ minLength: 1 }),
     resources: Type.Array(PluginResourceSchema),
   },
   { additionalProperties: false },
@@ -33,48 +26,20 @@ export const PluginManifestSchema = Type.Object(
 
 export type PluginResource = Static<typeof PluginResourceSchema>
 export type PluginManifest = Static<typeof PluginManifestSchema>
+export type PluginMetadata = Omit<PluginManifest, 'entryModulePath' | 'resources'>
 export type PluginUserConfig = Record<string, unknown>
 
-export interface PluginManifestCompatibility {
-  readonly apiVersion?: string
-  readonly cordisVersion?: string
-  readonly protocolVersion?: number
-}
-
-export const assertPluginManifestCompatible = (
-  manifest: PluginManifest,
-  compatibility: PluginManifestCompatibility,
-) => {
-  if (
-    compatibility.protocolVersion !== undefined &&
-    manifest.protocolVersion !== compatibility.protocolVersion
-  ) {
+export const assertPluginManifestCompatible = (manifest: PluginManifest, coreVersion: string) => {
+  if (manifest.supportCoreVersion && !semver.satisfies(coreVersion, manifest.supportCoreVersion)) {
     throw new TypeError(
-      `plugin protocol ${manifest.protocolVersion} is incompatible with ${compatibility.protocolVersion}`,
-    )
-  }
-  if (
-    compatibility.apiVersion &&
-    manifest.apiVersion &&
-    !semver.satisfies(compatibility.apiVersion, manifest.apiVersion)
-  ) {
-    throw new TypeError(
-      `plugin API ${manifest.apiVersion} does not support ${compatibility.apiVersion}`,
-    )
-  }
-  if (
-    compatibility.cordisVersion &&
-    manifest.cordisVersion &&
-    !semver.satisfies(compatibility.cordisVersion, manifest.cordisVersion)
-  ) {
-    throw new TypeError(
-      `plugin Cordis ${manifest.cordisVersion} does not support ${compatibility.cordisVersion}`,
+      `plugin core range ${manifest.supportCoreVersion} does not support ${coreVersion}`,
     )
   }
 }
 
 export const isPluginManifest = (value: unknown): value is PluginManifest =>
-  Value.Check(PluginManifestSchema, value) && Boolean(value.client)
+  Value.Check(PluginManifestSchema, value) &&
+  (value.supportCoreVersion === undefined || semver.validRange(value.supportCoreVersion) !== null)
 
 export const parsePluginManifest = (value: unknown): PluginManifest => {
   if (!isPluginManifest(value)) {

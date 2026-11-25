@@ -6,7 +6,7 @@ import { NIcon } from 'naive-ui'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { Icons } from '@/icons'
+import { Icons } from '@/components/icons'
 
 const filtersHistory = defineModel<string[]>('filtersHistory', { required: true })
 const { t } = useI18n()

@@ -11,12 +11,11 @@ import {
   type PluginMarketplaceItem,
 } from '@/features/pluginMarketplace/model'
 import { usePluginMarketplace } from '@/features/pluginMarketplace/usePluginMarketplace'
+import { getCoreHost } from '@/native/ports'
 
-import { getCoreHost } from '../../../ports'
-
-import PluginMarketplaceDetails from './PluginMarketplaceDetails'
-import PluginMarketplaceFilters from './PluginMarketplaceFilters'
-import PluginMarketplaceList from './PluginMarketplaceList'
+import PluginMarketplaceDetails from './PluginMarketplaceDetails.vue'
+import PluginMarketplaceFilters from './PluginMarketplaceFilters.vue'
+import PluginMarketplaceList from './PluginMarketplaceList.vue'
 
 const openExternal = (url: string) => getCoreHost().platform.openExternal(url)
 

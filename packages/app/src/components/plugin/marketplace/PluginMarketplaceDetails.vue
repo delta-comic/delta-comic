@@ -3,7 +3,7 @@ import { NAlert, NButton, NModal, NTag } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import PluginIcon from '@/components/plugin/PluginIcon'
+import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import {
   pluginMarketplaceInstallInput,
   pluginMarketplaceSourceUrl,
@@ -78,7 +78,7 @@ const canInstall = computed(
         </div>
         <div v-if="item.manifest">
           <dt>{{ t('plugin.market.details.supportCore') }}</dt>
-          <dd>{{ item.manifest.apiVersion ?? '*' }}</dd>
+          <dd>{{ item.manifest.supportCoreVersion ?? '*' }}</dd>
         </div>
         <div>
           <dt>{{ t('plugin.market.details.manifest') }}</dt>
