@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/release-cli",
-  "version": "3.0.0-next.31",
+  "version": "3.0.0-next.32",
   "description": "Delta Comic semantic-release 控制 CLI",
   "license": "AGPL-3.0-only",
   "bin": {
