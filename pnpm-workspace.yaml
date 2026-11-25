@@ -35,7 +35,7 @@ catalog:
   '@types/node': 26.6.6
   '@types/semver': ^7.8.0
   '@vitejs/plugin-legacy': ^8.2.4
-  '@vizejs/vite-plugin': ^0.792.0
+  '@vizejs/vite-plugin': ^0.793.0
   '@vueuse/core': ^15.0.0
   '@vitest/coverage-v8': 5.1.1
   browserslist: ^4.29.5
@@ -72,7 +72,7 @@ catalog:
   vite-plugin-vue-devtools: ^9.0.0-rc.3
   vite-plus: 1.8.0
   vue-tsc: ^3.3.14
-  vize: ^0.792.0
+  vize: ^0.793.0
   vue: 3.6.0-rc.16
   vue-i18n: ^12.0.0-alpha.13
   vue-component-type-helpers: ^4.0.0-alpha.3
@@ -84,25 +84,17 @@ catalog:
   vitest: 5.1.1
 
 minimumReleaseAgeExclude:
-  - '@tsrs/darwin-arm64@7.1.0-beta.tsrs5'
-  - '@tsrs/darwin-x64@7.1.0-beta.tsrs5'
-  - '@tsrs/linux-arm64-gnu@7.1.0-beta.tsrs5'
-  - '@tsrs/linux-arm64-musl@7.1.0-beta.tsrs5'
-  - '@tsrs/linux-x64-gnu@7.1.0-beta.tsrs5'
-  - '@tsrs/linux-x64-musl@7.1.0-beta.tsrs5'
-  - '@tsrs/win32-arm64@7.1.0-beta.tsrs5'
-  - '@tsrs/win32-x64@7.1.0-beta.tsrs5'
-  - '@vizejs/native-darwin-arm64@0.792.0'
-  - '@vizejs/native-darwin-x64@0.792.0'
-  - '@vizejs/native-linux-arm64-gnu@0.792.0'
-  - '@vizejs/native-linux-arm64-musl@0.792.0'
-  - '@vizejs/native-linux-x64-gnu@0.792.0'
-  - '@vizejs/native-linux-x64-musl@0.792.0'
-  - '@vizejs/native-win32-arm64-msvc@0.792.0'
-  - '@vizejs/native-win32-x64-msvc@0.792.0'
-  - '@vizejs/native@0.792.0'
-  - '@vizejs/unplugin@0.792.0'
-  - '@vizejs/vite-plugin@0.792.0'
+  - '@vizejs/native-darwin-arm64@0.793.0'
+  - '@vizejs/native-darwin-x64@0.793.0'
+  - '@vizejs/native-linux-arm64-gnu@0.793.0'
+  - '@vizejs/native-linux-arm64-musl@0.793.0'
+  - '@vizejs/native-linux-x64-gnu@0.793.0'
+  - '@vizejs/native-linux-x64-musl@0.793.0'
+  - '@vizejs/native-win32-arm64-msvc@0.793.0'
+  - '@vizejs/native-win32-x64-msvc@0.793.0'
+  - '@vizejs/native@0.793.0'
+  - '@vizejs/unplugin@0.793.0'
+  - '@vizejs/vite-plugin@0.793.0'
   - '@voidzero-dev/vite-plus-core@8.3.8001'
   - '@voidzero-dev/vite-plus-darwin-arm64@1.8.0'
   - '@voidzero-dev/vite-plus-darwin-x64@1.8.0'
@@ -112,9 +104,8 @@ minimumReleaseAgeExclude:
   - '@voidzero-dev/vite-plus-linux-x64-musl@1.8.0'
   - '@voidzero-dev/vite-plus-win32-arm64-msvc@1.8.0'
   - '@voidzero-dev/vite-plus-win32-x64-msvc@1.8.0'
-  - tsrs@7.1.0-beta.tsrs5
   - vite-plus@1.8.0
-  - vize@0.792.0
+  - vize@0.793.0
 
 overrides:
   typescript: 'catalog:'
