@@ -1,5 +1,30 @@
 **请谨慎更新，当前版本为预发布版本，可能包含未完成的功能或兼容性问题**
 
+# [3.0.0-next.32](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.31...3.0.0-next.32) (2026-11-25)
+
+
+### Bug Fixes
+
+* codegen ([1507aea](https://github.com/delta-comic/delta-comic/commit/1507aea244f9e17003dbc57198a1324e9ca529db))
+* **plugin:** 修复首次安装的目录提交 ([22a3528](https://github.com/delta-comic/delta-comic/commit/22a3528347f96d89efddf5bdc009667e7d3ebb69))
+* **tooling:** 升级 Vize 和 tsrs 并修复全量类型检查 ([62502d5](https://github.com/delta-comic/delta-comic/commit/62502d557dcba6a5ddd4057e9b22aaff09d18181))
+* **ui:** 修复桌面头像不居中问题 ([88dd43f](https://github.com/delta-comic/delta-comic/commit/88dd43f9214b6afb1de7532231fda8d2fa44321e))
+
+
+### Features
+
+* **app:** 为插件安装地址补全协议 ([9417652](https://github.com/delta-comic/delta-comic/commit/94176527793547f2f800c4c74922f4d9425f36c0))
+* **app:** 将桌面开发数据存入项目临时目录 ([8f77b9f](https://github.com/delta-comic/delta-comic/commit/8f77b9f9c5fa0f6d88ed739a27e0ce7d5637c6e4))
+* **plugin:** 统一验证插件安装地址 ([d2ef67e](https://github.com/delta-comic/delta-comic/commit/d2ef67e52923ddb7fa14cc2b8239106137e95f62))
+* **plugin:** 通过 Cordis 重注入开发插件 HMR ([372e6f3](https://github.com/delta-comic/delta-comic/commit/372e6f39c3c98ea07cb67f546eccd24c90ce6237))
+
+
+### Performance Improvements
+
+* **app:** 优化开屏性能 ([2e211d3](https://github.com/delta-comic/delta-comic/commit/2e211d3c38a8d396bc44abc3c1c1b78c10d8787b))
+
+**请谨慎更新，当前版本为预发布版本，可能包含未完成的功能或兼容性问题**
+
 # [3.0.0-next.31](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.30...3.0.0-next.31) (2026-11-15)
 
 
