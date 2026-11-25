@@ -99,7 +99,7 @@ pub fn run() {
     context
   };
 
-  builder
+  let app = builder
     .setup(|app| {
       setup(app)?;
       #[cfg(not(any(target_os = "android", target_os = "ios")))]
@@ -107,8 +107,11 @@ pub fn run() {
       Ok(())
     })
     .build(context)
-    .expect("failed to build Delta Comic runtime")
-    .run(on_event);
+    .expect("failed to build Delta Comic runtime");
+
+  // Aptabase uses Tokio I/O in both the plugin and application exit callbacks.
+  let _runtime_guard = tauri::async_runtime::handle().inner().enter();
+  app.run(on_event);
 }
 mod native;
 
