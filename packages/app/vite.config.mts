@@ -1,4 +1,4 @@
-import { resolve } from 'node:path'
+import { relative, resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
@@ -39,9 +39,26 @@ export default defineConfig(() => ({
       legacy({ targets: ['ie >= 11'], renderModernChunks: true }),
       VueRouter({
         root: import.meta.dirname,
-        routesFolder: 'src/pages',
+        routesFolder: {
+          src: 'src/pages',
+          path: file =>
+            relative(resolve(import.meta.dirname, 'src/pages'), file)
+              .replaceAll('\\', '/')
+              .replace(/\/index\.vue$/, '.vue'),
+        },
         dts: resolve(import.meta.dirname, 'typed-router.d.ts'),
         exclude: ['**/components/**', '**/*.impl.vue', '**/*.desktop.vue', '**/*.mobile.vue'],
+        // `index.vue` directories keep the existing route names used by the app.
+        getRouteName: node => {
+          const segments: string[] = []
+          let current = node
+          while (current.parent) {
+            const segment = current.value.rawSegment
+            if (segment !== 'index' && !/^\(.+\)$/.test(segment)) segments.unshift(segment)
+            current = current.parent
+          }
+          return segments.length ? `/${segments.join('/')}` : '/'
+        },
       }),
       vueDevTools(),
       tailwindcss(),
