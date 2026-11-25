@@ -1101,7 +1101,7 @@ dependencies = [
 
 [[package]]
 name = "delta-comic"
-version = "3.0.0-next.30"
+version = "3.0.0-next.31"
 dependencies = [
  "objc2-foundation",
  "serde",
@@ -1123,29 +1123,6 @@ dependencies = [
  "tauri-plugin-sql",
  "tauri-plugin-utils",
  "tauri-plugin-webview-upgrade",
- "tracing",
-]
-
-[[package]]
-name = "delta-comic-native"
-version = "3.0.0-next.31"
-dependencies = [
- "serde",
- "serde_json",
- "specta",
- "tauri",
- "tauri-plugin-aptabase",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-db",
- "tauri-plugin-downloader",
- "tauri-plugin-fs",
- "tauri-plugin-http",
- "tauri-plugin-logger",
- "tauri-plugin-persisted-scope",
- "tauri-plugin-plugin",
- "tauri-plugin-shell",
- "tauri-plugin-sql",
- "tauri-plugin-utils",
  "taurpc",
  "tempfile",
  "tokio",

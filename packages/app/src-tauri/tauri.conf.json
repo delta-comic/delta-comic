@@ -1,13 +1,13 @@
 {
-  "$schema": "../../../node_modules/@tauri-apps/cli/config.schema.json",
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Delta Comic",
   "version": "3.0.0-next.31",
   "identifier": "org.wenxig.delta-comic",
   "build": {
     "frontendDist": "../dist",
-    "devUrl": "http://localhost:5174",
-    "beforeDevCommand": "vp run --filter @delta-comic/app dev:web:desktop",
-    "beforeBuildCommand": "vp run --filter @delta-comic/app build:web:desktop"
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "vp run --filter @delta-comic/app dev:web",
+    "beforeBuildCommand": "vp run --filter @delta-comic/app build:web"
   },
   "app": {
     "windows": [

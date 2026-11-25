@@ -41,7 +41,6 @@
   },
   "devDependencies": {
     "@delta-comic/runtime": "workspace:",
-    "@swc/core": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tauri-apps/cli": "catalog:",
     "@types/semver": "catalog:",
@@ -49,6 +48,7 @@
     "@vizejs/vite-plugin": "catalog:",
     "browserslist": "catalog:",
     "lightningcss": "catalog:",
+    "unplugin-swc": "catalog:",
     "vite-plugin-vue-devtools": "catalog:",
     "vue-component-type-helpers": "catalog:"
   },
