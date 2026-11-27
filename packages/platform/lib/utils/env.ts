@@ -19,19 +19,12 @@ export interface AppApiRegistry {
   __core_lib__: Record<string, unknown>
 }
 
-/**
- * 宿主应用暴露给插件的 UMD 库类型。通过 Module Augmentation 扩展：
- * `declare module '@delta-comic/platform/utils' { interface AppLibRegistry { Vue: typeof import('vue') } }`
- */
-export interface AppLibRegistry {}
-
 declare global {
   interface Window {
     $message: ReturnType<typeof useMessage>
     $loading: ReturnType<typeof useLoadingBar>
     $dialog: ReturnType<typeof useDialog>
     $api: AppApiRegistry
-    $$lib$$: AppLibRegistry
     $router: DeltaRouter
     $isDev: boolean
   }

@@ -1,8 +1,6 @@
-import { copyFile, mkdir } from 'node:fs/promises'
 import { relative, resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
-import { exposeHostLibraries } from '@delta-comic/platform/vite'
 import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
@@ -11,7 +9,7 @@ import { defaultClientConditions, lazyPlugins } from 'vite-plus'
 const target = process.env.DELTA_APP_TARGET === 'mobile' ? 'mobile' : 'desktop'
 const isDesktop = target === 'desktop'
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(() => ({
   define: { __DC_APP_TARGET__: JSON.stringify(target) },
   devtools: { apply: 'serve' },
   plugins: lazyPlugins(async () => {
@@ -23,19 +21,6 @@ export default defineConfig(({ mode }) => ({
       ])
 
     return [
-      {
-        name: 'delta-comic:copy-runtime',
-        async buildStart() {
-          if (mode === 'test') return
-          const directory = resolve(import.meta.dirname, 'public/runtime')
-          await mkdir(directory, { recursive: true })
-          await copyFile(
-            fileURLToPath(import.meta.resolve('@delta-comic/runtime')),
-            resolve(directory, 'host-libraries.umd.js'),
-          )
-        },
-      },
-      exposeHostLibraries({ entry: resolve(import.meta.dirname, 'src/index.ts') }),
       VueRouter({
         root: import.meta.dirname,
         routesFolder: {

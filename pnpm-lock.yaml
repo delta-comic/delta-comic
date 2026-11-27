@@ -218,9 +218,6 @@ catalogs:
     '@vueuse/core':
       specifier: ^15.0.0
       version: 15.1.0
-    acorn:
-      specifier: ^8.19.0
-      version: 8.19.0
     browserslist:
       specifier: ^4.29.5
       version: 4.29.6
@@ -442,6 +439,9 @@ importers:
       '@delta-comic/platform':
         specifier: 'workspace:'
         version: link:../platform
+      '@delta-comic/runtime':
+        specifier: 'workspace:'
+        version: link:../runtime
       '@octokit/rest':
         specifier: 'catalog:'
         version: 22.0.1
@@ -472,9 +472,6 @@ importers:
       dayjs:
         specifier: 'catalog:'
         version: 1.11.23
-      es-module-lexer:
-        specifier: 'catalog:'
-        version: 3.0.5
       es-toolkit:
         specifier: 'catalog:'
         version: 1.53.2
@@ -539,9 +536,6 @@ importers:
         specifier: 'catalog:'
         version: 5.5.1(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(jiti@2.7.0)(terser@5.51.4)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.46)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.3)(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
     devDependencies:
-      '@delta-comic/runtime':
-        specifier: 'workspace:'
-        version: link:../runtime
       '@tailwindcss/vite':
         specifier: 'catalog:'
         version: 4.3.5(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(jiti@2.7.0)(terser@5.51.4)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))
@@ -578,15 +572,9 @@ importers:
       '@tauri-apps/plugin-sql':
         specifier: 'catalog:'
         version: 2.6.0
-      acorn:
-        specifier: 'catalog:'
-        version: 8.19.0
       dayjs:
         specifier: 'catalog:'
         version: 1.11.23
-      es-module-lexer:
-        specifier: 'catalog:'
-        version: 3.0.5
       es-toolkit:
         specifier: 'catalog:'
         version: 1.53.2
@@ -602,9 +590,6 @@ importers:
       kysely-wasqlite-worker:
         specifier: 'catalog:'
         version: 2.0.1(@subframe7536/sqlite-wasm@1.4.1)(kysely@0.30.0-beta.2)
-      magic-string:
-        specifier: 'catalog:'
-        version: 1.4.5
       mitt:
         specifier: 'catalog:'
         version: 3.0.1
@@ -631,35 +616,13 @@ importers:
         specifier: 'catalog:'
         version: 7.8.0
 
-  packages/runtime:
-    dependencies:
-      '@pinia/colada':
-        specifier: 'catalog:'
-        version: 1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      cordis:
-        specifier: 'catalog:'
-        version: 4.0.0-rc.13
-      naive-ui:
-        specifier: 'catalog:'
-        version: 2.45.3(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      pinia:
-        specifier: 'catalog:'
-        version: 4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
-      vue:
-        specifier: 'catalog:'
-        version: 3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
-      vue-router:
-        specifier: 'catalog:'
-        version: 5.5.1(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.6)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(jiti@2.7.0)(terser@5.51.4)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.5.46)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.3)(vue@3.6.0-rc.16(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+  packages/runtime: {}
 
   packages/sdk:
     dependencies:
       '@tauri-apps/api':
         specifier: 'catalog:'
         version: 2.12.5
-      acorn:
-        specifier: 'catalog:'
-        version: 8.19.0
       cordis:
         specifier: 'catalog:'
         version: 4.0.0-rc.13

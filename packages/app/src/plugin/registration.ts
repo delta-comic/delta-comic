@@ -1,4 +1,4 @@
-import type { ModuleFactory, Registration } from '@delta-comic/runtime/modules'
+import type { ModuleFactory, Registration } from '@delta-comic/runtime'
 
 const pending = new WeakMap<HTMLScriptElement, (record: Registration) => void>()
 declare global {

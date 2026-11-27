@@ -12,7 +12,6 @@ catalog:
   '@semantic-release/changelog': ^7.0.0
   '@semantic-release/release-notes-generator': ^14.1.1
   semantic-release: ^25.0.9
-  acorn: ^8.19.0
   es-module-lexer: ^3.0.4
   magic-string: ^1.4.5
   cordis: ^4.0.0-rc.13

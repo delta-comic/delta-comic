@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@tauri-apps/api": "catalog:",
-    "acorn": "catalog:",
     "cordis": "catalog:",
     "dayjs": "catalog:",
     "es-module-lexer": "catalog:",
