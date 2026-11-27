@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { useNativeStore } from '@delta-comic/db'
-import { usePluginStore } from '@delta-comic/plugin'
-import { usePreventBack, DcCellGroup, DcCell } from '@delta-comic/ui'
-import { SharedFunction } from '@delta-comic/utils'
-import { ReuseableAbortController } from '@delta-comic/utils'
+import { useNativeStore } from '@delta-comic/platform/db'
+import { SharedFunction } from '@delta-comic/platform/utils'
+import { ReuseableAbortController } from '@delta-comic/platform/utils'
 import { computedAsync } from '@vueuse/core'
 import { uniq } from 'es-toolkit'
 import { isEmpty } from 'es-toolkit/compat'
@@ -14,7 +12,9 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { Icons } from '@/components/icons'
+import { usePluginStore } from '@/plugin'
 import { pluginName } from '@/symbol'
+import { usePreventBack, DcCellGroup, DcCell } from '@/ui'
 import { getBarcodeList, type ThinkList } from '@/utils/search'
 
 import { searchSourceKey } from './source'

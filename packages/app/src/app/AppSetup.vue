@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { configurePluginHost, loadEnabledPlugins } from '@delta-comic/plugin'
 import { useDialog, useLoadingBar, useMessage } from 'naive-ui'
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { createPluginAuthGateway } from '@/features/pluginAuth/gateway'
 import { appLogger } from '@/logger'
+import { configurePluginHost, loadEnabledPlugins } from '@/plugin'
 
 import App from './App.vue'
 import UpdateChecker from './UpdateChecker.vue'

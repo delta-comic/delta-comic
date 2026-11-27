@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { DBUtils, FavouriteDB, RecentDB, SubscribeDB } from '@delta-comic/db'
-import { UniUser } from '@delta-comic/model'
-import { useConfig, usePluginStore } from '@delta-comic/plugin'
-import { DcVar, DcCell } from '@delta-comic/ui'
+import { DBUtils, FavouriteDB, RecentDB, SubscribeDB } from '@delta-comic/platform/db'
+import { UniUser } from '@delta-comic/platform/model'
 import { createReusableTemplate } from '@vueuse/core'
 import { isEmpty } from 'es-toolkit/compat'
 import { motion, AnimatePresence, Motion } from 'motion-v'
@@ -13,7 +11,9 @@ import { useRouter } from 'vue-router'
 
 import { Icons } from '@/components/icons'
 import ActionCard from '@/components/user/actionCard.vue'
+import { useConfig, usePluginStore } from '@/plugin'
 import { useAppStore } from '@/stores/app'
+import { DcVar, DcCell } from '@/ui'
 const $router = useRouter()
 const config = useConfig()
 const $window = window

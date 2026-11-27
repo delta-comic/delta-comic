@@ -1,5 +1,10 @@
-import type { FormConfigure, FormSingleResult } from '@delta-comic/model'
-import type { UniItem, UniItemAuthor, UniItemRaw, UniUserCardComponent } from '@delta-comic/model'
+import type { FormConfigure, FormSingleResult } from '@delta-comic/platform/model'
+import type {
+  UniItem,
+  UniItemAuthor,
+  UniItemRaw,
+  UniUserCardComponent,
+} from '@delta-comic/platform/model'
 import type { Component, MaybeRefOrGetter } from 'vue'
 
 export interface UserModel {

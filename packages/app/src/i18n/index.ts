@@ -1,9 +1,10 @@
-import { pluginI18n, type PluginI18nAdapter } from '@delta-comic/plugin'
 import dayjs, { type Dayjs } from 'dayjs'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
+import { createI18n } from 'vue-i18n'
 import 'dayjs/locale/zh-cn'
 import 'dayjs/locale/zh-tw'
-import { createI18n } from 'vue-i18n'
+
+import { pluginI18n, type PluginI18nAdapter } from '@/plugin'
 
 import { localeMessages } from './locales'
 

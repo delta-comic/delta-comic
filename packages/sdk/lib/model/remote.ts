@@ -1,4 +1,4 @@
-import type { UniResourceProcessor } from '@delta-comic/model'
+import type { UniResourceProcessor } from '@delta-comic/platform/model'
 
 export type RemoteModel = TestGroup[]
 

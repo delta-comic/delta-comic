@@ -1,89 +1,91 @@
-# Monorepo dependency map
+# Delta Comic 工作区依赖图
 
-This map reflects the workspace package manifests and Rust path configuration at `develop` commit `650aaf2c`.
+箭头从使用方指向依赖。包节点使用 `packages/` 下的目录名，`sdk` 发布为 `@delta-comic/client`。统计包含直接的运行、开发和 peer 依赖，同一包内的导入及第三方依赖不计入。
 
-## JavaScript workspace
+## 当前结构 · 4 个产品包，4 条包间依赖
 
-Solid arrows are declared workspace dependencies. Dotted arrows are peer dependencies. Dashed arrows are development-only dependencies.
+```mermaid
+flowchart LR
+  app --> sdk
+  app --> platform
+  app -. 开发 .-> runtime
+  sdk -. 开发 .-> platform
+```
+
+| 包 | 职责 |
+| --- | --- |
+| app | Vue/Tauri 应用、UI、插件宿主、安装与校验 |
+| sdk | 对外的插件 API、开发服务器和打包工具 |
+| platform | 宿主和 SDK 使用的模型、协议、数据、原生接口及构建桥接模块 |
+| runtime | 预构建 UMD，共享 Vue、路由、状态管理、Naive UI 与 Cordis 实例 |
+
+SDK 将使用的 platform 代码和声明打包。宿主在启动插件前通过 UMD 桥接暴露同一份 SDK。两个工具包位于 `script/codegen` 和 `script/manager`，由根工作区调用。
+
+## 合并前 · 15 个产品包，46 条包间依赖
+
+基线为 `650aaf2c` 的各包清单。artifact 并入安装模块，core、install、ui 并入 app，vite 并入 sdk。db、downloader、http、logger、manifest、model、utils 并入 platform。
 
 ```mermaid
 flowchart TD
-  root[Root tooling] --> codegen[codegen-cli]
-  root --> release[release-cli]
-
-  app --> client[client SDK]
-  app --> db[db]
-  app --> downloader[downloader]
-  app --> http[http]
-  app --> logger[logger]
-  app --> model[model]
-  app --> plugin[plugin core]
-  app --> ui[ui]
-  app --> utils[utils]
-  app -. dev .-> runtime[runtime host]
-
-  plugin --> client
-  plugin --> logger
-  plugin --> manifest[manifest]
-  plugin --> install[plugin install]
-  plugin --> vite[plugin vite]
-  plugin -. peer .-> db
-  plugin -. peer .-> model
-  plugin -. peer .-> ui
-  plugin -. peer .-> utils
-
+  app --> sdk
+  app --> db
+  app --> downloader
+  app --> http
+  app --> logger
+  app --> model
+  app --> core
+  app --> ui
+  app --> utils
+  app -. 开发 .-> runtime
+  artifact --> manifest
+  core --> sdk
+  core --> logger
+  core --> manifest
+  core --> install
+  core --> vite
+  core -. peer .-> db
+  core -. peer .-> model
+  core -. peer .-> ui
+  core -. peer .-> utils
   db --> logger
   db --> manifest
   db -. peer .-> model
+  install --> logger
+  install --> manifest
+  install --> model
+  install --> artifact
+  install -. 开发 .-> db
   model --> logger
   model --> manifest
+  runtime --> sdk
+  sdk -. 开发 .-> db
+  sdk -. 开发 .-> downloader
+  sdk -. 开发 .-> manifest
+  sdk -. 开发 .-> model
+  sdk -. 开发 .-> vite
+  sdk -. 开发 .-> ui
+  sdk -. 开发 .-> utils
   ui --> logger
   ui -. peer .-> model
   ui -. peer .-> utils
   utils --> logger
-
-  install --> logger
-  install --> manifest
-  install --> model
-  install --> artifact[plugin artifact]
-  install -. dev .-> db
-
   vite --> manifest
   vite --> install
   vite --> utils
-  vite -. dev .-> db
-
-  client -. dev .-> db
-  client -. dev .-> downloader
-  client -. dev .-> manifest
-  client -. dev .-> model
-  client -. dev .-> vite
-  client -. dev .-> ui
-  client -. dev .-> utils
-
-  runtime --> client
-  artifact --> manifest
+  vite -. 开发 .-> db
 ```
 
-## Rust workspace paths
+## Cargo 工作区 · 8 个成员
 
-The Rust workspace declarations below still point at the pre-flattening layout. Those directories are absent in this checkout. The matching crates currently live directly under `packages/`.
+原始清单中已有 6 个 Tauri 插件，成员路径仍指向目录扁平化前的位置。现已移至 `crates/`。每个插件有自己的 Cargo 构建脚本和 Tauri 注册入口。
 
 ```mermaid
 flowchart LR
-  app_rs[app/src-tauri]
-  app_rs -. stale path .-> db_rs[packages/platform/db]
-  app_rs -. stale path .-> downloader_rs[packages/platform/downloader]
-  app_rs -. stale path .-> http_rs[packages/platform/http]
-  app_rs -. stale path .-> logger_rs[packages/core/logger]
-  app_rs -. stale path .-> plugin_rs[packages/plugin/core]
-  app_rs -. stale path .-> utils_rs[packages/core/utils]
+  native["packages/app/src-tauri"] --> db["crates/db"]
+  native --> downloader["crates/downloader"]
+  native --> http["crates/http"]
+  native --> logger["crates/logger"]
+  native --> plugin["crates/plugin"]
+  native --> utils["crates/utils"]
+  bench["downloader/tools/performance-baseline"] --> downloader
 ```
-
-## Additional stale references
-
-- Root TypeScript project references still name the pre-flattening Rust and UI package paths.
-- The client SDK's Vite aliases still point at the pre-flattening db, downloader, manifest, and UI paths.
-- Release discovery and codegen checks still reference the pre-flattening package locations.
-- The lockfile records workspace links to package paths that no longer exist.
-

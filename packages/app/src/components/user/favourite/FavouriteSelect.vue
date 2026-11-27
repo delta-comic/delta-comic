@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { db, DBUtils, FavouriteDB } from '@delta-comic/db'
-import { logger } from '@delta-comic/logger'
-import type { UniItem } from '@delta-comic/model'
-import { DcToggleIcon, DcState, DcCellGroup, DcVar, DcCell } from '@delta-comic/ui'
+import { db, DBUtils, FavouriteDB } from '@delta-comic/platform/db'
+import { logger } from '@delta-comic/platform/logger'
+import type { UniItem } from '@delta-comic/platform/model'
 import { useMessage, NDrawer, NIcon, NCheckbox, NButton } from 'naive-ui'
 import { useTemplateRef, shallowRef, shallowReactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/components/icons'
+import { DcToggleIcon, DcState, DcCellGroup, DcVar, DcCell } from '@/ui'
 
 import CreateFavouriteCard from './CreateFavouriteCard.vue'
 

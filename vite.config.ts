@@ -23,8 +23,11 @@ export default defineConfig(
         'dev:android': { command: 'vp run @delta-comic/app#dev:mobile', cache: false },
         'dev:web': { command: 'vp run @delta-comic/app#dev:web:mobile', cache: false },
         // build
-        'build:packages': { command: 'vp run -r build', cache: { output: [] } },
-        'build': { command: 'echo "no need"' },
+        'build:packages': {
+          command: 'vp run --filter "@delta-comic/*" --filter "!@delta-comic/app" build',
+          cache: { output: [] },
+        },
+        'build': { command: 'vp run @delta-comic/app#build:web' },
         'release-cli': {
           command: 'vp run --filter @delta-comic/release-cli build',
           cache: { output: ['script/manager/dist/**'] },
@@ -53,7 +56,7 @@ export default defineConfig(
         // linter
         'typecheck': {
           command: [
-            'vp exec tsrs --fast -p ./tsconfig.json',
+            'vp exec tsrs --fast --runExternalCode -p ./tsconfig.json',
             'vp run -r --ignore-depends-on typecheck',
           ],
           dependsOn: ['build:packages'],
@@ -79,16 +82,12 @@ export default defineConfig(
       unstubGlobals: true,
       coverage: {
         provider: 'v8',
-        include: ['packages/*/*/{app,lib,src,src-web,vite}/**/*.ts', 'script/**/*.{ts,mts}'],
+        include: ['packages/*/{lib,src}/**/*.ts', 'script/**/*.{ts,mts}'],
         exclude: ['**/*.d.ts', '**/{test,dist,generated}/**', '**/*.test.ts', '**/src/router.ts'],
         thresholds: { lines: 20, functions: 20, branches: 20, statements: 20 },
       },
       exclude: ['**/node_modules/**', '**/.git/**', '.agents/**'],
-      projects: [
-        'script/*/vite.config.*',
-        'packages/*/vite.config.*',
-        'packages/*/*/vite.config.*',
-      ],
+      projects: ['script/*/vite.config.*', 'packages/*/vite.config.*'],
     },
   },
   { lint: false, fmt: false },

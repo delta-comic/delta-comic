@@ -1,9 +1,9 @@
-import { usePluginStore } from '@delta-comic/plugin'
-import { DcCell } from '@delta-comic/ui'
-import { SharedFunction } from '@delta-comic/utils'
+import { SharedFunction } from '@delta-comic/platform/utils'
 import { h, type Component } from 'vue'
 
 import { i18n } from '@/i18n/index'
+import { usePluginStore } from '@/plugin'
+import { DcCell } from '@/ui'
 export type ThinkList = ({ text: string; value: string } | Component)[]
 export const getBarcodeList = (searchText: string, signal: AbortSignal): Promise<ThinkList> => {
   const store = usePluginStore()

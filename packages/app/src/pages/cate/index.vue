@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { usePluginStore } from '@delta-comic/plugin'
-import { SharedFunction } from '@delta-comic/utils'
+import { SharedFunction } from '@delta-comic/platform/utils'
 import { NPageHeader, NScrollbar, NH1, NText, NButton } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+
+import { usePluginStore } from '@/plugin'
 
 const $router = useRouter()
 const pluginStore = usePluginStore()

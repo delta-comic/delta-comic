@@ -1,8 +1,9 @@
-import { logger } from '@delta-comic/logger'
-import { UniContentPage } from '@delta-comic/model'
-import { usePluginStore } from '@delta-comic/plugin'
+import { logger } from '@delta-comic/platform/logger'
+import { UniContentPage } from '@delta-comic/platform/model'
 import { defineStore } from 'pinia'
 import { computed, shallowRef, watch } from 'vue'
+
+import { usePluginStore } from '@/plugin'
 
 import { getPluginDownloadIdentity } from '../features/downloads/contentPlan'
 import {

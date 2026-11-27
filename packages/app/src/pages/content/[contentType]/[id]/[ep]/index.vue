@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { HistoryDB } from '@delta-comic/db'
-import { UniContentPage } from '@delta-comic/model'
-import { usePreventBack } from '@delta-comic/ui'
-import { useFullscreen } from '@delta-comic/utils'
+import { HistoryDB } from '@delta-comic/platform/db'
+import { UniContentPage } from '@delta-comic/platform/model'
+import { useFullscreen } from '@delta-comic/platform/utils'
 import { NButton, NIcon, useMessage } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { computed, onUnmounted, shallowRef } from 'vue'
@@ -15,6 +14,7 @@ import { contentPlanToEnqueueInput } from '@/features/downloads/contentPlan'
 import type { ContentDownloadRequest } from '@/features/downloads/destination'
 import { useContentStore } from '@/stores/content'
 import { useDownloadsStore } from '@/stores/downloads'
+import { usePreventBack } from '@/ui'
 
 const $route = useRoute<'/content/[contentType]/[id]/[ep]'>()
 const ep = $route.params.ep.toString()

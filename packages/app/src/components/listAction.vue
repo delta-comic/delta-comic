@@ -1,10 +1,11 @@
 <script setup lang="ts" generic="T">
-import { useConfig } from '@delta-comic/plugin'
 import { createReusableTemplate } from '@vueuse/core'
 import { motion, AnimatePresence, Motion } from 'motion-v'
 import { NButton, NCheckbox, NDropdown, type DropdownOption } from 'naive-ui'
 import { computed, shallowRef, shallowReactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { useConfig } from '@/plugin'
 
 export interface ListActionOption<T> {
   text: string

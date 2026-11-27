@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useConfig } from '@delta-comic/plugin'
-import { DcCell, DcCellGroup } from '@delta-comic/ui'
 import { NPageHeader, NScrollbar, NModal } from 'naive-ui'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -11,6 +9,8 @@ import PluginConfigField from '@/components/plugin/PluginConfigField.vue'
 import { translateText } from '@/i18n/index'
 import { localizeFormConfig } from '@/i18n/pluginText'
 import { isTauriRuntime } from '@/native/platform'
+import { useConfig } from '@/plugin'
+import { DcCell, DcCellGroup } from '@/ui'
 
 const $router = useRouter()
 const config = useConfig()

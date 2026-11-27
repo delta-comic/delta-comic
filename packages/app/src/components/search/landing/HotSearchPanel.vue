@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Content } from '@delta-comic/plugin'
 import { NSkeleton, NEmpty } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 import type { ResolvedHotSearchSection } from '@/features/search/useSearchLanding'
+import type { Content } from '@/plugin'
 
 defineProps<{ loading: boolean; sections: readonly ResolvedHotSearchSection[] }>()
 const emit = defineEmits<{ select: [section: ResolvedHotSearchSection, item: Content.SearchAim] }>()

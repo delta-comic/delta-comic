@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { FavouriteDB } from '@delta-comic/db'
-import { DcCellGroup } from '@delta-comic/ui'
+import { FavouriteDB } from '@delta-comic/platform/db'
 import {
   NButton,
   NDrawer,
@@ -14,6 +13,8 @@ import {
 } from 'naive-ui'
 import { computed, reactive, shallowRef, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { DcCellGroup } from '@/ui'
 
 interface FavouriteFormData {
   title: string

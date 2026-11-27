@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { SubscribeDB } from '@delta-comic/db'
-import { usePluginStore } from '@delta-comic/plugin'
-import { DcWaterfall } from '@delta-comic/ui'
+import { SubscribeDB } from '@delta-comic/platform/db'
 import { useInfiniteQuery } from '@pinia/colada'
 import { computed } from 'vue'
+
+import { usePluginStore } from '@/plugin'
+import { DcWaterfall } from '@/ui'
 
 import Card from './subCard.vue'
 

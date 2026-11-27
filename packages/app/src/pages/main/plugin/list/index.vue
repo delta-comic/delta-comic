@@ -1,15 +1,5 @@
 <script setup lang="ts">
-import { logger } from '@delta-comic/logger'
-import {
-  setPluginConfig,
-  pluginFiberStates,
-  reconnectDevPlugin,
-  setPluginEnabled,
-  uninstallPlugin,
-  updatePluginByName,
-  type PluginInstallation,
-  usePluginStore,
-} from '@delta-comic/plugin'
+import { logger } from '@delta-comic/platform/logger'
 import type { DropdownOption } from 'naive-ui'
 import {
   NScrollbar,
@@ -32,6 +22,16 @@ import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import { usePluginInstall } from '@/features/pluginInstall/usePluginInstall'
 import { translateText } from '@/i18n/index'
 import { isTauriRuntime, openPluginDirectory } from '@/native/platform'
+import {
+  setPluginConfig,
+  pluginFiberStates,
+  reconnectDevPlugin,
+  setPluginEnabled,
+  uninstallPlugin,
+  updatePluginByName,
+  type PluginInstallation,
+  usePluginStore,
+} from '@/plugin'
 
 const pluginListLogger = logger.scoped('app:plugin-list')
 

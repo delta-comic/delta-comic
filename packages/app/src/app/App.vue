@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { logger } from '@delta-comic/logger'
-import { usePluginStore } from '@delta-comic/plugin'
-import { SharedFunction } from '@delta-comic/utils'
+import { logger } from '@delta-comic/platform/logger'
+import { SharedFunction } from '@delta-comic/platform/utils'
 import { useIntervalFn } from '@vueuse/core'
 import { Mutex } from 'es-toolkit'
 import { onMounted } from 'vue'
@@ -10,6 +9,7 @@ import { useRouter, useRoute, RouterView } from 'vue-router'
 
 import { useDownloadLifecycle } from '@/features/downloads/useDownloadLifecycle'
 import { readClipboardText, writeClipboardText } from '@/native/platform'
+import { usePluginStore } from '@/plugin'
 import { pluginName } from '@/symbol'
 
 const appShellLogger = logger.scoped('app:shell')

@@ -3,7 +3,6 @@ packages:
   - script/*
 
 allowBuilds:
-  '@swc/core': true
   core-js: true
   esbuild: true
   sharp: true
@@ -32,7 +31,6 @@ catalog:
   '@tauri-apps/plugin-sql': ^2.6.0
   '@types/node': 26.6.6
   '@types/semver': ^7.8.0
-  '@vitejs/plugin-legacy': ^8.2.4
   '@vizejs/vite-plugin': ^0.797.0
   '@vueuse/core': ^15.0.0
   '@vitest/coverage-v8': 5.1.1
@@ -80,7 +78,6 @@ catalog:
   json-logic-js: ^2.0.5
   '@types/json-logic-js': ^2.0.8
   vitest: 5.1.1
-  unplugin-swc: ^2.0.0
 
 minimumReleaseAgeExclude:
   - '@vizejs/native-darwin-arm64@0.793.0 || 0.797.0'

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { SubscribeDB } from '@delta-comic/db'
-import { DcState, DcAuthorIcon, DcVar } from '@delta-comic/ui'
+import { SubscribeDB } from '@delta-comic/platform/db'
 import { NButton, NIcon, NEmpty, NDrawer } from 'naive-ui'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/components/icons'
 import AuthorList from '@/components/subscribe/subAuthorList.vue'
+import { DcState, DcAuthorIcon, DcVar } from '@/ui'
 const isOnAllPage = shallowRef(true)
 const { t } = useI18n()
 const subscribeQuery = SubscribeDB.useQuery(db =>

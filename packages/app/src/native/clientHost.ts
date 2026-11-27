@@ -1,11 +1,10 @@
 import { type ClientRouteRegistration, type ClientUiRegistrars } from '@delta-comic/client'
-import { db, PluginDiagnosticLogDB } from '@delta-comic/db'
-import { configurePluginHost, disposePluginHost, preparePluginHost } from '@delta-comic/plugin'
+import { db, PluginDiagnosticLogDB } from '@delta-comic/platform/db'
 import { shallowReactive } from 'vue'
-import type { Component } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 
 import { appLogger } from '@/logger'
+import { configurePluginHost, disposePluginHost, preparePluginHost } from '@/plugin/composition'
 
 import { getCoreHost } from './ports'
 
@@ -72,7 +71,7 @@ const registerCommand = (id: string, handler: () => void | Promise<void>, owner:
   }
 }
 
-export const clientUiRegistrars: ClientUiRegistrars = {
+const clientUiRegistrars: ClientUiRegistrars = {
   command: registerCommand,
   navItem: registerNavItem,
   route: registerRoute,
@@ -80,39 +79,38 @@ export const clientUiRegistrars: ClientUiRegistrars = {
 
 let diagnosticWrites = Promise.resolve()
 
-configurePluginHost({
-  diagnosticSink: record => {
-    diagnosticWrites = diagnosticWrites
-      .then(() =>
-        PluginDiagnosticLogDB.append(db, {
-          id: record.id,
-          pluginId:
-            record.pluginId ??
-            (typeof record.details?.pluginId === 'string' ? record.details.pluginId : 'app'),
-          timestamp: record.timestamp,
-          level: record.level,
-          source: record.source,
-          message: record.message,
-          details: record.details,
-          fiberId: typeof record.details?.fiberId === 'string' ? record.details.fiberId : undefined,
-        }),
-      )
-      .catch(error => {
-        appLogger.scoped('diagnostics').error('failed to persist diagnostic record', error)
-      })
-    return diagnosticWrites
-  },
-})
-
-export const prepareAppPluginHost = () =>
-  preparePluginHost({
+export const prepareAppPluginHost = () => {
+  configurePluginHost({
+    diagnosticSink: record => {
+      diagnosticWrites = diagnosticWrites
+        .then(() =>
+          PluginDiagnosticLogDB.append(db, {
+            id: record.id,
+            pluginId:
+              record.pluginId ??
+              (typeof record.details?.pluginId === 'string' ? record.details.pluginId : 'app'),
+            timestamp: record.timestamp,
+            level: record.level,
+            source: record.source,
+            message: record.message,
+            details: record.details,
+            fiberId:
+              typeof record.details?.fiberId === 'string' ? record.details.fiberId : undefined,
+          }),
+        )
+        .catch(error => {
+          appLogger.scoped('diagnostics').error('failed to persist diagnostic record', error)
+        })
+      return diagnosticWrites
+    },
+  })
+  return preparePluginHost({
     database: { db, query: (_name, operation) => operation(db) },
     uiRegistrars: clientUiRegistrars,
   })
+}
 
 export const disposeAppPluginHost = async () => {
   await disposePluginHost()
   await diagnosticWrites
 }
-
-export type AppClientComponent = Component

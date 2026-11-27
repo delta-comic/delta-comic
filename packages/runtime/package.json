@@ -12,7 +12,6 @@
     "./host-libraries.umd.js": "./dist/host-libraries.umd.js"
   },
   "dependencies": {
-    "@delta-comic/client": "workspace:",
     "@pinia/colada": "catalog:",
     "cordis": "catalog:",
     "naive-ui": "catalog:",

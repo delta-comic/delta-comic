@@ -1,5 +1,5 @@
-import type { PluginInstallOptions, PluginInstallProgress } from '@delta-comic/plugin'
-import type { DownloadMessageBind } from '@delta-comic/ui'
+import type { PluginInstallOptions, PluginInstallProgress } from '@/plugin'
+import type { DownloadMessageBind } from '@/ui'
 
 export async function runPluginInstallPhases<T>(
   { createProgress, createLoading }: DownloadMessageBind,

@@ -1,7 +1,6 @@
-import { UniContentPage } from '@delta-comic/model'
-import { useConfig } from '@delta-comic/plugin'
-import { SharedFunction } from '@delta-comic/utils'
-import type { DeltaRouter } from '@delta-comic/utils'
+import { UniContentPage } from '@delta-comic/platform/model'
+import { SharedFunction } from '@delta-comic/platform/utils'
+import type { DeltaRouter } from '@delta-comic/platform/utils'
 import { toValue } from 'vue'
 import {
   createRouter,
@@ -15,6 +14,7 @@ import { routes, handleHotUpdate } from 'vue-router/auto-routes'
 
 import { searchSourceKey } from '@/components/search/source'
 import { setStatusBar } from '@/native/platform'
+import { useConfig } from '@/plugin'
 import { useContentStore } from '@/stores/content'
 import { pluginName } from '@/symbol'
 

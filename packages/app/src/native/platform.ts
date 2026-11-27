@@ -1,5 +1,6 @@
-import { getTauriPluginRoot } from '@delta-comic/plugin'
 import { isTauri } from '@tauri-apps/api/core'
+
+import { getTauriPluginRoot } from '@/plugin/adapters/fileStore'
 
 export const isTauriRuntime = isTauri
 
@@ -13,7 +14,7 @@ export interface SafeAreaInsets {
 export const initializePlatform = async (): Promise<SafeAreaInsets | false> => {
   window.$api.M3 = { getInsets: async () => false, setBarColor: async () => true }
   if (!isTauriRuntime()) return false
-  const { CORSFetch } = await import('@delta-comic/http')
+  const { CORSFetch } = await import('@delta-comic/platform/http')
   await CORSFetch.init({
     request: { danger: { acceptInvalidCerts: true, acceptInvalidHostnames: true } },
   })

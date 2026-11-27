@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { UniItem } from '@delta-comic/model'
-import { usePluginStore } from '@delta-comic/plugin'
-import { DcWaterfall } from '@delta-comic/ui'
-import { useTemp } from '@delta-comic/utils'
+import { UniItem } from '@delta-comic/platform/model'
+import { useTemp } from '@delta-comic/platform/utils'
 import { useInfiniteQuery } from '@pinia/colada'
 import { until, useResizeObserver } from '@vueuse/core'
 import { isEmpty } from 'es-toolkit/compat'
@@ -11,7 +9,9 @@ import { computed, inject, onMounted, shallowRef, useTemplateRef, watch } from '
 import { useRouter } from 'vue-router'
 
 import { Icons } from '@/components/icons'
+import { usePluginStore } from '@/plugin'
 import { isShowMainHomeNavBar } from '@/symbol'
+import { DcWaterfall } from '@/ui'
 const waterfall = useTemplateRef('waterfall')
 const $router = useRouter()
 const temp = useTemp().$applyRaw('randomConfig', () => ({ scroll: 0 }))

@@ -2,7 +2,7 @@ import { Type } from 'typebox'
 
 import { defineTable, jsonColumn } from './schema'
 
-const model = '@delta-comic/model'
+const model = '../../model'
 
 const itemStoreTable = defineTable(
   'item_store',
@@ -91,8 +91,8 @@ const pluginTable = defineTable(
     installer_name: Type.String(),
     loader_name: Type.String(),
     plugin_name: Type.String(),
-    meta: jsonColumn('PluginManifest', '@delta-comic/manifest'),
-    config: Type.Optional(jsonColumn('PluginUserConfig', '@delta-comic/manifest')),
+    meta: jsonColumn('PluginManifest', '../../manifest'),
+    config: Type.Optional(jsonColumn('PluginUserConfig', '../../manifest')),
     enable: Type.Boolean(),
     install_input: Type.String(),
     display_name: Type.Optional(Type.String()),

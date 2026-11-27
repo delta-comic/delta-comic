@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { db, DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/db'
-import { createLoadingMessage, DcState, DcWaterfall, DcCellGroup, DcCell } from '@delta-comic/ui'
+import { db, DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/platform/db'
 import { useDialog, NIcon, NButton, NDrawer, NPopconfirm } from 'naive-ui'
 import { computed, shallowRef } from 'vue'
 import { useTemplateRef } from 'vue'
@@ -14,6 +13,7 @@ import FavouriteItem from '@/components/user/favouriteItem.vue'
 import FavouriteSelect from '@/components/user/userFavouriteSelect.vue'
 import Layout from '@/components/user/userLayout.vue'
 import { pluginName } from '@/symbol'
+import { createLoadingMessage, DcState, DcWaterfall, DcCellGroup, DcCell } from '@/ui'
 
 const $route = useRoute<'/user/favourite/[id]'>()
 const $router = useRouter()
@@ -25,7 +25,7 @@ const { state: cardState } = FavouriteDB.useQueryCard<FavouriteDB.Card | undefin
   [cardKey],
 )
 const { state: itemsState } = FavouriteDB.useQueryItem<
-  Array<FavouriteDB.Item & { item: import('@delta-comic/model').UniItemRaw; key: string }>
+  Array<FavouriteDB.Item & { item: import('@delta-comic/platform/model').UniItemRaw; key: string }>
 >(
   db =>
     db

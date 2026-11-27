@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/platform/logger'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, shallowRef } from 'vue'
 

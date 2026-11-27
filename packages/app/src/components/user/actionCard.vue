@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { usePluginStore, type User } from '@delta-comic/plugin'
 import { NGi, NGrid, NIcon, NStatistic } from 'naive-ui'
 import { toRef } from 'vue'
 import { useRouter } from 'vue-router'
+
+import { usePluginStore, type User } from '@/plugin'
 
 defineProps<{ card: User.UserActionPage; pluginName: string; color?: string }>()
 const pluginStore = usePluginStore()

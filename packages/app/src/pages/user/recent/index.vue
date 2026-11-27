@@ -1,8 +1,7 @@
 <script setup lang="ts">
 const isDesktop = __DC_APP_TARGET__ === 'desktop'
 
-import { RecentDB, useNativeStore } from '@delta-comic/db'
-import { DcState, DcWaterfall } from '@delta-comic/ui'
+import { RecentDB, useNativeStore } from '@delta-comic/platform/db'
 import { useDialog, NIcon, NPopconfirm, NButton } from 'naive-ui'
 import { useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -13,6 +12,7 @@ import Searcher from '@/components/listSearcher.vue'
 import RecentCard from '@/components/user/recentCard.vue'
 import Layout from '@/components/user/userLayout.vue'
 import { pluginName } from '@/symbol'
+import { DcState, DcWaterfall } from '@/ui'
 
 const { state: recentState } = RecentDB.useQuery(
   db =>

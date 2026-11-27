@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { usePluginStore } from '@delta-comic/plugin'
-import { DcTab } from '@delta-comic/ui'
 import { NIcon } from 'naive-ui'
 import { computed, provide, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -8,7 +6,9 @@ import { useRouter } from 'vue-router'
 
 import MainPageSearchBar from '@/components/home/mainPageSearchBar.vue'
 import { Icons } from '@/components/icons'
+import { usePluginStore } from '@/plugin'
 import { isShowMainHomeNavBar } from '@/symbol'
+import { DcTab } from '@/ui'
 
 const $router = useRouter()
 const { t } = useI18n()

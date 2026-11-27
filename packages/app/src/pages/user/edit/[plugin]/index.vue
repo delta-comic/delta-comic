@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { UniUser } from '@delta-comic/model'
+import { UniUser } from '@delta-comic/platform/model'
 import { NPageHeader, NScrollbar } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

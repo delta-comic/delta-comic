@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { usePluginStore } from '@delta-comic/plugin'
 import { NPageHeader } from 'naive-ui'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+import { usePluginStore } from '@/plugin'
 
 const $router = useRouter()
 const $route = useRoute<'/user/action/[plugin]/[key]'>()

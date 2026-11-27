@@ -5,11 +5,9 @@ import * as Pinia from 'pinia'
 import * as Vue from 'vue'
 import * as VR from 'vue-router'
 import * as VRExperimental from 'vue-router/experimental'
-import * as DcClient from '@delta-comic/client'
 
-export const hostLibraries = { Vue, Naive, VR, VRExperimental, Pinia, Pc, Cordis, DcClient } as const
+export const hostLibraries = { Vue, Naive, VR, VRExperimental, Pinia, Pc, Cordis } as const
 
-const hostWindow = window as Window & { $$lib$$?: Record<string, unknown> }
-Object.assign((hostWindow.$$lib$$ ??= {}), hostLibraries)
+Object.assign(window, { $$lib$$: hostLibraries })
 
 export default hostLibraries

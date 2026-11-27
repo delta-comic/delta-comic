@@ -4,7 +4,7 @@ import type {
   StreamQuery,
   UniItem,
   UniItemAuthor,
-} from '@delta-comic/model'
+} from '@delta-comic/platform/model'
 import type { Component } from 'vue'
 
 export interface SocialModel {

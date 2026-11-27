@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { UniItem } from '@delta-comic/model'
-import { DcAuthorIcon, DcImage } from '@delta-comic/ui'
-import { SharedFunction } from '@delta-comic/utils'
+import type { UniItem } from '@delta-comic/platform/model'
+import { SharedFunction } from '@delta-comic/platform/utils'
 import { NButton, NDropdown, NIcon, type DropdownOption } from 'naive-ui'
 import { computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/components/icons'
+import { DcAuthorIcon, DcImage } from '@/ui'
 import { createDateString } from '@/utils/date'
 
 defineProps<{ item: UniItem }>()

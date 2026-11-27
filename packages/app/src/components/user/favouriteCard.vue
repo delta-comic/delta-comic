@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { FavouriteDB } from '@delta-comic/db'
-import { UniImage } from '@delta-comic/model'
-import { DcState, DcImage } from '@delta-comic/ui'
+import { FavouriteDB } from '@delta-comic/platform/db'
+import { UniImage } from '@delta-comic/platform/model'
 import { isEmpty } from 'es-toolkit/compat'
 import { NIcon, NEmpty, NButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/components/icons'
+import { DcState, DcImage } from '@/ui'
 
 const props = withDefaults(defineProps<{ isCardMode?: boolean; card: FavouriteDB.Card }>(), {
   isCardMode: true,
@@ -15,7 +15,7 @@ const emit = defineEmits<{ open: []; play: [] }>()
 const { t } = useI18n()
 
 const { state: favouriteItems } = FavouriteDB.useQueryItem<
-  Array<FavouriteDB.Item & { item: import('@delta-comic/model').UniItemRaw; key: string }>
+  Array<FavouriteDB.Item & { item: import('@delta-comic/platform/model').UniItemRaw; key: string }>
 >(
   db =>
     db

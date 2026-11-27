@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type UniEp, UniItem, type UniItemRaw } from '@delta-comic/model'
+import { type UniEp, UniItem, type UniItemRaw } from '@delta-comic/platform/model'
 import { NIcon } from 'naive-ui'
 import { computed } from 'vue'
 
