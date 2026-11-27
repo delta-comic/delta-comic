@@ -7,12 +7,15 @@ mounts. The Web entry and visible Tauri main window both use `index.html`.
 
 ## Package Entry
 
-The build tool generates `entryModulePath`, the entry ESM module path relative to the package root
-(or the development server root), together with its resources. The host loads the module graph
-from this path. The entry module exports
-a default `readonly Component.Function<Config>[]`. Functions use Cordis `name`, `inject`, `provide`,
-and Standard Schema `Config` metadata. Plugin authors import types and Context extensions from
-`@delta-comic/client`. The build bridge shares Cordis and UI library instances with the host.
+Plugin authors import `deltaComic` from `@delta-comic/client/vite`. The build reads the npm
+package name and version, bundles the optional Cordis entry and public exports into one
+registration script, and emits declarations and a ZIP. Declare cross-plugin package names in
+`pluginPeers` and their compatible versions in `peerDependencies`. A format 2 manifest lists
+the exact external requests, exported module paths, host range and resource hashes.
+
+The host verifies the manifest and bytes before registration. A script provides a factory.
+Its consumer-bound resolver reads the host ESM namespaces or a provider's cached exports.
+The runtime records successful module reads, including deferred requests.
 
 Each installation has one parent Fiber. Its functions are child plugins, mounted as a group
 before awaiting stability. Cordis coordinates service providers and consumers, including pending
@@ -34,28 +37,16 @@ discovered from `builtins/*.builtin.ts`; each file supplies its manifest and fun
 ## Installation And Management
 
 `@/plugin/install` owns source resolution, manifest validation, ZIP integrity,
-persistence transactions, module graph rewriting, and development-server module reading.
-Database/file/catalog adapters live in this package. Vite tooling emits manifest resources and
-integrity, icons, and client chunks. Development loading uses Vite's HMR and CSS
-bridge. Resource disposal follows the installation parent Context.
+revision storage, registration and activation transactions.
 
-Installation records persist enable state and user configuration. Configuration validation uses
-each function's native Config, including disabled installations. Management operations are
-serialized and update the current module and Fiber mapping.
+SQLite stores the active manifest revision. IndexedDB and Tauri store the verified bytes by
+installation ID and revision. Development builds publish successful revisions over SSE. The host
+reads the corresponding resources and follows the same installation path as ZIP upgrades.
 
-## Failure And Recovery
+## Replacement and recovery
 
-A module-load failure or managed FAILED Fiber enters session safe mode. One cleanup per failure
-generation unloads all managed packages; host services and builtin Fibers remain available.
-Persistent enable values support retry on the next launch. Within safe mode, the plugin page can
-enable individual installations and displays persisted enable state, current Fiber state, and
-error source. Cleanup errors enter diagnostics. Business-operation errors are reported by their
-calling application flow.
-
-## Verification
-
-Native lifecycle tests cover reverse service order, provider disable/restore, function arrays,
-failed-group cleanup, individual recovery, configuration validation, and hot replacement.
-Installation and builder tests cover integrity, module graphs, CSS disposal, update rollback,
-client package resources. Runtime acceptance includes direct Web/Tauri startup
-and the application plugin-management view.
+The management queue checks declared peer ranges and module paths before stopping consumers. The
+runtime freezes generations in the reverse closure of successful reads. The host disposes their
+fibers, rebuilds the affected factories and mounts their components in dependency order.
+Failure during activation or persistence restores the preceding closure. Unrelated fibers keep
+their state. Legacy installations require a rebuild with the current SDK.

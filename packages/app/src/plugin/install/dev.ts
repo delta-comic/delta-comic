@@ -1,4 +1,4 @@
-import { DEV_MANIFEST_PATH } from '@delta-comic/platform/manifest/dev'
+import { DEV_MANIFEST_PATH, revisionPath } from '@delta-comic/platform/manifest/dev'
 
 import { validateArtifact } from './artifact'
 import { parsePluginManifest } from './manifest'
@@ -18,20 +18,27 @@ export const parseDevServerPort = (input: string): number | undefined => {
 export const devServerUrl = (port: number, path: string) =>
   `http://localhost:${port}${path.startsWith('/') ? path : `/${path}`}`
 
-export const readDevArtifact = async (port: number, signal: AbortSignal) => {
-  const response = await fetch(devServerUrl(port, DEV_MANIFEST_PATH), {
-    cache: 'no-store',
-    signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]),
-  })
+export const readDevArtifact = async (
+  port: number,
+  signal: AbortSignal,
+  expectedRevision?: string,
+) => {
+  const response = await fetch(
+    devServerUrl(
+      port,
+      expectedRevision ? revisionPath(expectedRevision, 'manifest.json') : DEV_MANIFEST_PATH,
+    ),
+    { cache: 'no-store', signal: AbortSignal.any([signal, AbortSignal.timeout(5000)]) },
+  )
   if (!response.ok) throw new Error(`development manifest request failed: ${response.status}`)
   const bytes = new Uint8Array(await response.arrayBuffer())
   const manifest = parsePluginManifest(JSON.parse(new TextDecoder().decode(bytes)))
   const revision = await manifestRevision(bytes)
+  if (expectedRevision && revision !== expectedRevision)
+    throw new Error('development revision mismatch')
   const files = new Map([['manifest.json', bytes]])
   for (const resource of manifest.resources) {
-    const data = await fetch(devServerUrl(port, `/revisions/${revision}/${resource.path}`), {
-      signal,
-    })
+    const data = await fetch(devServerUrl(port, revisionPath(revision, resource.path)), { signal })
     if (!data.ok) throw new Error(`development resource unavailable: ${resource.path}`)
     files.set(resource.path, new Uint8Array(await data.arrayBuffer()))
   }

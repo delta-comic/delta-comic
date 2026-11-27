@@ -1,6 +1,11 @@
 import { createHash, randomUUID } from 'node:crypto'
 import type { ServerResponse } from 'node:http'
 
+import {
+  DEV_EVENTS_PATH,
+  DEV_MANIFEST_PATH,
+  type DevRevision,
+} from '@delta-comic/platform/manifest/dev'
 import { build, type Plugin } from 'vite-plus'
 
 import type { ModulePluginOptions } from './vite-modules'
@@ -16,7 +21,7 @@ export function createDevPlugin(options: ModulePluginOptions): Plugin {
       let sequence = 0
       let revision = ''
       const event = () =>
-        `data: ${JSON.stringify({ session, sequence, id: options.id, revision })}\n\n`
+        `data: ${JSON.stringify({ session, sequence, id: options.id, revision } satisfies DevRevision)}\n\n`
       async function rebuild() {
         const result = await build({
           root: server.config.root,
@@ -62,11 +67,11 @@ export function createDevPlugin(options: ModulePluginOptions): Plugin {
       server.watcher.on('all', schedule)
       server.middlewares.use((req, res, next) => {
         const path = new URL(req.url ?? '/', 'http://localhost').pathname
-        if (!['/manifest.json', '/events'].includes(path) && !path.startsWith('/revisions/'))
+        if (![DEV_MANIFEST_PATH, DEV_EVENTS_PATH].includes(path) && !path.startsWith('/revisions/'))
           return next()
         res.setHeader('Access-Control-Allow-Origin', '*')
         res.setHeader('Cache-Control', 'no-store')
-        if (path === '/events') {
+        if (path === DEV_EVENTS_PATH) {
           res.setHeader('Content-Type', 'text/event-stream')
           res.flushHeaders()
           clients.add(res)
@@ -76,7 +81,7 @@ export function createDevPlugin(options: ModulePluginOptions): Plugin {
         }
         const [, , hash, ...segments] = path.split('/')
         const file =
-          path === '/manifest.json'
+          path === DEV_MANIFEST_PATH
             ? revisions.get(revision)?.get('manifest.json')
             : revisions.get(hash)?.get(segments.join('/'))
         res.statusCode = file === undefined ? 404 : 200

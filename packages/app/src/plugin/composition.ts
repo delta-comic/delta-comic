@@ -27,6 +27,8 @@ import { computed, shallowReactive, shallowRef } from 'vue'
 import {
   DevServerSourceResolver,
   DEV_SERVER_LOADER_ID,
+  DEV_EVENTS_PATH,
+  isDevRevision,
   GitHubSourceResolver,
   HttpSourceResolver,
   LocalFileSourceResolver,
@@ -584,7 +586,7 @@ function watchDev(row: PluginArchiveDB.Archive) {
   current?.events.close()
   watchers.delete(id)
   if (!row.enable || row.loaderName !== DEV_SERVER_LOADER_ID || !port) return
-  const events = new EventSource(devServerUrl(port, '/events'))
+  const events = new EventSource(devServerUrl(port, DEV_EVENTS_PATH))
   watchers.set(id, { source: row.installInput, events })
   let sequence = 0
   let session = ''
@@ -595,9 +597,15 @@ function watchDev(row: PluginArchiveDB.Archive) {
     sequence = 0
   }
   events.onmessage = async message => {
-    const event = JSON.parse(message.data)
+    let event: unknown
+    try {
+      event = JSON.parse(message.data)
+    } catch {
+      return
+    }
     if (
       watchers.get(id)?.events !== events ||
+      !isDevRevision(event) ||
       event.id !== id ||
       (session && session !== event.session) ||
       event.sequence <= sequence
@@ -612,7 +620,21 @@ function watchDev(row: PluginArchiveDB.Archive) {
       while (revision && watchers.get(id)?.events === events) {
         const next = revision
         revision = ''
-        if ((await repository.find(id))?.revision !== next) await updatePluginByName(id)
+        await managed(async () => {
+          if (watchers.get(id)?.events !== events) return
+          const installed = await repository.find(id)
+          if (!installed || installed.revision === next) return
+          await pluginInstaller.install(installed.installInput, undefined, undefined, {
+            expectedId: id,
+            expectedRevision: next,
+            afterStage: replace,
+          })
+        }).catch(error =>
+          pluginDiagnostics.record('error', 'development update failed', {
+            pluginId: id,
+            error: describe(error),
+          }),
+        )
       }
     } catch (error) {
       failed(id, error)

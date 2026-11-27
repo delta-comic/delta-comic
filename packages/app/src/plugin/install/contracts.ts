@@ -24,6 +24,7 @@ export interface PluginSourceResolver {
     input: PluginInstallInput,
     signal: AbortSignal,
     report?: PluginInstallReporter,
+    expectedRevision?: string,
   ): Promise<ResolvedPluginSource>
 }
 

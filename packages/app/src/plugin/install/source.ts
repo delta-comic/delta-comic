@@ -102,6 +102,8 @@ export class DevServerSourceResolver implements PluginSourceResolver {
   public async resolve(
     input: PluginInstallInput,
     signal: AbortSignal,
+    _report?: PluginInstallReporter,
+    expectedRevision?: string,
   ): Promise<ResolvedPluginSource> {
     if (typeof input !== 'string') throw new TypeError('development resolver requires dev:<port>')
     const port = parseDevServerPort(input)
@@ -109,7 +111,7 @@ export class DevServerSourceResolver implements PluginSourceResolver {
 
     return {
       kind: 'dev-server',
-      ...(await readDevArtifact(port, signal)),
+      ...(await readDevArtifact(port, signal, expectedRevision)),
       installInput: input,
       resolverId: this.id,
     }

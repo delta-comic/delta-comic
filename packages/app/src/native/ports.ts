@@ -1,4 +1,4 @@
-import type { RouteRecordRaw } from 'vue-router'
+import type { Router, RouteRecordRaw } from 'vue-router'
 
 import type { createDownloadMessage } from '@/ui'
 
@@ -8,7 +8,7 @@ export interface PlatformPort {
   listenResume: (callback: () => void) => Promise<() => void>
 }
 
-export interface NavigationPort {
+export interface NavigationPort extends Pick<Router, 'currentRoute' | 'replace'> {
   hasRoute: (name: string) => boolean
   addRoute: (route: RouteRecordRaw) => () => void
   removeRoute: (name: string) => void

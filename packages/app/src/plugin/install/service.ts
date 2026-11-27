@@ -21,6 +21,7 @@ export interface PluginInstallServiceOptions {
 }
 
 export interface PluginInstallHooks {
+  readonly expectedRevision?: string
   readonly expectedId?: string
   readonly afterStage?: (
     archive: PluginArchiveDB.Archive,
@@ -52,7 +53,7 @@ export class PluginInstallService {
     report({ phase: 'resolve', progress: 0 })
     const resolver = this.findResolver(input)
     if (!resolver) throw new Error('no plugin source resolver accepts this input')
-    const source = await resolver.resolve(input, signal, report)
+    const source = await resolver.resolve(input, signal, report, hooks.expectedRevision)
     signal.throwIfAborted()
     report({
       phase: 'resolve',

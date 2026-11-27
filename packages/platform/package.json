@@ -34,25 +34,18 @@
     "./manifest/dev": {
       "types": "./dist/lib/manifest/dev.d.ts",
       "default": "./lib/manifest/dev.ts"
-    },
-    "./vite": {
-      "types": "./dist/vite/index.d.ts",
-      "default": "./vite/index.ts"
     }
   },
   "dependencies": {
     "@pinia/colada": "catalog:",
     "@tauri-apps/api": "catalog:",
     "@tauri-apps/plugin-sql": "catalog:",
-    "acorn": "catalog:",
     "dayjs": "catalog:",
-    "es-module-lexer": "catalog:",
     "es-toolkit": "catalog:",
     "kysely": "catalog:",
     "kysely-dialect-tauri": "catalog:",
     "kysely-plugin-serialize": "catalog:",
     "kysely-wasqlite-worker": "catalog:",
-    "magic-string": "catalog:",
     "mitt": "catalog:",
     "naive-ui": "catalog:",
     "semver": "catalog:",

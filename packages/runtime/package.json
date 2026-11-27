@@ -2,22 +2,15 @@
   "name": "@delta-comic/runtime",
   "version": "2.3.0",
   "private": true,
-  "description": "Delta Comic 宿主与外部插件共享的预构建 UMD 运行时。",
+  "description": "Delta Comic 插件模块加载器",
   "files": [
     "dist"
   ],
   "type": "module",
   "exports": {
-    ".": "./dist/host-libraries.umd.js",
-    "./modules": "./lib/modules.ts",
-    "./host-libraries.umd.js": "./dist/host-libraries.umd.js"
-  },
-  "dependencies": {
-    "@pinia/colada": "catalog:",
-    "cordis": "catalog:",
-    "naive-ui": "catalog:",
-    "pinia": "catalog:",
-    "vue": "catalog:",
-    "vue-router": "catalog:"
+    ".": {
+      "types": "./dist/modules.d.mts",
+      "import": "./dist/modules.mjs"
+    }
   }
 }

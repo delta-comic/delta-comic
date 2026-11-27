@@ -14,8 +14,7 @@
 - `packages/app`：统一 Vue 客户端与 Tauri 工程。Web 入口为 `src/index.ts`；原生入口为
   `src-tauri/src/main.rs`。`dev:desktop`、`dev:mobile` 分别启动对应目标；Web 入口使用
   `dev:web:desktop` 或 `dev:web:mobile`。Tauri 必须使用固定端口，端口不可用时会直接失败。
-- 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/runtime`，它是供外部插件使用的
-  UMD 宿主库桥接层。请保持此依赖顺序。
+- 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/runtime`，它是私有 ESM 插件模块加载器。请保持此依赖顺序。
 
 ## 架构约束
 
