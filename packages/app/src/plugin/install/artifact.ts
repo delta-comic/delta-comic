@@ -1,8 +1,4 @@
-import {
-  parsePluginManifest,
-  type PluginManifest,
-  type PluginResource,
-} from '@delta-comic/platform/manifest'
+import { parsePluginManifest, type PluginManifest } from '@delta-comic/platform/manifest'
 
 export interface ArtifactFile {
   path: string
@@ -73,37 +69,17 @@ const digest = async (bytes: Uint8Array) => {
   return `sha256-${toBase64(new Uint8Array(hash))}`
 }
 
-const resourceByPath = (resources: readonly PluginResource[]) =>
-  new Map(resources.map(resource => [normalizePath(resource.path), resource]))
-
-const validateResourceGraph = (manifest: PluginManifest) => {
-  const resources = resourceByPath(manifest.resources)
-  if (!resources.has(normalizePath(manifest.entryModulePath))) {
-    throw new ArtifactValidationError(
-      `entry module is not declared as a resource: ${manifest.entryModulePath}`,
-    )
-  }
-  for (const resource of resources.values()) {
-    for (const imported of resource.imports) {
-      if (!resources.has(normalizePath(imported))) {
-        throw new ArtifactValidationError(
-          `${resource.path} imports undeclared resource ${imported}`,
-        )
-      }
-    }
-  }
-  return resources
-}
-
 export const validateArtifact = async (
   artifact: PluginArtifact,
 ): Promise<ArtifactValidationResult> => {
   const manifest = parsePluginManifest(artifact.manifest)
-  const resources = validateResourceGraph(manifest)
+  const resources = new Map(manifest.resources.map(r => [r.path, r]))
   const files = new Map<string, ArtifactFile>()
   for (const file of artifact.files) {
     const path = normalizePath(file.path)
     if (files.has(path)) throw new ArtifactValidationError(`duplicate file: ${path}`)
+    if (path !== 'manifest.json' && !resources.has(path))
+      throw new ArtifactValidationError(`undeclared resource: ${path}`)
     files.set(path, { path, bytes: file.bytes })
   }
   for (const [path, resource] of resources) {
@@ -113,9 +89,8 @@ export const validateArtifact = async (
       throw new ArtifactValidationError(`integrity mismatch: ${path}`)
     }
   }
-  const entryModule = files.get(normalizePath(manifest.entryModulePath))
-  if (!entryModule)
-    throw new ArtifactValidationError(`entry module is missing: ${manifest.entryModulePath}`)
+  const entryModule = files.get(normalizePath(manifest.script))
+  if (!entryModule) throw new ArtifactValidationError(`entry module is missing: ${manifest.script}`)
   return { manifest, files: [...files.values()], entryModule }
 }
 

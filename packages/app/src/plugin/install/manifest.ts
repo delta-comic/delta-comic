@@ -33,11 +33,6 @@ export const safePluginPath = (value: unknown, path: string) => {
 
 export const parsePluginManifest = (value: unknown): PluginManifest => {
   const manifest = parseManifest(value)
-  safePluginPath(manifest.entryModulePath, 'entry module path')
-  for (const resource of manifest.resources) {
-    safePluginPath(resource.path, 'resource path')
-    for (const imported of resource.imports) safePluginPath(imported, 'resource import')
-  }
   if (manifest.icon) {
     if (/^[a-z][a-z\d+.-]*:/i.test(manifest.icon)) {
       const url = new URL(manifest.icon)

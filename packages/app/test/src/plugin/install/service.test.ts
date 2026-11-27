@@ -69,7 +69,13 @@ class MemoryPluginFileStore implements PluginFileStore {
 }
 
 const manifest = (version: string): PluginManifest => ({
-  entryModulePath: 'index.js',
+  formatVersion: 2 as const,
+  package: 'demo',
+  supportCoreVersion: '*',
+  exports: [],
+  externals: [],
+  pluginPeers: {},
+  script: 'index.js',
   resources: [],
   author: 'test',
   description: 'test',
@@ -80,6 +86,8 @@ const manifest = (version: string): PluginManifest => ({
 })
 
 const archive = (version: string): PluginArchiveDB.Archive => ({
+  revision: null,
+  config: {},
   displayName: 'Example',
   enable: true,
   installerName: 'local',
@@ -91,7 +99,10 @@ const archive = (version: string): PluginArchiveDB.Archive => ({
 
 const packageFor = (pluginManifest: PluginManifest) => ({
   codecId: 'zip',
-  files: new Map([['index.js', new TextEncoder().encode(pluginManifest.id)]]),
+  files: new Map([
+    ['index.js', new TextEncoder().encode(pluginManifest.id)],
+    ['manifest.json', new TextEncoder().encode(JSON.stringify(pluginManifest))],
+  ]),
   manifest: pluginManifest,
 })
 
@@ -163,7 +174,7 @@ describe('PluginInstallService', () => {
       matches: input => input === 'dev:6173',
       resolve: async () => ({
         kind: 'dev-server',
-        manifest: manifest('2.0.0'),
+        ...packageFor(manifest('2.0.0')),
         installInput: 'dev:6173',
         resolverId: 'dev-server',
       }),
@@ -301,7 +312,6 @@ describe('PluginInstallService', () => {
       find: async () => current,
       list: async () => (current ? [current] : []),
       remove: async () => {
-        current = undefined
         throw new Error('database unavailable')
       },
       upsert: async value => {

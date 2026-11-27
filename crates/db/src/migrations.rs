@@ -153,6 +153,12 @@ pub fn all() -> Vec<Migration> {
       sql: "ALTER TABLE plugin ADD COLUMN config JSON;",
       kind: MigrationKind::Up,
     },
+    Migration {
+      version: 7,
+      description: "plugin_module_revision",
+      sql: "ALTER TABLE plugin ADD COLUMN revision TEXT; CREATE UNIQUE INDEX plugin_module_package ON plugin (lower(json_extract(meta, '$.package'))) WHERE revision IS NOT NULL;",
+      kind: MigrationKind::Up,
+    },
   ]
 }
 

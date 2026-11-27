@@ -5,6 +5,7 @@ import type { PluginManifest, PluginUserConfig } from '../../manifest'
 export interface PluginTable {
   installerName: string
   loaderName: string
+  revision: string | null
   pluginName: string
   meta: JSONColumnType<PluginManifest>
   config: JSONColumnType<PluginUserConfig> | null

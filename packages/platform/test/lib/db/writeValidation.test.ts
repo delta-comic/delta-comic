@@ -57,6 +57,7 @@ const validCard = [1, 'desc', true, 'Reading']
 const pluginColumns = [
   'installerName',
   'loaderName',
+  'revision',
   'pluginName',
   'meta',
   'enable',
@@ -64,7 +65,7 @@ const pluginColumns = [
   'displayName',
   'config',
 ]
-const validPluginRow = ['installer', 'loader', 'p', '{"name":"p"}', true, '', null, '{}']
+const validPluginRow = ['installer', 'loader', null, 'p', '{"name":"p"}', true, '', null, '{}']
 
 describe('validateWriteNode', () => {
   it('accepts valid insert rows', () => {

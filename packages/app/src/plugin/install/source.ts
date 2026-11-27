@@ -11,7 +11,7 @@ import type {
 import {
   DEV_SERVER_LOADER_ID,
   DEV_SERVER_SOURCE_PREFIX,
-  readDevManifest,
+  readDevArtifact,
   parseDevServerPort,
 } from './dev'
 import { isPluginManifestCompatible, parsePluginManifest } from './manifest'
@@ -109,7 +109,7 @@ export class DevServerSourceResolver implements PluginSourceResolver {
 
     return {
       kind: 'dev-server',
-      manifest: await readDevManifest(port, signal),
+      ...(await readDevArtifact(port, signal)),
       installInput: input,
       resolverId: this.id,
     }

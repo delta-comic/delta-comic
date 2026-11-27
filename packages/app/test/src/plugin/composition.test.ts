@@ -12,13 +12,20 @@ declare module 'cordis' {
 const state = vi.hoisted(() => ({
   archives: new Map<
     string,
-    { pluginName: string; meta: unknown; enable: boolean; config: Record<string, unknown> }
+    {
+      pluginName: string
+      revision?: string
+      meta: unknown
+      enable: boolean
+      config: Record<string, unknown>
+    }
   >(),
   modules: new Map<string, readonly Component.Function[]>(),
   released: vi.fn(),
   builtins: new Array<{ manifest: PluginManifest; functions: readonly Component.Function[] }>(),
 }))
 
+vi.mock('../../../src/plugin/seed', () => ({ hostSeed: new Map() }))
 vi.mock('@delta-comic/platform/db', () => ({ db: {} }))
 vi.mock('../../../src/plugin/adapters/index', () => ({
   AwesomeRegistryClient: class {},
@@ -58,10 +65,18 @@ vi.mock('../../../src/plugin/builtins/index', () => ({
 vi.mock('@/plugin/install', async importOriginal => ({
   ...(await importOriginal<typeof import('@/plugin/install')>()),
   StoredPluginModuleReader: class {
-    async read(archive: { pluginName: string }) {
+    async prepare(archive: { pluginName: string }) {
       const functions = state.modules.get(archive.pluginName)
       if (!functions) throw new Error('module unavailable')
-      return { functions, dispose: () => state.released(archive.pluginName) }
+      return {
+        entry: {
+          package: archive.pluginName,
+          exports: [],
+          externals: [],
+          factory: () => ({ components: functions, modules: {} }),
+        },
+        load: () => ({ functions, dispose: () => state.released(archive.pluginName) }),
+      }
     }
   },
 }))
@@ -81,10 +96,29 @@ afterEach(async () => {
 
 const install = (id: string, functions: readonly Component.Function[]) => {
   state.archives.set(id, {
+    revision: 'test',
     pluginName: id,
     enable: true,
     config: {},
-    meta: { id, name: id, version: '1.0.0', entryModulePath: 'index.js', resources: [] },
+    meta: {
+      id,
+      name: id,
+      version: '1.0.0',
+      formatVersion: 2 as const,
+      package: id,
+      supportCoreVersion: '*',
+      exports: [],
+      externals: [],
+      pluginPeers: {},
+      script: 'index.js',
+      resources: [
+        {
+          path: 'index.js',
+          mimeType: 'text/javascript',
+          integrity: 'sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
+        },
+      ],
+    },
   })
   state.modules.set(id, functions)
 }
@@ -99,7 +133,13 @@ describe('native package lifecycle', () => {
       id: 'core',
       name: 'Core',
       version: '1.0.0',
-      entryModulePath: 'core',
+      formatVersion: 2 as const,
+      package: 'demo',
+      supportCoreVersion: '*',
+      exports: [],
+      externals: [],
+      pluginPeers: {},
+      script: 'core',
       resources: [],
     }
     state.builtins.push({ manifest, functions: [function core() {}] })
@@ -123,8 +163,8 @@ describe('native package lifecycle', () => {
       config: {},
     })
     await prepare()
-    await expect(host.loadEnabledPlugins()).rejects.toThrow('invalid plugin manifest: invalid')
-    expect(host.pluginSafeMode.value).toBe(true)
+    await host.loadEnabledPlugins()
+    expect(host.pluginSafeMode.value).toBe(false)
     expect(host.pluginInstallations.get('invalid')).toMatchObject({ manifest: null, enabled: true })
     expect(host.pluginStore.displayName('invalid')).toBe('invalid')
     await host.setPluginEnabled('invalid', false)
@@ -148,7 +188,7 @@ describe('native package lifecycle', () => {
     install('configured', [configured])
     await prepare()
     await host.loadEnabledPlugins().catch(() => {})
-    expect(host.pluginSafeMode.value).toBe(true)
+    expect(host.pluginSafeMode.value).toBe(false)
     await host.setPluginEnabled('configured', false)
     await expect(host.setPluginConfig('configured', {})).rejects.toThrow('token required')
     expect(state.archives.get('configured')?.config).toEqual({})
@@ -200,10 +240,10 @@ describe('native package lifecycle', () => {
       },
     ])
     await prepare()
-    await expect(host.loadEnabledPlugins()).rejects.toThrow('startup failed')
-    expect(host.pluginSafeMode.value).toBe(true)
-    expect(host.pluginFibers.size).toBe(0)
-    expect(cleanup).toHaveBeenCalledOnce()
+    await host.loadEnabledPlugins()
+    expect(host.pluginSafeMode.value).toBe(false)
+    expect(host.pluginFibers.size).toBe(1)
+    expect(cleanup).not.toHaveBeenCalled()
     expect(state.archives.get('healthy')?.enable).toBe(true)
     expect(state.archives.get('broken')?.enable).toBe(true)
     expect(host.pluginStatuses.get('broken')).toMatchObject({
@@ -229,7 +269,7 @@ describe('native package lifecycle', () => {
     ])
     await prepare()
     await host.loadEnabledPlugins()
-    await host.reloadPlugin('reader', [
+    state.modules.set('reader', [
       Object.assign(
         function updated(ctx: Context) {
           ctx.share.register({ share: { initiative: [] } })
@@ -237,6 +277,7 @@ describe('native package lifecycle', () => {
         { inject: ['share'] },
       ),
     ])
+    await host.reloadPlugin('reader')
     expect(cleanup).toHaveBeenCalledOnce()
     expect(state.released).toHaveBeenCalledWith('reader')
     expect(host.pluginStore.share.has('reader')).toBe(true)

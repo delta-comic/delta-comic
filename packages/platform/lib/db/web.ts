@@ -103,6 +103,16 @@ export const createWebDialect = (): Dialect =>
       const columns = await connection.executeQuery<{ name: string }>(
         CompiledQuery.raw('PRAGMA table_info(plugin)'),
       )
+      if (!columns.rows.some(column => column.name === 'revision')) {
+        await connection.executeQuery(
+          CompiledQuery.raw('ALTER TABLE plugin ADD COLUMN revision TEXT'),
+        )
+      }
+      await connection.executeQuery(
+        CompiledQuery.raw(
+          "CREATE UNIQUE INDEX IF NOT EXISTS plugin_module_package ON plugin (lower(json_extract(meta, '$.package'))) WHERE revision IS NOT NULL",
+        ),
+      )
       if (!columns.rows.some(column => column.name === 'config')) {
         await connection.executeQuery(
           CompiledQuery.raw('ALTER TABLE plugin ADD COLUMN config JSON'),

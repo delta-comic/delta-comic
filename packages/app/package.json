@@ -10,6 +10,7 @@
   "dependencies": {
     "@delta-comic/client": "workspace:",
     "@delta-comic/platform": "workspace:",
+    "@delta-comic/runtime": "workspace:",
     "@octokit/rest": "catalog:",
     "@pinia/colada": "catalog:",
     "@tauri-apps/api": "catalog:",
@@ -44,7 +45,6 @@
     "vue-router": "catalog:"
   },
   "devDependencies": {
-    "@delta-comic/runtime": "workspace:",
     "@tailwindcss/vite": "catalog:",
     "@tauri-apps/cli": "catalog:",
     "@types/semver": "catalog:",
