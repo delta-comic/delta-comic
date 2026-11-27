@@ -1,0 +1,8 @@
+{
+  "name": "@fixture/catalog",
+  "version": "1.0.0",
+  "type": "module",
+  "peerDependencies": {
+    "@fixture/parser": "^2.0.0"
+  }
+}

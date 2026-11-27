@@ -6,5 +6,6 @@
 
     "types": ["vite-plus/client"]
   },
+  "exclude": ["test/fixtures"],
   "include": ["lib", "test"]
 }

@@ -1,0 +1,13 @@
+{
+  "name": "@fixture/parser",
+  "version": "2.0.0",
+  "type": "module",
+  "exports": {
+    "./text": {
+      "types": "./dist/text.d.ts"
+    },
+    "./lazy": {
+      "types": "./dist/lazy.d.ts"
+    }
+  }
+}
