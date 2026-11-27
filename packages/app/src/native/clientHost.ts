@@ -49,6 +49,11 @@ const registerRoute = (route: ClientRouteRegistration, owner: string) => {
     path,
   }
   router.addRoute(record)
+  // Vue Router keeps the previous matched record when its registration is replaced.
+  if (router.currentRoute.value.matched.some(match => match.name === name)) {
+    const { path: currentPath, query, hash } = router.currentRoute.value
+    void router.replace({ path: currentPath, query, hash, force: true })
+  }
   return () => router.hasRoute(name) && router.removeRoute(name)
 }
 

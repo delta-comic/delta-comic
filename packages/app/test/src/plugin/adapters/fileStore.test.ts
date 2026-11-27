@@ -36,28 +36,16 @@ describe('Tauri plugin roots', () => {
   })
 })
 
-describe('module URL versioning', () => {
-  it('busts the module cache after every file replacement and removal', async () => {
-    const { AtomicPluginFileStore } = await import('../../../../src/plugin/adapters/fileStore')
-    const backend = {
-      moduleUrl: vi.fn(async () => 'plugin://localhost/demo/index.js'),
-      read: vi.fn(),
-      replace: vi.fn(async () => undefined),
-      snapshot: vi.fn(async () => new Map<string, Uint8Array>()),
-    }
-    const store = new AtomicPluginFileStore(backend)
-
-    await expect(store.createModuleUrl('demo', 'index.js')).resolves.toBe(
-      'plugin://localhost/demo/index.js?v=0',
-    )
-    await store.replace('demo', new Map())
-    await expect(store.createModuleUrl('demo', 'index.js')).resolves.toBe(
-      'plugin://localhost/demo/index.js?v=1',
-    )
-    await store.remove('demo')
-    await store.replace('demo', new Map())
-    await expect(store.createModuleUrl('demo', 'index.js')).resolves.toBe(
-      'plugin://localhost/demo/index.js?v=3',
-    )
-  })
+it('collects abandoned revisions after restart and preserves legacy files', async () => {
+  const { AtomicPluginFileStore } = await import('../../../../src/plugin/adapters/fileStore')
+  const live = '_demo.' + '1'.repeat(64)
+  const abandoned = '_demo.' + '2'.repeat(64)
+  const backend = {
+    keys: async () => [live, abandoned, 'demo'],
+    replace: vi.fn(),
+    read: vi.fn(),
+    snapshot: vi.fn(),
+  }
+  await new AtomicPluginFileStore(backend).collectRevisions(new Set([live]))
+  expect(backend.replace.mock.calls).toEqual([[abandoned, new Map()]])
 })

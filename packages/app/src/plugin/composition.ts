@@ -357,6 +357,11 @@ export const loadEnabledPlugins = () =>
   managed(async () => {
     await refreshInstallations()
     const rows = await repository.list()
+    await pluginFiles.collectRevisions(
+      new Set(
+        rows.flatMap(row => (row.revision ? [revisionKey(row.pluginName, row.revision)] : [])),
+      ),
+    )
     const graph = declared(rows)
     const byName = new Map(rows.filter(r => isPluginManifest(r.meta)).map(r => [r.meta.package, r]))
     for (const row of rows) {
