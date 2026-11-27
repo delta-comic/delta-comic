@@ -9,7 +9,11 @@ export type ResolvedPluginSource = {
   readonly resolverId: string
 } & (
   | { readonly kind: 'archive'; readonly file: File }
-  | { readonly kind: 'dev-server'; readonly manifest: PluginManifest }
+  | {
+      readonly kind: 'dev-server'
+      readonly manifest: PluginManifest
+      readonly files: ReadonlyMap<string, Uint8Array>
+    }
 )
 
 export interface PluginSourceResolver {

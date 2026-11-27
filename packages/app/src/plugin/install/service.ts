@@ -10,6 +10,7 @@ import type {
   PluginSourceResolver,
 } from './contracts'
 import { DEV_SERVER_LOADER_ID } from './dev'
+import { manifestRevision, revisionKey } from './revision'
 
 export interface PluginInstallServiceOptions {
   readonly codecs: readonly PluginPackageCodec[]
@@ -61,7 +62,7 @@ export class PluginInstallService {
     const resolved =
       source.kind === 'archive'
         ? await this.decode(source.file, signal, report)
-        : { manifest: source.manifest, codecId: DEV_SERVER_LOADER_ID, files: undefined }
+        : { manifest: source.manifest, codecId: DEV_SERVER_LOADER_ID, files: source.files }
     const { manifest, files, codecId } = resolved
     const plugin = manifest.id
 
@@ -71,9 +72,24 @@ export class PluginInstallService {
     signal.throwIfAborted()
     report({ phase: 'decode', progress: 100, description: plugin })
     const previous = await this.options.repository.find(plugin)
-    let replacement = files && (await this.options.files.replace(plugin, files))
+    const manifestBytes = files.get('manifest.json')
+    if (!manifestBytes) throw new Error('missing manifest bytes')
+    const revision = await manifestRevision(manifestBytes)
+    const key = revisionKey(plugin, revision)
+    for (const row of await this.options.repository.list()) {
+      if (
+        row.pluginName !== plugin &&
+        (row.pluginName.toLowerCase() === plugin || row.meta?.package === manifest.package)
+      )
+        throw new Error(`installation conflicts with ${row.pluginName}: ${manifest.package}`)
+    }
+    if (previous?.revision && previous.meta.package !== manifest.package)
+      throw new Error(`package changed for ${plugin}`)
+    const replacement =
+      previous?.revision === revision ? undefined : await this.options.files.replace(key, files)
     let activation: PluginFileReplacement | void = undefined
     const archive: PluginArchiveDB.Archive = {
+      revision,
       displayName: manifest.name,
       enable: previous?.enable ?? true,
       config: previous?.config ?? {},
@@ -86,11 +102,9 @@ export class PluginInstallService {
     try {
       signal.throwIfAborted()
       report({ phase: 'persist', progress: 50, description: plugin })
-      await this.options.repository.upsert(archive)
       activation = await hooks.afterStage?.(archive, previous)
       signal.throwIfAborted()
-      if (!files && previous && previous.loaderName !== DEV_SERVER_LOADER_ID)
-        replacement = await this.options.files.replace(plugin, new Map())
+      await this.options.repository.upsert(archive)
       await replacement?.commit()
       await activation?.commit()
       report({ phase: 'persist', progress: 100, description: plugin })
@@ -129,28 +143,9 @@ export class PluginInstallService {
   public async uninstall(plugin: string) {
     const previous = await this.options.repository.find(plugin)
     if (!previous) return
-    const replacement =
-      previous.loaderName === DEV_SERVER_LOADER_ID
-        ? undefined
-        : await this.options.files.replace(plugin, new Map())
-    try {
-      await this.options.repository.remove(plugin)
-      await replacement?.commit()
-    } catch (error) {
-      const errors: unknown[] = [error]
-      try {
-        await replacement?.rollback()
-      } catch (error) {
-        errors.push(error)
-      }
-      try {
-        if (previous) await this.options.repository.upsert(previous)
-      } catch (error) {
-        errors.push(error)
-      }
-      if (errors.length > 1)
-        throw new AggregateError(errors, `plugin uninstall rollback failed: ${plugin}`)
-      throw error
-    }
+    await this.options.repository.remove(plugin)
+    await this.options.files.remove(
+      previous.revision ? revisionKey(plugin, previous.revision) : plugin,
+    )
   }
 }

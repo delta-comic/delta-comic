@@ -13,14 +13,15 @@ const archive = async (entry = 'export default () => ({})') => {
       id: 'artifact-reader',
       name: 'Artifact Reader',
       version: '1.0.0',
-      entryModulePath: 'index.js',
+      formatVersion: 2 as const,
+      package: 'demo',
+      supportCoreVersion: '*',
+      exports: [],
+      externals: [],
+      pluginPeers: {},
+      script: 'index.js',
       resources: [
-        {
-          path: 'index.js',
-          mimeType: 'text/javascript',
-          integrity: await sha256Integrity(bytes),
-          imports: [],
-        },
+        { path: 'index.js', mimeType: 'text/javascript', integrity: await sha256Integrity(bytes) },
       ],
     }),
   )

@@ -90,6 +90,7 @@ const pluginTable = defineTable(
   {
     installer_name: Type.String(),
     loader_name: Type.String(),
+    revision: Type.Optional(Type.String()),
     plugin_name: Type.String(),
     meta: jsonColumn('PluginManifest', '../../manifest'),
     config: Type.Optional(jsonColumn('PluginUserConfig', '../../manifest')),

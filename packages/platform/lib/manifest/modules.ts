@@ -23,7 +23,7 @@ const packagePattern = '^(@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*$'
 const range = Type.String({ minLength: 1 })
 const paths = Type.Array(Type.String({ minLength: 1 }), { uniqueItems: true })
 
-const schema = Type.Object(
+export const PluginManifestSchema = Type.Object(
   {
     formatVersion: Type.Literal(2),
     id: Type.String({ maxLength: 64, pattern: '^[a-z0-9][a-z0-9._-]*$' }),
@@ -52,7 +52,7 @@ const schema = Type.Object(
   { additionalProperties: false },
 )
 
-export type ModuleManifest = Static<typeof schema>
+export type ModuleManifest = Static<typeof PluginManifestSchema>
 
 export function isPublicSubpath(path: string) {
   return (
@@ -66,7 +66,10 @@ export function isPublicSubpath(path: string) {
 }
 
 export function parseModuleManifest(input: unknown): ModuleManifest {
-  if (!Value.Check(schema, input)) throw new TypeError('invalid format 2 plugin manifest')
+  if (input && typeof input === 'object' && !('formatVersion' in input))
+    throw new Error('使用新版 SDK 重新构建')
+  if (!Value.Check(PluginManifestSchema, input))
+    throw new TypeError('invalid format 2 plugin manifest')
   const fail = (message: string): never => {
     throw new TypeError(`${input.id}: ${message}`)
   }

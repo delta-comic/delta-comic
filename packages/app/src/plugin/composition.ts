@@ -8,7 +8,12 @@ import {
   type DiagnosticRecord,
 } from '@delta-comic/client'
 import type { DB, PluginArchiveDB } from '@delta-comic/platform/db'
-import { isPluginManifest, type PluginManifest } from '@delta-comic/platform/manifest'
+import {
+  dependencyOrder,
+  isPluginManifest,
+  type PluginManifest,
+} from '@delta-comic/platform/manifest'
+import { ModuleRegistry } from '@delta-comic/runtime'
 import {
   Context,
   type Component,
@@ -20,10 +25,8 @@ import {
 import { computed, shallowReactive, shallowRef } from 'vue'
 
 import {
-  DevServerPluginModuleReader,
   DevServerSourceResolver,
   DEV_SERVER_LOADER_ID,
-  DEV_INVALIDATE_EVENT,
   GitHubSourceResolver,
   HttpSourceResolver,
   LocalFileSourceResolver,
@@ -33,7 +36,6 @@ import {
   ZipPackageCodec,
   devServerUrl,
   parseDevServerPort,
-  safePluginPath,
   type LoadedPluginModule,
   type PluginCatalog,
   type PluginInstallReporter,
@@ -48,6 +50,8 @@ import {
 import { DatabasePluginArchiveRepository } from './adapters/pluginRepository'
 import { builtinPlugins, coreManifest } from './builtins'
 import { cfg } from './core/config'
+import { revisionKey } from './install/revision'
+import { hostSeed } from './seed'
 import {
   ConfigService,
   ContentService,
@@ -93,9 +97,7 @@ export const useConfig = () => pluginConfigStore
 const owners = new WeakMap<Fiber, string>()
 const loadedModules = new Map<string, LoadedPluginModule>()
 const children = new Map<string, Fiber[]>()
-let generation = 0
-let failedGeneration = -1
-let cleanup: Promise<void> | undefined
+
 let management = Promise.resolve()
 let initialization: Promise<void> | undefined
 
@@ -116,13 +118,10 @@ export const pluginDiagnostics = new DiagnosticRecorder({
 
 const pluginFiles = createDefaultPluginFileStore()
 const repository = new DatabasePluginArchiveRepository()
-const devServerReader = new DevServerPluginModuleReader()
+const registry = new ModuleRegistry(hostSeed)
 const storedReader = new StoredPluginModuleReader(pluginFiles)
-const readModule = (archive: PluginArchiveDB.Archive) =>
-  (archive.loaderName === DEV_SERVER_LOADER_ID ? devServerReader : storedReader).read(
-    archive,
-    new AbortController().signal,
-  )
+type Prepared = Awaited<ReturnType<typeof storedReader.prepare>>
+const active = new Map<string, { archive: PluginArchiveDB.Archive; prepared: Prepared }>()
 const internalIds = new Set(builtinPlugins.map(plugin => plugin.manifest.id))
 const httpSource = new HttpSourceResolver()
 const githubSource = new GitHubSourceResolver({
@@ -178,41 +177,23 @@ const unload = async (id: string) => {
   }
 }
 
-const enterSafeMode = (id: string, source: string, error: unknown) => {
-  if (failedGeneration === generation) return cleanup ?? Promise.resolve()
-  failedGeneration = generation
-  pluginSafeMode.value = true
-  pluginStatuses.set(id, { state: pluginFiberStates.FAILED, source, error: describe(error) })
-  pluginDiagnostics.record('error', 'plugin lifecycle failed', {
-    pluginId: id,
-    source,
-    error: describe(error),
-  })
-  cleanup = (async () => {
-    const ids = [...pluginFibers.keys()].filter(id => !internalIds.has(id))
-    const results = await Promise.allSettled(ids.map(unload))
-    for (const [index, result] of results.entries()) {
-      if (result.status === 'rejected') {
-        pluginDiagnostics.record('error', 'plugin cleanup failed', {
-          pluginId: ids[index],
-          error: describe(result.reason),
-        })
-      }
-    }
-  })()
-  return cleanup
-}
-
 pluginContext.on(
   'internal/status',
   fiber => {
     const id = findOwner(fiber)
     if (!id) return
     if (fiber.state === pluginFiberStates.FAILED && !internalIds.has(id)) {
-      void fiber.await().catch(error => enterSafeMode(id, fiber.name, error))
+      void fiber
+        .await()
+        .catch(error =>
+          pluginStatuses.set(id, {
+            state: pluginFiberStates.FAILED,
+            source: fiber.name,
+            error: describe(error),
+          }),
+        )
       return
     }
-    if (pluginStatuses.get(id)?.state === pluginFiberStates.FAILED && pluginSafeMode.value) return
     const fibers = children.get(id) ?? []
     const state = fibers.some(child => child.state === pluginFiberStates.PENDING)
       ? pluginFiberStates.PENDING
@@ -267,15 +248,11 @@ const mount = async (id: string, override?: readonly Component.Function[]) => {
   const builtin = builtinPlugins.find(plugin => plugin.manifest.id === id)
   if (builtin) module = { functions: builtin.functions }
   else {
-    const archive = await repository.find(id)
-    if (!archive) throw new Error(`installed plugin not found: ${id}`)
-    module = await readModule(archive)
+    const selected = active.get(installation.manifest.package)
+    if (!selected) throw new Error(`unregistered installation: ${id}`)
+    module = selected.prepared.load(registry)
   }
   if (override) module = { ...module, functions: override }
-  if (failedGeneration === generation) {
-    await module.dispose?.()
-    throw new Error('plugin loading stopped after lifecycle failure')
-  }
   loadedModules.set(id, module)
   pluginStatuses.set(id, { state: pluginFiberStates.LOADING })
   const group: Fiber[] = []
@@ -301,8 +278,6 @@ const stabilize = async () => {
 
 const managed = <T>(operation: () => Promise<T>): Promise<T> => {
   const result = management.then(async () => {
-    await cleanup
-    generation++
     return await operation()
   })
   management = result.then(
@@ -353,91 +328,149 @@ export const preparePluginHost = async (options: PreparePluginHostOptions) => {
   await initialization
 }
 
+function showArchive(archive: PluginArchiveDB.Archive) {
+  pluginInstallations.set(archive.pluginName, {
+    manifest: isPluginManifest(archive.meta) ? archive.meta : null,
+    enabled: archive.enable,
+    config: archive.config ?? {},
+    origin: 'installed',
+    installInput: archive.installInput,
+    loaderName: archive.loaderName,
+  })
+}
+function failed(id: string, error: unknown) {
+  pluginStatuses.set(id, { state: pluginFiberStates.FAILED, source: id, error: describe(error) })
+  pluginDiagnostics.record('error', 'plugin load failed', { pluginId: id, error: describe(error) })
+}
+async function settle(id: string) {
+  await pluginFibers.get(id)?.await()
+  await Promise.all((children.get(id) ?? []).map(fiber => fiber.await()))
+}
+function declared(rows: PluginArchiveDB.Archive[]) {
+  return new Map(
+    rows
+      .filter(row => row.enable && !internalIds.has(row.pluginName) && isPluginManifest(row.meta))
+      .map(row => [row.meta.package, row.meta]),
+  )
+}
 export const loadEnabledPlugins = () =>
   managed(async () => {
-    try {
-      await refreshInstallations()
-    } catch (error) {
-      await enterSafeMode('installation', 'installation records', error)
-      throw error
-    }
-    for (const [id, installation] of pluginInstallations) {
-      if (installation.origin === 'builtin' || !installation.enabled || pluginFibers.has(id))
-        continue
+    await refreshInstallations()
+    const rows = await repository.list()
+    const graph = declared(rows)
+    const byName = new Map(rows.filter(r => isPluginManifest(r.meta)).map(r => [r.meta.package, r]))
+    for (const row of rows) {
+      if (!row.enable || internalIds.has(row.pluginName)) continue
       try {
-        await mount(id)
-      } catch (error) {
-        if (
-          pluginInstallations.get(id)?.manifest &&
-          (await repository.find(id))?.loaderName === DEV_SERVER_LOADER_ID
-        ) {
-          pluginStatuses.set(id, {
-            state: pluginFiberStates.FAILED,
-            source: 'dev-server',
-            error: describe(error),
-          })
-          continue
+        if (!isPluginManifest(row.meta) || !row.revision) throw new Error('使用新版 SDK 重新构建')
+        for (const name of dependencyOrder(graph, [row.meta.package], coreManifest.version)) {
+          if (active.has(name)) continue
+          const archive = byName.get(name)!
+          const prepared = await storedReader.prepare(archive)
+          registry.register(prepared.entry)
+          active.set(name, { archive, prepared })
         }
-        await enterSafeMode(id, id, error)
-        throw error
+      } catch (error) {
+        failed(row.pluginName, error)
       }
-      if (failedGeneration === generation) break
     }
-    try {
-      await stabilize()
-    } catch (error) {
-      const failed = [...children].find(([, group]) =>
-        group.some(fiber => fiber.state === pluginFiberStates.FAILED),
-      )
-      await enterSafeMode(
-        failed?.[0] ?? 'loading',
-        failed?.[1].find(fiber => fiber.state === pluginFiberStates.FAILED)?.name ?? 'loading',
-        error,
-      )
-      throw error
+    for (const [name, { archive }] of active) {
+      if (pluginFibers.has(archive.pluginName)) continue
+      try {
+        dependencyOrder(graph, [name], coreManifest.version)
+        await mount(archive.pluginName)
+      } catch (error) {
+        failed(archive.pluginName, error)
+      }
+    }
+    for (const { archive } of active.values()) {
+      try {
+        await settle(archive.pluginName)
+      } catch (error) {
+        await unload(archive.pluginName)
+        failed(archive.pluginName, error)
+      }
+      watchDev(archive)
     }
   })
 
-const reload = async (id: string, override?: readonly Component.Function[]) => {
-  const current = loadedModules.get(id)
-  await unload(id)
-  await refreshInstallations()
-  try {
-    if (pluginInstallations.get(id)?.enabled) {
-      if (override && current?.dev) {
-        loadedModules.set(id, { ...current, functions: override })
-        pluginStatuses.set(id, { state: pluginFiberStates.LOADING })
-        const group: Fiber[] = []
-        children.set(id, group)
-        const installation = pluginInstallations.get(id)!
-        const fiber = pluginContext.use({
-          name: id,
-          apply(ctx) {
-            owners.set(ctx.fiber, id)
-            current.activate?.(ctx)
-            for (const fn of override) group.push(ctx.use(fn, installation.config))
-          },
-        })
-        pluginFibers.set(id, fiber)
-      } else {
-        await mount(id, override)
+async function replace(archive: PluginArchiveDB.Archive) {
+  const id = archive.pluginName
+  const previousInstallation = pluginInstallations.get(id)
+  const rows = (await repository.list()).filter(row => row.pluginName !== id)
+  const graph = declared([...rows, archive])
+  const name = archive.meta.package
+  const roots = new Set([name])
+  for (const pkg of roots) {
+    for (const manifest of graph.values())
+      if (Object.hasOwn(manifest.pluginPeers, pkg)) roots.add(manifest.package)
+  }
+  if (!archive.enable) roots.delete(name)
+  const order = dependencyOrder(graph, roots, coreManifest.version)
+  const candidate = archive.enable ? await storedReader.prepare(archive) : undefined
+  const before = new Map(active)
+  const affected = registry.freeze([name])
+  async function stop() {
+    for (const pkg of affected) {
+      const selected = active.get(pkg)
+      active.delete(pkg)
+      if (selected) await unload(selected.archive.pluginName)
+    }
+  }
+  async function start(pkg: string, selected: NonNullable<ReturnType<typeof active.get>>) {
+    active.set(pkg, selected)
+    registry.register(selected.prepared.entry)
+    showArchive(selected.archive)
+    await mount(selected.archive.pluginName)
+  }
+  async function rollback() {
+    registry.freeze(affected)
+    try {
+      await stop()
+      if (previousInstallation) pluginInstallations.set(id, previousInstallation)
+      else pluginInstallations.delete(id)
+      for (const pkg of [...affected].reverse()) {
+        const old = before.get(pkg)
+        if (old) await start(pkg, old)
       }
+      for (const pkg of affected) {
+        const selected = active.get(pkg)
+        if (selected) await settle(selected.archive.pluginName)
+      }
+    } catch (error) {
+      registry.freeze(affected)
+      await stop()
+      for (const pkg of affected) failed(before.get(pkg)?.archive.pluginName ?? id, error)
+      throw error
+    } finally {
+      registry.finish(affected)
     }
-    await stabilize()
+  }
+  try {
+    await stop()
+    showArchive(archive)
+    for (const pkg of order) {
+      if (!affected.includes(pkg)) continue
+      const selected =
+        pkg === name && candidate ? { archive, prepared: candidate } : before.get(pkg)
+      if (selected) await start(pkg, selected)
+    }
+    for (const pkg of affected) {
+      const selected = active.get(pkg)
+      if (selected) await settle(selected.archive.pluginName)
+    }
   } catch (error) {
-    if ((await repository.find(id))?.loaderName === DEV_SERVER_LOADER_ID) {
-      pluginStatuses.set(id, {
-        state: pluginFiberStates.FAILED,
-        source: 'dev-server',
-        error: describe(error),
-      })
-    } else {
-      await enterSafeMode(id, id, error)
-    }
+    await rollback()
     throw error
   }
+  return {
+    rollback,
+    commit: async () => {
+      registry.finish(affected)
+      watchDev(archive)
+    },
+  }
 }
-
 export interface PluginInstallOptions {
   readonly report?: PluginInstallReporter
   readonly signal?: AbortSignal
@@ -445,9 +478,7 @@ export interface PluginInstallOptions {
 
 export const installPlugin = (input: File | string, options: PluginInstallOptions = {}) =>
   managed(async () =>
-    pluginInstaller.install(input, options.signal, options.report, {
-      afterStage: (archive, previous) => reloadForInstall(archive, previous),
-    }),
+    pluginInstaller.install(input, options.signal, options.report, { afterStage: replace }),
   )
 
 export const updatePluginByName = (id: string, options: PluginInstallOptions = {}) =>
@@ -456,7 +487,7 @@ export const updatePluginByName = (id: string, options: PluginInstallOptions = {
     if (!archive?.installInput) throw new Error(`plugin has no update source: ${id}`)
     return await pluginInstaller.install(archive.installInput, options.signal, options.report, {
       expectedId: id,
-      afterStage: (staged, previous) => reloadForInstall(staged, previous),
+      afterStage: replace,
     })
   })
 
@@ -465,104 +496,129 @@ export const setPluginEnabled = (id: string, enabled: boolean) =>
     if (internalIds.has(id)) throw new Error(`host plugin cannot be disabled: ${id}`)
     const archive = await repository.find(id)
     if (!archive) throw new Error(`installed plugin not found: ${id}`)
-    await repository.upsert({ ...archive, enable: enabled })
-    await reload(id)
+    const next = { ...archive, enable: enabled }
+    if (!isPluginManifest(archive.meta) && !enabled) {
+      await repository.upsert(next)
+      showArchive(next)
+      return
+    }
+    await updateRecord(next)
   })
 
 export const setPluginConfig = (id: string, config: Record<string, unknown>) =>
   managed(async () => {
     const archive = await repository.find(id)
     if (!archive) throw new Error(`installed plugin not found: ${id}`)
-    const module = loadedModules.get(id) ?? (await readModule(archive))
-    try {
-      for (const fn of module.functions) {
-        resolveConfig(
-          {
-            callback: (ctx: Context, value: Record<string, unknown>) => fn(ctx, value),
-            Config: fn.Config,
-            fibers: new DisposableList(),
-          },
-          config,
-        )
-      }
-    } finally {
-      if (!loadedModules.has(id)) await module.dispose?.()
+    const validationRegistry = new ModuleRegistry(hostSeed)
+    for (const { prepared } of active.values()) validationRegistry.register(prepared.entry)
+    let module = loadedModules.get(id)
+    if (!module && !archive.enable) {
+      const prepared = await storedReader.prepare(archive)
+      validationRegistry.register(prepared.entry)
+      module = prepared.load(validationRegistry)
     }
-    await repository.upsert({ ...archive, config })
-    await reload(id)
+    for (const fn of module?.functions ?? []) {
+      resolveConfig(
+        {
+          callback: (ctx: Context, value: Record<string, unknown>) => fn(ctx, value),
+          Config: fn.Config,
+          fibers: new DisposableList(),
+        },
+        config,
+      )
+    }
+    await updateRecord({ ...archive, config })
   })
 
+async function updateRecord(archive: PluginArchiveDB.Archive) {
+  const change = await replace(archive)
+  try {
+    await repository.upsert(archive)
+  } catch (error) {
+    await change.rollback()
+    throw error
+  }
+  await change.commit()
+}
 export const uninstallPlugin = (id: string) =>
   managed(async () => {
     if (internalIds.has(id)) throw new Error(`host plugin cannot be uninstalled: ${id}`)
-    await unload(id)
-    await pluginInstaller.uninstall(id)
-    await refreshInstallations()
-  })
-
-export const reloadPlugin = (id: string, functions?: readonly Component.Function[]) =>
-  managed(async () => {
+    const row = await repository.find(id)
+    if (!row) return
+    const change = isPluginManifest(row.meta) ? await replace({ ...row, enable: false }) : undefined
     try {
-      await reload(id, functions)
+      await pluginInstaller.uninstall(id)
     } catch (error) {
-      if ((await repository.find(id))?.loaderName !== DEV_SERVER_LOADER_ID) throw error
+      await change?.rollback()
+      throw error
     }
+    await change?.commit()
+    pluginInstallations.delete(id)
+    pluginStatuses.delete(id)
   })
-
-export const reconnectDevPlugin = (id: string) =>
+export const reloadPlugin = (id: string) =>
   managed(async () => {
-    const archive = await repository.find(id)
-    if (archive?.loaderName !== DEV_SERVER_LOADER_ID)
-      throw new Error(`plugin is not connected to a development server: ${id}`)
-    await reload(id)
+    const row = await repository.find(id)
+    if (!row) throw new Error(`unknown plugin: ${id}`)
+    await (await replace(row)).commit()
   })
+export const reconnectDevPlugin = updatePluginByName
 
-const reloadForInstall = async (
-  archive: PluginArchiveDB.Archive,
-  previous: PluginArchiveDB.Archive | undefined,
-) => {
-  const previousModule = loadedModules.get(archive.pluginName)
-  try {
-    await reload(archive.pluginName)
-  } catch (error) {
-    if (archive.loaderName !== DEV_SERVER_LOADER_ID) throw error
-    if (previous) {
-      await repository.upsert(previous)
-      if (previous.enable && previousModule) {
-        loadedModules.set(archive.pluginName, previousModule)
-        pluginInstallations.set(archive.pluginName, {
-          installInput: previous.installInput,
-          loaderName: previous.loaderName,
-          manifest: previous.meta,
-          enabled: previous.enable,
-          config: previous.config ?? {},
-          origin: 'installed',
-        })
-        await mount(archive.pluginName, previousModule.functions)
-        await stabilize()
-      }
-    }
-    pluginStatuses.set(archive.pluginName, {
-      state: pluginFiberStates.FAILED,
-      source: 'dev-server',
-      error: describe(error),
-    })
-    throw error
+const watchers = new Map<string, { source: string; events: EventSource }>()
+function watchDev(row: PluginArchiveDB.Archive) {
+  const id = row.pluginName
+  const port = parseDevServerPort(row.installInput)
+  const current = watchers.get(id)
+  if (
+    row.enable &&
+    row.loaderName === DEV_SERVER_LOADER_ID &&
+    port &&
+    current?.source === row.installInput
+  )
+    return
+  current?.events.close()
+  watchers.delete(id)
+  if (!row.enable || row.loaderName !== DEV_SERVER_LOADER_ID || !port) return
+  const events = new EventSource(devServerUrl(port, '/events'))
+  watchers.set(id, { source: row.installInput, events })
+  let sequence = 0
+  let session = ''
+  let revision = ''
+  let running = false
+  events.onopen = () => {
+    session = ''
+    sequence = 0
   }
-  return {
-    commit: async () => previousModule?.dispose?.(),
-    rollback: async () => {
-      if (!previous || !previousModule) return
-      await unload(archive.pluginName)
-      await repository.upsert(previous)
-      loadedModules.set(archive.pluginName, previousModule)
-      await mount(archive.pluginName, previousModule.functions)
-      await stabilize()
-    },
+  events.onmessage = async message => {
+    const event = JSON.parse(message.data)
+    if (
+      watchers.get(id)?.events !== events ||
+      event.id !== id ||
+      (session && session !== event.session) ||
+      event.sequence <= sequence
+    )
+      return
+    session = event.session
+    sequence = event.sequence
+    revision = event.revision
+    if (running) return
+    running = true
+    try {
+      while (revision && watchers.get(id)?.events === events) {
+        const next = revision
+        revision = ''
+        if ((await repository.find(id))?.revision !== next) await updatePluginByName(id)
+      }
+    } catch (error) {
+      failed(id, error)
+    } finally {
+      running = false
+    }
   }
 }
-
 export const disposePluginHost = async () => {
+  for (const watcher of watchers.values()) watcher.events.close()
+  watchers.clear()
   await management
   await Promise.allSettled([...pluginFibers.keys()].map(unload))
   await pluginContext.fiber.dispose()
@@ -612,28 +668,6 @@ export const pluginStore = {
 
 export const usePluginStore = () => pluginStore
 
-if (typeof window !== 'undefined') {
-  window.addEventListener(DEV_INVALIDATE_EVENT, event => {
-    if (!(event instanceof CustomEvent)) return
-    const detail: unknown = event.detail
-    if (
-      typeof detail !== 'object' ||
-      detail === null ||
-      !('id' in detail) ||
-      typeof detail.id !== 'string' ||
-      !('session' in detail) ||
-      typeof detail.session !== 'string'
-    )
-      return
-    const id = detail.id
-    if (!pluginFibers.has(id)) return
-    const current = loadedModules.get(id)?.dev
-    if (!current || current.session !== detail.session) return
-    void reloadPlugin(id)
-    pluginDiagnostics.record('info', 'development plugin invalidated', { pluginId: id })
-  })
-}
-
 export const resolvePluginIconUrl = async (
   plugin: string | undefined,
   icon: string | undefined,
@@ -642,13 +676,8 @@ export const resolvePluginIconUrl = async (
   if (/^https?:\/\//i.test(icon)) return icon
   if (!plugin) throw new Error('plugin id is required for a local icon')
   const archive = await repository.find(plugin)
-  if (archive?.loaderName === DEV_SERVER_LOADER_ID) {
-    const port = parseDevServerPort(archive.installInput)
-    if (port === undefined)
-      throw new Error(`invalid development install source: ${archive.installInput}`)
-    return devServerUrl(port, safePluginPath(icon, 'icon path'))
-  }
-  return await pluginFiles.createAssetUrl(plugin, icon)
+  if (!archive?.revision) return
+  return await pluginFiles.createAssetUrl(revisionKey(plugin, archive.revision), icon)
 }
 
 export {

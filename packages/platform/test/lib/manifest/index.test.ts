@@ -10,8 +10,20 @@ const manifest = {
   id: 'demo',
   name: 'Demo',
   version: '1.0.0',
-  entryModulePath: 'index.js',
-  resources: [],
+  formatVersion: 2 as const,
+  package: 'demo',
+  supportCoreVersion: '*',
+  exports: [],
+  externals: [],
+  pluginPeers: {},
+  script: 'index.js',
+  resources: [
+    {
+      path: 'index.js',
+      mimeType: 'text/javascript',
+      integrity: 'sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
+    },
+  ],
 }
 
 describe('@delta-comic/platform/manifest', () => {
@@ -22,8 +34,8 @@ describe('@delta-comic/platform/manifest', () => {
 
   it('rejects malformed manifests', () => {
     expect(isPluginManifest({ ...manifest, id: 'bad id' })).toBe(false)
-    expect(() => parsePluginManifest({ ...manifest, entryModulePath: undefined })).toThrow(
-      'invalid plugin manifest',
+    expect(() => parsePluginManifest({ ...manifest, script: undefined })).toThrow(
+      'invalid format 2 plugin manifest',
     )
     expect(isPluginManifest({ ...manifest, protocolVersion: 2 })).toBe(false)
     expect(isPluginManifest({ ...manifest, cordisVersion: '*' })).toBe(false)

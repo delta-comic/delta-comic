@@ -27,6 +27,10 @@ export class DatabasePluginArchiveRepository implements PluginArchiveRepository 
       meta: JSON.stringify(archive.meta),
       config: JSON.stringify(archive.config ?? {}),
     })
-    await db.replaceInto('plugin').values(row).execute()
+    await db
+      .insertInto('plugin')
+      .values(row)
+      .onConflict(conflict => conflict.column('pluginName').doUpdateSet(row))
+      .execute()
   }
 }

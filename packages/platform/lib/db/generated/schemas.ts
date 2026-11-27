@@ -77,6 +77,7 @@ export const pluginRowSchema = {
   properties: {
     installer_name: { type: 'string' },
     loader_name: { type: 'string' },
+    revision: { anyOf: [{ type: 'string' }, { type: 'null' }] },
     plugin_name: { type: 'string' },
     meta: { type: 'string' },
     config: { anyOf: [{ type: 'string' }, { type: 'null' }] },
@@ -87,6 +88,7 @@ export const pluginRowSchema = {
   required: [
     'installer_name',
     'loader_name',
+    'revision',
     'plugin_name',
     'meta',
     'config',
@@ -230,6 +232,7 @@ export const pluginCamelRowSchema = {
   properties: {
     installerName: { type: 'string' },
     loaderName: { type: 'string' },
+    revision: { anyOf: [{ type: 'string' }, { type: 'null' }] },
     pluginName: { type: 'string' },
     meta: { anyOf: [{ type: 'object' }, { type: 'string' }] },
     config: { anyOf: [{ type: 'object' }, { type: 'string' }, { type: 'null' }] },
@@ -240,6 +243,7 @@ export const pluginCamelRowSchema = {
   required: [
     'installerName',
     'loaderName',
+    'revision',
     'pluginName',
     'meta',
     'config',

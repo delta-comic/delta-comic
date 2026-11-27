@@ -1,221 +1,91 @@
-import type { IncomingMessage, ServerResponse } from 'node:http'
-import { relative, resolve } from 'node:path'
+import { createHash, randomUUID } from 'node:crypto'
+import type { ServerResponse } from 'node:http'
 
-import type { PluginManifest, PluginMetadata } from '@delta-comic/platform/manifest'
-import {
-  DEV_CSS_PATH,
-  DEV_ENTRY_PATH,
-  DEV_MANIFEST_PATH,
-  DEV_SESSION_QUERY,
-  DEV_INVALIDATE_EVENT,
-} from '@delta-comic/platform/manifest/dev'
-import type { Connect, ModuleNode, Plugin, ViteDevServer } from 'vite-plus'
-import { isCSSRequest, normalizePath } from 'vite-plus'
+import { build, type Plugin } from 'vite-plus'
 
-export const DEV_ENTRY_ID = '\0delta-comic:dev-entry'
-export { DEV_CSS_PATH, DEV_ENTRY_PATH, DEV_MANIFEST_PATH }
+import type { ModulePluginOptions } from './vite-modules'
 
-const NO_CACHE_HEADERS = {
-  'Cache-Control': 'no-cache, no-store, must-revalidate',
-  'Pragma': 'no-cache',
-  'Expires': '0',
-} as const
-
-const CORS_HEADERS = { 'Access-Control-Allow-Origin': '*' } as const
-
-const VUE_STYLE_QUERY = /(?:^|[?&])vue&type=style(?:&|$)/
-const CSS_RUNTIME_BYPASS_QUERY = /(?:^|[?&])(?:direct|inline|raw|url)(?:&|$)/
-
-export const createWireManifest = (meta: PluginMetadata): PluginManifest => ({
-  ...meta,
-  entryModulePath: DEV_ENTRY_PATH.slice(1),
-  resources: [],
-})
-
-export const createDevEntryCode = (meta: PluginMetadata, entryUrl: string) =>
-  [
-    `import '/@vite/client'`,
-    `const session = new URL(import.meta.url).searchParams.get(${JSON.stringify(DEV_SESSION_QUERY)})`,
-    `const hot = import.meta.hot`,
-    `if (hot && session) {`,
-    `  hot.accept(${JSON.stringify(entryUrl)}, () => {})`,
-    `  const afterUpdate = () => {`,
-    `    globalThis.dispatchEvent(new CustomEvent(${JSON.stringify(DEV_INVALIDATE_EVENT)}, { detail: { id: ${JSON.stringify(meta.id)}, session } }))`,
-    `  }`,
-    `  hot.on('vite:afterUpdate', afterUpdate)`,
-    `  hot.dispose(() => hot.off('vite:afterUpdate', afterUpdate))`,
-    `}`,
-    `export { default } from ${JSON.stringify(entryUrl)}`,
-  ].join('\n')
-
-const isCssModuleRequest = (id: string) => isCSSRequest(id) || VUE_STYLE_QUERY.test(id)
-
-const isDevCssRuntimeRequest = (id: string) =>
-  !CSS_RUNTIME_BYPASS_QUERY.test(id) && isCssModuleRequest(id)
-
-const stripViteCssRuntime = (code: string) => {
-  let stripped = code
-  const replacements: [RegExp, string][] = [
-    [
-      /import\s*\{\s*updateStyle\s+as\s+__vite__updateStyle(?:\s*,\s*removeStyle\s+as\s+__vite__removeStyle)?\s*\}\s*from\s*['"]\/@vite\/client['"]\s*;?/g,
-      '',
-    ],
-    [
-      /const\s*\{\s*updateStyle\s*:\s*__vite__updateStyle\s*,\s*removeStyle\s*:\s*__vite__removeStyle\s*\}\s*=\s*import\.meta\.hot\._internal\s*;?/g,
-      '',
-    ],
-    [/const\s+__vite__id\s*=\s*(['"])(?:\\.|(?!\1)[^\\])*\1\s*;?/g, ''],
-    [/const\s+__vite__css\s*=\s*(['"`])(?:\\.|(?!\1)[^\\])*\1\s*;?/g, ''],
-    [/__vite__updateStyle\(\s*__vite__id\s*,\s*__vite__css\s*\)\s*;?/g, ''],
-    [
-      /import\.meta\.hot\.prune\(\s*\(\)\s*=>\s*__vite__removeStyle\(\s*__vite__id\s*\)\s*\)\s*;?/g,
-      'import.meta.hot.prune(() => {})',
-    ],
-  ]
-  for (const [pattern, replacement] of replacements)
-    stripped = stripped.replace(pattern, replacement)
-  return stripped === code ? undefined : stripped
-}
-
-const collectCssModules = (
-  server: ViteDevServer,
-  starts: readonly (ModuleNode | undefined)[],
-): ModuleNode[] => {
-  const seen = new Set<ModuleNode>()
-  const queue: ModuleNode[] = starts.filter((node): node is ModuleNode => node !== undefined)
-  const cssModules: ModuleNode[] = []
-  while (queue.length > 0) {
-    const node = queue.shift()
-    if (!node || seen.has(node)) continue
-    seen.add(node)
-    if (isCssModuleRequest(node.url)) cssModules.push(node)
-    for (const imported of node.importedModules) queue.push(imported)
-    // Vue SFC style modules share the component file but are not linked through
-    // importedModules, so discover them through the file-to-modules map.
-    const fileModules = node.file ? (server.moduleGraph.getModulesByFile?.(node.file) ?? []) : []
-    for (const fileModule of fileModules) queue.push(fileModule)
-  }
-  return cssModules
-}
-
-const toOriginAbsoluteUrls = (css: string, origin: string) =>
-  css.replace(/(url\(\s*(?:"|')?)\/(?!\/)/g, `$1${origin}/`)
-
-const collectDevCss = async (
-  server: ViteDevServer,
-  origin: string,
-  entryUrl: string,
-): Promise<string> => {
-  const entryModule = await server.moduleGraph.getModuleByUrl?.(entryUrl)
-  const modules = collectCssModules(server, [
-    server.moduleGraph.getModuleById(DEV_ENTRY_ID),
-    entryModule,
-  ])
-  const parts: string[] = []
-  for (const module of modules) {
-    const directUrl = `${module.url}${module.url.includes('?') ? '&' : '?'}direct`
-    const result = await server.transformRequest(directUrl)
-    if (result?.code) parts.push(toOriginAbsoluteUrls(result.code, origin))
-  }
-  return parts.join('\n')
-}
-
-const sendJson = (res: ServerResponse, body: unknown) => {
-  res.writeHead(200, {
-    'Content-Type': 'application/json; charset=utf-8',
-    ...NO_CACHE_HEADERS,
-    ...CORS_HEADERS,
-  })
-  res.end(JSON.stringify(body))
-}
-
-const sendError = (res: ServerResponse, status: number, message: string) => {
-  res.writeHead(status, {
-    'Content-Type': 'text/plain; charset=utf-8',
-    ...NO_CACHE_HEADERS,
-    ...CORS_HEADERS,
-  })
-  res.end(message)
-}
-
-const requestOrigin = (req: IncomingMessage) => {
-  const secure = 'encrypted' in req.socket && req.socket.encrypted === true
-  return `${secure ? 'https' : 'http'}://${req.headers.host}`
-}
-
-export const createDevPlugin = (meta: PluginMetadata): Plugin => {
-  let server: ViteDevServer | undefined
-  let entryUrl = '/src/main.ts'
-
+export function createDevPlugin(options: ModulePluginOptions): Plugin {
   return {
-    name: 'delta-comic:dev-server',
-    enforce: 'post',
-    config() {
-      return { server: { cors: true } }
-    },
-    configureServer(devServer) {
-      server = devServer
-      const entryFile = resolve(devServer.config.root, 'src/main.ts')
-      entryUrl = `/${normalizePath(relative(devServer.config.root, entryFile))}`
-
-      const handleManifest: Connect.NextHandleFunction = (req, res, next) => {
-        if (new URL(req.url ?? '/', 'http://localhost').pathname !== DEV_MANIFEST_PATH) {
-          return next()
+    name: 'delta-comic:development-revisions',
+    apply: 'serve',
+    configureServer(server) {
+      const session = randomUUID()
+      const clients = new Set<ServerResponse>()
+      const revisions = new Map<string, Map<string, string | Uint8Array>>()
+      let sequence = 0
+      let revision = ''
+      const event = () =>
+        `data: ${JSON.stringify({ session, sequence, id: options.id, revision })}\n\n`
+      async function rebuild() {
+        const result = await build({
+          root: server.config.root,
+          configFile: server.config.configFile || undefined,
+          mode: server.config.mode,
+          build: { write: false, watch: null },
+        })
+        if ('on' in result) throw new Error('unexpected build watcher')
+        const files = new Map<string, string | Uint8Array>()
+        for (const output of Array.isArray(result) ? result : [result]) {
+          for (const file of output.output)
+            files.set(file.fileName, file.type === 'chunk' ? file.code : file.source)
         }
-        sendJson(res, createWireManifest(meta))
+        const manifest = files.get('manifest.json')
+        if (!manifest) throw new Error('missing development manifest')
+        const next = createHash('sha256').update(manifest).digest('hex')
+        if (next === revision) return
+        revision = next
+        revisions.set(next, files)
+        sequence++
+        for (const client of clients) client.write(event())
       }
-      const handleEntry: Connect.NextHandleFunction = async (req, res, next) => {
-        if (new URL(req.url ?? '/', 'http://localhost').pathname !== DEV_ENTRY_PATH) {
-          return next()
-        }
-        if (!server) return next()
+      let pending = false
+      let building = false
+      const schedule = async () => {
+        pending = true
+        if (building) return
+        building = true
         try {
-          const result = await server.transformRequest(DEV_ENTRY_ID)
-          if (!result?.code) {
-            sendError(res, 500, `[delta-comic] failed to transform the plugin entry ${entryUrl}`)
-            return
+          while (pending) {
+            pending = false
+            try {
+              await rebuild()
+            } catch (error) {
+              server.config.logger.error(String(error))
+            }
           }
-          res.writeHead(200, {
-            'Content-Type': 'application/javascript; charset=utf-8',
-            ...NO_CACHE_HEADERS,
-            ...CORS_HEADERS,
-          })
-          res.end(result.code)
-        } catch (error) {
-          sendError(res, 500, error instanceof Error ? error.message : String(error))
+        } finally {
+          building = false
         }
       }
-      const handleCss: Connect.NextHandleFunction = async (req, res, next) => {
-        if (new URL(req.url ?? '/', 'http://localhost').pathname !== DEV_CSS_PATH) {
+      void schedule()
+      server.watcher.on('all', schedule)
+      server.middlewares.use((req, res, next) => {
+        const path = new URL(req.url ?? '/', 'http://localhost').pathname
+        if (!['/manifest.json', '/events'].includes(path) && !path.startsWith('/revisions/'))
           return next()
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        res.setHeader('Cache-Control', 'no-store')
+        if (path === '/events') {
+          res.setHeader('Content-Type', 'text/event-stream')
+          res.flushHeaders()
+          clients.add(res)
+          if (revision) res.write(event())
+          res.on('close', () => clients.delete(res))
+          return
         }
-        if (!server) return next()
-        try {
-          const css = await collectDevCss(server, requestOrigin(req), entryUrl)
-          res.writeHead(200, {
-            'Content-Type': 'text/css; charset=utf-8',
-            ...NO_CACHE_HEADERS,
-            ...CORS_HEADERS,
-          })
-          res.end(css)
-        } catch (error) {
-          sendError(res, 500, error instanceof Error ? error.message : String(error))
-        }
-      }
-      devServer.middlewares.use(handleManifest)
-      devServer.middlewares.use(handleEntry)
-      devServer.middlewares.use(handleCss)
-    },
-    resolveId(id) {
-      if (id === DEV_ENTRY_ID) return DEV_ENTRY_ID
-    },
-    load(id) {
-      if (id !== DEV_ENTRY_ID || !server) return
-      return createDevEntryCode(meta, entryUrl)
-    },
-    transform(code, id) {
-      if (!isDevCssRuntimeRequest(id)) return
-      return stripViteCssRuntime(code)
+        const [, , hash, ...segments] = path.split('/')
+        const file =
+          path === '/manifest.json'
+            ? revisions.get(revision)?.get('manifest.json')
+            : revisions.get(hash)?.get(segments.join('/'))
+        res.statusCode = file === undefined ? 404 : 200
+        res.end(file)
+      })
+      server.httpServer?.once('close', () => {
+        server.watcher.off('all', schedule)
+        for (const client of clients) client.end()
+      })
     },
   }
 }

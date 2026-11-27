@@ -76,14 +76,15 @@ describe('content source refresh preparation', () => {
     expect(
       pluginArchiveToContentRefreshIdentity({
         meta: {
-          entryModulePath: 'index.js',
+          formatVersion: 2 as const,
+          package: 'demo',
+          supportCoreVersion: '*',
+          exports: [],
+          externals: [],
+          pluginPeers: {},
+          script: 'index.js',
           resources: [
-            {
-              path: 'index.js',
-              mimeType: 'text/javascript',
-              integrity: 'sha256-abc123',
-              imports: [],
-            },
+            { path: 'index.js', mimeType: 'text/javascript', integrity: 'sha256-abc123' },
           ],
           author: 'author',
           description: 'description',
@@ -98,7 +99,13 @@ describe('content source refresh preparation', () => {
     expect(
       pluginArchiveToContentRefreshIdentity({
         meta: {
-          entryModulePath: 'index.js',
+          formatVersion: 2 as const,
+          package: 'demo',
+          supportCoreVersion: '*',
+          exports: [],
+          externals: [],
+          pluginPeers: {},
+          script: 'index.js',
           resources: [],
           author: 'author',
           description: 'description',

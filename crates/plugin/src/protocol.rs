@@ -42,7 +42,14 @@ fn request_path(uri: &http::Uri) -> Result<(String, PathBuf), http::StatusCode> 
   let (plugin, relative) = decoded
     .split_once('/')
     .ok_or(http::StatusCode::BAD_REQUEST)?;
-  if !plugin_id(plugin) || relative.is_empty() || relative.contains(['\\', '\0']) {
+  let revision_key = plugin
+    .strip_prefix('_')
+    .and_then(|key| key.rsplit_once('.'))
+    .is_some_and(|(id, revision)| {
+      plugin_id(id) && revision.len() == 64 && revision.bytes().all(|b| b.is_ascii_hexdigit())
+    });
+  if !(plugin_id(plugin) || revision_key) || relative.is_empty() || relative.contains(['\\', '\0'])
+  {
     return Err(http::StatusCode::BAD_REQUEST);
   }
 
