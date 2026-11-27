@@ -37,7 +37,7 @@ vi.mock('../../../src/plugin/adapters/index', () => ({
       return { data: { value: {} } }
     }
   },
-  createDefaultPluginFileStore: () => ({}),
+  createDefaultPluginFileStore: () => ({ collectRevisions: vi.fn() }),
   pluginI18n: { translateText: (text: string) => text },
 }))
 vi.mock('../../../src/plugin/adapters/pluginRepository', () => ({
@@ -96,7 +96,7 @@ afterEach(async () => {
 
 const install = (id: string, functions: readonly Component.Function[]) => {
   state.archives.set(id, {
-    revision: 'test',
+    revision: '1'.repeat(64),
     pluginName: id,
     enable: true,
     config: {},
@@ -155,7 +155,7 @@ describe('native package lifecycle', () => {
     await expect(host.uninstallPlugin('core')).rejects.toThrow('host plugin cannot be uninstalled')
   })
 
-  it('keeps invalid installations manageable by ID during safe mode', async () => {
+  it('keeps invalid installations manageable by ID when the manifest requires rebuilding', async () => {
     state.archives.set('invalid', {
       pluginName: 'invalid',
       meta: { id: 'invalid' },
@@ -227,7 +227,7 @@ describe('native package lifecycle', () => {
     expect(host.pluginStatuses.get('consumer')?.state).toBe(2)
   })
 
-  it('unloads all managed fibers on failure and permits individual recovery', async () => {
+  it('isolates startup failures and permits individual recovery', async () => {
     const cleanup = vi.fn()
     install('healthy', [
       function healthy(ctx: Context) {

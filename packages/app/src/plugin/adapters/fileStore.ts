@@ -12,6 +12,7 @@ export const getTauriPluginRoot = async (plugin: string) => {
 
 interface PluginFileBackend {
   read(plugin: string, path: string): Promise<Uint8Array>
+  keys(): Promise<string[]>
   snapshot(plugin: string): Promise<Map<string, Uint8Array>>
   replace(plugin: string, files: PluginFiles): Promise<void>
   moduleUrl?(plugin: string, path: string): Promise<string>
@@ -71,10 +72,6 @@ export class MemoryPluginFileStore implements PluginFileStore {
     return Uint8Array.from(bytes)
   }
 
-  public async createModuleUrl(plugin: string, path: string) {
-    return await this.#createUrl(plugin, path, 'text/javascript')
-  }
-
   public async createAssetUrl(plugin: string, path: string) {
     return await this.#createUrl(plugin, path, mimeType(path))
   }
@@ -125,6 +122,23 @@ class IndexedDbPluginFileBackend implements PluginFileBackend {
           if (!request.result) reject(new Error(`plugin file not found: ${plugin}/${path}`))
           else resolve(Uint8Array.from(request.result as Uint8Array))
         }
+        request.onerror = () => reject(request.error)
+      })
+    } finally {
+      database.close()
+    }
+  }
+
+  public async keys() {
+    const database = await this.#open()
+    try {
+      return await new Promise<string[]>((resolve, reject) => {
+        const request = database
+          .transaction(this.#store, 'readonly')
+          .objectStore(this.#store)
+          .getAllKeys()
+        request.onsuccess = () =>
+          resolve([...new Set(request.result.map(key => String(key).split('/')[0]))])
         request.onerror = () => reject(request.error)
       })
     } finally {
@@ -195,6 +209,16 @@ class TauriPluginFileBackend implements PluginFileBackend {
       import('@tauri-apps/plugin-fs'),
     ])
     return await fs.readFile(await join(await this.#root(plugin), path))
+  }
+
+  public async keys() {
+    const [{ appLocalDataDir, join }, fs] = await Promise.all([
+      import('@tauri-apps/api/path'),
+      import('@tauri-apps/plugin-fs'),
+    ])
+    const root = await join(await appLocalDataDir(), 'plugin')
+    if (!(await fs.exists(root))) return []
+    return (await fs.readDir(root)).filter(entry => entry.isDirectory).map(entry => entry.name)
   }
 
   public async snapshot(plugin: string) {
@@ -268,13 +292,11 @@ class TauriPluginFileBackend implements PluginFileBackend {
 }
 
 export class AtomicPluginFileStore implements PluginFileStore {
-  readonly #moduleVersions = new Map<string, number>()
   readonly #urls = new Map<string, Set<string>>()
 
   public constructor(private readonly backend: PluginFileBackend) {}
 
   public async replace(plugin: string, files: PluginFiles) {
-    this.#moduleVersions.set(plugin, (this.#moduleVersions.get(plugin) ?? 0) + 1)
     const previous = await this.backend.snapshot(plugin)
     await this.backend.replace(plugin, files)
     let settled = false
@@ -291,29 +313,19 @@ export class AtomicPluginFileStore implements PluginFileStore {
   }
 
   public async remove(plugin: string) {
-    this.#moduleVersions.set(plugin, (this.#moduleVersions.get(plugin) ?? 0) + 1)
     this.release(plugin)
     await this.backend.replace(plugin, new Map())
   }
 
-  public read(plugin: string, path: string) {
-    return this.backend.read(plugin, safePluginPath(path, 'plugin file path'))
+  public async collectRevisions(live: ReadonlySet<string>) {
+    for (const key of await this.backend.keys()) {
+      if (/^_[a-z0-9][a-z0-9._-]{0,63}\.[a-f0-9]{64}$/.test(key) && !live.has(key))
+        await this.remove(key)
+    }
   }
 
-  public async createModuleUrl(plugin: string, path: string) {
-    const safePath = safePluginPath(path, 'plugin module path')
-    if (this.backend.moduleUrl) {
-      // The protocol URL is stable, so bust the module cache on every file replacement so a
-      // hot reload always evaluates the current files instead of the previously imported module.
-      const version = this.#moduleVersions.get(plugin) ?? 0
-      return `${await this.backend.moduleUrl(plugin, safePath)}?v=${version}`
-    }
-    const bytes = await this.backend.read(plugin, safePath)
-    const url = URL.createObjectURL(new Blob([Uint8Array.from(bytes)], { type: 'text/javascript' }))
-    const urls = this.#urls.get(plugin) ?? new Set<string>()
-    urls.add(url)
-    this.#urls.set(plugin, urls)
-    return url
+  public read(plugin: string, path: string) {
+    return this.backend.read(plugin, safePluginPath(path, 'plugin file path'))
   }
 
   public async createAssetUrl(plugin: string, path: string) {

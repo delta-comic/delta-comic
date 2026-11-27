@@ -49,7 +49,6 @@ export interface PluginFileStore {
   remove(plugin: string): Promise<void>
   read(plugin: string, path: string): Promise<Uint8Array>
   createAssetUrl(plugin: string, path: string): Promise<string>
-  createModuleUrl(plugin: string, path: string): Promise<string>
   release(plugin: string): void
 }
 
