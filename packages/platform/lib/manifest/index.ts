@@ -48,3 +48,4 @@ export const parsePluginManifest = (value: unknown): PluginManifest => {
   }
   return value
 }
+export * from './modules'
