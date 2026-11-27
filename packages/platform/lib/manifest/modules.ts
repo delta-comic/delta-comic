@@ -108,3 +108,36 @@ export function parseModuleManifest(input: unknown): ModuleManifest {
   if (!resources.has(input.script)) fail(`missing registration script: ${input.script}`)
   return input
 }
+// Validate only the requested roots so a broken installation cannot block unrelated startup.
+export function dependencyOrder(
+  manifests: ReadonlyMap<string, ModuleManifest>,
+  roots: Iterable<string>,
+  coreVersion: string,
+) {
+  const ordered = new Set<string>()
+  const visiting: string[] = []
+  function visit(name: string) {
+    if (ordered.has(name)) return
+    if (visiting.includes(name)) throw new Error(`plugin cycle: ${[...visiting, name].join(' → ')}`)
+    const manifest = manifests.get(name)
+    if (!manifest) throw new Error(`missing plugin: ${name}`)
+    visiting.push(name)
+    if (!semver.satisfies(coreVersion, manifest.supportCoreVersion, { includePrerelease: true }))
+      throw new Error(`${name}: expected host ${manifest.supportCoreVersion}, found ${coreVersion}`)
+    for (const [peer, range] of Object.entries(manifest.pluginPeers)) {
+      const provider = manifests.get(peer)
+      const requests = manifest.externals.filter(request => modulePackage(request) === peer)
+      const diagnostic = `${visiting.join(' → ')} → ${requests.join(', ') || peer}: expected ${range}, found ${provider?.version ?? 'missing'}`
+      if (!provider || !semver.satisfies(provider.version, range)) throw new Error(diagnostic)
+      for (const request of requests) {
+        if (!provider.exports.includes('.' + request.slice(peer.length)))
+          throw new Error(`${diagnostic}: missing export ${request}`)
+      }
+      visit(peer)
+    }
+    visiting.pop()
+    ordered.add(name)
+  }
+  for (const root of roots) visit(root)
+  return [...ordered]
+}

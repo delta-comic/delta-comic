@@ -9,6 +9,7 @@
   "type": "module",
   "exports": {
     ".": "./dist/host-libraries.umd.js",
+    "./modules": "./lib/modules.ts",
     "./host-libraries.umd.js": "./dist/host-libraries.umd.js"
   },
   "dependencies": {
