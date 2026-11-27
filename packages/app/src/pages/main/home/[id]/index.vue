@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { usePluginStore } from '@delta-comic/plugin'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+
+import { usePluginStore } from '@/plugin'
 
 const $route = useRoute<'/main/home/[id]'>()
 const plugin = computed(() => $route.query.plugin?.toString() ?? '')

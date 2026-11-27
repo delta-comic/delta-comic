@@ -1,4 +1,4 @@
-import type { DeltaRouter } from '@delta-comic/utils'
+import type { DeltaRouter } from '@delta-comic/platform/utils'
 
 import type { AppMessageSchema } from '@/i18n/locales/index'
 
@@ -16,7 +16,7 @@ declare module 'vue-i18n' {
   export interface DefineLocaleMessage extends AppMessageSchema {}
 }
 
-declare module '@delta-comic/utils' {
+declare module '@delta-comic/platform/utils' {
   interface AppApiRegistry {
     M3?: Pick<typeof import('tauri-plugin-m3').M3, 'getInsets' | 'setBarColor'>
   }

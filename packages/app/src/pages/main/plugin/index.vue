@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { logger } from '@delta-comic/logger'
-import { loadEnabledPlugins, pluginSafeMode } from '@delta-comic/plugin'
+import { logger } from '@delta-comic/platform/logger'
 import { type MenuOption, NIcon, NMenu, NButton } from 'naive-ui'
 import type { Component } from 'vue'
 import { computed, h, shallowRef } from 'vue'
@@ -8,6 +7,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter, RouterView } from 'vue-router'
 
 import { Icons } from '@/components/icons'
+import { loadEnabledPlugins, pluginSafeMode } from '@/plugin'
 
 const pluginPageLogger = logger.scoped('app:plugin-page')
 const router = useRouter()

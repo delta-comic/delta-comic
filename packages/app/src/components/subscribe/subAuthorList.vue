@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { SubscribeDB } from '@delta-comic/db'
-import { usePreventBack, DcState, DcAuthorIcon } from '@delta-comic/ui'
+import { SubscribeDB } from '@delta-comic/platform/db'
 import { motion, AnimatePresence } from 'motion-v'
 import { NButton, NIcon, NTabPane, NTabs } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/components/icons'
+import { usePreventBack, DcState, DcAuthorIcon } from '@/ui'
 
 import SubList from './subList.vue'
 

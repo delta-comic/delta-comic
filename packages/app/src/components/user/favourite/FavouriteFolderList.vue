@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FavouriteDB } from '@delta-comic/db'
+import type { FavouriteDB } from '@delta-comic/platform/db'
 import { NEmpty, NButton, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 

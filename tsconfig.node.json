@@ -11,13 +11,5 @@
     "isolatedModules": true
   },
   "files": [],
-  "references": [
-    { "path": "./packages/app/tsconfig.node.json" },
-
-    { "path": "./packages/platform/db/tsconfig.node.json" },
-    { "path": "./packages/core/model/tsconfig.node.json" },
-    { "path": "./packages/plugin/core/tsconfig.node.json" },
-    { "path": "./packages/ui/ui/tsconfig.node.json" },
-    { "path": "./packages/core/utils/tsconfig.node.json" }
-  ]
+  "references": [{ "path": "./packages/app/tsconfig.node.json" }]
 }

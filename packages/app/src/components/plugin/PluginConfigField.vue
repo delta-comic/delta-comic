@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import type { FormSingleConfigure } from '@delta-comic/model'
+import type { FormSingleConfigure } from '@delta-comic/platform/model'
+import { NPopselect, NModal } from 'naive-ui'
+import { computed } from 'vue'
+
 import {
   DcCell,
   DcFormSwitch,
@@ -9,9 +12,7 @@ import {
   DcFormDate,
   DcFormDateRange,
   DcFormPairs,
-} from '@delta-comic/ui'
-import { NPopselect, NModal } from 'naive-ui'
-import { computed } from 'vue'
+} from '@/ui'
 
 const props = defineProps<{ config: FormSingleConfigure; modelValue: any }>()
 const emit = defineEmits<{ 'update:modelValue': [value: any] }>()

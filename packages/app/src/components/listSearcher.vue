@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { usePreventBack, DcCell } from '@delta-comic/ui'
 import { isEmpty, uniq } from 'es-toolkit/compat'
 import { motion, AnimatePresence, Motion } from 'motion-v'
 import { NIcon } from 'naive-ui'
@@ -7,6 +6,7 @@ import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { Icons } from '@/components/icons'
+import { usePreventBack, DcCell } from '@/ui'
 
 const filtersHistory = defineModel<string[]>('filtersHistory', { required: true })
 const { t } = useI18n()

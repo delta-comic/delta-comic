@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { logger } from '@delta-comic/logger'
-import { installPlugin, pluginInstaller } from '@delta-comic/plugin'
+import { logger } from '@delta-comic/platform/logger'
 import { useDialog, NScrollbar, NAutoComplete, NButton } from 'naive-ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { usePluginInstall } from '@/features/pluginInstall/usePluginInstall'
+import { installPlugin, pluginInstaller } from '@/plugin'
 
 const pluginInstallLogger = logger.scoped('app:plugin-install')
 const { t } = useI18n()

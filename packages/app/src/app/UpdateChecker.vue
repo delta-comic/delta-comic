@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { DcMarkdown } from '@delta-comic/ui'
 import { Octokit } from '@octokit/rest'
 import { computedAsync } from '@vueuse/core'
 import { NModal, NButton } from 'naive-ui'
@@ -7,6 +6,7 @@ import { watch, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { openExternal } from '@/native/platform'
+import { DcMarkdown } from '@/ui'
 
 import pkg from '../../package.json'
 

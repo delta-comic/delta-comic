@@ -1,12 +1,12 @@
-import type { PluginAuthGateway, User } from '@delta-comic/plugin'
-import { pluginStore } from '@delta-comic/plugin'
-import { createForm } from '@delta-comic/ui'
-import { PageWebviewAuth } from '@delta-comic/utils'
+import { PageWebviewAuth } from '@delta-comic/platform/utils'
 import { NSelect } from 'naive-ui'
 import { h, ref } from 'vue'
 
 import { translateText } from '@/i18n/index'
 import { localizeForm } from '@/i18n/pluginText'
+import type { PluginAuthGateway, User } from '@/plugin'
+import { pluginStore } from '@/plugin'
+import { createForm } from '@/ui'
 
 import { createPluginAuthGateway as createCorePluginAuthGateway, raceAbort } from './gatewayCore'
 

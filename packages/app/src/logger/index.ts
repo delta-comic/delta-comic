@@ -1,4 +1,4 @@
-import { installGlobalLogger, logger } from '@delta-comic/logger'
+import { installGlobalLogger, logger } from '@delta-comic/platform/logger'
 
 import { TauriLoggerClient } from '@/logger/TauriLoggerClient'
 

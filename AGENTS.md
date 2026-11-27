@@ -11,7 +11,7 @@
 
 ## 运行时入口
 
-- `packages/app`：统一 Vue 客户端与 Tauri 工程。Web 入口为 `src/main.ts`；原生入口为
+- `packages/app`：统一 Vue 客户端与 Tauri 工程。Web 入口为 `src/index.ts`；原生入口为
   `src-tauri/src/main.rs`。`dev:desktop`、`dev:mobile` 分别启动对应目标；Web 入口使用
   `dev:web:desktop` 或 `dev:web:mobile`。Tauri 必须使用固定端口，端口不可用时会直接失败。
 - 应用的 `build:web`/`dev:web` 会先构建 `@delta-comic/runtime`，它是供外部插件使用的
@@ -29,12 +29,12 @@
   Vue/组件标签使用 PascalCase。
 - 测试应放在生产目录之外，并与源文件路径对应：
   `packages/x/lib/a.ts` -> `packages/x/test/lib/a.test.ts`；根目录脚本使用 `script/test`。
-  Rust 单元测试通常放在 `packages/x/test/src` 下，并通过 `#[path = ...]` 链接。
+  Rust 单元测试通常放在 `crates/x/test/src` 下，并通过 `#[path = ...]` 链接。
 - 格式规范为 2 空格缩进、不使用分号、使用单引号、每行 100 列；运行 `vp fmt`/`vp lint`，
   不要手动重新格式化。Markdown 和生成的声明文件有意排除在格式化范围之外。
 - 提交使用 Conventional/Angular 语法和中文描述，例如 `feat(ui): 实现列表组件`；提交必须签名。
   pre-commit 会运行 `vp staged`，对已暂存文件执行 `vp check --fix` 和 cspell。
-- 公共包版本统一发布，并从 `packages/*/*/*/package.json` 中发现。使用
+- 公共包版本统一发布，并从 `packages/*/package.json` 中发现。使用
   `vp run set-ver -- <version>`，不要分别编辑包含版本号的清单文件。分支/发布操作记录在
   `docs/release-workflow.md` 中，并且必须先进行 dry run。
 - 在做完任何的任务后都必须立刻提交保存进度，不是等多个任务完成后集中提交。

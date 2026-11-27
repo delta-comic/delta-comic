@@ -1,7 +1,7 @@
-import type { PluginInstallOptions, PluginInstallProgress } from '@delta-comic/plugin'
 import { useI18n } from 'vue-i18n'
 
 import { getCoreHost } from '@/native/ports'
+import type { PluginInstallOptions, PluginInstallProgress } from '@/plugin'
 
 import { formatBytes } from '../downloads/format'
 

@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/db'
-import { type UniItemRaw } from '@delta-comic/model'
-import { usePluginStore } from '@delta-comic/plugin'
-import { createDownloadMessage, DcState } from '@delta-comic/ui'
-import { useTemp } from '@delta-comic/utils'
+import { DBUtils, FavouriteDB, useNativeStore } from '@delta-comic/platform/db'
+import { type UniItemRaw } from '@delta-comic/platform/model'
+import { useTemp } from '@delta-comic/platform/utils'
 import { uniqBy } from 'es-toolkit/compat'
 import { useMessage, NIcon, NButton } from 'naive-ui'
 import { computed, shallowRef, useTemplateRef } from 'vue'
@@ -15,7 +13,9 @@ import Searcher from '@/components/listSearcher.vue'
 import CreateFavouriteCard from '@/components/user/favourite/CreateFavouriteCard.vue'
 import FavouriteFolderList from '@/components/user/favourite/FavouriteFolderList.vue'
 import Layout from '@/components/user/userLayout.vue'
+import { usePluginStore } from '@/plugin'
 import { pluginName } from '@/symbol'
+import { createDownloadMessage, DcState } from '@/ui'
 
 const isCardMode = shallowRef(true)
 const isSyncing = shallowRef(false)

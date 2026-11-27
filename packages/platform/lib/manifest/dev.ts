@@ -1,0 +1,5 @@
+export const DEV_MANIFEST_PATH = '/manifest.json'
+export const DEV_ENTRY_PATH = '/index.js'
+export const DEV_CSS_PATH = '/index.css'
+export const DEV_INVALIDATE_EVENT = 'delta-comic:plugin-invalidate'
+export const DEV_SESSION_QUERY = 'dc-session'

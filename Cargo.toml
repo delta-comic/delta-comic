@@ -2,13 +2,13 @@
 resolver = "3"
 members = [
   "packages/app/src-tauri",
-  "packages/platform/db",
-  "packages/platform/downloader",
-  "packages/platform/http",
-  "packages/platform/downloader/tools/performance-baseline",
-  "packages/core/logger",
-  "packages/plugin/core",
-  "packages/core/utils",
+  "crates/db",
+  "crates/downloader",
+  "crates/http",
+  "crates/downloader/tools/performance-baseline",
+  "crates/logger",
+  "crates/plugin",
+  "crates/utils",
 ]
 
 [workspace.package]
@@ -59,22 +59,22 @@ tauri = "2.12.5"
 tauri-build = "2.7.4"
 tauri-plugin = "2.7.2"
 tauri-plugin-aptabase = { git = "https://github.com/delta-comic/tauri-plugin-aptabase-rustls", branch = "main" }
-tauri-plugin-http = { path = "packages/platform/http", features = ["multipart", "blocking"] }
+tauri-plugin-http = { path = "crates/http", features = ["multipart", "blocking"] }
 tauri-plugin-clipboard-manager = "2.5.0"
-tauri-plugin-db = { path = "packages/platform/db" }
-tauri-plugin-downloader = { path = "packages/platform/downloader" }
-tauri-plugin-logger = { path = "packages/core/logger" }
+tauri-plugin-db = { path = "crates/db" }
+tauri-plugin-downloader = { path = "crates/downloader" }
+tauri-plugin-logger = { path = "crates/logger" }
 tauri-plugin-fs = "2.7.1"
 tauri-plugin-m3 = "0.3.2"
 tauri-plugin-persisted-scope = "2.4.3"
-tauri-plugin-plugin = { path = "packages/plugin/core" }
+tauri-plugin-plugin = { path = "crates/plugin" }
 tauri-plugin-shell = "2.6.0"
 tauri-plugin-webview-upgrade = { git = "https://github.com/readest/tauri-plugin-webview-upgrade" }
 
 tauri-plugin-sql = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2", features = [
   "sqlite",
 ] }
-tauri-plugin-utils = { path = "packages/core/utils" }
+tauri-plugin-utils = { path = "crates/utils" }
 taurpc = "0.8.2"
 tempfile = "3.27.0"
 thiserror = "2.0.21"

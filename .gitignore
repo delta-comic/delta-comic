@@ -37,8 +37,8 @@ target
 packages/app/public/runtime/
 packages/app/*/public/runtime/
 *.tsbuildinfo
-packages/*/android/.tauri
-packages/*/android/.gradle
+crates/*/android/.tauri
+crates/*/android/.gradle
 
 .test-plugin
 .planning

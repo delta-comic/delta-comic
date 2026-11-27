@@ -1,22 +1,11 @@
-import type { LogEntry, LoggerTransport } from '@delta-comic/logger'
+import {
+  createTauRPCProxy,
+  type LogEntry,
+  type LoggerTransport,
+  type LogFileInfo,
+  type LogFileContent,
+} from '@delta-comic/platform/logger'
 import { isTauri } from '@tauri-apps/api/core'
-
-import { createTauRPCProxy } from './bindings'
-
-interface LogFileInfo {
-  name: string
-  path: string
-  size: number
-  modifiedAt: string
-  archived: boolean
-}
-
-interface LogFileContent {
-  path: string
-  content: string
-  size: number
-  truncated: boolean
-}
 
 interface ExportLogsOptions {
   paths?: string[]

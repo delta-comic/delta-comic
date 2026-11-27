@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'packages/**'
+      - 'crates/**'
       - 'script/android/**'
       - '.github/workflows/lint.yaml'
       - '.editorconfig'
@@ -19,6 +20,7 @@ on:
   pull_request:
     paths:
       - 'packages/**'
+      - 'crates/**'
       - 'script/android/**'
       - '.github/workflows/lint.yaml'
       - '.editorconfig'
@@ -145,7 +147,7 @@ jobs:
         run: |
           chmod +x ./packages/app/src-tauri/gen/android/gradlew
           ./packages/app/src-tauri/gen/android/gradlew \
-            -p packages/platform/downloader/android \
+            -p crates/downloader/android \
             ktlintCheck \
             lintDebug \
             --no-daemon \

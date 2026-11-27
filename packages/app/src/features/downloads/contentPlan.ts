@@ -1,12 +1,12 @@
-import { db } from '@delta-comic/db'
-import type { ContentRefreshContext, EnqueuePlanInput } from '@delta-comic/downloader'
+import { db } from '@delta-comic/platform/db'
+import type { ContentRefreshContext, EnqueuePlanInput } from '@delta-comic/platform/downloader'
 import {
   type UniContentDownloadProvider,
   UniContentPage,
   type UniContentPageLike,
   type UniContentType,
   type UniDownloadPlan,
-} from '@delta-comic/model'
+} from '@delta-comic/platform/model'
 
 async function sha256Hex(value: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))

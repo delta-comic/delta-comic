@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { usePluginStore } from '@delta-comic/plugin'
-import { DcImage, DcTab } from '@delta-comic/ui'
 import { NIcon } from 'naive-ui'
 import { computed, provide, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -9,8 +7,10 @@ import { useRouter } from 'vue-router'
 import userIcon from '@/assets/images/userIcon.webp'
 import MainPageSearchBar from '@/components/home/mainPageSearchBar.vue'
 import { Icons } from '@/components/icons'
+import { usePluginStore } from '@/plugin'
 import { useAppStore } from '@/stores/app'
 import { isShowMainHomeNavBar } from '@/symbol'
+import { DcImage, DcTab } from '@/ui'
 const $router = useRouter()
 const { t } = useI18n()
 const isShowNavBar = shallowRef(true)

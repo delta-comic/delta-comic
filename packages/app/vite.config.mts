@@ -1,6 +1,8 @@
+import { copyFile, mkdir } from 'node:fs/promises'
 import { relative, resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
+import { exposeHostLibraries } from '@delta-comic/platform/vite'
 import { defineConfig } from '@vizejs/vite-plugin/vite-plus'
 import browserslist from 'browserslist'
 import { browserslistToTargets } from 'lightningcss'
@@ -9,34 +11,31 @@ import { defaultClientConditions, lazyPlugins } from 'vite-plus'
 const target = process.env.DELTA_APP_TARGET === 'mobile' ? 'mobile' : 'desktop'
 const isDesktop = target === 'desktop'
 
-export default defineConfig(() => ({
+export default defineConfig(({ mode }) => ({
   define: { __DC_APP_TARGET__: JSON.stringify(target) },
   devtools: { apply: 'serve' },
   plugins: lazyPlugins(async () => {
-    const [
-      { default: tailwindcss },
-      { default: legacy },
-      { default: vueDevTools },
-      { default: VueRouter },
-      { default: swc },
-    ] = await Promise.all([
-      import('@tailwindcss/vite'),
-      import('@vitejs/plugin-legacy'),
-      import('vite-plugin-vue-devtools'),
-      import('vue-router/vite'),
-      import('unplugin-swc'),
-    ])
+    const [{ default: tailwindcss }, { default: vueDevTools }, { default: VueRouter }] =
+      await Promise.all([
+        import('@tailwindcss/vite'),
+        import('vite-plugin-vue-devtools'),
+        import('vue-router/vite'),
+      ])
 
     return [
-      swc.vite({
-        tsconfigFile: 'tsconfig.json',
-        jsc: {
-          externalHelpers: true,
-          parser: { syntax: 'typescript', tsx: true, decorators: true },
-          transform: { decoratorVersion: '2023-11', useDefineForClassFields: true },
+      {
+        name: 'delta-comic:copy-runtime',
+        async buildStart() {
+          if (mode === 'test') return
+          const directory = resolve(import.meta.dirname, 'public/runtime')
+          await mkdir(directory, { recursive: true })
+          await copyFile(
+            fileURLToPath(import.meta.resolve('@delta-comic/runtime')),
+            resolve(directory, 'host-libraries.umd.js'),
+          )
         },
-      }),
-      legacy({ targets: ['ie >= 11'], renderModernChunks: true }),
+      },
+      exposeHostLibraries({ entry: resolve(import.meta.dirname, 'src/index.ts') }),
       VueRouter({
         root: import.meta.dirname,
         routesFolder: {
@@ -82,11 +81,7 @@ export default defineConfig(() => ({
   },
   worker: { format: 'es' },
   base: '/',
-  test: {
-    environment: 'happy-dom',
-    setupFiles: ['./test/setup.ts'],
-    include: ['test/**/*.test.ts'],
-  },
+  test: { environment: 'happy-dom', include: ['test/**/*.test.ts'] },
   server: {
     port: 5173,
     strictPort: true,
@@ -128,13 +123,29 @@ export default defineConfig(() => ({
         command: 'DELTA_APP_TARGET=mobile tauri android dev --config src-tauri/tauri.conf.json',
         cache: false,
       },
-      // dev/tauri/web
-      'dev:web': {
-        command: 'vp dev',
+      'build': { command: 'vp build', dependsOn: ['@delta-comic/runtime#build'], cache: false },
+      'build:web': { command: 'vp run build', cache: false },
+      'build:web:mobile': {
+        command: 'DELTA_APP_TARGET=mobile vp build',
+        dependsOn: ['@delta-comic/runtime#build'],
         cache: false,
-        dependsOn: [{ task: 'build', from: 'dependencies' }],
       },
-      //
+      'build:web:desktop': {
+        command: 'DELTA_APP_TARGET=desktop vp build',
+        dependsOn: ['@delta-comic/runtime#build'],
+        cache: false,
+      },
+      'dev:web:mobile': {
+        command: 'DELTA_APP_TARGET=mobile vp dev',
+        dependsOn: ['@delta-comic/runtime#build:dev'],
+        cache: false,
+      },
+      'dev:web:desktop': {
+        command: 'DELTA_APP_TARGET=desktop vp dev',
+        dependsOn: ['@delta-comic/runtime#build:dev'],
+        cache: false,
+      },
+      'dev:web': { command: 'vp dev', cache: false, dependsOn: ['@delta-comic/runtime#build:dev'] },
       'tauri': { command: 'vp exec tauri', cache: false },
       'typecheck': {
         command: [

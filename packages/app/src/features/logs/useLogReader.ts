@@ -1,4 +1,4 @@
-import { logger } from '@delta-comic/logger'
+import { logger } from '@delta-comic/platform/logger'
 import { computed, onMounted, readonly, shallowRef } from 'vue'
 
 import { TauriLoggerClient } from '@/logger/TauriLoggerClient'

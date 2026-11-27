@@ -1,5 +1,6 @@
-import type { createDownloadMessage } from '@delta-comic/ui'
 import type { RouteRecordRaw } from 'vue-router'
+
+import type { createDownloadMessage } from '@/ui'
 
 export interface PlatformPort {
   openExternal: (url: string) => Promise<void>

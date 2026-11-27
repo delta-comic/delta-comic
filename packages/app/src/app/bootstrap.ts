@@ -1,11 +1,3 @@
-import { useConfig } from '@delta-comic/plugin'
-import {
-  configureUiI18n,
-  createDownloadMessage,
-  DcConfigProvider,
-  type UiMessageKey,
-  type UiMessageParams,
-} from '@delta-comic/ui'
 import { PiniaColada } from '@pinia/colada'
 import { isTauri } from '@tauri-apps/api/core'
 import { listen, TauriEvent } from '@tauri-apps/api/event'
@@ -27,9 +19,9 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createApp, defineComponent, h, vaporInteropPlugin, watch } from 'vue'
 import { DataLoaderPlugin } from 'vue-router/experimental'
 
-import '@/index.css'
 import { i18n } from '@/i18n'
 import { appLogger } from '@/logger'
+import '@/index.css'
 import {
   prepareAppPluginHost,
   disposeAppPluginHost,
@@ -37,7 +29,15 @@ import {
   initializePlatform,
   openExternal,
 } from '@/native'
+import { useConfig } from '@/plugin'
 import { router } from '@/router'
+import {
+  configureUiI18n,
+  createDownloadMessage,
+  DcConfigProvider,
+  type UiMessageKey,
+  type UiMessageParams,
+} from '@/ui'
 
 import AppSetup from './AppSetup.vue'
 

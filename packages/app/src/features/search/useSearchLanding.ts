@@ -1,10 +1,11 @@
-import { useNativeStore } from '@delta-comic/db'
-import { logger } from '@delta-comic/logger'
-import { type Content, usePluginStore } from '@delta-comic/plugin'
-import { SharedFunction } from '@delta-comic/utils'
+import { useNativeStore } from '@delta-comic/platform/db'
+import { logger } from '@delta-comic/platform/logger'
+import { SharedFunction } from '@delta-comic/platform/utils'
 import { computedAsync } from '@vueuse/core'
 import { uniq } from 'es-toolkit'
 import { computed, readonly, shallowRef } from 'vue'
+
+import { type Content, usePluginStore } from '@/plugin'
 
 import { pluginName } from '../../symbol'
 

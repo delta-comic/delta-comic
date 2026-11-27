@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { pluginContext, usePluginStore } from '@delta-comic/plugin'
 import { isEmpty } from 'es-toolkit/compat'
 import { NScrollbar, NIcon } from 'naive-ui'
 import { computed } from 'vue'
@@ -8,6 +7,7 @@ import { useRouter } from 'vue-router'
 
 import HotMainListBlock from '@/components/home/HotMainListBlock.vue'
 import { Icons } from '@/components/icons'
+import { pluginContext, usePluginStore } from '@/plugin'
 
 const $router = useRouter()
 const { t } = useI18n()

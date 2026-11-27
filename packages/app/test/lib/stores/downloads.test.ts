@@ -3,11 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vite-plus/test'
 
 import type { Destination } from '../../../src/features/downloads/downloaderClient'
 
-await vi.hoisted(async () => {
-  // @ts-expect-error The checked-in UMD runtime intentionally has no TypeScript declaration.
-  await import('@delta-comic/runtime/host-libraries.umd.js')
-})
-
 const { client, handlers, sourceRefresh } = vi.hoisted(() => {
   const handlers: Record<string, ((event: unknown) => void) | undefined> = {}
   const task = {
@@ -78,10 +73,10 @@ const { client, handlers, sourceRefresh } = vi.hoisted(() => {
 })
 
 vi.mock('../../../src/features/downloads/downloaderClient', () => ({ downloaderClient: client }))
-vi.mock('@delta-comic/model', () => ({
+vi.mock('@delta-comic/platform/model', () => ({
   UniContentPage: { contentPages: { get: vi.fn() }, downloadProviders: { get: vi.fn() } },
 }))
-vi.mock('@delta-comic/plugin', () => ({ usePluginStore: () => sourceRefresh.pluginStore }))
+vi.mock('@/plugin', () => ({ usePluginStore: () => sourceRefresh.pluginStore }))
 vi.mock('../../../src/features/downloads/contentPlan', () => ({
   getPluginDownloadIdentity: sourceRefresh.getPluginDownloadIdentity,
 }))

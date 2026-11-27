@@ -1,12 +1,13 @@
-import { db, validateReadRow, type PluginArchiveDB } from '@delta-comic/db'
-import { logger } from '@delta-comic/logger'
+import { db, validateReadRow, type PluginArchiveDB } from '@delta-comic/platform/db'
+import { logger } from '@delta-comic/platform/logger'
+import { refDebounced } from '@vueuse/core'
+import { computed, readonly, shallowRef } from 'vue'
+
 import {
   pluginCatalog as defaultCatalog,
   type PluginCatalog,
   type PluginCatalogIndex,
-} from '@delta-comic/plugin'
-import { refDebounced } from '@vueuse/core'
-import { computed, readonly, shallowRef } from 'vue'
+} from '@/plugin'
 
 import {
   filterPluginMarketplaceItems,

@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { SourcedValue, UniItem } from '@delta-comic/model'
-import { usePluginStore } from '@delta-comic/plugin'
-import { DcVar, DcList } from '@delta-comic/ui'
+import { SourcedValue, UniItem } from '@delta-comic/platform/model'
 import { useQuery } from '@pinia/colada'
 import { NPageHeader, NPopselect, NButton } from 'naive-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+
+import { usePluginStore } from '@/plugin'
+import { DcVar, DcList } from '@/ui'
 
 const $router = useRouter()
 const $route = useRoute<'/hot/[plugin]'>()

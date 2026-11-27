@@ -5,7 +5,4 @@
 @import 'tailwindcss/preflight.css' layer(base);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
-@plugin '@delta-comic/ui/tailwind';
-
-@import '@delta-comic/ui/style.css';
-@import '../tailwind.css';
+@plugin '../tailwind/index.ts';

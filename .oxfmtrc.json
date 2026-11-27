@@ -5,7 +5,7 @@
     "bindings.ts",
     "**/permissions/**",
     "*.md",
-    "packages/app/*/public/runtime/**"
+    "packages/app/public/runtime/**"
   ],
   "endOfLine": "lf",
   "semi": false,

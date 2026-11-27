@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { UniItem } from '@delta-comic/model'
-import { Core, useConfig, usePluginStore, type Content } from '@delta-comic/plugin'
-import { DcImage, DcList } from '@delta-comic/ui'
-import { SharedFunction } from '@delta-comic/utils'
+import { UniItem } from '@delta-comic/platform/model'
+import { SharedFunction } from '@delta-comic/platform/utils'
 import { useInfiniteQuery } from '@pinia/colada'
 import { isEmpty } from 'es-toolkit/compat'
 import { NPopselect, NButton, NIcon, NSwitch, NResult } from 'naive-ui'
@@ -14,6 +12,8 @@ import noneSearchTextIcon from '@/assets/images/none-search-text-icon.webp'
 import { Icons } from '@/components/icons'
 import SearchBar from '@/components/search/searchBar.vue'
 import { searchSourceKey } from '@/components/search/source'
+import { Core, useConfig, usePluginStore, type Content } from '@/plugin'
+import { DcImage, DcList } from '@/ui'
 
 const route = useRoute<'/search/[keyword]/[sort]/[method]'>()
 const pluginStore = usePluginStore()

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const isDesktop = __DC_APP_TARGET__ === 'desktop'
 
-import { type UniContentPage, type UniEp } from '@delta-comic/model'
+import { type UniContentPage, type UniEp } from '@delta-comic/platform/model'
 import {
   NAlert,
   NButton,

@@ -11,6 +11,7 @@
   "types": "./dist/index.d.mts",
   "exports": {
     "./vite": {
+      "delta-comic-workspace": "./lib/vite.ts",
       "types": "./dist/vite.d.mts",
       "import": "./dist/vite.mjs"
     },
@@ -18,37 +19,27 @@
       "delta-comic-workspace": "./lib/index.ts",
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
-    },
-    "./manifest": {
-      "types": "./dist/manifest.d.mts",
-      "import": "./dist/manifest.mjs"
-    },
-    "./ui": {
-      "types": "./dist/ui.d.mts",
-      "import": "./dist/ui.mjs"
-    },
-    "./network": {
-      "types": "./dist/network.d.mts",
-      "import": "./dist/network.mjs"
     }
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
+    "@tauri-apps/api": "catalog:",
+    "acorn": "catalog:",
     "cordis": "catalog:",
+    "dayjs": "catalog:",
+    "es-module-lexer": "catalog:",
+    "es-toolkit": "catalog:",
+    "jszip": "catalog:",
     "kysely": "catalog:",
+    "magic-string": "catalog:",
+    "semver": "catalog:",
+    "taurpc": "catalog:",
     "typebox": "catalog:"
   },
   "devDependencies": {
-    "@delta-comic/db": "workspace:",
-    "@delta-comic/downloader": "workspace:",
-    "@delta-comic/manifest": "workspace:",
-    "@delta-comic/model": "workspace:",
-    "@delta-comic/plugin-vite": "workspace:",
-    "@delta-comic/ui": "workspace:",
-    "@delta-comic/utils": "workspace:",
-    "unplugin-swc": "catalog:",
+    "@delta-comic/platform": "workspace:",
     "vue": "catalog:"
   },
   "peerDependencies": {

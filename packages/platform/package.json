@@ -1,0 +1,67 @@
+{
+  "name": "@delta-comic/platform",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./db": {
+      "types": "./dist/lib/db/index.d.ts",
+      "default": "./lib/db/index.ts"
+    },
+    "./downloader": {
+      "types": "./dist/lib/downloader/index.d.ts",
+      "default": "./lib/downloader/index.ts"
+    },
+    "./http": {
+      "types": "./dist/lib/http/index.d.ts",
+      "default": "./lib/http/index.ts"
+    },
+    "./logger": {
+      "types": "./dist/lib/logger/index.d.ts",
+      "default": "./lib/logger/index.ts"
+    },
+    "./manifest": {
+      "types": "./dist/lib/manifest/index.d.ts",
+      "default": "./lib/manifest/index.ts"
+    },
+    "./model": {
+      "types": "./dist/lib/model/index.d.ts",
+      "default": "./lib/model/index.ts"
+    },
+    "./utils": {
+      "types": "./dist/lib/utils/index.d.ts",
+      "default": "./lib/utils/index.ts"
+    },
+    "./manifest/dev": {
+      "types": "./dist/lib/manifest/dev.d.ts",
+      "default": "./lib/manifest/dev.ts"
+    },
+    "./vite": {
+      "types": "./dist/vite/index.d.ts",
+      "default": "./vite/index.ts"
+    }
+  },
+  "dependencies": {
+    "@pinia/colada": "catalog:",
+    "@tauri-apps/api": "catalog:",
+    "@tauri-apps/plugin-sql": "catalog:",
+    "acorn": "catalog:",
+    "dayjs": "catalog:",
+    "es-module-lexer": "catalog:",
+    "es-toolkit": "catalog:",
+    "kysely": "catalog:",
+    "kysely-dialect-tauri": "catalog:",
+    "kysely-plugin-serialize": "catalog:",
+    "kysely-wasqlite-worker": "catalog:",
+    "magic-string": "catalog:",
+    "mitt": "catalog:",
+    "naive-ui": "catalog:",
+    "semver": "catalog:",
+    "taurpc": "catalog:",
+    "typebox": "catalog:",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "devDependencies": {
+    "@types/semver": "catalog:"
+  }
+}

@@ -1,9 +1,7 @@
 <script setup lang="ts">
 const isDesktop = __DC_APP_TARGET__ === 'desktop'
 
-import { HistoryDB, useNativeStore } from '@delta-comic/db'
-import { Core, useConfig } from '@delta-comic/plugin'
-import { DcState, DcWaterfall, DcCellGroup, DcCell } from '@delta-comic/ui'
+import { HistoryDB, useNativeStore } from '@delta-comic/platform/db'
 import { useDialog, NIcon, NPopconfirm, NButton, NDrawer, NSwitch } from 'naive-ui'
 import { shallowRef, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -13,7 +11,9 @@ import Action from '@/components/listAction.vue'
 import Searcher from '@/components/listSearcher.vue'
 import HistoryCard from '@/components/user/historyCard.vue'
 import Layout from '@/components/user/userLayout.vue'
+import { Core, useConfig } from '@/plugin'
 import { pluginName } from '@/symbol'
+import { DcState, DcWaterfall, DcCellGroup, DcCell } from '@/ui'
 
 const { state: historiesState } = HistoryDB.useQuery(
   db =>

@@ -1,4 +1,4 @@
-import type { UniContentDownloadSelection } from '@delta-comic/model'
+import type { UniContentDownloadSelection } from '@delta-comic/platform/model'
 
 import type { Destination } from './downloaderClient'
 
