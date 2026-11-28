@@ -1,4 +1,4 @@
-import { readdir, readFile } from 'node:fs/promises'
+import { glob, readdir, readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 
 import type { CIConfig } from './config'
@@ -82,17 +82,27 @@ function sortByWorkspaceDependencies(packages: PublishableWorkspacePackage[]) {
 
 export class ReleaseWorkspace {
   private readonly cwd: string
-  private readonly roots: readonly string[]
+  private readonly config: NonNullable<CIConfig['workspace']>
 
   constructor(cwd = rootDir, config: CIConfig['workspace'] = {}) {
     this.cwd = cwd
-    this.roots = config?.roots?.length ? config.roots : ['packages']
+    this.config = config
   }
 
   private async loadPackages() {
     const packages: LoadedWorkspacePackage[] = []
 
-    for (const root of this.roots) {
+    if (this.config.manifests) {
+      for await (const path of glob([...this.config.manifests], { cwd: this.cwd })) {
+        const manifest = JSON.parse(
+          await readFile(join(this.cwd, path), 'utf-8'),
+        ) as WorkspaceManifest
+        packages.push({ manifest, path })
+      }
+      return packages
+    }
+
+    for (const root of this.config.roots?.length ? this.config.roots : ['packages']) {
       const packagesDir = join(this.cwd, root)
       for (const manifestPath of await findPackageManifests(packagesDir)) {
         const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as WorkspaceManifest
