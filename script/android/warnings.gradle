@@ -28,8 +28,10 @@ allprojects { target ->
     ['com.android.application', 'com.android.library'].each { pluginId ->
         target.plugins.withId(pluginId) {
             target.extensions.getByName('androidComponents').finalizeDsl { android ->
-                android.compileOptions.sourceCompatibility = JavaVersion.VERSION_17
-                android.compileOptions.targetCompatibility = JavaVersion.VERSION_17
+                android.compileSdk = 37
+                android.buildToolsVersion = '37.0.0'
+                android.compileOptions.sourceCompatibility = JavaVersion.VERSION_21
+                android.compileOptions.targetCompatibility = JavaVersion.VERSION_21
 
                 if (target.name == 'tauri-plugin-m3') {
                     def rules = new File(repositoryDir, 'script/android/m3-consumer-rules.pro')
@@ -62,7 +64,7 @@ allprojects { target ->
                 }
             }
             target.tasks.matching { it.name ==~ /compile.*Kotlin/ }.configureEach {
-                compilerOptions.jvmTarget.set(compilerOptions.jvmTarget.get().values().find { it.target == '17' })
+                compilerOptions.jvmTarget.set(compilerOptions.jvmTarget.get().values().find { it.target == '21' })
             }
         }
     }

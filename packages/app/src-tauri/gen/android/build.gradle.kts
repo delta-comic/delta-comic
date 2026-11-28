@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.11.0")
+        classpath("com.android.tools.build:gradle:9.5.3")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.21")
     }
 }

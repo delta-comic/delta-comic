@@ -12,7 +12,7 @@ ktlint {
 
 android {
     namespace = "org.deltacomic.downloader"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 26
@@ -31,21 +31,21 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
 dependencies {
-    implementation("androidx.activity:activity-ktx:1.10.1")
-    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.activity:activity-ktx:1.13.0")
+    implementation("androidx.core:core-ktx:1.19.1")
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.work:work-runtime-ktx:2.12.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.23.0")
     implementation(project(":tauri-android"))
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
 }
 
 apply(from = "../../../script/android/warnings.gradle")
