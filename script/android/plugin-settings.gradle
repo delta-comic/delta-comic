@@ -1,0 +1,14 @@
+// These upstream modules still set jvmTarget through the removed kotlinOptions DSL.
+[':tauri-plugin-m3', ':tauri-plugin-webview-upgrade'].collect { findProject(it) }.findAll().each { plugin ->
+    def original = new File(plugin.projectDir, 'build.gradle.kts')
+    def patched = new File(settingsDir, "build/android-patches/${plugin.name}.gradle.kts")
+    def source = original.getText('UTF-8').replace('''    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+''', '')
+    patched.parentFile.mkdirs()
+    if (!patched.exists() || patched.getText('UTF-8') != source) {
+        patched.setText(source, 'UTF-8')
+    }
+    plugin.buildFileName = plugin.projectDir.toPath().relativize(patched.toPath()).toString()
+}
