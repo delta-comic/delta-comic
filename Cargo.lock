@@ -6691,7 +6691,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-webview-upgrade"
 version = "0.1.0"
-source = "git+https://github.com/readest/tauri-plugin-webview-upgrade#23cf2076808b929af65db0a5a6ec2c456550928c"
+source = "git+https://github.com/readest/tauri-plugin-webview-upgrade#5b8b8c88f04e8a28a47f5252e05a3043ad65f2ab"
 dependencies = [
  "tauri",
  "tauri-plugin",
