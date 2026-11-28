@@ -4130,7 +4130,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d8fae84b431384b68627d0f9b3b1245fcf9f46f6c0e3dc902e9dce64edd1967"
 dependencies = [
  "libc",
- "windows-sys 0.48.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -6655,7 +6655,7 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-sql"
 version = "2.6.0"
-source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v2#9aa4f717152cdeceed4bada9c849ad68a9dc402c"
+source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v2#4140767e222a299eb1b2a1ac98f529151e37dfc6"
 dependencies = [
  "futures-core",
  "indexmap 2.14.2",
@@ -7821,7 +7821,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
