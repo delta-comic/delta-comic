@@ -37,6 +37,6 @@ export default defineConfig({
     'tauri-plugin-plugin',
     'tauri-plugin-utils',
   ],
-  workspace: { roots: ['packages', 'script/manager'] },
+  workspace: { manifests: ['packages/*/package.json', 'script/*/package.json'] },
   registry: 'https://npm.pkg.github.com/',
 })

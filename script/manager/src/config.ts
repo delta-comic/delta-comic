@@ -8,7 +8,7 @@ export interface CIConfig {
   jsonVersionPaths?: readonly string[]
   cargoTomlVersionPaths?: readonly (readonly [string, 'package' | 'workspace.package'])[]
   cargoLockPackageNames?: readonly string[]
-  workspace?: { roots?: readonly string[] }
+  workspace?: { roots?: readonly string[]; manifests?: readonly string[] }
   buildCommand?: { command: string; args?: readonly string[] }
   publishCommand?: { command: string; args?: readonly string[] }
   registry?: string

@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from 'node:fs/promises'
+import { glob, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { valid } from 'semver'
@@ -28,6 +28,15 @@ export class VersionSynchronizer {
 
   private async versionedJsonPaths() {
     const paths = new Set<string>(this.config.jsonVersionPaths ?? ['package.json'])
+    if (this.config.workspace?.manifests) {
+      for await (const path of glob([...this.config.workspace.manifests], { cwd: this.cwd })) {
+        const manifest = JSON.parse(await readFile(join(this.cwd, path), 'utf-8')) as {
+          private?: boolean
+        }
+        if (manifest.private !== true) paths.add(path)
+      }
+      return [...paths]
+    }
     const packageRoots = this.config.workspace?.roots ?? ['packages']
 
     const visit = async (directory: string) => {
