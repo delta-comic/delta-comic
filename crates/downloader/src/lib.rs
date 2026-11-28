@@ -21,7 +21,6 @@ mod persistence;
 #[cfg(any(target_os = "android", test))]
 mod saf_contract;
 mod target_file;
-mod torrent;
 
 pub use commands::DownloaderEventTrigger;
 
@@ -172,6 +171,6 @@ pub trait DownloaderExt<R: Runtime> {
 
 impl<R: Runtime> DownloaderExt<R> for AppHandle<R> {
   fn downloader(&self) -> DownloaderHandle {
-    self.state::<engine::Engine>().handle()
+    self.state::<std::sync::Arc<engine::Engine>>().handle()
   }
 }

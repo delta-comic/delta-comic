@@ -6,7 +6,7 @@ import { useI18n } from 'vue-i18n'
 
 import Layout from '@/components/user/userLayout.vue'
 import type {
-  AddDownloadRequest,
+  EnqueueUrlInput,
   DownloadTask,
   DownloaderSettings,
 } from '@/features/downloads/downloaderClient'
@@ -56,10 +56,9 @@ async function perform(operation: () => Promise<unknown>) {
   }
 }
 
-async function addDownload(request: AddDownloadRequest) {
+async function addDownload(request: EnqueueUrlInput) {
   await perform(async () => {
-    if (request.type === 'http') await store.enqueueUrl(request.input)
-    else await store.enqueueTorrent(request.input)
+    await store.enqueueUrl(request)
     showAdd.value = false
     message.success(t('download.messages.added'))
   })

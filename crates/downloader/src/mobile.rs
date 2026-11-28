@@ -2,7 +2,7 @@ use std::{
   ffi::c_void,
   fs::File,
   os::fd::FromRawFd,
-  path::PathBuf,
+  path::Path,
   sync::{Arc, Mutex, OnceLock, RwLock},
 };
 
@@ -36,7 +36,7 @@ type MobileEventSink = Arc<dyn Fn(EngineEvent) + Send + Sync>;
 
 #[derive(Clone)]
 struct RegisteredEngine {
-  engine: Engine,
+  engine: Arc<Engine>,
   config: AndroidEngineConfig,
 }
 
@@ -130,7 +130,7 @@ fn emit_event(event: EngineEvent) {
 pub(crate) async fn open_or_reuse_engine(
   config: AndroidEngineConfig,
   secret_resolver: Option<Arc<dyn SecretResolver>>,
-) -> crate::Result<Engine> {
+) -> crate::Result<Arc<Engine>> {
   if let Some(secret_resolver) = secret_resolver {
     *SECRET_RESOLVER
       .get_or_init(|| RwLock::new(None))
@@ -152,8 +152,8 @@ pub(crate) async fn open_or_reuse_engine(
   }
 
   let engine = Engine::open(
-    &PathBuf::from(&config.database_path),
-    &PathBuf::from(&config.download_dir),
+    Path::new(&config.database_path),
+    Path::new(&config.download_dir),
     Some(Arc::new(MobileSecretResolver)),
     emit_event,
   )
@@ -200,7 +200,7 @@ impl<R: Runtime> MobileDownloader<R> {
 
   pub(crate) fn schedule(
     &self,
-    task_id: String,
+    task_id: &str,
     estimated_bytes: Option<u64>,
     allow_metered: bool,
   ) -> Result<AndroidNotificationPermission, String> {
@@ -226,11 +226,7 @@ impl<R: Runtime> MobileDownloader<R> {
       .map_err(|error| format!("failed to select Android download destination: {error}"))
   }
 
-  pub(crate) fn delete_exported(
-    &self,
-    tree_uri: String,
-    document_uri: String,
-  ) -> Result<(), String> {
+  pub(crate) fn delete_exported(&self, tree_uri: &str, document_uri: &str) -> Result<(), String> {
     let response = self
       .handle
       .run_mobile_plugin::<AndroidDeleteExportResponse>(
@@ -586,7 +582,6 @@ pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_getSafExportI
           "treeUri": instruction.tree_uri,
           "relativePath": instruction.relative_path,
           "stagingPath": instruction.staging_path,
-          "isDirectory": instruction.is_directory,
         })
         .to_string();
         env
@@ -758,16 +753,14 @@ pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_bootstrap(
         let Ok(download_dir): Result<String, _> = download_dir.try_to_string(env) else {
           return Ok(2);
         };
-        let config = match AndroidEngineConfig::new(
-          PathBuf::from(database_path).as_path(),
-          PathBuf::from(download_dir).as_path(),
-        ) {
-          Ok(config) => config,
-          Err(error) => {
-            tracing::error!("Android downloader bootstrap rejected its configuration: {error}");
-            return Ok(2);
-          }
-        };
+        let config =
+          match AndroidEngineConfig::new(Path::new(&database_path), Path::new(&download_dir)) {
+            Ok(config) => config,
+            Err(error) => {
+              tracing::error!("Android downloader bootstrap rejected its configuration: {error}");
+              return Ok(2);
+            }
+          };
         if let Err(error) = register_system_secret_resolver_if_missing() {
           tracing::error!("Android credential store initialization failed: {error}");
           return Ok(1);

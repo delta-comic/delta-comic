@@ -43,7 +43,6 @@ export const activeDownloadStatuses = new Set<DownloadTask['status']>([
   'probing',
   'downloading',
   'verifying',
-  'seeding',
 ])
 
 export const resumableDownloadStatuses = new Set<DownloadTask['status']>([

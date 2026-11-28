@@ -10,7 +10,6 @@ import {
   type DownloadTask,
   type DownloadTaskDetail,
   type EnqueuePlanInput,
-  type EnqueueTorrentInput,
   type EnqueueUrlInput,
   type TaskAttention,
   type TaskRemovedEvent,
@@ -27,13 +26,8 @@ export type {
   DownloaderSettings,
   DownloaderCapabilities,
   EnqueuePlanInput,
-  EnqueueTorrentInput,
   EnqueueUrlInput,
 }
-
-export type AddDownloadRequest =
-  | { input: EnqueueTorrentInput; type: 'torrent' }
-  | { input: EnqueueUrlInput; type: 'http' }
 
 export type DownloadTaskUpsertEvent = TaskUpsertEvent
 export type DownloadTaskRemovedEvent = TaskRemovedEvent

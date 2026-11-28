@@ -115,14 +115,6 @@ const eta = computed(() => (props.task ? formatDuration(taskEta(props.task)) : u
               >{{ task.checksum.algorithm }}:{{ task.checksum.value }}</span
             >
           </NDescriptionsItem>
-          <template v-if="task.kind === 'torrent' && detail?.torrent">
-            <NDescriptionsItem :label="t('download.detail.uploaded')">
-              {{ formatBytes(detail.torrent.uploadedBytes) }}
-            </NDescriptionsItem>
-            <NDescriptionsItem :label="t('download.detail.peers')">
-              {{ detail.torrent.peerCount }}
-            </NDescriptionsItem>
-          </template>
         </NDescriptions>
 
         <section

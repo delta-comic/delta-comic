@@ -73,9 +73,7 @@ export type DownloadCollection = {
 
 export type DownloadSource = {
 	type: "http",
-} & HttpSource | {
-	type: "torrent",
-} & TorrentSource;
+} & HttpSource;
 
 export type DownloadTask = {
 	id: string,
@@ -107,7 +105,6 @@ export type DownloadTask = {
 export type DownloadTaskDetail = {
 	task: DownloadTask,
 	completedRanges: ByteRange[],
-	torrent: TorrentTaskDetail | null,
 };
 
 export type DownloaderCapabilities = {
@@ -120,9 +117,6 @@ export type DownloaderSettings = {
 	connectionBudget: number,
 	perTaskConnections: number,
 	allowMetered: boolean,
-	seedOnComplete: boolean,
-	seedRatio: number | null,
-	seedSeconds: number | null,
 	revision: number,
 };
 
@@ -133,14 +127,6 @@ export type EnqueuePlanInput = {
 	destinationId: string | null,
 	priority: number | null,
 	refreshContext: ContentRefreshContext | null,
-};
-
-export type EnqueueTorrentInput = {
-	source: TorrentSource,
-	title: string | null,
-	relativePath: string | null,
-	destinationId: string | null,
-	priority: number | null,
 };
 
 export type EnqueueUrlInput = {
@@ -174,39 +160,22 @@ export type Result<T, E> = {
 	err: E,
 };
 
-export type SeedPolicy = { mode: "none" } | { mode: "ratio"; ratio: number | null } | { mode: "duration"; duration_seconds: number } | { mode: "ratioOrDuration"; ratio: number | null; duration_seconds: number };
-
-export type TaskKind = "http" | "torrent";
+export type TaskKind = "http";
 
 export type TaskRemovedEvent = {
 	taskId: string,
 	revision: number,
 };
 
-export type TaskStatus = "queued" | "probing" | "downloading" | "waitingForNetwork" | "waitingForSource" | "paused" | "verifying" | "seeding" | "completed" | "failed" | "cancelled";
+export type TaskStatus = "queued" | "probing" | "downloading" | "waitingForNetwork" | "waitingForSource" | "paused" | "verifying" | "completed" | "failed" | "cancelled";
 
 export type TaskUpsertEvent = {
 	task: DownloadTask,
 	revision: number,
 };
+const ARGS_MAP = {"downloader":{"attention":["event"],"cancel_task":["id"],"delete_secret":["secret_ref"],"delete_task_files":["id"],"download_ephemeral":["url","headers","secret_ref","max_bytes"],"enqueue_plan":["input"],"enqueue_url":["input"],"forget_task":["id"],"get_capabilities":[],"get_collections":[],"get_settings":[],"get_task_detail":["id"],"list_destinations":[],"list_tasks":[],"move_queue":["id","before_task_id"],"pause_task":["id"],"pick_destination":[],"resume_task":["id"],"retry_task":["id"],"set_priority":["id","priority"],"store_secret":["value"],"task_removed":["event"],"task_upsert":["event"],"update_settings":["settings"],"update_source":["id","source"]}};
 
-export type TorrentInput = { type: "magnet"; uri: string } | { type: "url"; url: string } | { type: "bytes"; base64: string };
-
-export type TorrentSource = {
-	input: TorrentInput,
-	onlyFiles?: number[],
-	seedPolicy: SeedPolicy | null,
-};
-
-export type TorrentTaskDetail = {
-	infoHash: string | null,
-	uploadedBytes: number,
-	peerCount: number,
-	seedStartedAt: number | null,
-};
-const ARGS_MAP = {"downloader":{"attention":["event"],"cancel_task":["id"],"delete_secret":["secret_ref"],"delete_task_files":["id"],"download_ephemeral":["url","headers","secret_ref","max_bytes"],"enqueue_plan":["input"],"enqueue_torrent":["input"],"enqueue_url":["input"],"forget_task":["id"],"get_capabilities":[],"get_collections":[],"get_settings":[],"get_task_detail":["id"],"list_destinations":[],"list_tasks":[],"move_queue":["id","before_task_id"],"pause_task":["id"],"pick_destination":[],"resume_task":["id"],"retry_task":["id"],"set_priority":["id","priority"],"store_secret":["value"],"task_removed":["event"],"task_upsert":["event"],"update_settings":["settings"],"update_source":["id","source"]}};
-
-const RESULT_MAP = {"downloader":{"attention":false,"cancel_task":true,"delete_secret":true,"delete_task_files":true,"download_ephemeral":true,"enqueue_plan":true,"enqueue_torrent":true,"enqueue_url":true,"forget_task":true,"get_capabilities":true,"get_collections":true,"get_settings":true,"get_task_detail":true,"list_destinations":true,"list_tasks":true,"move_queue":true,"pause_task":true,"pick_destination":true,"resume_task":true,"retry_task":true,"set_priority":true,"store_secret":true,"task_removed":false,"task_upsert":false,"update_settings":true,"update_source":true}};
+const RESULT_MAP = {"downloader":{"attention":false,"cancel_task":true,"delete_secret":true,"delete_task_files":true,"download_ephemeral":true,"enqueue_plan":true,"enqueue_url":true,"forget_task":true,"get_capabilities":true,"get_collections":true,"get_settings":true,"get_task_detail":true,"list_destinations":true,"list_tasks":true,"move_queue":true,"pause_task":true,"pick_destination":true,"resume_task":true,"retry_task":true,"set_priority":true,"store_secret":true,"task_removed":false,"task_upsert":false,"update_settings":true,"update_source":true}};
 
 export type Router = {
 	downloader: {
@@ -216,7 +185,6 @@ export type Router = {
 		delete_task_files: (id: string) => Promise<null>,
 		download_ephemeral: (url: string, headers: { [key in string]: string } | null, secretRef: string | null, maxBytes: number | null) => Promise<number[]>,
 		enqueue_plan: (input: EnqueuePlanInput) => Promise<DownloadTask[]>,
-		enqueue_torrent: (input: EnqueueTorrentInput) => Promise<DownloadTask>,
 		enqueue_url: (input: EnqueueUrlInput) => Promise<DownloadTask>,
 		forget_task: (id: string) => Promise<null>,
 		get_capabilities: () => Promise<DownloaderCapabilities>,

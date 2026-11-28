@@ -1,12 +1,11 @@
 use std::path::Path;
 
 use super::*;
-use crate::domain::{HttpSource, TorrentInput, TorrentSource};
 
 #[test]
 fn serializes_the_kotlin_schedule_request_contract() {
   let request = AndroidScheduleRequest {
-    task_id: "task-1".into(),
+    task_id: "task-1",
     estimated_bytes: Some(42),
     allow_metered: false,
   };
@@ -62,51 +61,4 @@ fn serializes_versioned_absolute_headless_engine_configuration() {
     })
   );
   assert!(AndroidEngineConfig::new(Path::new("relative.sqlite"), Path::new("/absolute")).is_err());
-}
-
-#[test]
-fn any_torrent_that_can_seed_requires_an_unmetered_android_job() {
-  let mut settings = DownloaderSettings::platform_default();
-  settings.allow_metered = true;
-  let http = DownloadSource::Http(HttpSource {
-    mirrors: Vec::new(),
-    expected_size: None,
-    etag: None,
-    last_modified: None,
-    expires_at: None,
-  });
-  let torrent = |seed_policy| {
-    DownloadSource::Torrent(TorrentSource {
-      input: TorrentInput::Magnet {
-        uri: "magnet:?xt=urn:btih:test".into(),
-      },
-      only_files: Vec::new(),
-      seed_policy,
-    })
-  };
-
-  assert!(android_task_allows_metered_network(&http, &settings));
-  assert!(android_task_allows_metered_network(
-    &torrent(None),
-    &settings
-  ));
-  settings.seed_on_complete = true;
-  settings.seed_ratio = Some(1.0);
-  assert!(!android_task_allows_metered_network(
-    &torrent(None),
-    &settings
-  ));
-  settings.seed_ratio = None;
-  assert!(!android_task_allows_metered_network(
-    &torrent(Some(SeedPolicy::Duration {
-      duration_seconds: 60,
-    })),
-    &settings
-  ));
-  assert!(android_task_allows_metered_network(
-    &torrent(Some(SeedPolicy::None)),
-    &settings
-  ));
-  settings.allow_metered = false;
-  assert!(!android_task_allows_metered_network(&http, &settings));
 }

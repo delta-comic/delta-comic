@@ -2,8 +2,6 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-use crate::domain::{DownloadSource, DownloaderSettings, SeedPolicy};
-
 pub(crate) const ANDROID_ENGINE_CONFIG_VERSION: u32 = 1;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -32,8 +30,8 @@ impl AndroidEngineConfig {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct AndroidScheduleRequest {
-  pub(crate) task_id: String,
+pub(crate) struct AndroidScheduleRequest<'a> {
+  pub(crate) task_id: &'a str,
   pub(crate) estimated_bytes: Option<u64>,
   pub(crate) allow_metered: bool,
 }
@@ -50,27 +48,6 @@ pub(crate) enum AndroidNotificationPermission {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct AndroidScheduleResponse {
   pub(crate) notification_permission: AndroidNotificationPermission,
-}
-
-pub(crate) fn android_task_allows_metered_network(
-  source: &DownloadSource,
-  settings: &DownloaderSettings,
-) -> bool {
-  settings.allow_metered && !torrent_may_seed(source, settings)
-}
-
-fn torrent_may_seed(source: &DownloadSource, settings: &DownloaderSettings) -> bool {
-  if !settings.seed_on_complete {
-    return false;
-  }
-  let DownloadSource::Torrent(source) = source else {
-    return false;
-  };
-  match source.seed_policy.as_ref() {
-    Some(SeedPolicy::None) => false,
-    Some(_) => true,
-    None => settings.seed_ratio.is_some() || settings.seed_seconds.is_some(),
-  }
 }
 
 #[cfg(test)]

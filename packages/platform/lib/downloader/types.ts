@@ -1,4 +1,4 @@
-export type TaskKind = 'http' | 'torrent'
+export type TaskKind = 'http'
 
 export type TaskStatus =
   | 'queued'
@@ -8,7 +8,6 @@ export type TaskStatus =
   | 'waitingForSource'
   | 'paused'
   | 'verifying'
-  | 'seeding'
   | 'completed'
   | 'failed'
   | 'cancelled'
@@ -33,25 +32,7 @@ export type HttpSource = {
   expiresAt?: number
 }
 
-export type TorrentInput =
-  | { type: 'magnet'; uri: string }
-  | { type: 'url'; url: string }
-  | { type: 'bytes'; base64: string }
-
-export type SeedPolicy =
-  | { mode: 'none' }
-  | { mode: 'ratio'; ratio: number }
-  | { mode: 'duration'; durationSeconds: number }
-  | { mode: 'ratioOrDuration'; ratio: number; durationSeconds: number }
-
-export type TorrentSource = {
-  type: 'torrent'
-  input: TorrentInput
-  onlyFiles?: number[]
-  seedPolicy?: SeedPolicy
-}
-
-export type DownloadSource = HttpSource | TorrentSource
+export type DownloadSource = HttpSource
 
 export type DownloadTask = {
   id: string
@@ -105,18 +86,7 @@ export type ContentRefreshContext = {
 
 export type ByteRange = { start: number; end: number }
 
-export type TorrentTaskDetail = {
-  infoHash?: string
-  uploadedBytes: number
-  peerCount: number
-  seedStartedAt?: number
-}
-
-export type DownloadTaskDetail = {
-  task: DownloadTask
-  completedRanges: ByteRange[]
-  torrent?: TorrentTaskDetail
-}
+export type DownloadTaskDetail = { task: DownloadTask; completedRanges: ByteRange[] }
 
 export type DownloadAsset = {
   key: string
@@ -145,22 +115,11 @@ export type EnqueueUrlInput = {
   mirrors?: HttpMirror[]
 }
 
-export type EnqueueTorrentInput = {
-  source: Omit<TorrentSource, 'type'>
-  title?: string
-  relativePath?: string
-  destinationId?: string
-  priority?: number
-}
-
 export type DownloaderSettings = {
   maxActiveTasks: number
   connectionBudget: number
   perTaskConnections: number
   allowMetered: boolean
-  seedOnComplete: boolean
-  seedRatio?: number
-  seedSeconds?: number
   revision: number
 }
 

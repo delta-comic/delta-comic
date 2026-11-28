@@ -48,7 +48,6 @@ kysely
 Levelboard
 lhlyu
 libappindicator
-librqbit
 librsvg
 libwebkit
 lightningcss
@@ -80,6 +79,7 @@ Popconfirm
 Popselect
 preboot
 previewable
+rangemap
 Redirections
 Refreshable
 releaserc

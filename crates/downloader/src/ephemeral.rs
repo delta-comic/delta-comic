@@ -101,7 +101,8 @@ async fn download_in_workspace(
   let payload_path = workspace.join("payload.part");
   let repository = Repository::memory().await?;
   let settings = DownloaderSettings::platform_default();
-  let task = initialize_task(&repository, workspace, source.clone(), &settings).await?;
+  let task = initialize_task(&repository, workspace, source, &settings).await?;
+  let DownloadSource::Http(source) = &task.source;
 
   let mut attempts = 0_u8;
   loop {
@@ -110,11 +111,11 @@ async fn download_in_workspace(
       http::DownloadRequest {
         repository: &repository,
         task: &task,
-        source: &source,
+        source,
         settings: &settings,
         temp_path: &payload_path,
         target_file: None,
-        cancellation: cancellation.clone(),
+        cancellation: &cancellation,
         secret_resolver: secret_resolver.map(Arc::as_ref),
         maximum_bytes: Some(maximum_bytes),
         progress: None,

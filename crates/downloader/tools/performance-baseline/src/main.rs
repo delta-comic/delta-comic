@@ -388,9 +388,6 @@ fn run_case(config: &Config, shards: u8, tasks: u8) -> ToolResult<CaseReport> {
     connection_budget,
     per_task_connections: shards,
     allow_metered: true,
-    seed_on_complete: false,
-    seed_ratio: None,
-    seed_seconds: None,
     revision: 0,
   };
   tauri::async_runtime::block_on(downloader.update_settings(settings))?;

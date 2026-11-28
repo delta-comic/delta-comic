@@ -21,6 +21,7 @@ export default defineConfig({
     'package.json',
     'script/manager/package.json',
     'packages/app/package.json',
+    'packages/platform/package.json',
     'packages/sdk/package.json',
     'packages/app/src-tauri/tauri.conf.json',
   ],

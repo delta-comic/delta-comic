@@ -11,9 +11,9 @@ pub(crate) struct AndroidPickedDestination {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct AndroidDeleteExportRequest {
-  pub(crate) tree_uri: String,
-  pub(crate) document_uri: String,
+pub(crate) struct AndroidDeleteExportRequest<'a> {
+  pub(crate) tree_uri: &'a str,
+  pub(crate) document_uri: &'a str,
 }
 
 #[derive(Debug, Deserialize, PartialEq, Eq)]

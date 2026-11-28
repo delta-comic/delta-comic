@@ -37,9 +37,6 @@ const form = reactive({
   connectionBudget: 16,
   maxActiveTasks: 4,
   perTaskConnections: 8,
-  seedMinutes: undefined as number | undefined,
-  seedOnComplete: false,
-  seedRatio: undefined as number | undefined,
 })
 
 watch(
@@ -49,10 +46,6 @@ watch(
     form.connectionBudget = Math.min(settings.connectionBudget, connectionBudgetMax)
     form.maxActiveTasks = settings.maxActiveTasks
     form.perTaskConnections = settings.perTaskConnections
-    form.seedOnComplete = settings.seedOnComplete
-    form.seedRatio = settings.seedRatio ?? undefined
-    form.seedMinutes =
-      settings.seedSeconds == null ? undefined : Math.round(settings.seedSeconds / 60)
   },
   { immediate: true },
 )
@@ -64,12 +57,6 @@ function save() {
     connectionBudget,
     maxActiveTasks: form.maxActiveTasks,
     perTaskConnections: Math.min(form.perTaskConnections, connectionBudget),
-    seedOnComplete: form.seedOnComplete,
-    seedRatio: form.seedOnComplete ? form.seedRatio : undefined,
-    seedSeconds:
-      form.seedOnComplete && form.seedMinutes != null
-        ? Math.round(form.seedMinutes * 60)
-        : undefined,
   })
 }
 </script>
@@ -159,26 +146,6 @@ function save() {
           </div>
           <NSwitch v-model:value="form.allowMetered" />
         </div>
-        <div class="flex items-center justify-between gap-4">
-          <span class="text-sm font-medium text-(--dc-text)">{{
-            t('download.settings.seedEnabled')
-          }}</span>
-          <NSwitch v-model:value="form.seedOnComplete" />
-        </div>
-        <template v-if="form.seedOnComplete">
-          <NFormItem :label="t('download.settings.seedRatio')">
-            <NInputNumber
-              v-model:value="form.seedRatio"
-              class="w-full"
-              :min="0.1"
-              :step="0.1"
-              clearable
-            />
-          </NFormItem>
-          <NFormItem :label="t('download.settings.seedMinutes')">
-            <NInputNumber v-model:value="form.seedMinutes" class="w-full" :min="1" clearable />
-          </NFormItem>
-        </template>
       </div>
       <template #footer>
         <NButton :loading="disabled" type="primary" @click="save">{{

@@ -19,8 +19,8 @@ fn destination_picker_contract_does_not_accept_a_renderer_path() {
 #[test]
 fn delete_contract_contains_only_trusted_database_uris() {
   let request = AndroidDeleteExportRequest {
-    tree_uri: "content://provider/tree/root".into(),
-    document_uri: "content://provider/document/root%2Ffile".into(),
+    tree_uri: "content://provider/tree/root",
+    document_uri: "content://provider/document/root%2Ffile",
   };
   assert_eq!(
     serde_json::to_value(request).unwrap(),

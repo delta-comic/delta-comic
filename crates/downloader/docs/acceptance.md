@@ -20,16 +20,6 @@
   每秒最多重平衡一次。
 - 进度事件不超过 4 Hz，状态变更立即发出。
 
-## BitTorrent
-
-- magnet、torrent URL 与 torrent 字节输入。
-- 文件筛选、暂停、恢复与 fast-resume。
-- 每个 Torrent 的 live peer 上限使用调度器分配的公平连接份额，HTTP worker 与 BT peer
-  共同受全局连接预算约束。
-- 下载完成默认立即停止上传。
-- 分享率、做种时长和“任一条件达到”策略。
-- SQLite 任务与磁盘/协议恢复状态不一致时可安全重建。
-
 ## 平台
 
 - macOS 与 Windows 使用系统 Downloads，活动下载时关闭窗口进入托盘。

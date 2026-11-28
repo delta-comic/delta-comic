@@ -112,7 +112,7 @@ async fn downloads_through_the_range_core_and_removes_all_temporary_files() {
   .unwrap();
 
   assert_eq!(actual, *body);
-  assert!(requests.load(Ordering::SeqCst) >= 2);
+  assert_eq!(requests.load(Ordering::SeqCst), 1);
   assert_empty(&temporary_root).await;
 }
 

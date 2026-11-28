@@ -15,9 +15,6 @@ queue scheduler ── SQLite repository (WAL)
         │      ├── bounded parallel workers
         │      └── .part file + checksum + atomic commit
         │
-        ├── BitTorrent adapter (librqbit)
-        │      └── supervised sessions + fast resume
-        │
         └── destination and platform lifecycle adapters
 ```
 
@@ -68,10 +65,6 @@ HTTP 请求头可以直接提供普通值。Cookie、Authorization 等敏感值�
 API 生成不透明 `credential:` 引用；macOS 使用 Keychain、Windows 使用 Credential
 Manager、Android 使用 Keystore，秘密本身不会写入下载数据库、事件或普通日志。宿主仍可
 注入自定义凭据解析器，但原生 `credential:` 引用不会回退到宿主解析器。
-
-当前精确锁定 `librqbit 9.0.0-rc.0`，因为该版本首次提供可由下载器全局连接调度器约束的
-per-torrent live peer 上限。稳定版 9 发布后应在完整回归通过的前提下替换该精确版本，
-避免在 RC 期间被未审查的依赖更新自动改变协议行为。
 
 ## 开发与验证
 

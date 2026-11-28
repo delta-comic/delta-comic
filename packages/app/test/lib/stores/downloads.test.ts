@@ -28,7 +28,6 @@ const { client, handlers, sourceRefresh } = vi.hoisted(() => {
       cancelTask: vi.fn(async () => task),
       deleteTaskFiles: vi.fn(async () => undefined),
       enqueuePlan: vi.fn(async () => [task]),
-      enqueueTorrent: vi.fn(async () => task),
       enqueueUrl: vi.fn(async () => task),
       forgetTask: vi.fn(async () => undefined),
       getCapabilities: vi.fn(async () => ({ connectionBudgetMax: 64, maxActiveTasks: 20 })),
@@ -39,7 +38,6 @@ const { client, handlers, sourceRefresh } = vi.hoisted(() => {
         maxActiveTasks: 4,
         perTaskConnections: 8,
         revision: 1,
-        seedOnComplete: false,
       })),
       getTask: vi.fn(async () => task),
       getTaskDetail: vi.fn(async () => ({ completedRanges: [], task })),
@@ -156,7 +154,6 @@ describe('useDownloadsStore', () => {
       maxActiveTasks: 4,
       perTaskConnections: 8,
       revision: 1,
-      seedOnComplete: false,
     })
     client.listDestinations.mockResolvedValue([])
     client.listTasks.mockResolvedValue([

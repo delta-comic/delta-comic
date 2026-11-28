@@ -14,8 +14,7 @@ use super::{BackgroundClaim, DirectSafTarget, Engine, EngineEvent};
 use crate::{
   domain::{
     ContentRefreshContext, Destination, DestinationKind, DownloadAsset, DownloadSource,
-    EnqueuePlanInput, HttpHeaderValue, HttpMirror, HttpSource, TaskStatus, TorrentInput,
-    TorrentSource,
+    EnqueuePlanInput, HttpHeaderValue, HttpMirror, HttpSource, TaskStatus,
   },
   error::Error,
   persistence::CompletedRange,
@@ -41,7 +40,7 @@ fn asset(key: &str, relative_path: &str, size: u64) -> DownloadAsset {
   }
 }
 
-async fn engine(root: &TempDir) -> Engine {
+async fn engine(root: &TempDir) -> Arc<Engine> {
   Engine::open(
     &root.path().join("downloader.sqlite"),
     &root.path().join("downloads"),
@@ -129,7 +128,13 @@ async fn shutdown_waits_for_worker_checkpoint_and_requeues_only_interrupted_task
 
   engine
     .repository
-    .save_checkpoint(&interrupted.id, &[CompletedRange { start: 0, end: 8 }], &[])
+    .save_checkpoint(
+      &interrupted.id,
+      &[CompletedRange { start: 0, end: 8 }],
+      &[],
+      None,
+      0,
+    )
     .await
     .unwrap();
   engine.controls.lock().await.remove(&interrupted.id);
@@ -254,7 +259,6 @@ async fn system_stop_cancels_the_worker_and_requeues_only_system_owned_states() 
     TaskStatus::Downloading,
     TaskStatus::WaitingForNetwork,
     TaskStatus::Verifying,
-    TaskStatus::Seeding,
   ] {
     engine
       .repository
@@ -355,9 +359,6 @@ async fn task_events_redact_sources_headers_and_local_paths() {
   const SECRET_URL: &str = "https://secret.example/private?token=url-secret";
   const SECRET_AUTHORIZATION: &str = "Bearer authorization-secret";
   const SECRET_REFERENCE: &str = "credential:cookie-secret";
-  const SECRET_MAGNET: &str = "magnet:?xt=urn:btih:secret-info-hash";
-  const SECRET_TORRENT_URL: &str = "https://secret.example/private.torrent";
-  const SECRET_TORRENT_BYTES: &str = "dG9ycmVudC1zZWNyZXQ=";
   const SECRET_FINAL_PATH: &str = "/private/user/downloads/secret-file";
 
   let root = TempDir::new().unwrap();
@@ -398,29 +399,14 @@ async fn task_events_redact_sources_headers_and_local_paths() {
     last_modified: None,
     expires_at: None,
   });
-  engine.emit_task(task.clone());
-
-  for input in [
-    TorrentInput::Magnet {
-      uri: SECRET_MAGNET.into(),
-    },
-    TorrentInput::Url {
-      url: SECRET_TORRENT_URL.into(),
-    },
-    TorrentInput::Bytes {
-      base64: SECRET_TORRENT_BYTES.into(),
-    },
-  ] {
-    task.source = DownloadSource::Torrent(TorrentSource {
-      input,
-      only_files: vec![0, 2],
-      seed_policy: None,
-    });
-    engine.emit_task(task.clone());
-  }
+  engine.emit_task_ref(&task);
+  assert_eq!(task.final_path.as_deref(), Some(SECRET_FINAL_PATH));
+  let DownloadSource::Http(source) = &task.source;
+  assert_eq!(source.mirrors[0].url, SECRET_URL);
+  engine.emit_task(task);
 
   let events = events.lock().unwrap();
-  assert_eq!(events.len(), 4);
+  assert_eq!(events.len(), 2);
   for event in events.iter() {
     let EngineEvent::TaskUpsert(payload) = event else {
       panic!("unexpected redaction event: {event:?}");
@@ -433,9 +419,6 @@ async fn task_events_redact_sources_headers_and_local_paths() {
       SECRET_AUTHORIZATION,
       "Cookie",
       SECRET_REFERENCE,
-      SECRET_MAGNET,
-      SECRET_TORRENT_URL,
-      SECRET_TORRENT_BYTES,
       SECRET_FINAL_PATH,
     ] {
       assert!(!serialized.contains(secret), "event leaked {secret}");
@@ -451,23 +434,8 @@ async fn task_events_redact_sources_headers_and_local_paths() {
           HttpHeaderValue::SecretRef { secret_ref } => secret_ref == "[redacted]",
         }));
       }
-      DownloadSource::Torrent(_) => panic!("HTTP event changed its source variant"),
     },
     event => panic!("unexpected redaction event: {event:?}"),
-  }
-  for (event, expected_variant) in events[1..].iter().zip(["magnet", "url", "bytes"]) {
-    let EngineEvent::TaskUpsert(payload) = event else {
-      panic!("unexpected redaction event: {event:?}");
-    };
-    let DownloadSource::Torrent(source) = &payload.task.source else {
-      panic!("torrent event changed its source variant");
-    };
-    match (&source.input, expected_variant) {
-      (TorrentInput::Magnet { uri }, "magnet") => assert_eq!(uri, "[redacted]"),
-      (TorrentInput::Url { url }, "url") => assert_eq!(url, "[redacted]"),
-      (TorrentInput::Bytes { base64 }, "bytes") => assert_eq!(base64, "[redacted]"),
-      _ => panic!("torrent input variant was not preserved"),
-    }
   }
 }
 
@@ -497,7 +465,6 @@ async fn enqueues_a_plan_atomically_with_collection_and_asset_keys() {
   assert_eq!(collections[0].total_bytes, Some(30));
 }
 
-#[cfg(feature = "bittorrent")]
 #[tokio::test]
 async fn rejects_a_plan_before_writing_any_partial_tasks() {
   let root = TempDir::new().unwrap();
@@ -565,6 +532,8 @@ async fn reopens_interrupted_tasks_with_ranges_and_refresh_context() {
         CompletedRange { start: 16, end: 24 },
       ],
       &[],
+      None,
+      0,
     )
     .await
     .unwrap();
@@ -721,9 +690,7 @@ async fn direct_saf_transfer_persists_resume_identity_and_commit_state() {
     .await
     .unwrap();
   let mut direct_asset = asset("direct", "chapter.cbz", 4);
-  let DownloadSource::Http(source) = &mut direct_asset.source else {
-    unreachable!();
-  };
+  let DownloadSource::Http(source) = &mut direct_asset.source;
   source.expires_at = Some(crate::persistence::now_millis() - 1);
   let task = engine
     .enqueue_plan(EnqueuePlanInput {

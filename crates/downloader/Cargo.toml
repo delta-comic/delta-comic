@@ -16,24 +16,18 @@ macos = { level = "full", notes = "" }
 android = { level = "full", notes = "" }
 ios = { level = "full", notes = "" }
 
-[features]
-default = ["bittorrent"]
-bittorrent = ["dep:librqbit"]
-
 [build-dependencies]
 tauri-plugin = { workspace = true, features = ["build"] }
 
 [dependencies]
-async-trait = { workspace = true }
-base64 = { workspace = true }
 bytes = { workspace = true }
 futures-util = { workspace = true }
 hex = { workspace = true }
 httpdate = { workspace = true }
 keyring-core = { workspace = true }
-librqbit = { workspace = true, optional = true }
 md-5 = { workspace = true }
 rand = { workspace = true }
+rangemap = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
