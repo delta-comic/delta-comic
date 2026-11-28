@@ -1,5 +1,14 @@
 **请谨慎更新，当前版本为预发布版本，可能包含未完成的功能或兼容性问题**
 
+# [3.0.0-next.35](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.34...3.0.0-next.35) (2026-11-28)
+
+
+### Bug Fixes
+
+* **android:** 修复插件缺失和下载器重复初始化导致的启动崩溃 ([779c8d0](https://github.com/delta-comic/delta-comic/commit/779c8d058bbcc203a8811c4d5ad2e5e40e0766d3))
+
+**请谨慎更新，当前版本为预发布版本，可能包含未完成的功能或兼容性问题**
+
 # [3.0.0-next.34](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.33...3.0.0-next.34) (2026-11-28)
 
 
