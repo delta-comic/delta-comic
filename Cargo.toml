@@ -22,7 +22,6 @@ version = "3.0.0-next.32"
 [workspace.dependencies]
 android-native-keyring-store = "1.0.0"
 apple-native-keyring-store = { version = "1.0.3", features = ["keychain"] }
-async-trait = "0.1.92"
 axum = "0.8.9"
 bytes = "1.12.2"
 chrono = { version = "0.4.45", features = ["serde"] }
@@ -45,6 +44,7 @@ ndk-context = "0.1.1"
 objc2-foundation = { version = "0.3.2", features = ["NSString", "NSUserDefaults"] }
 percent-encoding = "2.3.2"
 rand = "0.10.4"
+rangemap = "1.9.0"
 reqwest = { version = "0.13.5", default-features = false, features = ["json", "rustls", "stream"] }
 rfd = { version = "0.18.0", default-features = false, features = ["xdg-portal"] }
 serde = { version = "1.0.229", features = ["derive"] }

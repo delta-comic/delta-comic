@@ -26,7 +26,22 @@ fn ledger_never_claims_overlapping_writes() {
   assert_eq!(second, vec![CompletedRange { start: 20, end: 25 }]);
   ledger.commit(&first);
   ledger.commit(&second);
-  assert_eq!(ledger.completed_bytes(), 25);
+  assert_eq!(ledger.completed_bytes, 25);
+}
+
+#[test]
+fn releasing_a_failed_write_keeps_other_claims_and_committed_bytes() {
+  let mut ledger = RangeLedger::new(vec![CompletedRange { start: 10, end: 20 }]);
+  let failed = ledger.claim(5, 25);
+  let other = ledger.claim(0, 30);
+  ledger.commit(&other);
+  ledger.release(&failed);
+  assert_eq!(ledger.completed_bytes, 20);
+  let retry = ledger.claim(0, 30);
+  assert_eq!(retry, failed);
+  ledger.commit(&retry);
+  assert_eq!(ledger.completed_bytes, 30);
+  assert!(ledger.claim(0, 30).is_empty());
 }
 
 #[test]

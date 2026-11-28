@@ -4099,6 +4099,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rangemap"
+version = "1.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2d43a8c8c74056248124068fde0df374d1ddf9039e747d190f01c36faeaab08"
+
+[[package]]
 name = "raw-window-handle"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5759,7 +5765,6 @@ version = "3.0.0-next.32"
 dependencies = [
  "android-native-keyring-store",
  "apple-native-keyring-store",
- "async-trait",
  "axum",
  "bytes",
  "futures-util",
@@ -5771,6 +5776,7 @@ dependencies = [
  "md-5 0.11.0",
  "ndk-context",
  "rand 0.10.4",
+ "rangemap",
  "reqwest",
  "rfd",
  "serde",

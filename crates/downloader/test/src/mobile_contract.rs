@@ -5,7 +5,7 @@ use super::*;
 #[test]
 fn serializes_the_kotlin_schedule_request_contract() {
   let request = AndroidScheduleRequest {
-    task_id: "task-1".into(),
+    task_id: "task-1",
     estimated_bytes: Some(42),
     allow_metered: false,
   };

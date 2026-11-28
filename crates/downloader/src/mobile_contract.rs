@@ -30,8 +30,8 @@ impl AndroidEngineConfig {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct AndroidScheduleRequest {
-  pub(crate) task_id: String,
+pub(crate) struct AndroidScheduleRequest<'a> {
+  pub(crate) task_id: &'a str,
   pub(crate) estimated_bytes: Option<u64>,
   pub(crate) allow_metered: bool,
 }

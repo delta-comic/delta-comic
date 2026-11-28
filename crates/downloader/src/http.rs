@@ -10,6 +10,7 @@ use std::{
 };
 
 use futures_util::StreamExt;
+use rangemap::RangeSet;
 use reqwest::{
   Client, RequestBuilder, Response, StatusCode,
   header::{
@@ -22,9 +23,7 @@ use tokio_util::sync::CancellationToken;
 use crate::{
   domain::{DownloadTask, DownloaderSettings, HttpHeaderValue, HttpMirror, HttpSource},
   error::{Error, Result},
-  persistence::{
-    CompletedRange, IntegritySample, Repository, merge_ranges, missing_ranges, split_ranges,
-  },
+  persistence::{CompletedRange, IntegritySample, Repository, split_ranges},
 };
 
 const MINIMUM_SEGMENT_SIZE: u64 = 4 * 1024 * 1024;
@@ -33,10 +32,11 @@ const MINIMUM_WORKER_AGE: Duration = Duration::from_secs(2);
 const REBALANCE_COOLDOWN: Duration = Duration::from_secs(1);
 const CHECKPOINT_INTERVAL: Duration = Duration::from_millis(500);
 const WRITE_BUFFER_BYTES: usize = 512 * 1024;
+const INITIAL_RANGE_BYTES: u64 = 1024 * 1024;
 const INTEGRITY_SAMPLE_BYTES: u64 = 64 * 1024;
 const MAX_INTEGRITY_SAMPLES: usize = 16;
 
-pub(crate) type ProgressSink = Arc<dyn Fn(DownloadTask) + Send + Sync>;
+type ProgressSink<'a> = &'a (dyn Fn(DownloadTask) + Send + Sync);
 
 fn lock<T>(mutex: &StdMutex<T>) -> MutexGuard<'_, T> {
   mutex.lock().unwrap_or_else(PoisonError::into_inner)
@@ -49,6 +49,7 @@ struct Probe {
   last_modified: Option<String>,
   /// Complete response kept when the server ignored the probe range, so its body is not fetched twice.
   full_response: Option<Response>,
+  initial_segment: Option<(CompletedRange, Response)>,
 }
 
 #[derive(Debug)]
@@ -59,48 +60,49 @@ pub struct DownloadReport {
 
 #[derive(Default)]
 struct RangeLedger {
-  completed: Vec<CompletedRange>,
-  inflight: Vec<CompletedRange>,
+  completed: RangeSet<u64>,
+  // Includes both committed bytes and outstanding write claims.
+  occupied: RangeSet<u64>,
+  completed_bytes: u64,
 }
 
 impl RangeLedger {
   fn new(completed: Vec<CompletedRange>) -> Self {
+    let completed: RangeSet<_> = completed.into_iter().map(|r| r.start..r.end).collect();
     Self {
-      completed: merge_ranges(completed),
-      inflight: Vec::new(),
+      completed_bytes: completed.iter().map(|r| r.end - r.start).sum(),
+      occupied: completed.clone(),
+      completed,
     }
   }
 
   fn claim(&mut self, start: u64, end: u64) -> Vec<CompletedRange> {
-    let mut occupied = self.completed.clone();
-    occupied.extend(self.inflight.iter().copied());
-    let claims = missing_inside(start, end, &merge_ranges(occupied));
-    self.inflight.extend(claims.iter().copied());
-    self.inflight = merge_ranges(std::mem::take(&mut self.inflight));
+    let claims: Vec<_> = self
+      .occupied
+      .gaps(&(start..end))
+      .map(|r| CompletedRange {
+        start: r.start,
+        end: r.end,
+      })
+      .collect();
+    if !claims.is_empty() {
+      self.occupied.insert(start..end);
+    }
     claims
   }
 
   fn commit(&mut self, claims: &[CompletedRange]) {
     for claim in claims {
-      self.inflight = subtract_ranges(&self.inflight, *claim);
-      self.completed.push(*claim);
+      self.completed.insert(claim.start..claim.end);
+      self.completed_bytes += claim.end - claim.start;
     }
-    self.completed = merge_ranges(std::mem::take(&mut self.completed));
   }
 
   fn release(&mut self, claims: &[CompletedRange]) {
     for claim in claims {
-      self.inflight = subtract_ranges(&self.inflight, *claim);
+      self.occupied.remove(claim.start..claim.end);
     }
   }
-
-  fn completed_bytes(&self) -> u64 {
-    range_bytes(&self.completed)
-  }
-}
-
-fn range_bytes(ranges: &[CompletedRange]) -> u64 {
-  ranges.iter().map(|range| range.end - range.start).sum()
 }
 
 enum SegmentOutcome {
@@ -259,17 +261,28 @@ impl CheckpointState {
   }
 }
 
+struct MirrorRequest {
+  client: Client,
+  url: url::Url,
+  headers: HeaderMap,
+}
+
+impl MirrorRequest {
+  fn get(&self) -> RequestBuilder {
+    let request = self.client.get(self.url.clone());
+    if self.headers.is_empty() {
+      request
+    } else {
+      request.headers(self.headers.clone())
+    }
+  }
+}
+
 /// State shared by every range worker of one mirror transfer.
 struct Transfer {
-  client: Client,
-  url: String,
-  headers: HeaderMap,
+  mirror: MirrorRequest,
   file: Arc<File>,
-  repository: Repository,
-  task_id: String,
-  progress: Option<ProgressSink>,
   ledger: StdMutex<RangeLedger>,
-  checkpoint: StdMutex<CheckpointState>,
   total: u64,
   validator: Option<String>,
 }
@@ -278,16 +291,16 @@ impl Transfer {
   /// Writes the unclaimed parts of a buffered response chunk and returns the buffer for reuse.
   async fn write(&self, start: u64, buffer: Vec<u8>) -> Result<Vec<u8>> {
     let claims = lock(&self.ledger).claim(start, start + buffer.len() as u64);
+    if claims.is_empty() {
+      return Ok(buffer);
+    }
     let file = self.file.clone();
-    let claimed = claims.clone();
-    let result = tokio::task::spawn_blocking(move || {
-      write_claims(&file, start, &buffer, &claimed)?;
-      Ok(buffer)
+    let (result, claims) = tokio::task::spawn_blocking(move || {
+      let result = write_claims(&file, start, &buffer, &claims).map(|()| buffer);
+      (result, claims)
     })
     .await
-    .map_err(std::io::Error::from)
-    .map_err(Error::from)
-    .and_then(|result| result);
+    .map_err(std::io::Error::from)?;
     let mut ledger = lock(&self.ledger);
     match result {
       Ok(buffer) => {
@@ -301,25 +314,23 @@ impl Transfer {
     }
   }
 
-  async fn checkpoint_if_due(&self) -> Result<()> {
-    let completed_bytes = lock(&self.ledger).completed_bytes();
-    let due = lock(&self.checkpoint).due(completed_bytes);
-    match due {
-      Some(speed) => self.save(speed).await,
-      None => Ok(()),
-    }
-  }
-
-  async fn save(&self, speed: u64) -> Result<()> {
-    let completed = lock(&self.ledger).completed.clone();
+  async fn save(&self, request: &DownloadRequest<'_>, speed: u64) -> Result<()> {
+    let completed = lock(&self.ledger)
+      .completed
+      .iter()
+      .map(|r| CompletedRange {
+        start: r.start,
+        end: r.end,
+      })
+      .collect();
     save_checkpoint(
-      &self.repository,
-      &self.task_id,
+      request.repository,
+      &request.task.id,
       &self.file,
       completed,
       None,
       speed,
-      self.progress.as_ref(),
+      request.progress,
     )
     .await
   }
@@ -327,7 +338,7 @@ impl Transfer {
 
 struct ActiveWorker {
   cancellation: CancellationToken,
-  progress: Arc<WorkerProgress>,
+  progress: WorkerProgress,
 }
 
 pub(crate) struct DownloadRequest<'a> {
@@ -339,11 +350,11 @@ pub(crate) struct DownloadRequest<'a> {
   /// An already-open, seekable destination owned by the caller. Android SAF
   /// uses this to write directly through a detached document-provider file
   /// descriptor while retaining the same range and checkpoint engine.
-  pub target_file: Option<Arc<File>>,
-  pub cancellation: CancellationToken,
+  pub target_file: Option<&'a Arc<File>>,
+  pub cancellation: &'a CancellationToken,
   pub secret_resolver: Option<&'a dyn crate::SecretResolver>,
   pub maximum_bytes: Option<u64>,
-  pub progress: Option<ProgressSink>,
+  pub progress: Option<ProgressSink<'a>>,
 }
 
 pub(crate) async fn download(
@@ -368,12 +379,15 @@ pub(crate) async fn download(
     if request.cancellation.is_cancelled() {
       return Err(Error::Cancelled);
     }
-    let current_task = request
-      .repository
-      .get_task(&request.task.id)
-      .await?
-      .unwrap_or_else(|| request.task.clone());
-    match download_from_mirror(client, mirror, &current_task, &request).await {
+    let current_task = request.repository.get_task(&request.task.id).await?;
+    match download_from_mirror(
+      client,
+      mirror,
+      current_task.as_ref().unwrap_or(request.task),
+      &request,
+    )
+    .await
+    {
       Ok(report) => return Ok(report),
       Err(error) if is_mirror_failure(&error) => last_error = Some(error),
       Err(error) => return Err(error),
@@ -395,13 +409,35 @@ async fn download_from_mirror(
     ));
   }
 
-  let headers = build_headers(&mirror.headers, request.secret_resolver)?;
-  let probe = probe(
-    client,
-    &mirror.url,
-    &headers,
+  let mirror = MirrorRequest {
+    client: client.clone(),
+    url,
+    headers: build_headers(&mirror.headers, request.secret_resolver)?,
+  };
+  let mut completed = request.repository.completed_ranges(&task.id).await?;
+  let workers = usize::from(request.settings.per_task_connections)
+    .min(usize::from(request.settings.connection_budget))
+    .max(1);
+  let probe_bytes = if completed.is_empty() {
+    let limit = request.maximum_bytes.unwrap_or(i64::MAX as u64);
+    if workers == 1 {
+      request
+        .source
+        .expected_size
+        .unwrap_or(limit)
+        .min(limit)
+        .max(1)
+    } else {
+      INITIAL_RANGE_BYTES.min(limit).max(1)
+    }
+  } else {
+    1
+  };
+  let mut probe = probe(
+    &mirror,
     request.source.expected_size,
-    &request.cancellation,
+    probe_bytes,
+    request.cancellation,
   )
   .await?;
   if let Some(maximum_bytes) = request.maximum_bytes
@@ -432,8 +468,8 @@ async fn download_from_mirror(
     return Err(Error::RemoteChanged);
   }
 
-  let file = match &request.target_file {
-    Some(file) => file.clone(),
+  let file = match request.target_file {
+    Some(file) => Arc::clone(file),
     None => {
       let destination_root = task_storage_root(task)?;
       if let Some(parent) = request.temp_path.parent() {
@@ -445,19 +481,16 @@ async fn download_from_mirror(
     }
   };
 
-  let mut completed = request.repository.completed_ranges(&task.id).await?;
   if !completed.is_empty()
     && (!probe.supports_ranges
       || !can_reuse_completed(
-        client,
-        &mirror.url,
-        &headers,
+        &mirror,
         &file,
         &completed,
         request.repository,
         task,
         &probe,
-        &request.cancellation,
+        request.cancellation,
       )
       .await?)
   {
@@ -490,9 +523,7 @@ async fn download_from_mirror(
 
   let (Some(total_bytes), true) = (probe.total_bytes, probe.supports_ranges) else {
     let total_bytes = sequential_download(
-      client,
-      &mirror.url,
-      &headers,
+      &mirror,
       &file,
       probe.total_bytes,
       probe.full_response,
@@ -506,48 +537,58 @@ async fn download_from_mirror(
   };
 
   let ledger = RangeLedger::new(completed);
+  let mut checkpoint = CheckpointState::new(ledger.completed_bytes);
   let transfer = Arc::new(Transfer {
-    client: client.clone(),
-    url: mirror.url.clone(),
-    headers,
-    file: file.clone(),
-    repository: request.repository.clone(),
-    task_id: task.id.clone(),
-    progress: request.progress.clone(),
-    checkpoint: StdMutex::new(CheckpointState::new(ledger.completed_bytes())),
+    mirror,
+    file,
     ledger: StdMutex::new(ledger),
     total: total_bytes,
-    validator: strong_etag(probe.etag.as_deref())
-      .map(str::to_owned)
+    validator: probe
+      .etag
+      .filter(|etag| strong_etag(Some(etag)).is_some())
       .or(probe.last_modified),
   });
-  let workers = usize::from(request.settings.per_task_connections)
-    .min(usize::from(request.settings.connection_budget))
-    .max(1);
   let mut no_progress_rounds = 0_u8;
 
   loop {
     if request.cancellation.is_cancelled() {
       return Err(Error::Cancelled);
     }
+    let initial = probe.initial_segment.take();
+    let start = initial.as_ref().map_or(0, |(range, _)| range.end);
     let (before, missing) = {
       let ledger = lock(&transfer.ledger);
       (
-        ledger.completed_bytes(),
-        missing_ranges(total_bytes, &ledger.completed),
+        ledger.completed_bytes,
+        ledger
+          .completed
+          .gaps(&(start..total_bytes))
+          .filter(|r| !r.is_empty())
+          .map(|r| CompletedRange {
+            start: r.start,
+            end: r.end,
+          })
+          .collect::<Vec<_>>(),
       )
     };
-    if missing.is_empty() {
+    if missing.is_empty() && initial.is_none() {
       break;
     }
-    let planned = split_ranges(&missing, workers, MINIMUM_SEGMENT_SIZE);
-    if run_segment_round(&transfer, planned, workers, &request.cancellation).await? {
+    let planned = split_ranges(missing, workers, MINIMUM_SEGMENT_SIZE);
+    if run_segment_round(
+      &transfer,
+      initial,
+      planned,
+      workers,
+      request,
+      &mut checkpoint,
+    )
+    .await?
+    {
       request.repository.clear_progress(&task.id).await?;
       sequential_download(
-        client,
-        &mirror.url,
-        &transfer.headers,
-        &file,
+        &transfer.mirror,
+        &transfer.file,
         Some(total_bytes),
         None,
         request,
@@ -559,7 +600,7 @@ async fn download_from_mirror(
       });
     }
 
-    if lock(&transfer.ledger).completed_bytes() == before {
+    if lock(&transfer.ledger).completed_bytes == before {
       no_progress_rounds += 1;
       if no_progress_rounds >= 2 {
         return Err(Error::RangeRejected);
@@ -569,7 +610,7 @@ async fn download_from_mirror(
     }
   }
 
-  transfer.save(0).await?;
+  transfer.save(request, 0).await?;
   Ok(DownloadReport {
     total_bytes,
     elapsed: started.elapsed(),
@@ -605,42 +646,39 @@ fn is_mirror_failure(error: &Error) -> bool {
 
 async fn run_segment_round(
   transfer: &Arc<Transfer>,
+  mut initial: Option<(CompletedRange, Response)>,
   planned: Vec<CompletedRange>,
   worker_limit: usize,
-  cancellation: &CancellationToken,
+  request: &DownloadRequest<'_>,
+  checkpoint: &mut CheckpointState,
 ) -> Result<bool> {
-  let round_token = cancellation.child_token();
+  let round_token = request.cancellation.child_token();
   let mut pending = VecDeque::from(planned);
-  let mut active = HashMap::<u64, ActiveWorker>::new();
+  let mut active = HashMap::<u64, Arc<ActiveWorker>>::new();
   let mut rebalanced = HashSet::<u64>::new();
-  let mut handles = tokio::task::JoinSet::<(u64, Result<SegmentOutcome>)>::new();
+  let mut segments = tokio::task::JoinSet::new();
   let mut next_worker_id = 0_u64;
   let mut last_rebalance: Option<Instant> = None;
   let mut range_ignored = false;
 
-  loop {
+  let failure = loop {
     while !range_ignored && active.len() < worker_limit {
-      let Some(range) = pending.pop_front() else {
-        break;
+      let (range, response) = match initial.take() {
+        Some((range, response)) => (range, Some(response)),
+        None => match pending.pop_front() {
+          Some(range) => (range, None),
+          None => break,
+        },
       };
       next_worker_id += 1;
       let id = next_worker_id;
-      let worker_token = round_token.child_token();
-      let progress = Arc::new(WorkerProgress::new(range));
-      let segment = download_segment(
-        transfer.clone(),
-        progress.clone(),
-        worker_token.clone(),
-        range,
-      );
-      handles.spawn(async move { (id, segment.await) });
-      active.insert(
-        id,
-        ActiveWorker {
-          cancellation: worker_token,
-          progress,
-        },
-      );
+      let worker = Arc::new(ActiveWorker {
+        cancellation: round_token.child_token(),
+        progress: WorkerProgress::new(range),
+      });
+      let segment = download_segment(Arc::clone(transfer), Arc::clone(&worker), range, response);
+      segments.spawn(async move { (id, segment.await) });
+      active.insert(id, worker);
     }
 
     if active.is_empty() {
@@ -682,58 +720,59 @@ async fn run_segment_round(
     }
 
     tokio::select! {
-      () = cancellation.cancelled() => {
-        round_token.cancel();
-        while handles.join_next().await.is_some() {}
-        transfer.save(0).await?;
-        return Err(Error::Cancelled);
-      }
-      joined = handles.join_next() => {
-        let Some(joined) = joined else {
-          return Ok(range_ignored);
-        };
-        let (id, result) = joined
-          .map_err(|error| Error::InvalidInput(format!("segment worker panicked: {error}")))?;
-        active.remove(&id);
-        match result {
-          Ok(SegmentOutcome::Completed) => {}
-          Ok(SegmentOutcome::RangeIgnored) => {
-            range_ignored = true;
-            pending.clear();
-            round_token.cancel();
+      () = request.cancellation.cancelled() => break Error::Cancelled,
+      Some(joined) = segments.join_next() => match joined {
+        Ok((id, result)) => {
+          active.remove(&id);
+          match result {
+            Ok(SegmentOutcome::Completed) => {}
+            Ok(SegmentOutcome::RangeIgnored) => {
+              range_ignored = true;
+              pending.clear();
+              round_token.cancel();
+            }
+            Err(Error::Cancelled) if range_ignored || rebalanced.remove(&id) => {}
+            Err(error) => break error,
           }
-          Err(Error::Cancelled) if range_ignored || rebalanced.remove(&id) => {}
-          Err(error) => {
-            round_token.cancel();
-            while handles.join_next().await.is_some() {}
-            transfer.save(0).await?;
-            return Err(error);
-          }
-        }
-      }
+        },
+        Err(error) => break std::io::Error::from(error).into(),
+      },
       () = tokio::time::sleep(Duration::from_millis(100)) => {}
     }
-  }
+    let completed = lock(&transfer.ledger).completed_bytes;
+    if completed > checkpoint.completed_bytes
+      && let Some(speed) = checkpoint.due(completed)
+      && let Err(error) = transfer.save(request, speed).await
+    {
+      break error;
+    }
+  };
+  round_token.cancel();
+  while segments.join_next().await.is_some() {}
+  transfer.save(request, 0).await?;
+  Err(failure)
 }
 
 async fn download_segment(
   transfer: Arc<Transfer>,
-  progress: Arc<WorkerProgress>,
-  cancellation: CancellationToken,
+  worker: Arc<ActiveWorker>,
   requested: CompletedRange,
+  initial_response: Option<Response>,
 ) -> Result<SegmentOutcome> {
-  let mut request = transfer
-    .client
-    .get(&transfer.url)
-    .headers(transfer.headers.clone())
-    .header(
+  let progress = &worker.progress;
+  let cancellation = &worker.cancellation;
+  let response = if let Some(response) = initial_response {
+    response
+  } else {
+    let mut request = transfer.mirror.get().header(
       RANGE,
       format!("bytes={}-{}", requested.start, requested.end - 1),
     );
-  if let Some(validator) = &transfer.validator {
-    request = request.header(IF_RANGE, validator);
-  }
-  let response = send(request, &cancellation).await?;
+    if let Some(validator) = &transfer.validator {
+      request = request.header(IF_RANGE, validator);
+    }
+    send(request, cancellation).await?
+  };
   if let Some(error) = retryable_response_error(&response) {
     return Err(error);
   }
@@ -749,7 +788,7 @@ async fn download_segment(
     }
   }
   let content_range = header_text(&response, CONTENT_RANGE)
-    .and_then(|value| parse_content_range(&value))
+    .and_then(parse_content_range)
     .ok_or(Error::RangeRejected)?;
   if content_range.total != transfer.total
     || transfer
@@ -791,7 +830,6 @@ async fn download_segment(
       flushed += length;
       last_flush = Instant::now();
       progress.advance(flushed, 0);
-      transfer.checkpoint_if_due().await?;
     }
   };
   // Bytes already received are kept on cancellation and transport errors so resume skips them.
@@ -809,9 +847,7 @@ async fn download_segment(
 }
 
 async fn sequential_download(
-  client: &Client,
-  url: &str,
-  headers: &HeaderMap,
+  mirror: &MirrorRequest,
   file: &Arc<File>,
   expected_total: Option<u64>,
   response: Option<Response>,
@@ -820,11 +856,7 @@ async fn sequential_download(
   let response = match response {
     Some(response) => response,
     None => {
-      let response = send(
-        client.get(url).headers(headers.clone()),
-        &request.cancellation,
-      )
-      .await?;
+      let response = send(mirror.get(), request.cancellation).await?;
       if let Some(error) = retryable_response_error(&response) {
         return Err(error);
       }
@@ -881,7 +913,7 @@ async fn sequential_download(
         prefix(flushed),
         None,
         speed,
-        request.progress.as_ref(),
+        request.progress,
       )
       .await?;
     }
@@ -901,7 +933,7 @@ async fn sequential_download(
     prefix(flushed),
     Some(flushed),
     0,
-    request.progress.as_ref(),
+    request.progress,
   )
   .await?;
   Ok(flushed)
@@ -915,28 +947,43 @@ async fn send(request: RequestBuilder, cancellation: &CancellationToken) -> Resu
 }
 
 async fn probe(
-  client: &Client,
-  url: &str,
-  headers: &HeaderMap,
+  mirror: &MirrorRequest,
   expected_size: Option<u64>,
+  probe_bytes: u64,
   cancellation: &CancellationToken,
 ) -> Result<Probe> {
-  let request = client
-    .get(url)
-    .headers(headers.clone())
-    .header(RANGE, "bytes=0-0");
-  let response = send(request, cancellation).await?;
+  let probe_request = |bytes: u64| mirror.get().header(RANGE, format!("bytes=0-{}", bytes - 1));
+  let mut response = send(probe_request(probe_bytes), cancellation).await?;
+  if probe_bytes > 1
+    && matches!(
+      response.status(),
+      StatusCode::BAD_REQUEST | StatusCode::RANGE_NOT_SATISFIABLE
+    )
+  {
+    drop(response);
+    response = send(probe_request(1), cancellation).await?;
+  }
   if let Some(error) = retryable_response_error(&response) {
     return Err(error);
   }
-  let etag = header_text(&response, ETAG);
-  let last_modified = header_text(&response, LAST_MODIFIED);
+  let etag = header_text(&response, ETAG).map(str::to_owned);
+  let last_modified = header_text(&response, LAST_MODIFIED).map(str::to_owned);
+  let mut initial_segment = None;
   let (total_bytes, supports_ranges, full_response) = match response.status() {
     StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => return Err(Error::SourceExpired),
     StatusCode::PARTIAL_CONTENT => {
       let content_range = header_text(&response, CONTENT_RANGE)
-        .and_then(|value| parse_content_range(&value))
+        .and_then(parse_content_range)
         .ok_or(Error::RangeRejected)?;
+      if probe_bytes > 1 && content_range.start == 0 {
+        initial_segment = Some((
+          CompletedRange {
+            start: 0,
+            end: content_range.end,
+          },
+          response,
+        ));
+      }
       (Some(content_range.total), true, None)
     }
     StatusCode::OK => (
@@ -958,6 +1005,7 @@ async fn probe(
     etag,
     last_modified,
     full_response,
+    initial_segment,
   })
 }
 
@@ -1017,12 +1065,11 @@ fn parse_content_range(value: &str) -> Option<ParsedContentRange> {
   (start < end && end <= total).then_some(ParsedContentRange { start, end, total })
 }
 
-fn header_text(response: &Response, name: reqwest::header::HeaderName) -> Option<String> {
+fn header_text(response: &Response, name: HeaderName) -> Option<&str> {
   response
     .headers()
     .get(name)
     .and_then(|value| value.to_str().ok())
-    .map(str::to_string)
 }
 
 fn retryable_response_error(response: &Response) -> Option<Error> {
@@ -1071,11 +1118,8 @@ fn response_validator_changed(response: &Response, expected: &str) -> bool {
   header_text(response, header).is_some_and(|actual| actual != expected)
 }
 
-#[allow(clippy::too_many_arguments)]
 async fn can_reuse_completed(
-  client: &Client,
-  url: &str,
-  headers: &HeaderMap,
+  mirror: &MirrorRequest,
   file: &File,
   completed: &[CompletedRange],
   repository: &Repository,
@@ -1106,7 +1150,7 @@ async fn can_reuse_completed(
   if let (Some(previous), Some(current)) = (&task.last_modified, &probe.last_modified) {
     return Ok(previous == current);
   }
-  verify_remote_integrity_samples(client, url, headers, &samples, total, cancellation).await
+  verify_remote_integrity_samples(mirror, &samples, total, cancellation).await
 }
 
 fn verify_local_integrity_samples(
@@ -1131,18 +1175,15 @@ fn verify_local_integrity_samples(
 }
 
 async fn verify_remote_integrity_samples(
-  client: &Client,
-  url: &str,
-  headers: &HeaderMap,
+  mirror: &MirrorRequest,
   samples: &[IntegritySample],
   total: u64,
   cancellation: &CancellationToken,
 ) -> Result<bool> {
   for sample in samples {
     let end = sample.start + sample.length;
-    let request = client
-      .get(url)
-      .headers(headers.clone())
+    let request = mirror
+      .get()
       .header(RANGE, format!("bytes={}-{}", sample.start, end - 1));
     let response = send(request, cancellation).await?;
     match response.status() {
@@ -1150,7 +1191,7 @@ async fn verify_remote_integrity_samples(
       StatusCode::PARTIAL_CONTENT => {}
       _ => return Ok(false),
     }
-    if header_text(&response, CONTENT_RANGE).and_then(|value| parse_content_range(&value))
+    if header_text(&response, CONTENT_RANGE).and_then(parse_content_range)
       != Some(ParsedContentRange {
         start: sample.start,
         end,
@@ -1214,9 +1255,8 @@ async fn save_checkpoint(
   completed: Vec<CompletedRange>,
   total: Option<u64>,
   speed: u64,
-  progress: Option<&ProgressSink>,
+  progress: Option<ProgressSink<'_>>,
 ) -> Result<()> {
-  let completed = merge_ranges(completed);
   let (completed, samples) = {
     let file = file.clone();
     tokio::task::spawn_blocking(move || {
@@ -1227,26 +1267,18 @@ async fn save_checkpoint(
     .await
     .map_err(std::io::Error::from)??
   };
-  repository
-    .save_checkpoint(task_id, &completed, &samples)
+  let task = repository
+    .save_checkpoint(task_id, &completed, &samples, total, speed)
     .await?;
-  let downloaded = range_bytes(&completed);
-  let task = match total {
-    Some(total) => {
-      repository
-        .update_transfer_progress(task_id, total, downloaded, speed)
-        .await?
-    }
-    None => {
-      repository
-        .update_progress(task_id, downloaded, speed)
-        .await?
-    }
-  };
+  let downloading = task.status == crate::TaskStatus::Downloading;
   if let Some(progress) = progress {
     progress(task);
   }
-  Ok(())
+  if downloading {
+    Ok(())
+  } else {
+    Err(Error::Cancelled)
+  }
 }
 
 async fn collect_limited_body(response: Response, expected: u64) -> Result<Vec<u8>> {
@@ -1398,52 +1430,6 @@ fn write_all_at(file: &File, mut bytes: &[u8], mut offset: u64) -> Result<()> {
     offset += written as u64;
   }
   Ok(())
-}
-
-fn missing_inside(start: u64, end: u64, occupied: &[CompletedRange]) -> Vec<CompletedRange> {
-  missing_ranges(
-    end - start,
-    &occupied
-      .iter()
-      .filter_map(|range| {
-        let clipped_start = range.start.max(start);
-        let clipped_end = range.end.min(end);
-        (clipped_start < clipped_end).then(|| CompletedRange {
-          start: clipped_start - start,
-          end: clipped_end - start,
-        })
-      })
-      .collect::<Vec<_>>(),
-  )
-  .into_iter()
-  .map(|range| CompletedRange {
-    start: range.start + start,
-    end: range.end + start,
-  })
-  .collect()
-}
-
-fn subtract_ranges(ranges: &[CompletedRange], removed: CompletedRange) -> Vec<CompletedRange> {
-  let mut result = Vec::new();
-  for range in ranges {
-    if range.end <= removed.start || range.start >= removed.end {
-      result.push(*range);
-      continue;
-    }
-    if range.start < removed.start {
-      result.push(CompletedRange {
-        start: range.start,
-        end: removed.start,
-      });
-    }
-    if range.end > removed.end {
-      result.push(CompletedRange {
-        start: removed.end,
-        end: range.end,
-      });
-    }
-  }
-  result
 }
 
 #[cfg(test)]

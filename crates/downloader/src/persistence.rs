@@ -1082,7 +1082,7 @@ impl Repository {
     let revision = next_revision(&mut transaction).await?;
     let result = sqlx::query(
       "UPDATE tasks SET total_bytes = ?, etag = ?, last_modified = ?, status = 'downloading', \
-       updated_at = ?, revision = ? WHERE id = ? \
+       error_code = NULL, error_message = NULL, updated_at = ?, revision = ? WHERE id = ? \
        AND status IN ('queued', 'probing', 'downloading')",
     )
     .bind(total_bytes.map(to_i64).transpose()?)
@@ -1098,69 +1098,6 @@ impl Repository {
       result.rows_affected(),
       id,
       "commit a probe for",
-    )
-    .await?;
-    transaction.commit().await?;
-    self.require_task(id).await
-  }
-
-  pub async fn update_progress(
-    &self,
-    id: &str,
-    downloaded: u64,
-    speed: u64,
-  ) -> Result<DownloadTask> {
-    let mut transaction = self.writer.begin().await?;
-    let revision = next_revision(&mut transaction).await?;
-    let result = sqlx::query(
-      "UPDATE tasks SET downloaded_bytes = ?, speed_bytes_per_second = ?, updated_at = ?, \
-       revision = ? WHERE id = ? AND status = 'downloading'",
-    )
-    .bind(to_i64(downloaded)?)
-    .bind(to_i64(speed)?)
-    .bind(now_millis())
-    .bind(revision)
-    .bind(id)
-    .execute(&mut *transaction)
-    .await?;
-    ensure_task_mutated(
-      &mut transaction,
-      result.rows_affected(),
-      id,
-      "commit HTTP progress for",
-    )
-    .await?;
-    transaction.commit().await?;
-    self.require_task(id).await
-  }
-
-  pub async fn update_transfer_progress(
-    &self,
-    id: &str,
-    total: u64,
-    downloaded: u64,
-    speed: u64,
-  ) -> Result<DownloadTask> {
-    let mut transaction = self.writer.begin().await?;
-    let revision = next_revision(&mut transaction).await?;
-    let result = sqlx::query(
-      "UPDATE tasks SET status = 'downloading', total_bytes = ?, downloaded_bytes = ?, \
-       speed_bytes_per_second = ?, error_code = NULL, error_message = NULL, updated_at = ?, \
-       revision = ? WHERE id = ? AND status IN ('probing', 'downloading')",
-    )
-    .bind(to_i64(total)?)
-    .bind(to_i64(downloaded)?)
-    .bind(to_i64(speed)?)
-    .bind(now_millis())
-    .bind(revision)
-    .bind(id)
-    .execute(&mut *transaction)
-    .await?;
-    ensure_task_mutated(
-      &mut transaction,
-      result.rows_affected(),
-      id,
-      "commit download progress for",
     )
     .await?;
     transaction.commit().await?;
@@ -1212,7 +1149,9 @@ impl Repository {
     task_id: &str,
     ranges: &[CompletedRange],
     samples: &[IntegritySample],
-  ) -> Result<()> {
+    total: Option<u64>,
+    speed: u64,
+  ) -> Result<DownloadTask> {
     let mut transaction = self.writer.begin().await?;
     replace_completed_ranges(&mut transaction, task_id, ranges).await?;
     sqlx::query("DELETE FROM integrity_samples WHERE task_id = ?")
@@ -1231,8 +1170,24 @@ impl Repository {
       .execute(&mut *transaction)
       .await?;
     }
+    let revision = next_revision(&mut transaction).await?;
+    let downloaded: u64 = ranges.iter().map(|range| range.end - range.start).sum();
+    let row = sqlx::query(
+      "UPDATE tasks SET downloaded_bytes = ?, total_bytes = COALESCE(?, total_bytes), \
+       speed_bytes_per_second = CASE WHEN status = 'downloading' THEN ? ELSE 0 END, \
+       updated_at = ?, revision = ? WHERE id = ? RETURNING *",
+    )
+    .bind(to_i64(downloaded)?)
+    .bind(total.map(to_i64).transpose()?)
+    .bind(to_i64(speed)?)
+    .bind(now_millis())
+    .bind(revision)
+    .bind(task_id)
+    .fetch_one(&mut *transaction)
+    .await?;
+    let task = task_from_row(&row)?;
     transaction.commit().await?;
-    Ok(())
+    Ok(task)
   }
 
   pub async fn clear_progress(&self, task_id: &str) -> Result<()> {
@@ -1604,7 +1559,7 @@ async fn replace_completed_ranges(
     .execute(&mut **transaction)
     .await?;
   let updated_at = now_millis();
-  for range in merge_ranges(ranges.to_vec()) {
+  for range in ranges {
     sqlx::query(
       "INSERT INTO segments(task_id, start_offset, end_offset, committed_end, state, updated_at) \
        VALUES (?, ?, ?, ?, 'completed', ?)",
@@ -1645,43 +1600,11 @@ pub fn merge_ranges(mut ranges: Vec<CompletedRange>) -> Vec<CompletedRange> {
   merged
 }
 
-pub fn missing_ranges(total: u64, completed: &[CompletedRange]) -> Vec<CompletedRange> {
-  let completed = merge_ranges(completed.to_vec());
-  let mut cursor = 0;
-  let mut missing = Vec::new();
-  for range in completed {
-    if cursor < range.start {
-      missing.push(CompletedRange {
-        start: cursor,
-        end: range.start.min(total),
-      });
-    }
-    cursor = cursor.max(range.end.min(total));
-    if cursor >= total {
-      break;
-    }
-  }
-  if cursor < total {
-    missing.push(CompletedRange {
-      start: cursor,
-      end: total,
-    });
-  }
-  missing
-    .into_iter()
-    .filter(|range| range.start < range.end)
-    .collect()
-}
-
 pub fn split_ranges(
-  ranges: &[CompletedRange],
+  mut ranges: Vec<CompletedRange>,
   target_count: usize,
   minimum_size: u64,
 ) -> Vec<CompletedRange> {
-  if target_count <= ranges.len() {
-    return ranges.to_vec();
-  }
-  let mut ranges = ranges.to_vec();
   while ranges.len() < target_count {
     let candidate = ranges
       .iter()

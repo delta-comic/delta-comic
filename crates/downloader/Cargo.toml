@@ -20,7 +20,6 @@ ios = { level = "full", notes = "" }
 tauri-plugin = { workspace = true, features = ["build"] }
 
 [dependencies]
-async-trait = { workspace = true }
 bytes = { workspace = true }
 futures-util = { workspace = true }
 hex = { workspace = true }
@@ -28,6 +27,7 @@ httpdate = { workspace = true }
 keyring-core = { workspace = true }
 md-5 = { workspace = true }
 rand = { workspace = true }
+rangemap = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

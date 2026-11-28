@@ -32,6 +32,8 @@ use crate::{
 #[derive(Clone, Copy)]
 enum FaultMode {
   Standard,
+  RejectOversizedRange,
+  StallAfterProbe,
   IgnoreRange,
   LastModified,
   ShortBody,
@@ -114,6 +116,13 @@ async fn serve_file(State(state): State<FaultState>, headers: HeaderMap) -> Resp
   let request_index = state.request_count.fetch_add(1, Ordering::AcqRel);
 
   let total = state.bytes.len() as u64;
+  if matches!(state.mode, FaultMode::RejectOversizedRange) && requested_end > total {
+    return Response::builder()
+      .status(StatusCode::RANGE_NOT_SATISFIABLE)
+      .header(header::CONTENT_RANGE, format!("bytes */{total}"))
+      .body(Body::empty())
+      .unwrap();
+  }
   let start = requested_start.min(total.saturating_sub(1));
   let mut end = requested_end.min(total);
   if start >= end {
@@ -134,6 +143,9 @@ async fn serve_file(State(state): State<FaultState>, headers: HeaderMap) -> Resp
   };
   let bytes = state.bytes[start as usize..end as usize].to_vec();
   let body = match state.mode {
+    FaultMode::StallAfterProbe if request_index > 0 => {
+      Body::from_stream(stream::pending::<io::Result<Vec<u8>>>())
+    }
     FaultMode::ShortBody if request_index > 0 => {
       let shortened = bytes[..bytes.len() / 2].to_vec();
       Body::from_stream(stream::iter([Ok::<_, io::Error>(shortened)]))
@@ -247,7 +259,7 @@ async fn run_fixture(mode: FaultMode, size: usize, expected_size: Option<u64>) -
       settings: &settings,
       temp_path: &partial,
       target_file: None,
-      cancellation: CancellationToken::new(),
+      cancellation: &CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
       progress: None,
@@ -272,7 +284,7 @@ async fn run_error(mode: FaultMode, size: usize, expected_size: Option<u64>) -> 
       settings: &settings,
       temp_path: &root.path().join("fixture.bin.part"),
       target_file: None,
-      cancellation: CancellationToken::new(),
+      cancellation: &CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
       progress: None,
@@ -324,6 +336,8 @@ async fn assert_stale_resume_restarts(
       &task.id,
       &ranges,
       &integrity_samples(&partial_file, &ranges).unwrap(),
+      None,
+      0,
     )
     .await
     .unwrap();
@@ -337,7 +351,7 @@ async fn assert_stale_resume_restarts(
       settings: &settings,
       temp_path: &partial,
       target_file: None,
-      cancellation: CancellationToken::new(),
+      cancellation: &CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
       progress: None,
@@ -362,6 +376,57 @@ async fn downloads_parallel_standard_ranges() {
   let size = 9 * 1024 * 1024 + 37;
   assert_eq!(
     run_fixture(FaultMode::Standard, size, Some(size as u64)).await,
+    fixture(size),
+  );
+}
+
+#[tokio::test]
+async fn checkpoints_finished_bytes_while_other_ranges_stall_and_then_cancels() {
+  let size = 2 * 1024 * 1024;
+  let server = FaultServer::start(fixture(size), FaultMode::StallAfterProbe).await;
+  let root = TempDir::new().unwrap();
+  let (repository, task, source, settings) = setup_task(&root, &server.url, None).await;
+  let cancellation = CancellationToken::new();
+  let on_progress = |task: DownloadTask| {
+    if task.downloaded_bytes > 0 {
+      cancellation.cancel();
+    }
+  };
+  let result = tokio::time::timeout(
+    std::time::Duration::from_secs(10),
+    download(
+      &reqwest::Client::new(),
+      DownloadRequest {
+        repository: &repository,
+        task: &task,
+        source: &source,
+        settings: &settings,
+        temp_path: &root.path().join("fixture.bin.part"),
+        target_file: None,
+        cancellation: &cancellation,
+        secret_resolver: None,
+        maximum_bytes: None,
+        progress: Some(&on_progress),
+      },
+    ),
+  )
+  .await
+  .unwrap();
+  assert!(matches!(result, Err(Error::Cancelled)));
+  assert_eq!(
+    repository.completed_ranges(&task.id).await.unwrap(),
+    [CompletedRange {
+      start: 0,
+      end: super::INITIAL_RANGE_BYTES
+    }],
+  );
+}
+
+#[tokio::test]
+async fn retries_single_byte_probe_when_server_rejects_an_oversized_range() {
+  let size = 32 * 1024;
+  assert_eq!(
+    run_fixture(FaultMode::RejectOversizedRange, size, None).await,
     fixture(size),
   );
 }
@@ -444,7 +509,7 @@ async fn refuses_a_symlinked_partial_file_without_touching_its_target() {
       settings: &settings,
       temp_path: &partial,
       target_file: None,
-      cancellation: CancellationToken::new(),
+      cancellation: &CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
       progress: None,
@@ -498,6 +563,8 @@ async fn resume_requests_only_missing_ranges() {
       &task.id,
       &ranges,
       &integrity_samples(&partial_file, &ranges).unwrap(),
+      None,
+      0,
     )
     .await
     .unwrap();
@@ -511,7 +578,7 @@ async fn resume_requests_only_missing_ranges() {
       settings: &settings,
       temp_path: &partial,
       target_file: None,
-      cancellation: CancellationToken::new(),
+      cancellation: &CancellationToken::new(),
       secret_resolver: None,
       maximum_bytes: None,
       progress: None,

@@ -171,6 +171,6 @@ pub trait DownloaderExt<R: Runtime> {
 
 impl<R: Runtime> DownloaderExt<R> for AppHandle<R> {
   fn downloader(&self) -> DownloaderHandle {
-    self.state::<engine::Engine>().handle()
+    self.state::<std::sync::Arc<engine::Engine>>().handle()
   }
 }

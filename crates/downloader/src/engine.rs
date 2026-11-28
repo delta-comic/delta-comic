@@ -37,7 +37,7 @@ pub enum EngineEvent {
   Attention(AttentionEvent),
 }
 
-type EventSink = Arc<dyn Fn(EngineEvent) + Send + Sync>;
+type EventSink = Box<dyn Fn(EngineEvent) + Send + Sync>;
 
 #[cfg(any(target_os = "android", test))]
 enum BackgroundClaim {
@@ -55,7 +55,7 @@ pub(crate) struct DirectSafTarget {
 
 #[derive(Clone)]
 pub struct DownloaderHandle {
-  engine: Engine,
+  engine: Arc<Engine>,
 }
 
 impl DownloaderHandle {
@@ -84,16 +84,15 @@ impl DownloaderHandle {
   }
 }
 
-#[derive(Clone)]
 pub struct Engine {
   pub(crate) repository: Repository,
   staging_root: PathBuf,
   client: Client,
-  controls: Arc<Mutex<HashMap<String, CancellationToken>>>,
+  controls: Mutex<HashMap<String, CancellationToken>>,
   #[cfg(any(target_os = "android", test))]
-  background_stop_generations: Arc<Mutex<HashMap<String, u64>>>,
-  workers_changed: Arc<Notify>,
-  wake: Arc<Notify>,
+  background_stop_generations: Mutex<HashMap<String, u64>>,
+  workers_changed: Notify,
+  wake: Notify,
   shutdown: CancellationToken,
   events: EventSink,
   secret_resolver: Option<Arc<dyn crate::SecretResolver>>,
@@ -105,7 +104,7 @@ impl Engine {
     default_download_dir: &Path,
     secret_resolver: Option<Arc<dyn crate::SecretResolver>>,
     events: impl Fn(EngineEvent) + Send + Sync + 'static,
-  ) -> Result<Self> {
+  ) -> Result<Arc<Self>> {
     tokio::fs::create_dir_all(default_download_dir).await?;
     let repository = Repository::open(database_path).await?;
     let default_destination = Destination {
@@ -132,29 +131,29 @@ impl Engine {
       .build()?;
     let staging_root = default_download_dir.join(".saf-staging");
     tokio::fs::create_dir_all(&staging_root).await?;
-    Ok(Self {
+    Ok(Arc::new(Self {
       repository,
       staging_root,
       client,
-      controls: Arc::new(Mutex::new(HashMap::new())),
+      controls: Mutex::default(),
       #[cfg(any(target_os = "android", test))]
-      background_stop_generations: Arc::new(Mutex::new(HashMap::new())),
-      workers_changed: Arc::new(Notify::new()),
-      wake: Arc::new(Notify::new()),
+      background_stop_generations: Mutex::default(),
+      workers_changed: Notify::new(),
+      wake: Notify::new(),
       shutdown: CancellationToken::new(),
-      events: Arc::new(events),
+      events: Box::new(events),
       secret_resolver,
-    })
+    }))
   }
 
-  pub fn handle(&self) -> DownloaderHandle {
+  pub fn handle(self: &Arc<Self>) -> DownloaderHandle {
     DownloaderHandle {
       engine: self.clone(),
     }
   }
 
   #[cfg(not(target_os = "android"))]
-  pub fn start(&self) {
+  pub fn start(self: &Arc<Self>) {
     let engine = self.clone();
     self.wake.notify_one();
     tauri::async_runtime::spawn(async move { engine.dispatch_loop().await });
@@ -188,9 +187,9 @@ impl Engine {
       .map(sanitize_file_name)
       .filter(|value| !value.is_empty())
       .unwrap_or_else(|| "download".into());
-    let title = input.title.unwrap_or_else(|| file_name.clone());
     let relative_path =
       sanitize_relative_path(input.relative_path.as_deref().unwrap_or(&file_name))?;
+    let title = input.title.unwrap_or(file_name);
     let mut mirrors = input.mirrors;
     mirrors.push(HttpMirror {
       url: input.url,
@@ -210,12 +209,18 @@ impl Engine {
         expires_at: None,
       }),
     };
-    self
-      .create_task(None, title, asset, input.destination_id, input.priority)
-      .await
+    let destination = self
+      .repository
+      .destination(input.destination_id.as_deref().unwrap_or("default"))
+      .await?;
+    let mut task = self.build_task(None, title, asset, &destination, input.priority)?;
+    self.repository.insert_task(&mut task).await?;
+    self.emit_task_ref(&task);
+    self.wake.notify_one();
+    Ok(task)
   }
 
-  pub async fn enqueue_plan(&self, input: EnqueuePlanInput) -> Result<Vec<DownloadTask>> {
+  pub async fn enqueue_plan(&self, mut input: EnqueuePlanInput) -> Result<Vec<DownloadTask>> {
     if input.assets.is_empty() {
       return Err(Error::InvalidInput(
         "download plan contains no assets".into(),
@@ -232,91 +237,73 @@ impl Engine {
         "download plan key must not be empty".into(),
       ));
     }
-    let destination_id = input.destination_id.unwrap_or_else(|| "default".into());
+    let destination = self
+      .repository
+      .destination(input.destination_id.as_deref().unwrap_or("default"))
+      .await?;
     let mut tasks = Vec::with_capacity(input.assets.len());
     let mut asset_keys = HashSet::with_capacity(input.assets.len());
     let mut relative_paths = HashSet::with_capacity(input.assets.len());
-    for mut asset in input.assets {
-      if asset.key.trim().is_empty() || !asset_keys.insert(asset.key.clone()) {
+    for asset in &mut input.assets {
+      if asset.key.trim().is_empty() || !asset_keys.insert(asset.key.as_str()) {
         return Err(Error::InvalidInput(
           "download plan contains an empty or duplicate asset key".into(),
         ));
       }
       asset.relative_path =
         sanitize_relative_path(&format!("{collection_dir}/{}", asset.relative_path))?;
-      if !relative_paths.insert(asset.relative_path.clone()) {
+      if !relative_paths.insert(asset.relative_path.as_str()) {
         return Err(Error::InvalidInput(
           "download plan contains duplicate destination paths".into(),
         ));
       }
+    }
+    for asset in input.assets {
       let title = asset
         .relative_path
         .rsplit('/')
         .next()
-        .map(str::to_string)
-        .unwrap_or_else(|| input.title.clone());
-      tasks.push(
-        self
-          .build_task(
-            Some(input.key.clone()),
-            title,
-            asset,
-            Some(destination_id.clone()),
-            input.priority,
-          )
-          .await?,
-      );
+        .unwrap_or(&input.title)
+        .to_owned();
+      tasks.push(self.build_task(
+        Some(input.key.clone()),
+        title,
+        asset,
+        &destination,
+        input.priority,
+      )?);
     }
     self
       .repository
       .insert_collection_tasks(
         &input.key,
         &input.title,
-        &destination_id,
+        &destination.id,
         input.refresh_context.as_ref(),
         &mut tasks,
       )
       .await?;
     for task in &tasks {
-      self.emit_task(task.clone());
+      self.emit_task_ref(task);
     }
     self.wake.notify_one();
     Ok(tasks)
   }
 
-  async fn create_task(
+  fn build_task(
     &self,
     collection_key: Option<String>,
     title: String,
     asset: DownloadAsset,
-    destination_id: Option<String>,
+    destination: &Destination,
     priority: Option<u8>,
   ) -> Result<DownloadTask> {
-    let mut task = self
-      .build_task(collection_key, title, asset, destination_id, priority)
-      .await?;
-    self.repository.insert_task(&mut task).await?;
-    self.emit_task(task.clone());
-    self.wake.notify_one();
-    Ok(task)
-  }
-
-  async fn build_task(
-    &self,
-    collection_key: Option<String>,
-    title: String,
-    asset: DownloadAsset,
-    destination_id: Option<String>,
-    priority: Option<u8>,
-  ) -> Result<DownloadTask> {
-    let destination_id = destination_id.unwrap_or_else(|| "default".into());
-    let destination = self.repository.destination(&destination_id).await?;
     let id = Uuid::new_v4().to_string();
     let root = match destination.kind {
       DestinationKind::AndroidSaf => self.staging_root.join(&id),
-      _ => PathBuf::from(destination.path),
+      _ => PathBuf::from(&destination.path),
     };
-    let relative_path = sanitize_relative_path(&asset.relative_path)?;
+    let relative_path = asset.relative_path;
     let final_path = root.join(&relative_path);
     if !final_path.starts_with(&root) {
       return Err(Error::InvalidInput(
@@ -331,7 +318,7 @@ impl Engine {
       kind: TaskKind::Http,
       title,
       source: asset.source,
-      destination_id,
+      destination_id: destination.id.clone(),
       relative_path,
       status: TaskStatus::Queued,
       priority: validate_priority(priority.unwrap_or(5))?,
@@ -358,27 +345,27 @@ impl Engine {
       control.cancel();
     }
     let task = self.repository.pause_task(id).await?;
-    self.emit_task(task.clone());
+    self.emit_task_ref(&task);
     Ok(task)
   }
 
   pub async fn resume(&self, id: &str) -> Result<DownloadTask> {
     let task = self.repository.resume_task(id).await?;
-    self.emit_task(task.clone());
+    self.emit_task_ref(&task);
     self.wake.notify_one();
     Ok(task)
   }
 
   pub async fn retry(&self, id: &str) -> Result<DownloadTask> {
     let task = self.repository.retry_task(id).await?;
-    self.emit_task(task.clone());
+    self.emit_task_ref(&task);
     self.wake.notify_one();
     Ok(task)
   }
 
   pub async fn update_source(&self, id: &str, source: &DownloadSource) -> Result<DownloadTask> {
     let task = self.repository.update_source(id, source).await?;
-    self.emit_task(task.clone());
+    self.emit_task_ref(&task);
     self.wake.notify_one();
     Ok(task)
   }
@@ -388,14 +375,14 @@ impl Engine {
       .repository
       .set_priority(id, validate_priority(priority)?)
       .await?;
-    self.emit_task(task.clone());
+    self.emit_task_ref(&task);
     self.wake.notify_one();
     Ok(task)
   }
 
   pub async fn move_queue(&self, id: &str, before_task_id: Option<&str>) -> Result<DownloadTask> {
     let task = self.repository.move_queue(id, before_task_id).await?;
-    self.emit_task(task.clone());
+    self.emit_task_ref(&task);
     self.wake.notify_one();
     Ok(task)
   }
@@ -414,7 +401,7 @@ impl Engine {
       control.cancel();
     }
     let task = self.repository.cancel_task(id).await?;
-    self.emit_task(task.clone());
+    self.emit_task_ref(&task);
     Ok(task)
   }
 
@@ -587,7 +574,7 @@ impl Engine {
   }
 
   #[cfg(not(target_os = "android"))]
-  async fn dispatch_loop(self) {
+  async fn dispatch_loop(self: Arc<Self>) {
     let mut next_network_reprobe = tokio::time::Instant::now() + NETWORK_REPROBE_INTERVAL;
     loop {
       tokio::select! {
@@ -782,7 +769,7 @@ impl Engine {
       };
       settings.per_task_connections = per_task_connections;
       let result = self
-        .run_task_inner(&task, &settings, token, direct_target.clone())
+        .run_task_inner(&task, &settings, token, direct_target)
         .await;
       let outcome = self.finish_task_now(id, result).await;
       self.controls.lock().await.remove(id);
@@ -860,7 +847,7 @@ impl Engine {
     let mut generations = self.background_stop_generations.lock().await;
     let generation = generations.entry(id.to_owned()).or_default();
     *generation = generation.saturating_add(1);
-    if let Some(control) = self.controls.lock().await.get(id).cloned() {
+    if let Some(control) = self.controls.lock().await.get(id) {
       control.cancel();
     }
     drop(generations);
@@ -965,9 +952,9 @@ impl Engine {
     #[cfg(not(any(target_os = "android", test)))]
     let is_direct_saf = false;
     #[cfg(any(target_os = "android", test))]
-    let direct_file = direct_target.as_ref().map(|target| target.file.clone());
+    let direct_file = direct_target.as_ref().map(|target| &target.file);
     #[cfg(not(any(target_os = "android", test)))]
-    let direct_file: Option<Arc<File>> = None;
+    let direct_file: Option<&Arc<File>> = None;
     if !is_direct_saf && let Some(parent) = final_path.parent() {
       tokio::fs::create_dir_all(parent).await?;
     }
@@ -983,14 +970,11 @@ impl Engine {
           source,
           settings,
           temp_path: &temp_path,
-          target_file: direct_file.clone(),
-          cancellation: token.clone(),
+          target_file: direct_file,
+          cancellation: &token,
           secret_resolver: self.secret_resolver.as_deref(),
           maximum_bytes: None,
-          progress: Some({
-            let engine = self.clone();
-            Arc::new(move |task| engine.emit_task(task))
-          }),
+          progress: Some(&|task| self.emit_task(task)),
         },
       )
       .await
@@ -1032,7 +1016,7 @@ impl Engine {
     if let Some(checksum) = &task.checksum {
       let verifying = self.repository.begin_verification(&task.id).await?;
       self.emit_task(verifying);
-      if let Some(file) = &direct_file {
+      if let Some(file) = direct_file {
         checksum::verify_file(file, checksum).await?;
       } else {
         checksum::verify(&temp_path, checksum).await?;
@@ -1065,8 +1049,7 @@ impl Engine {
     Ok(())
   }
 
-  fn emit_task(&self, task: DownloadTask) {
-    let task = Self::event_snapshot(task);
+  fn publish_snapshot(&self, task: DownloadTask) {
     let revision = task.revision;
     (self.events)(EngineEvent::TaskUpsert(Box::new(TaskUpsertEvent {
       task,
@@ -1074,37 +1057,84 @@ impl Engine {
     })));
   }
 
-  fn event_snapshot(mut task: DownloadTask) -> DownloadTask {
-    const REDACTED: &str = "[redacted]";
-
+  fn emit_task(&self, mut task: DownloadTask) {
     task.final_path = None;
     let DownloadSource::Http(source) = &mut task.source;
     for mirror in &mut source.mirrors {
-      mirror.url = REDACTED.into();
-      let mut headers = BTreeMap::new();
-      for value in mirror.headers.values() {
-        match value {
-          HttpHeaderValue::Value { .. } => {
-            headers.insert(
-              "[redacted-value-header]".into(),
-              HttpHeaderValue::Value {
-                value: REDACTED.into(),
-              },
-            );
-          }
-          HttpHeaderValue::SecretRef { .. } => {
-            headers.insert(
-              "[redacted-secret-header]".into(),
-              HttpHeaderValue::SecretRef {
-                secret_ref: REDACTED.into(),
-              },
-            );
-          }
-        }
-      }
-      mirror.headers = headers;
+      *mirror = redacted_mirror(mirror);
     }
-    task
+    self.publish_snapshot(task);
+  }
+
+  // Commands return the original task, while the event owns only its public snapshot.
+  fn emit_task_ref(&self, task: &DownloadTask) {
+    let DownloadSource::Http(source) = &task.source;
+    self.publish_snapshot(DownloadTask {
+      id: task.id.clone(),
+      collection_key: task.collection_key.clone(),
+      asset_key: task.asset_key.clone(),
+      kind: task.kind,
+      title: task.title.clone(),
+      source: DownloadSource::Http(HttpSource {
+        mirrors: source.mirrors.iter().map(redacted_mirror).collect(),
+        expected_size: source.expected_size,
+        expires_at: source.expires_at,
+        etag: source.etag.clone(),
+        last_modified: source.last_modified.clone(),
+      }),
+      destination_id: task.destination_id.clone(),
+      relative_path: task.relative_path.clone(),
+      status: task.status,
+      priority: task.priority,
+      queue_position: task.queue_position,
+      total_bytes: task.total_bytes,
+      downloaded_bytes: task.downloaded_bytes,
+      speed_bytes_per_second: task.speed_bytes_per_second,
+      error_code: task.error_code.clone(),
+      error_message: task.error_message.clone(),
+      checksum: task.checksum.clone(),
+      etag: task.etag.clone(),
+      last_modified: task.last_modified.clone(),
+      final_path: None,
+      retry_count: task.retry_count,
+      created_at: task.created_at,
+      updated_at: task.updated_at,
+      revision: task.revision,
+    });
+  }
+}
+
+fn redacted_mirror(mirror: &HttpMirror) -> HttpMirror {
+  const REDACTED: &str = "[redacted]";
+  let mut headers = BTreeMap::new();
+  if mirror
+    .headers
+    .values()
+    .any(|v| matches!(v, HttpHeaderValue::Value { .. }))
+  {
+    headers.insert(
+      "[redacted-value-header]".into(),
+      HttpHeaderValue::Value {
+        value: REDACTED.into(),
+      },
+    );
+  }
+  if mirror
+    .headers
+    .values()
+    .any(|v| matches!(v, HttpHeaderValue::SecretRef { .. }))
+  {
+    headers.insert(
+      "[redacted-secret-header]".into(),
+      HttpHeaderValue::SecretRef {
+        secret_ref: REDACTED.into(),
+      },
+    );
+  }
+  HttpMirror {
+    url: REDACTED.into(),
+    priority: mirror.priority,
+    headers,
   }
 }
 

@@ -79,6 +79,7 @@ Popconfirm
 Popselect
 preboot
 previewable
+rangemap
 Redirections
 Refreshable
 releaserc

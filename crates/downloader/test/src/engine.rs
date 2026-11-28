@@ -40,7 +40,7 @@ fn asset(key: &str, relative_path: &str, size: u64) -> DownloadAsset {
   }
 }
 
-async fn engine(root: &TempDir) -> Engine {
+async fn engine(root: &TempDir) -> Arc<Engine> {
   Engine::open(
     &root.path().join("downloader.sqlite"),
     &root.path().join("downloads"),
@@ -128,7 +128,13 @@ async fn shutdown_waits_for_worker_checkpoint_and_requeues_only_interrupted_task
 
   engine
     .repository
-    .save_checkpoint(&interrupted.id, &[CompletedRange { start: 0, end: 8 }], &[])
+    .save_checkpoint(
+      &interrupted.id,
+      &[CompletedRange { start: 0, end: 8 }],
+      &[],
+      None,
+      0,
+    )
     .await
     .unwrap();
   engine.controls.lock().await.remove(&interrupted.id);
@@ -393,10 +399,14 @@ async fn task_events_redact_sources_headers_and_local_paths() {
     last_modified: None,
     expires_at: None,
   });
-  engine.emit_task(task.clone());
+  engine.emit_task_ref(&task);
+  assert_eq!(task.final_path.as_deref(), Some(SECRET_FINAL_PATH));
+  let DownloadSource::Http(source) = &task.source;
+  assert_eq!(source.mirrors[0].url, SECRET_URL);
+  engine.emit_task(task);
 
   let events = events.lock().unwrap();
-  assert_eq!(events.len(), 1);
+  assert_eq!(events.len(), 2);
   for event in events.iter() {
     let EngineEvent::TaskUpsert(payload) = event else {
       panic!("unexpected redaction event: {event:?}");
@@ -522,6 +532,8 @@ async fn reopens_interrupted_tasks_with_ranges_and_refresh_context() {
         CompletedRange { start: 16, end: 24 },
       ],
       &[],
+      None,
+      0,
     )
     .await
     .unwrap();
