@@ -1,5 +1,19 @@
 **请谨慎更新，当前版本为预发布版本，可能包含未完成的功能或兼容性问题**
 
+# [3.0.0-next.34](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.33...3.0.0-next.34) (2026-11-28)
+
+
+### Bug Fixes
+
+* **ci:** 修复安卓格式检查和 SDK 发布打包 ([c389d8b](https://github.com/delta-comic/delta-comic/commit/c389d8b72129b63dfabbf03aa424bad7b0b2cdce))
+
+
+### Performance Improvements
+
+* **downloader:** 减少分片与任务快照复制并复用首段响应 ([ee9af49](https://github.com/delta-comic/delta-comic/commit/ee9af492e3022e8ab5fa8a5519508497a7b6c813))
+
+**请谨慎更新，当前版本为预发布版本，可能包含未完成的功能或兼容性问题**
+
 # [3.0.0-next.32](https://github.com/delta-comic/delta-comic/compare/3.0.0-next.31...3.0.0-next.32) (2026-11-25)
 
 

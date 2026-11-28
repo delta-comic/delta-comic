@@ -1,6 +1,6 @@
 {
   "name": "@delta-comic/platform",
-  "version": "3.0.0-next.32",
+  "version": "3.0.0-next.34",
   "private": true,
   "type": "module",
   "exports": {
