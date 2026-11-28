@@ -14,7 +14,7 @@ catalog:
   semantic-release: ^25.0.9
   es-module-lexer: ^3.0.4
   magic-string: ^1.4.5
-  cordis: ^4.0.0-rc.13
+  cordis: ^4.0.0-rc.14
   rolldown-plugin-dts: ^0.30.2
   '@commitlint/cli': ^21.2.4
   '@commitlint/config-conventional': ^21.2.4
@@ -28,9 +28,9 @@ catalog:
   '@tauri-apps/plugin-fs': ^2.7.1
   '@tauri-apps/plugin-shell': ^2.6.0
   '@tauri-apps/plugin-sql': ^2.6.0
-  '@types/node': 26.6.6
+  '@types/node': 26.6.11
   '@types/semver': ^7.8.0
-  '@vizejs/vite-plugin': ^0.797.0
+  '@vizejs/vite-plugin': ^0.810.0
   '@vueuse/core': ^15.0.0
   '@vitest/coverage-v8': 5.1.1
   browserslist: ^4.29.5
@@ -64,43 +64,45 @@ catalog:
   tsrs: 7.1.0-beta.tsrs5
   typescript: npm:typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2
   vite: npm:@voidzero-dev/vite-plus-core@8.3.8001
-  vite-plugin-vue-devtools: ^9.0.0-rc.3
+  vite-plugin-vue-devtools: ^9.0.0-rc.4
   vite-plus: 1.8.0
   vue-tsc: ^3.3.14
-  vize: ^0.797.0
-  vue: 3.6.0-rc.16
-  vue-i18n: ^12.0.0-alpha.13
+  vize: ^0.810.0
+  vue: 3.6.0-rc.17
+  vue-i18n: ^12.0.0-alpha.14
   vue-component-type-helpers: ^4.0.0-alpha.3
   vue-router: ^5.5.1
   kysely-wasqlite-worker: ^2.0.1
   happy-dom: ^21.0.4
   json-logic-js: ^2.0.5
   '@types/json-logic-js': ^2.0.8
-  vitest: 5.1.1
+  vitest: 5.1.2
 
 minimumReleaseAgeExclude:
-  - '@vizejs/native-darwin-arm64@0.793.0 || 0.797.0'
-  - '@vizejs/native-darwin-x64@0.793.0 || 0.797.0'
-  - '@vizejs/native-linux-arm64-gnu@0.793.0 || 0.797.0'
-  - '@vizejs/native-linux-arm64-musl@0.793.0 || 0.797.0'
-  - '@vizejs/native-linux-x64-gnu@0.793.0 || 0.797.0'
-  - '@vizejs/native-linux-x64-musl@0.793.0 || 0.797.0'
-  - '@vizejs/native-win32-arm64-msvc@0.793.0 || 0.797.0'
-  - '@vizejs/native-win32-x64-msvc@0.793.0 || 0.797.0'
-  - '@vizejs/native@0.793.0 || 0.797.0'
-  - '@vizejs/unplugin@0.793.0 || 0.797.0'
-  - '@vizejs/vite-plugin@0.793.0 || 0.797.0'
-  - '@voidzero-dev/vite-plus-core@8.3.8001'
-  - '@voidzero-dev/vite-plus-darwin-arm64@1.8.0'
-  - '@voidzero-dev/vite-plus-darwin-x64@1.8.0'
-  - '@voidzero-dev/vite-plus-linux-arm64-gnu@1.8.0'
-  - '@voidzero-dev/vite-plus-linux-arm64-musl@1.8.0'
-  - '@voidzero-dev/vite-plus-linux-x64-gnu@1.8.0'
-  - '@voidzero-dev/vite-plus-linux-x64-musl@1.8.0'
-  - '@voidzero-dev/vite-plus-win32-arm64-msvc@1.8.0'
-  - '@voidzero-dev/vite-plus-win32-x64-msvc@1.8.0'
-  - vite-plus@1.8.0
-  - vize@0.793.0 || 0.797.0
+  - '@vizejs/native-darwin-arm64@0.810.0'
+  - '@vizejs/native-darwin-x64@0.810.0'
+  - '@vizejs/native-linux-arm64-gnu@0.810.0'
+  - '@vizejs/native-linux-arm64-musl@0.810.0'
+  - '@vizejs/native-linux-x64-gnu@0.810.0'
+  - '@vizejs/native-linux-x64-musl@0.810.0'
+  - '@vizejs/native-win32-arm64-msvc@0.810.0'
+  - '@vizejs/native-win32-x64-msvc@0.810.0'
+  - '@vizejs/native@0.810.0'
+  - '@vizejs/unplugin@0.810.0'
+  - '@vizejs/vite-plugin@0.810.0'
+  - '@vue/compiler-core@3.6.0-rc.17'
+  - '@vue/compiler-dom@3.6.0-rc.17'
+  - '@vue/compiler-sfc@3.6.0-rc.17'
+  - '@vue/compiler-ssr@3.6.0-rc.17'
+  - '@vue/compiler-vapor@3.6.0-rc.17'
+  - '@vue/reactivity@3.6.0-rc.17'
+  - '@vue/runtime-core@3.6.0-rc.17'
+  - '@vue/runtime-dom@3.6.0-rc.17'
+  - '@vue/runtime-vapor@3.6.0-rc.17'
+  - '@vue/server-renderer@3.6.0-rc.17'
+  - '@vue/shared@3.6.0-rc.17'
+  - vize@0.810.0
+  - vue@3.6.0-rc.17
 
 overrides:
   typescript: 'catalog:'
