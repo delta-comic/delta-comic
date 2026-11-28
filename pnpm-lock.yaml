@@ -351,8 +351,8 @@ catalogs:
       specifier: ^4.0.0-alpha.3
       version: 4.0.0-alpha.3
     vue-i18n:
-      specifier: ^12.0.0-alpha.14
-      version: 12.0.0-alpha.14
+      specifier: ^11.4.24
+      version: 11.4.24
     vue-router:
       specifier: ^5.5.1
       version: 5.5.3
@@ -531,7 +531,7 @@ importers:
         version: 3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
       vue-i18n:
         specifier: 'catalog:'
-        version: 12.0.0-alpha.14(vue@3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+        version: 11.4.24(vue@3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
       vue-router:
         specifier: 'catalog:'
         version: 5.5.3(@pinia/colada@1.4.9(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(vue@3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(@voidzero-dev/vite-plus-core@8.3.8001(@types/node@26.6.11)(@vitejs/devtools@0.7.6)(@volar/typescript@2.4.30(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(@vue/language-core@3.3.14)(jiti@2.7.0)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue-tsc@3.3.14(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))(yaml@2.9.1))(@vue/compiler-sfc@3.6.0-rc.17)(pinia@4.1.0(@vue/devtools-api@8.2.1)(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)(vue@3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)))(rolldown@1.3.4)(vue@3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
@@ -1229,27 +1229,21 @@ packages:
   '@emotion/hash@0.8.0':
     resolution: {integrity: sha512-kBJtf7PH6aWwZ6fka3zQ0p6SBYzx4fl1LoZXE2RrnYST9Xljm7WfKJrU4g/Xr3Beg72MLrp1AWNUmuYJTL7Cow==}
 
-  '@intlify/core-base@12.0.0-alpha.14':
-    resolution: {integrity: sha512-TCYJBHGXwNdUple7jGsolvK4GZdN8rRAdhUXQQkNP2eHwdnDqRN+aqfftJv7JJwUv3uTOjRcDELh3gW65DL+3w==}
+  '@intlify/core-base@11.4.24':
+    resolution: {integrity: sha512-lFEs4lR28ek9FP4AUoPQch5H2m4Jbf9jOUnIpHmapDda9ZNQueRGqac9hiIrQC2AxUXMMxSNceUhn9mNe/FuCQ==}
     engines: {node: '>= 22'}
 
-  '@intlify/devtools-types@12.0.0-alpha.14':
-    resolution: {integrity: sha512-IGQTefsb/iAv3GPiW/aKfddmjnZHBXm06QDNe2uL1Rn2zWFrLG4bshd0lJyvgDuTW25b2Ej9iKjyQZip0gGt/A==}
+  '@intlify/devtools-types@11.4.24':
+    resolution: {integrity: sha512-ffL2YMfN3+yKxPs4f2jp9H7crgTHi0okIDhYD/ygoE86WC+jcL6VTpGdL4Wx7qktSRo6M43jZnoUqXGRlVK4HQ==}
     engines: {node: '>= 22'}
 
-  '@intlify/message-compiler@12.0.0-alpha.14':
-    resolution: {integrity: sha512-eH+aQVDu7LYWqKnzsqa2BUQbS+lh6HIW/4acBi/HPvN/JVA+cPgNLcB4yHNzESZywH1NNDeAmeT5uwKs1VCWxQ==}
+  '@intlify/message-compiler@11.4.24':
+    resolution: {integrity: sha512-RrA+avo7TIUI4RXh410RbZ8L5W9J/clVOesrjvBQXb/zzHadwW1ZoKRJAYZb6F8mHkt3CpmZwD73FVykT8QDiA==}
     engines: {node: '>= 22'}
 
-  '@intlify/shared@12.0.0-alpha.14':
-    resolution: {integrity: sha512-Z9pIm7gl3m9VfrfvpZXlHxDQRSKo/TNWopJxw6JnzMJ6/wNh4sDBERidGnOtAtLamq0VKjVPBgw8AO+SJGsSkQ==}
+  '@intlify/shared@11.4.24':
+    resolution: {integrity: sha512-EHpLWIRIp6OkrvXSGlvSnNmtiTQofV5pPqc0eyvA1YrbOLMSzTnVnZUoDexT8DPGOxsaAXq28oxB4jkqgh+2xQ==}
     engines: {node: '>= 22'}
-
-  '@intlify/vue-i18n-core@12.0.0-alpha.14':
-    resolution: {integrity: sha512-SUHPz6OKCjcP1POVZOucUt8oosR55/wp//wFX1ZXmdEIKhPIJOsm8+ZB1pSXsX3mU1SbyqjQ/TVuqFx7X3SE5A==}
-    engines: {node: '>= 22'}
-    peerDependencies:
-      vue: ^3.6.0-beta.2
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -5102,11 +5096,11 @@ packages:
   vue-component-type-helpers@4.0.0-alpha.3:
     resolution: {integrity: sha512-WHCTMi3O397YgXaR9DAKgZEI1JJnrREzv4cj1BN+Jc3QAUDiMrJ7QggH3aLfWspiY5Q3lIIHmZvcWLka5W2+jA==}
 
-  vue-i18n@12.0.0-alpha.14:
-    resolution: {integrity: sha512-gNHGOkGjDmTWcQiqyQuOXSLGiWfZEEBRQDc9Jqp1ZKz3XTiY798Mv2xYeL5jDgr3UA1xPBJS0q32Qn4AGesvhQ==}
+  vue-i18n@11.4.24:
+    resolution: {integrity: sha512-tJOAoZawEz2xFdDyHD2prvIjf1VbsTJUUeAe0VY9wiMzZV/SYhq3uz92achoGPGZk9eaBykyAI2NcvUcsX/ESw==}
     engines: {node: '>= 22'}
     peerDependencies:
-      vue: ^3.6.0-beta.2
+      vue: ^3.0.0
 
   vue-router@5.5.3:
     resolution: {integrity: sha512-F3uyE2siuOC8QLxR3YAdqtxTEgLM/+rc0Fvej7/DVo6YTY5RgLBQpm1+fYP26ITjD3Fg5rDWuzBKxIB6rjlt1w==}
@@ -5767,31 +5761,23 @@ snapshots:
 
   '@emotion/hash@0.8.0': {}
 
-  '@intlify/core-base@12.0.0-alpha.14':
+  '@intlify/core-base@11.4.24':
     dependencies:
-      '@intlify/devtools-types': 12.0.0-alpha.14
-      '@intlify/message-compiler': 12.0.0-alpha.14
-      '@intlify/shared': 12.0.0-alpha.14
+      '@intlify/devtools-types': 11.4.24
+      '@intlify/message-compiler': 11.4.24
+      '@intlify/shared': 11.4.24
 
-  '@intlify/devtools-types@12.0.0-alpha.14':
+  '@intlify/devtools-types@11.4.24':
     dependencies:
-      '@intlify/core-base': 12.0.0-alpha.14
-      '@intlify/shared': 12.0.0-alpha.14
+      '@intlify/core-base': 11.4.24
+      '@intlify/shared': 11.4.24
 
-  '@intlify/message-compiler@12.0.0-alpha.14':
+  '@intlify/message-compiler@11.4.24':
     dependencies:
-      '@intlify/shared': 12.0.0-alpha.14
+      '@intlify/shared': 11.4.24
       source-map-js: 1.2.4
 
-  '@intlify/shared@12.0.0-alpha.14': {}
-
-  '@intlify/vue-i18n-core@12.0.0-alpha.14(vue@3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))':
-    dependencies:
-      '@intlify/core-base': 12.0.0-alpha.14
-      '@intlify/devtools-types': 12.0.0-alpha.14
-      '@intlify/shared': 12.0.0-alpha.14
-      '@vue/devtools-api': 6.6.4
-      vue: 3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
+  '@intlify/shared@11.4.24': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -9207,11 +9193,11 @@ snapshots:
 
   vue-component-type-helpers@4.0.0-alpha.3: {}
 
-  vue-i18n@12.0.0-alpha.14(vue@3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)):
+  vue-i18n@11.4.24(vue@3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)):
     dependencies:
-      '@intlify/core-base': 12.0.0-alpha.14
-      '@intlify/devtools-types': 12.0.0-alpha.14
-      '@intlify/vue-i18n-core': 12.0.0-alpha.14(vue@3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2))
+      '@intlify/core-base': 11.4.24
+      '@intlify/devtools-types': 11.4.24
+      '@intlify/shared': 11.4.24
       '@vue/devtools-api': 6.6.4
       vue: 3.6.0-rc.17(typescript-native-bridge@6.0.3-bridge.19.tsgo.7.0.2)
 
