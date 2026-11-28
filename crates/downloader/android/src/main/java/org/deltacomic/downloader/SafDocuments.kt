@@ -18,7 +18,7 @@ import java.security.MessageDigest
 internal data class SafExportInstruction(
     val treeUri: String = "",
     val relativePath: String = "",
-    val stagingPath: String = "",
+    val stagingPath: String = ""
 )
 
 internal data class SafDirectInstruction(
@@ -318,7 +318,6 @@ internal object SafDocuments {
         }
         return parent.createDirectory(name) ?: error("Could not create SAF directory: $name")
     }
-
 
     private fun copyFile(context: Context, source: File, parent: DocumentFile, name: String): DocumentFile {
         val existing = parent.findFile(name)
