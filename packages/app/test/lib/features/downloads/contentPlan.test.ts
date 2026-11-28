@@ -190,34 +190,6 @@ describe('contentPlanToEnqueueInput', () => {
     ).rejects.toThrow('content download runtime changed')
   })
 
-  it('preserves torrent input and the first-reached seeding policy', async () => {
-    const input = await contentPlanToEnqueueInput(
-      {
-        assets: [
-          {
-            key: 'torrent',
-            relativePath: 'comic',
-            source: {
-              input: { type: 'magnet', uri: 'magnet:?xt=urn:btih:test' },
-              seedPolicy: { durationSeconds: 600, mode: 'ratioOrDuration', ratio: 1.5 },
-              type: 'torrent',
-            },
-          },
-        ],
-        key: 'comic:2',
-        title: 'Torrent comic',
-      },
-      page,
-    )
-
-    expect(input.assets[0]?.source).toEqual({
-      input: { type: 'magnet', uri: 'magnet:?xt=urn:btih:test' },
-      onlyFiles: undefined,
-      seedPolicy: { durationSeconds: 600, mode: 'ratioOrDuration', ratio: 1.5 },
-      type: 'torrent',
-    })
-  })
-
   it('preserves literal headers for the native request layer', async () => {
     const input = await contentPlanToEnqueueInput(
       {

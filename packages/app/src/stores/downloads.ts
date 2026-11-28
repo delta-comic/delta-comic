@@ -23,7 +23,6 @@ import {
   type DownloaderCapabilities,
   type DownloaderSettings,
   type EnqueuePlanInput,
-  type EnqueueTorrentInput,
   type EnqueueUrlInput,
 } from '../features/downloads/downloaderClient'
 import { activeDownloadStatuses } from '../features/downloads/format'
@@ -42,9 +41,6 @@ const DEFAULT_SETTINGS: DownloaderSettings = {
   maxActiveTasks: 4,
   perTaskConnections: 8,
   revision: 0,
-  seedOnComplete: false,
-  seedRatio: undefined,
-  seedSeconds: undefined,
 }
 
 const DEFAULT_CAPABILITIES: DownloaderCapabilities = { connectionBudgetMax: 64, maxActiveTasks: 20 }
@@ -542,8 +538,6 @@ export const useDownloadsStore = defineStore('downloads', () => {
     mutate('enqueue-url', () => downloaderClient.enqueueUrl(input))
   const enqueuePlan = (input: EnqueuePlanInput) =>
     mutate('enqueue-plan', () => downloaderClient.enqueuePlan(input))
-  const enqueueTorrent = (input: EnqueueTorrentInput) =>
-    mutate('enqueue-torrent', () => downloaderClient.enqueueTorrent(input))
   const pickDestination = () => mutate('pick-destination', () => downloaderClient.pickDestination())
   const pauseTask = (id: string) => mutate('pause-task', () => downloaderClient.pauseTask(id))
   const resumeTask = (id: string) => mutate('resume-task', () => downloaderClient.resumeTask(id))
@@ -591,7 +585,6 @@ export const useDownloadsStore = defineStore('downloads', () => {
     destinations,
     disconnect,
     enqueuePlan,
-    enqueueTorrent,
     enqueueUrl,
     error,
     forgetTask,

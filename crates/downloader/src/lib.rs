@@ -21,7 +21,6 @@ mod persistence;
 #[cfg(any(target_os = "android", test))]
 mod saf_contract;
 mod target_file;
-mod torrent;
 
 pub use commands::DownloaderEventTrigger;
 

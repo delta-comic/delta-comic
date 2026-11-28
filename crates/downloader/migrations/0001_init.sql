@@ -72,25 +72,11 @@ CREATE TABLE IF NOT EXISTS segments (
   FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS torrent_sessions (
-  task_id TEXT PRIMARY KEY NOT NULL,
-  info_hash TEXT,
-  session_id INTEGER,
-  fast_resume_path TEXT,
-  uploaded_bytes INTEGER NOT NULL DEFAULT 0,
-  peer_count INTEGER NOT NULL DEFAULT 0,
-  seed_started_at INTEGER,
-  FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS settings (
   id INTEGER PRIMARY KEY CHECK (id = 1),
   max_active_tasks INTEGER NOT NULL,
   connection_budget INTEGER NOT NULL,
   per_task_connections INTEGER NOT NULL,
   allow_metered INTEGER NOT NULL DEFAULT 1,
-  seed_on_complete INTEGER NOT NULL DEFAULT 0,
-  seed_ratio REAL,
-  seed_seconds INTEGER,
   revision INTEGER NOT NULL DEFAULT 0
 );

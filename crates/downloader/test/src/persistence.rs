@@ -14,7 +14,7 @@ impl Repository {
     self
         .mutate_task(
           id,
-          "status = ?, speed_bytes_per_second = CASE WHEN ? IN ('downloading', 'seeding') THEN speed_bytes_per_second ELSE 0 END, error_code = NULL, error_message = NULL",
+          "status = ?, speed_bytes_per_second = CASE WHEN ? = 'downloading' THEN speed_bytes_per_second ELSE 0 END, error_code = NULL, error_message = NULL",
           &[status.as_db(), status.as_db()],
         )
         .await
@@ -272,7 +272,6 @@ async fn persists_saf_export_until_native_commit() {
     .unwrap()
     .unwrap();
   assert_eq!(instruction.relative_path, "Comic/comic.cbz");
-  assert!(!instruction.is_directory);
 
   let failed = repository
     .fail_saf_export(&task.id, "provider is full")

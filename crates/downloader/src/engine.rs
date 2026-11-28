@@ -16,16 +16,15 @@ use crate::{
   checksum,
   domain::{
     AttentionEvent, Destination, DestinationKind, DownloadAsset, DownloadSource, DownloadTask,
-    DownloaderSettings, EnqueuePlanInput, EnqueueTorrentInput, EnqueueUrlInput, HttpHeaderValue,
-    HttpMirror, HttpSource, TaskKind, TaskRemovedEvent, TaskStatus, TaskUpsertEvent, TorrentInput,
-    sanitize_file_name, sanitize_relative_path, validate_priority,
+    DownloaderSettings, EnqueuePlanInput, EnqueueUrlInput, HttpHeaderValue, HttpMirror, HttpSource,
+    TaskKind, TaskRemovedEvent, TaskStatus, TaskUpsertEvent, sanitize_file_name,
+    sanitize_relative_path, validate_priority,
   },
   ephemeral::{EphemeralDownloadRequest, download as download_ephemeral},
   error::{Error, Result},
   http,
   persistence::{Repository, now_millis},
   target_file,
-  torrent::{TorrentEvent, TorrentManager, TorrentResumeIdentity},
 };
 
 #[cfg(not(target_os = "android"))]
@@ -90,7 +89,6 @@ pub struct Engine {
   pub(crate) repository: Repository,
   staging_root: PathBuf,
   client: Client,
-  torrent: TorrentManager,
   controls: Arc<Mutex<HashMap<String, CancellationToken>>>,
   #[cfg(any(target_os = "android", test))]
   background_stop_generations: Arc<Mutex<HashMap<String, u64>>>,
@@ -132,19 +130,12 @@ impl Engine {
       .connect_timeout(Duration::from_secs(20))
       .read_timeout(Duration::from_secs(60))
       .build()?;
-    let settings = repository.get_settings().await?;
-    let torrent = TorrentManager::new(
-      default_download_dir.join(".torrent-session"),
-      Self::fair_connection_limit(&settings),
-    )
-    .await?;
     let staging_root = default_download_dir.join(".saf-staging");
     tokio::fs::create_dir_all(&staging_root).await?;
     Ok(Self {
       repository,
       staging_root,
       client,
-      torrent,
       controls: Arc::new(Mutex::new(HashMap::new())),
       #[cfg(any(target_os = "android", test))]
       background_stop_generations: Arc::new(Mutex::new(HashMap::new())),
@@ -218,27 +209,6 @@ impl Engine {
         last_modified: None,
         expires_at: None,
       }),
-    };
-    self
-      .create_task(None, title, asset, input.destination_id, input.priority)
-      .await
-  }
-
-  pub async fn enqueue_torrent(&self, input: EnqueueTorrentInput) -> Result<DownloadTask> {
-    let title = input.title.unwrap_or_else(|| "BitTorrent download".into());
-    let default_relative_path = sanitize_file_name(&title);
-    let relative_path = sanitize_relative_path(
-      input
-        .relative_path
-        .as_deref()
-        .unwrap_or(&default_relative_path),
-    )?;
-    let asset = DownloadAsset {
-      key: Uuid::new_v4().to_string(),
-      relative_path,
-      size: None,
-      checksum: None,
-      source: DownloadSource::Torrent(input.source),
     };
     self
       .create_task(None, title, asset, input.destination_id, input.priority)
@@ -354,15 +324,11 @@ impl Engine {
       ));
     }
     let timestamp = now_millis();
-    let kind = match &asset.source {
-      DownloadSource::Http(_) => TaskKind::Http,
-      DownloadSource::Torrent(_) => TaskKind::Torrent,
-    };
     let task = DownloadTask {
       id,
       collection_key,
       asset_key: Some(asset.key),
-      kind,
+      kind: TaskKind::Http,
       title,
       source: asset.source,
       destination_id,
@@ -458,14 +424,6 @@ impl Engine {
         "pause an active task before forgetting it".into(),
       ));
     }
-    let task = self
-      .repository
-      .get_task(id)
-      .await?
-      .ok_or_else(|| Error::NotFound(id.into()))?;
-    if matches!(task.source, DownloadSource::Torrent(_)) {
-      self.remove_torrent_session(id, false).await?;
-    }
     let revision = self.repository.forget(id).await?;
     (self.events)(EngineEvent::TaskRemoved(TaskRemovedEvent {
       task_id: id.into(),
@@ -509,9 +467,6 @@ impl Engine {
         DestinationKind::AndroidSaf => self.staging_root.join(&task.id),
         _ => PathBuf::from(destination.path),
       };
-      if matches!(task.source, DownloadSource::Torrent(_)) {
-        self.remove_torrent_session(id, true).await?;
-      }
       if let Some(final_path) = task.final_path.map(PathBuf::from) {
         if !final_path.starts_with(&root) {
           return Err(Error::InvalidInput(
@@ -592,20 +547,6 @@ impl Engine {
     Ok(())
   }
 
-  async fn remove_torrent_session(&self, id: &str, delete_files: bool) -> Result<()> {
-    let Some(identity) = self.repository.torrent_session_identity(id).await? else {
-      return Ok(());
-    };
-    self
-      .torrent
-      .remove(
-        identity.session_id,
-        identity.info_hash.as_deref(),
-        delete_files,
-      )
-      .await
-  }
-
   pub async fn shutdown(&self) -> Result<()> {
     self.shutdown.cancel();
     for token in self.controls.lock().await.values() {
@@ -625,11 +566,6 @@ impl Engine {
         }
       }
       Err(error) => first_error = Some(error),
-    }
-    if let Err(error) = self.torrent.stop().await
-      && first_error.is_none()
-    {
-      first_error = Some(error);
     }
     let checkpoint = self.repository.checkpoint().await;
     match (first_error, checkpoint) {
@@ -1032,140 +968,66 @@ impl Engine {
     let direct_file = direct_target.as_ref().map(|target| target.file.clone());
     #[cfg(not(any(target_os = "android", test)))]
     let direct_file: Option<Arc<File>> = None;
-    if is_direct_saf && !matches!(task.source, DownloadSource::Http(_)) {
-      return Err(Error::InvalidInput(
-        "direct SAF targets support HTTP tasks only".into(),
-      ));
-    }
     if !is_direct_saf && let Some(parent) = final_path.parent() {
       tokio::fs::create_dir_all(parent).await?;
     }
 
-    let torrent_report = match &task.source {
-      DownloadSource::Http(source) => {
-        let mut attempts = 0_u8;
-        loop {
-          match http::download(
-            &self.client,
-            http::DownloadRequest {
-              repository: &self.repository,
-              task,
-              source,
-              settings,
-              temp_path: &temp_path,
-              target_file: direct_file.clone(),
-              cancellation: token.clone(),
-              secret_resolver: self.secret_resolver.as_deref(),
-              maximum_bytes: None,
-              progress: Some({
-                let engine = self.clone();
-                Arc::new(move |task| engine.emit_task(task))
-              }),
-            },
-          )
-          .await
-          {
-            Ok(report) => {
-              tracing::info!(
-                "download task {} transferred {} bytes in {:?}",
-                task.id,
-                report.total_bytes,
-                report.elapsed
-              );
-              break;
-            }
-            Err(error) if error.is_connectivity_loss() => return Err(error),
-            Err(error) if error.is_transient() && attempts < 5 => {
-              attempts += 1;
-              if let Ok(retrying) = self
-                .repository
-                .record_retry(&task.id, attempts, &error)
-                .await
-              {
-                self.emit_task(retrying);
-              }
-              let delay = Duration::from_secs(1_u64 << (attempts - 1)).max(error.retry_after());
-              let jitter = rand::random_range(0..=500);
-              tokio::select! {
-                () = token.cancelled() => return Err(Error::Cancelled),
-                () = tokio::time::sleep(delay + Duration::from_millis(jitter)) => {},
-              }
-              tracing::warn!(
-                "retrying download task {} after transient error: {error}",
-                task.id
-              );
-            }
-            Err(error) => return Err(error),
-          }
+    let DownloadSource::Http(source) = &task.source;
+    let mut attempts = 0_u8;
+    loop {
+      match http::download(
+        &self.client,
+        http::DownloadRequest {
+          repository: &self.repository,
+          task,
+          source,
+          settings,
+          temp_path: &temp_path,
+          target_file: direct_file.clone(),
+          cancellation: token.clone(),
+          secret_resolver: self.secret_resolver.as_deref(),
+          maximum_bytes: None,
+          progress: Some({
+            let engine = self.clone();
+            Arc::new(move |task| engine.emit_task(task))
+          }),
+        },
+      )
+      .await
+      {
+        Ok(report) => {
+          tracing::info!(
+            "download task {} transferred {} bytes in {:?}",
+            task.id,
+            report.total_bytes,
+            report.elapsed
+          );
+          break;
         }
-        None
+        Err(error) if error.is_connectivity_loss() => return Err(error),
+        Err(error) if error.is_transient() && attempts < 5 => {
+          attempts += 1;
+          if let Ok(retrying) = self
+            .repository
+            .record_retry(&task.id, attempts, &error)
+            .await
+          {
+            self.emit_task(retrying);
+          }
+          let delay = Duration::from_secs(1_u64 << (attempts - 1)).max(error.retry_after());
+          let jitter = rand::random_range(0..=500);
+          tokio::select! {
+            () = token.cancelled() => return Err(Error::Cancelled),
+            () = tokio::time::sleep(delay + Duration::from_millis(jitter)) => {},
+          }
+          tracing::warn!(
+            "retrying download task {} after transient error: {error}",
+            task.id
+          );
+        }
+        Err(error) => return Err(error),
       }
-      DownloadSource::Torrent(source) => {
-        let resume_identity = self
-          .repository
-          .torrent_session_identity(&task.id)
-          .await?
-          .map(|identity| TorrentResumeIdentity {
-            session_id: identity.session_id,
-            info_hash: identity.info_hash,
-          });
-        let repository = self.repository.clone();
-        let events = self.events.clone();
-        let task_id = task.id.clone();
-        let torrent_events = Arc::new(move |event| {
-          let repository = repository.clone();
-          let events = events.clone();
-          let task_id = task_id.clone();
-          Box::pin(async move {
-            let (status, seed_started_at, sample) = match event {
-              TorrentEvent::Initialized(sample) | TorrentEvent::Progress(sample) => {
-                (TaskStatus::Downloading, None, sample)
-              }
-              TorrentEvent::Seeding(sample) => (TaskStatus::Seeding, Some(now_millis()), sample),
-            };
-            repository
-              .update_torrent_session(
-                &task_id,
-                sample.info_hash.as_deref(),
-                sample.session_id,
-                sample.uploaded_bytes,
-                sample.peer_count,
-                seed_started_at,
-              )
-              .await?;
-            let task = repository
-              .update_transfer_progress(
-                &task_id,
-                status,
-                sample.total_bytes,
-                sample.downloaded_bytes,
-                sample.speed_bytes_per_second,
-              )
-              .await?;
-            let task = Engine::event_snapshot(task);
-            let revision = task.revision;
-            events(EngineEvent::TaskUpsert(Box::new(TaskUpsertEvent {
-              task,
-              revision,
-            })));
-            Ok(())
-          }) as futures_util::future::BoxFuture<'static, Result<()>>
-        });
-        let report = self
-          .torrent
-          .download(
-            task,
-            source,
-            settings,
-            resume_identity.as_ref(),
-            &final_path,
-            token.clone(),
-            torrent_events,
-          )
-          .await?;
-        Some(report)
-      }
-    };
+    }
 
     if let Some(checksum) = &task.checksum {
       let verifying = self.repository.begin_verification(&task.id).await?;
@@ -1173,14 +1035,10 @@ impl Engine {
       if let Some(file) = &direct_file {
         checksum::verify_file(file, checksum).await?;
       } else {
-        let checksum_path = match &torrent_report {
-          Some(report) => report.checksum_path()?,
-          None => temp_path.as_path(),
-        };
-        checksum::verify(checksum_path, checksum).await?;
+        checksum::verify(&temp_path, checksum).await?;
       }
     }
-    if matches!(task.source, DownloadSource::Http(_)) && !is_direct_saf {
+    if !is_direct_saf {
       target_file::replace(&temp_path, &final_path).await?;
     }
     let destination = self.repository.destination(&task.destination_id).await?;
@@ -1220,39 +1078,31 @@ impl Engine {
     const REDACTED: &str = "[redacted]";
 
     task.final_path = None;
-    match &mut task.source {
-      DownloadSource::Http(source) => {
-        for mirror in &mut source.mirrors {
-          mirror.url = REDACTED.into();
-          let mut headers = BTreeMap::new();
-          for value in mirror.headers.values() {
-            match value {
-              HttpHeaderValue::Value { .. } => {
-                headers.insert(
-                  "[redacted-value-header]".into(),
-                  HttpHeaderValue::Value {
-                    value: REDACTED.into(),
-                  },
-                );
-              }
-              HttpHeaderValue::SecretRef { .. } => {
-                headers.insert(
-                  "[redacted-secret-header]".into(),
-                  HttpHeaderValue::SecretRef {
-                    secret_ref: REDACTED.into(),
-                  },
-                );
-              }
-            }
+    let DownloadSource::Http(source) = &mut task.source;
+    for mirror in &mut source.mirrors {
+      mirror.url = REDACTED.into();
+      let mut headers = BTreeMap::new();
+      for value in mirror.headers.values() {
+        match value {
+          HttpHeaderValue::Value { .. } => {
+            headers.insert(
+              "[redacted-value-header]".into(),
+              HttpHeaderValue::Value {
+                value: REDACTED.into(),
+              },
+            );
           }
-          mirror.headers = headers;
+          HttpHeaderValue::SecretRef { .. } => {
+            headers.insert(
+              "[redacted-secret-header]".into(),
+              HttpHeaderValue::SecretRef {
+                secret_ref: REDACTED.into(),
+              },
+            );
+          }
         }
       }
-      DownloadSource::Torrent(source) => match &mut source.input {
-        TorrentInput::Magnet { uri } => *uri = REDACTED.into(),
-        TorrentInput::Url { url } => *url = REDACTED.into(),
-        TorrentInput::Bytes { base64 } => *base64 = REDACTED.into(),
-      },
+      mirror.headers = headers;
     }
     task
   }

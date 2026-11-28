@@ -9,7 +9,7 @@ use crate::{
   domain::{
     AttentionEvent, ByteRange, Destination, DownloadCollection, DownloadSource, DownloadTask,
     DownloadTaskDetail, DownloaderCapabilities, DownloaderSettings, EnqueuePlanInput,
-    EnqueueTorrentInput, EnqueueUrlInput, TaskRemovedEvent, TaskUpsertEvent,
+    EnqueueUrlInput, TaskRemovedEvent, TaskUpsertEvent,
   },
   engine::Engine,
   ephemeral::{EphemeralDownloadRequest, EphemeralRoot},
@@ -60,10 +60,6 @@ pub trait DownloaderApi {
   async fn enqueue_url<R: tauri::Runtime>(
     #[app_handle] app_handle: tauri::AppHandle<R>,
     input: EnqueueUrlInput,
-  ) -> std::result::Result<DownloadTask, String>;
-  async fn enqueue_torrent<R: tauri::Runtime>(
-    #[app_handle] app_handle: tauri::AppHandle<R>,
-    input: EnqueueTorrentInput,
   ) -> std::result::Result<DownloadTask, String>;
   async fn enqueue_plan<R: tauri::Runtime>(
     #[app_handle] app_handle: tauri::AppHandle<R>,
@@ -277,15 +273,6 @@ impl DownloaderApi for DownloaderApiImpl {
     scheduled(&app_handle, &engine, engine.enqueue_url(input).await).await
   }
 
-  async fn enqueue_torrent<R: tauri::Runtime>(
-    self,
-    app_handle: tauri::AppHandle<R>,
-    input: EnqueueTorrentInput,
-  ) -> std::result::Result<DownloadTask, String> {
-    let engine = engine(&app_handle);
-    scheduled(&app_handle, &engine, engine.enqueue_torrent(input).await).await
-  }
-
   async fn enqueue_plan<R: tauri::Runtime>(
     self,
     app_handle: tauri::AppHandle<R>,
@@ -409,10 +396,8 @@ async fn schedule_android<R: tauri::Runtime>(
 ) -> Result<()> {
   let settings = engine.repository.get_settings().await?;
   let mobile = app.state::<crate::mobile::MobileDownloader<R>>();
-  let allow_metered =
-    crate::mobile_contract::android_task_allows_metered_network(&task.source, &settings);
   let notification_permission = mobile
-    .schedule(task.id.clone(), task.total_bytes, allow_metered)
+    .schedule(task.id.clone(), task.total_bytes, settings.allow_metered)
     .map_err(crate::Error::InvalidInput)?;
   if notification_permission == crate::mobile_contract::AndroidNotificationPermission::Denied {
     let events = DownloaderEventTrigger::new(app.clone());
@@ -442,11 +427,9 @@ async fn get_task_detail(engine: &Engine, id: String) -> Result<DownloadTaskDeta
       end: range.end,
     })
     .collect();
-  let torrent = engine.repository.torrent_detail(&id).await?;
   Ok(DownloadTaskDetail {
     task,
     completed_ranges,
-    torrent,
   })
 }
 

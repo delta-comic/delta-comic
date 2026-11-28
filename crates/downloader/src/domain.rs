@@ -8,21 +8,18 @@ use crate::error::{Error, Result};
 #[serde(rename_all = "camelCase")]
 pub enum TaskKind {
   Http,
-  Torrent,
 }
 
 impl TaskKind {
   pub(crate) fn as_db(self) -> &'static str {
     match self {
       Self::Http => "http",
-      Self::Torrent => "torrent",
     }
   }
 
   pub(crate) fn from_db(value: &str) -> Result<Self> {
     match value {
       "http" => Ok(Self::Http),
-      "torrent" => Ok(Self::Torrent),
       _ => Err(Error::InvalidInput(format!("unknown task kind: {value}"))),
     }
   }
@@ -38,7 +35,6 @@ pub enum TaskStatus {
   WaitingForSource,
   Paused,
   Verifying,
-  Seeding,
   Completed,
   Failed,
   Cancelled,
@@ -54,7 +50,6 @@ impl TaskStatus {
       Self::WaitingForSource => "waiting_for_source",
       Self::Paused => "paused",
       Self::Verifying => "verifying",
-      Self::Seeding => "seeding",
       Self::Completed => "completed",
       Self::Failed => "failed",
       Self::Cancelled => "cancelled",
@@ -70,7 +65,6 @@ impl TaskStatus {
       "waiting_for_source" => Ok(Self::WaitingForSource),
       "paused" => Ok(Self::Paused),
       "verifying" => Ok(Self::Verifying),
-      "seeding" => Ok(Self::Seeding),
       "completed" => Ok(Self::Completed),
       "failed" => Ok(Self::Failed),
       "cancelled" => Ok(Self::Cancelled),
@@ -79,10 +73,7 @@ impl TaskStatus {
   }
 
   pub fn is_active(self) -> bool {
-    matches!(
-      self,
-      Self::Probing | Self::Downloading | Self::Verifying | Self::Seeding
-    )
+    matches!(self, Self::Probing | Self::Downloading | Self::Verifying)
   }
 }
 
@@ -148,35 +139,8 @@ pub struct HttpSource {
 
 #[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
-pub enum TorrentInput {
-  Magnet { uri: String },
-  Url { url: String },
-  Bytes { base64: String },
-}
-
-#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "mode", rename_all = "camelCase")]
-pub enum SeedPolicy {
-  None,
-  Ratio { ratio: f64 },
-  Duration { duration_seconds: u64 },
-  RatioOrDuration { ratio: f64, duration_seconds: u64 },
-}
-
-#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TorrentSource {
-  pub input: TorrentInput,
-  #[serde(default)]
-  pub only_files: Vec<usize>,
-  pub seed_policy: Option<SeedPolicy>,
-}
-
-#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
 pub enum DownloadSource {
   Http(HttpSource),
-  Torrent(TorrentSource),
 }
 
 #[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
@@ -244,19 +208,9 @@ pub struct ByteRange {
 
 #[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TorrentTaskDetail {
-  pub info_hash: Option<String>,
-  pub uploaded_bytes: u64,
-  pub peer_count: u64,
-  pub seed_started_at: Option<i64>,
-}
-
-#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct DownloadTaskDetail {
   pub task: DownloadTask,
   pub completed_ranges: Vec<ByteRange>,
-  pub torrent: Option<TorrentTaskDetail>,
 }
 
 #[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
@@ -295,24 +249,11 @@ pub struct EnqueueUrlInput {
 
 #[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct EnqueueTorrentInput {
-  pub source: TorrentSource,
-  pub title: Option<String>,
-  pub relative_path: Option<String>,
-  pub destination_id: Option<String>,
-  pub priority: Option<u8>,
-}
-
-#[derive(taurpc::specta::Type, Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct DownloaderSettings {
   pub max_active_tasks: u8,
   pub connection_budget: u16,
   pub per_task_connections: u8,
   pub allow_metered: bool,
-  pub seed_on_complete: bool,
-  pub seed_ratio: Option<f64>,
-  pub seed_seconds: Option<u64>,
   pub revision: i64,
 }
 
@@ -347,9 +288,6 @@ impl DownloaderSettings {
       connection_budget: values.1,
       per_task_connections: values.2,
       allow_metered: true,
-      seed_on_complete: false,
-      seed_ratio: None,
-      seed_seconds: None,
       revision: 0,
     }
   }
@@ -371,14 +309,6 @@ impl DownloaderSettings {
     {
       return Err(Error::InvalidInput(
         "perTaskConnections must be positive and not exceed connectionBudget".into(),
-      ));
-    }
-    if self
-      .seed_ratio
-      .is_some_and(|ratio| !ratio.is_finite() || ratio <= 0.0)
-    {
-      return Err(Error::InvalidInput(
-        "seedRatio must be a positive finite number".into(),
       ));
     }
     Ok(())

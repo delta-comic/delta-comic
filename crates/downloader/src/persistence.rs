@@ -8,7 +8,7 @@ use sqlx::{
 use crate::{
   domain::{
     Checksum, ChecksumAlgorithm, ContentRefreshContext, Destination, DownloadCollection,
-    DownloadSource, DownloadTask, DownloaderSettings, TaskKind, TaskStatus, TorrentTaskDetail,
+    DownloadSource, DownloadTask, DownloaderSettings, TaskKind, TaskStatus,
   },
   error::{Error, Result},
 };
@@ -27,12 +27,6 @@ pub struct IntegritySample {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct TorrentSessionIdentity {
-  pub info_hash: Option<String>,
-  pub session_id: Option<u64>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct SafExportRecord {
   pub task_id: String,
   pub destination_id: String,
@@ -48,7 +42,6 @@ pub(crate) struct SafExportInstruction {
   pub tree_uri: String,
   pub relative_path: String,
   pub staging_path: String,
-  pub is_directory: bool,
 }
 
 #[cfg(any(target_os = "android", test))]
@@ -184,16 +177,13 @@ impl Repository {
     sqlx::query(
       "INSERT OR IGNORE INTO settings(\
          id, max_active_tasks, connection_budget, per_task_connections, allow_metered, \
-         seed_on_complete, seed_ratio, seed_seconds, revision\
-       ) VALUES (1, ?, ?, ?, ?, ?, ?, ?, 0)",
+         revision\
+       ) VALUES (1, ?, ?, ?, ?, 0)",
     )
     .bind(i64::from(settings.max_active_tasks))
     .bind(i64::from(settings.connection_budget))
     .bind(i64::from(settings.per_task_connections))
     .bind(settings.allow_metered)
-    .bind(settings.seed_on_complete)
-    .bind(settings.seed_ratio)
-    .bind(settings.seed_seconds.map(to_i64).transpose()?)
     .execute(&self.writer)
     .await?;
     self.restore_interrupted_tasks().await?;
@@ -203,7 +193,7 @@ impl Repository {
   async fn restore_interrupted_tasks(&self) -> Result<()> {
     sqlx::query(
       "UPDATE tasks SET status = 'queued', speed_bytes_per_second = 0, updated_at = ? \
-       WHERE status IN ('probing', 'downloading', 'verifying', 'seeding')",
+       WHERE status IN ('probing', 'downloading', 'verifying')",
     )
     .bind(now_millis())
     .execute(&self.writer)
@@ -354,7 +344,7 @@ impl Repository {
     let count: i64 = sqlx::query_scalar(
       "SELECT COUNT(*) FROM tasks WHERE status IN (\
          'queued', 'probing', 'downloading', 'waiting_for_network', 'waiting_for_source', \
-         'verifying', 'seeding'\
+         'verifying'\
        )",
     )
     .fetch_one(&self.pool)
@@ -371,12 +361,6 @@ impl Repository {
       connection_budget: to_u16(row.try_get::<i64, _>("connection_budget")?)?,
       per_task_connections: to_u8(row.try_get::<i64, _>("per_task_connections")?)?,
       allow_metered: row.try_get("allow_metered")?,
-      seed_on_complete: row.try_get("seed_on_complete")?,
-      seed_ratio: row.try_get("seed_ratio")?,
-      seed_seconds: row
-        .try_get::<Option<i64>, _>("seed_seconds")?
-        .map(to_u64)
-        .transpose()?,
       revision: row.try_get("revision")?,
     })
   }
@@ -387,16 +371,12 @@ impl Repository {
     settings.revision = next_revision(&mut transaction).await?;
     sqlx::query(
       "UPDATE settings SET max_active_tasks = ?, connection_budget = ?, \
-       per_task_connections = ?, allow_metered = ?, seed_on_complete = ?, seed_ratio = ?, \
-       seed_seconds = ?, revision = ? WHERE id = 1",
+       per_task_connections = ?, allow_metered = ?, revision = ? WHERE id = 1",
     )
     .bind(i64::from(settings.max_active_tasks))
     .bind(i64::from(settings.connection_budget))
     .bind(i64::from(settings.per_task_connections))
     .bind(settings.allow_metered)
-    .bind(settings.seed_on_complete)
-    .bind(settings.seed_ratio)
-    .bind(settings.seed_seconds.map(to_i64).transpose()?)
     .bind(settings.revision)
     .execute(&mut *transaction)
     .await?;
@@ -437,7 +417,7 @@ impl Repository {
        FROM tasks t \
        JOIN destinations d ON d.id = t.destination_id \
        LEFT JOIN saf_exports e ON e.task_id = t.id AND e.destination_id = d.id \
-       WHERE t.id = ? AND t.kind = 'http' AND d.kind = 'android_saf' \
+       WHERE t.id = ? AND d.kind = 'android_saf' \
        AND t.status IN ('queued', 'probing', 'downloading', 'verifying', 'waiting_for_network') \
        AND (e.task_id IS NULL OR e.staging_path LIKE 'saf-direct:%')",
     )
@@ -479,7 +459,7 @@ impl Repository {
     let destination: Option<(String, String)> = sqlx::query_as(
       "SELECT d.id, d.path FROM tasks t \
        JOIN destinations d ON d.id = t.destination_id \
-       WHERE t.id = ? AND t.kind = 'http' AND d.kind = 'android_saf'",
+       WHERE t.id = ? AND d.kind = 'android_saf'",
     )
     .bind(task_id)
     .fetch_optional(&self.pool)
@@ -627,7 +607,7 @@ impl Repository {
     task_id: &str,
   ) -> Result<Option<SafExportInstruction>> {
     let row = sqlx::query(
-      "SELECT d.path AS tree_uri, t.relative_path, e.staging_path, t.kind \
+      "SELECT d.path AS tree_uri, t.relative_path, e.staging_path \
        FROM saf_exports e \
        JOIN tasks t ON t.id = e.task_id AND t.destination_id = e.destination_id \
        JOIN destinations d ON d.id = e.destination_id \
@@ -639,12 +619,10 @@ impl Repository {
     .await?;
     row
       .map(|row| {
-        let kind: String = row.try_get("kind")?;
         Ok(SafExportInstruction {
           tree_uri: row.try_get("tree_uri")?,
           relative_path: row.try_get("relative_path")?,
           staging_path: row.try_get("staging_path")?,
-          is_directory: kind == TaskKind::Torrent.as_db(),
         })
       })
       .transpose()
@@ -696,7 +674,7 @@ impl Repository {
     let task_result = sqlx::query(
       "UPDATE tasks SET status = 'completed', speed_bytes_per_second = 0, \
        error_code = NULL, error_message = NULL, updated_at = ?, revision = ? \
-       WHERE id = ? AND status IN ('probing', 'downloading', 'verifying', 'seeding')",
+       WHERE id = ? AND status IN ('probing', 'downloading', 'verifying')",
     )
     .bind(now_millis())
     .bind(revision)
@@ -814,7 +792,6 @@ impl Repository {
           TaskStatus::WaitingForSource,
           TaskStatus::Paused,
           TaskStatus::Verifying,
-          TaskStatus::Seeding,
         ],
         "pause",
       )
@@ -864,7 +841,6 @@ impl Repository {
           TaskStatus::WaitingForSource,
           TaskStatus::Paused,
           TaskStatus::Verifying,
-          TaskStatus::Seeding,
           TaskStatus::Failed,
           TaskStatus::Cancelled,
         ],
@@ -888,7 +864,6 @@ impl Repository {
           TaskStatus::Probing,
           TaskStatus::Downloading,
           TaskStatus::Verifying,
-          TaskStatus::Seeding,
         ],
         "verify",
       )
@@ -906,7 +881,6 @@ impl Repository {
           TaskStatus::Probing,
           TaskStatus::Downloading,
           TaskStatus::Verifying,
-          TaskStatus::Seeding,
         ],
         "resume destination export",
       )
@@ -919,7 +893,7 @@ impl Repository {
     let result = sqlx::query(
       "UPDATE tasks SET status = 'completed', speed_bytes_per_second = 0, \
        error_code = NULL, error_message = NULL, updated_at = ?, revision = ? \
-       WHERE id = ? AND status IN ('probing', 'downloading', 'verifying', 'seeding')",
+       WHERE id = ? AND status IN ('probing', 'downloading', 'verifying')",
     )
     .bind(now_millis())
     .bind(revision)
@@ -945,7 +919,7 @@ impl Repository {
         "UPDATE tasks SET status = 'queued', speed_bytes_per_second = 0, \
          error_code = NULL, error_message = NULL, updated_at = ?, revision = ? \
          WHERE id = ? AND status IN (\
-           'probing', 'downloading', 'waiting_for_network', 'verifying', 'seeding'\
+           'probing', 'downloading', 'waiting_for_network', 'verifying'\
          )",
       )
       .await
@@ -1044,7 +1018,7 @@ impl Repository {
     let result = sqlx::query(
       "UPDATE tasks SET status = ?, error_code = ?, error_message = ?, \
        speed_bytes_per_second = 0, updated_at = ?, revision = ? WHERE id = ? \
-       AND status IN ('queued', 'probing', 'downloading', 'verifying', 'seeding')",
+       AND status IN ('queued', 'probing', 'downloading', 'verifying')",
     )
     .bind(status.as_db())
     .bind(error.code())
@@ -1076,7 +1050,7 @@ impl Repository {
     let result = sqlx::query(
       "UPDATE tasks SET retry_count = ?, error_code = ?, error_message = ?, updated_at = ?, \
        revision = ? WHERE id = ? \
-       AND status IN ('probing', 'downloading', 'verifying', 'seeding')",
+       AND status IN ('probing', 'downloading', 'verifying')",
     )
     .bind(i64::from(retry_count))
     .bind(error.code())
@@ -1163,24 +1137,17 @@ impl Repository {
   pub async fn update_transfer_progress(
     &self,
     id: &str,
-    status: TaskStatus,
     total: u64,
     downloaded: u64,
     speed: u64,
   ) -> Result<DownloadTask> {
-    if !matches!(status, TaskStatus::Downloading | TaskStatus::Seeding) {
-      return Err(Error::InvalidInput(
-        "torrent progress status must be downloading or seeding".into(),
-      ));
-    }
     let mut transaction = self.writer.begin().await?;
     let revision = next_revision(&mut transaction).await?;
     let result = sqlx::query(
-      "UPDATE tasks SET status = ?, total_bytes = ?, downloaded_bytes = ?, \
+      "UPDATE tasks SET status = 'downloading', total_bytes = ?, downloaded_bytes = ?, \
        speed_bytes_per_second = ?, error_code = NULL, error_message = NULL, updated_at = ?, \
-       revision = ? WHERE id = ? AND status IN ('probing', 'downloading', 'seeding')",
+       revision = ? WHERE id = ? AND status IN ('probing', 'downloading')",
     )
-    .bind(status.as_db())
     .bind(to_i64(total)?)
     .bind(to_i64(downloaded)?)
     .bind(to_i64(speed)?)
@@ -1193,7 +1160,7 @@ impl Repository {
       &mut transaction,
       result.rows_affected(),
       id,
-      "commit torrent progress for",
+      "commit download progress for",
     )
     .await?;
     transaction.commit().await?;
@@ -1268,77 +1235,6 @@ impl Repository {
     Ok(())
   }
 
-  pub async fn update_torrent_session(
-    &self,
-    task_id: &str,
-    info_hash: Option<&str>,
-    session_id: Option<u64>,
-    uploaded_bytes: u64,
-    peer_count: u64,
-    seed_started_at: Option<i64>,
-  ) -> Result<()> {
-    sqlx::query(
-      "INSERT INTO torrent_sessions(\
-         task_id, info_hash, session_id, uploaded_bytes, peer_count, seed_started_at\
-       ) VALUES (?, ?, ?, ?, ?, ?) \
-       ON CONFLICT(task_id) DO UPDATE SET \
-         info_hash = COALESCE(excluded.info_hash, torrent_sessions.info_hash), \
-         session_id = COALESCE(excluded.session_id, torrent_sessions.session_id), \
-         uploaded_bytes = excluded.uploaded_bytes, peer_count = excluded.peer_count, \
-         seed_started_at = COALESCE(torrent_sessions.seed_started_at, excluded.seed_started_at)",
-    )
-    .bind(task_id)
-    .bind(info_hash)
-    .bind(session_id.map(to_i64).transpose()?)
-    .bind(to_i64(uploaded_bytes)?)
-    .bind(to_i64(peer_count)?)
-    .bind(seed_started_at)
-    .execute(&self.writer)
-    .await?;
-    Ok(())
-  }
-
-  pub async fn torrent_detail(&self, task_id: &str) -> Result<Option<TorrentTaskDetail>> {
-    let row = sqlx::query(
-      "SELECT info_hash, uploaded_bytes, peer_count, seed_started_at \
-       FROM torrent_sessions WHERE task_id = ?",
-    )
-    .bind(task_id)
-    .fetch_optional(&self.pool)
-    .await?;
-    row
-      .map(|row| {
-        Ok(TorrentTaskDetail {
-          info_hash: row.try_get("info_hash")?,
-          uploaded_bytes: to_u64(row.try_get("uploaded_bytes")?)?,
-          peer_count: to_u64(row.try_get("peer_count")?)?,
-          seed_started_at: row.try_get("seed_started_at")?,
-        })
-      })
-      .transpose()
-  }
-
-  pub(crate) async fn torrent_session_identity(
-    &self,
-    task_id: &str,
-  ) -> Result<Option<TorrentSessionIdentity>> {
-    let row = sqlx::query("SELECT info_hash, session_id FROM torrent_sessions WHERE task_id = ?")
-      .bind(task_id)
-      .fetch_optional(&self.pool)
-      .await?;
-    row
-      .map(|row| {
-        Ok(TorrentSessionIdentity {
-          info_hash: row.try_get("info_hash")?,
-          session_id: row
-            .try_get::<Option<i64>, _>("session_id")?
-            .map(to_u64)
-            .transpose()?,
-        })
-      })
-      .transpose()
-  }
-
   pub async fn clear_progress(&self, task_id: &str) -> Result<()> {
     let mut transaction = self.writer.begin().await?;
     sqlx::query("DELETE FROM segments WHERE task_id = ?")
@@ -1364,10 +1260,6 @@ impl Repository {
       .execute(&mut *transaction)
       .await?;
     sqlx::query("DELETE FROM integrity_samples WHERE task_id = ?")
-      .bind(task_id)
-      .execute(&mut *transaction)
-      .await?;
-    sqlx::query("DELETE FROM torrent_sessions WHERE task_id = ?")
       .bind(task_id)
       .execute(&mut *transaction)
       .await?;
@@ -1510,7 +1402,7 @@ impl Repository {
       .push(", speed_bytes_per_second = CASE WHEN ")
       .push_bind(target.as_db())
       .push(
-        " IN ('downloading', 'seeding') THEN speed_bytes_per_second ELSE 0 END, \
+        " = 'downloading' THEN speed_bytes_per_second ELSE 0 END, \
          error_code = NULL, error_message = NULL, updated_at = ",
       )
       .push_bind(now_millis())

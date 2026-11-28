@@ -20,7 +20,7 @@ use reqwest::{
 use tokio_util::sync::CancellationToken;
 
 use crate::{
-  domain::{DownloadTask, DownloaderSettings, HttpHeaderValue, HttpMirror, HttpSource, TaskStatus},
+  domain::{DownloadTask, DownloaderSettings, HttpHeaderValue, HttpMirror, HttpSource},
   error::{Error, Result},
   persistence::{
     CompletedRange, IntegritySample, Repository, merge_ranges, missing_ranges, split_ranges,
@@ -1234,7 +1234,7 @@ async fn save_checkpoint(
   let task = match total {
     Some(total) => {
       repository
-        .update_transfer_progress(task_id, TaskStatus::Downloading, total, downloaded, speed)
+        .update_transfer_progress(task_id, total, downloaded, speed)
         .await?
     }
     None => {

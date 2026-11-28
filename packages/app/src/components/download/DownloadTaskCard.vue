@@ -32,7 +32,7 @@ const eta = computed(() => formatDuration(taskEta(props.task)))
 const statusType = computed(() => {
   if (props.task.status === 'completed') return 'success'
   if (props.task.status === 'failed') return 'error'
-  if (['downloading', 'seeding'].includes(props.task.status)) return 'info'
+  if (props.task.status === 'downloading') return 'info'
   if (['waitingForNetwork', 'waitingForSource'].includes(props.task.status)) return 'warning'
   return 'default'
 })

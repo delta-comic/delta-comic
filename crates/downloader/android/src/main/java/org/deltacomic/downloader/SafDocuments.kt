@@ -19,7 +19,6 @@ internal data class SafExportInstruction(
     val treeUri: String = "",
     val relativePath: String = "",
     val stagingPath: String = "",
-    val isDirectory: Boolean = false
 )
 
 internal data class SafDirectInstruction(
@@ -100,23 +99,14 @@ internal object SafDocuments {
         require(tree.exists() && tree.isDirectory) { "The SAF destination no longer exists" }
 
         val staging = File(instruction.stagingPath)
-        require(staging.exists()) { "The completed staging file no longer exists" }
-        require(staging.isDirectory == instruction.isDirectory) {
-            "The staging file type does not match the download task"
-        }
+        require(staging.isFile) { "The completed staging file is unavailable" }
         require(!Files.isSymbolicLink(staging.toPath())) { "Symbolic links cannot be exported" }
 
         val components = instruction.relativePath.split('/')
         val parent = components.dropLast(1).fold(tree) { directory, component ->
             requireDirectory(directory, component)
         }
-        val exported = if (instruction.isDirectory) {
-            val destination = requireDirectory(parent, components.last())
-            copyDirectory(context, staging, destination)
-            destination
-        } else {
-            copyFile(context, staging, parent, components.last())
-        }
+        val exported = copyFile(context, staging, parent, components.last())
         SafOperationResult(value = exported.uri.toString())
     } catch (error: Exception) {
         SafOperationResult(error = error.message ?: error.javaClass.simpleName)
@@ -329,19 +319,6 @@ internal object SafDocuments {
         return parent.createDirectory(name) ?: error("Could not create SAF directory: $name")
     }
 
-    private fun copyDirectory(context: Context, source: File, destination: DocumentFile) {
-        source.listFiles()?.forEach { child ->
-            require(!Files.isSymbolicLink(child.toPath())) { "Symbolic links cannot be exported" }
-            require(child.name.isNotBlank() && child.name != "." && child.name != "..") {
-                "The staging directory contains an invalid name"
-            }
-            if (child.isDirectory) {
-                copyDirectory(context, child, requireDirectory(destination, child.name))
-            } else {
-                copyFile(context, child, destination, child.name)
-            }
-        } ?: error("Could not enumerate the staging directory")
-    }
 
     private fun copyFile(context: Context, source: File, parent: DocumentFile, name: String): DocumentFile {
         val existing = parent.findFile(name)

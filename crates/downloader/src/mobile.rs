@@ -586,7 +586,6 @@ pub extern "system" fn Java_org_deltacomic_downloader_NativeBridge_getSafExportI
           "treeUri": instruction.tree_uri,
           "relativePath": instruction.relative_path,
           "stagingPath": instruction.staging_path,
-          "isDirectory": instruction.is_directory,
         })
         .to_string();
         env

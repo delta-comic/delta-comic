@@ -19,8 +19,6 @@ pub enum Error {
   ChecksumMismatch { expected: String, actual: String },
   #[error("download was cancelled")]
   Cancelled,
-  #[error("BitTorrent support is not enabled in this build")]
-  BitTorrentUnavailable,
   #[error("server returned retryable HTTP status {status}")]
   RetryableHttp {
     status: u16,
@@ -36,8 +34,6 @@ pub enum Error {
   Url(#[from] url::ParseError),
   #[error("serialization error: {0}")]
   Json(#[from] serde_json::Error),
-  #[error("BitTorrent error: {0}")]
-  BitTorrent(String),
   #[error("Android destination export failed: {0}")]
   DestinationExport(String),
   #[error("credential store error: {0}")]
@@ -54,14 +50,12 @@ impl Error {
       Self::RemoteChanged => "remoteChanged",
       Self::ChecksumMismatch { .. } => "checksumMismatch",
       Self::Cancelled => "cancelled",
-      Self::BitTorrentUnavailable => "bitTorrentUnavailable",
       Self::RetryableHttp { .. } => "retryableHttp",
       Self::Database(_) => "database",
       Self::Network(_) => "network",
       Self::Io(_) => "filesystem",
       Self::Url(_) => "invalidUrl",
       Self::Json(_) => "serialization",
-      Self::BitTorrent(_) => "bitTorrent",
       Self::DestinationExport(_) => "destinationExport",
       Self::CredentialStore(_) => "credentialStore",
     }

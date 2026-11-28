@@ -5,12 +5,10 @@ import type {
   ContentRefreshContext as RpcContentRefreshContext,
   DownloadAsset as RpcDownloadAsset,
   DownloadCollection as RpcDownloadCollection,
-  DownloaderSettings as RpcDownloaderSettings,
   DownloadSource as RpcDownloadSource,
   DownloadTask as RpcDownloadTask,
   DownloadTaskDetail as RpcDownloadTaskDetail,
   HttpMirror as RpcHttpMirror,
-  SeedPolicy as RpcSeedPolicy,
   TaskRemovedEvent as RpcTaskRemovedEvent,
   TaskUpsertEvent as RpcTaskUpsertEvent,
 } from './bindings'
@@ -28,10 +26,8 @@ import type {
   DownloadTask,
   DownloadTaskDetail,
   EnqueuePlanInput,
-  EnqueueTorrentInput,
   EnqueueUrlInput,
   HttpMirror,
-  SeedPolicy,
   TaskAttention,
   TaskRemovedEvent,
   TaskUpsertEvent,
@@ -57,40 +53,14 @@ const toRpcMirror = (mirror: HttpMirror): RpcHttpMirror => ({
     : undefined,
 })
 
-const toRpcSource = (source: DownloadSource): RpcDownloadSource =>
-  source.type === 'http'
-    ? {
-        type: 'http',
-        mirrors: source.mirrors.map(toRpcMirror),
-        expectedSize: source.expectedSize ?? null,
-        etag: source.etag ?? null,
-        lastModified: source.lastModified ?? null,
-        expiresAt: source.expiresAt ?? null,
-      }
-    : {
-        type: 'torrent',
-        input: source.input,
-        onlyFiles: source.onlyFiles,
-        seedPolicy: toRpcSeedPolicy(source.seedPolicy),
-      }
-
-const toRpcSeedPolicy = (policy: SeedPolicy | undefined): RpcSeedPolicy | null => {
-  if (!policy) return null
-  switch (policy.mode) {
-    case 'none':
-      return policy
-    case 'ratio':
-      return { mode: 'ratio', ratio: policy.ratio }
-    case 'duration':
-      return { mode: 'duration', duration_seconds: policy.durationSeconds }
-    case 'ratioOrDuration':
-      return {
-        mode: 'ratioOrDuration',
-        ratio: policy.ratio,
-        duration_seconds: policy.durationSeconds,
-      }
-  }
-}
+const toRpcSource = (source: DownloadSource): RpcDownloadSource => ({
+  type: 'http',
+  mirrors: source.mirrors.map(toRpcMirror),
+  expectedSize: source.expectedSize ?? null,
+  etag: source.etag ?? null,
+  lastModified: source.lastModified ?? null,
+  expiresAt: source.expiresAt ?? null,
+})
 
 const toRpcRefreshContext = (
   context: ContentRefreshContext | undefined,
@@ -133,48 +103,25 @@ const toClientAttention = (event: RpcAttentionEvent): TaskAttention => ({
   revision: event.revision,
 })
 
-const toClientSource = (source: RpcDownloadSource): DownloadSource =>
-  source.type === 'http'
-    ? {
-        type: 'http',
-        mirrors: source.mirrors.map(mirror => ({
-          url: mirror.url,
-          priority: mirror.priority,
-          headers: mirror.headers
-            ? Object.fromEntries(
-                Object.entries(mirror.headers).map(([key, value]) => [
-                  key,
-                  value.type === 'secretRef'
-                    ? { type: 'secretRef', secretRef: value.secret_ref }
-                    : value,
-                ]),
-              )
-            : undefined,
-        })),
-        expectedSize: source.expectedSize ?? undefined,
-        etag: source.etag ?? undefined,
-        lastModified: source.lastModified ?? undefined,
-        expiresAt: source.expiresAt ?? undefined,
-      }
-    : {
-        type: 'torrent',
-        input: source.input,
-        onlyFiles: source.onlyFiles,
-        seedPolicy:
-          source.seedPolicy?.mode === 'duration'
-            ? { mode: 'duration', durationSeconds: source.seedPolicy.duration_seconds }
-            : source.seedPolicy?.mode === 'ratio'
-              ? { mode: 'ratio', ratio: source.seedPolicy.ratio ?? 0 }
-              : source.seedPolicy?.mode === 'ratioOrDuration'
-                ? {
-                    mode: 'ratioOrDuration',
-                    ratio: source.seedPolicy.ratio ?? 0,
-                    durationSeconds: source.seedPolicy.duration_seconds,
-                  }
-                : source.seedPolicy?.mode === 'none'
-                  ? { mode: 'none' }
-                  : undefined,
-      }
+const toClientSource = (source: RpcDownloadSource): DownloadSource => ({
+  type: 'http',
+  mirrors: source.mirrors.map(mirror => ({
+    url: mirror.url,
+    priority: mirror.priority,
+    headers: mirror.headers
+      ? Object.fromEntries(
+          Object.entries(mirror.headers).map(([key, value]) => [
+            key,
+            value.type === 'secretRef' ? { type: 'secretRef', secretRef: value.secret_ref } : value,
+          ]),
+        )
+      : undefined,
+  })),
+  expectedSize: source.expectedSize ?? undefined,
+  etag: source.etag ?? undefined,
+  lastModified: source.lastModified ?? undefined,
+  expiresAt: source.expiresAt ?? undefined,
+})
 
 const toClientTask = (task: RpcDownloadTask): DownloadTask => ({
   id: task.id,
@@ -225,20 +172,6 @@ const toClientCollection = (collection: RpcDownloadCollection): DownloadCollecti
 const toClientTaskDetail = (detail: RpcDownloadTaskDetail): DownloadTaskDetail => ({
   task: toClientTask(detail.task),
   completedRanges: detail.completedRanges,
-  torrent: detail.torrent
-    ? {
-        infoHash: detail.torrent.infoHash ?? undefined,
-        uploadedBytes: detail.torrent.uploadedBytes,
-        peerCount: detail.torrent.peerCount,
-        seedStartedAt: detail.torrent.seedStartedAt ?? undefined,
-      }
-    : undefined,
-})
-
-const toClientSettings = (settings: RpcDownloaderSettings): DownloaderSettings => ({
-  ...settings,
-  seedRatio: settings.seedRatio ?? undefined,
-  seedSeconds: settings.seedSeconds ?? undefined,
 })
 
 export interface CreateDownloaderOptions {
@@ -344,7 +277,7 @@ export class Downloader {
   }
 
   async getSettings(): Promise<DownloaderSettings> {
-    return toClientSettings(await this.#getRpc().get_settings())
+    return await this.#getRpc().get_settings()
   }
 
   async getCapabilities(): Promise<DownloaderCapabilities> {
@@ -355,13 +288,7 @@ export class Downloader {
     patch: Partial<Omit<DownloaderSettings, 'revision'>>,
   ): Promise<DownloaderSettings> {
     const settings = { ...(await this.getSettings()), ...patch }
-    return toClientSettings(
-      await this.#getRpc().update_settings({
-        ...settings,
-        seedRatio: settings.seedRatio ?? null,
-        seedSeconds: settings.seedSeconds ?? null,
-      }),
-    )
+    return await this.#getRpc().update_settings(settings)
   }
 
   async enqueueUrl(input: EnqueueUrlInput): Promise<DownloadTask> {
@@ -374,22 +301,6 @@ export class Downloader {
         destinationId: input.destinationId ?? null,
         priority: input.priority ?? null,
         checksum: toRpcChecksum(input.checksum),
-      }),
-    )
-  }
-
-  async enqueueTorrent(input: EnqueueTorrentInput): Promise<DownloadTask> {
-    return toClientTask(
-      await this.#getRpc().enqueue_torrent({
-        source: {
-          input: input.source.input,
-          onlyFiles: input.source.onlyFiles,
-          seedPolicy: toRpcSeedPolicy(input.source.seedPolicy),
-        },
-        title: input.title ?? null,
-        relativePath: input.relativePath ?? null,
-        destinationId: input.destinationId ?? null,
-        priority: input.priority ?? null,
       }),
     )
   }

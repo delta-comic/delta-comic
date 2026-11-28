@@ -48,7 +48,6 @@ kysely
 Levelboard
 lhlyu
 libappindicator
-librqbit
 librsvg
 libwebkit
 lightningcss

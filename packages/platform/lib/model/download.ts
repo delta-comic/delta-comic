@@ -30,26 +30,7 @@ export interface UniDownloadHttpSource {
   expiresAt?: number
 }
 
-export type UniDownloadTorrentInput =
-  | { type: 'magnet'; uri: string }
-  | { type: 'url'; url: string }
-  | { type: 'bytes'; base64: string }
-
-export type UniDownloadTorrentSeedPolicy =
-  | { mode: 'none' }
-  | { mode: 'ratio'; ratio: number }
-  | { mode: 'duration'; durationSeconds: number }
-  | { mode: 'ratioOrDuration'; ratio: number; durationSeconds: number }
-
-export interface UniDownloadTorrentSource {
-  type: 'torrent'
-  input: UniDownloadTorrentInput
-  /** Zero-based file indexes in torrent metadata. Omit to download every file. */
-  onlyFiles?: number[]
-  seedPolicy?: UniDownloadTorrentSeedPolicy
-}
-
-export type UniDownloadSource = UniDownloadHttpSource | UniDownloadTorrentSource
+export type UniDownloadSource = UniDownloadHttpSource
 
 /** A JSON-serializable file entry produced by a content plugin. */
 export interface UniDownloadAsset {
