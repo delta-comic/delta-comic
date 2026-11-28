@@ -30,7 +30,7 @@ catalog:
   '@tauri-apps/plugin-sql': ^2.6.0
   '@types/node': 26.6.11
   '@types/semver': ^7.8.0
-  '@vizejs/vite-plugin': ^0.810.0
+  '@vizejs/vite-plugin': ^0.811.0
   '@vueuse/core': ^15.0.0
   '@vitest/coverage-v8': 5.1.1
   browserslist: ^4.29.5
@@ -67,7 +67,7 @@ catalog:
   vite-plugin-vue-devtools: ^9.0.0-rc.4
   vite-plus: 1.8.0
   vue-tsc: ^3.3.14
-  vize: ^0.810.0
+  vize: ^0.811.0
   vue: 3.6.0-rc.17
   vue-i18n: ^12.0.0-alpha.14
   vue-component-type-helpers: ^4.0.0-alpha.3
@@ -79,17 +79,17 @@ catalog:
   vitest: 5.1.2
 
 minimumReleaseAgeExclude:
-  - '@vizejs/native-darwin-arm64@0.810.0'
-  - '@vizejs/native-darwin-x64@0.810.0'
-  - '@vizejs/native-linux-arm64-gnu@0.810.0'
-  - '@vizejs/native-linux-arm64-musl@0.810.0'
-  - '@vizejs/native-linux-x64-gnu@0.810.0'
-  - '@vizejs/native-linux-x64-musl@0.810.0'
-  - '@vizejs/native-win32-arm64-msvc@0.810.0'
-  - '@vizejs/native-win32-x64-msvc@0.810.0'
-  - '@vizejs/native@0.810.0'
-  - '@vizejs/unplugin@0.810.0'
-  - '@vizejs/vite-plugin@0.810.0'
+  - '@vizejs/native-darwin-arm64@0.811.0'
+  - '@vizejs/native-darwin-x64@0.811.0'
+  - '@vizejs/native-linux-arm64-gnu@0.811.0'
+  - '@vizejs/native-linux-arm64-musl@0.811.0'
+  - '@vizejs/native-linux-x64-gnu@0.811.0'
+  - '@vizejs/native-linux-x64-musl@0.811.0'
+  - '@vizejs/native-win32-arm64-msvc@0.811.0'
+  - '@vizejs/native-win32-x64-msvc@0.811.0'
+  - '@vizejs/native@0.811.0'
+  - '@vizejs/unplugin@0.811.0'
+  - '@vizejs/vite-plugin@0.811.0'
   - '@vue/compiler-core@3.6.0-rc.17'
   - '@vue/compiler-dom@3.6.0-rc.17'
   - '@vue/compiler-sfc@3.6.0-rc.17'
@@ -101,7 +101,7 @@ minimumReleaseAgeExclude:
   - '@vue/runtime-vapor@3.6.0-rc.17'
   - '@vue/server-renderer@3.6.0-rc.17'
   - '@vue/shared@3.6.0-rc.17'
-  - vize@0.810.0
+  - vize@0.811.0
   - vue@3.6.0-rc.17
 
 overrides:
