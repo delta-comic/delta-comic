@@ -46,9 +46,8 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "android-native-keyring-store"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48c6349ddff23194f8fdce2ea8849380f5a4868c1648965b70e801e104cba9b3"
+version = "2.0.0"
+source = "git+https://github.com/open-source-cooperative/android-native-keyring-store?rev=5b675c57e161aad1b9705e11b9f11c64bf9653e6#5b675c57e161aad1b9705e11b9f11c64bf9653e6"
 dependencies = [
  "base64 0.22.1",
  "jni 0.21.1",
@@ -5770,11 +5769,11 @@ dependencies = [
  "futures-util",
  "hex",
  "httpdate",
+ "jni 0.21.1",
  "jni 0.22.4",
  "keyring-core",
  "libc",
  "md-5 0.11.0",
- "ndk-context",
  "rand 0.10.4",
  "rangemap",
  "reqwest",
@@ -5963,6 +5962,7 @@ dependencies = [
  "specta",
  "specta-typescript",
  "tauri",
+ "tauri-plugin",
  "taurpc",
  "tokio",
  "tracing",

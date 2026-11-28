@@ -20,7 +20,7 @@ rust-version = "1.100.0"
 version = "3.0.0-next.34"
 
 [workspace.dependencies]
-android-native-keyring-store = "1.0.0"
+android-native-keyring-store = { git = "https://github.com/open-source-cooperative/android-native-keyring-store", rev = "5b675c57e161aad1b9705e11b9f11c64bf9653e6" }
 apple-native-keyring-store = { version = "1.0.3", features = ["keychain"] }
 axum = "0.8.9"
 bytes = "1.12.2"
@@ -34,13 +34,13 @@ hex = "0.4.3"
 http = "1.5.0"
 httpdate = "1.0.3"
 jni = "0.22.4"
+jni-keyring = { package = "jni", version = "0.21.1" }
 keyring-core = "1.1.0"
 libc = "0.2.191"
 log = "0.4.35"
 mach2 = "0.7.0"
 md-5 = "0.11.0"
 mime_guess = "2.0.5"
-ndk-context = "0.1.1"
 objc2-foundation = { version = "0.3.2", features = ["NSString", "NSUserDefaults"] }
 percent-encoding = "2.3.2"
 rand = "0.10.4"
