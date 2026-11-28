@@ -55,7 +55,7 @@ zeroize = { workspace = true }
 [target.'cfg(target_os = "android")'.dependencies]
 android-native-keyring-store = { workspace = true }
 jni = { workspace = true }
-ndk-context = { workspace = true }
+jni-keyring = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 apple-native-keyring-store = { workspace = true }

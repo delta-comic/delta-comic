@@ -42,7 +42,9 @@ impl CredentialVault {
     #[cfg(target_os = "android")]
     {
       let configuration = std::collections::HashMap::from([("name", "delta-comic-downloader")]);
-      android_native_keyring_store::Store::new_with_configuration(&configuration)
+      let context = crate::mobile::credential_context()?;
+      android_native_keyring_store::by_store::store::StoreConfig::from_configuration(&configuration)
+        .and_then(|config| android_native_keyring_store::Store::new_with_context(context, config))
         .map(Self::from_keyring_store)
         .map_err(|_| credential_error("initialize the Android Keystore"))
     }
